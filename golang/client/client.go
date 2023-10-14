@@ -11,6 +11,7 @@ import (
 )
 
 // This is the base URL for the 1inch API.
+// TODO factor this out to config file
 var baseUrl, _ = url.Parse("http://api.1inch.dev")
 
 func NewClient() *Client {

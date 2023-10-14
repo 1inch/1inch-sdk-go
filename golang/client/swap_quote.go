@@ -8,9 +8,7 @@ import (
 	"dev-portal-sdk-go/client/tokenprices"
 )
 
-type PricesResponse map[string]string
-
-func (c Client) GetTokenPrices(params tokenprices.PricesParameters) (string, *http.Response, error) {
+func (c Client) GetQuote(params tokenprices.PricesParameters) (string, *http.Response, error) {
 	// TODO accept context
 	req, err := http.NewRequest(http.MethodGet, fmt.Sprintf("%s/price/v1.1/1", c.BaseURL), nil)
 
@@ -36,21 +34,4 @@ func (c Client) GetTokenPrices(params tokenprices.PricesParameters) (string, *ht
 	}
 
 	return fmt.Sprintf("Pirces: %v", exStr), res, nil
-}
-
-func validateParameters(params tokenprices.PricesParameters) error {
-	if !contains(tokenprices.CurrencyTypeValues, params.Currency) {
-		return fmt.Errorf("currency value %s is not valid", params.Currency)
-	}
-	return nil
-}
-
-// TODO Make a helpers class
-func contains(slice []tokenprices.CurrencyType, item tokenprices.CurrencyType) bool {
-	for _, a := range slice {
-		if a == item {
-			return true
-		}
-	}
-	return false
 }
