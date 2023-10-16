@@ -4,13 +4,13 @@ import (
 	"fmt"
 
 	"dev-portal-sdk-go/client"
-	"dev-portal-sdk-go/client/tokenprices"
+	"dev-portal-sdk-go/client/spotprice"
 )
 
 func main() {
 	c := client.NewClient()
-	priceParameters := tokenprices.PricesParameters{
-		Currency: tokenprices.CurrencyTypeUSD,
+	priceParameters := spotprice.PricesParameters{
+		Currency: spotprice.CurrencyTypeUSD,
 	}
 	message, _, err := c.GetTokenPrices(priceParameters)
 	if err != nil {

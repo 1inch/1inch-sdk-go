@@ -5,12 +5,11 @@ import (
 	"fmt"
 	"net/http"
 
-	"dev-portal-sdk-go/client/tokenprices"
+	"dev-portal-sdk-go/client/spotprice"
 )
 
-func (c Client) GetQuote(params tokenprices.PricesParameters) (string, *http.Response, error) {
-	// TODO accept context
-	req, err := http.NewRequest(http.MethodGet, fmt.Sprintf("%s/price/v1.1/1", c.BaseURL), nil)
+func (c Client) GetQuote(params spotprice.PricesParameters) (string, *http.Response, error) {
+	req, err := http.NewRequest(http.MethodGet, fmt.Sprintf("%s/v5.2/1/swap", c.BaseURL), nil)
 
 	err = validateParameters(params)
 	if err != nil {

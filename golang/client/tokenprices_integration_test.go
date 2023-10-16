@@ -4,7 +4,7 @@ import (
 	"fmt"
 	"testing"
 
-	"dev-portal-sdk-go/client/tokenprices"
+	"dev-portal-sdk-go/client/spotprice"
 	"github.com/stretchr/testify/assert"
 )
 
@@ -12,18 +12,18 @@ func TestGetTokenPricesIntegration(t *testing.T) {
 
 	testcases := []struct {
 		description              string
-		currency                 tokenprices.CurrencyType
+		currency                 spotprice.CurrencyType
 		expectedOutput           string
 		expectedErrorCode        int
 		expectedErrorDescription string
 	}{
 		{
 			description: "Get prices in USD",
-			currency:    tokenprices.CurrencyTypeUSD,
+			currency:    spotprice.CurrencyTypeUSD,
 		},
 		{
 			description: "Get prices in Wei",
-			currency:    tokenprices.CurrencyTypeWEI,
+			currency:    spotprice.CurrencyTypeWEI,
 		},
 		{
 			description: "Get prices in Wei (no field)",
@@ -31,7 +31,7 @@ func TestGetTokenPricesIntegration(t *testing.T) {
 		},
 		{
 			description:              "Fail - provide invalid currency",
-			currency:                 tokenprices.CurrencyType("ok"),
+			currency:                 spotprice.CurrencyType("ok"),
 			expectedErrorCode:        400,
 			expectedErrorDescription: "Currency ok not supported",
 		},
@@ -42,7 +42,7 @@ func TestGetTokenPricesIntegration(t *testing.T) {
 	for _, tc := range testcases {
 		t.Run(fmt.Sprintf("%v", tc.description), func(t *testing.T) {
 
-			priceParameters := tokenprices.PricesParameters{
+			priceParameters := spotprice.PricesParameters{
 				Currency: tc.currency,
 			}
 

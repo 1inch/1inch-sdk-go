@@ -1,4 +1,4 @@
-package tokenprices
+package spotprice
 
 type PricesParameters struct {
 	Currency CurrencyType

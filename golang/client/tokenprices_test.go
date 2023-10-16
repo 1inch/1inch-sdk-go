@@ -5,7 +5,7 @@ import (
 	"net/http"
 	"testing"
 
-	"dev-portal-sdk-go/client/tokenprices"
+	"dev-portal-sdk-go/client/spotprice"
 	"github.com/stretchr/testify/assert"
 )
 
@@ -23,7 +23,7 @@ func TestGetTokenPrices(t *testing.T) {
 	testcases := []struct {
 		description              string
 		handlerFunc              func(w http.ResponseWriter, r *http.Request)
-		params                   tokenprices.PricesParameters
+		params                   spotprice.PricesParameters
 		expectedOutput           string
 		expectedErrorDescription string
 	}{
@@ -33,8 +33,8 @@ func TestGetTokenPrices(t *testing.T) {
 				// TODO Can we make these constants?
 				assert.Equal(t, "USD", r.URL.Query().Get("currency"))
 			},
-			params: tokenprices.PricesParameters{
-				Currency: tokenprices.CurrencyTypeUSD,
+			params: spotprice.PricesParameters{
+				Currency: spotprice.CurrencyTypeUSD,
 			},
 		},
 		{
@@ -42,8 +42,8 @@ func TestGetTokenPrices(t *testing.T) {
 			handlerFunc: func(w http.ResponseWriter, r *http.Request) {
 				assert.Empty(t, r.URL.Query().Get("currency"))
 			},
-			params: tokenprices.PricesParameters{
-				Currency: tokenprices.CurrencyTypeWEI,
+			params: spotprice.PricesParameters{
+				Currency: spotprice.CurrencyTypeWEI,
 			},
 		},
 		{
@@ -54,8 +54,8 @@ func TestGetTokenPrices(t *testing.T) {
 		},
 		{
 			description: "Fail - provide invalid currency",
-			params: tokenprices.PricesParameters{
-				Currency: tokenprices.CurrencyType("ok"),
+			params: spotprice.PricesParameters{
+				Currency: spotprice.CurrencyType("ok"),
 			},
 			expectedErrorDescription: "currency value ok is not valid",
 		},
