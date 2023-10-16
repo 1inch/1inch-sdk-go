@@ -1,13 +1,39 @@
 #!/bin/bash
 
+# Constants for exit codes
+GOLANG_NOT_INSTALLED=1
+CURL_NOT_INSTALLED=2
+UNKNOWN_ARGUMENT=3
+CURL_FAIL=4
+SWAGGER_404=5
+SWAGGER_INVALID_DATA=6
+
 # Check if Go is installed
 if ! which go > /dev/null 2>&1; then
     echo "Golang is not installed!"
-    exit 1
+    exit $GOLANG_NOT_INSTALLED
 fi
 
+# Check if curl is installed
+if ! which curl > /dev/null 2>&1; then
+    echo "curl is not installed!"
+    exit $CURL_NOT_INSTALLED
+fi
+
+display_help() {
+    echo "This script will generate request/response structs for all APIs supported by the SDK"
+    echo
+    echo "Usage: $0 [OPTIONS]"
+    echo ""
+    echo "Options:"
+    echo "  -logs            Enable verbose logging."
+    echo "  -use-local       Use the swagger files in swagger-static."
+    echo "  -help            Display this help message."
+    exit 0
+}
+
 verbose_logging=false
-skip_downloads=false
+use_local=false
 
 # Parse all CLI flags
 for arg in "$@"; do
@@ -15,22 +41,18 @@ for arg in "$@"; do
         -logs)
             verbose_logging=true
             ;;
-        -skip-downloads)
-            skip_downloads=true
+        -use-local)
+            use_local=true
             ;;
         -help)
-            echo "Usage: $0 [OPTIONS]"
-            echo ""
-            echo "Options:"
-            echo "  -logs            Enable verbose logging."
-            echo "  -skip-downloads  Skip the download processes."
-            echo "  -help            Display this help message."
-            exit 0
+            display_help
             ;;
         *)
             echo "Error: Unknown argument '$arg'."
             echo "Use '-help' for a list of available options."
-            exit 1
+            echo
+            display_help
+            exit $UNKNOWN_ARGUMENT
             ;;
     esac
 done
@@ -43,42 +65,48 @@ fetch_and_generate() {
     local package_name="$2"
     local types_destination_directory="$3"
 
-    local api_swagger_file_name="swagger/$package_name-swagger.json"
+    local types_file_name="${package_name}_types.gen.go"
 
-  if [ "$verbose_logging" == "true" ]; then
-    echo "Generating type data for the $types_destination_directory directory"
-    echo "Downloading the swagger file from $api_swagger_url"
-    echo "The generated GoLang file will have a package name of '$package_name' and the file will be at '$api_swagger_file_name'"
-    echo
-  fi
+    if [ "$verbose_logging" == "true" ]; then
+        echo "Generating type data for the $types_destination_directory directory"
+        echo "Downloading the swagger file from $api_swagger_url"
+        echo "The generated GoLang file will be at '$types_destination_directory/$types_file_name'"
+        echo
+    fi
 
-  if [ "$skip_downloads" == "false" ]; then
-      curl -s "$api_swagger_url" > "$api_swagger_file_name"
+    local api_swagger_file_name="swagger-static/$package_name-swagger.json"
 
-      # Check if curl was successful
-      response_code=$?
-      if [ $response_code -ne 0 ]; then
-          echo "The curl command to get the latest swagger file from our servers (url: $api_swagger_url) failed with an error code of $response_code."
-          exit 1
-      fi
+    if [ "$use_local" == "false" ]; then
 
-      # Check if the content contains "404"
-      if grep -q '^{\"statusCode\":404' "$api_swagger_file_name"; then
-          echo "The first contents of $api_swagger_file_name were a 404. The provided URL is likely wrong."
-          echo "Manually check the contents of $api_swagger_file_name for more information."
-          exit 2
-      fi
+        api_swagger_file_name="swagger-dynamic/$package_name-swagger.json"
+        curl -s "$api_swagger_url" > "$api_swagger_file_name"
 
-      # Check if the content contains data that looks like an openapi spec
-      if ! grep -q '^{\"openapi\"' "$api_swagger_file_name"; then
-          echo "The first contents of $api_swagger_file_name does not look like openapi data. The request has likely failed."
-          echo "Manually check the contents of $api_swagger_file_name for more information."
-          exit 3
-      fi
-  fi
+        # Check if curl was successful
+        response_code=$?
+        if [ $response_code -ne 0 ]; then
+            echo "The curl command to get the latest swagger file from our servers (url: $api_swagger_url) failed with an error code of $response_code."
+            exit $CURL_FAIL
+        fi
 
-    oapi-codegen -generate types -package "$package_name" "$api_swagger_file_name" > "$types_destination_directory/${package_name}_types.gen.go"
+        # Check if the content contains "404"
+        if grep -q '^{\"statusCode\":404' "$api_swagger_file_name"; then
+            echo "The first contents of $api_swagger_file_name were a 404. The provided URL is likely wrong."
+            echo "Manually check the contents of $api_swagger_file_name for more information."
+            exit $SWAGGER_404
+        fi
+
+        # Check if the content contains data that looks like an openapi spec
+        if ! grep -q '^{\"openapi\"' "$api_swagger_file_name"; then
+            echo "The first contents of $api_swagger_file_name does not look like openapi data. The request has likely failed."
+            echo "Manually check the contents of $api_swagger_file_name for more information."
+            exit $SWAGGER_INVALID_DATA
+        fi
+    fi
+
+    oapi-codegen -generate types -package "$package_name" "$api_swagger_file_name" > "$types_destination_directory/${types_file_name}"
 }
+
+
 
 # Swap API
 # TODO This URL is not versioned. We will want versioned APIs in the future.

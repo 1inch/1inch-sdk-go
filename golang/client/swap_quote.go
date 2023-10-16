@@ -5,32 +5,28 @@ import (
 	"fmt"
 	"net/http"
 
-	"dev-portal-sdk-go/client/spotprice"
+	"dev-portal-sdk-go/client/swap"
 )
 
-func (c Client) GetQuote(params spotprice.PricesParameters) (string, *http.Response, error) {
-	req, err := http.NewRequest(http.MethodGet, fmt.Sprintf("%s/v5.2/1/swap", c.BaseURL), nil)
+func (c Client) GetQuote(params swap.AggregationControllerGetQuoteParams) (string, *http.Response, error) {
+	req, err := http.NewRequest(http.MethodGet, fmt.Sprintf("%s/swap/v5.2/1/quote", c.BaseURL), nil)
 
-	err = validateParameters(params)
+	err = params.Validate()
 	if err != nil {
 		return "", nil, err
 	}
 
-	switch params.Currency {
-	case "":
-	case "WEI":
-	default:
-		req.URL.RawQuery += fmt.Sprintf("currency=%s", params.Currency)
-	}
+	query := req.URL.Query()
+	query.Add("src", params.Src)
+	query.Add("dst", params.Dst)
+	query.Add("amount", params.Amount)
+	req.URL.RawQuery = query.Encode()
+
+	var quote swap.QuoteResponse
+	res, err := c.Do(context.Background(), req, &quote)
 	if err != nil {
 		return "", nil, err
 	}
 
-	var exStr PricesResponse
-	res, err := c.Do(context.Background(), req, &exStr)
-	if err != nil {
-		return "", nil, err
-	}
-
-	return fmt.Sprintf("Pirces: %v", exStr), res, nil
+	return fmt.Sprintf("Quote: %v", quote), res, nil
 }
