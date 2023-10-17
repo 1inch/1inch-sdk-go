@@ -8,7 +8,10 @@ import (
 )
 
 func main() {
-	c := client.NewClient()
+
+	config := &client.Config{TargetEnvironment: client.EnvironmentStaging}
+
+	c := client.NewClient(config)
 	priceParameters := spotprice.PricesParameters{
 		Currency: spotprice.CurrencyTypeUSD,
 	}

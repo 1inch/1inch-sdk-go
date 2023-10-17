@@ -11,14 +11,43 @@ import (
 )
 
 // This is the base URL for the 1inch API.
-// TODO factor this out to config file
-var baseUrl, _ = url.Parse("http://api.1inch.dev")
+var baseUrlProduction, _ = url.Parse("http://api.1inch.dev")
+var baseUrlStaging, _ = url.Parse("http://api.1inch.dev")
 
-func NewClient() *Client {
+type Environment string
+
+const (
+	EnvironmentProduction Environment = "Production"
+	EnvironmentStaging    Environment = "Staging"
+)
+
+type Config struct {
+	TargetEnvironment Environment
+}
+
+var defaultConfig = &Config{
+	TargetEnvironment: EnvironmentProduction,
+}
+
+func NewClient(config *Config) *Client {
+
+	if config == nil || *config == (Config{}) {
+		config = defaultConfig
+	}
+
+	var baseUrl *url.URL
+	switch config.TargetEnvironment {
+	case EnvironmentProduction:
+		baseUrl = baseUrlProduction
+	case EnvironmentStaging:
+		baseUrl = baseUrlStaging
+	}
+
 	client := &Client{
 		httpClient: &http.Client{},
 		BaseURL:    baseUrl,
 	}
+
 	return client
 }
 
@@ -91,7 +120,7 @@ func (c Client) Do(ctx context.Context, req *http.Request, v interface{}) (*http
 			decErr = nil // ignore EOF errors caused by empty response body
 		}
 		if decErr != nil {
-			err = decErr
+			err = fmt.Errorf("request did not fail, but the response could not be decoded (this could be due to cloudflare blocking the request): %v", decErr)
 		}
 	}
 	return resp, err
