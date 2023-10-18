@@ -5,20 +5,41 @@ import (
 
 	"dev-portal-sdk-go/client"
 	"dev-portal-sdk-go/client/swap"
+	"dev-portal-sdk-go/helpers"
+	"dev-portal-sdk-go/helpers/consts/addresses"
+	"dev-portal-sdk-go/helpers/consts/amounts"
+	"dev-portal-sdk-go/helpers/consts/tokens"
 )
 
 func main() {
 	c := client.NewClient(nil)
-	swapParams := swap.AggregationControllerGetQuoteParams{
-		Src:    "0xA0b86991c6218b36c1d19D4a2e9Eb0cE3606eB48",
-		Dst:    "0xC02aaA39b223FE8D0A0e5C4F27eAD9083C756Cc2",
-		Amount: "1000000",
+	quoteParams := swap.AggregationControllerGetQuoteParams{
+		Src:    tokens.EthereumUsdc,
+		Dst:    tokens.EthereumWeth,
+		Amount: amounts.Ten6,
 	}
-	message, _, err := c.GetQuote(swapParams)
+	quoteResponse, _, err := c.GetQuote(quoteParams)
 	if err != nil {
-		fmt.Printf("Failure: %v\n", err)
+		fmt.Println(err)
 		return
 	}
 
-	fmt.Printf("Success: %v\n", message)
+	fmt.Printf("Quote: %v\n", quoteResponse.ToAmount)
+
+	helpers.Sleep()
+
+	swapParams := swap.AggregationControllerGetSwapParams{
+		Src:             tokens.EthereumWeth,
+		Dst:             tokens.EthereumUsdc,
+		From:            addresses.Vitalik,
+		Amount:          amounts.Ten18,
+		DisableEstimate: helpers.BoolPtr(true),
+	}
+	swapResponse, _, err := c.GetSwap(swapParams)
+	if err != nil {
+		fmt.Println(err)
+		return
+	}
+
+	client.PrettyPrintSwapResponse(swapResponse)
 }

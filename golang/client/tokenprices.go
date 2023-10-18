@@ -10,13 +10,13 @@ import (
 
 type PricesResponse map[string]string
 
-func (c Client) GetTokenPrices(params spotprice.PricesParameters) (string, *http.Response, error) {
+func (c Client) GetTokenPrices(params spotprice.PricesParameters) (*PricesResponse, *http.Response, error) {
 	// TODO accept context
 	req, err := http.NewRequest(http.MethodGet, fmt.Sprintf("%s/price/v1.1/1", c.BaseURL), nil)
 
 	err = validateParameters(params)
 	if err != nil {
-		return "", nil, err
+		return nil, nil, err
 	}
 
 	switch params.Currency {
@@ -26,16 +26,16 @@ func (c Client) GetTokenPrices(params spotprice.PricesParameters) (string, *http
 		req.URL.RawQuery += fmt.Sprintf("currency=%s", params.Currency)
 	}
 	if err != nil {
-		return "", nil, err
+		return nil, nil, err
 	}
 
 	var exStr PricesResponse
 	res, err := c.Do(context.Background(), req, &exStr)
 	if err != nil {
-		return "", nil, err
+		return nil, nil, err
 	}
 
-	return fmt.Sprintf("Pirces: %v", exStr), res, nil
+	return &exStr, res, nil
 }
 
 func validateParameters(params spotprice.PricesParameters) error {

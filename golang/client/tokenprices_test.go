@@ -75,6 +75,9 @@ func TestGetTokenPrices(t *testing.T) {
 
 			_, _, err := client.GetTokenPrices(tc.params)
 			if tc.expectedErrorDescription != "" {
+				if err == nil {
+					assert.FailNow(t, "Expected error message, but error was nil")
+				}
 				assert.Equal(t, tc.expectedErrorDescription, err.Error())
 				return
 			}

@@ -37,7 +37,7 @@ func TestGetTokenPricesIntegration(t *testing.T) {
 		},
 	}
 
-	c := NewClient()
+	c := NewClient(nil)
 
 	for _, tc := range testcases {
 		t.Run(fmt.Sprintf("%v", tc.description), func(t *testing.T) {
