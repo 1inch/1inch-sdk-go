@@ -2,8 +2,10 @@ Dev Portal GoLang SDK
 
 ## Running locally
 
-// TODO Decide on a pattern for pulling/committing to a type definition
+Before using the SDK, you must set your Dev Portal API key as an environment variable:
 
-Currently, the type definitions are not saved to the repo. These definitions will be set once a release is made which will lock the version of the SDK with the current versions of the various 1inch APIs. 
+```bash
+export DEV_PORTAL_TOKEN=<api_token>
+```
 
-Before running this locally, you must first generate the most up-to-date types files using the `generate_types.sh` script.
+**note**: if you are running the SDK from an IDE like Intellij, you may need to set the environment variable in the local run config insteead

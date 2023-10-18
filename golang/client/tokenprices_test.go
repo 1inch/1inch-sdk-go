@@ -23,27 +23,17 @@ func TestGetTokenPrices(t *testing.T) {
 	testcases := []struct {
 		description              string
 		handlerFunc              func(w http.ResponseWriter, r *http.Request)
-		params                   spotprice.PricesParameters
+		params                   spotprice.ChainControllerByAddressesParams
 		expectedOutput           string
 		expectedErrorDescription string
 	}{
 		{
 			description: "Get prices in USD",
 			handlerFunc: func(w http.ResponseWriter, r *http.Request) {
-				// TODO Can we make these constants?
-				assert.Equal(t, "USD", r.URL.Query().Get("currency"))
+				assert.Equal(t, string(spotprice.USD), r.URL.Query().Get("currency"))
 			},
-			params: spotprice.PricesParameters{
-				Currency: spotprice.CurrencyTypeUSD,
-			},
-		},
-		{
-			description: "Get prices in Wei",
-			handlerFunc: func(w http.ResponseWriter, r *http.Request) {
-				assert.Empty(t, r.URL.Query().Get("currency"))
-			},
-			params: spotprice.PricesParameters{
-				Currency: spotprice.CurrencyTypeWEI,
+			params: spotprice.ChainControllerByAddressesParams{
+				Currency: spotprice.GetCurrencyType(spotprice.USD),
 			},
 		},
 		{
@@ -54,8 +44,8 @@ func TestGetTokenPrices(t *testing.T) {
 		},
 		{
 			description: "Fail - provide invalid currency",
-			params: spotprice.PricesParameters{
-				Currency: spotprice.CurrencyType("ok"),
+			params: spotprice.ChainControllerByAddressesParams{
+				Currency: spotprice.GetCurrencyType("ok"),
 			},
 			expectedErrorDescription: "currency value ok is not valid",
 		},

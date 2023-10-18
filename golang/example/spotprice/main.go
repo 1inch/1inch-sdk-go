@@ -12,8 +12,8 @@ func main() {
 	config := &client.Config{TargetEnvironment: client.EnvironmentStaging}
 
 	c := client.NewClient(config)
-	priceParameters := spotprice.PricesParameters{
-		Currency: spotprice.CurrencyTypeUSD,
+	priceParameters := spotprice.ChainControllerByAddressesParams{
+		Currency: spotprice.GetCurrencyType(spotprice.USD),
 	}
 	message, _, err := c.GetTokenPrices(priceParameters)
 	if err != nil {

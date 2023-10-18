@@ -5,6 +5,7 @@ import (
 	"testing"
 
 	"dev-portal-sdk-go/client/spotprice"
+	"dev-portal-sdk-go/helpers"
 	"github.com/stretchr/testify/assert"
 )
 
@@ -12,28 +13,18 @@ func TestGetTokenPricesIntegration(t *testing.T) {
 
 	testcases := []struct {
 		description              string
-		currency                 spotprice.CurrencyType
+		currency                 spotprice.ChainControllerByAddressesParamsCurrency
 		expectedOutput           string
 		expectedErrorCode        int
 		expectedErrorDescription string
 	}{
 		{
 			description: "Get prices in USD",
-			currency:    spotprice.CurrencyTypeUSD,
-		},
-		{
-			description: "Get prices in Wei",
-			currency:    spotprice.CurrencyTypeWEI,
+			currency:    spotprice.USD,
 		},
 		{
 			description: "Get prices in Wei (no field)",
 			currency:    "",
-		},
-		{
-			description:              "Fail - provide invalid currency",
-			currency:                 spotprice.CurrencyType("ok"),
-			expectedErrorCode:        400,
-			expectedErrorDescription: "Currency ok not supported",
 		},
 	}
 
@@ -42,18 +33,24 @@ func TestGetTokenPricesIntegration(t *testing.T) {
 	for _, tc := range testcases {
 		t.Run(fmt.Sprintf("%v", tc.description), func(t *testing.T) {
 
-			priceParameters := spotprice.PricesParameters{
-				Currency: tc.currency,
+			priceParameters := spotprice.ChainControllerByAddressesParams{
+				Currency: &tc.currency,
 			}
 
-			message, _, err := c.GetTokenPrices(priceParameters)
+			message, resp, err := c.GetTokenPrices(priceParameters)
 			if tc.expectedErrorCode != 0 {
-				assert.Equal(t, tc.expectedErrorCode, err)
+				if resp == nil {
+					assert.FailNow(t, "Response should not be nil")
+				}
+				assert.Equal(t, tc.expectedErrorCode, resp.StatusCode)
+				assert.Equal(t, tc.expectedErrorDescription, err.Error())
 				return
 			}
 
 			assert.NoError(t, err)
 			assert.NotEqual(t, "", message)
+
+			helpers.Sleep()
 		})
 	}
 }
