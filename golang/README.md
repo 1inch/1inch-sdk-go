@@ -1,11 +1,18 @@
-Dev Portal GoLang SDK
+# Dev Portal Go SDK
 
 ## Running locally
 
-Before using the SDK, you must set your Dev Portal API key as an environment variable:
+To authenticate your client with the 1inch API, your API token will be needed by the initial config used to create the SDK client. It is recommended to store this information in your local environment and read it dynamically at runtime:
 
-```bash
-export DEV_PORTAL_TOKEN=<api_token>
+```go
+...
+config := client.Config{
+    ApiKey: os.Getenv("DEV_PORTAL_TOKEN"),
+}
+
+c, err := client.NewClient(config)
+if err != nil {
+    log.Fatalf("Failed to create client: %v", err)
+}
+...
 ```
-
-**note**: if you are running the SDK from an IDE like Intellij, you may need to set the environment variable in the IDE's dedicated run config instead

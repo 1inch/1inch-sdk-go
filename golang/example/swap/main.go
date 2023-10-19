@@ -15,7 +15,9 @@ import (
 
 func main() {
 
-	config := client.Config{ApiKey: os.Getenv("DEV_PORTAL_TOKEN")}
+	config := client.Config{
+		ApiKey: os.Getenv("DEV_PORTAL_TOKEN"),
+	}
 	c, err := client.NewClient(config)
 	if err != nil {
 		log.Fatalf("Failed to create client: %v", err)

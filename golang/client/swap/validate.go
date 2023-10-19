@@ -36,3 +36,20 @@ func (params *AggregationControllerGetSwapParams) Validate() error {
 	}
 	return nil
 }
+
+func (params *ApproveControllerGetCallDataParams) Validate() error {
+	if params.TokenAddress == "" {
+		return fmt.Errorf("tokenAddress is required")
+	}
+	return nil
+}
+
+func (params *ApproveControllerGetAllowanceParams) Validate() error {
+	if params.TokenAddress == "" {
+		return fmt.Errorf("tokenAddress is required")
+	}
+	if params.WalletAddress == "" {
+		return fmt.Errorf("walletAddress is required")
+	}
+	return nil
+}
