@@ -2,28 +2,59 @@ package client
 
 import (
 	"fmt"
-	"net/http"
-	"net/http/httptest"
-	"net/url"
+	"testing"
+
+	"github.com/stretchr/testify/assert"
 )
 
-// setup sets up a test HTTP server along with a Client that is
-// configured to talk to that test server. Tests should register handlers on
-// mux which provide mock responses for the API method being tested.
-func setup() (*Client, *http.ServeMux, string, func()) {
-	apiHandler := http.NewServeMux()
+func TestNewConfig(t *testing.T) {
+	testcases := []struct {
+		description              string
+		config                   Config
+		expectedEnvironment      string
+		expectedErrorDescription string
+	}{
+		{
+			description: "Production",
+			config: Config{
+				TargetEnvironment: EnvironmentProduction,
+				ApiKey:            "",
+			},
+			expectedEnvironment:      baseUrlProduction.Host,
+			expectedErrorDescription: "",
+		},
+		{
+			description: "Production (excluded entry)",
+			config: Config{
+				ApiKey: "",
+			},
+			expectedEnvironment:      baseUrlProduction.Host,
+			expectedErrorDescription: "",
+		},
+		{
+			description: "Staging",
+			config: Config{
+				TargetEnvironment: EnvironmentStaging,
+				ApiKey:            "",
+			},
+			expectedEnvironment:      baseUrlStaging.Host,
+			expectedErrorDescription: "",
+		},
+	}
 
-	// This defaults all requests to return a 404
-	apiHandler.HandleFunc("/", func(w http.ResponseWriter, r *http.Request) {
-		w.WriteHeader(http.StatusNotFound)
-		fmt.Fprintf(w, "Not Found")
-	})
+	for _, tc := range testcases {
+		t.Run(fmt.Sprintf("%v", tc.description), func(t *testing.T) {
 
-	// server is a test HTTP server used to provide mock API responses.
-	// the base URL of the client will have its destination swapped to use this new test server for requests
-	server := httptest.NewServer(apiHandler)
-	client := NewClient(nil)
-	url, _ := url.Parse(server.URL + "/")
-	client.BaseURL = url
-	return client, apiHandler, server.URL, server.Close
+			client, err := NewClient(tc.config)
+			if tc.expectedErrorDescription != "" {
+				if err == nil {
+					assert.FailNow(t, "Expected error message, but error was nil")
+				}
+				assert.Equal(t, tc.expectedErrorDescription, err.Error())
+				return
+			}
+			assert.NoError(t, err)
+			assert.Equal(t, tc.expectedEnvironment, client.BaseURL.Host)
+		})
+	}
 }

@@ -2,6 +2,8 @@ package main
 
 import (
 	"fmt"
+	"log"
+	"os"
 
 	"dev-portal-sdk-go/client"
 	"dev-portal-sdk-go/client/swap"
@@ -12,7 +14,12 @@ import (
 )
 
 func main() {
-	c := client.NewClient(nil)
+
+	config := client.Config{ApiKey: os.Getenv("DEV_PORTAL_TOKEN")}
+	c, err := client.NewClient(config)
+	if err != nil {
+		log.Fatalf("Failed to create client: %v", err)
+	}
 	quoteParams := swap.AggregationControllerGetQuoteParams{
 		Src:    tokens.EthereumUsdc,
 		Dst:    tokens.EthereumWeth,
@@ -20,8 +27,7 @@ func main() {
 	}
 	quoteResponse, _, err := c.GetQuote(quoteParams)
 	if err != nil {
-		fmt.Println(err)
-		return
+		log.Fatalf("Failed to get quote: %v", err)
 	}
 
 	fmt.Printf("Quote: %v\n", quoteResponse.ToAmount)
@@ -37,8 +43,7 @@ func main() {
 	}
 	swapResponse, _, err := c.GetSwap(swapParams)
 	if err != nil {
-		fmt.Println(err)
-		return
+		log.Fatalf("Failed to get swap: %v", err)
 	}
 
 	client.PrettyPrintSwapResponse(swapResponse)

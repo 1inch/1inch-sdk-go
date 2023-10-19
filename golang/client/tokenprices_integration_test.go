@@ -2,6 +2,7 @@ package client
 
 import (
 	"fmt"
+	"os"
 	"testing"
 
 	"dev-portal-sdk-go/client/spotprice"
@@ -28,7 +29,11 @@ func TestGetTokenPricesIntegration(t *testing.T) {
 		},
 	}
 
-	c := NewClient(nil)
+	c, err := NewClient(Config{
+		TargetEnvironment: EnvironmentProduction,
+		ApiKey:            os.Getenv("DEV_PORTAL_TOKEN"),
+	})
+	assert.NoError(t, err)
 
 	for _, tc := range testcases {
 		t.Run(fmt.Sprintf("%v", tc.description), func(t *testing.T) {

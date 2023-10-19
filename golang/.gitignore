@@ -1,3 +1,2 @@
 .idea
-*.gen.go
 swagger-dynamic/*.json

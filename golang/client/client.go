@@ -7,12 +7,11 @@ import (
 	"io"
 	"net/http"
 	"net/url"
-	"os"
 )
 
 // This is the base URL for the 1inch API.
 var baseUrlProduction, _ = url.Parse("http://api.1inch.dev")
-var baseUrlStaging, _ = url.Parse("http://api.1inch.dev")
+var baseUrlStaging, _ = url.Parse("http://fake-staging.1inch.dev")
 
 type Environment string
 
@@ -23,20 +22,15 @@ const (
 
 type Config struct {
 	TargetEnvironment Environment
+	ApiKey            string
 }
 
-var defaultConfig = &Config{
-	TargetEnvironment: EnvironmentProduction,
-}
-
-func NewClient(config *Config) *Client {
-
-	if config == nil || *config == (Config{}) {
-		config = defaultConfig
-	}
+func NewClient(config Config) (*Client, error) {
 
 	var baseUrl *url.URL
 	switch config.TargetEnvironment {
+	case "":
+		fallthrough
 	case EnvironmentProduction:
 		baseUrl = baseUrlProduction
 	case EnvironmentStaging:
@@ -46,15 +40,17 @@ func NewClient(config *Config) *Client {
 	client := &Client{
 		httpClient: &http.Client{},
 		BaseURL:    baseUrl,
+		ApiKey:     config.ApiKey,
 	}
 
-	return client
+	return client, nil
 }
 
 type Client struct {
 	httpClient *http.Client
 
 	BaseURL *url.URL
+	ApiKey  string
 }
 
 type ErrorResponse struct {
@@ -75,9 +71,8 @@ func (r *ErrorResponse) Error() string {
 }
 
 func (c Client) Do(ctx context.Context, req *http.Request, v interface{}) (*http.Response, error) {
-	token := os.Getenv("DEV_PORTAL_TOKEN")
 	req.Header.Set("Content-Type", "application/json")
-	req.Header.Set("Authorization", fmt.Sprintf("Bearer %s", token))
+	req.Header.Set("Authorization", fmt.Sprintf("Bearer %s", c.ApiKey))
 
 	req.WithContext(ctx)
 	resp, err := c.httpClient.Do(req)
