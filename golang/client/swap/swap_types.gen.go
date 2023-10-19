@@ -188,96 +188,96 @@ type TransactionData struct {
 // ApproveControllerGetAllowanceParams defines parameters for ApproveControllerGetAllowance.
 type ApproveControllerGetAllowanceParams struct {
 	// TokenAddress Token address you want to swap
-	TokenAddress string `form:"tokenAddress" json:"tokenAddress"`
+	TokenAddress string `url:"tokenAddress" json:"tokenAddress"`
 
 	// WalletAddress Wallet address for which you want to check
-	WalletAddress string `form:"walletAddress" json:"walletAddress"`
+	WalletAddress string `url:"walletAddress" json:"walletAddress"`
 }
 
 // ApproveControllerGetCallDataParams defines parameters for ApproveControllerGetCallData.
 type ApproveControllerGetCallDataParams struct {
 	// TokenAddress Token address you want to swap
-	TokenAddress string `form:"tokenAddress" json:"tokenAddress"`
+	TokenAddress string `url:"tokenAddress" json:"tokenAddress"`
 
 	// Amount The number of tokens that the 1inch Router is allowed to swap.If not specified, it will be allowed to spend an infinite amount of tokens.
-	Amount *string `form:"amount,omitempty" json:"amount,omitempty"`
+	Amount *string `url:"amount,omitempty" json:"amount,omitempty"`
 }
 
 // AggregationControllerGetQuoteParams defines parameters for AggregationControllerGetQuote.
 type AggregationControllerGetQuoteParams struct {
-	Src    string `form:"src" json:"src"`
-	Dst    string `form:"dst" json:"dst"`
-	Amount string `form:"amount" json:"amount"`
+	Src    string `url:"src" json:"src"`
+	Dst    string `url:"dst" json:"dst"`
+	Amount string `url:"amount" json:"amount"`
 
 	// Protocols All supported liquidity sources by default
-	Protocols *string `form:"protocols,omitempty" json:"protocols,omitempty"`
+	Protocols *string `url:"protocols,omitempty" json:"protocols,omitempty"`
 
 	// Fee Partner fee. min: 0; max: 3 Should be the same for /quote and /swap
-	Fee *float32 `form:"fee,omitempty" json:"fee,omitempty"`
+	Fee *float32 `url:"fee,omitempty" json:"fee,omitempty"`
 
 	// GasPrice Network price per gas in wei. By default fast network gas price
-	GasPrice        *string  `form:"gasPrice,omitempty" json:"gasPrice,omitempty"`
-	ComplexityLevel *float32 `form:"complexityLevel,omitempty" json:"complexityLevel,omitempty"`
-	Parts           *float32 `form:"parts,omitempty" json:"parts,omitempty"`
-	MainRouteParts  *float32 `form:"mainRouteParts,omitempty" json:"mainRouteParts,omitempty"`
-	GasLimit        *float32 `form:"gasLimit,omitempty" json:"gasLimit,omitempty"`
+	GasPrice        *string  `url:"gasPrice,omitempty" json:"gasPrice,omitempty"`
+	ComplexityLevel *float32 `url:"complexityLevel,omitempty" json:"complexityLevel,omitempty"`
+	Parts           *float32 `url:"parts,omitempty" json:"parts,omitempty"`
+	MainRouteParts  *float32 `url:"mainRouteParts,omitempty" json:"mainRouteParts,omitempty"`
+	GasLimit        *float32 `url:"gasLimit,omitempty" json:"gasLimit,omitempty"`
 
 	// IncludeTokensInfo Return fromToken and toToken info in response
-	IncludeTokensInfo *bool `form:"includeTokensInfo,omitempty" json:"includeTokensInfo,omitempty"`
+	IncludeTokensInfo *bool `url:"includeTokensInfo,omitempty" json:"includeTokensInfo,omitempty"`
 
 	// IncludeProtocols Return used swap protocols in response
-	IncludeProtocols *bool `form:"includeProtocols,omitempty" json:"includeProtocols,omitempty"`
+	IncludeProtocols *bool `url:"includeProtocols,omitempty" json:"includeProtocols,omitempty"`
 
 	// IncludeGas Return approximated gas in response
-	IncludeGas      *bool   `form:"includeGas,omitempty" json:"includeGas,omitempty"`
-	ConnectorTokens *string `form:"connectorTokens,omitempty" json:"connectorTokens,omitempty"`
+	IncludeGas      *bool   `url:"includeGas,omitempty" json:"includeGas,omitempty"`
+	ConnectorTokens *string `url:"connectorTokens,omitempty" json:"connectorTokens,omitempty"`
 }
 
 // AggregationControllerGetSwapParams defines parameters for AggregationControllerGetSwap.
 type AggregationControllerGetSwapParams struct {
-	Src    string `form:"src" json:"src"`
-	Dst    string `form:"dst" json:"dst"`
-	Amount string `form:"amount" json:"amount"`
+	Src    string `url:"src" json:"src"`
+	Dst    string `url:"dst" json:"dst"`
+	Amount string `url:"amount" json:"amount"`
 
 	// From The address that calls the 1inch contract
-	From string `form:"from" json:"from"`
+	From string `url:"from" json:"from"`
 
 	// Slippage min: 0; max: 50
-	Slippage float32 `form:"slippage" json:"slippage"`
+	Slippage float32 `url:"slippage" json:"slippage"`
 
 	// Protocols All supported liquidity sources by default
-	Protocols *string `form:"protocols,omitempty" json:"protocols,omitempty"`
+	Protocols *string `url:"protocols,omitempty" json:"protocols,omitempty"`
 
 	// Fee Partner fee. min: 0; max: 3 Should be the same for /quote and /swap
-	Fee *float32 `form:"fee,omitempty" json:"fee,omitempty"`
+	Fee *float32 `url:"fee,omitempty" json:"fee,omitempty"`
 
 	// GasPrice Network price per gas in wei. By default fast network gas price
-	GasPrice        *string  `form:"gasPrice,omitempty" json:"gasPrice,omitempty"`
-	ComplexityLevel *float32 `form:"complexityLevel,omitempty" json:"complexityLevel,omitempty"`
-	Parts           *float32 `form:"parts,omitempty" json:"parts,omitempty"`
-	MainRouteParts  *float32 `form:"mainRouteParts,omitempty" json:"mainRouteParts,omitempty"`
-	GasLimit        *float32 `form:"gasLimit,omitempty" json:"gasLimit,omitempty"`
+	GasPrice        *string  `url:"gasPrice,omitempty" json:"gasPrice,omitempty"`
+	ComplexityLevel *float32 `url:"complexityLevel,omitempty" json:"complexityLevel,omitempty"`
+	Parts           *float32 `url:"parts,omitempty" json:"parts,omitempty"`
+	MainRouteParts  *float32 `url:"mainRouteParts,omitempty" json:"mainRouteParts,omitempty"`
+	GasLimit        *float32 `url:"gasLimit,omitempty" json:"gasLimit,omitempty"`
 
 	// IncludeTokensInfo Return fromToken and toToken info in response
-	IncludeTokensInfo *bool `form:"includeTokensInfo,omitempty" json:"includeTokensInfo,omitempty"`
+	IncludeTokensInfo *bool `url:"includeTokensInfo,omitempty" json:"includeTokensInfo,omitempty"`
 
 	// IncludeProtocols Return used swap protocols in response
-	IncludeProtocols *bool `form:"includeProtocols,omitempty" json:"includeProtocols,omitempty"`
+	IncludeProtocols *bool `url:"includeProtocols,omitempty" json:"includeProtocols,omitempty"`
 
 	// IncludeGas Return approximated gas in response
-	IncludeGas      *bool   `form:"includeGas,omitempty" json:"includeGas,omitempty"`
-	ConnectorTokens *string `form:"connectorTokens,omitempty" json:"connectorTokens,omitempty"`
+	IncludeGas      *bool   `url:"includeGas,omitempty" json:"includeGas,omitempty"`
+	ConnectorTokens *string `url:"connectorTokens,omitempty" json:"connectorTokens,omitempty"`
 
 	// Permit https://eips.ethereum.org/EIPS/eip-2612
-	Permit *string `form:"permit,omitempty" json:"permit,omitempty"`
+	Permit *string `url:"permit,omitempty" json:"permit,omitempty"`
 
 	// Receiver This address will receive funds after the swap. By default same address as "from" param
-	Receiver *string `form:"receiver,omitempty" json:"receiver,omitempty"`
-	Referrer *string `form:"referrer,omitempty" json:"referrer,omitempty"`
+	Receiver *string `url:"receiver,omitempty" json:"receiver,omitempty"`
+	Referrer *string `url:"referrer,omitempty" json:"referrer,omitempty"`
 
 	// AllowPartialFill By default set to false
-	AllowPartialFill *bool `form:"allowPartialFill,omitempty" json:"allowPartialFill,omitempty"`
+	AllowPartialFill *bool `url:"allowPartialFill,omitempty" json:"allowPartialFill,omitempty"`
 
 	// DisableEstimate Enable this flag to disable onchain simulation
-	DisableEstimate *bool `form:"disableEstimate,omitempty" json:"disableEstimate,omitempty"`
+	DisableEstimate *bool `url:"disableEstimate,omitempty" json:"disableEstimate,omitempty"`
 }

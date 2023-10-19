@@ -103,7 +103,14 @@ fetch_and_generate() {
         fi
     fi
 
-    oapi-codegen -generate types -package "$package_name" "$api_swagger_file_name" > "$types_destination_directory/${types_file_name}"
+    local output_file=$types_destination_directory/${types_file_name}
+    oapi-codegen -generate types -package "$package_name" "$api_swagger_file_name" > "$output_file"
+
+    # In the generated file, replace all 'form:' tags with 'url:' tags so the fields are properly parsed as URL query parameters
+    sed -i.bak -E 's/`form:"([^"]+)"([^`]*)(`)/`url:"\1"\2\3/g' "$output_file"
+
+    # Remove the backup file created by sed
+    rm "$output_file.bak"
 }
 
 

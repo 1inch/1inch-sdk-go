@@ -24,8 +24,7 @@ func TestGetTokenPricesIntegration(t *testing.T) {
 			currency:    spotprice.USD,
 		},
 		{
-			description: "Get prices in Wei (no field)",
-			currency:    "",
+			description: "Get prices in Wei (exclude currency field)",
 		},
 	}
 

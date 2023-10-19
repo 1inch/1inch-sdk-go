@@ -4,21 +4,26 @@ import (
 	"context"
 	"fmt"
 	"net/http"
-	"net/url"
 
 	"dev-portal-sdk-go/client/swap"
 )
 
 func (c Client) GetSwap(params swap.AggregationControllerGetSwapParams) (*swap.SwapResponse, *http.Response, error) {
-	req, err := http.NewRequest(http.MethodGet, fmt.Sprintf("%s/swap/v5.2/1/swap", c.BaseURL), nil)
+	u := "/swap/v5.2/1/swap"
 
-	err = params.Validate()
+	err := params.Validate()
 	if err != nil {
 		return nil, nil, fmt.Errorf("request validation error: %v", err)
 	}
 
-	query := getSwapAddQueryParameters(req.URL.Query(), params)
-	req.URL.RawQuery = query.Encode()
+	u, err = addOptions(u, params)
+	if err != nil {
+		return nil, nil, err
+	}
+	req, err := c.NewRequest("GET", u, nil)
+	if err != nil {
+		return nil, nil, err
+	}
 
 	var swap swap.SwapResponse
 	res, err := c.Do(context.Background(), req, &swap)
@@ -27,64 +32,6 @@ func (c Client) GetSwap(params swap.AggregationControllerGetSwapParams) (*swap.S
 	}
 
 	return &swap, res, nil
-}
-
-func getSwapAddQueryParameters(query url.Values, params swap.AggregationControllerGetSwapParams) url.Values {
-	query.Add("src", params.Src)
-	query.Add("dst", params.Dst)
-	query.Add("amount", params.Amount)
-	query.Add("from", params.From)
-	query.Add("slippage", fmt.Sprintf("%f", params.Slippage))
-
-	if params.Protocols != nil {
-		query.Add("protocols", *params.Protocols)
-	}
-	if params.Fee != nil {
-		query.Add("fee", fmt.Sprintf("%f", *params.Fee))
-	}
-	if params.GasPrice != nil {
-		query.Add("gasPrice", *params.GasPrice)
-	}
-	if params.ComplexityLevel != nil {
-		query.Add("complexityLevel", fmt.Sprintf("%f", *params.ComplexityLevel))
-	}
-	if params.Parts != nil {
-		query.Add("parts", fmt.Sprintf("%f", *params.Parts))
-	}
-	if params.MainRouteParts != nil {
-		query.Add("mainRouteParts", fmt.Sprintf("%f", *params.MainRouteParts))
-	}
-	if params.GasLimit != nil {
-		query.Add("gasLimit", fmt.Sprintf("%f", *params.GasLimit))
-	}
-	if params.IncludeTokensInfo != nil && *params.IncludeTokensInfo {
-		query.Add("includeTokensInfo", "true")
-	}
-	if params.IncludeProtocols != nil && *params.IncludeProtocols {
-		query.Add("includeProtocols", "true")
-	}
-	if params.IncludeGas != nil && *params.IncludeGas {
-		query.Add("includeGas", "true")
-	}
-	if params.ConnectorTokens != nil {
-		query.Add("connectorTokens", *params.ConnectorTokens)
-	}
-	if params.Permit != nil {
-		query.Add("permit", *params.Permit)
-	}
-	if params.Receiver != nil {
-		query.Add("receiver", *params.Receiver)
-	}
-	if params.Referrer != nil {
-		query.Add("referrer", *params.Referrer)
-	}
-	if params.AllowPartialFill != nil && *params.AllowPartialFill {
-		query.Add("allowPartialFill", "true")
-	}
-	if params.DisableEstimate != nil && *params.DisableEstimate {
-		query.Add("disableEstimate", "true")
-	}
-	return query
 }
 
 func PrettyPrintSwapResponse(resp *swap.SwapResponse) {

@@ -1,12 +1,16 @@
 package client
 
 import (
+	"bytes"
 	"context"
 	"encoding/json"
 	"fmt"
 	"io"
 	"net/http"
 	"net/url"
+	"reflect"
+
+	"github.com/google/go-querystring/query"
 )
 
 // This is the base URL for the 1inch API.
@@ -119,4 +123,60 @@ func (c Client) Do(ctx context.Context, req *http.Request, v interface{}) (*http
 		}
 	}
 	return resp, err
+}
+
+func (c Client) NewRequest(method, urlStr string, body interface{}) (*http.Request, error) {
+	// TODO verify if this is needed
+	//if !strings.HasSuffix(c.BaseURL.Path, "/") {
+	//	return nil, fmt.Errorf("BaseURL must have a trailing slash, but %q does not", c.BaseURL)
+	//}
+
+	u, err := c.BaseURL.Parse(urlStr)
+	if err != nil {
+		return nil, err
+	}
+
+	var buf io.ReadWriter
+	if body != nil {
+		buf = &bytes.Buffer{}
+		enc := json.NewEncoder(buf)
+		enc.SetEscapeHTML(false)
+		err := enc.Encode(body)
+		if err != nil {
+			return nil, err
+		}
+	}
+
+	req, err := http.NewRequest(method, u.String(), buf)
+	if err != nil {
+		return nil, err
+	}
+
+	if body != nil {
+		req.Header.Set("Content-Type", "application/json")
+	}
+
+	return req, nil
+}
+
+// addOptions adds the parameters in opts as URL query parameters to s. opts
+// must be a struct whose fields may contain "url" tags.
+func addOptions(s string, opts interface{}) (string, error) {
+	v := reflect.ValueOf(opts)
+	if v.Kind() == reflect.Ptr && v.IsNil() {
+		return s, nil
+	}
+
+	u, err := url.Parse(s)
+	if err != nil {
+		return s, err
+	}
+
+	qs, err := query.Values(opts)
+	if err != nil {
+		return s, err
+	}
+
+	u.RawQuery = qs.Encode()
+	return u.String(), nil
 }

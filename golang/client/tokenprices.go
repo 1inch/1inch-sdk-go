@@ -2,7 +2,6 @@ package client
 
 import (
 	"context"
-	"fmt"
 	"net/http"
 
 	"dev-portal-sdk-go/client/spotprice"
@@ -12,16 +11,25 @@ type PricesResponse map[string]string
 
 func (c Client) GetTokenPrices(params spotprice.ChainControllerByAddressesParams) (*PricesResponse, *http.Response, error) {
 	// TODO accept context
-	req, err := http.NewRequest(http.MethodGet, fmt.Sprintf("%s/price/v1.1/1", c.BaseURL), nil)
+	u := "/price/v1.1/1"
 
-	err = params.Validate()
+	err := params.Validate()
 	if err != nil {
 		return nil, nil, err
 	}
 
-	if params.Currency != nil && *params.Currency != "" {
-		req.URL.RawQuery += fmt.Sprintf("currency=%s", string(*params.Currency))
+	// If nothing is set, remove the field from the struct
+	// A blank input is required by the API to set the response currency to wei
+	if params.Currency != nil && *params.Currency == "" {
+		params.Currency = nil
 	}
+
+	u, err = addOptions(u, params)
+	if err != nil {
+		return nil, nil, err
+	}
+
+	req, err := c.NewRequest("GET", u, nil)
 	if err != nil {
 		return nil, nil, err
 	}

@@ -124,7 +124,7 @@ type GetPricesRequestDtoCurrency string
 // ChainControllerWhitelistParams defines parameters for ChainControllerWhitelist.
 type ChainControllerWhitelistParams struct {
 	// Currency If no currency provided, then price returned in native Wei
-	Currency *ChainControllerWhitelistParamsCurrency `form:"currency,omitempty" json:"currency,omitempty"`
+	Currency *ChainControllerWhitelistParamsCurrency `url:"currency,omitempty" json:"currency,omitempty"`
 }
 
 // ChainControllerWhitelistParamsCurrency defines parameters for ChainControllerWhitelist.
@@ -133,7 +133,7 @@ type ChainControllerWhitelistParamsCurrency string
 // ChainControllerByAddressesParams defines parameters for ChainControllerByAddresses.
 type ChainControllerByAddressesParams struct {
 	// Currency If no currency provided, then price returned in native Wei
-	Currency *ChainControllerByAddressesParamsCurrency `form:"currency,omitempty" json:"currency,omitempty"`
+	Currency *ChainControllerByAddressesParamsCurrency `url:"currency,omitempty" json:"currency,omitempty"`
 }
 
 // ChainControllerByAddressesParamsCurrency defines parameters for ChainControllerByAddresses.

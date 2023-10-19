@@ -10,15 +10,22 @@ import (
 )
 
 func (c Client) GetQuote(params swap.AggregationControllerGetQuoteParams) (*swap.QuoteResponse, *http.Response, error) {
-	req, err := http.NewRequest(http.MethodGet, fmt.Sprintf("%s/swap/v5.2/1/quote", c.BaseURL), nil)
+	u := "/swap/v5.2/1/quote"
 
-	err = params.Validate()
+	err := params.Validate()
 	if err != nil {
 		return nil, nil, fmt.Errorf("request validation error: %v", err)
 	}
 
-	query := getQuoteAddQueryParameters(req.URL.Query(), params)
-	req.URL.RawQuery = query.Encode()
+	u, err = addOptions(u, params)
+	if err != nil {
+		return nil, nil, err
+	}
+
+	req, err := c.NewRequest("GET", u, nil)
+	if err != nil {
+		return nil, nil, err
+	}
 
 	var quote swap.QuoteResponse
 	res, err := c.Do(context.Background(), req, &quote)
