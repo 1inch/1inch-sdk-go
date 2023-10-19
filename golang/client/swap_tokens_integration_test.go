@@ -7,25 +7,23 @@ import (
 
 	"dev-portal-sdk-go/client/swap"
 	"dev-portal-sdk-go/helpers"
-	"dev-portal-sdk-go/helpers/consts/tokens"
 	"github.com/stretchr/testify/assert"
 )
 
-func TestApproveTransactionIntegration(t *testing.T) {
+func TestGetTokensIntegration(t *testing.T) {
 
 	testcases := []struct {
-		description    string
-		params         swap.ApproveControllerGetCallDataParams
-		expectedOutput swap.ApproveCallDataResponse
+		description   string
+		expectedToken swap.TokenInfo
 	}{
 		{
 			description: "Get approve spender address",
-			params: swap.ApproveControllerGetCallDataParams{
-				TokenAddress: tokens.EthereumUsdc,
-				Amount:       nil,
-			},
-			expectedOutput: swap.ApproveCallDataResponse{
-				To: tokens.EthereumUsdc,
+			expectedToken: swap.TokenInfo{
+				Address:  "0xa0b86991c6218b36c1d19d4a2e9eb0ce3606eb48",
+				Decimals: 6,
+				Eip2612:  helpers.BoolPtr(true),
+				Name:     "USD Coin",
+				Symbol:   "USDC",
 			},
 		},
 	}
@@ -39,11 +37,18 @@ func TestApproveTransactionIntegration(t *testing.T) {
 	for _, tc := range testcases {
 		t.Run(fmt.Sprintf("%v", tc.description), func(t *testing.T) {
 
-			transaction, resp, err := c.ApproveTransaction(tc.params)
+			tokens, resp, err := c.GetTokens()
 			assert.NoError(t, err)
 			assert.Equal(t, 200, resp.StatusCode)
-			assert.Equal(t, tc.expectedOutput.To, transaction.To)
 
+			found := false
+			for _, tok := range tokens.Tokens {
+				if tok.Address == tc.expectedToken.Address {
+					found = true
+					break
+				}
+			}
+			assert.True(t, found, fmt.Sprintf("expected to find %s in tokens list, but did not", tc.expectedToken.Address))
 			helpers.Sleep()
 		})
 	}

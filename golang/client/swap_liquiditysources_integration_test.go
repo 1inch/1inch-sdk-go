@@ -19,10 +19,8 @@ func TestGetLiquiditySourcesIntegration(t *testing.T) {
 		{
 			description: "Get approve spender address",
 			expectedProtocol: swap.ProtocolImage{
-				Id:       "UNISWAP_V2",
-				Img:      "Uniswap V2",
-				ImgColor: "https://cdn.1inch.io/liquidity-sources-logo/uniswap.png",
-				Title:    "https://cdn.1inch.io/liquidity-sources-logo/uniswap_color.png",
+				Id:  "UNISWAP_V2",
+				Img: "Uniswap V2",
 			},
 		},
 	}
