@@ -1,4 +1,4 @@
-package spotprice
+package tokenprices
 
 import (
 	"fmt"

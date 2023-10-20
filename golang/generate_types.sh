@@ -120,4 +120,4 @@ fetch_and_generate() {
 fetch_and_generate "https://api.1inch.io/swagger/ethereum-json" "swap" "client/swap"
 
 # Spot Price API
-fetch_and_generate "https://token-prices.1inch.io/swagger/ethereum-json" "spotprice" "client/spotprice"
+fetch_and_generate "https://token-prices.1inch.io/swagger/ethereum-json" "tokenprices" "client/tokenprices"

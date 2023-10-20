@@ -5,7 +5,7 @@ import (
 	"net/http"
 	"testing"
 
-	"dev-portal-sdk-go/client/spotprice"
+	"dev-portal-sdk-go/client/tokenprices"
 	"github.com/stretchr/testify/assert"
 )
 
@@ -23,17 +23,17 @@ func TestGetTokenPrices(t *testing.T) {
 	testcases := []struct {
 		description              string
 		handlerFunc              func(w http.ResponseWriter, r *http.Request)
-		params                   spotprice.ChainControllerByAddressesParams
+		params                   tokenprices.ChainControllerByAddressesParams
 		expectedOutput           string
 		expectedErrorDescription string
 	}{
 		{
 			description: "Get prices in USD",
 			handlerFunc: func(w http.ResponseWriter, r *http.Request) {
-				assert.Equal(t, string(spotprice.USD), r.URL.Query().Get("currency"))
+				assert.Equal(t, string(tokenprices.USD), r.URL.Query().Get("currency"))
 			},
-			params: spotprice.ChainControllerByAddressesParams{
-				Currency: spotprice.GetCurrencyType(spotprice.USD),
+			params: tokenprices.ChainControllerByAddressesParams{
+				Currency: tokenprices.GetCurrencyType(tokenprices.USD),
 			},
 		},
 		{
@@ -44,8 +44,8 @@ func TestGetTokenPrices(t *testing.T) {
 		},
 		{
 			description: "Fail - provide invalid currency",
-			params: spotprice.ChainControllerByAddressesParams{
-				Currency: spotprice.GetCurrencyType("ok"),
+			params: tokenprices.ChainControllerByAddressesParams{
+				Currency: tokenprices.GetCurrencyType("ok"),
 			},
 			expectedErrorDescription: "currency value ok is not valid",
 		},

@@ -4,12 +4,12 @@ import (
 	"context"
 	"net/http"
 
-	"dev-portal-sdk-go/client/spotprice"
+	"dev-portal-sdk-go/client/tokenprices"
 )
 
 type PricesResponse map[string]string
 
-func (tp *TokenPricesService) GetPrices(params spotprice.ChainControllerByAddressesParams) (*PricesResponse, *http.Response, error) {
+func (tp *TokenPricesService) GetPrices(params tokenprices.ChainControllerByAddressesParams) (*PricesResponse, *http.Response, error) {
 	// TODO accept context
 	u := "/price/v1.1/1"
 

@@ -7,7 +7,7 @@ import (
 	"sort"
 
 	"dev-portal-sdk-go/client"
-	"dev-portal-sdk-go/client/spotprice"
+	"dev-portal-sdk-go/client/tokenprices"
 )
 
 func main() {
@@ -24,8 +24,8 @@ func main() {
 	}
 
 	// Build the config for fetching token prices
-	priceParameters := spotprice.ChainControllerByAddressesParams{
-		Currency: spotprice.GetCurrencyType(spotprice.USD),
+	priceParameters := tokenprices.ChainControllerByAddressesParams{
+		Currency: tokenprices.GetCurrencyType(tokenprices.USD),
 	}
 
 	// Fetch token prices
