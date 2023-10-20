@@ -33,6 +33,38 @@ type Config struct {
 	ApiKey            string
 }
 
+type ErrorResponse struct {
+	Response     *http.Response `json:"-"`
+	ErrorMessage string         `json:"error"`
+	Description  string         `json:"description"`
+	StatusCode   int            `json:"statusCode"`
+	Meta         []struct {
+		Value string `json:"value"`
+		Type  string `json:"type"`
+	} `json:"meta"`
+}
+
+func (r *ErrorResponse) Error() string {
+	return fmt.Sprintf("%v %v: %d %+v - %v - %+v",
+		r.Response.Request.Method, r.Response.Request.URL,
+		r.Response.StatusCode, r.ErrorMessage, r.Description, r.Meta)
+}
+
+type Client struct {
+	// Standard http client in Go
+	httpClient *http.Client
+	// The URL of the 1inch API
+	BaseURL *url.URL
+	// The API key to use for authentication
+	ApiKey string
+	// A struct that will contain a reference to this client
+	// Used to separate each API into a unique namespace to aid in method discovery
+	common service
+	// Isolated namespaces for each API
+	Swap        *SwapService
+	TokenPrices *TokenPricesService
+}
+
 func NewClient(config Config) (*Client, error) {
 
 	var baseUrl *url.URL
@@ -57,35 +89,6 @@ func NewClient(config Config) (*Client, error) {
 	c.TokenPrices = (*TokenPricesService)(&c.common)
 
 	return c, nil
-}
-
-type Client struct {
-	httpClient *http.Client
-
-	BaseURL *url.URL
-	ApiKey  string
-
-	common service
-
-	Swap        *SwapService
-	TokenPrices *TokenPricesService
-}
-
-type ErrorResponse struct {
-	Response     *http.Response `json:"-"`
-	ErrorMessage string         `json:"error"`
-	Description  string         `json:"description"`
-	StatusCode   int            `json:"statusCode"`
-	Meta         []struct {
-		Value string `json:"value"`
-		Type  string `json:"type"`
-	} `json:"meta"`
-}
-
-func (r *ErrorResponse) Error() string {
-	return fmt.Sprintf("%v %v: %d %+v - %v - %+v",
-		r.Response.Request.Method, r.Response.Request.URL,
-		r.Response.StatusCode, r.ErrorMessage, r.Description, r.Meta)
 }
 
 func (c *Client) Do(ctx context.Context, req *http.Request, v interface{}) (*http.Response, error) {
