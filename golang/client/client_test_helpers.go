@@ -23,7 +23,7 @@ func setup() (*Client, *http.ServeMux, string, func(), error) {
 	// server is a test HTTP server used to provide mock API responses.
 	// the base URL of the client will have its destination swapped to use this new test server for requests
 	server := httptest.NewServer(apiHandler)
-	client, err := NewClient(
+	c, err := NewClient(
 		Config{
 			TargetEnvironment: EnvironmentProduction,
 			ApiKey:            os.Getenv("DEV_PORTAL_TOKEN"),
@@ -33,6 +33,6 @@ func setup() (*Client, *http.ServeMux, string, func(), error) {
 	}
 
 	url, _ := url.Parse(server.URL + "/")
-	client.BaseURL = url
-	return client, apiHandler, server.URL, server.Close, nil
+	c.BaseURL = url
+	return c, apiHandler, server.URL, server.Close, nil
 }

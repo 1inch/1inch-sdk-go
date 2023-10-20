@@ -34,7 +34,7 @@ func TestGetLiquiditySourcesIntegration(t *testing.T) {
 	for _, tc := range testcases {
 		t.Run(fmt.Sprintf("%v", tc.description), func(t *testing.T) {
 
-			liquiditySources, resp, err := c.GetLiquiditySources()
+			liquiditySources, resp, err := c.Swap.GetLiquiditySources()
 			assert.NoError(t, err)
 			assert.Equal(t, 200, resp.StatusCode)
 

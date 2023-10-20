@@ -34,7 +34,7 @@ func main() {
 	}
 
 	// Execute quote call
-	quoteResponse, _, err := c.GetQuote(quoteParams)
+	quoteResponse, _, err := c.Swap.GetQuote(quoteParams)
 	if err != nil {
 		log.Fatalf("Failed to get quote: %v", err)
 	}
@@ -54,7 +54,7 @@ func main() {
 
 	// Execute swap call
 	// This will return the transaction data used by a wallet to execute the swap
-	swapResponse, _, err := c.GetSwap(swapParams)
+	swapResponse, _, err := c.Swap.GetSwap(swapParams)
 	if err != nil {
 		log.Fatalf("Failed to get swap: %v", err)
 	}

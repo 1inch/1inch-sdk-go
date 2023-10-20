@@ -29,7 +29,7 @@ func main() {
 	}
 
 	// Fetch token prices
-	tokenPrices, _, err := c.GetTokenPrices(priceParameters)
+	tokenPrices, _, err := c.TokenPrices.GetPrices(priceParameters)
 	if err != nil {
 		log.Fatalf("Failed to get token prices: %v", err)
 	}

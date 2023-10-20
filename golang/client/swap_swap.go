@@ -8,7 +8,7 @@ import (
 	"dev-portal-sdk-go/client/swap"
 )
 
-func (c Client) GetSwap(params swap.AggregationControllerGetSwapParams) (*swap.SwapResponse, *http.Response, error) {
+func (s *SwapService) GetSwap(params swap.AggregationControllerGetSwapParams) (*swap.SwapResponse, *http.Response, error) {
 	u := "/swap/v5.2/1/swap"
 
 	err := params.Validate()
@@ -20,13 +20,13 @@ func (c Client) GetSwap(params swap.AggregationControllerGetSwapParams) (*swap.S
 	if err != nil {
 		return nil, nil, err
 	}
-	req, err := c.NewRequest("GET", u, nil)
+	req, err := s.client.NewRequest("GET", u, nil)
 	if err != nil {
 		return nil, nil, err
 	}
 
 	var swap swap.SwapResponse
-	res, err := c.Do(context.Background(), req, &swap)
+	res, err := s.client.Do(context.Background(), req, &swap)
 	if err != nil {
 		return nil, nil, err
 	}

@@ -39,7 +39,7 @@ func TestApproveTransactionIntegration(t *testing.T) {
 	for _, tc := range testcases {
 		t.Run(fmt.Sprintf("%v", tc.description), func(t *testing.T) {
 
-			transaction, resp, err := c.ApproveTransaction(tc.params)
+			transaction, resp, err := c.Swap.ApproveTransaction(tc.params)
 			assert.NoError(t, err)
 			assert.Equal(t, 200, resp.StatusCode)
 			assert.Equal(t, tc.expectedOutput.To, transaction.To)

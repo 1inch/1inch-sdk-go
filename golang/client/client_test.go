@@ -45,7 +45,7 @@ func TestNewConfig(t *testing.T) {
 	for _, tc := range testcases {
 		t.Run(fmt.Sprintf("%v", tc.description), func(t *testing.T) {
 
-			client, err := NewClient(tc.config)
+			c, err := NewClient(tc.config)
 			if tc.expectedErrorDescription != "" {
 				if err == nil {
 					assert.FailNow(t, "Expected error message, but error was nil")
@@ -54,7 +54,7 @@ func TestNewConfig(t *testing.T) {
 				return
 			}
 			assert.NoError(t, err)
-			assert.Equal(t, tc.expectedEnvironment, client.BaseURL.Host)
+			assert.Equal(t, tc.expectedEnvironment, c.BaseURL.Host)
 		})
 	}
 }

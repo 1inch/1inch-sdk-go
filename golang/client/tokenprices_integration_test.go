@@ -41,7 +41,7 @@ func TestGetTokenPricesIntegration(t *testing.T) {
 				Currency: &tc.currency,
 			}
 
-			message, resp, err := c.GetTokenPrices(priceParameters)
+			message, resp, err := c.TokenPrices.GetPrices(priceParameters)
 			if tc.expectedErrorCode != 0 {
 				if resp == nil {
 					assert.FailNow(t, "Response should not be nil")

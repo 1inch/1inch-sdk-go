@@ -24,6 +24,10 @@ const (
 	EnvironmentStaging    Environment = "Staging"
 )
 
+type service struct {
+	client *Client
+}
+
 type Config struct {
 	TargetEnvironment Environment
 	ApiKey            string
@@ -41,13 +45,18 @@ func NewClient(config Config) (*Client, error) {
 		baseUrl = baseUrlStaging
 	}
 
-	client := &Client{
+	c := &Client{
 		httpClient: &http.Client{},
 		BaseURL:    baseUrl,
 		ApiKey:     config.ApiKey,
 	}
 
-	return client, nil
+	c.common.client = c
+
+	c.Swap = (*SwapService)(&c.common)
+	c.TokenPrices = (*TokenPricesService)(&c.common)
+
+	return c, nil
 }
 
 type Client struct {
@@ -55,6 +64,11 @@ type Client struct {
 
 	BaseURL *url.URL
 	ApiKey  string
+
+	common service
+
+	Swap        *SwapService
+	TokenPrices *TokenPricesService
 }
 
 type ErrorResponse struct {
@@ -74,7 +88,7 @@ func (r *ErrorResponse) Error() string {
 		r.Response.StatusCode, r.ErrorMessage, r.Description, r.Meta)
 }
 
-func (c Client) Do(ctx context.Context, req *http.Request, v interface{}) (*http.Response, error) {
+func (c *Client) Do(ctx context.Context, req *http.Request, v interface{}) (*http.Response, error) {
 	req.Header.Set("Content-Type", "application/json")
 	req.Header.Set("Authorization", fmt.Sprintf("Bearer %s", c.ApiKey))
 
@@ -125,7 +139,7 @@ func (c Client) Do(ctx context.Context, req *http.Request, v interface{}) (*http
 	return resp, err
 }
 
-func (c Client) NewRequest(method, urlStr string, body interface{}) (*http.Request, error) {
+func (c *Client) NewRequest(method, urlStr string, body interface{}) (*http.Request, error) {
 	// TODO verify if this is needed
 	//if !strings.HasSuffix(c.BaseURL.Path, "/") {
 	//	return nil, fmt.Errorf("BaseURL must have a trailing slash, but %q does not", c.BaseURL)

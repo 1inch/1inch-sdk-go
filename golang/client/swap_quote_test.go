@@ -80,7 +80,7 @@ func TestGetQuote(t *testing.T) {
 	for _, tc := range testcases {
 		t.Run(fmt.Sprintf("%v", tc.description), func(t *testing.T) {
 
-			client, apiHandler, _, teardown, err := setup()
+			c, apiHandler, _, teardown, err := setup()
 			assert.NoError(t, err)
 			defer teardown()
 
@@ -90,7 +90,7 @@ func TestGetQuote(t *testing.T) {
 				apiHandler.HandleFunc(endpoint, defaultResponse)
 			}
 
-			_, _, err = client.GetQuote(tc.params)
+			_, _, err = c.Swap.GetQuote(tc.params)
 			if tc.expectedErrorDescription != "" {
 				if err == nil {
 					assert.FailNow(t, "Expected error message, but error was nil")

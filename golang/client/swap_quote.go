@@ -8,7 +8,7 @@ import (
 	"dev-portal-sdk-go/client/swap"
 )
 
-func (c Client) GetQuote(params swap.AggregationControllerGetQuoteParams) (*swap.QuoteResponse, *http.Response, error) {
+func (s *SwapService) GetQuote(params swap.AggregationControllerGetQuoteParams) (*swap.QuoteResponse, *http.Response, error) {
 	u := "/swap/v5.2/1/quote"
 
 	err := params.Validate()
@@ -21,13 +21,13 @@ func (c Client) GetQuote(params swap.AggregationControllerGetQuoteParams) (*swap
 		return nil, nil, err
 	}
 
-	req, err := c.NewRequest("GET", u, nil)
+	req, err := s.client.NewRequest("GET", u, nil)
 	if err != nil {
 		return nil, nil, err
 	}
 
 	var quote swap.QuoteResponse
-	res, err := c.Do(context.Background(), req, &quote)
+	res, err := s.client.Do(context.Background(), req, &quote)
 	if err != nil {
 		return nil, nil, err
 	}

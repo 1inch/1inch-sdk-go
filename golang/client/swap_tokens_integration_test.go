@@ -37,7 +37,7 @@ func TestGetTokensIntegration(t *testing.T) {
 	for _, tc := range testcases {
 		t.Run(fmt.Sprintf("%v", tc.description), func(t *testing.T) {
 
-			tokens, resp, err := c.GetTokens()
+			tokens, resp, err := c.Swap.GetTokens()
 			assert.NoError(t, err)
 			assert.Equal(t, 200, resp.StatusCode)
 
