@@ -1,6 +1,7 @@
 package client
 
 import (
+	"context"
 	"fmt"
 	"net/http"
 	"testing"
@@ -10,6 +11,7 @@ import (
 	"dev-portal-sdk-go/helpers/consts/amounts"
 	"dev-portal-sdk-go/helpers/consts/tokens"
 	"github.com/stretchr/testify/assert"
+	"github.com/stretchr/testify/require"
 )
 
 func TestGetSwap(t *testing.T) {
@@ -97,7 +99,7 @@ func TestGetSwap(t *testing.T) {
 		t.Run(fmt.Sprintf("%v", tc.description), func(t *testing.T) {
 
 			c, apiHandler, _, teardown, err := setup()
-			assert.NoError(t, err)
+			require.NoError(t, err)
 			defer teardown()
 
 			if tc.handlerFunc != nil {
@@ -106,7 +108,7 @@ func TestGetSwap(t *testing.T) {
 				apiHandler.HandleFunc(endpoint, defaultResponse)
 			}
 
-			_, _, err = c.Swap.GetSwap(tc.params)
+			_, _, err = c.Swap.GetSwap(context.Background(), tc.params)
 			if tc.expectedErrorDescription != "" {
 				if err == nil {
 					assert.FailNow(t, "Expected error message, but error was nil")
@@ -114,7 +116,7 @@ func TestGetSwap(t *testing.T) {
 				assert.Equal(t, tc.expectedErrorDescription, err.Error())
 				return
 			}
-			assert.NoError(t, err)
+			require.NoError(t, err)
 		})
 	}
 }

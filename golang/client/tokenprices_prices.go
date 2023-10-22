@@ -9,8 +9,7 @@ import (
 
 type PricesResponse map[string]string
 
-func (tp *TokenPricesService) GetPrices(params tokenprices.ChainControllerByAddressesParams) (*PricesResponse, *http.Response, error) {
-	// TODO accept context
+func (tp *TokenPricesService) GetPrices(ctx context.Context, params tokenprices.ChainControllerByAddressesParams) (*PricesResponse, *http.Response, error) {
 	u := "/price/v1.1/1"
 
 	err := params.Validate()
@@ -35,7 +34,7 @@ func (tp *TokenPricesService) GetPrices(params tokenprices.ChainControllerByAddr
 	}
 
 	var exStr PricesResponse
-	res, err := tp.client.Do(context.Background(), req, &exStr)
+	res, err := tp.client.Do(ctx, req, &exStr)
 	if err != nil {
 		return nil, nil, err
 	}

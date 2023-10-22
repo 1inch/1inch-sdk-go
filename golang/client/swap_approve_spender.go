@@ -7,7 +7,7 @@ import (
 	"dev-portal-sdk-go/client/swap"
 )
 
-func (s *SwapService) ApproveSpender() (*swap.SpenderResponse, *http.Response, error) {
+func (s *SwapService) ApproveSpender(ctx context.Context) (*swap.SpenderResponse, *http.Response, error) {
 	u := "/swap/v5.2/1/approve/spender"
 
 	req, err := s.client.NewRequest("GET", u, nil)
@@ -16,7 +16,7 @@ func (s *SwapService) ApproveSpender() (*swap.SpenderResponse, *http.Response, e
 	}
 
 	var spender swap.SpenderResponse
-	res, err := s.client.Do(context.Background(), req, &spender)
+	res, err := s.client.Do(ctx, req, &spender)
 	if err != nil {
 		return nil, nil, err
 	}

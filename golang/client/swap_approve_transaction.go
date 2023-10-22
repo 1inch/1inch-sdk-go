@@ -8,7 +8,7 @@ import (
 	"dev-portal-sdk-go/client/swap"
 )
 
-func (s *SwapService) ApproveTransaction(params swap.ApproveControllerGetCallDataParams) (*swap.ApproveCallDataResponse, *http.Response, error) {
+func (s *SwapService) ApproveTransaction(ctx context.Context, params swap.ApproveControllerGetCallDataParams) (*swap.ApproveCallDataResponse, *http.Response, error) {
 	u := "/swap/v5.2/1/approve/transaction"
 
 	err := params.Validate()
@@ -27,7 +27,7 @@ func (s *SwapService) ApproveTransaction(params swap.ApproveControllerGetCallDat
 	}
 
 	var approveCallData swap.ApproveCallDataResponse
-	res, err := s.client.Do(context.Background(), req, &approveCallData)
+	res, err := s.client.Do(ctx, req, &approveCallData)
 	if err != nil {
 		return nil, nil, err
 	}

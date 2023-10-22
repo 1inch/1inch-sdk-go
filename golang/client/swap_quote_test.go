@@ -1,6 +1,7 @@
 package client
 
 import (
+	"context"
 	"fmt"
 	"net/http"
 	"testing"
@@ -9,6 +10,7 @@ import (
 	"dev-portal-sdk-go/helpers/consts/amounts"
 	"dev-portal-sdk-go/helpers/consts/tokens"
 	"github.com/stretchr/testify/assert"
+	"github.com/stretchr/testify/require"
 )
 
 func TestGetQuote(t *testing.T) {
@@ -81,7 +83,7 @@ func TestGetQuote(t *testing.T) {
 		t.Run(fmt.Sprintf("%v", tc.description), func(t *testing.T) {
 
 			c, apiHandler, _, teardown, err := setup()
-			assert.NoError(t, err)
+			require.NoError(t, err)
 			defer teardown()
 
 			if tc.handlerFunc != nil {
@@ -90,7 +92,7 @@ func TestGetQuote(t *testing.T) {
 				apiHandler.HandleFunc(endpoint, defaultResponse)
 			}
 
-			_, _, err = c.Swap.GetQuote(tc.params)
+			_, _, err = c.Swap.GetQuote(context.Background(), tc.params)
 			if tc.expectedErrorDescription != "" {
 				if err == nil {
 					assert.FailNow(t, "Expected error message, but error was nil")
@@ -98,7 +100,7 @@ func TestGetQuote(t *testing.T) {
 				assert.Equal(t, tc.expectedErrorDescription, err.Error())
 				return
 			}
-			assert.NoError(t, err)
+			require.NoError(t, err)
 		})
 	}
 }

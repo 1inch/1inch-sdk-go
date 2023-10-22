@@ -1,6 +1,7 @@
 package client
 
 import (
+	"context"
 	"fmt"
 	"os"
 	"testing"
@@ -8,6 +9,7 @@ import (
 	"dev-portal-sdk-go/client/swap"
 	"dev-portal-sdk-go/helpers"
 	"github.com/stretchr/testify/assert"
+	"github.com/stretchr/testify/require"
 )
 
 func TestGetLiquiditySourcesIntegration(t *testing.T) {
@@ -29,13 +31,13 @@ func TestGetLiquiditySourcesIntegration(t *testing.T) {
 		TargetEnvironment: EnvironmentProduction,
 		ApiKey:            os.Getenv("DEV_PORTAL_TOKEN"),
 	})
-	assert.NoError(t, err)
+	require.NoError(t, err)
 
 	for _, tc := range testcases {
 		t.Run(fmt.Sprintf("%v", tc.description), func(t *testing.T) {
 
-			liquiditySources, resp, err := c.Swap.GetLiquiditySources()
-			assert.NoError(t, err)
+			liquiditySources, resp, err := c.Swap.GetLiquiditySources(context.Background())
+			require.NoError(t, err)
 			assert.Equal(t, 200, resp.StatusCode)
 
 			found := false

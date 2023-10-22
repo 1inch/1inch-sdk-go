@@ -7,7 +7,7 @@ import (
 	"dev-portal-sdk-go/client/swap"
 )
 
-func (s *SwapService) GetTokens() (*swap.TokensResponse, *http.Response, error) {
+func (s *SwapService) GetTokens(ctx context.Context) (*swap.TokensResponse, *http.Response, error) {
 	u := "/swap/v5.2/1/tokens"
 
 	req, err := s.client.NewRequest("GET", u, nil)
@@ -16,7 +16,7 @@ func (s *SwapService) GetTokens() (*swap.TokensResponse, *http.Response, error) 
 	}
 
 	var tokens swap.TokensResponse
-	res, err := s.client.Do(context.Background(), req, &tokens)
+	res, err := s.client.Do(ctx, req, &tokens)
 	if err != nil {
 		return nil, nil, err
 	}

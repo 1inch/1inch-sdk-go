@@ -33,23 +33,6 @@ type Config struct {
 	ApiKey            string
 }
 
-type ErrorResponse struct {
-	Response     *http.Response `json:"-"`
-	ErrorMessage string         `json:"error"`
-	Description  string         `json:"description"`
-	StatusCode   int            `json:"statusCode"`
-	Meta         []struct {
-		Value string `json:"value"`
-		Type  string `json:"type"`
-	} `json:"meta"`
-}
-
-func (r *ErrorResponse) Error() string {
-	return fmt.Sprintf("%v %v: %d %+v - %v - %+v",
-		r.Response.Request.Method, r.Response.Request.URL,
-		r.Response.StatusCode, r.ErrorMessage, r.Description, r.Meta)
-}
-
 type Client struct {
 	// Standard http client in Go
 	httpClient *http.Client
@@ -57,8 +40,7 @@ type Client struct {
 	BaseURL *url.URL
 	// The API key to use for authentication
 	ApiKey string
-	// A struct that will contain a reference to this client
-	// Used to separate each API into a unique namespace to aid in method discovery
+	// A struct that will contain a reference to this client. Used to separate each API into a unique namespace to aid in method discovery
 	common service
 	// Isolated namespaces for each API
 	Swap        *SwapService
@@ -89,6 +71,35 @@ func NewClient(config Config) (*Client, error) {
 	c.TokenPrices = (*TokenPricesService)(&c.common)
 
 	return c, nil
+}
+
+func (c *Client) NewRequest(method, urlStr string, body interface{}) (*http.Request, error) {
+	u, err := c.BaseURL.Parse(urlStr)
+	if err != nil {
+		return nil, err
+	}
+
+	var buf io.ReadWriter
+	if body != nil {
+		buf = &bytes.Buffer{}
+		enc := json.NewEncoder(buf)
+		enc.SetEscapeHTML(false)
+		err := enc.Encode(body)
+		if err != nil {
+			return nil, err
+		}
+	}
+
+	req, err := http.NewRequest(method, u.String(), buf)
+	if err != nil {
+		return nil, err
+	}
+
+	if body != nil {
+		req.Header.Set("Content-Type", "application/json")
+	}
+
+	return req, nil
 }
 
 func (c *Client) Do(ctx context.Context, req *http.Request, v interface{}) (*http.Response, error) {
@@ -140,40 +151,6 @@ func (c *Client) Do(ctx context.Context, req *http.Request, v interface{}) (*htt
 		}
 	}
 	return resp, err
-}
-
-func (c *Client) NewRequest(method, urlStr string, body interface{}) (*http.Request, error) {
-	// TODO verify if this is needed
-	//if !strings.HasSuffix(c.BaseURL.Path, "/") {
-	//	return nil, fmt.Errorf("BaseURL must have a trailing slash, but %q does not", c.BaseURL)
-	//}
-
-	u, err := c.BaseURL.Parse(urlStr)
-	if err != nil {
-		return nil, err
-	}
-
-	var buf io.ReadWriter
-	if body != nil {
-		buf = &bytes.Buffer{}
-		enc := json.NewEncoder(buf)
-		enc.SetEscapeHTML(false)
-		err := enc.Encode(body)
-		if err != nil {
-			return nil, err
-		}
-	}
-
-	req, err := http.NewRequest(method, u.String(), buf)
-	if err != nil {
-		return nil, err
-	}
-
-	if body != nil {
-		req.Header.Set("Content-Type", "application/json")
-	}
-
-	return req, nil
 }
 
 // addOptions adds the parameters in opts as URL query parameters to s. opts

@@ -1,6 +1,7 @@
 package main
 
 import (
+	"context"
 	"fmt"
 	"log"
 	"os"
@@ -34,7 +35,7 @@ func main() {
 	}
 
 	// Execute quote call
-	quoteResponse, _, err := c.Swap.GetQuote(quoteParams)
+	quoteResponse, _, err := c.Swap.GetQuote(context.Background(), quoteParams)
 	if err != nil {
 		log.Fatalf("Failed to get quote: %v", err)
 	}
@@ -54,7 +55,7 @@ func main() {
 
 	// Execute swap call
 	// This will return the transaction data used by a wallet to execute the swap
-	swapResponse, _, err := c.Swap.GetSwap(swapParams)
+	swapResponse, _, err := c.Swap.GetSwap(context.Background(), swapParams)
 	if err != nil {
 		log.Fatalf("Failed to get swap: %v", err)
 	}

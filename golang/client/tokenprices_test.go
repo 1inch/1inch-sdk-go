@@ -1,12 +1,14 @@
 package client
 
 import (
+	"context"
 	"fmt"
 	"net/http"
 	"testing"
 
 	"dev-portal-sdk-go/client/tokenprices"
 	"github.com/stretchr/testify/assert"
+	"github.com/stretchr/testify/require"
 )
 
 func TestGetTokenPrices(t *testing.T) {
@@ -55,7 +57,7 @@ func TestGetTokenPrices(t *testing.T) {
 		t.Run(fmt.Sprintf("%v", tc.description), func(t *testing.T) {
 
 			c, apiHandler, _, teardown, err := setup()
-			assert.NoError(t, err)
+			require.NoError(t, err)
 			defer teardown()
 
 			if tc.handlerFunc != nil {
@@ -64,7 +66,7 @@ func TestGetTokenPrices(t *testing.T) {
 				apiHandler.HandleFunc(endpoint, defaultResponse)
 			}
 
-			_, _, err = c.TokenPrices.GetPrices(tc.params)
+			_, _, err = c.TokenPrices.GetPrices(context.Background(), tc.params)
 			if tc.expectedErrorDescription != "" {
 				if err == nil {
 					assert.FailNow(t, "Expected error message, but error was nil")
@@ -72,7 +74,7 @@ func TestGetTokenPrices(t *testing.T) {
 				assert.Equal(t, tc.expectedErrorDescription, err.Error())
 				return
 			}
-			assert.NoError(t, err)
+			require.NoError(t, err)
 		})
 	}
 }

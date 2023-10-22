@@ -116,7 +116,7 @@ fetch_and_generate() {
 
 
 # Swap API
-# TODO This URL is not versioned. We will want versioned APIs in the future.
+# TODO This URL is not versioned. If we want to support auto-downloading of swagger files and backwards compatibility, We will need to have links to any version of our API swagger files.
 fetch_and_generate "https://api.1inch.io/swagger/ethereum-json" "swap" "client/swap"
 
 # Spot Price API

@@ -1,6 +1,7 @@
 package client
 
 import (
+	"context"
 	"fmt"
 	"os"
 	"testing"
@@ -8,6 +9,7 @@ import (
 	"dev-portal-sdk-go/client/tokenprices"
 	"dev-portal-sdk-go/helpers"
 	"github.com/stretchr/testify/assert"
+	"github.com/stretchr/testify/require"
 )
 
 func TestGetTokenPricesIntegration(t *testing.T) {
@@ -32,7 +34,7 @@ func TestGetTokenPricesIntegration(t *testing.T) {
 		TargetEnvironment: EnvironmentProduction,
 		ApiKey:            os.Getenv("DEV_PORTAL_TOKEN"),
 	})
-	assert.NoError(t, err)
+	require.NoError(t, err)
 
 	for _, tc := range testcases {
 		t.Run(fmt.Sprintf("%v", tc.description), func(t *testing.T) {
@@ -41,7 +43,7 @@ func TestGetTokenPricesIntegration(t *testing.T) {
 				Currency: &tc.currency,
 			}
 
-			message, resp, err := c.TokenPrices.GetPrices(priceParameters)
+			message, resp, err := c.TokenPrices.GetPrices(context.Background(), priceParameters)
 			if tc.expectedErrorCode != 0 {
 				if resp == nil {
 					assert.FailNow(t, "Response should not be nil")
@@ -51,7 +53,7 @@ func TestGetTokenPricesIntegration(t *testing.T) {
 				return
 			}
 
-			assert.NoError(t, err)
+			require.NoError(t, err)
 			assert.NotEqual(t, "", message)
 
 			helpers.Sleep()

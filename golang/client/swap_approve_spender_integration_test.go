@@ -1,6 +1,7 @@
 package client
 
 import (
+	"context"
 	"fmt"
 	"os"
 	"testing"
@@ -8,6 +9,7 @@ import (
 	"dev-portal-sdk-go/client/swap"
 	"dev-portal-sdk-go/helpers"
 	"github.com/stretchr/testify/assert"
+	"github.com/stretchr/testify/require"
 )
 
 func TestApproveSpenderIntegration(t *testing.T) {
@@ -28,13 +30,13 @@ func TestApproveSpenderIntegration(t *testing.T) {
 		TargetEnvironment: EnvironmentProduction,
 		ApiKey:            os.Getenv("DEV_PORTAL_TOKEN"),
 	})
-	assert.NoError(t, err)
+	require.NoError(t, err)
 
 	for _, tc := range testcases {
 		t.Run(fmt.Sprintf("%v", tc.description), func(t *testing.T) {
 
-			spender, resp, err := c.Swap.ApproveSpender()
-			assert.NoError(t, err)
+			spender, resp, err := c.Swap.ApproveSpender(context.Background())
+			require.NoError(t, err)
 			assert.Equal(t, 200, resp.StatusCode)
 			assert.Equal(t, tc.expectedOutput.Address, spender.Address)
 

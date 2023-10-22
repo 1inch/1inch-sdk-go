@@ -1,6 +1,7 @@
 package main
 
 import (
+	"context"
 	"fmt"
 	"log"
 	"os"
@@ -29,7 +30,7 @@ func main() {
 	}
 
 	// Fetch token prices
-	tokenPrices, _, err := c.TokenPrices.GetPrices(priceParameters)
+	tokenPrices, _, err := c.TokenPrices.GetPrices(context.Background(), priceParameters)
 	if err != nil {
 		log.Fatalf("Failed to get token prices: %v", err)
 	}

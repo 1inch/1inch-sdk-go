@@ -1,6 +1,7 @@
 package client
 
 import (
+	"context"
 	"fmt"
 	"net/http"
 	"testing"
@@ -8,6 +9,7 @@ import (
 	"dev-portal-sdk-go/client/swap"
 	"dev-portal-sdk-go/helpers/consts/tokens"
 	"github.com/stretchr/testify/assert"
+	"github.com/stretchr/testify/require"
 )
 
 func TestApproveTransaction(t *testing.T) {
@@ -51,7 +53,7 @@ func TestApproveTransaction(t *testing.T) {
 		t.Run(fmt.Sprintf("%v", tc.description), func(t *testing.T) {
 
 			c, apiHandler, _, teardown, err := setup()
-			assert.NoError(t, err)
+			require.NoError(t, err)
 			defer teardown()
 
 			if tc.handlerFunc != nil {
@@ -60,7 +62,7 @@ func TestApproveTransaction(t *testing.T) {
 				apiHandler.HandleFunc(endpoint, defaultResponse)
 			}
 
-			approveTransactionResponse, _, err := c.Swap.ApproveTransaction(tc.params)
+			approveTransactionResponse, _, err := c.Swap.ApproveTransaction(context.Background(), tc.params)
 			if tc.expectedErrorDescription != "" {
 				if err == nil {
 					assert.FailNow(t, "Expected error message, but error was nil")
@@ -68,7 +70,7 @@ func TestApproveTransaction(t *testing.T) {
 				assert.Equal(t, tc.expectedErrorDescription, err.Error())
 				return
 			}
-			assert.NoError(t, err)
+			require.NoError(t, err)
 			assert.Equal(t, tc.expectedOutput.To, approveTransactionResponse.To)
 		})
 	}

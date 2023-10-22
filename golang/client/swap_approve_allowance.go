@@ -8,7 +8,7 @@ import (
 	"dev-portal-sdk-go/client/swap"
 )
 
-func (s *SwapService) ApproveAllowance(params swap.ApproveControllerGetAllowanceParams) (*swap.AllowanceResponse, *http.Response, error) {
+func (s *SwapService) ApproveAllowance(ctx context.Context, params swap.ApproveControllerGetAllowanceParams) (*swap.AllowanceResponse, *http.Response, error) {
 	u := "/swap/v5.2/1/approve/allowance"
 
 	err := params.Validate()
@@ -27,7 +27,7 @@ func (s *SwapService) ApproveAllowance(params swap.ApproveControllerGetAllowance
 	}
 
 	var allowanceResponse swap.AllowanceResponse
-	res, err := s.client.Do(context.Background(), req, &allowanceResponse)
+	res, err := s.client.Do(ctx, req, &allowanceResponse)
 	if err != nil {
 		return nil, nil, err
 	}

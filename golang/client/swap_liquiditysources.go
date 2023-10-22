@@ -7,7 +7,7 @@ import (
 	"dev-portal-sdk-go/client/swap"
 )
 
-func (s *SwapService) GetLiquiditySources() (*swap.ProtocolsResponse, *http.Response, error) {
+func (s *SwapService) GetLiquiditySources(ctx context.Context) (*swap.ProtocolsResponse, *http.Response, error) {
 	u := "/swap/v5.2/1/liquidity-sources"
 
 	req, err := s.client.NewRequest("GET", u, nil)
@@ -16,7 +16,7 @@ func (s *SwapService) GetLiquiditySources() (*swap.ProtocolsResponse, *http.Resp
 	}
 
 	var liquiditySources swap.ProtocolsResponse
-	res, err := s.client.Do(context.Background(), req, &liquiditySources)
+	res, err := s.client.Do(ctx, req, &liquiditySources)
 	if err != nil {
 		return nil, nil, err
 	}

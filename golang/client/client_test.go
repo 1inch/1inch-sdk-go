@@ -5,6 +5,7 @@ import (
 	"testing"
 
 	"github.com/stretchr/testify/assert"
+	"github.com/stretchr/testify/require"
 )
 
 func TestNewConfig(t *testing.T) {
@@ -53,7 +54,7 @@ func TestNewConfig(t *testing.T) {
 				assert.Equal(t, tc.expectedErrorDescription, err.Error())
 				return
 			}
-			assert.NoError(t, err)
+			require.NoError(t, err)
 			assert.Equal(t, tc.expectedEnvironment, c.BaseURL.Host)
 		})
 	}
