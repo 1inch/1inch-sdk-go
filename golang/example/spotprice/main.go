@@ -7,8 +7,8 @@ import (
 	"os"
 	"sort"
 
-	"dev-portal-sdk-go/client"
-	"dev-portal-sdk-go/client/tokenprices"
+	"1inch-sdk-golang/client"
+	"1inch-sdk-golang/client/tokenprices"
 )
 
 func main() {

@@ -4,7 +4,7 @@ import (
 	"context"
 	"net/http"
 
-	"dev-portal-sdk-go/client/swap"
+	"1inch-sdk-golang/client/swap"
 )
 
 func (s *SwapService) GetLiquiditySources(ctx context.Context) (*swap.ProtocolsResponse, *http.Response, error) {

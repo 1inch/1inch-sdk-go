@@ -4,7 +4,7 @@ import (
 	"context"
 	"net/http"
 
-	"dev-portal-sdk-go/client/swap"
+	"1inch-sdk-golang/client/swap"
 )
 
 func (s *SwapService) ApproveSpender(ctx context.Context) (*swap.SpenderResponse, *http.Response, error) {

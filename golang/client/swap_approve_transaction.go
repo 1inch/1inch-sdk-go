@@ -5,7 +5,7 @@ import (
 	"fmt"
 	"net/http"
 
-	"dev-portal-sdk-go/client/swap"
+	"1inch-sdk-golang/client/swap"
 )
 
 func (s *SwapService) ApproveTransaction(ctx context.Context, params swap.ApproveControllerGetCallDataParams) (*swap.ApproveCallDataResponse, *http.Response, error) {

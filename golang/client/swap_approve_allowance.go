@@ -5,7 +5,7 @@ import (
 	"fmt"
 	"net/http"
 
-	"dev-portal-sdk-go/client/swap"
+	"1inch-sdk-golang/client/swap"
 )
 
 func (s *SwapService) ApproveAllowance(ctx context.Context, params swap.ApproveControllerGetAllowanceParams) (*swap.AllowanceResponse, *http.Response, error) {

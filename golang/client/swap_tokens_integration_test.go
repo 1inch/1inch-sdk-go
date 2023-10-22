@@ -6,10 +6,11 @@ import (
 	"os"
 	"testing"
 
-	"dev-portal-sdk-go/client/swap"
-	"dev-portal-sdk-go/helpers"
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
+
+	"1inch-sdk-golang/client/swap"
+	"1inch-sdk-golang/helpers"
 )
 
 func TestGetTokensIntegration(t *testing.T) {

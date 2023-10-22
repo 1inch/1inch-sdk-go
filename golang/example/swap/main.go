@@ -6,12 +6,12 @@ import (
 	"log"
 	"os"
 
-	"dev-portal-sdk-go/client"
-	"dev-portal-sdk-go/client/swap"
-	"dev-portal-sdk-go/helpers"
-	"dev-portal-sdk-go/helpers/consts/addresses"
-	"dev-portal-sdk-go/helpers/consts/amounts"
-	"dev-portal-sdk-go/helpers/consts/tokens"
+	"1inch-sdk-golang/client"
+	"1inch-sdk-golang/client/swap"
+	"1inch-sdk-golang/helpers"
+	"1inch-sdk-golang/helpers/consts/addresses"
+	"1inch-sdk-golang/helpers/consts/amounts"
+	"1inch-sdk-golang/helpers/consts/tokens"
 )
 
 func main() {

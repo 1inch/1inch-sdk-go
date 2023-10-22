@@ -4,7 +4,7 @@ import (
 	"context"
 	"net/http"
 
-	"dev-portal-sdk-go/client/swap"
+	"1inch-sdk-golang/client/swap"
 )
 
 func (s *SwapService) GetTokens(ctx context.Context) (*swap.TokensResponse, *http.Response, error) {

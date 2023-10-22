@@ -6,12 +6,13 @@ import (
 	"net/http"
 	"testing"
 
-	"dev-portal-sdk-go/client/swap"
-	"dev-portal-sdk-go/helpers/consts/addresses"
-	"dev-portal-sdk-go/helpers/consts/amounts"
-	"dev-portal-sdk-go/helpers/consts/tokens"
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
+
+	"1inch-sdk-golang/client/swap"
+	"1inch-sdk-golang/helpers/consts/addresses"
+	"1inch-sdk-golang/helpers/consts/amounts"
+	"1inch-sdk-golang/helpers/consts/tokens"
 )
 
 func TestGetSwap(t *testing.T) {

@@ -1,4 +1,4 @@
-module dev-portal-sdk-go
+module 1inch-sdk-golang
 
 go 1.21.1
 

@@ -5,7 +5,7 @@ import (
 	"fmt"
 	"net/http"
 
-	"dev-portal-sdk-go/client/swap"
+	"1inch-sdk-golang/client/swap"
 )
 
 func (s *SwapService) GetSwap(ctx context.Context, params swap.AggregationControllerGetSwapParams) (*swap.SwapResponse, *http.Response, error) {

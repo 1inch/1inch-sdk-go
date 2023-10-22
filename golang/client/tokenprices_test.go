@@ -6,9 +6,10 @@ import (
 	"net/http"
 	"testing"
 
-	"dev-portal-sdk-go/client/tokenprices"
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
+
+	"1inch-sdk-golang/client/tokenprices"
 )
 
 func TestGetTokenPrices(t *testing.T) {

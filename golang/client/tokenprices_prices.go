@@ -4,7 +4,7 @@ import (
 	"context"
 	"net/http"
 
-	"dev-portal-sdk-go/client/tokenprices"
+	"1inch-sdk-golang/client/tokenprices"
 )
 
 type PricesResponse map[string]string
