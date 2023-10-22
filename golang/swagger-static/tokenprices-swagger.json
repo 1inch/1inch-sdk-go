@@ -80,9 +80,7 @@
             }
           }
         },
-        "tags": [
-          "Prices"
-        ]
+        "tags": ["Prices"]
       },
       "post": {
         "operationId": "ChainController_byAddressesPost",
@@ -122,17 +120,13 @@
                   "type": "object",
                   "properties": {
                     "error": {
-                      "enum": [
-                        "Bad Request"
-                      ]
+                      "enum": ["Bad Request"]
                     },
                     "description": {
                       "type": "string"
                     },
                     "statusCode": {
-                      "enum": [
-                        400
-                      ]
+                      "enum": [400]
                     },
                     "meta": {
                       "type": "array",
@@ -154,9 +148,7 @@
             }
           }
         },
-        "tags": [
-          "Prices"
-        ]
+        "tags": ["Prices"]
       }
     },
     "/v1.1/1/currencies": {
@@ -177,9 +169,7 @@
             }
           }
         },
-        "tags": [
-          "Prices"
-        ]
+        "tags": ["Prices"]
       }
     },
     "/v1.1/1/{addresses}": {
@@ -280,17 +270,13 @@
                   "type": "object",
                   "properties": {
                     "error": {
-                      "enum": [
-                        "Bad Request"
-                      ]
+                      "enum": ["Bad Request"]
                     },
                     "description": {
                       "type": "string"
                     },
                     "statusCode": {
-                      "enum": [
-                        400
-                      ]
+                      "enum": [400]
                     },
                     "meta": {
                       "type": "array",
@@ -312,9 +298,7 @@
             }
           }
         },
-        "tags": [
-          "Prices"
-        ]
+        "tags": ["Prices"]
       }
     }
   },
@@ -338,17 +322,13 @@
             }
           }
         },
-        "required": [
-          "codes"
-        ]
+        "required": ["codes"]
       },
       "GetPricesRequestDto": {
         "type": "object",
         "properties": {
           "tokens": {
-            "example": [
-              "0x111111111117dc0aa78b770fa6a738034120c302"
-            ],
+            "example": ["0x111111111117dc0aa78b770fa6a738034120c302"],
             "type": "array",
             "items": {
               "type": "string"
@@ -356,15 +336,11 @@
           },
           "currency": {
             "type": "string",
-            "enum": [
-              "USD"
-            ],
+            "enum": ["USD"],
             "description": "If no currency provided, then price returned in native Wei"
           }
         },
-        "required": [
-          "tokens"
-        ]
+        "required": ["tokens"]
       }
     }
   }

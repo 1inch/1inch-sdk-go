@@ -162,9 +162,7 @@
             }
           }
         },
-        "tags": [
-          "Swap"
-        ]
+        "tags": ["Swap"]
       }
     },
     "/v5.2/1/swap": {
@@ -393,9 +391,7 @@
             }
           }
         },
-        "tags": [
-          "Swap"
-        ]
+        "tags": ["Swap"]
       }
     },
     "/v5.2/1/approve/spender": {
@@ -415,9 +411,7 @@
             }
           }
         },
-        "tags": [
-          "Approve"
-        ]
+        "tags": ["Approve"]
       }
     },
     "/v5.2/1/approve/transaction": {
@@ -458,9 +452,7 @@
             }
           }
         },
-        "tags": [
-          "Approve"
-        ]
+        "tags": ["Approve"]
       }
     },
     "/v5.2/1/approve/allowance": {
@@ -500,9 +492,7 @@
             }
           }
         },
-        "tags": [
-          "Approve"
-        ]
+        "tags": ["Approve"]
       }
     },
     "/v5.2/1/liquidity-sources": {
@@ -522,9 +512,7 @@
             }
           }
         },
-        "tags": [
-          "Info"
-        ]
+        "tags": ["Info"]
       }
     },
     "/v5.2/1/tokens": {
@@ -554,9 +542,7 @@
             }
           }
         },
-        "tags": [
-          "Info"
-        ]
+        "tags": ["Info"]
       }
     }
   },
@@ -605,22 +591,14 @@
             "example": false
           },
           "tags": {
-            "example": [
-              "tokens"
-            ],
+            "example": ["tokens"],
             "type": "array",
             "items": {
               "type": "string"
             }
           }
         },
-        "required": [
-          "address",
-          "symbol",
-          "name",
-          "decimals",
-          "logoURI"
-        ]
+        "required": ["address", "symbol", "name", "decimals", "logoURI"]
       },
       "QuoteResponse": {
         "type": "object",
@@ -665,9 +643,7 @@
             "example": 100000
           }
         },
-        "required": [
-          "toAmount"
-        ]
+        "required": ["toAmount"]
       },
       "HttpExceptionMeta": {
         "type": "object",
@@ -679,10 +655,7 @@
             "type": "string"
           }
         },
-        "required": [
-          "type",
-          "value"
-        ]
+        "required": ["type", "value"]
       },
       "QuoteRequestError": {
         "type": "object",
@@ -700,10 +673,7 @@
           "statusCode": {
             "type": "number",
             "description": "HTTP code",
-            "enum": [
-              400,
-              500
-            ],
+            "enum": [400, 500],
             "example": 400
           },
           "requestId": {
@@ -719,13 +689,7 @@
             }
           }
         },
-        "required": [
-          "error",
-          "description",
-          "statusCode",
-          "requestId",
-          "meta"
-        ]
+        "required": ["error", "description", "statusCode", "requestId", "meta"]
       },
       "TransactionData": {
         "type": "object",
@@ -755,14 +719,7 @@
             "example": 121363
           }
         },
-        "required": [
-          "from",
-          "to",
-          "data",
-          "value",
-          "gasPrice",
-          "gas"
-        ]
+        "required": ["from", "to", "data", "value", "gasPrice", "gas"]
       },
       "SwapResponse": {
         "type": "object",
@@ -810,10 +767,7 @@
             ]
           }
         },
-        "required": [
-          "toAmount",
-          "tx"
-        ]
+        "required": ["toAmount", "tx"]
       },
       "SwapRequestError": {
         "type": "object",
@@ -831,10 +785,7 @@
           "statusCode": {
             "type": "number",
             "description": "HTTP code",
-            "enum": [
-              400,
-              500
-            ],
+            "enum": [400, 500],
             "example": 400
           },
           "requestId": {
@@ -850,13 +801,7 @@
             }
           }
         },
-        "required": [
-          "error",
-          "description",
-          "statusCode",
-          "requestId",
-          "meta"
-        ]
+        "required": ["error", "description", "statusCode", "requestId", "meta"]
       },
       "SpenderResponse": {
         "type": "object",
@@ -867,9 +812,7 @@
             "example": "0x1111111254eeb25477b68fb85ed929f73a960582"
           }
         },
-        "required": [
-          "address"
-        ]
+        "required": ["address"]
       },
       "ApproveCallDataResponse": {
         "type": "object",
@@ -895,12 +838,7 @@
             "example": "0"
           }
         },
-        "required": [
-          "data",
-          "gasPrice",
-          "to",
-          "value"
-        ]
+        "required": ["data", "gasPrice", "to", "value"]
       },
       "AllowanceResponse": {
         "type": "object",
@@ -911,9 +849,7 @@
             "example": "115792089237316195423570985008687907853269984665640564039457584007913129639935"
           }
         },
-        "required": [
-          "allowance"
-        ]
+        "required": ["allowance"]
       },
       "ProtocolImage": {
         "type": "object",
@@ -935,12 +871,7 @@
             "description": "Protocol logo image in color"
           }
         },
-        "required": [
-          "id",
-          "title",
-          "img",
-          "img_color"
-        ]
+        "required": ["id", "title", "img", "img_color"]
       },
       "ProtocolsResponse": {
         "type": "object",
@@ -953,9 +884,7 @@
             }
           }
         },
-        "required": [
-          "protocols"
-        ]
+        "required": ["protocols"]
       },
       "SelectedProtocol": {
         "type": "object",
@@ -981,12 +910,7 @@
             "example": "0x111111111117dc0aa78b770fa6a738034120c302"
           }
         },
-        "required": [
-          "name",
-          "part",
-          "fromTokenAddress",
-          "toTokenAddress"
-        ]
+        "required": ["name", "part", "fromTokenAddress", "toTokenAddress"]
       }
     }
   }
