@@ -26,7 +26,7 @@ func main() {
 
 	// Build the config for fetching token prices
 	priceParameters := tokenprices.ChainControllerByAddressesParams{
-		Currency: tokenprices.GetCurrencyType(tokenprices.USD),
+		Currency: tokenprices.GetCurrencyParameter(tokenprices.USD),
 	}
 
 	// Fetch token prices

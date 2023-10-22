@@ -36,7 +36,7 @@ func TestGetTokenPrices(t *testing.T) {
 				assert.Equal(t, string(tokenprices.USD), r.URL.Query().Get("currency"))
 			},
 			params: tokenprices.ChainControllerByAddressesParams{
-				Currency: tokenprices.GetCurrencyType(tokenprices.USD),
+				Currency: tokenprices.GetCurrencyParameter(tokenprices.USD),
 			},
 		},
 		{
@@ -48,7 +48,7 @@ func TestGetTokenPrices(t *testing.T) {
 		{
 			description: "Fail - provide invalid currency",
 			params: tokenprices.ChainControllerByAddressesParams{
-				Currency: tokenprices.GetCurrencyType("ok"),
+				Currency: tokenprices.GetCurrencyParameter("ok"),
 			},
 			expectedErrorDescription: "currency value ok is not valid",
 		},

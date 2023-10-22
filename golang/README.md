@@ -1,7 +1,8 @@
 # Dev Portal Go SDK
 
-## Running locally
+## Using the SDK in your project
 
+### Client Initialization
 To authenticate your client with the 1inch API, your API token will be needed by the initial config used to create the SDK client. It is recommended to store this information in your local environment and read it dynamically at runtime:
 
 ```go
@@ -16,6 +17,12 @@ if err != nil {
 }
 ...
 ```
+
+### API calls
+
+Once you have an initialized client, API calls can be made using any of the client's underlying services:
+
+// TODO add simple example here and link to `examples` directory 
 
 ## Development
 
