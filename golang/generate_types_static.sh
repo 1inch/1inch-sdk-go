@@ -106,6 +106,7 @@ if [ ! -d "$swagger_dir" ] || [ ! -r "$swagger_dir" ]; then
 fi
 
 # Check for any file in the directory that doesn't fit the naming schema
+shopt -s nullglob # This ensures that the loop doesn't execute if no files match the pattern
 for file in "$swagger_dir"/*; do
     filename=$(basename "$file")
     if [[ ! $filename =~ .+-swagger.json$ ]]; then
@@ -113,6 +114,7 @@ for file in "$swagger_dir"/*; do
         exit 1
     fi
 done
+shopt -u nullglob # Turn off the nullglob option
 
 # Check if there are any swagger files to process
 swagger_files_count=$(ls "$swagger_dir"/*-swagger.json 2>/dev/null | wc -l)
