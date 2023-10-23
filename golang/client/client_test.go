@@ -55,7 +55,6 @@ func TestNewConfig(t *testing.T) {
 			config: Config{
 				ApiKey: "",
 			},
-			expectedEnvironment:      baseUrlProduction.Host,
 			expectedErrorDescription: "API key is required",
 		},
 	}
