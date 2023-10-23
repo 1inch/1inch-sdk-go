@@ -49,6 +49,10 @@ type Client struct {
 
 func NewClient(config Config) (*Client, error) {
 
+	if config.ApiKey == "" {
+		return nil, fmt.Errorf("API key is required")
+	}
+
 	var baseUrl *url.URL
 	switch config.TargetEnvironment {
 	case "":
@@ -57,6 +61,8 @@ func NewClient(config Config) (*Client, error) {
 		baseUrl = baseUrlProduction
 	case EnvironmentStaging:
 		baseUrl = baseUrlStaging
+	default:
+		return nil, fmt.Errorf("unrecognized environment: %s", config.TargetEnvironment)
 	}
 
 	c := &Client{

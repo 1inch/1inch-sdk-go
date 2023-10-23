@@ -49,7 +49,7 @@ func TestGetSwap(t *testing.T) {
 			},
 		},
 		{
-			description: "Swap Error - exclude src",
+			description: "Error - exclude src",
 			params: swap.AggregationControllerGetSwapParams{
 				Dst:    tokens.EthereumWeth,
 				From:   addresses.Vitalik,
@@ -58,7 +58,7 @@ func TestGetSwap(t *testing.T) {
 			expectedErrorDescription: "request validation error: src is required",
 		},
 		{
-			description: "Swap Error - exclude dst",
+			description: "Error - exclude dst",
 			params: swap.AggregationControllerGetSwapParams{
 				Src:    tokens.EthereumUsdc,
 				From:   addresses.Vitalik,
@@ -67,7 +67,7 @@ func TestGetSwap(t *testing.T) {
 			expectedErrorDescription: "request validation error: dst is required",
 		},
 		{
-			description: "Swap Error - exclude amount",
+			description: "Error - exclude amount",
 			params: swap.AggregationControllerGetSwapParams{
 				Src:  tokens.EthereumUsdc,
 				Dst:  tokens.EthereumWeth,
@@ -76,7 +76,7 @@ func TestGetSwap(t *testing.T) {
 			expectedErrorDescription: "request validation error: amount is required",
 		},
 		{
-			description: "Swap Error - exclude from",
+			description: "Error - exclude from",
 			params: swap.AggregationControllerGetSwapParams{
 				Src:    tokens.EthereumUsdc,
 				Dst:    tokens.EthereumWeth,
@@ -85,7 +85,7 @@ func TestGetSwap(t *testing.T) {
 			expectedErrorDescription: "request validation error: from is required",
 		},
 		{
-			description: "Swap Error - src and dst identical",
+			description: "Error - src and dst identical",
 			params: swap.AggregationControllerGetSwapParams{
 				Src:    tokens.EthereumUsdc,
 				Dst:    tokens.EthereumUsdc,

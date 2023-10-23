@@ -33,7 +33,7 @@ func TestGetQuote(t *testing.T) {
 		expectedErrorDescription string
 	}{
 		{
-			description: "Swap WETH to USDC",
+			description: "Quote swap WETH to USDC",
 			handlerFunc: func(w http.ResponseWriter, r *http.Request) {
 				assert.Equal(t, tokens.EthereumUsdc, r.URL.Query().Get("src"))
 				assert.Equal(t, tokens.EthereumWeth, r.URL.Query().Get("dst"))
@@ -46,7 +46,7 @@ func TestGetQuote(t *testing.T) {
 			},
 		},
 		{
-			description: "Swap Error - exclude src",
+			description: "Error - exclude src",
 			params: swap.AggregationControllerGetQuoteParams{
 				Dst:    tokens.EthereumWeth,
 				Amount: amounts.Ten18,
@@ -54,7 +54,7 @@ func TestGetQuote(t *testing.T) {
 			expectedErrorDescription: "request validation error: src is required",
 		},
 		{
-			description: "Swap Error - exclude dst",
+			description: "Error - exclude dst",
 			params: swap.AggregationControllerGetQuoteParams{
 				Src:    tokens.EthereumUsdc,
 				Amount: amounts.Ten18,
@@ -62,7 +62,7 @@ func TestGetQuote(t *testing.T) {
 			expectedErrorDescription: "request validation error: dst is required",
 		},
 		{
-			description: "Swap Error - exclude amount",
+			description: "Error - exclude amount",
 			params: swap.AggregationControllerGetQuoteParams{
 				Src: tokens.EthereumUsdc,
 				Dst: tokens.EthereumWeth,
@@ -70,7 +70,7 @@ func TestGetQuote(t *testing.T) {
 			expectedErrorDescription: "request validation error: amount is required",
 		},
 		{
-			description: "Swap Error - src and dst identical",
+			description: "Error - src and dst identical",
 			params: swap.AggregationControllerGetQuoteParams{
 				Src:    tokens.EthereumUsdc,
 				Dst:    tokens.EthereumUsdc,
