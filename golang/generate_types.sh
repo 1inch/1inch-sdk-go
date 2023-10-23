@@ -27,22 +27,17 @@ display_help() {
     echo ""
     echo "Options:"
     echo "  -logs            Enable verbose logging."
-    echo "  -use-local       Use the swagger files in swagger-static."
     echo "  -help            Display this help message."
     exit 0
 }
 
 verbose_logging=false
-use_local=false
 
 # Parse all CLI flags
 for arg in "$@"; do
     case "$arg" in
         -logs)
             verbose_logging=true
-            ;;
-        -use-local)
-            use_local=true
             ;;
         -help)
             display_help
@@ -74,33 +69,28 @@ fetch_and_generate() {
         echo
     fi
 
-    local api_swagger_file_name="swagger-static/$package_name-swagger.json"
+    local api_swagger_file_name="swagger-dynamic/$package_name-swagger.json"
+    curl -s "$api_swagger_url" > "$api_swagger_file_name"
 
-    if [ "$use_local" == "false" ]; then
+    # Check if curl was successful
+    response_code=$?
+    if [ $response_code -ne 0 ]; then
+        echo "The curl command to get the latest swagger file from our servers (url: $api_swagger_url) failed with an error code of $response_code."
+        exit $CURL_FAIL
+    fi
 
-        api_swagger_file_name="swagger-dynamic/$package_name-swagger.json"
-        curl -s "$api_swagger_url" > "$api_swagger_file_name"
+    # Check if the content contains "404"
+    if grep -q '^{\"statusCode\":404' "$api_swagger_file_name"; then
+        echo "The first contents of $api_swagger_file_name were a 404. The provided URL is likely wrong."
+        echo "Manually check the contents of $api_swagger_file_name for more information."
+        exit $SWAGGER_404
+    fi
 
-        # Check if curl was successful
-        response_code=$?
-        if [ $response_code -ne 0 ]; then
-            echo "The curl command to get the latest swagger file from our servers (url: $api_swagger_url) failed with an error code of $response_code."
-            exit $CURL_FAIL
-        fi
-
-        # Check if the content contains "404"
-        if grep -q '^{\"statusCode\":404' "$api_swagger_file_name"; then
-            echo "The first contents of $api_swagger_file_name were a 404. The provided URL is likely wrong."
-            echo "Manually check the contents of $api_swagger_file_name for more information."
-            exit $SWAGGER_404
-        fi
-
-        # Check if the content contains data that looks like an openapi spec
-        if ! grep -q '^{\"openapi\"' "$api_swagger_file_name"; then
-            echo "The first contents of $api_swagger_file_name does not look like openapi data. The request has likely failed."
-            echo "Manually check the contents of $api_swagger_file_name for more information."
-            exit $SWAGGER_INVALID_DATA
-        fi
+    # Check if the content contains data that looks like an openapi spec
+    if ! grep -q '^{\"openapi\"' "$api_swagger_file_name"; then
+        echo "The first contents of $api_swagger_file_name does not look like openapi data. The request has likely failed."
+        echo "Manually check the contents of $api_swagger_file_name for more information."
+        exit $SWAGGER_INVALID_DATA
     fi
 
     local output_file=$types_destination_directory/${types_file_name}
@@ -113,10 +103,7 @@ fetch_and_generate() {
     rm "$output_file.bak"
 }
 
-
-
 # Swap API
-# TODO This URL is not versioned. If we want to support auto-downloading of swagger files and backwards compatibility, We will need to have links to any version of our API swagger files.
 fetch_and_generate "https://api.1inch.io/swagger/ethereum-json" "swap" "client/swap"
 
 # Spot Price API
