@@ -57,14 +57,14 @@ func TestGetTokenPrices(t *testing.T) {
 	for _, tc := range testcases {
 		t.Run(fmt.Sprintf("%v", tc.description), func(t *testing.T) {
 
-			c, apiHandler, _, teardown, err := setup()
+			c, mux, _, teardown, err := setup()
 			require.NoError(t, err)
 			defer teardown()
 
 			if tc.handlerFunc != nil {
-				apiHandler.HandleFunc(endpoint, tc.handlerFunc)
+				mux.HandleFunc(endpoint, tc.handlerFunc)
 			} else {
-				apiHandler.HandleFunc(endpoint, defaultResponse)
+				mux.HandleFunc(endpoint, defaultResponse)
 			}
 
 			_, _, err = c.TokenPrices.GetPrices(context.Background(), tc.params)

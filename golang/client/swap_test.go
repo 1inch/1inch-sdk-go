@@ -60,14 +60,14 @@ func TestApproveAllowance(t *testing.T) {
 	for _, tc := range testcases {
 		t.Run(fmt.Sprintf("%v", tc.description), func(t *testing.T) {
 
-			c, apiHandler, _, teardown, err := setup()
+			c, mux, _, teardown, err := setup()
 			require.NoError(t, err)
 			defer teardown()
 
 			if tc.handlerFunc != nil {
-				apiHandler.HandleFunc(endpoint, tc.handlerFunc)
+				mux.HandleFunc(endpoint, tc.handlerFunc)
 			} else {
-				apiHandler.HandleFunc(endpoint, defaultResponse)
+				mux.HandleFunc(endpoint, defaultResponse)
 			}
 
 			allowanceResponse, _, err := c.Swap.ApproveAllowance(context.Background(), tc.params)
@@ -124,14 +124,14 @@ func TestApproveTransaction(t *testing.T) {
 	for _, tc := range testcases {
 		t.Run(fmt.Sprintf("%v", tc.description), func(t *testing.T) {
 
-			c, apiHandler, _, teardown, err := setup()
+			c, mux, _, teardown, err := setup()
 			require.NoError(t, err)
 			defer teardown()
 
 			if tc.handlerFunc != nil {
-				apiHandler.HandleFunc(endpoint, tc.handlerFunc)
+				mux.HandleFunc(endpoint, tc.handlerFunc)
 			} else {
-				apiHandler.HandleFunc(endpoint, defaultResponse)
+				mux.HandleFunc(endpoint, defaultResponse)
 			}
 
 			approveTransactionResponse, _, err := c.Swap.ApproveTransaction(context.Background(), tc.params)
@@ -217,14 +217,14 @@ func TestGetQuote(t *testing.T) {
 	for _, tc := range testcases {
 		t.Run(fmt.Sprintf("%v", tc.description), func(t *testing.T) {
 
-			c, apiHandler, _, teardown, err := setup()
+			c, mux, _, teardown, err := setup()
 			require.NoError(t, err)
 			defer teardown()
 
 			if tc.handlerFunc != nil {
-				apiHandler.HandleFunc(endpoint, tc.handlerFunc)
+				mux.HandleFunc(endpoint, tc.handlerFunc)
 			} else {
-				apiHandler.HandleFunc(endpoint, defaultResponse)
+				mux.HandleFunc(endpoint, defaultResponse)
 			}
 
 			_, _, err = c.Swap.GetQuote(context.Background(), tc.params)
@@ -324,14 +324,14 @@ func TestGetSwap(t *testing.T) {
 	for _, tc := range testcases {
 		t.Run(fmt.Sprintf("%v", tc.description), func(t *testing.T) {
 
-			c, apiHandler, _, teardown, err := setup()
+			c, mux, _, teardown, err := setup()
 			require.NoError(t, err)
 			defer teardown()
 
 			if tc.handlerFunc != nil {
-				apiHandler.HandleFunc(endpoint, tc.handlerFunc)
+				mux.HandleFunc(endpoint, tc.handlerFunc)
 			} else {
-				apiHandler.HandleFunc(endpoint, defaultResponse)
+				mux.HandleFunc(endpoint, defaultResponse)
 			}
 
 			_, _, err = c.Swap.GetSwap(context.Background(), tc.params)
