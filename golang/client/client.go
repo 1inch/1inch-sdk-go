@@ -159,10 +159,10 @@ func (c *Client) Do(ctx context.Context, req *http.Request, v interface{}) (*htt
 	return resp, err
 }
 
-// addOptions adds the parameters in opts as URL query parameters to s. opts
-// must be a struct whose fields may contain "url" tags.
-func addOptions(s string, opts interface{}) (string, error) {
-	v := reflect.ValueOf(opts)
+// addQueryParameters adds the parameters in the struct params as URL query parameters to s.
+// params must be a struct whose fields may contain "url" tags.
+func addQueryParameters(s string, params interface{}) (string, error) {
+	v := reflect.ValueOf(params)
 	if v.Kind() == reflect.Ptr && v.IsNil() {
 		return s, nil
 	}
@@ -172,7 +172,7 @@ func addOptions(s string, opts interface{}) (string, error) {
 		return s, err
 	}
 
-	qs, err := query.Values(opts)
+	qs, err := query.Values(params)
 	if err != nil {
 		return s, err
 	}

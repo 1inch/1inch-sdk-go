@@ -26,6 +26,12 @@ Once you have an initialized client, API calls can be made using any of the clie
 
 ## Development
 
+### Type generation
+
+// TODO explain this more
+
+Type generation is done using the `generate_types.sh` script 
+
 ### Swagger file formatting
 For consistency, Swagger files should be formatted with `prettier`
 
