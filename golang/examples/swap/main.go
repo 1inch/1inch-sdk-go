@@ -27,14 +27,14 @@ func main() {
 		log.Fatalf("Failed to create client: %v", err)
 	}
 
-	// Build the config for the quote call
+	// Build the config for the quote request
 	quoteParams := swap.AggregationControllerGetQuoteParams{
 		Src:    tokens.EthereumUsdc,
 		Dst:    tokens.EthereumWeth,
 		Amount: amounts.Ten6,
 	}
 
-	// Execute quote call
+	// Execute quote request
 	quoteResponse, _, err := c.Swap.GetQuote(context.Background(), quoteParams)
 	if err != nil {
 		log.Fatalf("Failed to get quote: %v", err)
@@ -44,16 +44,16 @@ func main() {
 
 	helpers.Sleep()
 
-	// Build the config for the swap call
+	// Build the config for the swap request
 	swapParams := swap.AggregationControllerGetSwapParams{
 		Src:             tokens.EthereumUsdc,
 		Dst:             tokens.EthereumWeth,
 		From:            addresses.Vitalik,
 		Amount:          amounts.Ten6,
-		DisableEstimate: helpers.BoolPtr(true),
+		DisableEstimate: helpers.GetPtr(true),
 	}
 
-	// Execute swap call
+	// Execute swap request
 	// This will return the transaction data used by a wallet to execute the swap
 	swapResponse, _, err := c.Swap.GetSwap(context.Background(), swapParams)
 	if err != nil {

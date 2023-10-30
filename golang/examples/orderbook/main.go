@@ -30,13 +30,13 @@ func main() {
 		log.Fatalf("Failed to create client: %v", err)
 	}
 
-	// Build the config for fetching token prices
+	// Build the config for the orders request
 	limitOrdersParams := orderbook.LimitOrderV3SubscribedApiControllerGetAllLimitOrdersParams{
-		Page:  helpers.Float32Ptr(1),
-		Limit: helpers.Float32Ptr(2),
+		Page:  helpers.GetPtr(float32(1)),
+		Limit: helpers.GetPtr(float32(2)),
 	}
 
-	// Execute quote call
+	// Execute orders request
 	allOrdersResponse, _, err := c.Orderbook.GetAllOrders(context.Background(), limitOrdersParams)
 	if err != nil {
 		log.Fatalf("Failed to get quote: %v", err)

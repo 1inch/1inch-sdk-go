@@ -33,7 +33,7 @@ fi
 
 # Check if Go is installed
 if ! which go > /dev/null 2>&1; then
-    echo "Golang is not installed or not in PATH!"
+    echo "golang is not installed or not in PATH!"
     exit 1
 fi
 

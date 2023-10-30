@@ -24,12 +24,12 @@ func main() {
 		log.Fatalf("Failed to create client: %v", err)
 	}
 
-	// Build the config for fetching token prices
+	// Build the config for the token prices request
 	priceParameters := tokenprices.ChainControllerByAddressesParams{
 		Currency: tokenprices.GetCurrencyParameter(tokenprices.USD),
 	}
 
-	// Fetch token prices
+	// Execute token prices request
 	tokenPrices, _, err := c.TokenPrices.GetPrices(context.Background(), priceParameters)
 	if err != nil {
 		log.Fatalf("Failed to get token prices: %v", err)
