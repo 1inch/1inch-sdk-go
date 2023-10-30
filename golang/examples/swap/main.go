@@ -18,7 +18,7 @@ func main() {
 
 	// Build the config for the client
 	config := client.Config{
-		ApiKey: os.Getenv("DEV_PORTAL_TOKEN"),
+		DevPortalApiKey: os.Getenv("DEV_PORTAL_TOKEN"),
 	}
 
 	// Create the 1inch client

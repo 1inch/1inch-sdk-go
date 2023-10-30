@@ -2,7 +2,6 @@ package client
 
 import (
 	"context"
-	"fmt"
 	"net/http"
 
 	"1inch-sdk-golang/client/swap"
@@ -15,7 +14,7 @@ func (s *SwapService) ApproveAllowance(ctx context.Context, params swap.ApproveC
 
 	err := params.Validate()
 	if err != nil {
-		return nil, nil, fmt.Errorf("request validation error: %v", err)
+		return nil, nil, NewRequestValidationError(err) // TODO move this error constructor call into the Validate function if possible
 	}
 
 	u, err = addQueryParameters(u, params)
@@ -59,7 +58,7 @@ func (s *SwapService) ApproveTransaction(ctx context.Context, params swap.Approv
 
 	err := params.Validate()
 	if err != nil {
-		return nil, nil, fmt.Errorf("request validation error: %v", err)
+		return nil, nil, NewRequestValidationError(err)
 	}
 
 	u, err = addQueryParameters(u, params)
@@ -103,7 +102,7 @@ func (s *SwapService) GetQuote(ctx context.Context, params swap.AggregationContr
 
 	err := params.Validate()
 	if err != nil {
-		return nil, nil, fmt.Errorf("request validation error: %v", err)
+		return nil, nil, NewRequestValidationError(err)
 	}
 
 	u, err = addQueryParameters(u, params)
@@ -130,7 +129,7 @@ func (s *SwapService) GetSwap(ctx context.Context, params swap.AggregationContro
 
 	err := params.Validate()
 	if err != nil {
-		return nil, nil, fmt.Errorf("request validation error: %v", err)
+		return nil, nil, NewRequestValidationError(err)
 	}
 
 	u, err = addQueryParameters(u, params)

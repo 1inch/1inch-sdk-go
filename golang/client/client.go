@@ -4,11 +4,13 @@ import (
 	"bytes"
 	"context"
 	"encoding/json"
+	"errors"
 	"fmt"
 	"io"
 	"net/http"
 	"net/url"
 	"reflect"
+	"strings"
 
 	"github.com/google/go-querystring/query"
 )
@@ -29,8 +31,23 @@ type service struct {
 }
 
 type Config struct {
-	TargetEnvironment Environment
-	ApiKey            string
+	TargetEnvironment   Environment
+	DevPortalApiKey     string
+	Web3HttpProviderUrl string
+	EtherscanApiKey     string
+	WalletAddress       string
+	WalletKey           string
+	LimitOrderContract  string // TODO Probably want to move this somewhere else
+	ChainId             string // TODO Probably want to do this a different way
+}
+
+func (c *Config) validate() error {
+
+	if c.DevPortalApiKey == "" {
+		return fmt.Errorf("API key is required")
+	}
+
+	return nil
 }
 
 type Client struct {
@@ -40,17 +57,22 @@ type Client struct {
 	BaseURL *url.URL
 	// The API key to use for authentication
 	ApiKey string
+	// The key of the wallet that will be used to sign transactions
+	WalletKey string
 	// A struct that will contain a reference to this client. Used to separate each API into a unique namespace to aid in method discovery
 	common service
 	// Isolated namespaces for each API
 	Swap        *SwapService
 	TokenPrices *TokenPricesService
+	Orderbook   *OrderbookService
 }
 
 func NewClient(config Config) (*Client, error) {
 
-	if config.ApiKey == "" {
-		return nil, fmt.Errorf("API key is required")
+	// TODO this may be replaceable with https://github.com/go-playground/validator
+	err := config.validate()
+	if err != nil {
+		return nil, fmt.Errorf("config validation error: %v", err)
 	}
 
 	var baseUrl *url.URL
@@ -68,13 +90,15 @@ func NewClient(config Config) (*Client, error) {
 	c := &Client{
 		httpClient: &http.Client{},
 		BaseURL:    baseUrl,
-		ApiKey:     config.ApiKey,
+		ApiKey:     config.DevPortalApiKey,
+		WalletKey:  config.WalletKey,
 	}
 
 	c.common.client = c
 
 	c.Swap = (*SwapService)(&c.common)
 	c.TokenPrices = (*TokenPricesService)(&c.common)
+	c.Orderbook = (*OrderbookService)(&c.common)
 
 	return c, nil
 }
@@ -179,4 +203,15 @@ func addQueryParameters(s string, params interface{}) (string, error) {
 
 	u.RawQuery = qs.Encode()
 	return u.String(), nil
+}
+
+// ReplacePathVariable replaces the path variable in the given URL with the specified value.
+func ReplacePathVariable(path, pathVarName string, value interface{}) (string, error) {
+	placeholder := fmt.Sprintf("{%s}", pathVarName)
+
+	if !strings.Contains(path, placeholder) {
+		return "", errors.New("path variable not found in URL path")
+	}
+
+	return strings.Replace(path, placeholder, fmt.Sprintf("%s", value), 1), nil
 }

@@ -36,7 +36,7 @@ func TestApproveAllowanceIntegration(t *testing.T) {
 
 	c, err := NewClient(Config{
 		TargetEnvironment: EnvironmentProduction,
-		ApiKey:            os.Getenv("DEV_PORTAL_TOKEN"),
+		DevPortalApiKey:   os.Getenv("DEV_PORTAL_TOKEN"),
 	})
 	require.NoError(t, err)
 
@@ -69,7 +69,7 @@ func TestApproveSpenderIntegration(t *testing.T) {
 
 	c, err := NewClient(Config{
 		TargetEnvironment: EnvironmentProduction,
-		ApiKey:            os.Getenv("DEV_PORTAL_TOKEN"),
+		DevPortalApiKey:   os.Getenv("DEV_PORTAL_TOKEN"),
 	})
 	require.NoError(t, err)
 
@@ -107,7 +107,7 @@ func TestApproveTransactionIntegration(t *testing.T) {
 
 	c, err := NewClient(Config{
 		TargetEnvironment: EnvironmentProduction,
-		ApiKey:            os.Getenv("DEV_PORTAL_TOKEN"),
+		DevPortalApiKey:   os.Getenv("DEV_PORTAL_TOKEN"),
 	})
 	require.NoError(t, err)
 
@@ -141,7 +141,7 @@ func TestGetLiquiditySourcesIntegration(t *testing.T) {
 
 	c, err := NewClient(Config{
 		TargetEnvironment: EnvironmentProduction,
-		ApiKey:            os.Getenv("DEV_PORTAL_TOKEN"),
+		DevPortalApiKey:   os.Getenv("DEV_PORTAL_TOKEN"),
 	})
 	require.NoError(t, err)
 
@@ -185,7 +185,7 @@ func TestGetTokensIntegration(t *testing.T) {
 
 	c, err := NewClient(Config{
 		TargetEnvironment: EnvironmentProduction,
-		ApiKey:            os.Getenv("DEV_PORTAL_TOKEN"),
+		DevPortalApiKey:   os.Getenv("DEV_PORTAL_TOKEN"),
 	})
 	require.NoError(t, err)
 

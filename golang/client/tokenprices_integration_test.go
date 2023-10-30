@@ -33,7 +33,7 @@ func TestGetTokenPricesIntegration(t *testing.T) {
 
 	c, err := NewClient(Config{
 		TargetEnvironment: EnvironmentProduction,
-		ApiKey:            os.Getenv("DEV_PORTAL_TOKEN"),
+		DevPortalApiKey:   os.Getenv("DEV_PORTAL_TOKEN"),
 	})
 	require.NoError(t, err)
 

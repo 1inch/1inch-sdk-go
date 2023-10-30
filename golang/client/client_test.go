@@ -19,7 +19,7 @@ func TestNewConfig(t *testing.T) {
 			description: "Production",
 			config: Config{
 				TargetEnvironment: EnvironmentProduction,
-				ApiKey:            "abc123",
+				DevPortalApiKey:   "abc123",
 			},
 			expectedEnvironment:      baseUrlProduction.Host,
 			expectedErrorDescription: "",
@@ -27,7 +27,7 @@ func TestNewConfig(t *testing.T) {
 		{
 			description: "Production (excluded entry)",
 			config: Config{
-				ApiKey: "abc123",
+				DevPortalApiKey: "abc123",
 			},
 			expectedEnvironment:      baseUrlProduction.Host,
 			expectedErrorDescription: "",
@@ -36,7 +36,7 @@ func TestNewConfig(t *testing.T) {
 			description: "Staging",
 			config: Config{
 				TargetEnvironment: EnvironmentStaging,
-				ApiKey:            "abc123",
+				DevPortalApiKey:   "abc123",
 			},
 			expectedEnvironment:      baseUrlStaging.Host,
 			expectedErrorDescription: "",
@@ -45,7 +45,7 @@ func TestNewConfig(t *testing.T) {
 			description: "Error - unrecognized environment",
 			config: Config{
 				TargetEnvironment: Environment("invalid"),
-				ApiKey:            "abc123",
+				DevPortalApiKey:   "abc123",
 			},
 			expectedEnvironment:      baseUrlStaging.Host,
 			expectedErrorDescription: "unrecognized environment: invalid",
@@ -53,9 +53,9 @@ func TestNewConfig(t *testing.T) {
 		{
 			description: "Error - no API key",
 			config: Config{
-				ApiKey: "",
+				DevPortalApiKey: "",
 			},
-			expectedErrorDescription: "API key is required",
+			expectedErrorDescription: "config validation error: API key is required",
 		},
 	}
 

@@ -3,6 +3,7 @@ module 1inch-sdk-golang
 go 1.21.1
 
 require (
+	github.com/emirpasic/gods v1.18.1
 	github.com/google/go-querystring v1.1.0
 	github.com/stretchr/testify v1.8.4
 )

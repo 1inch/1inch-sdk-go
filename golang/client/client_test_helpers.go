@@ -26,7 +26,7 @@ func setup() (*Client, *http.ServeMux, string, func(), error) {
 	c, err := NewClient(
 		Config{
 			TargetEnvironment: EnvironmentProduction,
-			ApiKey:            os.Getenv("DEV_PORTAL_TOKEN"),
+			DevPortalApiKey:   os.Getenv("DEV_PORTAL_TOKEN"),
 		})
 	if err != nil {
 		return nil, nil, "", nil, err
