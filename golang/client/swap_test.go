@@ -75,7 +75,7 @@ func TestApproveAllowance(t *testing.T) {
 				if err == nil {
 					assert.FailNow(t, "Expected error message, but error was nil")
 				}
-				require.Contains(t, tc.expectedErrorDescription, err.Error())
+				require.Contains(t, err.Error(), tc.expectedErrorDescription)
 				return
 			}
 			require.NoError(t, err)
@@ -139,7 +139,7 @@ func TestApproveTransaction(t *testing.T) {
 				if err == nil {
 					assert.FailNow(t, "Expected error message, but error was nil")
 				}
-				require.Contains(t, tc.expectedErrorDescription, err.Error())
+				require.Contains(t, err.Error(), tc.expectedErrorDescription)
 				return
 			}
 			require.NoError(t, err)
@@ -232,7 +232,7 @@ func TestGetQuote(t *testing.T) {
 				if err == nil {
 					assert.FailNow(t, "Expected error message, but error was nil")
 				}
-				require.Contains(t, tc.expectedErrorDescription, err.Error())
+				require.Contains(t, err.Error(), tc.expectedErrorDescription)
 				return
 			}
 			require.NoError(t, err)
@@ -339,7 +339,7 @@ func TestGetSwap(t *testing.T) {
 				if err == nil {
 					assert.FailNow(t, "Expected error message, but error was nil")
 				}
-				require.Contains(t, tc.expectedErrorDescription, err.Error())
+				require.Contains(t, err.Error(), tc.expectedErrorDescription)
 				return
 			}
 			require.NoError(t, err)
