@@ -2,12 +2,14 @@ package tokenprices
 
 import (
 	"fmt"
+
+	clienterrors "1inch-sdk-golang/client/errors"
 )
 
 func (params *ChainControllerByAddressesParams) Validate() error {
 	if params.Currency != nil && *params.Currency != "" {
 		if !contains(currencies, *params.Currency) {
-			return fmt.Errorf("currency value %s is not valid", string(*params.Currency))
+			return clienterrors.NewRequestValidationError(fmt.Sprintf("currency value %s is not valid", string(*params.Currency)))
 		}
 	}
 	return nil

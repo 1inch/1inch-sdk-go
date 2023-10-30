@@ -2,9 +2,9 @@ package client
 
 import (
 	"context"
-	"errors"
 	"net/http"
 
+	clienterrors "1inch-sdk-golang/client/errors"
 	"1inch-sdk-golang/client/orderbook"
 	"1inch-sdk-golang/client/swap"
 	"1inch-sdk-golang/helpers"
@@ -17,7 +17,7 @@ func (s *OrderbookService) CreateOrder(ctx context.Context, params orderbook.Lim
 
 	err := params.Validate()
 	if err != nil {
-		return nil, nil, NewRequestValidationError(err)
+		return nil, nil, err
 	}
 
 	u, err = addQueryParameters(u, params)
@@ -44,17 +44,17 @@ func (s *OrderbookService) GetOrdersByCreatorAddress(ctx context.Context, addres
 	u := "/orderbook/v3.0/1/address/{address}"
 
 	if !helpers.IsEthereumAddress(address) {
-		return nil, nil, NewRequestValidationError(errors.New("address must be a valid Ethereum address"))
+		return nil, nil, clienterrors.NewRequestValidationError("address must be a valid Ethereum address")
 	}
 
 	u, err := ReplacePathVariable(u, "address", address)
 	if err != nil {
-		return nil, nil, NewRequestValidationError(err)
+		return nil, nil, err
 	}
 
 	err = params.Validate()
 	if err != nil {
-		return nil, nil, NewRequestValidationError(err)
+		return nil, nil, err
 	}
 
 	u, err = addQueryParameters(u, params)
@@ -81,7 +81,7 @@ func (s *OrderbookService) GetAllOrders(ctx context.Context, params orderbook.Li
 
 	err := params.Validate()
 	if err != nil {
-		return nil, nil, NewRequestValidationError(err)
+		return nil, nil, err
 	}
 
 	u, err = addQueryParameters(u, params)
@@ -108,7 +108,7 @@ func (s *OrderbookService) GetCount(ctx context.Context, params orderbook.LimitO
 
 	err := params.Validate()
 	if err != nil {
-		return nil, nil, NewRequestValidationError(err)
+		return nil, nil, err
 	}
 
 	u, err = addQueryParameters(u, params)
@@ -135,7 +135,7 @@ func (s *OrderbookService) GetEvent(ctx context.Context, orderHash string) (*ord
 
 	u, err := ReplacePathVariable(u, "orderHash", orderHash)
 	if err != nil {
-		return nil, nil, NewRequestValidationError(err)
+		return nil, nil, err
 	}
 
 	req, err := s.client.NewRequest("GET", u, nil)
@@ -157,7 +157,7 @@ func (s *OrderbookService) GetEvents(ctx context.Context, params orderbook.Limit
 
 	err := params.Validate()
 	if err != nil {
-		return nil, nil, NewRequestValidationError(err)
+		return nil, nil, err
 	}
 
 	u, err = addQueryParameters(u, params)
@@ -184,19 +184,19 @@ func (s *OrderbookService) GetActiveOrdersWithPermit(ctx context.Context, wallet
 	u := "/orderbook/v3.0/1/has-active-orders-with-permit/{walletAddress}/{token}"
 
 	if !helpers.IsEthereumAddress(wallet) {
-		return nil, nil, NewRequestValidationError(errors.New("wallet must be a valid Ethereum address"))
+		return nil, nil, clienterrors.NewRequestValidationError("wallet must be a valid Ethereum address")
 	}
 	u, err := ReplacePathVariable(u, "walletAddress", wallet)
 	if err != nil {
-		return nil, nil, NewRequestValidationError(err)
+		return nil, nil, err
 	}
 
 	if !helpers.IsEthereumAddress(token) {
-		return nil, nil, NewRequestValidationError(errors.New("token must be a valid Ethereum address"))
+		return nil, nil, clienterrors.NewRequestValidationError("token must be a valid Ethereum address")
 	}
 	u, err = ReplacePathVariable(u, "token", token)
 	if err != nil {
-		return nil, nil, NewRequestValidationError(err)
+		return nil, nil, err
 	}
 
 	req, err := s.client.NewRequest("GET", u, nil)

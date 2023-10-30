@@ -42,18 +42,18 @@ func TestApproveAllowance(t *testing.T) {
 			expectedOutput: "0",
 		},
 		{
-			description: "Error - exclude tokenAddress",
+			description: "Error - Exclude tokenAddress",
 			params: swap.ApproveControllerGetAllowanceParams{
 				WalletAddress: addresses.Vitalik,
 			},
-			expectedErrorDescription: "request validation error: tokenAddress is required",
+			expectedErrorDescription: "tokenAddress is required",
 		},
 		{
-			description: "Error - exclude walletAddress",
+			description: "Error - Exclude walletAddress",
 			params: swap.ApproveControllerGetAllowanceParams{
 				TokenAddress: tokens.EthereumWeth,
 			},
-			expectedErrorDescription: "request validation error: walletAddress is required",
+			expectedErrorDescription: "walletAddress is required",
 		},
 	}
 
@@ -75,7 +75,7 @@ func TestApproveAllowance(t *testing.T) {
 				if err == nil {
 					assert.FailNow(t, "Expected error message, but error was nil")
 				}
-				assert.Equal(t, tc.expectedErrorDescription, err.Error())
+				require.Contains(t, tc.expectedErrorDescription, err.Error())
 				return
 			}
 			require.NoError(t, err)
@@ -117,7 +117,7 @@ func TestApproveTransaction(t *testing.T) {
 		{
 			description:              "Error - exclude tokenAddress",
 			params:                   swap.ApproveControllerGetCallDataParams{},
-			expectedErrorDescription: "request validation error: tokenAddress is required",
+			expectedErrorDescription: "tokenAddress is required",
 		},
 	}
 
@@ -139,7 +139,7 @@ func TestApproveTransaction(t *testing.T) {
 				if err == nil {
 					assert.FailNow(t, "Expected error message, but error was nil")
 				}
-				assert.Equal(t, tc.expectedErrorDescription, err.Error())
+				require.Contains(t, tc.expectedErrorDescription, err.Error())
 				return
 			}
 			require.NoError(t, err)
@@ -167,7 +167,7 @@ func TestGetQuote(t *testing.T) {
 		expectedErrorDescription string
 	}{
 		{
-			description: "Quote swap WETH to USDC",
+			description: "Success - Quote swap WETH to USDC",
 			handlerFunc: func(w http.ResponseWriter, r *http.Request) {
 				assert.Equal(t, tokens.EthereumUsdc, r.URL.Query().Get("src"))
 				assert.Equal(t, tokens.EthereumWeth, r.URL.Query().Get("dst"))
@@ -185,7 +185,7 @@ func TestGetQuote(t *testing.T) {
 				Dst:    tokens.EthereumWeth,
 				Amount: amounts.Ten18,
 			},
-			expectedErrorDescription: "request validation error: src is required",
+			expectedErrorDescription: "src is required",
 		},
 		{
 			description: "Error - exclude dst",
@@ -193,7 +193,7 @@ func TestGetQuote(t *testing.T) {
 				Src:    tokens.EthereumUsdc,
 				Amount: amounts.Ten18,
 			},
-			expectedErrorDescription: "request validation error: dst is required",
+			expectedErrorDescription: "dst is required",
 		},
 		{
 			description: "Error - exclude amount",
@@ -201,7 +201,7 @@ func TestGetQuote(t *testing.T) {
 				Src: tokens.EthereumUsdc,
 				Dst: tokens.EthereumWeth,
 			},
-			expectedErrorDescription: "request validation error: amount is required",
+			expectedErrorDescription: "amount is required",
 		},
 		{
 			description: "Error - src and dst identical",
@@ -210,7 +210,7 @@ func TestGetQuote(t *testing.T) {
 				Dst:    tokens.EthereumUsdc,
 				Amount: amounts.Ten18,
 			},
-			expectedErrorDescription: "request validation error: src and dst tokens must be different",
+			expectedErrorDescription: "src and dst tokens must be different",
 		},
 	}
 
@@ -232,7 +232,7 @@ func TestGetQuote(t *testing.T) {
 				if err == nil {
 					assert.FailNow(t, "Expected error message, but error was nil")
 				}
-				assert.Equal(t, tc.expectedErrorDescription, err.Error())
+				require.Contains(t, tc.expectedErrorDescription, err.Error())
 				return
 			}
 			require.NoError(t, err)
@@ -259,7 +259,7 @@ func TestGetSwap(t *testing.T) {
 		expectedErrorDescription string
 	}{
 		{
-			description: "Swap WETH to USDC",
+			description: "Success - Swap WETH to USDC",
 			handlerFunc: func(w http.ResponseWriter, r *http.Request) {
 				assert.Equal(t, tokens.EthereumUsdc, r.URL.Query().Get("src"))
 				assert.Equal(t, tokens.EthereumWeth, r.URL.Query().Get("dst"))
@@ -280,7 +280,7 @@ func TestGetSwap(t *testing.T) {
 				From:   addresses.Vitalik,
 				Amount: amounts.Ten18,
 			},
-			expectedErrorDescription: "request validation error: src is required",
+			expectedErrorDescription: "src is required",
 		},
 		{
 			description: "Error - exclude dst",
@@ -289,7 +289,7 @@ func TestGetSwap(t *testing.T) {
 				From:   addresses.Vitalik,
 				Amount: amounts.Ten18,
 			},
-			expectedErrorDescription: "request validation error: dst is required",
+			expectedErrorDescription: "dst is required",
 		},
 		{
 			description: "Error - exclude amount",
@@ -298,7 +298,7 @@ func TestGetSwap(t *testing.T) {
 				Dst:  tokens.EthereumWeth,
 				From: addresses.Vitalik,
 			},
-			expectedErrorDescription: "request validation error: amount is required",
+			expectedErrorDescription: "amount is required",
 		},
 		{
 			description: "Error - exclude from",
@@ -307,7 +307,7 @@ func TestGetSwap(t *testing.T) {
 				Dst:    tokens.EthereumWeth,
 				Amount: amounts.Ten18,
 			},
-			expectedErrorDescription: "request validation error: from is required",
+			expectedErrorDescription: "from is required",
 		},
 		{
 			description: "Error - src and dst identical",
@@ -317,7 +317,7 @@ func TestGetSwap(t *testing.T) {
 				Amount: amounts.Ten18,
 				From:   addresses.Vitalik,
 			},
-			expectedErrorDescription: "request validation error: src and dst tokens must be different",
+			expectedErrorDescription: "src and dst tokens must be different",
 		},
 	}
 
@@ -339,7 +339,7 @@ func TestGetSwap(t *testing.T) {
 				if err == nil {
 					assert.FailNow(t, "Expected error message, but error was nil")
 				}
-				assert.Equal(t, tc.expectedErrorDescription, err.Error())
+				require.Contains(t, tc.expectedErrorDescription, err.Error())
 				return
 			}
 			require.NoError(t, err)

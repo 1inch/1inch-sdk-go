@@ -42,14 +42,14 @@ func TestGetOrdersByCreatorAddress(t *testing.T) {
 			expectedOutput: defaultSignature,
 		},
 		{
-			description: "missing owner address",
+			description: "Error - Missing owner address",
 			params: orderbook.LimitOrderV3SubscribedApiControllerGetAllLimitOrdersParams{
 				Page: helpers.GetPtr(float32(0)),
 			},
 			expectedErrorDescription: "address must be a valid Ethereum address",
 		},
 		{
-			description: "Invalid owner address",
+			description: "Error - Invalid owner address",
 			owner:       "0x0",
 			params: orderbook.LimitOrderV3SubscribedApiControllerGetAllLimitOrdersParams{
 				Page: helpers.GetPtr(float32(0)),
@@ -57,7 +57,7 @@ func TestGetOrdersByCreatorAddress(t *testing.T) {
 			expectedErrorDescription: "address must be a valid Ethereum address",
 		},
 		{
-			description: "Invalid page value",
+			description: "Error - Invalid page value",
 			owner:       addresses.Vitalik,
 			params: orderbook.LimitOrderV3SubscribedApiControllerGetAllLimitOrdersParams{
 				Page: helpers.GetPtr(float32(0)),
@@ -65,7 +65,7 @@ func TestGetOrdersByCreatorAddress(t *testing.T) {
 			expectedErrorDescription: "page must be greater than 0",
 		},
 		{
-			description: "Invalid limit value",
+			description: "Error - Invalid limit value",
 			owner:       addresses.Vitalik,
 			params: orderbook.LimitOrderV3SubscribedApiControllerGetAllLimitOrdersParams{
 				Limit: helpers.GetPtr(float32(0)),
@@ -73,7 +73,7 @@ func TestGetOrdersByCreatorAddress(t *testing.T) {
 			expectedErrorDescription: "limit must be greater than 0",
 		},
 		{
-			description: "Invalid status",
+			description: "Error - Invalid status",
 			owner:       addresses.Vitalik,
 			params: orderbook.LimitOrderV3SubscribedApiControllerGetAllLimitOrdersParams{
 				Page:     helpers.GetPtr(float32(1)),
@@ -83,7 +83,7 @@ func TestGetOrdersByCreatorAddress(t *testing.T) {
 			expectedErrorDescription: "statuses can only contain 1, 2, and/or 3",
 		},
 		{
-			description: "Invalid sortBy",
+			description: "Error - Invalid sortBy",
 			owner:       addresses.Vitalik,
 			params: orderbook.LimitOrderV3SubscribedApiControllerGetAllLimitOrdersParams{
 				Page:   helpers.GetPtr(float32(1)),
@@ -93,7 +93,7 @@ func TestGetOrdersByCreatorAddress(t *testing.T) {
 			expectedErrorDescription: "sortBy can only contain createDateTime, takerRate, makerRate, makerAmount, or takerAmount",
 		},
 		{
-			description: "Invalid takerAddress",
+			description: "Error - Invalid takerAddress",
 			owner:       addresses.Vitalik,
 			params: orderbook.LimitOrderV3SubscribedApiControllerGetAllLimitOrdersParams{
 				Page:       helpers.GetPtr(float32(1)),
@@ -103,7 +103,7 @@ func TestGetOrdersByCreatorAddress(t *testing.T) {
 			expectedErrorDescription: "takerAsset must be a valid Ethereum address",
 		},
 		{
-			description: "Invalid makerAddress",
+			description: "Error - Invalid makerAddress",
 			owner:       addresses.Vitalik,
 			params: orderbook.LimitOrderV3SubscribedApiControllerGetAllLimitOrdersParams{
 				Page:       helpers.GetPtr(float32(1)),
@@ -132,7 +132,7 @@ func TestGetOrdersByCreatorAddress(t *testing.T) {
 				if err == nil {
 					assert.FailNow(t, "Expected error message, but error was nil")
 				}
-				assert.Contains(t, err.Error(), tc.expectedErrorDescription)
+				require.Contains(t, err.Error(), tc.expectedErrorDescription)
 				return
 			}
 			require.NoError(t, err)
@@ -166,21 +166,21 @@ func TestGetAllOrders(t *testing.T) {
 			expectedOutput: defaultSignature,
 		},
 		{
-			description: "Invalid page value",
+			description: "Error - Invalid page value",
 			params: orderbook.LimitOrderV3SubscribedApiControllerGetAllLimitOrdersParams{
 				Page: helpers.GetPtr(float32(0)),
 			},
 			expectedErrorDescription: "page must be greater than 0",
 		},
 		{
-			description: "Invalid limit value",
+			description: "Error - Invalid limit value",
 			params: orderbook.LimitOrderV3SubscribedApiControllerGetAllLimitOrdersParams{
 				Limit: helpers.GetPtr(float32(0)),
 			},
 			expectedErrorDescription: "limit must be greater than 0",
 		},
 		{
-			description: "Invalid status",
+			description: "Error - Invalid status",
 			params: orderbook.LimitOrderV3SubscribedApiControllerGetAllLimitOrdersParams{
 				Page:     helpers.GetPtr(float32(1)),
 				Limit:    helpers.GetPtr(float32(2)),
@@ -189,7 +189,7 @@ func TestGetAllOrders(t *testing.T) {
 			expectedErrorDescription: "statuses can only contain 1, 2, and/or 3",
 		},
 		{
-			description: "Invalid sortBy",
+			description: "Error - Invalid sortBy",
 			params: orderbook.LimitOrderV3SubscribedApiControllerGetAllLimitOrdersParams{
 				Page:   helpers.GetPtr(float32(1)),
 				Limit:  helpers.GetPtr(float32(2)),
@@ -198,7 +198,7 @@ func TestGetAllOrders(t *testing.T) {
 			expectedErrorDescription: "sortBy can only contain createDateTime, takerRate, makerRate, makerAmount, or takerAmount",
 		},
 		{
-			description: "Invalid takerAddress",
+			description: "Error - Invalid takerAddress",
 			params: orderbook.LimitOrderV3SubscribedApiControllerGetAllLimitOrdersParams{
 				Page:       helpers.GetPtr(float32(1)),
 				Limit:      helpers.GetPtr(float32(2)),
@@ -207,7 +207,7 @@ func TestGetAllOrders(t *testing.T) {
 			expectedErrorDescription: "takerAsset must be a valid Ethereum address",
 		},
 		{
-			description: "Invalid makerAddress",
+			description: "Error - Invalid makerAddress",
 			params: orderbook.LimitOrderV3SubscribedApiControllerGetAllLimitOrdersParams{
 				Page:       helpers.GetPtr(float32(1)),
 				Limit:      helpers.GetPtr(float32(2)),
@@ -235,7 +235,7 @@ func TestGetAllOrders(t *testing.T) {
 				if err == nil {
 					assert.FailNow(t, "Expected error message, but error was nil")
 				}
-				assert.Contains(t, err.Error(), tc.expectedErrorDescription)
+				require.Contains(t, err.Error(), tc.expectedErrorDescription)
 				return
 			}
 			require.NoError(t, err)
@@ -300,7 +300,7 @@ func TestGetCount(t *testing.T) {
 				if err == nil {
 					assert.FailNow(t, "Expected error message, but error was nil")
 				}
-				assert.Contains(t, err.Error(), tc.expectedErrorDescription)
+				require.Contains(t, err.Error(), tc.expectedErrorDescription)
 				return
 			}
 			require.NoError(t, err)
@@ -349,7 +349,7 @@ func TestGetEvent(t *testing.T) {
 				if err == nil {
 					assert.FailNow(t, "Expected error message, but error was nil")
 				}
-				assert.Contains(t, err.Error(), tc.expectedErrorDescription)
+				require.Contains(t, err.Error(), tc.expectedErrorDescription)
 				return
 			}
 			require.NoError(t, err)
@@ -410,7 +410,7 @@ func TestGetEvents(t *testing.T) {
 				if err == nil {
 					assert.FailNow(t, "Expected error message, but error was nil")
 				}
-				assert.Contains(t, err.Error(), tc.expectedErrorDescription)
+				require.Contains(t, err.Error(), tc.expectedErrorDescription)
 				return
 			}
 			require.NoError(t, err)
@@ -477,7 +477,7 @@ func TestGetActiveOrdersWithPermit(t *testing.T) {
 				if err == nil {
 					assert.FailNow(t, "Expected error message, but error was nil")
 				}
-				assert.Contains(t, err.Error(), tc.expectedErrorDescription)
+				require.Contains(t, err.Error(), tc.expectedErrorDescription)
 				return
 			}
 			require.NoError(t, err)

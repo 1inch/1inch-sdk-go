@@ -31,7 +31,7 @@ func TestGetTokenPrices(t *testing.T) {
 		expectedErrorDescription string
 	}{
 		{
-			description: "Get prices in USD",
+			description: "Success - Get prices in USD",
 			handlerFunc: func(w http.ResponseWriter, r *http.Request) {
 				assert.Equal(t, string(tokenprices.USD), r.URL.Query().Get("currency"))
 			},
@@ -40,13 +40,13 @@ func TestGetTokenPrices(t *testing.T) {
 			},
 		},
 		{
-			description: "Get prices in Wei (no field)",
+			description: "Success - Get prices in Wei (no field)",
 			handlerFunc: func(w http.ResponseWriter, r *http.Request) {
 				assert.Empty(t, r.URL.Query().Get("currency"))
 			},
 		},
 		{
-			description: "Fail - provide invalid currency",
+			description: "Error - Provide invalid currency",
 			params: tokenprices.ChainControllerByAddressesParams{
 				Currency: tokenprices.GetCurrencyParameter("ok"),
 			},
@@ -72,7 +72,7 @@ func TestGetTokenPrices(t *testing.T) {
 				if err == nil {
 					assert.FailNow(t, "Expected error message, but error was nil")
 				}
-				assert.Equal(t, tc.expectedErrorDescription, err.Error())
+				require.Contains(t, err.Error(), tc.expectedErrorDescription)
 				return
 			}
 			require.NoError(t, err)
