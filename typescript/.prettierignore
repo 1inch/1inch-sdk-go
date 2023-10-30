@@ -1,0 +1,4 @@
+.github
+coverage
+dist
+tsconfig.build.json
