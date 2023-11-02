@@ -1,33 +1,33 @@
 export interface QuoteResponse {
-    fromToken?: TokenInfo;
-    toToken?: TokenInfo;
-    toAmount: string;
-    protocols?: SelectedProtocol[][];
-    gas?: number;
+    fromToken?: TokenInfo
+    toToken?: TokenInfo
+    toAmount: string
+    protocols?: SelectedProtocol[][]
+    gas?: number
 }
 
 export interface TokenInfo {
     /** @example 0x111111111117dc0aa78b770fa6a738034120c302 */
-    address: string;
+    address: string
     /** @example 1INCH */
-    symbol: string;
+    symbol: string
     /** @example 1INCH Token */
-    name: string;
+    name: string
     /** @example 18 */
-    decimals: number;
+    decimals: number
     /** @example https://tokens.1inch.io/0x111111111117dc0aa78b770fa6a738034120c302.png */
-    logoURI: string;
-    domainVersion?: string;
+    logoURI: string
+    domainVersion?: string
     /** @example true */
-    eip2612?: boolean;
+    eip2612?: boolean
     /** @example false */
-    isFoT?: boolean;
+    isFoT?: boolean
     /**
      * @example [
      *   "tokens"
      * ]
      */
-    tags?: string[];
+    tags?: string[]
 }
 
 export interface SelectedProtocol {
@@ -35,20 +35,20 @@ export interface SelectedProtocol {
      * @description Protocol id
      * @example UNISWAP_V3
      */
-    name: string;
+    name: string
     /**
      * @description Protocol share
      * @example 100
      */
-    part: number;
+    part: number
     /**
      * @description Source token to swap on protocol
      * @example 0xeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeee
      */
-    fromTokenAddress: string;
+    fromTokenAddress: string
     /**
      * @description Destination token to swap on protocol
      * @example 0x111111111117dc0aa78b770fa6a738034120c302
      */
-    toTokenAddress: string;
+    toTokenAddress: string
 }

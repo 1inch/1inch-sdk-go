@@ -1,6 +1,9 @@
-import {isNativeCurrency} from '../../../utils'
 import {NATIVE_CURRENCY, ZERO_ADDRESS} from '../../../constants'
-import {hasDuplicates, isValidAddress, isValidAmount} from '../../../validations'
+import {
+    hasDuplicates,
+    isValidAddress,
+    isValidAmount
+} from '../../../validations'
 
 export class QuoteRequest {
     public readonly src: string
@@ -66,10 +69,6 @@ export class QuoteRequest {
     }
 
     validate(): string | null {
-        if (isNativeCurrency(this.src)) {
-            return `cannot swap ${NATIVE_CURRENCY}: wrap native currency to it's wrapper fist`
-        }
-
         if (this.src === ZERO_ADDRESS || this.dst === ZERO_ADDRESS) {
             return `replace ${ZERO_ADDRESS} with ${NATIVE_CURRENCY}`
         }
@@ -124,7 +123,7 @@ export class QuoteRequest {
                 return `${this.connectorTokens.length} length is invalid, max = 5`
             }
 
-            if(hasDuplicates(this.connectorTokens)) {
+            if (hasDuplicates(this.connectorTokens)) {
                 return `connectorTokens has duplicates`
             }
 
@@ -175,7 +174,6 @@ export class QuoteRequest {
 
         return params
     }
-
 }
 
 export interface QuoterRequestParamsRaw {
@@ -229,4 +227,3 @@ export interface QuoterRequestParams {
     includeGas?: boolean
     connectorTokens?: string
 }
-

@@ -3,6 +3,7 @@ import {SwapApiConfig} from './types'
 import {AxiosProviderConnector, HttpProviderConnector} from '../connectors'
 import {concatQueryParams} from '../utils'
 import {QuoteRequest} from './types/swap/request'
+import {QuoteResponse} from './types/swap/response';
 
 export class SwapApi {
     constructor(
@@ -19,7 +20,7 @@ export class SwapApi {
         return new SwapApi(config, httpClient)
     }
 
-    quote(params: QuoteRequest): Promise<void> {
+    quote(params: QuoteRequest): Promise<QuoteResponse> {
         const err = params.validate()
 
         if (err) {
@@ -29,9 +30,9 @@ export class SwapApi {
         // eslint-disable-next-line @typescript-eslint/ban-ts-comment
         // @ts-ignore
         const queryParams = concatQueryParams(params.build())
-        const url = `${this.config.url}/swap/${this.config.version}/${this.config.network}/quote?${queryParams}`
+        const url = `${this.config.url}/swap/${this.config.version}/${this.config.network}/quote${queryParams}`
 
-        return this.httpClient.post(url, queryParams)
+        return this.httpClient.get<QuoteResponse>(url)
     }
 
     swap(): Promise<void> {
