@@ -1,6 +1,8 @@
-import {SwapRequest} from './swap.request'
+// import {SwapRequest} from './swap.request'
 import {SwapApiConfig} from './types'
-import {AxiosProviderConnector, HttpProviderConnector} from '../connectors';
+import {AxiosProviderConnector, HttpProviderConnector} from '../connectors'
+import {concatQueryParams} from '../utils'
+import {QuoteRequest} from './types/swap/request'
 
 export class SwapApi {
     constructor(
@@ -17,8 +19,19 @@ export class SwapApi {
         return new SwapApi(config, httpClient)
     }
 
-    quote(): Promise<void> {
-        return Promise.resolve()
+    quote(params: QuoteRequest): Promise<void> {
+        const err = params.validate()
+
+        if (err) {
+            throw new Error(err)
+        }
+
+        // eslint-disable-next-line @typescript-eslint/ban-ts-comment
+        // @ts-ignore
+        const queryParams = concatQueryParams(params.build())
+        const url = `${this.config.url}/swap/${this.config.version}/${this.config.network}/quote?${queryParams}`
+
+        return this.httpClient.post(url, queryParams)
     }
 
     swap(): Promise<void> {
