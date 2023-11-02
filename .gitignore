@@ -1,3 +1,6 @@
 .idea/
 
 .vscode/
+
+./node_modules/
+./typescript/node_modules/
