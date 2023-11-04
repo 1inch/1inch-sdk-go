@@ -2,6 +2,7 @@ package client
 
 import (
 	"context"
+	"fmt"
 	"net/http"
 
 	"1inch-sdk-golang/client/swap"
@@ -10,7 +11,7 @@ import (
 type SwapService service
 
 func (s *SwapService) ApproveAllowance(ctx context.Context, params swap.ApproveControllerGetAllowanceParams) (*swap.AllowanceResponse, *http.Response, error) {
-	u := "/swap/v5.2/1/approve/allowance"
+	u := fmt.Sprintf("/swap/v5.2/%d/approve/allowance", s.client.ChainId)
 
 	err := params.Validate()
 	if err != nil {
@@ -37,7 +38,7 @@ func (s *SwapService) ApproveAllowance(ctx context.Context, params swap.ApproveC
 }
 
 func (s *SwapService) ApproveSpender(ctx context.Context) (*swap.SpenderResponse, *http.Response, error) {
-	u := "/swap/v5.2/1/approve/spender"
+	u := fmt.Sprintf("/swap/v5.2/%d/approve/spender", s.client.ChainId)
 
 	req, err := s.client.NewRequest("GET", u, nil)
 	if err != nil {
@@ -54,7 +55,7 @@ func (s *SwapService) ApproveSpender(ctx context.Context) (*swap.SpenderResponse
 }
 
 func (s *SwapService) ApproveTransaction(ctx context.Context, params swap.ApproveControllerGetCallDataParams) (*swap.ApproveCallDataResponse, *http.Response, error) {
-	u := "/swap/v5.2/1/approve/transaction"
+	u := fmt.Sprintf("/swap/v5.2/%d/approve/transaction", s.client.ChainId)
 
 	err := params.Validate()
 	if err != nil {
@@ -81,7 +82,7 @@ func (s *SwapService) ApproveTransaction(ctx context.Context, params swap.Approv
 }
 
 func (s *SwapService) GetLiquiditySources(ctx context.Context) (*swap.ProtocolsResponse, *http.Response, error) {
-	u := "/swap/v5.2/1/liquidity-sources"
+	u := fmt.Sprintf("/swap/v5.2/%d/liquidity-sources", s.client.ChainId)
 
 	req, err := s.client.NewRequest("GET", u, nil)
 	if err != nil {
@@ -98,7 +99,7 @@ func (s *SwapService) GetLiquiditySources(ctx context.Context) (*swap.ProtocolsR
 }
 
 func (s *SwapService) GetQuote(ctx context.Context, params swap.AggregationControllerGetQuoteParams) (*swap.QuoteResponse, *http.Response, error) {
-	u := "/swap/v5.2/1/quote"
+	u := fmt.Sprintf("/swap/v5.2/%d/quote", s.client.ChainId)
 
 	err := params.Validate()
 	if err != nil {
@@ -125,7 +126,7 @@ func (s *SwapService) GetQuote(ctx context.Context, params swap.AggregationContr
 }
 
 func (s *SwapService) GetSwap(ctx context.Context, params swap.AggregationControllerGetSwapParams) (*swap.SwapResponse, *http.Response, error) {
-	u := "/swap/v5.2/1/swap"
+	u := fmt.Sprintf("/swap/v5.2/%d/swap", s.client.ChainId)
 
 	err := params.Validate()
 	if err != nil {
@@ -151,7 +152,7 @@ func (s *SwapService) GetSwap(ctx context.Context, params swap.AggregationContro
 }
 
 func (s *SwapService) GetTokens(ctx context.Context) (*swap.TokensResponse, *http.Response, error) {
-	u := "/swap/v5.2/1/tokens"
+	u := fmt.Sprintf("/swap/v5.2/%d/tokens", s.client.ChainId)
 
 	req, err := s.client.NewRequest("GET", u, nil)
 	if err != nil {

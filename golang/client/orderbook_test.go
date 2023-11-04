@@ -15,6 +15,97 @@ import (
 	"1inch-sdk-golang/helpers/consts/tokens"
 )
 
+func TestCreateOrder(t *testing.T) {
+
+	endpoint := "/orderbook/v3.0/1/"
+	defaultResponse := func(w http.ResponseWriter, r *http.Request) {
+		fmt.Fprint(w, `[
+	{
+    	"Success": "true"
+	}
+]`)
+	}
+
+	testcases := []struct {
+		description              string
+		handlerFunc              func(w http.ResponseWriter, r *http.Request)
+		owner                    string
+		params                   orderbook.OrderRequest
+		expectedOutput           string
+		expectedErrorDescription string
+	}{
+		// TODO unsure of the value of validation tests when using the github.com/go-playground/validator/v10 library
+		{
+			description: "Error - missing fromToken",
+			owner:       addresses.Vitalik,
+			params: orderbook.OrderRequest{
+				ToToken:      tokens.PolygonWeth,
+				TakingAmount: 100,
+				MakingAmount: 100,
+			},
+			expectedErrorDescription: `'FromToken' failed on the 'required' tag`,
+		},
+		{
+			description: "Error - missing fromToken",
+			owner:       addresses.Vitalik,
+			params: orderbook.OrderRequest{
+				FromToken:    tokens.PolygonDai,
+				TakingAmount: 100,
+				MakingAmount: 100,
+			},
+			expectedErrorDescription: `'ToToken' failed on the 'required' tag`,
+		},
+		{
+			description: "Error - TakingAmount negative",
+			owner:       addresses.Vitalik,
+			params: orderbook.OrderRequest{
+				FromToken:    tokens.PolygonDai,
+				ToToken:      tokens.PolygonWeth,
+				TakingAmount: -1,
+				MakingAmount: 100,
+			},
+			expectedErrorDescription: `'TakingAmount' failed on the 'gt' tag`,
+		},
+		{
+			description: "Error - MakingAmount negative",
+			owner:       addresses.Vitalik,
+			params: orderbook.OrderRequest{
+				FromToken:    tokens.PolygonDai,
+				ToToken:      tokens.PolygonWeth,
+				TakingAmount: 100,
+				MakingAmount: -1,
+			},
+			expectedErrorDescription: `'MakingAmount' failed on the 'gt' tag`,
+		},
+	}
+
+	for _, tc := range testcases {
+		t.Run(fmt.Sprintf("%v", tc.description), func(t *testing.T) {
+
+			c, mux, _, teardown, err := setup()
+			require.NoError(t, err)
+			defer teardown()
+
+			if tc.handlerFunc != nil {
+				mux.HandleFunc(endpoint, tc.handlerFunc)
+			} else {
+				mux.HandleFunc(endpoint, defaultResponse)
+			}
+
+			createOrderResponse, _, err := c.Orderbook.CreateOrder(context.Background(), tc.params)
+			if tc.expectedErrorDescription != "" {
+				if err == nil {
+					assert.FailNow(t, "Expected error message, but error was nil")
+				}
+				require.Contains(t, err.Error(), tc.expectedErrorDescription)
+				return
+			}
+			require.NoError(t, err)
+			assert.Equal(t, tc.expectedOutput, createOrderResponse.Success)
+		})
+	}
+}
+
 func TestGetOrdersByCreatorAddress(t *testing.T) {
 
 	endpoint := "/orderbook/v3.0/1/address/"

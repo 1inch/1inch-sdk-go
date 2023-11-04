@@ -1,10 +1,13 @@
 package client
 
 import (
+	"encoding/json"
 	"fmt"
 	"net/http"
 	"strings"
 )
+
+// TODO Error format is not generically typed across all services. The error deserialization logic needs to be updated to handle this
 
 type ErrorResponse struct {
 	Response     *http.Response `json:"-"`
@@ -16,6 +19,21 @@ type ErrorResponse struct {
 		Value string `json:"value"`
 		Type  string `json:"type"`
 	} `json:"meta"`
+}
+
+type LimitOrderErrorResponse struct {
+	Response   *http.Response `json:"-"`
+	StatusCode int            `json:"statusCode"`
+	Message    string         `json:"message"`
+	ErrorType  string         `json:"error"`
+}
+
+func (r *LimitOrderErrorResponse) Error() string {
+	b, err := json.MarshalIndent(r, "", "    ")
+	if err != nil {
+		fmt.Println("Error: ", err)
+	}
+	return string(b)
 }
 
 func (r *ErrorResponse) Error() string {

@@ -6,11 +6,11 @@ import (
 	"os"
 	"testing"
 
+	"1inch-sdk-golang/helpers"
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
 
 	"1inch-sdk-golang/client/tokenprices"
-	"1inch-sdk-golang/helpers"
 )
 
 func TestGetTokenPricesIntegration(t *testing.T) {
@@ -40,6 +40,10 @@ func TestGetTokenPricesIntegration(t *testing.T) {
 	for _, tc := range testcases {
 		t.Run(fmt.Sprintf("%v", tc.description), func(t *testing.T) {
 
+			t.Cleanup(func() {
+				helpers.Sleep()
+			})
+
 			priceParameters := tokenprices.ChainControllerByAddressesParams{
 				Currency: &tc.currency,
 			}
@@ -56,8 +60,6 @@ func TestGetTokenPricesIntegration(t *testing.T) {
 
 			require.NoError(t, err)
 			assert.NotEqual(t, "", message)
-
-			helpers.Sleep()
 		})
 	}
 }

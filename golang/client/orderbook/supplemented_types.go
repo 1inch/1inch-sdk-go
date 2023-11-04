@@ -2,6 +2,10 @@ package orderbook
 
 import "time"
 
+type CreateOrderResponse struct {
+	Success bool
+}
+
 type OrderResponse struct {
 	Signature            string    `json:"signature"`
 	OrderHash            string    `json:"orderHash"`

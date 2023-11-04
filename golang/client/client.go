@@ -13,11 +13,13 @@ import (
 	"strings"
 
 	"github.com/google/go-querystring/query"
+
+	"1inch-sdk-golang/helpers"
 )
 
 // This is the base URL for the 1inch API.
-var baseUrlProduction, _ = url.Parse("http://api.1inch.dev")
-var baseUrlStaging, _ = url.Parse("http://fake-staging.1inch.dev")
+var baseUrlProduction, _ = url.Parse("https://api.1inch.dev")
+var baseUrlStaging, _ = url.Parse("https://fake-staging.1inch.dev")
 
 type Environment string
 
@@ -32,13 +34,13 @@ type service struct {
 
 type Config struct {
 	TargetEnvironment   Environment
+	ChainId             int
 	DevPortalApiKey     string
 	Web3HttpProviderUrl string
 	EtherscanApiKey     string
 	WalletAddress       string
 	WalletKey           string
 	LimitOrderContract  string // TODO Probably want to move this somewhere else
-	ChainId             string // TODO Probably want to do this a different way
 }
 
 func (c *Config) validate() error {
@@ -53,6 +55,8 @@ func (c *Config) validate() error {
 type Client struct {
 	// Standard http client in Go
 	httpClient *http.Client
+	// The chain ID for requests
+	ChainId int
 	// The URL of the 1inch API
 	BaseURL *url.URL
 	// The API key to use for authentication
@@ -87,8 +91,18 @@ func NewClient(config Config) (*Client, error) {
 		return nil, fmt.Errorf("unrecognized environment: %s", config.TargetEnvironment)
 	}
 
+	chainId := config.ChainId
+	if chainId != 0 {
+		if !helpers.IsValidChainId(chainId) {
+			return nil, fmt.Errorf("invalid chain id: %d", chainId)
+		}
+	} else {
+		chainId = 1
+	}
+
 	c := &Client{
 		httpClient: &http.Client{},
+		ChainId:    chainId,
 		BaseURL:    baseUrl,
 		ApiKey:     config.DevPortalApiKey,
 		WalletKey:  config.WalletKey,
@@ -103,24 +117,13 @@ func NewClient(config Config) (*Client, error) {
 	return c, nil
 }
 
-func (c *Client) NewRequest(method, urlStr string, body interface{}) (*http.Request, error) {
+func (c *Client) NewRequest(method, urlStr string, body []byte) (*http.Request, error) {
 	u, err := c.BaseURL.Parse(urlStr)
 	if err != nil {
 		return nil, err
 	}
 
-	var buf io.ReadWriter
-	if body != nil {
-		buf = &bytes.Buffer{}
-		enc := json.NewEncoder(buf)
-		enc.SetEscapeHTML(false)
-		err := enc.Encode(body)
-		if err != nil {
-			return nil, err
-		}
-	}
-
-	req, err := http.NewRequest(method, u.String(), buf)
+	req, err := http.NewRequest(method, u.String(), bytes.NewBuffer(body))
 	if err != nil {
 		return nil, err
 	}

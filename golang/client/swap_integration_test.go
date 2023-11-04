@@ -43,12 +43,14 @@ func TestApproveAllowanceIntegration(t *testing.T) {
 	for _, tc := range testcases {
 		t.Run(fmt.Sprintf("%v", tc.description), func(t *testing.T) {
 
+			t.Cleanup(func() {
+				helpers.Sleep()
+			})
+
 			allowance, resp, err := c.Swap.ApproveAllowance(context.Background(), tc.params)
 			require.NoError(t, err)
 			assert.Equal(t, 200, resp.StatusCode)
 			assert.Equal(t, tc.expectedOutput.Allowance, allowance.Allowance)
-
-			helpers.Sleep()
 		})
 	}
 }

@@ -2,6 +2,7 @@ package main
 
 import (
 	"context"
+	"encoding/json"
 	"fmt"
 	"log"
 	"os"
@@ -21,7 +22,7 @@ func main() {
 		WalletAddress:       os.Getenv("WALLET_ADDRESS"),
 		WalletKey:           os.Getenv("WALLET_KEY"),
 		LimitOrderContract:  "0x1111111254EEB25477B68fb85Ed929f73A960582",
-		ChainId:             "1",
+		ChainId:             1,
 	}
 
 	// Create the 1inch client
@@ -70,4 +71,16 @@ func prettyPrint(orders []*orderbook.OrderResponse) {
 		fmt.Println("OrderInvalidReason:", order.OrderInvalidReason)
 		fmt.Println("-------------------------------")
 	}
+}
+
+func PrettyPrint(order *orderbook.Order) {
+	fmt.Printf("OrderHash (hex): 0x%s\n", order.OrderHash)
+	fmt.Printf("Signature (hex): 0x%s\n", order.Signature)
+
+	// Marshal the struct into JSON
+	jsonOrder, err := json.MarshalIndent(order, "", "  ")
+	if err != nil {
+		log.Fatalf("Error marshaling to JSON: %v", err)
+	}
+	fmt.Println(string(jsonOrder))
 }

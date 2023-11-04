@@ -2,46 +2,55 @@ package client
 
 import (
 	"context"
+	"encoding/json"
+	"fmt"
 	"net/http"
+
+	"github.com/go-playground/validator/v10"
 
 	clienterrors "1inch-sdk-golang/client/errors"
 	"1inch-sdk-golang/client/orderbook"
-	"1inch-sdk-golang/client/swap"
 	"1inch-sdk-golang/helpers"
 )
 
 type OrderbookService service
 
-func (s *OrderbookService) CreateOrder(ctx context.Context, params orderbook.LimitOrderV3Request) (*orderbook.LimitOrderV3Data, *http.Response, error) {
-	u := "/orderbook/v3.0/1/"
+func (s *OrderbookService) CreateOrder(ctx context.Context, params orderbook.OrderRequest) (*orderbook.CreateOrderResponse, *http.Response, error) {
+	u := fmt.Sprintf("/orderbook/v3.0/%d", s.client.ChainId)
 
-	err := params.Validate()
+	validate := validator.New()
+	err := validate.Struct(params)
 	if err != nil {
 		return nil, nil, err
 	}
 
-	u, err = addQueryParameters(u, params)
+	order, err := orderbook.CreateLimitOrder(params, 137, s.client.WalletKey)
 	if err != nil {
 		return nil, nil, err
 	}
 
-	req, err := s.client.NewRequest("POST", u, nil)
+	body, err := json.Marshal(order)
 	if err != nil {
 		return nil, nil, err
 	}
 
-	var allowanceResponse swap.AllowanceResponse
-	res, err := s.client.Do(ctx, req, &allowanceResponse)
+	req, err := s.client.NewRequest("POST", u, body)
 	if err != nil {
 		return nil, nil, err
 	}
 
-	return nil, res, nil
+	var createOrderResponse orderbook.CreateOrderResponse
+	res, err := s.client.Do(ctx, req, &createOrderResponse)
+	if err != nil {
+		return nil, nil, err
+	}
+
+	return &createOrderResponse, res, nil
 }
 
 // TODO Reusing the same request/response objects due to bad swagger spec
 func (s *OrderbookService) GetOrdersByCreatorAddress(ctx context.Context, address string, params orderbook.LimitOrderV3SubscribedApiControllerGetAllLimitOrdersParams) ([]*orderbook.OrderResponse, *http.Response, error) {
-	u := "/orderbook/v3.0/1/address/{address}"
+	u := fmt.Sprintf("/orderbook/v3.0/%d/address/{address}", s.client.ChainId)
 
 	if !helpers.IsEthereumAddress(address) {
 		return nil, nil, clienterrors.NewRequestValidationError("address must be a valid Ethereum address")
@@ -77,7 +86,7 @@ func (s *OrderbookService) GetOrdersByCreatorAddress(ctx context.Context, addres
 }
 
 func (s *OrderbookService) GetAllOrders(ctx context.Context, params orderbook.LimitOrderV3SubscribedApiControllerGetAllLimitOrdersParams) ([]*orderbook.OrderResponse, *http.Response, error) {
-	u := "/orderbook/v3.0/1/all"
+	u := fmt.Sprintf("/orderbook/v3.0/%d/all", s.client.ChainId)
 
 	err := params.Validate()
 	if err != nil {
@@ -104,7 +113,7 @@ func (s *OrderbookService) GetAllOrders(ctx context.Context, params orderbook.Li
 }
 
 func (s *OrderbookService) GetCount(ctx context.Context, params orderbook.LimitOrderV3SubscribedApiControllerGetAllOrdersCountParams) (*orderbook.CountResponse, *http.Response, error) {
-	u := "/orderbook/v3.0/1/count"
+	u := fmt.Sprintf("/orderbook/v3.0/%d/count", s.client.ChainId)
 
 	err := params.Validate()
 	if err != nil {
@@ -131,7 +140,7 @@ func (s *OrderbookService) GetCount(ctx context.Context, params orderbook.LimitO
 }
 
 func (s *OrderbookService) GetEvent(ctx context.Context, orderHash string) (*orderbook.EventResponse, *http.Response, error) {
-	u := "/orderbook/v3.0/1/events/{orderHash}"
+	u := fmt.Sprintf("/orderbook/v3.0/%d/events/{orderHash}", s.client.ChainId)
 
 	u, err := ReplacePathVariable(u, "orderHash", orderHash)
 	if err != nil {
@@ -153,7 +162,7 @@ func (s *OrderbookService) GetEvent(ctx context.Context, orderHash string) (*ord
 }
 
 func (s *OrderbookService) GetEvents(ctx context.Context, params orderbook.LimitOrderV3SubscribedApiControllerGetEventsParams) ([]*orderbook.EventResponse, *http.Response, error) {
-	u := "/orderbook/v3.0/1/events"
+	u := fmt.Sprintf("/orderbook/v3.0/%d/events", s.client.ChainId)
 
 	err := params.Validate()
 	if err != nil {
@@ -181,7 +190,7 @@ func (s *OrderbookService) GetEvents(ctx context.Context, params orderbook.Limit
 
 // TODO need docs
 func (s *OrderbookService) GetActiveOrdersWithPermit(ctx context.Context, wallet string, token string) ([]*orderbook.OrderResponse, *http.Response, error) {
-	u := "/orderbook/v3.0/1/has-active-orders-with-permit/{walletAddress}/{token}"
+	u := fmt.Sprintf("/orderbook/v3.0/%d/has-active-orders-with-permit/{walletAddress}/{token}", s.client.ChainId)
 
 	if !helpers.IsEthereumAddress(wallet) {
 		return nil, nil, clienterrors.NewRequestValidationError("wallet must be a valid Ethereum address")
