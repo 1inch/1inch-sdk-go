@@ -33,14 +33,14 @@ type service struct {
 }
 
 type Config struct {
-	TargetEnvironment   Environment
-	ChainId             int
-	DevPortalApiKey     string
-	Web3HttpProviderUrl string
-	EtherscanApiKey     string
-	WalletAddress       string
-	WalletKey           string
-	LimitOrderContract  string // TODO Probably want to move this somewhere else
+	TargetEnvironment          Environment
+	ChainId                    int
+	DevPortalApiKey            string
+	Web3HttpProviderUrlWithKey string
+	EtherscanApiKey            string
+	WalletAddress              string
+	WalletKey                  string
+	LimitOrderContract         string // TODO Probably want to move this somewhere else
 }
 
 func (c *Config) validate() error {
@@ -63,6 +63,8 @@ type Client struct {
 	ApiKey string
 	// The key of the wallet that will be used to sign transactions
 	WalletKey string
+	// RPC URL for web3 provider with key
+	RpcUrlWithKey string
 	// A struct that will contain a reference to this client. Used to separate each API into a unique namespace to aid in method discovery
 	common service
 	// Isolated namespaces for each API
@@ -101,11 +103,12 @@ func NewClient(config Config) (*Client, error) {
 	}
 
 	c := &Client{
-		httpClient: &http.Client{},
-		ChainId:    chainId,
-		BaseURL:    baseUrl,
-		ApiKey:     config.DevPortalApiKey,
-		WalletKey:  config.WalletKey,
+		httpClient:    &http.Client{},
+		ChainId:       chainId,
+		BaseURL:       baseUrl,
+		ApiKey:        config.DevPortalApiKey,
+		WalletKey:     config.WalletKey,
+		RpcUrlWithKey: config.Web3HttpProviderUrlWithKey,
 	}
 
 	c.common.client = c

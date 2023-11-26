@@ -16,13 +16,13 @@ func main() {
 
 	// Build the config for the client
 	config := client.Config{
-		DevPortalApiKey:     os.Getenv("DEV_PORTAL_TOKEN"),
-		Web3HttpProviderUrl: os.Getenv("WEB_3_HTTP_PROVIDER_URL"),
-		EtherscanApiKey:     os.Getenv("ETHERSCAN_TOKEN"),
-		WalletAddress:       os.Getenv("WALLET_ADDRESS"),
-		WalletKey:           os.Getenv("WALLET_KEY"),
-		LimitOrderContract:  "0x1111111254EEB25477B68fb85Ed929f73A960582",
-		ChainId:             1,
+		DevPortalApiKey:            os.Getenv("DEV_PORTAL_TOKEN"),
+		Web3HttpProviderUrlWithKey: os.Getenv("WEB_3_HTTP_PROVIDER_URL_WITH_KEY"),
+		EtherscanApiKey:            os.Getenv("ETHERSCAN_TOKEN"),
+		WalletAddress:              os.Getenv("WALLET_ADDRESS"),
+		WalletKey:                  os.Getenv("WALLET_KEY"),
+		LimitOrderContract:         "0x1111111254EEB25477B68fb85Ed929f73A960582",
+		ChainId:                    1,
 	}
 
 	// Create the 1inch client
@@ -43,32 +43,16 @@ func main() {
 		log.Fatalf("Failed to get quote: %v", err)
 	}
 
-	prettyPrint(allOrdersResponse)
+	prettyPrintOrderResponse(allOrdersResponse)
 }
 
-func prettyPrint(orders []*orderbook.OrderResponse) {
+func prettyPrintOrderResponse(orders []*orderbook.OrderResponse) {
 	for _, order := range orders {
-		fmt.Println("Signature:", order.Signature)
-		fmt.Println("OrderHash:", order.OrderHash)
-		fmt.Println("CreateDateTime:", order.CreateDateTime)
-		fmt.Println("RemainingMakerAmount:", order.RemainingMakerAmount)
-		fmt.Println("MakerBalance:", order.MakerBalance)
-		fmt.Println("MakerAllowance:", order.MakerAllowance)
-		fmt.Println("Data:")
-		fmt.Println("\tMakerAsset:", order.Data.MakerAsset)
-		fmt.Println("\tTakerAsset:", order.Data.TakerAsset)
-		fmt.Println("\tSalt:", order.Data.Salt)
-		fmt.Println("\tReceiver:", order.Data.Receiver)
-		fmt.Println("\tAllowedSender:", order.Data.AllowedSender)
-		fmt.Println("\tMakingAmount:", order.Data.MakingAmount)
-		fmt.Println("\tTakingAmount:", order.Data.TakingAmount)
-		fmt.Println("\tMaker:", order.Data.Maker)
-		fmt.Println("\tInteractions:", order.Data.Interactions)
-		fmt.Println("\tOffsets:", order.Data.Offsets)
-		fmt.Println("MakerRate:", order.MakerRate)
-		fmt.Println("TakerRate:", order.TakerRate)
-		fmt.Println("IsMakerContract:", order.IsMakerContract)
-		fmt.Println("OrderInvalidReason:", order.OrderInvalidReason)
+		jsonOrder, err := json.MarshalIndent(order, "", "  ")
+		if err != nil {
+			log.Fatalf("Error marshaling to JSON: %v", err)
+		}
+		fmt.Println(string(jsonOrder))
 		fmt.Println("-------------------------------")
 	}
 }

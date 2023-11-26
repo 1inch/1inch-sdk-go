@@ -11,6 +11,7 @@ import (
 	"1inch-sdk-golang/helpers"
 	"1inch-sdk-golang/helpers/consts/addresses"
 	"1inch-sdk-golang/helpers/consts/amounts"
+	"1inch-sdk-golang/helpers/consts/chains"
 	"1inch-sdk-golang/helpers/consts/tokens"
 )
 
@@ -18,7 +19,10 @@ func main() {
 
 	// Build the config for the client
 	config := client.Config{
-		DevPortalApiKey: os.Getenv("DEV_PORTAL_TOKEN"),
+		DevPortalApiKey:            os.Getenv("DEV_PORTAL_TOKEN"),
+		WalletKey:                  os.Getenv("WALLET_KEY"),
+		Web3HttpProviderUrlWithKey: os.Getenv("WEB_3_HTTP_PROVIDER_URL_WITH_KEY_POLYGON"),
+		ChainId:                    chains.Polygon,
 	}
 
 	// Create the 1inch client
@@ -29,9 +33,9 @@ func main() {
 
 	// Build the config for the quote request
 	quoteParams := swap.AggregationControllerGetQuoteParams{
-		Src:    tokens.EthereumUsdc,
-		Dst:    tokens.EthereumWeth,
-		Amount: amounts.Ten6,
+		Src:    tokens.PolygonDai,
+		Dst:    tokens.PolygonWeth,
+		Amount: amounts.Ten16,
 	}
 
 	// Execute quote request
@@ -46,10 +50,10 @@ func main() {
 
 	// Build the config for the swap request
 	swapParams := swap.AggregationControllerGetSwapParams{
-		Src:             tokens.EthereumUsdc,
-		Dst:             tokens.EthereumWeth,
+		Src:             tokens.PolygonDai,
+		Dst:             tokens.PolygonWeth,
 		From:            addresses.Vitalik,
-		Amount:          amounts.Ten6,
+		Amount:          amounts.Ten16,
 		DisableEstimate: helpers.GetPtr(true),
 	}
 
@@ -61,6 +65,8 @@ func main() {
 	}
 
 	prettyPrintSwapResponse(swapResponse)
+
+	c.ExecuteSwap(tokens.PolygonDai, swapResponse.Tx.Data)
 }
 
 func prettyPrintSwapResponse(resp *swap.SwapResponse) {
