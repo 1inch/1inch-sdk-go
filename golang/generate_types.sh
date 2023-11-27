@@ -95,9 +95,18 @@ fi
 # Loop over all swagger files in the directory
 for api_swagger_file_name in "$swagger_dir"/*-swagger.json; do
     # Extract the service name from the filename
-    package_name=$(basename "$api_swagger_file_name" -swagger.json)
+    package_name_raw=$(basename "$api_swagger_file_name" -swagger.json)
 
-    types_file_name="${package_name}_types.gen.go"
+    types_file_name="${package_name_raw}_types.gen.go"
+
+    # Check if package_name_raw contains an underscore
+    if [[ $package_name_raw == *_* ]]; then
+        # Remove underscore and everything after it
+        package_name=${package_name_raw%%_*}
+    else
+        # If there is no underscore, assign raw value to package_name
+        package_name=$package_name_raw
+    fi
 
     if [ "$verbose_logging" == "true" ]; then
         echo "Generating type data for the $package_name directory"

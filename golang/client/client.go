@@ -71,6 +71,7 @@ type Client struct {
 	Swap        *SwapService
 	TokenPrices *TokenPricesService
 	Orderbook   *OrderbookService
+	Fusion      *FusionService
 }
 
 func NewClient(config Config) (*Client, error) {
@@ -116,6 +117,7 @@ func NewClient(config Config) (*Client, error) {
 	c.Swap = (*SwapService)(&c.common)
 	c.TokenPrices = (*TokenPricesService)(&c.common)
 	c.Orderbook = (*OrderbookService)(&c.common)
+	c.Fusion = (*FusionService)(&c.common)
 
 	return c, nil
 }
@@ -205,6 +207,16 @@ func addQueryParameters(s string, params interface{}) (string, error) {
 	qs, err := query.Values(params)
 	if err != nil {
 		return s, err
+	}
+
+	for k, v := range qs {
+		if helpers.IsScientificNotation(v[0]) {
+			expanded, err := helpers.ExpandScientificNotation(v[0])
+			if err != nil {
+				return "", fmt.Errorf("failed to expand scientific notation for parameter %v with a value of %v: %v", k, v, err)
+			}
+			v[0] = expanded
+		}
 	}
 
 	u.RawQuery = qs.Encode()

@@ -1,0 +1,137 @@
+{
+  "openapi": "3.0.0",
+  "paths": {
+    "/v1.0/1/order/active": {
+      "get": {
+        "operationId": "OrderApiController_getActiveOrders",
+        "summary": "Get gasless swap active orders",
+        "parameters": [
+          {
+            "name": "page",
+            "required": false,
+            "in": "query",
+            "description": "Pagination step, default: 1 (page = offset / limit)",
+            "example": 1,
+            "schema": { "type": "number" }
+          },
+          {
+            "name": "limit",
+            "required": false,
+            "in": "query",
+            "description": "Number of active orders to receive (default: 100, max: 500)",
+            "example": 100,
+            "schema": { "type": "number" }
+          }
+        ],
+        "responses": {
+          "200": { "description": "Array of queried active orders" },
+          "400": { "description": "Input data is invalid" },
+          "default": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/GetActiveOrdersOutput"
+                }
+              }
+            }
+          }
+        },
+        "tags": ["Orders"]
+      }
+    },
+    "/v1.0/1/order/settlement": {
+      "get": {
+        "operationId": "OrderApiController_getSettlementContract",
+        "summary": "Get actual settlement contract address",
+        "parameters": [],
+        "responses": {
+          "default": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/SettlementAddressOutput"
+                }
+              }
+            }
+          }
+        },
+        "tags": ["Orders"]
+      }
+    },
+    "/v1.0/healthcheck": {
+      "get": {
+        "operationId": "HealthcheckController_healthcheck",
+        "parameters": [],
+        "responses": { "200": { "description": "" } }
+      }
+    }
+  },
+  "info": {
+    "title": "1inch Fusion API",
+    "description": "<h2>Ethereum Network</h2>1inch Fusion Open API",
+    "version": "1.0",
+    "contact": {}
+  },
+  "tags": [],
+  "servers": [{ "url": "/orders" }],
+  "components": {
+    "schemas": {
+      "Meta": {
+        "type": "object",
+        "properties": {
+          "totalItems": { "type": "number" },
+          "itemsPerPage": { "type": "number" },
+          "totalPages": { "type": "number" },
+          "currentPage": { "type": "number" }
+        },
+        "required": ["totalItems", "itemsPerPage", "totalPages", "currentPage"]
+      },
+      "ActiveOrdersOutput": {
+        "type": "object",
+        "properties": {
+          "orderHash": {
+            "type": "string",
+            "description": "i.e 0x806039f5149065924ad52de616b50abff488c986716d052e9c160887bc09e559"
+          },
+          "signature": {
+            "type": "string",
+            "description": "i.e 0x38de7c8c406c8668eec947d59679028c068735e56c8a41bcc5b3dc2d2229dec258424e0f06b189d2b87f9f3d9cdd9edcb7b3be4108bd8605d052c20c84e65ad61c"
+          },
+          "deadline": { "format": "date-time", "type": "string" },
+          "auctionStartDate": { "format": "date-time", "type": "string" },
+          "auctionEndDate": { "format": "date-time", "type": "string" }
+        },
+        "required": [
+          "orderHash",
+          "signature",
+          "deadline",
+          "auctionStartDate",
+          "auctionEndDate"
+        ]
+      },
+      "GetActiveOrdersOutput": {
+        "type": "object",
+        "properties": {
+          "meta": { "$ref": "#/components/schemas/Meta" },
+          "items": {
+            "type": "array",
+            "items": { "$ref": "#/components/schemas/ActiveOrdersOutput" }
+          }
+        },
+        "required": ["meta", "items"]
+      },
+      "SettlementAddressOutput": {
+        "type": "object",
+        "properties": {
+          "address": {
+            "type": "string",
+            "description": "actual settlement contract address"
+          }
+        },
+        "required": ["address"]
+      }
+    }
+  }
+}

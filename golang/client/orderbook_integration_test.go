@@ -36,7 +36,7 @@ import (
 //
 //	c, err := NewClient(Config{
 //		TargetEnvironment: EnvironmentProduction,
-//		ChainId: chains.Polygon,
+//		ChainId:           chains.Polygon,
 //		DevPortalApiKey:   helpers.GetenvSafe("DEV_PORTAL_TOKEN"),
 //		WalletKey:         helpers.GetenvSafe("WALLET_KEY"),
 //	})
