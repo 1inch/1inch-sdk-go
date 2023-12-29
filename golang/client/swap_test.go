@@ -334,7 +334,7 @@ func TestGetSwap(t *testing.T) {
 				mux.HandleFunc(endpoint, defaultResponse)
 			}
 
-			_, _, err = c.Swap.GetSwap(context.Background(), tc.params)
+			_, _, err = c.Swap.GetSwapData(context.Background(), tc.params)
 			if tc.expectedErrorDescription != "" {
 				if err == nil {
 					assert.FailNow(t, "Expected error message, but error was nil")

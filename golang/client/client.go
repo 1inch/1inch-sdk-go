@@ -3,6 +3,7 @@ package client
 import (
 	"bytes"
 	"context"
+	"crypto/ecdsa"
 	"encoding/json"
 	"errors"
 	"fmt"
@@ -12,6 +13,8 @@ import (
 	"reflect"
 	"strings"
 
+	"github.com/ethereum/go-ethereum/common"
+	"github.com/ethereum/go-ethereum/crypto"
 	"github.com/google/go-querystring/query"
 
 	"1inch-sdk-golang/helpers"
@@ -63,6 +66,9 @@ type Client struct {
 	ApiKey string
 	// The key of the wallet that will be used to sign transactions
 	WalletKey string
+	// The public address of the wallet that will be used to sign transactions (derived from the private key)
+	// DO NOT MANUALLY SET
+	PublicAddress common.Address
 	// RPC URL for web3 provider with key
 	RpcUrlWithKey string
 	// A struct that will contain a reference to this client. Used to separate each API into a unique namespace to aid in method discovery
@@ -103,12 +109,29 @@ func NewClient(config Config) (*Client, error) {
 		chainId = 1
 	}
 
+	publicAddress := common.HexToAddress("0x0")
+	if config.WalletKey != "" {
+		privateKey, err := crypto.HexToECDSA(config.WalletKey)
+		if err != nil {
+			return nil, fmt.Errorf("failed to convert private key: %v", err)
+		}
+
+		publicKey := privateKey.Public()
+		publicKeyECDSA, ok := publicKey.(*ecdsa.PublicKey)
+		if !ok {
+			return nil, fmt.Errorf("could not cast public key to ECDSA")
+		}
+
+		publicAddress = crypto.PubkeyToAddress(*publicKeyECDSA)
+	}
+
 	c := &Client{
 		httpClient:    &http.Client{},
 		ChainId:       chainId,
 		BaseURL:       baseUrl,
 		ApiKey:        config.DevPortalApiKey,
 		WalletKey:     config.WalletKey,
+		PublicAddress: publicAddress,
 		RpcUrlWithKey: config.Web3HttpProviderUrlWithKey,
 	}
 

@@ -9,7 +9,6 @@ import (
 	"1inch-sdk-golang/client"
 	"1inch-sdk-golang/client/swap"
 	"1inch-sdk-golang/helpers"
-	"1inch-sdk-golang/helpers/consts/addresses"
 	"1inch-sdk-golang/helpers/consts/amounts"
 	"1inch-sdk-golang/helpers/consts/chains"
 	"1inch-sdk-golang/helpers/consts/tokens"
@@ -20,7 +19,7 @@ func main() {
 	// Build the config for the client
 	config := client.Config{
 		DevPortalApiKey:            os.Getenv("DEV_PORTAL_TOKEN"),
-		WalletKey:                  os.Getenv("WALLET_KEY"),
+		WalletKey:                  os.Getenv("WALLET_KEY_POLY"),
 		Web3HttpProviderUrlWithKey: os.Getenv("WEB_3_HTTP_PROVIDER_URL_WITH_KEY_POLYGON"),
 		ChainId:                    chains.Polygon,
 	}
@@ -31,42 +30,28 @@ func main() {
 		log.Fatalf("Failed to create client: %v", err)
 	}
 
-	// Build the config for the quote request
-	quoteParams := swap.AggregationControllerGetQuoteParams{
-		Src:    tokens.PolygonDai,
-		Dst:    tokens.PolygonWeth,
-		Amount: amounts.Ten16,
-	}
-
-	// Execute quote request
-	quoteResponse, _, err := c.Swap.GetQuote(context.Background(), quoteParams)
-	if err != nil {
-		log.Fatalf("Failed to get quote: %v", err)
-	}
-
-	fmt.Printf("Quote return amount: %v\n", quoteResponse.ToAmount)
-
-	helpers.Sleep()
-
 	// Build the config for the swap request
 	swapParams := swap.AggregationControllerGetSwapParams{
 		Src:             tokens.PolygonDai,
 		Dst:             tokens.PolygonWeth,
-		From:            addresses.Vitalik,
+		From:            os.Getenv("WALLET_ADDRESS_POLY"),
 		Amount:          amounts.Ten16,
 		DisableEstimate: helpers.GetPtr(true),
 	}
 
 	// Execute swap request
 	// This will return the transaction data used by a wallet to execute the swap
-	swapResponse, _, err := c.Swap.GetSwap(context.Background(), swapParams)
+	swapResponse, _, err := c.Swap.GetSwapData(context.Background(), swapParams)
 	if err != nil {
 		log.Fatalf("Failed to get swap: %v", err)
 	}
 
 	prettyPrintSwapResponse(swapResponse)
 
-	c.ExecuteSwap(tokens.PolygonDai, swapResponse.Tx.Data)
+	err = c.Swap.ExecuteSwap(tokens.PolygonDai, swapResponse.Tx.Data)
+	if err != nil {
+		log.Fatalf("Failed to execute swap: %v", err)
+	}
 }
 
 func prettyPrintSwapResponse(resp *swap.SwapResponse) {

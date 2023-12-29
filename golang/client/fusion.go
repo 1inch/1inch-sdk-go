@@ -2,6 +2,7 @@ package client
 
 import (
 	"context"
+	"encoding/json"
 	"fmt"
 	"net/http"
 
@@ -68,6 +69,45 @@ func (s *FusionService) GetQuote(ctx context.Context, params fusion.QuoterContro
 	}
 
 	req, err := s.client.NewRequest("GET", u, nil)
+	if err != nil {
+		return nil, nil, err
+	}
+
+	var getQuoteResponse fusion.GetQuoteOutput
+	res, err := s.client.Do(ctx, req, &getQuoteResponse)
+	if err != nil {
+		return nil, nil, err
+	}
+
+	return &getQuoteResponse, res, nil
+}
+
+// TODO CustomPresetInput struct does not properly represent Points information
+
+func (s *FusionService) GetQuoteWithCustomPresets(ctx context.Context, params fusion.QuoterControllerGetQuoteParams, body fusion.CustomPresetInput) (*fusion.GetQuoteOutput, *http.Response, error) {
+	u := fmt.Sprintf("/fusion/quoter/v1.0/%d/quote/receive", s.client.ChainId)
+
+	err := params.Validate()
+	if err != nil {
+		return nil, nil, err
+	}
+
+	err = body.Validate()
+	if err != nil {
+		return nil, nil, err
+	}
+
+	u, err = addQueryParameters(u, params)
+	if err != nil {
+		return nil, nil, err
+	}
+
+	bodyMarshalled, err := json.Marshal(body)
+	if err != nil {
+		return nil, nil, err
+	}
+
+	req, err := s.client.NewRequest("POST", u, bodyMarshalled)
 	if err != nil {
 		return nil, nil, err
 	}

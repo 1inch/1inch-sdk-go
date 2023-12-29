@@ -46,3 +46,8 @@ func (params *QuoterControllerGetQuoteParams) Validate() error {
 
 	return nil
 }
+
+// TODO validate
+func (body *CustomPresetInput) Validate() error {
+	return nil
+}

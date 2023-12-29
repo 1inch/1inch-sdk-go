@@ -90,6 +90,7 @@ func TestGetSettlementContractIntegration(t *testing.T) {
 		})
 	}
 }
+
 func TestGetQuoteIntegration(t *testing.T) {
 
 	testcases := []struct {
@@ -130,6 +131,59 @@ func TestGetQuoteIntegration(t *testing.T) {
 			getQuoteResponse, resp, err := c.Fusion.GetQuote(context.Background(), tc.params)
 			require.NoError(t, err)
 			require.Equal(t, 200, resp.StatusCode)
+
+			require.NotNil(t, getQuoteResponse)
+			require.Equal(t, tokens.EthereumUsdc, getQuoteResponse.FeeToken)
+		})
+	}
+}
+
+func TestGetQuoteWithCustomPresetsIntegration(t *testing.T) {
+
+	testcases := []struct {
+		description   string
+		params        fusion.QuoterControllerGetQuoteParams
+		body          fusion.CustomPresetInput
+		expectSuccess bool
+	}{
+		{
+			description: "Success",
+			params: fusion.QuoterControllerGetQuoteParams{
+				FromTokenAddress: tokens.EthereumWeth,
+				ToTokenAddress:   tokens.EthereumUsdc,
+				Amount:           1000000000000000000,
+				WalletAddress:    addresses.Vitalik,
+				EnableEstimate:   false,
+				Fee:              nil,
+				IsLedgerLive:     false,
+				Permit:           nil,
+			},
+			body: fusion.CustomPresetInput{
+				AuctionDuration:    600,
+				AuctionStartAmount: "2075314488",
+				AuctionEndAmount:   "2021177846",
+			},
+			expectSuccess: true,
+		},
+	}
+
+	c, err := NewClient(Config{
+		TargetEnvironment: EnvironmentProduction,
+		ChainId:           chains.Ethereum,
+		DevPortalApiKey:   helpers.GetenvSafe("DEV_PORTAL_TOKEN"),
+	})
+	require.NoError(t, err)
+
+	for _, tc := range testcases {
+		t.Run(fmt.Sprintf("%v", tc.description), func(t *testing.T) {
+
+			t.Cleanup(func() {
+				helpers.Sleep()
+			})
+
+			getQuoteResponse, resp, err := c.Fusion.GetQuoteWithCustomPresets(context.Background(), tc.params, tc.body)
+			require.NoError(t, err)
+			require.Equal(t, 201, resp.StatusCode) // incorrect code, but this is what the API returns
 
 			require.NotNil(t, getQuoteResponse)
 			require.Equal(t, tokens.EthereumUsdc, getQuoteResponse.FeeToken)
