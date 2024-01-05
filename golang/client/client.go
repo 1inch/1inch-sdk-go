@@ -8,6 +8,7 @@ import (
 	"errors"
 	"fmt"
 	"io"
+	"log"
 	"net/http"
 	"net/url"
 	"reflect"
@@ -15,6 +16,7 @@ import (
 
 	"github.com/ethereum/go-ethereum/common"
 	"github.com/ethereum/go-ethereum/crypto"
+	"github.com/ethereum/go-ethereum/ethclient"
 	"github.com/google/go-querystring/query"
 
 	"1inch-sdk-golang/helpers"
@@ -58,6 +60,8 @@ func (c *Config) validate() error {
 type Client struct {
 	// Standard http client in Go
 	httpClient *http.Client
+	// Ethereum client
+	EthClient *ethclient.Client
 	// The chain ID for requests
 	ChainId int
 	// The URL of the 1inch API
@@ -125,8 +129,17 @@ func NewClient(config Config) (*Client, error) {
 		publicAddress = crypto.PubkeyToAddress(*publicKeyECDSA)
 	}
 
+	var ethClient *ethclient.Client
+	if config.Web3HttpProviderUrlWithKey != "" {
+		ethClient, err = ethclient.Dial(config.Web3HttpProviderUrlWithKey) // TODO Should the user pass this in?
+		if err != nil {
+			log.Fatalf("Failed to create eth client: %v", err)
+		}
+	}
+
 	c := &Client{
 		httpClient:    &http.Client{},
+		EthClient:     ethClient,
 		ChainId:       chainId,
 		BaseURL:       baseUrl,
 		ApiKey:        config.DevPortalApiKey,
