@@ -46,9 +46,6 @@ func (s *SwapService) ExecuteSwap(config *ExecuteSwapConfig) error {
 
 	_, err = swap.GetTypeHash(s.client.EthClient, config.FromToken)
 	if err != nil {
-
-		fmt.Println("Permit may not available on this token. Proceeding with swap without Permit")
-
 		// Parse the USDC contract ABI to get the 'Approve' function signature
 		parsedABI, err := abi.JSON(strings.NewReader(contracts.Erc20Abi))
 		if err != nil {
@@ -102,57 +99,43 @@ func (s *SwapService) ExecuteSwap(config *ExecuteSwapConfig) error {
 			return fmt.Errorf("failed to send transaction: %v", err)
 		}
 
-		log.Printf("Swap transaction sent! Hash: %s\n", signedTx2.Hash().Hex())
+		fmt.Printf("Swap transaction sent! Hash: %s\n", signedTx2.Hash().Hex())
 
 		receipt2, err := onchain.WaitForTransaction(s.client.EthClient, signedTx2.Hash())
 		if err != nil {
 			return fmt.Errorf("failed to get transaction receipt: %v", err)
 		}
-		fmt.Printf("Transaction mined! Block hash: %v\n", receipt2.BlockHash)
+
+		helpers.PrintBlockExplorerTxLink(s.client.ChainId, receipt2.BlockHash.String())
 	} else {
-		fmt.Println("Permit found on this token. Proceeding with swap using Permit")
-
-		permitSignatureConfig := &swap.PermitSignatureConfig{
-			FromToken:     config.FromToken,
-			Name:          "Frax", // TODO get this from the contract directly
-			PublicAddress: s.client.PublicAddress.Hex(),
-			ChainId:       s.client.ChainId,
-			Key:           s.client.WalletKey,
-			Nonce:         1,
-			Deadline:      1704250835, // TODO use time.Now().Add(time.Minute).Unix()
-		}
-
-		sig, err := swap.CreatePermitSignature(permitSignatureConfig)
-		if err != nil {
-			return fmt.Errorf("failed to create permit signature: %v", err)
-		}
-		fmt.Printf("Signature: %v\n", sig)
+		fmt.Println("Permit supported by this token! Swapping using Permit1")
 
 		hexData, err := hex.DecodeString(config.TransactionData[2:])
 		if err != nil {
 			return fmt.Errorf("failed to decode swap data: %v", err)
 		}
-		tx2 := onchain.GetDynamicFeeTx(s.client.EthClient, chainID, s.client.PublicAddress, contracts.AggregationRouterV5, hexData)
+		permitSwapTx := onchain.GetDynamicFeeTx(s.client.EthClient, chainID, s.client.PublicAddress, contracts.AggregationRouterV5, hexData)
 
 		// Sign the transaction
-		signedTx2, err := types.SignTx(tx2, types.LatestSignerForChainID(chainID), privateKey)
+		permitSwapTxSigned, err := types.SignTx(permitSwapTx, types.LatestSignerForChainID(chainID), privateKey)
 		if err != nil {
 			return fmt.Errorf("failed to sign transaction: %v", err)
 		}
 
 		// Send the transaction
-		err = s.client.EthClient.SendTransaction(context.Background(), signedTx2)
+		err = s.client.EthClient.SendTransaction(context.Background(), permitSwapTxSigned)
 		if err != nil {
 			return fmt.Errorf("failed to send transaction: %v", err)
 		}
 
-		log.Printf("Swap transaction sent! Hash: %s\n", signedTx2.Hash().Hex())
+		fmt.Println("Swap transaction sent!")
+		helpers.PrintBlockExplorerTxLink(s.client.ChainId, permitSwapTxSigned.Hash().String())
 
-		receipt2, err := onchain.WaitForTransaction(s.client.EthClient, signedTx2.Hash())
+		_, err = onchain.WaitForTransaction(s.client.EthClient, permitSwapTxSigned.Hash())
 		if err != nil {
 			return fmt.Errorf("failed to get transaction receipt: %v", err)
 		}
-		fmt.Printf("Transaction mined! Block hash: %v\n", receipt2.BlockHash)
+		fmt.Printf("Transaction mined!")
 	}
 
 	return nil

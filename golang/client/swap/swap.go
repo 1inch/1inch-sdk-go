@@ -186,7 +186,6 @@ func GetTypeHash(client *ethclient.Client, addressAsString string) (string, erro
 
 	// Convert the result to a string
 	resultAsString := fmt.Sprintf("%x", typeHash)
-	fmt.Printf("PERMIT_TYPEHASH as string: %s\n", resultAsString)
 	// If the varaible does not exist, it will be all zeros
 	if string(resultAsString) == "0000000000000000000000000000000000000000000000000000000000000000" {
 		return "", errors.New("PERMIT_TYPEHASH does not exist")

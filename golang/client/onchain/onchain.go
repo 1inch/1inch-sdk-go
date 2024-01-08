@@ -23,8 +23,6 @@ func GetDynamicFeeTx(client *ethclient.Client, chainID *big.Int, fromAddress com
 		log.Fatalf("Failed to get nonce: %v", err)
 	}
 
-	fmt.Printf("Current nonce: %v\n", nonce)
-
 	gasTipCap, err := client.SuggestGasTipCap(context.Background())
 	if err != nil {
 		log.Fatalf("Failed to suggest gas tip cap: %v", err)
@@ -114,17 +112,24 @@ func ReadContractNonce(client *ethclient.Client, publicAddress common.Address, c
 }
 
 func WaitForTransaction(client *ethclient.Client, txHash common.Hash) (*types.Receipt, error) {
+	periodCount := 0
+	waitingForTxText := "Waiting for transaction to be mined"
+	clearLine := strings.Repeat(" ", len(waitingForTxText)+3)
 	for {
 		receipt, err := client.TransactionReceipt(context.Background(), txHash)
 		if receipt != nil {
+			fmt.Println() // End the animated waiting text
 			return receipt, nil
 		}
 		if err != nil {
-			fmt.Println("Transaction not yet mined...")
+			fmt.Printf("\r%s", clearLine) // Clear the current line
+			fmt.Printf("\r%s%s", waitingForTxText, strings.Repeat(".", periodCount))
+			periodCount = (periodCount + 1) % 4
 		}
 		select {
-		case <-time.After(1 * time.Second): // check again after a delay
+		case <-time.After(1000 * time.Millisecond): // check again after a delay
 		case <-context.Background().Done():
+			fmt.Println() // End the animated waiting text
 			return nil, context.Background().Err()
 		}
 	}

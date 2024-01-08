@@ -26,7 +26,7 @@ func main() {
 		return
 	}
 
-	filepath.Walk(".", func(path string, info os.FileInfo, err error) error {
+	err = filepath.Walk(".", func(path string, info os.FileInfo, err error) error {
 		if err != nil {
 			return err
 		}
@@ -68,6 +68,10 @@ func main() {
 
 		return nil
 	})
+	if err != nil {
+		fmt.Println("Failed to walk the path:", err)
+		return
+	}
 }
 
 func extractFunctionName(content string) string {

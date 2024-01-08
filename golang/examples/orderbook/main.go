@@ -56,15 +56,3 @@ func prettyPrintOrderResponse(orders []*orderbook.OrderResponse) {
 		fmt.Println("-------------------------------")
 	}
 }
-
-func PrettyPrint(order *orderbook.Order) {
-	fmt.Printf("OrderHash (hex): 0x%s\n", order.OrderHash)
-	fmt.Printf("Signature (hex): 0x%s\n", order.Signature)
-
-	// Marshal the struct into JSON
-	jsonOrder, err := json.MarshalIndent(order, "", "  ")
-	if err != nil {
-		log.Fatalf("Error marshaling to JSON: %v", err)
-	}
-	fmt.Println(string(jsonOrder))
-}
