@@ -22,13 +22,11 @@ func SwapTokens(c *client.Client, swapParams swap.AggregationControllerGetSwapPa
 
 	deadline := time.Now().Add(10 * time.Minute).Unix() // TODO make this configurable
 
-	executeSwapConfig := &client.ExecuteSwapConfig{}
+	executeSwapConfig := &swap.ExecuteSwapConfig{}
 	typehash, err := swap.GetTypeHash(c.EthClient, swapParams.Src)
 	if err == nil {
 		// Typehash is present which means we can use Permit to save gas
 		if typehash == typehashes.Permit1 {
-			executeSwapConfig.IsPermitSwap = true
-
 			name, err := onchain.ReadContractName(c.EthClient, common.HexToAddress(swapParams.Src))
 			if err != nil {
 				return fmt.Errorf("failed to read contract name: %v", err)
@@ -60,7 +58,9 @@ func SwapTokens(c *client.Client, swapParams swap.AggregationControllerGetSwapPa
 				Signature: sig,
 			})
 
+			executeSwapConfig.IsPermitSwap = true
 			swapParams.Permit = &permitParams
+			fmt.Println("Permit supported by this token! Swapping using Permit1")
 		} else {
 			log.Fatalf("Typehash exists, but it is not recognized: %v\n", typehash)
 		}
