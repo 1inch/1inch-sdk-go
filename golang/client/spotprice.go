@@ -4,7 +4,7 @@ import (
 	"context"
 	"net/http"
 
-	"1inch-sdk-golang/client/tokenprices"
+	"github.com/1inch/1inch-sdk/golang/client/tokenprices"
 )
 
 type TokenPricesService service

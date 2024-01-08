@@ -9,10 +9,10 @@ import (
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
 
-	"1inch-sdk-golang/client/orderbook"
-	"1inch-sdk-golang/helpers"
-	"1inch-sdk-golang/helpers/consts/addresses"
-	"1inch-sdk-golang/helpers/consts/tokens"
+	"github.com/1inch/1inch-sdk/golang/client/orderbook"
+	"github.com/1inch/1inch-sdk/golang/helpers"
+	"github.com/1inch/1inch-sdk/golang/helpers/consts/addresses"
+	"github.com/1inch/1inch-sdk/golang/helpers/consts/tokens"
 )
 
 func TestCreateOrder(t *testing.T) {

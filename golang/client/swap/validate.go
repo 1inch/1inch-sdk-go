@@ -1,7 +1,7 @@
 package swap
 
 import (
-	clienterrors "1inch-sdk-golang/client/errors"
+	clienterrors "github.com/1inch/1inch-sdk/golang/client/errors"
 )
 
 func (params *AggregationControllerGetQuoteParams) Validate() error {

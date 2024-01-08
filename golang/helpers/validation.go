@@ -3,7 +3,7 @@ package helpers
 import (
 	"regexp"
 
-	"1inch-sdk-golang/helpers/consts/chains"
+	"github.com/1inch/1inch-sdk/golang/helpers/consts/chains"
 )
 
 // IsEthereumAddress checks if the provided string is a valid Ethereum address.

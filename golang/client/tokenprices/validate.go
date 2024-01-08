@@ -3,7 +3,7 @@ package tokenprices
 import (
 	"fmt"
 
-	clienterrors "1inch-sdk-golang/client/errors"
+	clienterrors "github.com/1inch/1inch-sdk/golang/client/errors"
 )
 
 func (params *ChainControllerByAddressesParams) Validate() error {

@@ -9,8 +9,8 @@ import (
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
 
-	"1inch-sdk-golang/client/tokenprices"
-	"1inch-sdk-golang/helpers"
+	"github.com/1inch/1inch-sdk/golang/client/tokenprices"
+	"github.com/1inch/1inch-sdk/golang/helpers"
 )
 
 func TestGetTokenPricesIntegration(t *testing.T) {

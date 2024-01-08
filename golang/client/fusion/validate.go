@@ -3,8 +3,8 @@ package fusion
 import (
 	"errors"
 
-	clienterrors "1inch-sdk-golang/client/errors"
-	"1inch-sdk-golang/helpers"
+	clienterrors "github.com/1inch/1inch-sdk/golang/client/errors"
+	"github.com/1inch/1inch-sdk/golang/helpers"
 )
 
 func (params *OrderApiControllerGetActiveOrdersParams) Validate() error {

@@ -13,11 +13,11 @@ import (
 	"github.com/ethereum/go-ethereum/core/types"
 	"github.com/ethereum/go-ethereum/crypto"
 
-	"1inch-sdk-golang/client/onchain"
-	"1inch-sdk-golang/client/swap"
-	"1inch-sdk-golang/helpers"
-	"1inch-sdk-golang/helpers/consts/amounts"
-	"1inch-sdk-golang/helpers/consts/contracts"
+	"github.com/1inch/1inch-sdk/golang/client/onchain"
+	"github.com/1inch/1inch-sdk/golang/client/swap"
+	"github.com/1inch/1inch-sdk/golang/helpers"
+	"github.com/1inch/1inch-sdk/golang/helpers/consts/amounts"
+	"github.com/1inch/1inch-sdk/golang/helpers/consts/contracts"
 )
 
 // This file breaks convention. It sends transactions to the blockchain directly instead of using the 1inch API.

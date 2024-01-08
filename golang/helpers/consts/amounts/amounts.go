@@ -1,6 +1,6 @@
 package amounts
 
-import "1inch-sdk-golang/helpers"
+import "github.com/1inch/1inch-sdk/golang/helpers"
 
 const (
 	Ten5  = "100000"

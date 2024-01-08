@@ -1,26 +1,24 @@
 package main
 
 import (
+	"context"
 	"log"
 	"os"
 
-	"1inch-sdk-golang/actions"
-	"1inch-sdk-golang/client"
-	"1inch-sdk-golang/client/swap"
-	"1inch-sdk-golang/helpers"
-	"1inch-sdk-golang/helpers/consts/amounts"
-	"1inch-sdk-golang/helpers/consts/chains"
-	"1inch-sdk-golang/helpers/consts/tokens"
+	"github.com/1inch/1inch-sdk/golang/client"
+	"github.com/1inch/1inch-sdk/golang/client/swap"
+	"github.com/1inch/1inch-sdk/golang/helpers"
+	"github.com/1inch/1inch-sdk/golang/helpers/consts/amounts"
+	"github.com/1inch/1inch-sdk/golang/helpers/consts/chains"
+	"github.com/1inch/1inch-sdk/golang/helpers/consts/tokens"
 )
 
 func main() {
 
 	// Build the config for the client
 	config := client.Config{
-		DevPortalApiKey:            os.Getenv("DEV_PORTAL_TOKEN"),
-		WalletKey:                  os.Getenv("WALLET_KEY"),
-		Web3HttpProviderUrlWithKey: os.Getenv("WEB_3_HTTP_PROVIDER_URL_WITH_KEY_POLYGON"),
-		ChainId:                    chains.Polygon,
+		DevPortalApiKey: os.Getenv("DEV_PORTAL_TOKEN"),
+		ChainId:         chains.Polygon,
 	}
 
 	// Create the 1inch client
@@ -38,8 +36,10 @@ func main() {
 		DisableEstimate: helpers.GetPtr(true),
 	}
 
-	err = actions.SwapTokens(c, swapParams)
+	swapData, _, err := c.Swap.GetSwapData(context.Background(), swapParams)
 	if err != nil {
 		log.Fatalf("Failed to swap tokens: %v", err)
 	}
+
+	helpers.PrettyPrintStruct(swapData)
 }

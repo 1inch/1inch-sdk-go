@@ -6,7 +6,7 @@ import (
 	"fmt"
 	"net/http"
 
-	"1inch-sdk-golang/client/fusion"
+	"github.com/1inch/1inch-sdk/golang/client/fusion"
 )
 
 type FusionService service

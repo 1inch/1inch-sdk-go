@@ -10,7 +10,6 @@ func PrettyPrintStruct(v interface{}) {
 }
 
 func prettyPrintStructRecursive(v interface{}, indent string) {
-
 	indentIncrementation := "    "
 
 	val := reflect.ValueOf(v)
@@ -18,10 +17,21 @@ func prettyPrintStructRecursive(v interface{}, indent string) {
 		val = val.Elem()
 	}
 
+	// Check if the value is a struct
+	if val.Kind() != reflect.Struct {
+		fmt.Printf("%s%v\n", indent, val.Interface())
+		return
+	}
+
 	for i := 0; i < val.NumField(); i++ {
 		field := val.Field(i)
 		typeField := val.Type().Field(i)
 		fieldName := typeField.Name
+
+		// Skip empty strings
+		if field.Kind() == reflect.String && field.String() == "" {
+			continue
+		}
 
 		// Add conditions to format specific types if needed, like *big.Int or common.Address
 		switch field.Kind() {

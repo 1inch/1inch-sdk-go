@@ -15,8 +15,8 @@ import (
 	"github.com/ethereum/go-ethereum/ethclient"
 	"github.com/ethereum/go-ethereum/signer/core/apitypes"
 
-	"1inch-sdk-golang/helpers/consts/amounts"
-	"1inch-sdk-golang/helpers/consts/contracts"
+	"github.com/1inch/1inch-sdk/golang/helpers/consts/amounts"
+	"github.com/1inch/1inch-sdk/golang/helpers/consts/contracts"
 )
 
 type PermitSignatureConfig struct {

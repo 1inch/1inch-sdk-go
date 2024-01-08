@@ -8,9 +8,9 @@ import (
 
 	"github.com/go-playground/validator/v10"
 
-	clienterrors "1inch-sdk-golang/client/errors"
-	"1inch-sdk-golang/client/orderbook"
-	"1inch-sdk-golang/helpers"
+	clienterrors "github.com/1inch/1inch-sdk/golang/client/errors"
+	"github.com/1inch/1inch-sdk/golang/client/orderbook"
+	"github.com/1inch/1inch-sdk/golang/helpers"
 )
 
 type OrderbookService service

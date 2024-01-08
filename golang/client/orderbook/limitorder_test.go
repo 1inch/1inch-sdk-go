@@ -9,7 +9,7 @@ import (
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
 
-	"1inch-sdk-golang/helpers/consts/chains"
+	"github.com/1inch/1inch-sdk/golang/helpers/consts/chains"
 )
 
 func TestTrim0x(t *testing.T) {

@@ -14,7 +14,7 @@ import (
 	"github.com/ethereum/go-ethereum/core/types"
 	"github.com/ethereum/go-ethereum/ethclient"
 
-	"1inch-sdk-golang/helpers/consts/contracts"
+	"github.com/1inch/1inch-sdk/golang/helpers/consts/contracts"
 )
 
 func GetDynamicFeeTx(client *ethclient.Client, chainID *big.Int, fromAddress common.Address, to string, data []byte) *types.Transaction {

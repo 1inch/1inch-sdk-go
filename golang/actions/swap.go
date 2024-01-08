@@ -9,13 +9,13 @@ import (
 
 	"github.com/ethereum/go-ethereum/common"
 
-	"1inch-sdk-golang/client"
-	"1inch-sdk-golang/client/onchain"
-	"1inch-sdk-golang/client/swap"
-	"1inch-sdk-golang/helpers"
-	"1inch-sdk-golang/helpers/consts/amounts"
-	"1inch-sdk-golang/helpers/consts/contracts"
-	"1inch-sdk-golang/helpers/consts/typehashes"
+	"github.com/1inch/1inch-sdk/golang/client"
+	"github.com/1inch/1inch-sdk/golang/client/onchain"
+	"github.com/1inch/1inch-sdk/golang/client/swap"
+	"github.com/1inch/1inch-sdk/golang/helpers"
+	"github.com/1inch/1inch-sdk/golang/helpers/consts/amounts"
+	"github.com/1inch/1inch-sdk/golang/helpers/consts/contracts"
+	"github.com/1inch/1inch-sdk/golang/helpers/consts/typehashes"
 )
 
 func SwapTokens(c *client.Client, swapParams swap.AggregationControllerGetSwapParams) error {
@@ -62,7 +62,7 @@ func SwapTokens(c *client.Client, swapParams swap.AggregationControllerGetSwapPa
 			swapParams.Permit = &permitParams
 			fmt.Println("Permit supported by this token! Swapping using Permit1")
 		} else {
-			log.Fatalf("Typehash exists, but it is not recognized: %v\n", typehash)
+			log.Printf("Typehash exists, but it is not recognized: %v\n", typehash)
 		}
 	}
 

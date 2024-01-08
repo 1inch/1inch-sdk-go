@@ -7,8 +7,8 @@ import (
 	"os"
 	"sort"
 
-	"1inch-sdk-golang/client"
-	"1inch-sdk-golang/client/tokenprices"
+	"github.com/1inch/1inch-sdk/golang/client"
+	"github.com/1inch/1inch-sdk/golang/client/tokenprices"
 )
 
 func main() {
