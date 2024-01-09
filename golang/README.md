@@ -8,11 +8,25 @@ Additionally, this SDK also supports executing 1inch swaps onchain for your wall
 
 ## Using the SDK in your project
 
-### Using the SDK
-The SDK can be used by first creating a config object, calling the constructor, then accessing the service for the API of interest:
+The SDK can be used by first creating a config object, calling the constructor, then accessing the service for the API of interest. Here is a simple program using the SDK that will generate swap data using the 1inch Aggregator:
+
+**Note**: A 1inch Dev Portal Token can be generated at [portal.1inch.dev](https://portal.1inch.dev)  
 
 ```go
-...
+package main
+
+import (
+	"context"
+	"log"
+	"os"
+
+	"github.com/1inch/1inch-sdk/golang/client"
+	"github.com/1inch/1inch-sdk/golang/client/swap"
+	"github.com/1inch/1inch-sdk/golang/helpers"
+	"github.com/1inch/1inch-sdk/golang/helpers/consts/amounts"
+	"github.com/1inch/1inch-sdk/golang/helpers/consts/chains"
+	"github.com/1inch/1inch-sdk/golang/helpers/consts/tokens"
+)
 
 func main() {
 
@@ -44,23 +58,15 @@ func main() {
 
 	helpers.PrettyPrintStruct(swapData)
 }
-
-...
 ```
 
-### API calls
-
-Once you have an initialized client, API calls can be made using any of the client's underlying services:
-
-// TODO add simple example here and link to `examples` directory 
+More example programs using the SDK can be found in the [examples directory]()
 
 ## Development
 
 ### Type generation
 
-// TODO explain this more
-
-Type generation is done using the `generate_types.sh` script 
+Type generation is done using the `generate_types.sh` script. To add a new swagger file or update an existing one, place the swagger file in `swagger-static` and run the script. It will generate the types file and place it in the appropriately-named folder in a sub-folder inside the `client` directory
 
 ### Swagger file formatting
 For consistency, Swagger files should be formatted with `prettier`

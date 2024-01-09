@@ -185,6 +185,8 @@ func TestGetQuoteWithCustomPresetsIntegration(t *testing.T) {
 			require.NoError(t, err)
 			require.Equal(t, 201, resp.StatusCode) // incorrect code, but this is what the API returns
 
+			helpers.PrettyPrintStruct(getQuoteResponse)
+
 			require.NotNil(t, getQuoteResponse)
 			require.Equal(t, tokens.EthereumUsdc, getQuoteResponse.FeeToken)
 		})
