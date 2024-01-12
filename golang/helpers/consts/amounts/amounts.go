@@ -4,6 +4,7 @@ import "github.com/1inch/1inch-sdk/golang/helpers"
 
 const (
 	Ten5  = "100000"
+	Ten6  = "1000000"
 	Ten16 = "10000000000000000"
 	Ten17 = "100000000000000000"
 	Ten18 = "1000000000000000000"

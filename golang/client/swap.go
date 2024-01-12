@@ -125,7 +125,9 @@ func (s *SwapService) GetQuote(ctx context.Context, params swap.AggregationContr
 	return &quote, res, nil
 }
 
-func (s *SwapService) GetSwapData(ctx context.Context, params swap.AggregationControllerGetSwapParams) (*swap.SwapResponse, *http.Response, error) {
+// TODO temporarily adding a bool to the function call until config refactor
+
+func (s *SwapService) GetSwapData(ctx context.Context, params swap.AggregationControllerGetSwapParams, skipWarnings bool) (*swap.SwapResponse, *http.Response, error) {
 	u := fmt.Sprintf("/swap/v5.2/%d/swap", s.client.ChainId)
 
 	err := params.Validate()
@@ -150,6 +152,16 @@ func (s *SwapService) GetSwapData(ctx context.Context, params swap.AggregationCo
 
 	swapResponse.FromToken = &swap.TokenInfo{
 		Address: params.Src,
+	}
+	swapResponse.ToToken = &swap.TokenInfo{
+		Address: params.Dst,
+	}
+
+	if !skipWarnings {
+		err = swap.ConfirmSwapDataWithUser(&swapResponse, params.Amount, params.Slippage, s.client.EthClient)
+		if err != nil {
+			return nil, nil, err
+		}
 	}
 
 	return &swapResponse, res, nil

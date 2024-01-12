@@ -25,8 +25,9 @@ func setup() (*Client, *http.ServeMux, string, func(), error) {
 	server := httptest.NewServer(mux)
 	c, err := NewClient(
 		Config{
-			TargetEnvironment: EnvironmentProduction,
-			DevPortalApiKey:   os.Getenv("DEV_PORTAL_TOKEN"),
+			TargetEnvironment:          EnvironmentProduction,
+			DevPortalApiKey:            os.Getenv("DEV_PORTAL_TOKEN"),
+			Web3HttpProviderUrlWithKey: os.Getenv("WEB_3_HTTP_PROVIDER_URL_WITH_KEY"),
 		})
 	if err != nil {
 		return nil, nil, "", nil, err

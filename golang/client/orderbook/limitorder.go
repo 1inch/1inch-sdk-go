@@ -1,13 +1,18 @@
 package orderbook
 
 import (
+	"bufio"
 	"context"
 	"fmt"
+	"io"
 	"log"
 	"math/big"
+	"os"
 	"strings"
 	"time"
 
+	"github.com/1inch/1inch-sdk/golang/client/onchain"
+	"github.com/1inch/1inch-sdk/golang/helpers"
 	"github.com/ethereum/go-ethereum"
 	"github.com/ethereum/go-ethereum/accounts/abi"
 	"github.com/ethereum/go-ethereum/common"
@@ -21,61 +26,6 @@ import (
 
 type Client struct {
 	EthClient *ethclient.Client
-}
-
-func Trim0x(data string) string {
-	if strings.HasPrefix(data, "0x") {
-		return data[2:]
-	}
-	return data
-}
-
-func CumulativeSum(initial int) func(int) int {
-	sum := initial
-	return func(value int) int {
-		sum += value
-		return sum
-	}
-}
-
-var GenerateSalt = func() string {
-	return fmt.Sprintf("%d", time.Now().UnixNano()/int64(time.Millisecond))
-}
-
-const (
-	nonceMethod = "nonce"
-)
-
-func (c *Client) FetchNonce(address string) (*big.Int, error) {
-
-	parsedNonceManagerAbi, err := abi.JSON(strings.NewReader(nonceManagerAbi))
-	if err != nil {
-		log.Fatalf("Failed to parse nonceManager ABI: %v\n", err)
-	}
-
-	getNonceRequestData, err := parsedNonceManagerAbi.Pack(nonceMethod, big.NewInt(123), common.HexToAddress(address))
-	if err != nil {
-		log.Fatalf("Failed to pack ABI for %v: %v\n", nonceMethod, err)
-	}
-
-	nonceManagerAddressAsAddress := common.HexToAddress(nonceManagerAddress)
-
-	getNonceRequestMessage := ethereum.CallMsg{
-		To:   &nonceManagerAddressAsAddress,
-		Data: getNonceRequestData,
-	}
-	nonceResponse, err := c.EthClient.CallContract(context.Background(), getNonceRequestMessage, nil)
-	if err != nil {
-		log.Fatalf("Failed to call contract: %v\n", err)
-	}
-
-	var nonce *big.Int
-	err = parsedNonceManagerAbi.UnpackIntoInterface(&nonce, nonceMethod, nonceResponse)
-	if err != nil {
-		log.Fatalf("Failed to unpack data for %v: %v\n", nonceMethod, err)
-	}
-
-	return nonce, nil
 }
 
 func CreateLimitOrder(orderRequest OrderRequest, chainId int, key string) (*Order, error) {
@@ -182,4 +132,106 @@ func CreateLimitOrder(orderRequest OrderRequest, chainId int, key string) (*Orde
 		Signature: signatureHex,
 		Data:      orderData,
 	}, err
+}
+
+func ConfirmLimitOrderWithUser(order *Order, ethClient *ethclient.Client) (bool, error) {
+	stdOut := StdOutPrinter{}
+	return confirmLimitOrderWithUser(order, ethClient, os.Stdin, stdOut)
+}
+
+func confirmLimitOrderWithUser(order *Order, ethClient *ethclient.Client, reader io.Reader, writer Printer) (bool, error) {
+	makerTokenDecimals, err := onchain.ReadContractDecimals(ethClient, common.HexToAddress(order.Data.MakerAsset))
+	if err != nil {
+		log.Fatalf("Failed to read decimals: %v", err)
+	}
+
+	makerTokenName, err := onchain.ReadContractSymbol(ethClient, common.HexToAddress(order.Data.MakerAsset))
+	if err != nil {
+		log.Fatalf("Failed to read name: %v", err)
+	}
+
+	takerTokenDecimals, err := onchain.ReadContractDecimals(ethClient, common.HexToAddress(order.Data.TakerAsset))
+	if err != nil {
+		log.Fatalf("Failed to read decimals: %v", err)
+	}
+
+	takerTokenName, err := onchain.ReadContractSymbol(ethClient, common.HexToAddress(order.Data.TakerAsset))
+	if err != nil {
+		log.Fatalf("Failed to read name: %v", err)
+	}
+
+	writer.Printf("Order summary:\n")
+	writer.Printf("    %-30s %s\n", "Wallet:", order.Data.Maker)
+	writer.Printf("    %-30s %s %s\n", "Selling: ", helpers.SimplifyValue(order.Data.MakingAmount, int(makerTokenDecimals)), makerTokenName)
+	writer.Printf("    %-30s %s %s\n", "Buying:", helpers.SimplifyValue(order.Data.TakingAmount, int(takerTokenDecimals)), takerTokenName)
+	writer.Printf("\n")
+	writer.Printf("WARNING: This order will be officially posted to the 1inch Limit Order protocol where anyone will be able to execute in onchain immediately. " +
+		"Once executed, the results are irreversible. Make sure the proposed trade looks correct before continuing!\n")
+	writer.Printf("Would you like to post this order to the 1inch API now? [y/N]: ")
+
+	inputReader := bufio.NewReader(reader)
+	input, _ := inputReader.ReadString('\n')
+	input = strings.ToLower(strings.TrimSpace(input))
+
+	switch input {
+	case "y":
+		return true, nil
+	default:
+		return false, nil
+	}
+}
+
+func Trim0x(data string) string {
+	if strings.HasPrefix(data, "0x") {
+		return data[2:]
+	}
+	return data
+}
+
+func CumulativeSum(initial int) func(int) int {
+	sum := initial
+	return func(value int) int {
+		sum += value
+		return sum
+	}
+}
+
+var GenerateSalt = func() string {
+	return fmt.Sprintf("%d", time.Now().UnixNano()/int64(time.Millisecond))
+}
+
+const (
+	nonceMethod = "nonce"
+)
+
+func (c *Client) FetchNonce(address string) (*big.Int, error) {
+
+	parsedNonceManagerAbi, err := abi.JSON(strings.NewReader(nonceManagerAbi))
+	if err != nil {
+		log.Fatalf("Failed to parse nonceManager ABI: %v\n", err)
+	}
+
+	getNonceRequestData, err := parsedNonceManagerAbi.Pack(nonceMethod, big.NewInt(123), common.HexToAddress(address))
+	if err != nil {
+		log.Fatalf("Failed to pack ABI for %v: %v\n", nonceMethod, err)
+	}
+
+	nonceManagerAddressAsAddress := common.HexToAddress(nonceManagerAddress)
+
+	getNonceRequestMessage := ethereum.CallMsg{
+		To:   &nonceManagerAddressAsAddress,
+		Data: getNonceRequestData,
+	}
+	nonceResponse, err := c.EthClient.CallContract(context.Background(), getNonceRequestMessage, nil)
+	if err != nil {
+		log.Fatalf("Failed to call contract: %v\n", err)
+	}
+
+	var nonce *big.Int
+	err = parsedNonceManagerAbi.UnpackIntoInterface(&nonce, nonceMethod, nonceResponse)
+	if err != nil {
+		log.Fatalf("Failed to unpack data for %v: %v\n", nonceMethod, err)
+	}
+
+	return nonce, nil
 }

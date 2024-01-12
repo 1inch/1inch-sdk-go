@@ -1,5 +1,7 @@
 package orderbook
 
+import "fmt"
+
 type OrderRequest struct {
 	SourceWallet string `json:"sourceWallet" validate:"required,eth_addr"`
 	FromToken    string `json:"fromToken" validate:"required,eth_addr"`
@@ -7,6 +9,7 @@ type OrderRequest struct {
 	TakingAmount int    `json:"takingAmount" validate:"required,gt=0"`
 	MakingAmount int    `json:"makingAmount" validate:"required,gt=0"`
 	Receiver     string `json:"receiver" validate:"omitempty,eth_addr"`
+	SkipWarnings bool   `json:"skipWarnings"`
 }
 
 type Order struct {
@@ -33,4 +36,19 @@ type LimitOrderV3DomainData struct {
 	Version           string `json:"version"`
 	ChainId           int    `json:"chainId"`
 	VerifyingContract string `json:"verifyingContract"`
+}
+
+type NoOpPrinter struct{}
+
+func (n NoOpPrinter) Printf(format string, a ...interface{}) {}
+
+// StdOutPrinter is a Printer that writes to standard output.
+type StdOutPrinter struct{}
+
+func (p StdOutPrinter) Printf(format string, a ...interface{}) {
+	fmt.Printf(format, a...)
+}
+
+type Printer interface {
+	Printf(format string, a ...interface{})
 }

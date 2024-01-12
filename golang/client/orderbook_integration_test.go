@@ -14,7 +14,7 @@ import (
 	"github.com/1inch/1inch-sdk/golang/helpers"
 )
 
-// TODO This test requires a private key to be set in the environment and sign the limit order
+// TODO This test requires a private key to be set in the environment and uses Polygon
 func TestCreateOrderIntegration(t *testing.T) {
 
 	testcases := []struct {
@@ -31,16 +31,18 @@ func TestCreateOrderIntegration(t *testing.T) {
 				TakingAmount: 1000000000000000000,
 				MakingAmount: 1000000000000000000,
 				Receiver:     "0x0000000000000000000000000000000000000000",
+				SkipWarnings: true,
 			},
 			expectSuccess: true,
 		},
 	}
 
 	c, err := NewClient(Config{
-		TargetEnvironment: EnvironmentProduction,
-		ChainId:           chains.Polygon,
-		DevPortalApiKey:   helpers.GetenvSafe("DEV_PORTAL_TOKEN"),
-		WalletKey:         helpers.GetenvSafe("WALLET_KEY"),
+		TargetEnvironment:          EnvironmentProduction,
+		ChainId:                    chains.Polygon,
+		DevPortalApiKey:            helpers.GetenvSafe("DEV_PORTAL_TOKEN"),
+		WalletKey:                  helpers.GetenvSafe("WALLET_KEY"),
+		Web3HttpProviderUrlWithKey: helpers.GetenvSafe("WEB_3_HTTP_PROVIDER_URL_WITH_KEY_POLYGON"),
 	})
 	require.NoError(t, err)
 

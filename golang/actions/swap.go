@@ -12,17 +12,24 @@ import (
 	"github.com/1inch/1inch-sdk/golang/client"
 	"github.com/1inch/1inch-sdk/golang/client/onchain"
 	"github.com/1inch/1inch-sdk/golang/client/swap"
-	"github.com/1inch/1inch-sdk/golang/helpers"
 	"github.com/1inch/1inch-sdk/golang/helpers/consts/amounts"
 	"github.com/1inch/1inch-sdk/golang/helpers/consts/contracts"
 	"github.com/1inch/1inch-sdk/golang/helpers/consts/typehashes"
 )
 
-func SwapTokens(c *client.Client, swapParams swap.AggregationControllerGetSwapParams) error {
+// TODO temporarily adding a bool to the function call until config refactor
+
+func SwapTokens(c *client.Client, swapParams swap.AggregationControllerGetSwapParams, skipWarnings bool) error {
 
 	deadline := time.Now().Add(10 * time.Minute).Unix() // TODO make this configurable
 
-	executeSwapConfig := &swap.ExecuteSwapConfig{}
+	executeSwapConfig := &swap.ExecuteSwapConfig{
+		FromToken: swapParams.Src,
+		ToToken:   swapParams.Dst,
+		Amount:    swapParams.Amount,
+		Slippage:  swapParams.Slippage,
+	}
+
 	typehash, err := swap.GetTypeHash(c.EthClient, swapParams.Src)
 	if err == nil {
 		// Typehash is present which means we can use Permit to save gas
@@ -68,15 +75,16 @@ func SwapTokens(c *client.Client, swapParams swap.AggregationControllerGetSwapPa
 
 	// Execute swap request
 	// This will return the transaction data used by a wallet to execute the swap
-	swapResponse, _, err := c.Swap.GetSwapData(context.Background(), swapParams)
+	swapResponse, _, err := c.Swap.GetSwapData(context.Background(), swapParams, true)
 	if err != nil {
 		return fmt.Errorf("failed to get swap: %v", err)
 	}
 
-	helpers.PrettyPrintStruct(swapResponse)
+	//helpers.PrettyPrintStruct(swapResponse)
 
 	executeSwapConfig.TransactionData = swapResponse.Tx.Data
-	executeSwapConfig.FromToken = swapResponse.FromToken.Address
+	executeSwapConfig.EstimatedAmountOut = swapResponse.ToAmount
+	executeSwapConfig.SkipWarnings = skipWarnings
 
 	err = c.Swap.ExecuteSwap(executeSwapConfig)
 	if err != nil {

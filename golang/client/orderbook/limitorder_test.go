@@ -1,11 +1,16 @@
 package orderbook
 
 import (
+	"bytes"
 	"math/big"
 	"os"
 	"testing"
 	"time"
 
+	"github.com/1inch/1inch-sdk/golang/helpers/consts/addresses"
+	"github.com/1inch/1inch-sdk/golang/helpers/consts/amounts"
+	"github.com/1inch/1inch-sdk/golang/helpers/consts/tokens"
+	"github.com/ethereum/go-ethereum/ethclient"
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
 
@@ -243,6 +248,65 @@ func TestCreateLimitOrder(t *testing.T) {
 				// Compare the data fields individually or as a whole
 				assert.Equal(t, tc.expectedOrder.Data, result.Data, "Order data does not match expected value")
 			}
+		})
+	}
+}
+
+func TestConfirmTradeWithUser(t *testing.T) {
+
+	order := &Order{
+		Data: OrderData{
+			MakerAsset:   tokens.EthereumUsdc,
+			TakerAsset:   tokens.EthereumDai,
+			MakingAmount: amounts.Ten6 + "1",
+			TakingAmount: amounts.Ten18,
+			Maker:        addresses.Vitalik,
+		},
+	}
+
+	tests := []struct {
+		name           string
+		userInput      string
+		expectedResult bool
+		expectedOutput string
+	}{
+		{
+			name:           "User inputs 'y'",
+			userInput:      "y\n",
+			expectedResult: true,
+		},
+		{
+			name:           "User inputs 'Y'",
+			userInput:      "Y\n",
+			expectedResult: true,
+		},
+		{
+			name:           "User inputs 'n'",
+			userInput:      "n\n",
+			expectedResult: false,
+		},
+		{
+			name:           "User inputs nothing",
+			userInput:      "\n",
+			expectedResult: false,
+		},
+		{
+			name:           "User inputs other text",
+			userInput:      "other\n",
+			expectedResult: false,
+		},
+	}
+
+	for _, tc := range tests {
+		t.Run(tc.name, func(t *testing.T) {
+			ethClient, err := ethclient.Dial("https://eth-mainnet.public.blastapi.io") // TODO Should we swap all tests to use public endpoints?
+			require.NoError(t, err)
+			reader := bytes.NewBufferString(tc.userInput)
+			writer := NoOpPrinter{}
+			result, err := confirmLimitOrderWithUser(order, ethClient, reader, writer)
+
+			assert.NoError(t, err)
+			assert.Equal(t, tc.expectedResult, result)
 		})
 	}
 }

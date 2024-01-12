@@ -3,6 +3,7 @@ package client
 import (
 	"context"
 	"encoding/json"
+	"errors"
 	"fmt"
 	"net/http"
 
@@ -24,9 +25,19 @@ func (s *OrderbookService) CreateOrder(ctx context.Context, params orderbook.Ord
 		return nil, nil, err
 	}
 
-	order, err := orderbook.CreateLimitOrder(params, 137, s.client.WalletKey)
+	order, err := orderbook.CreateLimitOrder(params, 137, s.client.WalletKey) // TODO hardcoded chainId
 	if err != nil {
 		return nil, nil, err
+	}
+
+	if !params.SkipWarnings {
+		ok, err := orderbook.ConfirmLimitOrderWithUser(order, s.client.EthClient)
+		if err != nil {
+			return nil, nil, err
+		}
+		if !ok {
+			return nil, nil, errors.New("user rejected trade")
+		}
 	}
 
 	body, err := json.Marshal(order)

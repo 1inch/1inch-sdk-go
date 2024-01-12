@@ -35,10 +35,11 @@ func main() {
 		Dst:             tokens.PolygonWeth,
 		From:            os.Getenv("WALLET_ADDRESS"),
 		Amount:          amounts.Ten16,
+		Slippage:        0.5,
 		DisableEstimate: helpers.GetPtr(true),
 	}
 
-	err = actions.SwapTokens(c, swapParams)
+	err = actions.SwapTokens(c, swapParams, true)
 	if err != nil {
 		log.Fatalf("Failed to swap tokens: %v", err)
 	}

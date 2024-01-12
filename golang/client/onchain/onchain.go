@@ -78,6 +78,64 @@ func ReadContractName(client *ethclient.Client, contractAddress common.Address) 
 	return contractName, nil
 }
 
+// ReadContractSymbol reads the 'symbol' public variable from a contract.
+func ReadContractSymbol(client *ethclient.Client, contractAddress common.Address) (string, error) {
+	parsedABI, err := abi.JSON(strings.NewReader(contracts.Erc20Abi)) // Make a generic version of this ABI
+	if err != nil {
+		return "", err
+	}
+
+	// Construct the call message
+	msg := ethereum.CallMsg{
+		To:   &contractAddress,
+		Data: parsedABI.Methods["symbol"].ID,
+	}
+
+	// Query the blockchain
+	result, err := client.CallContract(context.Background(), msg, nil)
+	if err != nil {
+		return "", err
+	}
+
+	// Unpack the result
+	var contractName string
+	err = parsedABI.UnpackIntoInterface(&contractName, "name", result)
+	if err != nil {
+		return "", err
+	}
+
+	return contractName, nil
+}
+
+// ReadContractDecimals reads the 'decimals' public variable from a contract.
+func ReadContractDecimals(client *ethclient.Client, contractAddress common.Address) (uint8, error) {
+	parsedABI, err := abi.JSON(strings.NewReader(contracts.Erc20Abi)) // Make a generic version of this ABI
+	if err != nil {
+		return 0, err
+	}
+
+	// Construct the call message
+	msg := ethereum.CallMsg{
+		To:   &contractAddress,
+		Data: parsedABI.Methods["decimals"].ID,
+	}
+
+	// Query the blockchain
+	result, err := client.CallContract(context.Background(), msg, nil)
+	if err != nil {
+		return 0, err
+	}
+
+	// Unpack the result
+	var decimals uint8
+	err = parsedABI.UnpackIntoInterface(&decimals, "decimals", result)
+	if err != nil {
+		return 0, err
+	}
+
+	return decimals, nil
+}
+
 // ReadContractNonce reads the 'nonces' public variable from a contract.
 func ReadContractNonce(client *ethclient.Client, publicAddress common.Address, contractAddress common.Address) (int64, error) {
 	parsedABI, err := abi.JSON(strings.NewReader(contracts.Erc20Abi)) // Make a generic version of this ABI
