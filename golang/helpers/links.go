@@ -29,5 +29,5 @@ func GetBlockExplorerTxLinkInfo(chainId int, txHash string) string {
 		return fmt.Sprintf("Tx Id: %s\n", txHash)
 
 	}
-	return fmt.Sprintf("View it %s here: %s\n", serviceName, baseUrl+txHash)
+	return fmt.Sprintf("View it on %s here: %s\n", serviceName, baseUrl+txHash)
 }

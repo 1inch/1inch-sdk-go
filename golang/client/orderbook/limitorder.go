@@ -38,12 +38,17 @@ func CreateLimitOrder(orderRequest OrderRequest, chainId int, key string) (*Orde
 		Interactions:  "0x", // TODO use this
 	}
 
+	aggregationRouter, err := contracts.Get1inchRouterFromChainId(chainId)
+	if err != nil {
+		return nil, fmt.Errorf("failed to get 1inch router address: %v", err)
+	}
+
 	// Set up the domain data
 	domainData := apitypes.TypedDataDomain{
 		Name:              contracts.AggregationRouterV5Name,
 		Version:           contracts.AggregationRouterV5VersionNumber,
 		ChainId:           math.NewHexOrDecimal256(int64(chainId)),
-		VerifyingContract: contracts.AggregationRouterV5,
+		VerifyingContract: aggregationRouter,
 	}
 
 	orderMessage := apitypes.TypedDataMessage{
@@ -163,6 +168,39 @@ func confirmLimitOrderWithUser(order *Order, ethClient *ethclient.Client, reader
 	writer.Printf("WARNING: This order will be officially posted to the 1inch Limit Order protocol where anyone will be able to execute in onchain immediately. " +
 		"Once executed, the results are irreversible. Make sure the proposed trade looks correct before continuing!\n")
 	writer.Printf("Would you like to post this order to the 1inch API now? [y/N]: ")
+
+	inputReader := bufio.NewReader(reader)
+	input, _ := inputReader.ReadString('\n')
+	input = strings.ToLower(strings.TrimSpace(input))
+
+	switch input {
+	case "y":
+		return true, nil
+	default:
+		return false, nil
+	}
+}
+
+func ConfirmApprovalWithUser(ethClient *ethclient.Client, publicAddress string, tokenAddress string) (bool, error) {
+	stdOut := StdOutPrinter{}
+	return confirmApprovalWithUser(ethClient, publicAddress, tokenAddress, os.Stdin, stdOut)
+}
+
+func confirmApprovalWithUser(ethClient *ethclient.Client, publicAddress string, tokenAddress string, reader io.Reader, writer Printer) (bool, error) {
+	tokenName, err := onchain.ReadContractSymbol(ethClient, common.HexToAddress(tokenAddress))
+	if err != nil {
+		return false, fmt.Errorf("failed to read name: %v", err)
+	}
+
+	writer.Printf("The aggregator contract does not have enough allowance to execute the order! The SDK can give an " +
+		"unlimited approval on your behalf. If you would like to use custom approval amount instead, do that manually " +
+		"onchain, then run the SDK again\n")
+	writer.Printf("Approval summary:\n")
+	writer.Printf("    %-30s %s\n", "Wallet:", publicAddress)
+	writer.Printf("    %-30s %s\n", "Selling: ", tokenName)
+	writer.Printf("    %-30s %s\n", "Approval amount: ", "unlimited")
+	writer.Printf("\n")
+	writer.Printf("Would you like post an onchain unlimited approval now? [y/N]: ")
 
 	inputReader := bufio.NewReader(reader)
 	input, _ := inputReader.ReadString('\n')

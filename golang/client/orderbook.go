@@ -5,8 +5,12 @@ import (
 	"encoding/json"
 	"errors"
 	"fmt"
+	"math/big"
 	"net/http"
 
+	"github.com/1inch/1inch-sdk/golang/client/onchain"
+	"github.com/1inch/1inch-sdk/golang/helpers/consts/contracts"
+	"github.com/ethereum/go-ethereum/common"
 	"github.com/go-playground/validator/v10"
 
 	clienterrors "github.com/1inch/1inch-sdk/golang/client/errors"
@@ -28,6 +32,36 @@ func (s *OrderbookService) CreateOrder(ctx context.Context, params orderbook.Ord
 	err := validate.Struct(params)
 	if err != nil {
 		return nil, nil, err
+	}
+
+	aggregationRouter, err := contracts.Get1inchRouterFromChainId(s.client.ChainId)
+	if err != nil {
+		return nil, nil, fmt.Errorf("failed to get 1inch router address: %v", err)
+	}
+
+	fromTokenAddress := common.HexToAddress(params.FromToken)
+	publicAddress := common.HexToAddress(params.SourceWallet)
+	aggreateRouterAddress := common.HexToAddress(aggregationRouter)
+	allowance, err := onchain.ReadContractAllowance(s.client.EthClient, fromTokenAddress, publicAddress, aggreateRouterAddress)
+	if err != nil {
+		return nil, nil, fmt.Errorf("failed to read allowance: %v", err)
+	}
+
+	// TODO refactor to support big.Int
+	if allowance.Cmp(big.NewInt(int64(params.MakingAmount))) <= 0 {
+		if !params.SkipWarnings {
+			ok, err := orderbook.ConfirmApprovalWithUser(s.client.EthClient, params.SourceWallet, params.FromToken)
+			if err != nil {
+				return nil, nil, fmt.Errorf("failed to confirm approval: %v", err)
+			}
+			if !ok {
+				return nil, nil, errors.New("user rejected approval")
+			}
+		}
+		err := onchain.ApproveTokenForRouter(s.client.EthClient, s.client.ChainId, s.client.WalletKey, fromTokenAddress, publicAddress, aggreateRouterAddress)
+		if err != nil {
+			return nil, nil, fmt.Errorf("failed to approve token for router: %v", err)
+		}
 	}
 
 	order, err := orderbook.CreateLimitOrder(params, s.client.ChainId, s.client.WalletKey)

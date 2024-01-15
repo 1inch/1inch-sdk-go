@@ -49,8 +49,13 @@ func (s *SwapService) ExecuteSwap(config *swap.ExecuteSwapConfig) error {
 		return fmt.Errorf("failed to get network ID: %v", err)
 	}
 
+	aggregationRouter, err := contracts.Get1inchRouterFromChainId(s.client.ChainId)
+	if err != nil {
+		return fmt.Errorf("failed to get 1inch router address: %v", err)
+	}
+
 	// Assume spenderAddress is the address of the contract you are giving unlimited approval to spend your USDC
-	spenderAddress := common.HexToAddress(contracts.AggregationRouterV5)
+	spenderAddress := common.HexToAddress(aggregationRouter)
 
 	if !config.IsPermitSwap {
 		err = s.executeSwapWithApproval(spenderAddress.Hex(), chainID, config.FromToken, privateKey, config.TransactionData)
@@ -98,7 +103,8 @@ func (s *SwapService) executeSwapWithApproval(spenderAddress string, chainID *bi
 	if err != nil {
 		return fmt.Errorf("failed to send transaction: %v", err)
 	}
-	fmt.Printf("Approval transaction sent! Hash: %s\n", approvalTxSigned.Hash().Hex())
+	fmt.Printf("Approval transaction sent!\n")
+	helpers.PrintBlockExplorerTxLink(int(chainID.Int64()), approvalTxSigned.Hash().String())
 
 	_, err = onchain.WaitForTransaction(s.client.EthClient, approvalTxSigned.Hash())
 	if err != nil {
@@ -112,7 +118,13 @@ func (s *SwapService) executeSwapWithApproval(spenderAddress string, chainID *bi
 	if err != nil {
 		return fmt.Errorf("failed to decode swap data: %v", err)
 	}
-	swapTx, err := onchain.GetDynamicFeeTx(s.client.EthClient, chainID, s.client.PublicAddress, contracts.AggregationRouterV5, hexData)
+
+	aggregationRouter, err := contracts.Get1inchRouterFromChainId(s.client.ChainId)
+	if err != nil {
+		return fmt.Errorf("failed to get 1inch router address: %v", err)
+	}
+
+	swapTx, err := onchain.GetDynamicFeeTx(s.client.EthClient, chainID, s.client.PublicAddress, aggregationRouter, hexData)
 	if err != nil {
 		return fmt.Errorf("failed to get dynamic fee tx: %v", err)
 	}
@@ -146,7 +158,13 @@ func (s *SwapService) executeSwapWithPermit(chainID *big.Int, privateKey *ecdsa.
 	if err != nil {
 		return fmt.Errorf("failed to decode swap data: %v", err)
 	}
-	permitSwapTx, err := onchain.GetDynamicFeeTx(s.client.EthClient, chainID, s.client.PublicAddress, contracts.AggregationRouterV5, hexData)
+
+	aggregationRouter, err := contracts.Get1inchRouterFromChainId(s.client.ChainId)
+	if err != nil {
+		return fmt.Errorf("failed to get 1inch router address: %v", err)
+	}
+
+	permitSwapTx, err := onchain.GetDynamicFeeTx(s.client.EthClient, chainID, s.client.PublicAddress, aggregationRouter, hexData)
 	if err != nil {
 		return fmt.Errorf("failed to get dynamic fee tx: %v", err)
 	}

@@ -43,10 +43,15 @@ func CreatePermitSignature(config *PermitSignatureConfig) (string, error) {
 		VerifyingContract: config.FromToken,
 	}
 
+	aggregationRouter, err := contracts.Get1inchRouterFromChainId(config.ChainId)
+	if err != nil {
+		return "", fmt.Errorf("failed to get 1inch router address: %v", err)
+	}
+
 	// Order Message
 	orderMessage := apitypes.TypedDataMessage{
 		"owner":    config.PublicAddress,
-		"spender":  contracts.AggregationRouterV5,
+		"spender":  aggregationRouter,
 		"value":    amounts.BigMaxUint256,
 		"nonce":    big.NewInt(config.Nonce),
 		"deadline": big.NewInt(config.Deadline),

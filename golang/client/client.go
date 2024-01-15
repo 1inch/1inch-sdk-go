@@ -190,21 +190,28 @@ func (c *Client) Do(ctx context.Context, req *http.Request, v interface{}) (*htt
 	}
 
 	// Check response codes
-	var errorResp *ErrorResponse
+	// TODO errors are handled generically at the moment
 	if resp.StatusCode < 200 || resp.StatusCode >= 300 {
-		errorResp = &ErrorResponse{Response: resp}
 		data, err := io.ReadAll(resp.Body)
 		if err != nil {
-			return nil, err
+			return nil, fmt.Errorf("failed to read response body: %v", err)
 		}
-		err = json.Unmarshal(data, errorResp)
+
+		// Unmarshal into a map to handle arbitrary JSON structure
+		var messageMap map[string]interface{}
+		err = json.Unmarshal(data, &messageMap)
 		if err != nil {
-			// reset the response as if this never happened
-			errorResp = &ErrorResponse{Response: resp}
+			// Fallback to raw string if unmarshalling fails
+			return nil, fmt.Errorf("failed to unmarshal response body: %s", string(data))
 		}
-	}
-	if errorResp != nil {
-		return nil, errorResp
+
+		// Marshal the message with indentation
+		formattedMessage, err := json.MarshalIndent(messageMap, "", "    ")
+		if err != nil {
+			return nil, fmt.Errorf("failed to marshal formatted message: %v - Original error: %s", err, string(data))
+		}
+
+		return nil, fmt.Errorf("%s", formattedMessage)
 	}
 
 	switch v := v.(type) {

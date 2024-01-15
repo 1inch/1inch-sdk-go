@@ -18,13 +18,13 @@ func TestGetBlockExplorerTxLinkInfo(t *testing.T) {
 			description: "Ethereum mainnet transaction",
 			chainId:     chains.Ethereum,
 			txHash:      "0x123",
-			expected:    "View it Etherscan here: https://etherscan.io/tx/0x123\n",
+			expected:    "View it on Etherscan here: https://etherscan.io/tx/0x123\n",
 		},
 		{
 			description: "Polygon network transaction",
 			chainId:     chains.Polygon,
 			txHash:      "0x456",
-			expected:    "View it PolygonScan here: https://polygonscan.com/tx/0x456\n",
+			expected:    "View it on PolygonScan here: https://polygonscan.com/tx/0x456\n",
 		},
 		{
 			description: "Unknown network",

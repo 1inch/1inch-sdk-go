@@ -80,9 +80,14 @@ func SwapTokens(c *client.Client, swapParams swap.AggregationControllerGetSwapPa
 				return fmt.Errorf("failed to create permit signature: %v", err)
 			}
 
+			aggregationRouter, err := contracts.Get1inchRouterFromChainId(c.ChainId)
+			if err != nil {
+				return fmt.Errorf("failed to get 1inch router address: %v", err)
+			}
+
 			permitParams := swap.CreatePermitParams(&swap.PermitParamsConfig{
 				Owner:     strings.ToLower(c.PublicAddress.Hex()), // TODO remove ToLower and see if it still works
-				Spender:   contracts.AggregationRouterV5,
+				Spender:   aggregationRouter,
 				Value:     amounts.BigMaxUint256,
 				Deadline:  deadline,
 				Signature: sig,
