@@ -7,14 +7,13 @@ import (
 	"errors"
 	"fmt"
 	"math/big"
-	"strings"
 
 	"github.com/1inch/1inch-sdk/golang/client/onchain"
 	"github.com/1inch/1inch-sdk/golang/client/swap"
 	"github.com/1inch/1inch-sdk/golang/helpers"
 	"github.com/1inch/1inch-sdk/golang/helpers/consts/amounts"
 	"github.com/1inch/1inch-sdk/golang/helpers/consts/contracts"
-	"github.com/ethereum/go-ethereum/accounts/abi"
+	"github.com/1inch/1inch-sdk/golang/helpers/consts/tokens"
 	"github.com/ethereum/go-ethereum/common"
 	"github.com/ethereum/go-ethereum/core/types"
 	"github.com/ethereum/go-ethereum/crypto"
@@ -54,65 +53,54 @@ func (s *SwapService) ExecuteSwap(config *swap.ExecuteSwapConfig) error {
 		return fmt.Errorf("failed to get 1inch router address: %v", err)
 	}
 
-	// Assume spenderAddress is the address of the contract you are giving unlimited approval to spend your USDC
-	spenderAddress := common.HexToAddress(aggregationRouter)
-
 	if !config.IsPermitSwap {
-		err = s.executeSwapWithApproval(spenderAddress.Hex(), chainID, config.FromToken, privateKey, config.TransactionData)
+		err = s.executeSwapWithApproval(aggregationRouter, config.FromToken, config.Amount, privateKey, config.TransactionData, config.SkipWarnings)
 		if err != nil {
-			return fmt.Errorf("failed to execute swap with permit: %v", err)
+			return fmt.Errorf("failed to execute swap with approval: %v", err)
 		}
 	} else {
 		err = s.executeSwapWithPermit(chainID, privateKey, config.TransactionData)
 		if err != nil {
-			return fmt.Errorf("failed to execute swap with approval: %v", err)
+			return fmt.Errorf("failed to execute swap with permit: %v", err)
 		}
 	}
 
 	return nil
 }
 
-func (s *SwapService) executeSwapWithApproval(spenderAddress string, chainID *big.Int, fromToken string, privateKey *ecdsa.PrivateKey, transactionData string) error {
-	// Parse the USDC contract ABI to get the 'Approve' function signature
-	parsedABI, err := abi.JSON(strings.NewReader(contracts.Erc20Abi))
-	if err != nil {
-		return fmt.Errorf("failed to parse USDC ABI: %v", err)
+func (s *SwapService) executeSwapWithApproval(spenderAddress string, fromToken string, amount string, privateKey *ecdsa.PrivateKey, transactionData string, skipWarnings bool) error {
+
+	var allowance *big.Int
+	var err error
+	if fromToken != tokens.NativeToken {
+		allowance, err = onchain.ReadContractAllowance(s.client.EthClient, common.HexToAddress(fromToken), s.client.PublicAddress, common.HexToAddress(spenderAddress))
+		if err != nil {
+			return fmt.Errorf("failed to read allowance: %v", err)
+		}
+	} else {
+		allowance = amounts.BigMaxUint256
 	}
 
-	// TODO check if there is an appropriate approval balance instead of doing an unlimited approval
-
-	// Pack the transaction data with the method signature and parameters
-	data, err := parsedABI.Pack("approve", spenderAddress, amounts.BigMaxUint256)
+	amountBig, err := helpers.BigIntFromString(amount)
 	if err != nil {
-		return fmt.Errorf("failed to pack data for approve: %v", err)
+		return fmt.Errorf("failed to convert amount to big.Int: %v", err)
 	}
-
-	approvalTx, err := onchain.GetDynamicFeeTx(s.client.EthClient, chainID, s.client.PublicAddress, fromToken, data)
-	if err != nil {
-		return fmt.Errorf("failed to get dynamic fee tx: %v", err)
+	if allowance.Cmp(amountBig) <= 0 {
+		if !skipWarnings {
+			ok, err := swap.ConfirmApprovalWithUser(s.client.EthClient, s.client.PublicAddress.Hex(), fromToken)
+			if err != nil {
+				return fmt.Errorf("failed to confirm approval: %v", err)
+			}
+			if !ok {
+				return errors.New("user rejected approval")
+			}
+		}
+		err = onchain.ApproveTokenForRouter(s.client.EthClient, s.client.ChainId, s.client.WalletKey, common.HexToAddress(fromToken), s.client.PublicAddress, common.HexToAddress(spenderAddress))
+		if err != nil {
+			return fmt.Errorf("failed to approve token for router: %v", err)
+		}
+		helpers.Sleep()
 	}
-
-	// Sign the transaction
-	approvalTxSigned, err := types.SignTx(approvalTx, types.LatestSignerForChainID(chainID), privateKey)
-	if err != nil {
-		return fmt.Errorf("failed to sign transaction: %v", err)
-	}
-
-	// Send the transaction
-	err = s.client.EthClient.SendTransaction(context.Background(), approvalTxSigned)
-	if err != nil {
-		return fmt.Errorf("failed to send transaction: %v", err)
-	}
-	fmt.Printf("Approval transaction sent!\n")
-	helpers.PrintBlockExplorerTxLink(int(chainID.Int64()), approvalTxSigned.Hash().String())
-
-	_, err = onchain.WaitForTransaction(s.client.EthClient, approvalTxSigned.Hash())
-	if err != nil {
-		return fmt.Errorf("failed to get transaction receipt: %v", err)
-	}
-
-	// Sometimes the Ethereum client returns the old nonce. Adding a sleep here for now (still does not fix it 100%)
-	helpers.Sleep()
 
 	hexData, err := hex.DecodeString(transactionData[2:])
 	if err != nil {
@@ -124,13 +112,12 @@ func (s *SwapService) executeSwapWithApproval(spenderAddress string, chainID *bi
 		return fmt.Errorf("failed to get 1inch router address: %v", err)
 	}
 
-	swapTx, err := onchain.GetDynamicFeeTx(s.client.EthClient, chainID, s.client.PublicAddress, aggregationRouter, hexData)
-	if err != nil {
-		return fmt.Errorf("failed to get dynamic fee tx: %v", err)
-	}
+	chainIdBig := big.NewInt(int64(s.client.ChainId))
+
+	swapTx, err := onchain.GetTx(s.client.EthClient, chainIdBig, s.client.PublicAddress, fromToken, amount, aggregationRouter, hexData)
 
 	// Sign the transaction
-	swapTxSigned, err := types.SignTx(swapTx, types.LatestSignerForChainID(chainID), privateKey)
+	swapTxSigned, err := types.SignTx(swapTx, types.LatestSignerForChainID(chainIdBig), privateKey)
 	if err != nil {
 		return fmt.Errorf("failed to sign transaction: %v", err)
 	}
@@ -141,14 +128,13 @@ func (s *SwapService) executeSwapWithApproval(spenderAddress string, chainID *bi
 		return fmt.Errorf("failed to send transaction: %v", err)
 	}
 
-	fmt.Printf("Swap transaction sent! Hash: %s\n", swapTxSigned.Hash().Hex())
+	fmt.Println("Swap transaction sent!")
+	helpers.PrintBlockExplorerTxLink(s.client.ChainId, swapTxSigned.Hash().String())
 
 	_, err = onchain.WaitForTransaction(s.client.EthClient, swapTxSigned.Hash())
 	if err != nil {
 		return fmt.Errorf("failed to get transaction receipt: %v", err)
 	}
-
-	helpers.PrintBlockExplorerTxLink(s.client.ChainId, swapTxSigned.Hash().String())
 	return nil
 }
 
@@ -164,7 +150,7 @@ func (s *SwapService) executeSwapWithPermit(chainID *big.Int, privateKey *ecdsa.
 		return fmt.Errorf("failed to get 1inch router address: %v", err)
 	}
 
-	permitSwapTx, err := onchain.GetDynamicFeeTx(s.client.EthClient, chainID, s.client.PublicAddress, aggregationRouter, hexData)
+	permitSwapTx, err := onchain.GetTx(s.client.EthClient, chainID, s.client.PublicAddress, "", "0", aggregationRouter, hexData) // TODO Fix the empty string and 0 being passed in
 	if err != nil {
 		return fmt.Errorf("failed to get dynamic fee tx: %v", err)
 	}

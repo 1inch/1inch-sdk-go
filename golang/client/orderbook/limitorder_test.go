@@ -7,6 +7,7 @@ import (
 	"testing"
 	"time"
 
+	"github.com/1inch/1inch-sdk/golang/helpers"
 	"github.com/1inch/1inch-sdk/golang/helpers/consts/addresses"
 	"github.com/1inch/1inch-sdk/golang/helpers/consts/amounts"
 	"github.com/1inch/1inch-sdk/golang/helpers/consts/tokens"
@@ -300,10 +301,10 @@ func TestConfirmTradeWithUser(t *testing.T) {
 
 	for _, tc := range tests {
 		t.Run(tc.name, func(t *testing.T) {
-			ethClient, err := ethclient.Dial(web3providers.EthereumBlastApi)
+			ethClient, err := ethclient.Dial(web3providers.Ethereum)
 			require.NoError(t, err)
 			reader := bytes.NewBufferString(tc.userInput)
-			writer := NoOpPrinter{}
+			writer := helpers.NoOpPrinter{}
 			result, err := confirmLimitOrderWithUser(order, ethClient, reader, writer)
 
 			assert.NoError(t, err)

@@ -42,7 +42,7 @@ func main() {
 	// Execute orders request
 	createOrderResponse, _, err := c.Orderbook.CreateOrder(context.Background(), createOrderParams)
 	if err != nil {
-		log.Fatalf("Failed to get quote: %v", err)
+		log.Fatalf("Failed to create order: %v", err)
 	}
 
 	helpers.PrettyPrintStruct(createOrderResponse)

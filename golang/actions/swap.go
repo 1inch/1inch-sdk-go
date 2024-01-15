@@ -7,6 +7,7 @@ import (
 	"strings"
 	"time"
 
+	"github.com/1inch/1inch-sdk/golang/helpers/consts/chains"
 	"github.com/ethereum/go-ethereum/common"
 
 	"github.com/1inch/1inch-sdk/golang/client"
@@ -53,51 +54,53 @@ func SwapTokens(c *client.Client, swapParams swap.AggregationControllerGetSwapPa
 		Slippage:  swapParams.Slippage,
 	}
 
-	typehash, err := swap.GetTypeHash(c.EthClient, swapParams.Src)
-	if err == nil {
-		// Typehash is present which means we can use Permit to save gas
-		if typehash == typehashes.Permit1 {
-			name, err := onchain.ReadContractName(c.EthClient, common.HexToAddress(swapParams.Src))
-			if err != nil {
-				return fmt.Errorf("failed to read contract name: %v", err)
+	if c.ChainId == chains.Ethereum || c.ChainId == chains.Polygon { // Currently, Permit1 swaps are only tested on Ethereum and Polygon
+		typehash, err := swap.GetTypeHash(c.EthClient, swapParams.Src)
+		if err == nil {
+			// Typehash is present which means we can use Permit to save gas
+			if typehash == typehashes.Permit1 {
+				name, err := onchain.ReadContractName(c.EthClient, common.HexToAddress(swapParams.Src))
+				if err != nil {
+					return fmt.Errorf("failed to read contract name: %v", err)
+				}
+
+				nonce, err := onchain.ReadContractNonce(c.EthClient, c.PublicAddress, common.HexToAddress(swapParams.Src))
+				if err != nil {
+					return fmt.Errorf("failed to read contract name: %v", err)
+				}
+
+				sig, err := swap.CreatePermitSignature(&swap.PermitSignatureConfig{
+					FromToken:     swapParams.Src,
+					Name:          name,
+					PublicAddress: c.PublicAddress.Hex(),
+					ChainId:       c.ChainId,
+					Key:           c.WalletKey,
+					Nonce:         nonce,
+					Deadline:      deadline,
+				})
+				if err != nil {
+					return fmt.Errorf("failed to create permit signature: %v", err)
+				}
+
+				aggregationRouter, err := contracts.Get1inchRouterFromChainId(c.ChainId)
+				if err != nil {
+					return fmt.Errorf("failed to get 1inch router address: %v", err)
+				}
+
+				permitParams := swap.CreatePermitParams(&swap.PermitParamsConfig{
+					Owner:     strings.ToLower(c.PublicAddress.Hex()), // TODO remove ToLower and see if it still works
+					Spender:   aggregationRouter,
+					Value:     amounts.BigMaxUint256,
+					Deadline:  deadline,
+					Signature: sig,
+				})
+
+				executeSwapConfig.IsPermitSwap = true
+				swapParams.Permit = &permitParams
+				fmt.Println("Permit supported by this token! Swapping using Permit1")
+			} else {
+				log.Printf("Typehash exists, but it is not recognized: %v\n", typehash)
 			}
-
-			nonce, err := onchain.ReadContractNonce(c.EthClient, c.PublicAddress, common.HexToAddress(swapParams.Src))
-			if err != nil {
-				return fmt.Errorf("failed to read contract name: %v", err)
-			}
-
-			sig, err := swap.CreatePermitSignature(&swap.PermitSignatureConfig{
-				FromToken:     swapParams.Src,
-				Name:          name,
-				PublicAddress: c.PublicAddress.Hex(),
-				ChainId:       c.ChainId,
-				Key:           c.WalletKey,
-				Nonce:         nonce,
-				Deadline:      deadline,
-			})
-			if err != nil {
-				return fmt.Errorf("failed to create permit signature: %v", err)
-			}
-
-			aggregationRouter, err := contracts.Get1inchRouterFromChainId(c.ChainId)
-			if err != nil {
-				return fmt.Errorf("failed to get 1inch router address: %v", err)
-			}
-
-			permitParams := swap.CreatePermitParams(&swap.PermitParamsConfig{
-				Owner:     strings.ToLower(c.PublicAddress.Hex()), // TODO remove ToLower and see if it still works
-				Spender:   aggregationRouter,
-				Value:     amounts.BigMaxUint256,
-				Deadline:  deadline,
-				Signature: sig,
-			})
-
-			executeSwapConfig.IsPermitSwap = true
-			swapParams.Permit = &permitParams
-			fmt.Println("Permit supported by this token! Swapping using Permit1")
-		} else {
-			log.Printf("Typehash exists, but it is not recognized: %v\n", typehash)
 		}
 	}
 

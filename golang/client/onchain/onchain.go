@@ -9,6 +9,8 @@ import (
 
 	"github.com/1inch/1inch-sdk/golang/helpers"
 	"github.com/1inch/1inch-sdk/golang/helpers/consts/amounts"
+	"github.com/1inch/1inch-sdk/golang/helpers/consts/chains"
+	"github.com/1inch/1inch-sdk/golang/helpers/consts/tokens"
 	"github.com/ethereum/go-ethereum"
 	"github.com/ethereum/go-ethereum/accounts/abi"
 	"github.com/ethereum/go-ethereum/common"
@@ -19,25 +21,34 @@ import (
 	"github.com/1inch/1inch-sdk/golang/helpers/consts/contracts"
 )
 
+func GetTx(client *ethclient.Client, chainID *big.Int, fromAddress common.Address, fromToken string, amount string, to string, data []byte) (*types.Transaction, error) {
+	chainIDInt := int(chainID.Int64())
+	if chainIDInt == chains.Ethereum || chainIDInt == chains.Polygon {
+		return GetDynamicFeeTx(client, chainID, fromAddress, to, data)
+	} else {
+		return GetLegacyTx(client, fromAddress, fromToken, amount, to, data)
+	}
+}
+
 func GetDynamicFeeTx(client *ethclient.Client, chainID *big.Int, fromAddress common.Address, to string, data []byte) (*types.Transaction, error) {
 	nonce, err := client.PendingNonceAt(context.Background(), fromAddress)
 	if err != nil {
-		fmt.Printf("failed to get nonce: %v", err)
+		return nil, fmt.Errorf("failed to get nonce: %v", err)
 	}
 
 	gasTipCap, err := client.SuggestGasTipCap(context.Background())
 	if err != nil {
-		fmt.Printf("failed to suggest gas tip cap: %v", err)
+		return nil, fmt.Errorf("failed to suggest gas tip cap: %v", err)
 	}
 
 	gasFeeCap, err := client.SuggestGasPrice(context.Background())
 	if err != nil {
-		fmt.Printf("failed to suggest gas fee cap: %v", err)
+		return nil, fmt.Errorf("failed to suggest gas fee cap: %v", err)
 	}
 
 	toAddress := common.HexToAddress(to)
-	value := big.NewInt(0)     // in wei (0 eth)
-	gasLimit := uint64(210000) // TODO make sure this value is always correct
+	value := big.NewInt(0)      // in wei (0 eth)
+	gasLimit := uint64(2100000) // TODO make sure this value is always correct
 
 	return types.NewTx(&types.DynamicFeeTx{
 		ChainID:   chainID,
@@ -48,6 +59,40 @@ func GetDynamicFeeTx(client *ethclient.Client, chainID *big.Int, fromAddress com
 		To:        &toAddress,
 		Value:     value,
 		Data:      data,
+	}), nil
+}
+
+func GetLegacyTx(client *ethclient.Client, fromAddress common.Address, fromToken string, amount string, to string, data []byte) (*types.Transaction, error) {
+	nonce, err := client.PendingNonceAt(context.Background(), fromAddress)
+	if err != nil {
+		return nil, fmt.Errorf("failed to get nonce: %v", err)
+	}
+
+	gasPrice, err := client.SuggestGasPrice(context.Background())
+	if err != nil {
+		return nil, fmt.Errorf("failed to suggest gas price: %v", err)
+	}
+
+	toAddress := common.HexToAddress(to)
+
+	var value *big.Int
+	if fromToken == tokens.NativeToken {
+		value, err = helpers.BigIntFromString(amount)
+		if err != nil {
+			return nil, fmt.Errorf("failed to convert amount to big.Int: %v", err)
+		}
+	} else {
+		value = big.NewInt(0)
+	}
+	gasLimit := uint64(2100000) // This should be adjusted based on the context of the transaction
+
+	return types.NewTx(&types.LegacyTx{
+		Nonce:    nonce,
+		GasPrice: gasPrice,
+		Gas:      gasLimit,
+		To:       &toAddress,
+		Value:    value,
+		Data:     data,
 	}), nil
 }
 
@@ -213,8 +258,6 @@ func ApproveTokenForRouter(client *ethclient.Client, chainId int, key string, er
 		return fmt.Errorf("failed to parse USDC ABI: %v", err)
 	}
 
-	// TODO check if there is an appropriate approval balance instead of doing an unlimited approval
-
 	// Pack the transaction data with the method signature and parameters
 	data, err := parsedABI.Pack("approve", spenderAddress, amounts.BigMaxUint256)
 	if err != nil {
@@ -223,9 +266,7 @@ func ApproveTokenForRouter(client *ethclient.Client, chainId int, key string, er
 
 	chainIdBig := big.NewInt(int64(chainId))
 
-	// TODO Update to handle non-eip1559 transaction types too
-
-	approvalTx, err := GetDynamicFeeTx(client, chainIdBig, publicAddress, erc20Address.Hex(), data) // TODO improve common.Address <-> string conversions
+	approvalTx, err := GetTx(client, chainIdBig, publicAddress, "", "0", erc20Address.Hex(), data) // TODO improve common.Address <-> string conversions
 	if err != nil {
 		return fmt.Errorf("failed to get dynamic fee tx: %v", err)
 	}
@@ -246,7 +287,7 @@ func ApproveTokenForRouter(client *ethclient.Client, chainId int, key string, er
 	if err != nil {
 		return fmt.Errorf("failed to send transaction: %v", err)
 	}
-	fmt.Printf("Approval transaction sent!\n")
+	fmt.Println("Approval transaction sent!")
 
 	helpers.PrintBlockExplorerTxLink(chainId, approvalTxSigned.Hash().String())
 	_, err = WaitForTransaction(client, approvalTxSigned.Hash())

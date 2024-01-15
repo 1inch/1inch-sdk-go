@@ -2,6 +2,8 @@
 
 First and foremost, it is important to note that when using the SDK libraries for the 1inch aggregator or limit order protocols, you will be creating *real* transaction data that can and will be executed onchain. Always be  deliberate when calling [CreateOrder](https://github.com/1inch/1inch-sdk/blob/9703d3bf4a6d94ad64badd0e346a16d60a0c3509/golang/client/orderbook.go#L18-L18), [SwapTokens](https://github.com/1inch/1inch-sdk/blob/9703d3bf4a6d94ad64badd0e346a16d60a0c3509/golang/actions/swap.go#L21-L21), or [GetSwapData](https://github.com/1inch/1inch-sdk/blob/9703d3bf4a6d94ad64badd0e346a16d60a0c3509/golang/client/swap.go#L128-L128). When filling out the parameters for these functions, make sure you understand concepts like [slippage](https://medium.com/onomy-protocol/what-is-slippage-in-defi-62a0d068feb3) and [MEV](https://chain.link/education-hub/maximal-extractable-value-mev), as well as the difference between [USDC](https://etherscan.io/token/0xa0b86991c6218b36c1d19d4a2e9eb0ce3606eb48) having 6 digits of precision on Ethereum and [DAI](https://etherscan.io/token/0x6b175474e89094c44da98b954eedeac495271d0f) having 18!
 
+This SDK is young and there will be many use cases that have not been handled yet, so please try it and give us feedback!
+
 ## Overview
 
 This is a Go SDK to simplify interactions with the 1inch Dev Portal APIs. It will support all endpoints tracked by our official docs [here](https://portal.1inch.dev/documentation/authentication).
@@ -10,7 +12,7 @@ Additionally, this SDK also supports executing 1inch swaps onchain for EOA walle
 
 ## Versioning
 
-This library is currently in the developer preview phase (versions 0.x.x). There will be significant changes to the design of this library leading up to a 1.0.0 release. You can expect the API calls, library structure, etc to break between each release. Once the library version reaches 1.0.0 and beyond, it will follow traditional semver conventions. 
+This library is currently in the developer preview phase (versions 0.x.x). There will be significant changes to the design of this library leading up to a 1.0.0 release. You can expect the API calls, library structure, etc. to break between each release. Once the library version reaches 1.0.0 and beyond, it will follow traditional semver conventions. 
 
 ## Using the SDK in your project
 
@@ -99,7 +101,7 @@ This can be installed globally using npm:
 
 `npm install -g prettier`
 
-If using GoLand, you can setup this action to run automatically using File Watchers:
+If using GoLand, you can set up this action to run automatically using File Watchers:
 
 1. Go to Settings or Preferences > Tools > File Watchers.
 2. Click the + button to add a new watcher.

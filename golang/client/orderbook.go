@@ -10,6 +10,7 @@ import (
 
 	"github.com/1inch/1inch-sdk/golang/client/onchain"
 	"github.com/1inch/1inch-sdk/golang/helpers/consts/contracts"
+	"github.com/1inch/1inch-sdk/golang/helpers/consts/tokens"
 	"github.com/ethereum/go-ethereum/common"
 	"github.com/go-playground/validator/v10"
 
@@ -37,6 +38,10 @@ func (s *OrderbookService) CreateOrder(ctx context.Context, params orderbook.Ord
 	aggregationRouter, err := contracts.Get1inchRouterFromChainId(s.client.ChainId)
 	if err != nil {
 		return nil, nil, fmt.Errorf("failed to get 1inch router address: %v", err)
+	}
+
+	if params.FromToken == tokens.NativeToken || params.ToToken == tokens.NativeToken {
+		return nil, nil, errors.New("native gas token is not supported")
 	}
 
 	fromTokenAddress := common.HexToAddress(params.FromToken)

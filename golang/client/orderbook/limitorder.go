@@ -135,11 +135,11 @@ func CreateLimitOrder(orderRequest OrderRequest, chainId int, key string) (*Orde
 }
 
 func ConfirmLimitOrderWithUser(order *Order, ethClient *ethclient.Client) (bool, error) {
-	stdOut := StdOutPrinter{}
+	stdOut := helpers.StdOutPrinter{}
 	return confirmLimitOrderWithUser(order, ethClient, os.Stdin, stdOut)
 }
 
-func confirmLimitOrderWithUser(order *Order, ethClient *ethclient.Client, reader io.Reader, writer Printer) (bool, error) {
+func confirmLimitOrderWithUser(order *Order, ethClient *ethclient.Client, reader io.Reader, writer helpers.Printer) (bool, error) {
 	makerTokenDecimals, err := onchain.ReadContractDecimals(ethClient, common.HexToAddress(order.Data.MakerAsset))
 	if err != nil {
 		return false, fmt.Errorf("failed to read decimals: %v", err)
@@ -182,11 +182,11 @@ func confirmLimitOrderWithUser(order *Order, ethClient *ethclient.Client, reader
 }
 
 func ConfirmApprovalWithUser(ethClient *ethclient.Client, publicAddress string, tokenAddress string) (bool, error) {
-	stdOut := StdOutPrinter{}
+	stdOut := helpers.StdOutPrinter{}
 	return confirmApprovalWithUser(ethClient, publicAddress, tokenAddress, os.Stdin, stdOut)
 }
 
-func confirmApprovalWithUser(ethClient *ethclient.Client, publicAddress string, tokenAddress string, reader io.Reader, writer Printer) (bool, error) {
+func confirmApprovalWithUser(ethClient *ethclient.Client, publicAddress string, tokenAddress string, reader io.Reader, writer helpers.Printer) (bool, error) {
 	tokenName, err := onchain.ReadContractSymbol(ethClient, common.HexToAddress(tokenAddress))
 	if err != nil {
 		return false, fmt.Errorf("failed to read name: %v", err)
