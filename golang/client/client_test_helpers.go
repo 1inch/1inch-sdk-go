@@ -6,6 +6,8 @@ import (
 	"net/http/httptest"
 	"net/url"
 	"os"
+
+	"github.com/1inch/1inch-sdk/golang/helpers/consts/chains"
 )
 
 // setup sets up a test HTTP server along with a Client that is
@@ -25,9 +27,11 @@ func setup() (*Client, *http.ServeMux, string, func(), error) {
 	server := httptest.NewServer(mux)
 	c, err := NewClient(
 		Config{
-			TargetEnvironment:          EnvironmentProduction,
-			DevPortalApiKey:            os.Getenv("DEV_PORTAL_TOKEN"),
-			Web3HttpProviderUrlWithKey: os.Getenv("WEB_3_HTTP_PROVIDER_URL_WITH_KEY"),
+			TargetEnvironment: EnvironmentProduction,
+			ChainId:           chains.Ethereum,
+			DevPortalApiKey:   os.Getenv("DEV_PORTAL_TOKEN"),
+			Web3HttpProvider:  os.Getenv("WEB_3_HTTP_PROVIDER_URL_WITH_KEY"),
+			WalletKey:         os.Getenv("WALLET_KEY"),
 		})
 	if err != nil {
 		return nil, nil, "", nil, err

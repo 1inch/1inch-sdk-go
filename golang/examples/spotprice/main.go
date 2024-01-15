@@ -9,13 +9,17 @@ import (
 
 	"github.com/1inch/1inch-sdk/golang/client"
 	"github.com/1inch/1inch-sdk/golang/client/tokenprices"
+	"github.com/1inch/1inch-sdk/golang/helpers/consts/chains"
 )
 
 func main() {
 
 	// Build the config for the client
 	config := client.Config{
-		DevPortalApiKey: os.Getenv("DEV_PORTAL_TOKEN"),
+		DevPortalApiKey:  os.Getenv("DEV_PORTAL_TOKEN"),
+		Web3HttpProvider: os.Getenv("WEB_3_HTTP_PROVIDER_URL_WITH_KEY"),
+		WalletKey:        os.Getenv("WALLET_KEY"),
+		ChainId:          chains.Ethereum,
 	}
 
 	// Create the 1inch client

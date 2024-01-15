@@ -8,7 +8,6 @@ import (
 	"errors"
 	"fmt"
 	"io"
-	"log"
 	"net/http"
 	"net/url"
 	"reflect"
@@ -38,20 +37,25 @@ type service struct {
 }
 
 type Config struct {
-	TargetEnvironment          Environment
-	ChainId                    int
-	DevPortalApiKey            string
-	Web3HttpProviderUrlWithKey string
-	EtherscanApiKey            string
-	WalletAddress              string
-	WalletKey                  string
-	LimitOrderContract         string // TODO Probably want to move this somewhere else
+	TargetEnvironment Environment
+	ChainId           int
+	DevPortalApiKey   string
+	Web3HttpProvider  string
+	WalletKey         string
 }
 
 func (c *Config) validate() error {
 
 	if c.DevPortalApiKey == "" {
 		return fmt.Errorf("API key is required")
+	}
+	if c.Web3HttpProvider == "" {
+		return fmt.Errorf("web3 provider URL is required")
+	}
+	if c.ChainId == 0 {
+		return fmt.Errorf("chain ID is required")
+	} else if !helpers.IsValidChainId(c.ChainId) {
+		return fmt.Errorf("invalid chain id: %d", c.ChainId)
 	}
 
 	return nil
@@ -84,6 +88,7 @@ type Client struct {
 	Fusion      *FusionService
 }
 
+// NewClient creates and initializes a new Client instance based on the provided Config.
 func NewClient(config Config) (*Client, error) {
 
 	// TODO this may be replaceable with https://github.com/go-playground/validator
@@ -104,15 +109,6 @@ func NewClient(config Config) (*Client, error) {
 		return nil, fmt.Errorf("unrecognized environment: %s", config.TargetEnvironment)
 	}
 
-	chainId := config.ChainId
-	if chainId != 0 {
-		if !helpers.IsValidChainId(chainId) {
-			return nil, fmt.Errorf("invalid chain id: %d", chainId)
-		}
-	} else {
-		chainId = 1
-	}
-
 	publicAddress := common.HexToAddress("0x0")
 	if config.WalletKey != "" {
 		privateKey, err := crypto.HexToECDSA(config.WalletKey)
@@ -130,22 +126,22 @@ func NewClient(config Config) (*Client, error) {
 	}
 
 	var ethClient *ethclient.Client
-	if config.Web3HttpProviderUrlWithKey != "" {
-		ethClient, err = ethclient.Dial(config.Web3HttpProviderUrlWithKey) // TODO Should the user pass this in?
+	if config.Web3HttpProvider != "" {
+		ethClient, err = ethclient.Dial(config.Web3HttpProvider)
 		if err != nil {
-			log.Fatalf("Failed to create eth client: %v", err)
+			return nil, fmt.Errorf("failed to create eth client: %v", err)
 		}
 	}
 
 	c := &Client{
 		httpClient:    &http.Client{},
 		EthClient:     ethClient,
-		ChainId:       chainId,
+		ChainId:       config.ChainId,
 		BaseURL:       baseUrl,
 		ApiKey:        config.DevPortalApiKey,
 		WalletKey:     config.WalletKey,
 		PublicAddress: publicAddress,
-		RpcUrlWithKey: config.Web3HttpProviderUrlWithKey,
+		RpcUrlWithKey: config.Web3HttpProvider,
 	}
 
 	c.common.client = c

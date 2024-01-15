@@ -1,6 +1,10 @@
 package helpers
 
-import "fmt"
+import (
+	"fmt"
+
+	"github.com/1inch/1inch-sdk/golang/helpers/consts/chains"
+)
 
 func PrintBlockExplorerTxLink(chainId int, txHash string) {
 	output := GetBlockExplorerTxLinkInfo(chainId, txHash)
@@ -15,10 +19,10 @@ func GetBlockExplorerTxLinkInfo(chainId int, txHash string) string {
 
 	var baseUrl, serviceName string
 	switch chainId {
-	case 1:
+	case chains.Ethereum:
 		baseUrl = etherscanBaseURL
 		serviceName = etherscan
-	case 137:
+	case chains.Polygon:
 		baseUrl = polygonScanBaseURL
 		serviceName = polygonScan
 	default:

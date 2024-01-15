@@ -10,7 +10,6 @@ import (
 	"github.com/1inch/1inch-sdk/golang/helpers"
 	"github.com/1inch/1inch-sdk/golang/helpers/consts/addresses"
 	"github.com/1inch/1inch-sdk/golang/helpers/consts/chains"
-	"github.com/1inch/1inch-sdk/golang/helpers/consts/contracts"
 	"github.com/1inch/1inch-sdk/golang/helpers/consts/tokens"
 )
 
@@ -18,10 +17,10 @@ func main() {
 
 	// Build the config for the client
 	config := client.Config{
-		DevPortalApiKey:    os.Getenv("DEV_PORTAL_TOKEN"),
-		WalletKey:          os.Getenv("WALLET_KEY"),
-		LimitOrderContract: contracts.AggregationRouterV5,
-		ChainId:            chains.Polygon,
+		DevPortalApiKey:  os.Getenv("DEV_PORTAL_TOKEN"),
+		Web3HttpProvider: os.Getenv("WEB_3_HTTP_PROVIDER_URL_WITH_KEY_POLYGON"),
+		WalletKey:        os.Getenv("WALLET_KEY"),
+		ChainId:          chains.Polygon,
 	}
 
 	// Create the 1inch client
@@ -34,9 +33,9 @@ func main() {
 	createOrderParams := orderbook.OrderRequest{
 		SourceWallet: os.Getenv("WALLET_ADDRESS"),
 		FromToken:    tokens.PolygonDai,
-		ToToken:      tokens.PolygonWeth,
-		TakingAmount: 1000000000000000000,
+		ToToken:      tokens.PolygonUsdc,
 		MakingAmount: 1000000000000000000,
+		TakingAmount: 1000000,
 		Receiver:     addresses.Zero,
 	}
 

@@ -267,58 +267,69 @@ func TestGetSwap(t *testing.T) {
 				assert.Equal(t, amounts.Ten18, r.URL.Query().Get("amount"))
 			},
 			params: swap.AggregationControllerGetSwapParams{
-				Src:    tokens.EthereumUsdc,
+				Src:      tokens.EthereumUsdc,
+				Dst:      tokens.EthereumWeth,
+				From:     addresses.Vitalik,
+				Amount:   amounts.Ten18,
+				Slippage: 0.5,
+			},
+		},
+		{
+			description: "Error - exclude src",
+			params: swap.AggregationControllerGetSwapParams{
 				Dst:    tokens.EthereumWeth,
 				From:   addresses.Vitalik,
 				Amount: amounts.Ten18,
 			},
+			expectedErrorDescription: "src is required",
 		},
-		//{
-		//	description: "Error - exclude src",
-		//	params: swap.AggregationControllerGetSwapParams{
-		//		Dst:    tokens.EthereumWeth,
-		//		From:   addresses.Vitalik,
-		//		Amount: amounts.Ten18,
-		//	},
-		//	expectedErrorDescription: "src is required",
-		//},
-		//{
-		//	description: "Error - exclude dst",
-		//	params: swap.AggregationControllerGetSwapParams{
-		//		Src:    tokens.EthereumUsdc,
-		//		From:   addresses.Vitalik,
-		//		Amount: amounts.Ten18,
-		//	},
-		//	expectedErrorDescription: "dst is required",
-		//},
-		//{
-		//	description: "Error - exclude amount",
-		//	params: swap.AggregationControllerGetSwapParams{
-		//		Src:  tokens.EthereumUsdc,
-		//		Dst:  tokens.EthereumWeth,
-		//		From: addresses.Vitalik,
-		//	},
-		//	expectedErrorDescription: "amount is required",
-		//},
-		//{
-		//	description: "Error - exclude from",
-		//	params: swap.AggregationControllerGetSwapParams{
-		//		Src:    tokens.EthereumUsdc,
-		//		Dst:    tokens.EthereumWeth,
-		//		Amount: amounts.Ten18,
-		//	},
-		//	expectedErrorDescription: "from is required",
-		//},
-		//{
-		//	description: "Error - src and dst identical",
-		//	params: swap.AggregationControllerGetSwapParams{
-		//		Src:    tokens.EthereumUsdc,
-		//		Dst:    tokens.EthereumUsdc,
-		//		Amount: amounts.Ten18,
-		//		From:   addresses.Vitalik,
-		//	},
-		//	expectedErrorDescription: "src and dst tokens must be different",
-		//},
+		{
+			description: "Error - exclude dst",
+			params: swap.AggregationControllerGetSwapParams{
+				Src:    tokens.EthereumUsdc,
+				From:   addresses.Vitalik,
+				Amount: amounts.Ten18,
+			},
+			expectedErrorDescription: "dst is required",
+		},
+		{
+			description: "Error - exclude amount",
+			params: swap.AggregationControllerGetSwapParams{
+				Src:  tokens.EthereumUsdc,
+				Dst:  tokens.EthereumWeth,
+				From: addresses.Vitalik,
+			},
+			expectedErrorDescription: "amount is required",
+		},
+		{
+			description: "Error - exclude from",
+			params: swap.AggregationControllerGetSwapParams{
+				Src:    tokens.EthereumUsdc,
+				Dst:    tokens.EthereumWeth,
+				Amount: amounts.Ten18,
+			},
+			expectedErrorDescription: "from is required",
+		},
+		{
+			description: "Error - src and dst identical",
+			params: swap.AggregationControllerGetSwapParams{
+				Src:    tokens.EthereumUsdc,
+				Dst:    tokens.EthereumUsdc,
+				Amount: amounts.Ten18,
+				From:   addresses.Vitalik,
+			},
+			expectedErrorDescription: "src and dst tokens must be different",
+		},
+		{
+			description: "Error - slippage is required",
+			params: swap.AggregationControllerGetSwapParams{
+				Src:    tokens.EthereumUsdc,
+				Dst:    tokens.EthereumWeth,
+				Amount: amounts.Ten18,
+				From:   addresses.Vitalik,
+			},
+			expectedErrorDescription: "slippage is required",
+		},
 	}
 
 	for _, tc := range testcases {

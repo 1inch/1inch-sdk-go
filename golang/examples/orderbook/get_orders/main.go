@@ -10,20 +10,17 @@ import (
 	"github.com/1inch/1inch-sdk/golang/client"
 	"github.com/1inch/1inch-sdk/golang/client/orderbook"
 	"github.com/1inch/1inch-sdk/golang/helpers"
-	"github.com/1inch/1inch-sdk/golang/helpers/consts/contracts"
+	"github.com/1inch/1inch-sdk/golang/helpers/consts/chains"
 )
 
 func main() {
 
 	// Build the config for the client
 	config := client.Config{
-		DevPortalApiKey:            os.Getenv("DEV_PORTAL_TOKEN"),
-		Web3HttpProviderUrlWithKey: os.Getenv("WEB_3_HTTP_PROVIDER_URL_WITH_KEY"),
-		EtherscanApiKey:            os.Getenv("ETHERSCAN_TOKEN"),
-		WalletAddress:              os.Getenv("WALLET_ADDRESS"),
-		WalletKey:                  os.Getenv("WALLET_KEY"),
-		LimitOrderContract:         contracts.AggregationRouterV5,
-		ChainId:                    1,
+		DevPortalApiKey:  os.Getenv("DEV_PORTAL_TOKEN"),
+		Web3HttpProvider: os.Getenv("WEB_3_HTTP_PROVIDER_URL_WITH_KEY"),
+		WalletKey:        os.Getenv("WALLET_KEY"),
+		ChainId:          chains.Ethereum,
 	}
 
 	// Create the 1inch client

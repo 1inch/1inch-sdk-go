@@ -10,6 +10,7 @@ import (
 	"github.com/1inch/1inch-sdk/golang/helpers/consts/addresses"
 	"github.com/1inch/1inch-sdk/golang/helpers/consts/amounts"
 	"github.com/1inch/1inch-sdk/golang/helpers/consts/tokens"
+	"github.com/1inch/1inch-sdk/golang/helpers/web3providers"
 	"github.com/ethereum/go-ethereum/ethclient"
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
@@ -299,7 +300,7 @@ func TestConfirmTradeWithUser(t *testing.T) {
 
 	for _, tc := range tests {
 		t.Run(tc.name, func(t *testing.T) {
-			ethClient, err := ethclient.Dial("https://eth-mainnet.public.blastapi.io") // TODO Should we swap all tests to use public endpoints?
+			ethClient, err := ethclient.Dial(web3providers.EthereumBlastApi)
 			require.NoError(t, err)
 			reader := bytes.NewBufferString(tc.userInput)
 			writer := NoOpPrinter{}

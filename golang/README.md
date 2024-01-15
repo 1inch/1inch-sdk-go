@@ -6,19 +6,26 @@ First and foremost, it is important to note that when using the SDK libraries fo
 
 This is a Go SDK to simplify interactions with the 1inch Dev Portal APIs. It will support all endpoints tracked by our official docs [here](https://portal.1inch.dev/documentation/authentication).
 
-Additionally, this SDK also supports executing 1inch swaps onchain for your wallet. 
+Additionally, this SDK also supports executing 1inch swaps onchain for EOA wallets. 
+
+## Versioning
+
+This library is currently in the developer preview phase (versions 0.x.x). There will be significant changes to the design of this library leading up to a 1.0.0 release. You can expect the API calls, library structure, etc to break between each release. Once the library version reaches 1.0.0 and beyond, it will follow traditional semver conventions. 
 
 ## Using the SDK in your project
 
-The SDK can be used by first creating a config object, calling the constructor, then accessing the service for the API of interest. Here is a simple program using the SDK that will generate swap data using the 1inch Aggregator:
+The SDK can be used by first creating a config object, calling the constructor, then accessing the service for the API of interest. For now, the web3 provider and chain are set at the client level, but this will be moved to the request parameters in the future.
 
 **Note**: A 1inch Dev Portal Token can be generated at [portal.1inch.dev](https://portal.1inch.dev)  
+
+Here is a simple program using the SDK that will generate swap data using the 1inch Aggregator:
 
 ```go
 package main
 
 import (
 	"context"
+	"fmt"
 	"log"
 	"os"
 
@@ -34,8 +41,9 @@ func main() {
 
 	// Build the config for the client
 	config := client.Config{
-		DevPortalApiKey: os.Getenv("DEV_PORTAL_TOKEN"),
-		ChainId:         chains.Polygon,
+		DevPortalApiKey:  os.Getenv("DEV_PORTAL_TOKEN"),
+		Web3HttpProvider: os.Getenv("WEB_3_HTTP_PROVIDER_URL_WITH_KEY_POLYGON"),
+		ChainId:          chains.Polygon,
 	}
 
 	// Create the 1inch client
@@ -51,14 +59,16 @@ func main() {
 		From:            os.Getenv("WALLET_ADDRESS"),
 		Amount:          amounts.Ten16,
 		DisableEstimate: helpers.GetPtr(true),
+		Slippage:        0.5,
 	}
 
-	swapData, _, err := c.Swap.GetSwapData(context.Background(), swapParams)
+	swapData, _, err := c.Swap.GetSwapData(context.Background(), swapParams, false)
 	if err != nil {
-		log.Fatalf("Failed to get swap data: %v", err)
+		log.Fatalf("Failed to swap tokens: %v", err)
 	}
 
-	helpers.PrettyPrintStruct(swapData)
+	fmt.Printf("\nContract to send transaction to: %v\n", swapData.Tx.To)
+	fmt.Printf("Transaction data: %v\n", swapData.Tx.Data)
 }
 ```
 

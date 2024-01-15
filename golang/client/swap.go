@@ -10,6 +10,7 @@ import (
 
 type SwapService service
 
+// ApproveAllowance returns the allowance the 1inch router has to spend a token on behalf of a wallet
 func (s *SwapService) ApproveAllowance(ctx context.Context, params swap.ApproveControllerGetAllowanceParams) (*swap.AllowanceResponse, *http.Response, error) {
 	u := fmt.Sprintf("/swap/v5.2/%d/approve/allowance", s.client.ChainId)
 
@@ -37,6 +38,7 @@ func (s *SwapService) ApproveAllowance(ctx context.Context, params swap.ApproveC
 	return &allowanceResponse, res, nil
 }
 
+// ApproveSpender returns the address of the 1inch router contract
 func (s *SwapService) ApproveSpender(ctx context.Context) (*swap.SpenderResponse, *http.Response, error) {
 	u := fmt.Sprintf("/swap/v5.2/%d/approve/spender", s.client.ChainId)
 
@@ -54,6 +56,7 @@ func (s *SwapService) ApproveSpender(ctx context.Context) (*swap.SpenderResponse
 	return &spender, res, nil
 }
 
+// ApproveTransaction returns the transaction data for approving the 1inch router to spend a token on behalf of a wallet
 func (s *SwapService) ApproveTransaction(ctx context.Context, params swap.ApproveControllerGetCallDataParams) (*swap.ApproveCallDataResponse, *http.Response, error) {
 	u := fmt.Sprintf("/swap/v5.2/%d/approve/transaction", s.client.ChainId)
 
@@ -81,6 +84,7 @@ func (s *SwapService) ApproveTransaction(ctx context.Context, params swap.Approv
 	return &approveCallData, res, nil
 }
 
+// GetLiquiditySources returns all liquidity sources tracked by the 1inch Aggregation Protocol for a given chain
 func (s *SwapService) GetLiquiditySources(ctx context.Context) (*swap.ProtocolsResponse, *http.Response, error) {
 	u := fmt.Sprintf("/swap/v5.2/%d/liquidity-sources", s.client.ChainId)
 
@@ -98,6 +102,7 @@ func (s *SwapService) GetLiquiditySources(ctx context.Context) (*swap.ProtocolsR
 	return &liquiditySources, res, nil
 }
 
+// GetQuote returns the quote for a potential swap through the Aggregation Protocol
 func (s *SwapService) GetQuote(ctx context.Context, params swap.AggregationControllerGetQuoteParams) (*swap.QuoteResponse, *http.Response, error) {
 	u := fmt.Sprintf("/swap/v5.2/%d/quote", s.client.ChainId)
 
@@ -127,6 +132,7 @@ func (s *SwapService) GetQuote(ctx context.Context, params swap.AggregationContr
 
 // TODO temporarily adding a bool to the function call until config refactor
 
+// GetSwapData returns a swap quote with transaction data that can be used to execute a swap through the Aggregation Protocol
 func (s *SwapService) GetSwapData(ctx context.Context, params swap.AggregationControllerGetSwapParams, skipWarnings bool) (*swap.SwapResponse, *http.Response, error) {
 	u := fmt.Sprintf("/swap/v5.2/%d/swap", s.client.ChainId)
 
@@ -167,6 +173,7 @@ func (s *SwapService) GetSwapData(ctx context.Context, params swap.AggregationCo
 	return &swapResponse, res, nil
 }
 
+// GetTokens returns all tokens officially tracked by the 1inch Aggregation Protocol for a given chain
 func (s *SwapService) GetTokens(ctx context.Context) (*swap.TokensResponse, *http.Response, error) {
 	u := fmt.Sprintf("/swap/v5.2/%d/tokens", s.client.ChainId)
 

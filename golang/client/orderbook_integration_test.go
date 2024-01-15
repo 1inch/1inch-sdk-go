@@ -38,11 +38,11 @@ func TestCreateOrderIntegration(t *testing.T) {
 	}
 
 	c, err := NewClient(Config{
-		TargetEnvironment:          EnvironmentProduction,
-		ChainId:                    chains.Polygon,
-		DevPortalApiKey:            helpers.GetenvSafe("DEV_PORTAL_TOKEN"),
-		WalletKey:                  helpers.GetenvSafe("WALLET_KEY"),
-		Web3HttpProviderUrlWithKey: helpers.GetenvSafe("WEB_3_HTTP_PROVIDER_URL_WITH_KEY_POLYGON"),
+		TargetEnvironment: EnvironmentProduction,
+		ChainId:           chains.Polygon,
+		DevPortalApiKey:   helpers.GetenvSafe("DEV_PORTAL_TOKEN"),
+		WalletKey:         helpers.GetenvSafe("WALLET_KEY"),
+		Web3HttpProvider:  helpers.GetenvSafe("WEB_3_HTTP_PROVIDER_URL_WITH_KEY_POLYGON"),
 	})
 	require.NoError(t, err)
 
@@ -73,10 +73,7 @@ func TestGetAllOrdersIntegration(t *testing.T) {
 		},
 	}
 
-	c, err := NewClient(Config{
-		TargetEnvironment: EnvironmentProduction,
-		DevPortalApiKey:   os.Getenv("DEV_PORTAL_TOKEN"),
-	})
+	c, err := NewClient(SimpleEthereumConfig)
 	require.NoError(t, err)
 
 	for _, tc := range testcases {
@@ -106,10 +103,7 @@ func TestGetCountIntegration(t *testing.T) {
 		},
 	}
 
-	c, err := NewClient(Config{
-		TargetEnvironment: EnvironmentProduction,
-		DevPortalApiKey:   os.Getenv("DEV_PORTAL_TOKEN"),
-	})
+	c, err := NewClient(SimpleEthereumConfig)
 	require.NoError(t, err)
 
 	for _, tc := range testcases {
@@ -139,10 +133,7 @@ func TestGetEventsIntegration(t *testing.T) {
 		},
 	}
 
-	c, err := NewClient(Config{
-		TargetEnvironment: EnvironmentProduction,
-		DevPortalApiKey:   os.Getenv("DEV_PORTAL_TOKEN"),
-	})
+	c, err := NewClient(SimpleEthereumConfig)
 	require.NoError(t, err)
 
 	for _, tc := range testcases {

@@ -2,11 +2,22 @@ package client
 
 import (
 	"fmt"
+	"os"
 	"testing"
 
+	"github.com/1inch/1inch-sdk/golang/helpers/consts/chains"
+	"github.com/1inch/1inch-sdk/golang/helpers/web3providers"
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
 )
+
+var SimpleEthereumConfig = Config{
+	TargetEnvironment: EnvironmentProduction,
+	ChainId:           chains.Ethereum,
+	DevPortalApiKey:   os.Getenv("DEV_PORTAL_TOKEN"),
+	Web3HttpProvider:  os.Getenv("WEB_3_HTTP_PROVIDER_URL_WITH_KEY"),
+	WalletKey:         os.Getenv("WALLET_KEY"),
+}
 
 func TestNewConfig(t *testing.T) {
 	testcases := []struct {
@@ -20,6 +31,8 @@ func TestNewConfig(t *testing.T) {
 			config: Config{
 				TargetEnvironment: EnvironmentProduction,
 				DevPortalApiKey:   "abc123",
+				Web3HttpProvider:  web3providers.EthereumBlastApi,
+				ChainId:           chains.Ethereum,
 			},
 			expectedEnvironment:      baseUrlProduction.Host,
 			expectedErrorDescription: "",
@@ -27,7 +40,9 @@ func TestNewConfig(t *testing.T) {
 		{
 			description: "Production (excluded entry)",
 			config: Config{
-				DevPortalApiKey: "abc123",
+				DevPortalApiKey:  "abc123",
+				Web3HttpProvider: web3providers.EthereumBlastApi,
+				ChainId:          chains.Ethereum,
 			},
 			expectedEnvironment:      baseUrlProduction.Host,
 			expectedErrorDescription: "",
@@ -37,6 +52,8 @@ func TestNewConfig(t *testing.T) {
 			config: Config{
 				TargetEnvironment: EnvironmentStaging,
 				DevPortalApiKey:   "abc123",
+				Web3HttpProvider:  web3providers.EthereumBlastApi,
+				ChainId:           chains.Ethereum,
 			},
 			expectedEnvironment:      baseUrlStaging.Host,
 			expectedErrorDescription: "",
@@ -46,6 +63,8 @@ func TestNewConfig(t *testing.T) {
 			config: Config{
 				TargetEnvironment: Environment("invalid"),
 				DevPortalApiKey:   "abc123",
+				Web3HttpProvider:  web3providers.EthereumBlastApi,
+				ChainId:           chains.Ethereum,
 			},
 			expectedEnvironment:      baseUrlStaging.Host,
 			expectedErrorDescription: "unrecognized environment: invalid",
@@ -53,9 +72,27 @@ func TestNewConfig(t *testing.T) {
 		{
 			description: "Error - no API key",
 			config: Config{
-				DevPortalApiKey: "",
+				DevPortalApiKey:  "",
+				Web3HttpProvider: web3providers.EthereumBlastApi,
+				ChainId:          chains.Ethereum,
 			},
 			expectedErrorDescription: "config validation error: API key is required",
+		},
+		{
+			description: "Error - no web3 provider key",
+			config: Config{
+				DevPortalApiKey: "123",
+				ChainId:         chains.Ethereum,
+			},
+			expectedErrorDescription: "config validation error: web3 provider URL is required",
+		},
+		{
+			description: "Error - no chain ID",
+			config: Config{
+				DevPortalApiKey:  "123",
+				Web3HttpProvider: web3providers.EthereumBlastApi,
+			},
+			expectedErrorDescription: "config validation error: chain ID is required",
 		},
 	}
 

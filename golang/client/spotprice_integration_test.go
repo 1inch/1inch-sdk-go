@@ -3,7 +3,6 @@ package client
 import (
 	"context"
 	"fmt"
-	"os"
 	"testing"
 
 	"github.com/stretchr/testify/assert"
@@ -31,10 +30,7 @@ func TestGetTokenPricesIntegration(t *testing.T) {
 		},
 	}
 
-	c, err := NewClient(Config{
-		TargetEnvironment: EnvironmentProduction,
-		DevPortalApiKey:   os.Getenv("DEV_PORTAL_TOKEN"),
-	})
+	c, err := NewClient(SimpleEthereumConfig)
 	require.NoError(t, err)
 
 	for _, tc := range testcases {

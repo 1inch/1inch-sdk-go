@@ -3,7 +3,6 @@ package client
 import (
 	"context"
 	"fmt"
-	"os"
 	"testing"
 
 	"github.com/stretchr/testify/assert"
@@ -34,10 +33,7 @@ func TestApproveAllowanceIntegration(t *testing.T) {
 		},
 	}
 
-	c, err := NewClient(Config{
-		TargetEnvironment: EnvironmentProduction,
-		DevPortalApiKey:   os.Getenv("DEV_PORTAL_TOKEN"),
-	})
+	c, err := NewClient(SimpleEthereumConfig)
 	require.NoError(t, err)
 
 	for _, tc := range testcases {
@@ -69,10 +65,7 @@ func TestApproveSpenderIntegration(t *testing.T) {
 		},
 	}
 
-	c, err := NewClient(Config{
-		TargetEnvironment: EnvironmentProduction,
-		DevPortalApiKey:   os.Getenv("DEV_PORTAL_TOKEN"),
-	})
+	c, err := NewClient(SimpleEthereumConfig)
 	require.NoError(t, err)
 
 	for _, tc := range testcases {
@@ -107,10 +100,7 @@ func TestApproveTransactionIntegration(t *testing.T) {
 		},
 	}
 
-	c, err := NewClient(Config{
-		TargetEnvironment: EnvironmentProduction,
-		DevPortalApiKey:   os.Getenv("DEV_PORTAL_TOKEN"),
-	})
+	c, err := NewClient(SimpleEthereumConfig)
 	require.NoError(t, err)
 
 	for _, tc := range testcases {
@@ -141,10 +131,7 @@ func TestGetLiquiditySourcesIntegration(t *testing.T) {
 		},
 	}
 
-	c, err := NewClient(Config{
-		TargetEnvironment: EnvironmentProduction,
-		DevPortalApiKey:   os.Getenv("DEV_PORTAL_TOKEN"),
-	})
+	c, err := NewClient(SimpleEthereumConfig)
 	require.NoError(t, err)
 
 	for _, tc := range testcases {
@@ -185,10 +172,7 @@ func TestGetTokensIntegration(t *testing.T) {
 		},
 	}
 
-	c, err := NewClient(Config{
-		TargetEnvironment: EnvironmentProduction,
-		DevPortalApiKey:   os.Getenv("DEV_PORTAL_TOKEN"),
-	})
+	c, err := NewClient(SimpleEthereumConfig)
 	require.NoError(t, err)
 
 	for _, tc := range testcases {

@@ -3,7 +3,6 @@ package onchain
 import (
 	"context"
 	"fmt"
-	"log"
 	"math/big"
 	"strings"
 	"time"
@@ -17,20 +16,20 @@ import (
 	"github.com/1inch/1inch-sdk/golang/helpers/consts/contracts"
 )
 
-func GetDynamicFeeTx(client *ethclient.Client, chainID *big.Int, fromAddress common.Address, to string, data []byte) *types.Transaction {
+func GetDynamicFeeTx(client *ethclient.Client, chainID *big.Int, fromAddress common.Address, to string, data []byte) (*types.Transaction, error) {
 	nonce, err := client.PendingNonceAt(context.Background(), fromAddress)
 	if err != nil {
-		log.Fatalf("Failed to get nonce: %v", err)
+		fmt.Printf("failed to get nonce: %v", err)
 	}
 
 	gasTipCap, err := client.SuggestGasTipCap(context.Background())
 	if err != nil {
-		log.Fatalf("Failed to suggest gas tip cap: %v", err)
+		fmt.Printf("failed to suggest gas tip cap: %v", err)
 	}
 
 	gasFeeCap, err := client.SuggestGasPrice(context.Background())
 	if err != nil {
-		log.Fatalf("Failed to suggest gas fee cap: %v", err)
+		fmt.Printf("failed to suggest gas fee cap: %v", err)
 	}
 
 	toAddress := common.HexToAddress(to)
@@ -46,7 +45,7 @@ func GetDynamicFeeTx(client *ethclient.Client, chainID *big.Int, fromAddress com
 		To:        &toAddress,
 		Value:     value,
 		Data:      data,
-	})
+	}), nil
 }
 
 // ReadContractName reads the 'name' public variable from a contract.

@@ -36,6 +36,9 @@ func (params *AggregationControllerGetSwapParams) Validate() error {
 	if params.Src == params.Dst {
 		return clienterrors.NewRequestValidationError("src and dst tokens must be different")
 	}
+	if params.Slippage == 0 {
+		return clienterrors.NewRequestValidationError("slippage is required")
+	}
 	return nil
 }
 

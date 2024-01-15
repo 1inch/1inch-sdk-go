@@ -5,6 +5,7 @@ import (
 	"strings"
 	"testing"
 
+	"github.com/1inch/1inch-sdk/golang/helpers/consts/chains"
 	"github.com/stretchr/testify/require"
 
 	"github.com/1inch/1inch-sdk/golang/helpers/consts/amounts"
@@ -26,7 +27,7 @@ func TestCreatePermitSignature(t *testing.T) {
 			description:       "Create Signature",
 			fromToken:         "0x45c32fA6DF82ead1e2EF74d17b76547EDdFaFF89",
 			publicAddress:     "0x2a250893f86Dc8497E131508f680338ac647B498",
-			chainId:           137,
+			chainId:           chains.Polygon,
 			key:               "ad21c0552a3b52e94520da713455cc347e4e89628a334be24d85b8083848434f",
 			name:              "Frax",
 			nonce:             0,

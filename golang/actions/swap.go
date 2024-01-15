@@ -19,7 +19,30 @@ import (
 
 // TODO temporarily adding a bool to the function call until config refactor
 
+// SwapTokens executes a token swap operation using the 1inch Swap API.
+//
+// The helper function takes a client, swap parameters, and a flag to skip warnings. It executes the proposed swap onchain, using Permit if available.
+//
+// Parameters:
+//   - c: A pointer to the client.Client instance. This client should be initialized and connected to the Ethereum network.
+//   - swapParams: The parameters for the swap operation, of type swap.AggregationControllerGetSwapParams. It should contain details such as the source and destination tokens, the amount to swap, and the slippage tolerance.
+//   - skipWarnings: A boolean flag indicating whether to skip warning prompts. If true, warning prompts will be suppressed; otherwise, they will be displayed.
+//
+// The function performs several key operations:
+//   - Sets a 10-minute Permit1 deadline for the swap operation.
+//   - Checks if the source token supports Permit1. If Permit1 is supported, it tries to use that instead of the traditional `Approve` swap.
+//   - Executes the swap request onchain
+//
+// Note:
+//   - The function currently has a hardcoded 10-minute deadline. Future versions will make this configurable.
+//   - The Permit feature is used if the token typehash matches a known Permit typehash.
+//
+// Returns nil on successful execution of the swap. Any error during the process is returned as a non-nil error.
 func SwapTokens(c *client.Client, swapParams swap.AggregationControllerGetSwapParams, skipWarnings bool) error {
+
+	if c.WalletKey == "" {
+		return fmt.Errorf("wallet key must be set in the client config")
+	}
 
 	deadline := time.Now().Add(10 * time.Minute).Unix() // TODO make this configurable
 
@@ -79,8 +102,6 @@ func SwapTokens(c *client.Client, swapParams swap.AggregationControllerGetSwapPa
 	if err != nil {
 		return fmt.Errorf("failed to get swap: %v", err)
 	}
-
-	//helpers.PrettyPrintStruct(swapResponse)
 
 	executeSwapConfig.TransactionData = swapResponse.Tx.Data
 	executeSwapConfig.EstimatedAmountOut = swapResponse.ToAmount

@@ -18,9 +18,9 @@ func main() {
 
 	// Build the config for the client
 	config := client.Config{
-		DevPortalApiKey:            os.Getenv("DEV_PORTAL_TOKEN"),
-		Web3HttpProviderUrlWithKey: os.Getenv("WEB_3_HTTP_PROVIDER_URL_WITH_KEY_POLYGON"),
-		ChainId:                    chains.Polygon,
+		DevPortalApiKey:  os.Getenv("DEV_PORTAL_TOKEN"),
+		Web3HttpProvider: os.Getenv("WEB_3_HTTP_PROVIDER_URL_WITH_KEY_POLYGON"),
+		ChainId:          chains.Polygon,
 	}
 
 	// Create the 1inch client
@@ -36,6 +36,7 @@ func main() {
 		From:            os.Getenv("WALLET_ADDRESS"),
 		Amount:          amounts.Ten16,
 		DisableEstimate: helpers.GetPtr(true),
+		Slippage:        0.5,
 	}
 
 	swapData, _, err := c.Swap.GetSwapData(context.Background(), swapParams, false)

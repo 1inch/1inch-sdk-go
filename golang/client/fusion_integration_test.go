@@ -10,7 +10,6 @@ import (
 	"github.com/1inch/1inch-sdk/golang/client/fusion"
 	"github.com/1inch/1inch-sdk/golang/helpers"
 	"github.com/1inch/1inch-sdk/golang/helpers/consts/addresses"
-	"github.com/1inch/1inch-sdk/golang/helpers/consts/chains"
 	"github.com/1inch/1inch-sdk/golang/helpers/consts/tokens"
 )
 
@@ -31,11 +30,7 @@ func TestGetOrdersIntegration(t *testing.T) {
 		},
 	}
 
-	c, err := NewClient(Config{
-		TargetEnvironment: EnvironmentProduction,
-		ChainId:           chains.Ethereum,
-		DevPortalApiKey:   helpers.GetenvSafe("DEV_PORTAL_TOKEN"),
-	})
+	c, err := NewClient(SimpleEthereumConfig)
 	require.NoError(t, err)
 
 	for _, tc := range testcases {
@@ -67,11 +62,7 @@ func TestGetSettlementContractIntegration(t *testing.T) {
 		},
 	}
 
-	c, err := NewClient(Config{
-		TargetEnvironment: EnvironmentProduction,
-		ChainId:           chains.Ethereum,
-		DevPortalApiKey:   helpers.GetenvSafe("DEV_PORTAL_TOKEN"),
-	})
+	c, err := NewClient(SimpleEthereumConfig)
 	require.NoError(t, err)
 
 	for _, tc := range testcases {
@@ -114,11 +105,7 @@ func TestGetQuoteIntegration(t *testing.T) {
 		},
 	}
 
-	c, err := NewClient(Config{
-		TargetEnvironment: EnvironmentProduction,
-		ChainId:           chains.Ethereum,
-		DevPortalApiKey:   helpers.GetenvSafe("DEV_PORTAL_TOKEN"),
-	})
+	c, err := NewClient(SimpleEthereumConfig)
 	require.NoError(t, err)
 
 	for _, tc := range testcases {
@@ -167,11 +154,7 @@ func TestGetQuoteWithCustomPresetsIntegration(t *testing.T) {
 		},
 	}
 
-	c, err := NewClient(Config{
-		TargetEnvironment: EnvironmentProduction,
-		ChainId:           chains.Ethereum,
-		DevPortalApiKey:   helpers.GetenvSafe("DEV_PORTAL_TOKEN"),
-	})
+	c, err := NewClient(SimpleEthereumConfig)
 	require.NoError(t, err)
 
 	for _, tc := range testcases {
