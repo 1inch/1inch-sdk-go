@@ -82,10 +82,8 @@ type Client struct {
 	// A struct that will contain a reference to this client. Used to separate each API into a unique namespace to aid in method discovery
 	common service
 	// Isolated namespaces for each API
-	Swap        *SwapService
-	TokenPrices *TokenPricesService
-	Orderbook   *OrderbookService
-	Fusion      *FusionService
+	Swap      *SwapService
+	Orderbook *OrderbookService
 }
 
 // NewClient creates and initializes a new Client instance based on the provided Config.
@@ -147,9 +145,7 @@ func NewClient(config Config) (*Client, error) {
 	c.common.client = c
 
 	c.Swap = (*SwapService)(&c.common)
-	c.TokenPrices = (*TokenPricesService)(&c.common)
 	c.Orderbook = (*OrderbookService)(&c.common)
-	c.Fusion = (*FusionService)(&c.common)
 
 	return c, nil
 }
