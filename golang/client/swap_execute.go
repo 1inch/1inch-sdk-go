@@ -11,7 +11,6 @@ import (
 	"github.com/1inch/1inch-sdk/golang/client/onchain"
 	"github.com/1inch/1inch-sdk/golang/client/swap"
 	"github.com/1inch/1inch-sdk/golang/helpers"
-	"github.com/1inch/1inch-sdk/golang/helpers/consts/amounts"
 	"github.com/1inch/1inch-sdk/golang/helpers/consts/contracts"
 	"github.com/1inch/1inch-sdk/golang/helpers/consts/tokens"
 	"github.com/ethereum/go-ethereum/common"
@@ -70,36 +69,43 @@ func (s *SwapService) ExecuteSwap(config *swap.ExecuteSwapConfig) error {
 
 func (s *SwapService) executeSwapWithApproval(spenderAddress string, fromToken string, amount string, privateKey *ecdsa.PrivateKey, transactionData string, skipWarnings bool) error {
 
-	var allowance *big.Int
+	var value *big.Int
 	var err error
 	if fromToken != tokens.NativeToken {
-		allowance, err = onchain.ReadContractAllowance(s.client.EthClient, common.HexToAddress(fromToken), s.client.PublicAddress, common.HexToAddress(spenderAddress))
+		// When swapping erc20 tokens, the value set on the transaction will be 0
+		value = big.NewInt(0)
+
+		allowance, err := onchain.ReadContractAllowance(s.client.EthClient, common.HexToAddress(fromToken), s.client.PublicAddress, common.HexToAddress(spenderAddress))
 		if err != nil {
 			return fmt.Errorf("failed to read allowance: %v", err)
 		}
-	} else {
-		allowance = amounts.BigMaxUint256
-	}
 
-	amountBig, err := helpers.BigIntFromString(amount)
-	if err != nil {
-		return fmt.Errorf("failed to convert amount to big.Int: %v", err)
-	}
-	if allowance.Cmp(amountBig) <= 0 {
-		if !skipWarnings {
-			ok, err := swap.ConfirmApprovalWithUser(s.client.EthClient, s.client.PublicAddress.Hex(), fromToken)
-			if err != nil {
-				return fmt.Errorf("failed to confirm approval: %v", err)
-			}
-			if !ok {
-				return errors.New("user rejected approval")
-			}
-		}
-		err = onchain.ApproveTokenForRouter(s.client.EthClient, s.client.ChainId, s.client.WalletKey, common.HexToAddress(fromToken), s.client.PublicAddress, common.HexToAddress(spenderAddress))
+		amountBig, err := helpers.BigIntFromString(amount)
 		if err != nil {
-			return fmt.Errorf("failed to approve token for router: %v", err)
+			return fmt.Errorf("failed to convert amount to big.Int: %v", err)
 		}
-		helpers.Sleep()
+		if allowance.Cmp(amountBig) <= 0 {
+			if !skipWarnings {
+				ok, err := swap.ConfirmApprovalWithUser(s.client.EthClient, s.client.PublicAddress.Hex(), fromToken)
+				if err != nil {
+					return fmt.Errorf("failed to confirm approval: %v", err)
+				}
+				if !ok {
+					return errors.New("user rejected approval")
+				}
+			}
+			err = onchain.ApproveTokenForRouter(s.client.EthClient, s.client.ChainId, s.client.WalletKey, common.HexToAddress(fromToken), s.client.PublicAddress, common.HexToAddress(spenderAddress))
+			if err != nil {
+				return fmt.Errorf("failed to approve token for router: %v", err)
+			}
+			helpers.Sleep()
+		}
+	} else {
+		// When swapping from the native token, there is no need for an approval and the amount passed in must be explicitly set
+		value, err = helpers.BigIntFromString(amount)
+		if err != nil {
+			return fmt.Errorf("failed to convert amount to big.Int: %v", err)
+		}
 	}
 
 	hexData, err := hex.DecodeString(transactionData[2:])
@@ -114,7 +120,14 @@ func (s *SwapService) executeSwapWithApproval(spenderAddress string, fromToken s
 
 	chainIdBig := big.NewInt(int64(s.client.ChainId))
 
-	swapTx, err := onchain.GetTx(s.client.EthClient, chainIdBig, s.client.PublicAddress, fromToken, amount, aggregationRouter, hexData)
+	txConfig := onchain.GetTxConfig{
+		ChainId:     chainIdBig,
+		FromAddress: s.client.PublicAddress,
+		To:          aggregationRouter,
+		Value:       value,
+		Data:        hexData,
+	}
+	swapTx, err := onchain.GetTx(s.client.EthClient, txConfig)
 
 	// Sign the transaction
 	swapTxSigned, err := types.SignTx(swapTx, types.LatestSignerForChainID(chainIdBig), privateKey)
@@ -150,7 +163,14 @@ func (s *SwapService) executeSwapWithPermit(chainID *big.Int, privateKey *ecdsa.
 		return fmt.Errorf("failed to get 1inch router address: %v", err)
 	}
 
-	permitSwapTx, err := onchain.GetTx(s.client.EthClient, chainID, s.client.PublicAddress, "", "0", aggregationRouter, hexData) // TODO Fix the empty string and 0 being passed in
+	txConfig := onchain.GetTxConfig{
+		ChainId:     chainID,
+		FromAddress: s.client.PublicAddress,
+		To:          aggregationRouter,
+		Value:       big.NewInt(0),
+		Data:        hexData,
+	}
+	permitSwapTx, err := onchain.GetTx(s.client.EthClient, txConfig)
 	if err != nil {
 		return fmt.Errorf("failed to get dynamic fee tx: %v", err)
 	}
@@ -174,6 +194,5 @@ func (s *SwapService) executeSwapWithPermit(chainID *big.Int, privateKey *ecdsa.
 	if err != nil {
 		return fmt.Errorf("failed to get transaction receipt: %v", err)
 	}
-	fmt.Printf("Transaction mined!")
 	return nil
 }

@@ -7,6 +7,7 @@ import (
 	"strings"
 	"time"
 
+	"github.com/1inch/1inch-sdk/golang/helpers"
 	"github.com/1inch/1inch-sdk/golang/helpers/consts/chains"
 	"github.com/ethereum/go-ethereum/common"
 
@@ -40,6 +41,9 @@ import (
 //
 // Returns nil on successful execution of the swap. Any error during the process is returned as a non-nil error.
 func SwapTokens(c *client.Client, swapParams swap.AggregationControllerGetSwapParams, skipWarnings bool) error {
+
+	// Always disable estimate so we can don onchain approvals for the swaps right before we execute
+	swapParams.DisableEstimate = helpers.GetPtr(true)
 
 	if c.WalletKey == "" {
 		return fmt.Errorf("wallet key must be set in the client config")

@@ -31,7 +31,7 @@ func main() {
 			return err
 		}
 
-		if strings.HasSuffix(path, "_integration_test.go") {
+		if strings.HasSuffix(path, "_integration_test.go") || strings.HasSuffix(path, "_e2e_test.go") {
 			content, err := os.ReadFile(path)
 			if err != nil {
 				return err
@@ -65,13 +65,13 @@ func main() {
 				}
 			}
 		}
-
 		return nil
 	})
 	if err != nil {
 		fmt.Println("Failed to walk the path:", err)
 		return
 	}
+	fmt.Println("Done!")
 }
 
 func extractFunctionName(content string) string {

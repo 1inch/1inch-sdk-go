@@ -16,4 +16,5 @@ const (
 )
 
 // TODO Can I move this somewhere else to avoid conflicting with autocomplete?
+
 var ValidChainIds = []int{Arbitrum, Aurora, Avalanche, Base, BSC, Ethereum, Fantom, Gnosis, Klayton, Optimism, Polygon, ZkSyncEra}

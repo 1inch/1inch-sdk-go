@@ -10,7 +10,6 @@ import (
 	"github.com/1inch/1inch-sdk/golang/helpers"
 	"github.com/1inch/1inch-sdk/golang/helpers/consts/amounts"
 	"github.com/1inch/1inch-sdk/golang/helpers/consts/chains"
-	"github.com/1inch/1inch-sdk/golang/helpers/consts/tokens"
 	"github.com/ethereum/go-ethereum"
 	"github.com/ethereum/go-ethereum/accounts/abi"
 	"github.com/ethereum/go-ethereum/common"
@@ -21,16 +20,18 @@ import (
 	"github.com/1inch/1inch-sdk/golang/helpers/consts/contracts"
 )
 
-func GetTx(client *ethclient.Client, chainID *big.Int, fromAddress common.Address, fromToken string, amount string, to string, data []byte) (*types.Transaction, error) {
-	chainIDInt := int(chainID.Int64())
-	if chainIDInt == chains.Ethereum || chainIDInt == chains.Polygon {
-		return GetDynamicFeeTx(client, chainID, fromAddress, to, data)
+const gasLimit = uint64(2100000) // TODO make sure this value more dynamic
+
+func GetTx(client *ethclient.Client, config GetTxConfig) (*types.Transaction, error) {
+	chainIdInt := int(config.ChainId.Int64())
+	if chainIdInt == chains.Ethereum || chainIdInt == chains.Polygon {
+		return GetDynamicFeeTx(client, config.ChainId, config.FromAddress, config.To, config.Value, config.Data)
 	} else {
-		return GetLegacyTx(client, fromAddress, fromToken, amount, to, data)
+		return GetLegacyTx(client, config.FromAddress, config.To, config.Value, config.Data)
 	}
 }
 
-func GetDynamicFeeTx(client *ethclient.Client, chainID *big.Int, fromAddress common.Address, to string, data []byte) (*types.Transaction, error) {
+func GetDynamicFeeTx(client *ethclient.Client, chainID *big.Int, fromAddress common.Address, to string, value *big.Int, data []byte) (*types.Transaction, error) {
 	nonce, err := client.PendingNonceAt(context.Background(), fromAddress)
 	if err != nil {
 		return nil, fmt.Errorf("failed to get nonce: %v", err)
@@ -47,8 +48,6 @@ func GetDynamicFeeTx(client *ethclient.Client, chainID *big.Int, fromAddress com
 	}
 
 	toAddress := common.HexToAddress(to)
-	value := big.NewInt(0)      // in wei (0 eth)
-	gasLimit := uint64(2100000) // TODO make sure this value is always correct
 
 	return types.NewTx(&types.DynamicFeeTx{
 		ChainID:   chainID,
@@ -62,7 +61,7 @@ func GetDynamicFeeTx(client *ethclient.Client, chainID *big.Int, fromAddress com
 	}), nil
 }
 
-func GetLegacyTx(client *ethclient.Client, fromAddress common.Address, fromToken string, amount string, to string, data []byte) (*types.Transaction, error) {
+func GetLegacyTx(client *ethclient.Client, fromAddress common.Address, to string, value *big.Int, data []byte) (*types.Transaction, error) {
 	nonce, err := client.PendingNonceAt(context.Background(), fromAddress)
 	if err != nil {
 		return nil, fmt.Errorf("failed to get nonce: %v", err)
@@ -74,17 +73,6 @@ func GetLegacyTx(client *ethclient.Client, fromAddress common.Address, fromToken
 	}
 
 	toAddress := common.HexToAddress(to)
-
-	var value *big.Int
-	if fromToken == tokens.NativeToken {
-		value, err = helpers.BigIntFromString(amount)
-		if err != nil {
-			return nil, fmt.Errorf("failed to convert amount to big.Int: %v", err)
-		}
-	} else {
-		value = big.NewInt(0)
-	}
-	gasLimit := uint64(2100000) // This should be adjusted based on the context of the transaction
 
 	return types.NewTx(&types.LegacyTx{
 		Nonce:    nonce,
@@ -266,7 +254,14 @@ func ApproveTokenForRouter(client *ethclient.Client, chainId int, key string, er
 
 	chainIdBig := big.NewInt(int64(chainId))
 
-	approvalTx, err := GetTx(client, chainIdBig, publicAddress, "", "0", erc20Address.Hex(), data) // TODO improve common.Address <-> string conversions
+	getTxConfig := GetTxConfig{
+		ChainId:     chainIdBig,
+		FromAddress: publicAddress,
+		Value:       big.NewInt(0),
+		To:          erc20Address.Hex(),
+		Data:        data,
+	}
+	approvalTx, err := GetTx(client, getTxConfig) // TODO improve common.Address <-> string conversions
 	if err != nil {
 		return fmt.Errorf("failed to get dynamic fee tx: %v", err)
 	}
@@ -306,6 +301,7 @@ func WaitForTransaction(client *ethclient.Client, txHash common.Hash) (*types.Re
 		receipt, err := client.TransactionReceipt(context.Background(), txHash)
 		if receipt != nil {
 			fmt.Println() // End the animated waiting text
+			fmt.Println("Transaction complete!")
 			return receipt, nil
 		}
 		if err != nil {
@@ -317,6 +313,7 @@ func WaitForTransaction(client *ethclient.Client, txHash common.Hash) (*types.Re
 		case <-time.After(1000 * time.Millisecond): // check again after a delay
 		case <-context.Background().Done():
 			fmt.Println() // End the animated waiting text
+			fmt.Println("Context cancelled")
 			return nil, context.Background().Err()
 		}
 	}

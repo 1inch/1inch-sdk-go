@@ -11,7 +11,6 @@ import (
 	"github.com/1inch/1inch-sdk/golang/helpers/consts/addresses"
 	"github.com/1inch/1inch-sdk/golang/helpers/consts/amounts"
 	"github.com/1inch/1inch-sdk/golang/helpers/consts/tokens"
-	"github.com/1inch/1inch-sdk/golang/helpers/web3providers"
 	"github.com/ethereum/go-ethereum/ethclient"
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
@@ -301,7 +300,7 @@ func TestConfirmTradeWithUser(t *testing.T) {
 
 	for _, tc := range tests {
 		t.Run(tc.name, func(t *testing.T) {
-			ethClient, err := ethclient.Dial(web3providers.Ethereum)
+			ethClient, err := ethclient.Dial(os.Getenv("WEB_3_HTTP_PROVIDER_URL_WITH_KEY"))
 			require.NoError(t, err)
 			reader := bytes.NewBufferString(tc.userInput)
 			writer := helpers.NoOpPrinter{}

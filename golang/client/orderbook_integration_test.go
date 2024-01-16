@@ -14,7 +14,6 @@ import (
 	"github.com/1inch/1inch-sdk/golang/helpers"
 )
 
-// TODO This test requires a private key to be set in the environment and uses Polygon
 func TestCreateOrderIntegration(t *testing.T) {
 
 	testcases := []struct {
