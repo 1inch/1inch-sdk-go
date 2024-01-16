@@ -6,9 +6,22 @@ This SDK is young and there will be many use cases that have not been handled ye
 
 ## Overview
 
-This is a Go SDK to simplify interactions with the 1inch Dev Portal APIs. It will support all endpoints tracked by our official docs [here](https://portal.1inch.dev/documentation/authentication).
+This is a Go SDK to simplify interactions with the 1inch Dev Portal APIs. When complete, tt will support all endpoints tracked by our official docs [here](https://portal.1inch.dev/documentation/authentication). See the `Current Functionality` section for an up-to-date view of the SDK functionality.
 
-Additionally, this SDK also supports executing 1inch swaps onchain for EOA wallets. 
+Beyond mirroring the Developer Portal APIs, this SDK also supports token approvals, permit signature generation, and the execution of 1inch swaps onchain for EOA wallets. 
+
+## Current Functionality
+
+**Supported APIs**
+
+*Swap API*
+- All endpoints supported
+- Ethereum, Polygon, and Arbitrum tested (but should support all 1inch-supported chains)
+- Swaps can be executed onchain from within the SDK using `Permit1` when supported and `Approve` in all other cases
+
+*Orderbook API*
+- Most endpoints supported
+- Posting orders to Ethereum and Polygon is working. Other chains likely will not work at the moment
 
 ## Versioning
 
