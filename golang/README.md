@@ -18,7 +18,9 @@ This library is currently in the developer preview phase (versions 0.x.x). There
 
 The SDK can be used by first creating a config object, calling the constructor, then accessing the service for the API of interest. For now, the web3 provider and chain are set at the client level, but this will be moved to the request parameters in the future.
 
-**Note**: A 1inch Dev Portal Token can be generated at [portal.1inch.dev](https://portal.1inch.dev)  
+**Note**: The 1inch Dev Portal Token can be generated at https://portal.1inch.dev  
+Additionally,
+documentation for all API calls can be found at https://portal.1inch.dev/documentation
 
 Here is a simple program using the SDK that will generate swap data using the 1inch Aggregator:
 
