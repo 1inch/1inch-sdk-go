@@ -49,7 +49,7 @@ func SwapTokens(c *client.Client, swapParams swap.AggregationControllerGetSwapPa
 		return fmt.Errorf("wallet key must be set in the client config")
 	}
 
-	deadline := time.Now().Add(5 * time.Minute).Unix() // TODO make this configurable
+	deadline := time.Now().Add(1 * time.Minute).Unix() // TODO make this configurable
 
 	executeSwapConfig := &swap.ExecuteSwapConfig{
 		FromToken: swapParams.Src,
