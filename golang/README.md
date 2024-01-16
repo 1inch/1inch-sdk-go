@@ -6,7 +6,7 @@ This SDK is young and there will be many use cases that have not been handled ye
 
 ## Overview
 
-This is a Go SDK to simplify interactions with the 1inch Dev Portal APIs. When complete, tt will support all endpoints tracked by our official docs [here](https://portal.1inch.dev/documentation/authentication). See the `Current Functionality` section for an up-to-date view of the SDK functionality.
+This is a Go SDK to simplify interactions with the 1inch Dev Portal APIs. When complete, it will support all endpoints tracked by our official docs [here](https://portal.1inch.dev/documentation/authentication). See the `Current Functionality` section for an up-to-date view of the SDK functionality.
 
 Beyond mirroring the Developer Portal APIs, this SDK also supports token approvals, permit signature generation, and the execution of 1inch swaps onchain for EOA wallets. 
 
