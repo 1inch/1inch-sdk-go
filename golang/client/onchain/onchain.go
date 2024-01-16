@@ -20,7 +20,7 @@ import (
 	"github.com/1inch/1inch-sdk/golang/helpers/consts/contracts"
 )
 
-const gasLimit = uint64(2100000) // TODO make sure this value more dynamic
+const gasLimit = uint64(21000000) // TODO make sure this value more dynamic
 
 func GetTx(client *ethclient.Client, config GetTxConfig) (*types.Transaction, error) {
 	chainIdInt := int(config.ChainId.Int64())
