@@ -5,7 +5,6 @@ import (
 	"encoding/json"
 	"errors"
 	"fmt"
-	"math/big"
 	"net/http"
 
 	"github.com/1inch/1inch-sdk/golang/client/onchain"
@@ -52,8 +51,11 @@ func (s *OrderbookService) CreateOrder(ctx context.Context, params orderbook.Ord
 		return nil, nil, fmt.Errorf("failed to read allowance: %v", err)
 	}
 
-	// TODO refactor to support big.Int
-	if allowance.Cmp(big.NewInt(int64(params.MakingAmount))) <= 0 {
+	makingAmountBig, err := helpers.BigIntFromString(params.MakingAmount)
+	if err != nil {
+		return nil, nil, fmt.Errorf("failed to parse making amount: %v", err)
+	}
+	if allowance.Cmp(makingAmountBig) <= 0 {
 		if !params.SkipWarnings {
 			ok, err := orderbook.ConfirmApprovalWithUser(s.client.EthClient, params.SourceWallet, params.FromToken)
 			if err != nil {

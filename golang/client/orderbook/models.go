@@ -4,8 +4,8 @@ type OrderRequest struct {
 	SourceWallet string `json:"sourceWallet" validate:"required,eth_addr"`
 	FromToken    string `json:"fromToken" validate:"required,eth_addr"`
 	ToToken      string `json:"toToken" validate:"required,eth_addr"`
-	TakingAmount int    `json:"takingAmount" validate:"required,gt=0"`
-	MakingAmount int    `json:"makingAmount" validate:"required,gt=0"`
+	TakingAmount string `json:"takingAmount"`
+	MakingAmount string `json:"makingAmount"`
 	Receiver     string `json:"receiver" validate:"omitempty,eth_addr"`
 	SkipWarnings bool   `json:"skipWarnings"`
 }

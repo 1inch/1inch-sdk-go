@@ -141,8 +141,8 @@ func TestCreateLimitOrder(t *testing.T) {
 			orderRequest: OrderRequest{
 				FromToken:    "0x8f3Cf7ad23Cd3CaDbD9735AFf958023239c6A063",
 				ToToken:      "0x7ceb23fd6bc0add59e62ac25578270cff1b9f619",
-				MakingAmount: 1000000,
-				TakingAmount: 1000000000,
+				MakingAmount: "1000000",
+				TakingAmount: "1000000000",
 				SourceWallet: "0x2c9b2DBdbA8A9c969Ac24153f5C1c23CB0e63914",
 				//AllowedSender: "0x0000000000000000000000000000000000000000",
 				Receiver: "0x0000000000000000000000000000000000000000",
@@ -174,8 +174,8 @@ func TestCreateLimitOrder(t *testing.T) {
 			orderRequest: OrderRequest{
 				FromToken:    "",
 				ToToken:      "0x7ceb23fd6bc0add59e62ac25578270cff1b9f619",
-				MakingAmount: 1000000,
-				TakingAmount: 1000000000,
+				MakingAmount: "1000000",
+				TakingAmount: "1000000000",
 				SourceWallet: "0x2c9b2DBdbA8A9c969Ac24153f5C1c23CB0e63914",
 				//AllowedSender: "0x0000000000000000000000000000000000000000",
 				Receiver: "0x0000000000000000000000000000000000000000",
@@ -192,8 +192,8 @@ func TestCreateLimitOrder(t *testing.T) {
 			orderRequest: OrderRequest{
 				FromToken:    "0x8f3Cf7ad23Cd3CaDbD9735AFf958023239c6A063",
 				ToToken:      "",
-				MakingAmount: 1000000,
-				TakingAmount: 1000000000,
+				MakingAmount: "1000000",
+				TakingAmount: "1000000000",
 				SourceWallet: "0x2c9b2DBdbA8A9c969Ac24153f5C1c23CB0e63914",
 				//AllowedSender: "0x0000000000000000000000000000000000000000",
 				Receiver: "0x0000000000000000000000000000000000000000",
@@ -210,8 +210,8 @@ func TestCreateLimitOrder(t *testing.T) {
 			orderRequest: OrderRequest{
 				FromToken:    "0x8f3Cf7ad23Cd3CaDbD9735AFf958023239c6A063",
 				ToToken:      "0x7ceb23fd6bc0add59e62ac25578270cff1b9f619",
-				MakingAmount: 1000000,
-				TakingAmount: 1000000000,
+				MakingAmount: "1000000",
+				TakingAmount: "1000000000",
 				SourceWallet: "0x2c9b2DBdbA8A9c969Ac24153f5C1c23CB0e63914",
 				//AllowedSender: "0x0000000000000000000000000000000000000000",
 				Receiver: "0x0000000000000000000000000000000000000000",

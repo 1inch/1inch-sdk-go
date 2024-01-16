@@ -34,8 +34,8 @@ func main() {
 		SourceWallet: os.Getenv("WALLET_ADDRESS"),
 		FromToken:    tokens.PolygonDai,
 		ToToken:      tokens.PolygonUsdc,
-		MakingAmount: 1000000000000000000,
-		TakingAmount: 1000000,
+		MakingAmount: "1000000000000000000",
+		TakingAmount: "1000000",
 		Receiver:     addresses.Zero,
 	}
 

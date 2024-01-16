@@ -28,8 +28,8 @@ func CreateLimitOrder(orderRequest OrderRequest, chainId int, key string) (*Orde
 	orderData := OrderData{
 		MakerAsset:    orderRequest.FromToken,
 		TakerAsset:    orderRequest.ToToken,
-		MakingAmount:  fmt.Sprintf("%d", orderRequest.MakingAmount),
-		TakingAmount:  fmt.Sprintf("%d", orderRequest.TakingAmount),
+		MakingAmount:  orderRequest.MakingAmount,
+		TakingAmount:  orderRequest.TakingAmount,
 		Salt:          GenerateSalt(),
 		Maker:         orderRequest.SourceWallet,
 		AllowedSender: "0x0000000000000000000000000000000000000000", // TODO use this
