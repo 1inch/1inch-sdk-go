@@ -45,8 +45,8 @@ func (s *OrderbookService) CreateOrder(ctx context.Context, params orderbook.Ord
 
 	fromTokenAddress := common.HexToAddress(params.FromToken)
 	publicAddress := common.HexToAddress(params.SourceWallet)
-	aggreateRouterAddress := common.HexToAddress(aggregationRouter)
-	allowance, err := onchain.ReadContractAllowance(s.client.EthClient, fromTokenAddress, publicAddress, aggreateRouterAddress)
+	aggregationRouterAddress := common.HexToAddress(aggregationRouter)
+	allowance, err := onchain.ReadContractAllowance(s.client.EthClient, fromTokenAddress, publicAddress, aggregationRouterAddress)
 	if err != nil {
 		return nil, nil, fmt.Errorf("failed to read allowance: %v", err)
 	}
@@ -65,7 +65,15 @@ func (s *OrderbookService) CreateOrder(ctx context.Context, params orderbook.Ord
 				return nil, nil, errors.New("user rejected approval")
 			}
 		}
-		err := onchain.ApproveTokenForRouter(s.client.EthClient, s.client.ChainId, s.client.WalletKey, fromTokenAddress, publicAddress, aggreateRouterAddress)
+
+		erc20Config := onchain.Erc20ApprovalConfig{
+			ChainId:        s.client.ChainId,
+			Key:            s.client.WalletKey,
+			Erc20Address:   fromTokenAddress,
+			PublicAddress:  publicAddress,
+			SpenderAddress: aggregationRouterAddress,
+		}
+		err := onchain.ApproveTokenForRouter(s.client.EthClient, s.client.NonceCache, erc20Config)
 		if err != nil {
 			return nil, nil, fmt.Errorf("failed to approve token for router: %v", err)
 		}

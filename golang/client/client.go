@@ -79,9 +79,12 @@ type Client struct {
 	PublicAddress common.Address
 	// RPC URL for web3 provider with key
 	RpcUrlWithKey string
+	// Once a transaction has been sent by the SDK, the nonce is tracked internally to avoid RPC desync issues on subsequent transactions
+	NonceCache map[string]uint64
 	// A struct that will contain a reference to this client. Used to separate each API into a unique namespace to aid in method discovery
 	common service
 	// Isolated namespaces for each API
+	Actions   *ActionService
 	Swap      *SwapService
 	Orderbook *OrderbookService
 }
@@ -140,10 +143,12 @@ func NewClient(config Config) (*Client, error) {
 		WalletKey:     config.WalletKey,
 		PublicAddress: publicAddress,
 		RpcUrlWithKey: config.Web3HttpProvider,
+		NonceCache:    make(map[string]uint64),
 	}
 
 	c.common.client = c
 
+	c.Actions = (*ActionService)(&c.common)
 	c.Swap = (*SwapService)(&c.common)
 	c.Orderbook = (*OrderbookService)(&c.common)
 

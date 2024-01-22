@@ -1,4 +1,4 @@
-package actions
+package client
 
 import (
 	"context"
@@ -11,13 +11,14 @@ import (
 	"github.com/1inch/1inch-sdk/golang/helpers/consts/chains"
 	"github.com/ethereum/go-ethereum/common"
 
-	"github.com/1inch/1inch-sdk/golang/client"
 	"github.com/1inch/1inch-sdk/golang/client/onchain"
 	"github.com/1inch/1inch-sdk/golang/client/swap"
 	"github.com/1inch/1inch-sdk/golang/helpers/consts/amounts"
 	"github.com/1inch/1inch-sdk/golang/helpers/consts/contracts"
 	"github.com/1inch/1inch-sdk/golang/helpers/consts/typehashes"
 )
+
+type ActionService service
 
 // TODO temporarily adding a bool to the function call until config refactor
 
@@ -40,12 +41,12 @@ import (
 //   - The Permit feature is used if the token typehash matches a known Permit typehash.
 //
 // Returns nil on successful execution of the swap. Any error during the process is returned as a non-nil error.
-func SwapTokens(c *client.Client, swapParams swap.AggregationControllerGetSwapParams, skipWarnings bool) error {
+func (s *ActionService) SwapTokens(swapParams swap.AggregationControllerGetSwapParams, skipWarnings bool, approvalType swap.ApprovalType) error {
 
 	// Always disable estimate so we can don onchain approvals for the swaps right before we execute
 	swapParams.DisableEstimate = helpers.GetPtr(true)
 
-	if c.WalletKey == "" {
+	if s.client.WalletKey == "" {
 		return fmt.Errorf("wallet key must be set in the client config")
 	}
 
@@ -58,59 +59,74 @@ func SwapTokens(c *client.Client, swapParams swap.AggregationControllerGetSwapPa
 		Slippage:  swapParams.Slippage,
 	}
 
-	if c.ChainId == chains.Ethereum || c.ChainId == chains.Polygon { // Currently, Permit1 swaps are only tested on Ethereum and Polygon
-		typehash, err := swap.GetTypeHash(c.EthClient, swapParams.Src)
+	if shouldTryPermit(s.client.ChainId, approvalType) {
+
+	}
+
+	var usePermit bool
+
+	// Currently, Permit1 swaps are only tested on Ethereum and Polygon
+	isPermitSupportedForCurrentChain := s.client.ChainId == chains.Ethereum || s.client.ChainId == chains.Polygon
+
+	var typehash string
+	var err error
+	if isPermitSupportedForCurrentChain && approvalType != swap.ApprovalAlways {
+		typehash, err = onchain.GetTypeHash(s.client.EthClient, swapParams.Src)
 		if err == nil {
 			// Typehash is present which means we can use Permit to save gas
 			if typehash == typehashes.Permit1 {
-				name, err := onchain.ReadContractName(c.EthClient, common.HexToAddress(swapParams.Src))
-				if err != nil {
-					return fmt.Errorf("failed to read contract name: %v", err)
-				}
-
-				nonce, err := onchain.ReadContractNonce(c.EthClient, c.PublicAddress, common.HexToAddress(swapParams.Src))
-				if err != nil {
-					return fmt.Errorf("failed to read contract name: %v", err)
-				}
-
-				sig, err := swap.CreatePermitSignature(&swap.PermitSignatureConfig{
-					FromToken:     swapParams.Src,
-					Name:          name,
-					PublicAddress: c.PublicAddress.Hex(),
-					ChainId:       c.ChainId,
-					Key:           c.WalletKey,
-					Nonce:         nonce,
-					Deadline:      deadline,
-				})
-				if err != nil {
-					return fmt.Errorf("failed to create permit signature: %v", err)
-				}
-
-				aggregationRouter, err := contracts.Get1inchRouterFromChainId(c.ChainId)
-				if err != nil {
-					return fmt.Errorf("failed to get 1inch router address: %v", err)
-				}
-
-				permitParams := swap.CreatePermitParams(&swap.PermitParamsConfig{
-					Owner:     strings.ToLower(c.PublicAddress.Hex()), // TODO remove ToLower and see if it still works
-					Spender:   aggregationRouter,
-					Value:     amounts.BigMaxUint256,
-					Deadline:  deadline,
-					Signature: sig,
-				})
-
-				executeSwapConfig.IsPermitSwap = true
-				swapParams.Permit = &permitParams
-				fmt.Println("Permit supported by this token! Swapping using Permit1")
+				usePermit = true
 			} else {
 				log.Printf("Typehash exists, but it is not recognized: %v\n", typehash)
 			}
 		}
 	}
 
+	if usePermit || approvalType == swap.PermitAlways {
+		name, err := onchain.ReadContractName(s.client.EthClient, common.HexToAddress(swapParams.Src))
+		if err != nil {
+			return fmt.Errorf("failed to read contract name: %v", err)
+		}
+
+		nonce, err := onchain.ReadContractNonce(s.client.EthClient, s.client.PublicAddress, common.HexToAddress(swapParams.Src))
+		if err != nil {
+			return fmt.Errorf("failed to read contract name: %v", err)
+		}
+
+		sig, err := swap.CreatePermitSignature(&swap.PermitSignatureConfig{
+			FromToken:     swapParams.Src,
+			Name:          name,
+			PublicAddress: s.client.PublicAddress.Hex(),
+			ChainId:       s.client.ChainId,
+			Key:           s.client.WalletKey,
+			Nonce:         nonce,
+			Deadline:      deadline,
+		})
+		if err != nil {
+			return fmt.Errorf("failed to create permit signature: %v", err)
+		}
+
+		aggregationRouter, err := contracts.Get1inchRouterFromChainId(s.client.ChainId)
+		if err != nil {
+			return fmt.Errorf("failed to get 1inch router address: %v", err)
+		}
+
+		permitParams := swap.CreatePermitParams(&swap.PermitParamsConfig{
+			Owner:     strings.ToLower(s.client.PublicAddress.Hex()), // TODO remove ToLower and see if it still works
+			Spender:   aggregationRouter,
+			Value:     amounts.BigMaxUint256,
+			Deadline:  deadline,
+			Signature: sig,
+		})
+
+		executeSwapConfig.IsPermitSwap = true
+		swapParams.Permit = &permitParams
+		fmt.Println("Swapping using Permit1")
+	}
+
 	// Execute swap request
 	// This will return the transaction data used by a wallet to execute the swap
-	swapResponse, _, err := c.Swap.GetSwapData(context.Background(), swapParams, true)
+	swapResponse, _, err := s.client.Swap.GetSwapData(context.Background(), swapParams, true)
 	if err != nil {
 		return fmt.Errorf("failed to get swap: %v", err)
 	}
@@ -119,10 +135,14 @@ func SwapTokens(c *client.Client, swapParams swap.AggregationControllerGetSwapPa
 	executeSwapConfig.EstimatedAmountOut = swapResponse.ToAmount
 	executeSwapConfig.SkipWarnings = skipWarnings
 
-	err = c.Swap.ExecuteSwap(executeSwapConfig)
+	err = s.client.Swap.ExecuteSwap(executeSwapConfig)
 	if err != nil {
 		return fmt.Errorf("failed to execute swap: %v", err)
 	}
 
 	return nil
+}
+
+func shouldTryPermit(chainId int, approvalType swap.ApprovalType) bool {
+	return approvalType == swap.PermitIfPossible || approvalType == swap.PermitAlways
 }

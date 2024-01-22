@@ -2,6 +2,7 @@ package onchain
 
 import (
 	"context"
+	"errors"
 	"fmt"
 	"math/big"
 	"strings"
@@ -22,20 +23,69 @@ import (
 
 const gasLimit = uint64(21000000) // TODO make sure this value more dynamic
 
-func GetTx(client *ethclient.Client, config GetTxConfig) (*types.Transaction, error) {
+// TODO: this nonce value will compete with any pending transactions on the wallet. The user should be able to set this if they want
+
+func GetNonce(ethClient *ethclient.Client, key string, publicAddress common.Address, nonceCache map[string]uint64) (uint64, error) {
+	var err error
+	nonce, ok := nonceCache[key]
+	if !ok {
+		nonce, err = ethClient.NonceAt(context.Background(), publicAddress, nil)
+		if err != nil {
+			return 0, fmt.Errorf("failed to get nonce: %v", err)
+		}
+		nonceCache[key] = nonce
+	}
+	return nonce, nil
+}
+
+func ExecuteTransaction(txConfig TxConfig, ethClient *ethclient.Client, nonceCache map[string]uint64) error {
+
+	nonceCacheKey := fmt.Sprintf("%s+%d", txConfig.PublicAddress, txConfig.ChainId.Int64())
+	nonce, err := GetNonce(ethClient, nonceCacheKey, txConfig.PublicAddress, nonceCache)
+
+	swapTx, err := GetTx(ethClient, nonce, txConfig)
+
+	signingKey, err := crypto.HexToECDSA(txConfig.PrivateKey)
+	if err != nil {
+		return fmt.Errorf("failed to convert private key: %v", err)
+	}
+
+	// Sign the transaction
+	swapTxSigned, err := types.SignTx(swapTx, types.LatestSignerForChainID(txConfig.ChainId), signingKey)
+	if err != nil {
+		return fmt.Errorf("failed to sign transaction: %v", err)
+	}
+
+	// Send the transaction
+	err = ethClient.SendTransaction(context.Background(), swapTxSigned)
+	if err != nil {
+		return fmt.Errorf("failed to send transaction: %v", err)
+	}
+
+	fmt.Printf("Transaction sent! (%s)\n", txConfig.Description)
+	helpers.PrintBlockExplorerTxLink(int(txConfig.ChainId.Int64()), swapTxSigned.Hash().String())
+
+	_, err = WaitForTransaction(ethClient, swapTxSigned.Hash())
+	if err != nil {
+		return fmt.Errorf("failed to get transaction receipt: %v", err)
+	}
+
+	// Update cache to avoid RPC nonce desync
+	nonceCache[nonceCacheKey] = nonce + 1
+
+	return nil
+}
+
+func GetTx(client *ethclient.Client, nonce uint64, config TxConfig) (*types.Transaction, error) {
 	chainIdInt := int(config.ChainId.Int64())
 	if chainIdInt == chains.Ethereum || chainIdInt == chains.Polygon {
-		return GetDynamicFeeTx(client, config.ChainId, config.FromAddress, config.To, config.Value, config.Data)
+		return GetDynamicFeeTx(client, nonce, config.ChainId, config.To, config.Value, config.Data)
 	} else {
-		return GetLegacyTx(client, config.FromAddress, config.To, config.Value, config.Data)
+		return GetLegacyTx(client, nonce, config.To, config.Value, config.Data)
 	}
 }
 
-func GetDynamicFeeTx(client *ethclient.Client, chainID *big.Int, fromAddress common.Address, to string, value *big.Int, data []byte) (*types.Transaction, error) {
-	nonce, err := client.PendingNonceAt(context.Background(), fromAddress)
-	if err != nil {
-		return nil, fmt.Errorf("failed to get nonce: %v", err)
-	}
+func GetDynamicFeeTx(client *ethclient.Client, nonce uint64, chainID *big.Int, to string, value *big.Int, data []byte) (*types.Transaction, error) {
 
 	gasTipCap, err := client.SuggestGasTipCap(context.Background())
 	if err != nil {
@@ -46,6 +96,13 @@ func GetDynamicFeeTx(client *ethclient.Client, chainID *big.Int, fromAddress com
 	if err != nil {
 		return nil, fmt.Errorf("failed to suggest gas fee cap: %v", err)
 	}
+
+	//// Increase the gas fee cap by 25%
+	gasFeeCap = gasFeeCap.Mul(gasFeeCap, big.NewInt(150))
+	gasFeeCap = gasFeeCap.Div(gasFeeCap, big.NewInt(100))
+	//// Increase the gas tip cap by 25%
+	gasTipCap = gasTipCap.Mul(gasTipCap, big.NewInt(150))
+	gasTipCap = gasTipCap.Div(gasTipCap, big.NewInt(100))
 
 	toAddress := common.HexToAddress(to)
 
@@ -61,16 +118,16 @@ func GetDynamicFeeTx(client *ethclient.Client, chainID *big.Int, fromAddress com
 	}), nil
 }
 
-func GetLegacyTx(client *ethclient.Client, fromAddress common.Address, to string, value *big.Int, data []byte) (*types.Transaction, error) {
-	nonce, err := client.PendingNonceAt(context.Background(), fromAddress)
-	if err != nil {
-		return nil, fmt.Errorf("failed to get nonce: %v", err)
-	}
+func GetLegacyTx(client *ethclient.Client, nonce uint64, to string, value *big.Int, data []byte) (*types.Transaction, error) {
 
 	gasPrice, err := client.SuggestGasPrice(context.Background())
 	if err != nil {
 		return nil, fmt.Errorf("failed to suggest gas price: %v", err)
 	}
+
+	// Increase the gas fee cap by 25%
+	gasPrice = gasPrice.Mul(gasPrice, big.NewInt(125))
+	gasPrice = gasPrice.Div(gasPrice, big.NewInt(100))
 
 	toAddress := common.HexToAddress(to)
 
@@ -237,9 +294,49 @@ func ReadContractAllowance(client *ethclient.Client, erc20Address common.Address
 	return allowance, nil
 }
 
-// TODO function params can be clearer
+func GetTypeHash(client *ethclient.Client, addressAsString string) (string, error) { // Pack the call to get the PERMIT_TYPEHASH constant
 
-func ApproveTokenForRouter(client *ethclient.Client, chainId int, key string, erc20Address common.Address, publicAddress common.Address, spenderAddress common.Address) error {
+	// Parse the ABI
+	parsedABI, err := abi.JSON(strings.NewReader(contracts.Erc20Abi))
+	if err != nil {
+		return "", fmt.Errorf("failed to parse contract ABI: %v", err)
+	}
+
+	// Create the contract address
+	address := common.HexToAddress(addressAsString)
+
+	data, err := parsedABI.Pack("PERMIT_TYPEHASH")
+	if err != nil {
+		return "", fmt.Errorf("failed to pack data for PERMIT_TYPEHASH: %v", err)
+	}
+
+	// Create the call message
+	msg := ethereum.CallMsg{
+		To:   &address,
+		Data: data,
+	}
+
+	// Query the blockchain
+	result, err := client.CallContract(context.Background(), msg, nil)
+	if err != nil {
+		return "", fmt.Errorf("failed to retrieve the PERMIT_TYPEHASH: %v", err)
+	}
+
+	// Convert the result to bytes32
+	var typeHash [32]byte
+	copy(typeHash[:], result)
+
+	// Convert the result to a string
+	resultAsString := fmt.Sprintf("%x", typeHash)
+	// If the varaible does not exist, it will be all zeros
+	if string(resultAsString) == "0000000000000000000000000000000000000000000000000000000000000000" {
+		return "", errors.New("PERMIT_TYPEHASH does not exist")
+	}
+
+	return resultAsString, nil
+}
+
+func ApproveTokenForRouter(client *ethclient.Client, nonceCache map[string]uint64, config Erc20ApprovalConfig) error {
 	// Parse the USDC contract ABI to get the 'Approve' function signature
 	parsedABI, err := abi.JSON(strings.NewReader(contracts.Erc20Abi))
 	if err != nil {
@@ -247,72 +344,69 @@ func ApproveTokenForRouter(client *ethclient.Client, chainId int, key string, er
 	}
 
 	// Pack the transaction data with the method signature and parameters
-	data, err := parsedABI.Pack("approve", spenderAddress, amounts.BigMaxUint256)
+	data, err := parsedABI.Pack("approve", config.SpenderAddress, amounts.BigMaxUint256)
 	if err != nil {
 		return fmt.Errorf("failed to pack data for approve: %v", err)
 	}
 
-	chainIdBig := big.NewInt(int64(chainId))
-
-	getTxConfig := GetTxConfig{
-		ChainId:     chainIdBig,
-		FromAddress: publicAddress,
-		Value:       big.NewInt(0),
-		To:          erc20Address.Hex(),
-		Data:        data,
+	txConfig := TxConfig{
+		Description:   "Approval",
+		PublicAddress: config.PublicAddress,
+		PrivateKey:    config.Key,
+		ChainId:       big.NewInt(int64(config.ChainId)),
+		Value:         big.NewInt(0),
+		To:            config.Erc20Address.Hex(),
+		Data:          data,
 	}
-	approvalTx, err := GetTx(client, getTxConfig) // TODO improve common.Address <-> string conversions
+	err = ExecuteTransaction(txConfig, client, nonceCache)
 	if err != nil {
-		return fmt.Errorf("failed to get dynamic fee tx: %v", err)
+		return fmt.Errorf("failed to execute transaction: %v", err)
 	}
+	return nil
+}
 
-	privateKey, err := crypto.HexToECDSA(key)
+func RevokeApprovalForRouter(client *ethclient.Client, nonceCache map[string]uint64, config Erc20RevokeConfig) error {
+	// Parse the USDC contract ABI to get the 'Approve' function signature
+	parsedABI, err := abi.JSON(strings.NewReader(contracts.Erc20Abi))
 	if err != nil {
-		return fmt.Errorf("failed to convert private key: %v", err)
+		return fmt.Errorf("failed to parse ABI: %v", err)
 	}
 
-	// Sign the transaction
-	approvalTxSigned, err := types.SignTx(approvalTx, types.LatestSignerForChainID(chainIdBig), privateKey)
+	// Pack the transaction data with the method signature and parameters
+	data, err := parsedABI.Pack("decreaseAllowance", config.SpenderAddress, config.AllowanceDecreaseAmount)
 	if err != nil {
-		return fmt.Errorf("failed to sign transaction: %v", err)
+		return fmt.Errorf("failed to pack data for approve: %v", err)
 	}
 
-	// Send the transaction
-	err = client.SendTransaction(context.Background(), approvalTxSigned)
+	txConfig := TxConfig{
+		Description:   "Revoke Approval",
+		PublicAddress: config.PublicAddress,
+		PrivateKey:    config.Key,
+		ChainId:       big.NewInt(int64(config.ChainId)),
+		Value:         big.NewInt(0),
+		To:            config.Erc20Address.Hex(),
+		Data:          data,
+	}
+	err = ExecuteTransaction(txConfig, client, nonceCache)
 	if err != nil {
-		return fmt.Errorf("failed to send transaction: %v", err)
+		return fmt.Errorf("failed to execute transaction: %v", err)
 	}
-	fmt.Println("Approval transaction sent!")
-
-	helpers.PrintBlockExplorerTxLink(chainId, approvalTxSigned.Hash().String())
-	_, err = WaitForTransaction(client, approvalTxSigned.Hash())
-	if err != nil {
-		return fmt.Errorf("failed to get transaction receipt: %v", err)
-	}
-
 	return nil
 }
 
 func WaitForTransaction(client *ethclient.Client, txHash common.Hash) (*types.Receipt, error) {
-	periodCount := 0
-	waitingForTxText := "Waiting for transaction to be mined"
-	clearLine := strings.Repeat(" ", len(waitingForTxText)+3)
 	for {
 		receipt, err := client.TransactionReceipt(context.Background(), txHash)
 		if receipt != nil {
-			fmt.Println() // End the animated waiting text
 			fmt.Println("Transaction complete!")
 			return receipt, nil
 		}
 		if err != nil {
-			fmt.Printf("\r%s", clearLine) // Clear the current line
-			fmt.Printf("\r%s%s", waitingForTxText, strings.Repeat(".", periodCount))
-			periodCount = (periodCount + 1) % 4
+			fmt.Println("Waiting for transaction to be mined")
 		}
 		select {
 		case <-time.After(1000 * time.Millisecond): // check again after a delay
 		case <-context.Background().Done():
-			fmt.Println() // End the animated waiting text
 			fmt.Println("Context cancelled")
 			return nil, context.Background().Err()
 		}
