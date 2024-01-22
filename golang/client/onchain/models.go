@@ -6,10 +6,29 @@ import (
 	"github.com/ethereum/go-ethereum/common"
 )
 
-type GetTxConfig struct {
-	ChainId     *big.Int
-	FromAddress common.Address
-	Value       *big.Int
-	To          string
-	Data        []byte
+type TxConfig struct {
+	Description   string
+	PublicAddress common.Address
+	PrivateKey    string
+	ChainId       *big.Int
+	Value         *big.Int
+	To            string
+	Data          []byte
+}
+
+type Erc20ApprovalConfig struct {
+	ChainId        int
+	Key            string
+	Erc20Address   common.Address
+	PublicAddress  common.Address
+	SpenderAddress common.Address
+}
+
+type Erc20RevokeConfig struct {
+	ChainId                 int
+	Key                     string
+	Erc20Address            common.Address
+	PublicAddress           common.Address
+	SpenderAddress          common.Address
+	AllowanceDecreaseAmount *big.Int
 }

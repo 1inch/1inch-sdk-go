@@ -2,8 +2,6 @@ package swap
 
 import (
 	"bufio"
-	"context"
-	"errors"
 	"fmt"
 	"io"
 	"math/big"
@@ -13,8 +11,6 @@ import (
 	"github.com/1inch/1inch-sdk/golang/client/onchain"
 	"github.com/1inch/1inch-sdk/golang/helpers"
 	"github.com/1inch/1inch-sdk/golang/helpers/consts/tokens"
-	"github.com/ethereum/go-ethereum"
-	"github.com/ethereum/go-ethereum/accounts/abi"
 	"github.com/ethereum/go-ethereum/common"
 	"github.com/ethereum/go-ethereum/common/math"
 	"github.com/ethereum/go-ethereum/crypto"
@@ -161,48 +157,6 @@ func ConvertSignatureToVRSString(signature string) string {
 	//s := signature[66:128]
 	//v := signature[128:]
 	return padStringWithZeroes(signature[128:]) + signature[:128]
-}
-
-func GetTypeHash(client *ethclient.Client, addressAsString string) (string, error) { // Pack the call to get the PERMIT_TYPEHASH constant
-
-	// Parse the ABI
-	parsedABI, err := abi.JSON(strings.NewReader(contracts.Erc20Abi))
-	if err != nil {
-		return "", fmt.Errorf("failed to parse contract ABI: %v", err)
-	}
-
-	// Create the contract address
-	address := common.HexToAddress(addressAsString)
-
-	data, err := parsedABI.Pack("PERMIT_TYPEHASH")
-	if err != nil {
-		return "", fmt.Errorf("failed to pack data for PERMIT_TYPEHASH: %v", err)
-	}
-
-	// Create the call message
-	msg := ethereum.CallMsg{
-		To:   &address,
-		Data: data,
-	}
-
-	// Query the blockchain
-	result, err := client.CallContract(context.Background(), msg, nil)
-	if err != nil {
-		return "", fmt.Errorf("failed to retrieve the PERMIT_TYPEHASH: %v", err)
-	}
-
-	// Convert the result to bytes32
-	var typeHash [32]byte
-	copy(typeHash[:], result)
-
-	// Convert the result to a string
-	resultAsString := fmt.Sprintf("%x", typeHash)
-	// If the varaible does not exist, it will be all zeros
-	if string(resultAsString) == "0000000000000000000000000000000000000000000000000000000000000000" {
-		return "", errors.New("PERMIT_TYPEHASH does not exist")
-	}
-
-	return resultAsString, nil
 }
 
 func ConfirmExecuteSwapWithUser(config *ExecuteSwapConfig, ethClient *ethclient.Client) (bool, error) {

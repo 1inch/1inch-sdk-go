@@ -3,9 +3,10 @@ package tokens
 const (
 	NativeToken = "0xEeeeeEeeeEeEeeEeEeEeeEEEeeeeEeeeeeeeEEeE"
 
-	EthereumWeth = "0xc02aaa39b223fe8d0a0e5c4f27ead9083c756cc2"
-	EthereumUsdc = "0xa0b86991c6218b36c1d19d4a2e9eb0ce3606eb48"
-	EthereumDai  = "0x6B175474E89094C44Da98b954EedeAC495271d0F"
+	EthereumWeth  = "0xc02aaa39b223fe8d0a0e5c4f27ead9083c756cc2"
+	EthereumUsdc  = "0xa0b86991c6218b36c1d19d4a2e9eb0ce3606eb48"
+	EthereumDai   = "0x6B175474E89094C44Da98b954EedeAC495271d0F"
+	Ethereum1inch = "0x111111111117dC0aa78b770fA6A738034120C302"
 
 	PolygonDai  = "0x8f3Cf7ad23Cd3CaDbD9735AFf958023239c6A063"
 	PolygonFrax = "0x45c32fA6DF82ead1e2EF74d17b76547EDdFaFF89"

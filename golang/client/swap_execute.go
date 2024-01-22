@@ -1,8 +1,6 @@
 package client
 
 import (
-	"context"
-	"crypto/ecdsa"
 	"encoding/hex"
 	"errors"
 	"fmt"
@@ -14,8 +12,6 @@ import (
 	"github.com/1inch/1inch-sdk/golang/helpers/consts/contracts"
 	"github.com/1inch/1inch-sdk/golang/helpers/consts/tokens"
 	"github.com/ethereum/go-ethereum/common"
-	"github.com/ethereum/go-ethereum/core/types"
-	"github.com/ethereum/go-ethereum/crypto"
 )
 
 // This file breaks convention. It sends transactions to the blockchain directly instead of using the 1inch API.
@@ -37,28 +33,18 @@ func (s *SwapService) ExecuteSwap(config *swap.ExecuteSwapConfig) error {
 		}
 	}
 
-	privateKey, err := crypto.HexToECDSA(s.client.WalletKey)
-	if err != nil {
-		return fmt.Errorf("failed to convert private key: %v", err)
-	}
-
-	chainID, err := s.client.EthClient.NetworkID(context.Background())
-	if err != nil {
-		return fmt.Errorf("failed to get network ID: %v", err)
-	}
-
 	aggregationRouter, err := contracts.Get1inchRouterFromChainId(s.client.ChainId)
 	if err != nil {
 		return fmt.Errorf("failed to get 1inch router address: %v", err)
 	}
 
 	if !config.IsPermitSwap {
-		err = s.executeSwapWithApproval(aggregationRouter, config.FromToken, config.Amount, privateKey, config.TransactionData, config.SkipWarnings)
+		err = s.executeSwapWithApproval(aggregationRouter, config.FromToken, config.Amount, config.TransactionData, config.SkipWarnings)
 		if err != nil {
 			return fmt.Errorf("failed to execute swap with approval: %v", err)
 		}
 	} else {
-		err = s.executeSwapWithPermit(chainID, privateKey, config.TransactionData)
+		err = s.executeSwapWithPermit(config.TransactionData)
 		if err != nil {
 			return fmt.Errorf("failed to execute swap with permit: %v", err)
 		}
@@ -67,7 +53,7 @@ func (s *SwapService) ExecuteSwap(config *swap.ExecuteSwapConfig) error {
 	return nil
 }
 
-func (s *SwapService) executeSwapWithApproval(spenderAddress string, fromToken string, amount string, privateKey *ecdsa.PrivateKey, transactionData string, skipWarnings bool) error {
+func (s *SwapService) executeSwapWithApproval(spenderAddress string, fromToken string, amount string, transactionData string, skipWarnings bool) error {
 
 	var value *big.Int
 	var err error
@@ -94,7 +80,15 @@ func (s *SwapService) executeSwapWithApproval(spenderAddress string, fromToken s
 					return errors.New("user rejected approval")
 				}
 			}
-			err = onchain.ApproveTokenForRouter(s.client.EthClient, s.client.ChainId, s.client.WalletKey, common.HexToAddress(fromToken), s.client.PublicAddress, common.HexToAddress(spenderAddress))
+
+			erc20Config := onchain.Erc20ApprovalConfig{
+				ChainId:        s.client.ChainId,
+				Key:            s.client.WalletKey,
+				Erc20Address:   common.HexToAddress(fromToken),
+				PublicAddress:  s.client.PublicAddress,
+				SpenderAddress: common.HexToAddress(spenderAddress),
+			}
+			err = onchain.ApproveTokenForRouter(s.client.EthClient, s.client.NonceCache, erc20Config)
 			if err != nil {
 				return fmt.Errorf("failed to approve token for router: %v", err)
 			}
@@ -118,40 +112,23 @@ func (s *SwapService) executeSwapWithApproval(spenderAddress string, fromToken s
 		return fmt.Errorf("failed to get 1inch router address: %v", err)
 	}
 
-	chainIdBig := big.NewInt(int64(s.client.ChainId))
-
-	txConfig := onchain.GetTxConfig{
-		ChainId:     chainIdBig,
-		FromAddress: s.client.PublicAddress,
-		To:          aggregationRouter,
-		Value:       value,
-		Data:        hexData,
+	txConfig := onchain.TxConfig{
+		Description:   "Swap",
+		PublicAddress: s.client.PublicAddress,
+		PrivateKey:    s.client.WalletKey,
+		ChainId:       big.NewInt(int64(s.client.ChainId)),
+		Value:         value,
+		To:            aggregationRouter,
+		Data:          hexData,
 	}
-	swapTx, err := onchain.GetTx(s.client.EthClient, txConfig)
-
-	// Sign the transaction
-	swapTxSigned, err := types.SignTx(swapTx, types.LatestSignerForChainID(chainIdBig), privateKey)
+	err = onchain.ExecuteTransaction(txConfig, s.client.EthClient, s.client.NonceCache)
 	if err != nil {
-		return fmt.Errorf("failed to sign transaction: %v", err)
-	}
-
-	// Send the transaction
-	err = s.client.EthClient.SendTransaction(context.Background(), swapTxSigned)
-	if err != nil {
-		return fmt.Errorf("failed to send transaction: %v", err)
-	}
-
-	fmt.Println("Swap transaction sent!")
-	helpers.PrintBlockExplorerTxLink(s.client.ChainId, swapTxSigned.Hash().String())
-
-	_, err = onchain.WaitForTransaction(s.client.EthClient, swapTxSigned.Hash())
-	if err != nil {
-		return fmt.Errorf("failed to get transaction receipt: %v", err)
+		return fmt.Errorf("failed to execute transaction: %v", err)
 	}
 	return nil
 }
 
-func (s *SwapService) executeSwapWithPermit(chainID *big.Int, privateKey *ecdsa.PrivateKey, transactionData string) error {
+func (s *SwapService) executeSwapWithPermit(transactionData string) error {
 
 	hexData, err := hex.DecodeString(transactionData[2:])
 	if err != nil {
@@ -163,36 +140,18 @@ func (s *SwapService) executeSwapWithPermit(chainID *big.Int, privateKey *ecdsa.
 		return fmt.Errorf("failed to get 1inch router address: %v", err)
 	}
 
-	txConfig := onchain.GetTxConfig{
-		ChainId:     chainID,
-		FromAddress: s.client.PublicAddress,
-		To:          aggregationRouter,
-		Value:       big.NewInt(0),
-		Data:        hexData,
+	txConfig := onchain.TxConfig{
+		Description:   "Swap",
+		PublicAddress: s.client.PublicAddress,
+		PrivateKey:    s.client.WalletKey,
+		ChainId:       big.NewInt(int64(s.client.ChainId)),
+		Value:         big.NewInt(0),
+		To:            aggregationRouter,
+		Data:          hexData,
 	}
-	permitSwapTx, err := onchain.GetTx(s.client.EthClient, txConfig)
+	err = onchain.ExecuteTransaction(txConfig, s.client.EthClient, s.client.NonceCache)
 	if err != nil {
-		return fmt.Errorf("failed to get dynamic fee tx: %v", err)
-	}
-
-	// Sign the transaction
-	permitSwapTxSigned, err := types.SignTx(permitSwapTx, types.LatestSignerForChainID(chainID), privateKey)
-	if err != nil {
-		return fmt.Errorf("failed to sign transaction: %v", err)
-	}
-
-	// Send the transaction
-	err = s.client.EthClient.SendTransaction(context.Background(), permitSwapTxSigned)
-	if err != nil {
-		return fmt.Errorf("failed to send transaction: %v", err)
-	}
-
-	fmt.Println("Swap transaction sent!")
-	helpers.PrintBlockExplorerTxLink(s.client.ChainId, permitSwapTxSigned.Hash().String())
-
-	_, err = onchain.WaitForTransaction(s.client.EthClient, permitSwapTxSigned.Hash())
-	if err != nil {
-		return fmt.Errorf("failed to get transaction receipt: %v", err)
+		return fmt.Errorf("failed to execute transaction: %v", err)
 	}
 	return nil
 }

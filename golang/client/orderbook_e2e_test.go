@@ -17,23 +17,6 @@ import (
 	"github.com/stretchr/testify/require"
 )
 
-func createOrder(config Config, createOrderParams orderbook.OrderRequest) (*orderbook.CreateOrderResponse, error) {
-
-	// Create the 1inch client
-	c, err := NewClient(config)
-	if err != nil {
-		return nil, fmt.Errorf("failed to create client: %v", err)
-	}
-
-	// Execute orders request
-	createOrderResponse, _, err := c.Orderbook.CreateOrder(context.Background(), createOrderParams)
-	if err != nil {
-		return nil, fmt.Errorf("failed to create order: %v", err)
-	}
-
-	return createOrderResponse, err
-}
-
 func TestCreateOrderE2E(t *testing.T) {
 
 	testcases := []struct {
@@ -87,7 +70,10 @@ func TestCreateOrderE2E(t *testing.T) {
 				helpers.Sleep()
 			})
 
-			_, err := createOrder(tc.config, tc.createOrderParams)
+			c, err := NewClient(tc.config)
+			require.NoError(t, err)
+
+			_, _, err = c.Orderbook.CreateOrder(context.Background(), tc.createOrderParams)
 			require.NoError(t, err)
 		})
 	}

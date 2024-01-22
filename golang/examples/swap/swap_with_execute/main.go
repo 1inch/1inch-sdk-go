@@ -4,7 +4,6 @@ import (
 	"log"
 	"os"
 
-	"github.com/1inch/1inch-sdk/golang/actions"
 	"github.com/1inch/1inch-sdk/golang/client"
 	"github.com/1inch/1inch-sdk/golang/client/swap"
 	"github.com/1inch/1inch-sdk/golang/helpers"
@@ -38,7 +37,7 @@ func main() {
 		DisableEstimate: helpers.GetPtr(true),
 	}
 
-	err = actions.SwapTokens(c, swapParams, false)
+	err = c.Actions.SwapTokens(swapParams, false)
 	if err != nil {
 		log.Fatalf("Failed to swap tokens: %v", err)
 	}
