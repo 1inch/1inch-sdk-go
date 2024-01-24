@@ -1,6 +1,3 @@
-//go:build e2e
-// +build e2e
-
 package client
 
 import (
@@ -9,26 +6,22 @@ import (
 	"os"
 	"testing"
 
-	"github.com/1inch/1inch-sdk/golang/client/onchain"
 	"github.com/1inch/1inch-sdk/golang/client/swap"
 	"github.com/1inch/1inch-sdk/golang/helpers"
 	"github.com/1inch/1inch-sdk/golang/helpers/consts/chains"
-	"github.com/1inch/1inch-sdk/golang/helpers/consts/contracts"
 	"github.com/1inch/1inch-sdk/golang/helpers/consts/tokens"
 	"github.com/1inch/1inch-sdk/golang/helpers/consts/web3providers"
-	"github.com/ethereum/go-ethereum/common"
 	"github.com/stretchr/testify/require"
 )
 
-func TestSwapTokensE2E(t *testing.T) {
+func TestSwapTokensTenderlyE2E(t *testing.T) {
 
 	testcases := []struct {
-		description         string
-		config              Config
-		swapParams          swap.AggregationControllerGetSwapParams
-		removeApprovalAfter bool
-		approvalType        swap.ApprovalType
-		expectedOutput      string
+		description    string
+		config         Config
+		swapParams     swap.AggregationControllerGetSwapParams
+		approvalType   swap.ApprovalType
+		expectedOutput string
 	}{
 		{
 			description: "Polygon - Swap 0.01 DAI for USDC - Approval - Does not support traditional permit interface",
@@ -37,6 +30,7 @@ func TestSwapTokensE2E(t *testing.T) {
 				WalletKey:        os.Getenv("WALLET_KEY"),
 				Web3HttpProvider: os.Getenv("WEB_3_HTTP_PROVIDER_URL_WITH_KEY_POLYGON"),
 				ChainId:          chains.Polygon,
+				TenderlyKey:      os.Getenv("TENDERLY_API_KEY"),
 			},
 			swapParams: swap.AggregationControllerGetSwapParams{
 				Src:      tokens.PolygonDai,
@@ -45,8 +39,7 @@ func TestSwapTokensE2E(t *testing.T) {
 				From:     os.Getenv("WALLET_ADDRESS"),
 				Slippage: 0.5,
 			},
-			removeApprovalAfter: true,
-			approvalType:        swap.PermitIfPossible,
+			approvalType: swap.PermitIfPossible,
 		},
 		{
 			description: "Polygon - Swap 0.01 FRAX for USDC - Approval - Forced",
@@ -55,6 +48,7 @@ func TestSwapTokensE2E(t *testing.T) {
 				WalletKey:        os.Getenv("WALLET_KEY"),
 				Web3HttpProvider: os.Getenv("WEB_3_HTTP_PROVIDER_URL_WITH_KEY_POLYGON"),
 				ChainId:          chains.Polygon,
+				TenderlyKey:      os.Getenv("TENDERLY_API_KEY"),
 			},
 			swapParams: swap.AggregationControllerGetSwapParams{
 				Src:      tokens.PolygonFrax,
@@ -63,8 +57,25 @@ func TestSwapTokensE2E(t *testing.T) {
 				From:     os.Getenv("WALLET_ADDRESS"),
 				Slippage: 0.5,
 			},
-			removeApprovalAfter: true,
-			approvalType:        swap.ApprovalAlways,
+			approvalType: swap.ApprovalAlways,
+		},
+		{
+			description: "Polygon - Swap 0.01 FRAX for USDC - Permit",
+			config: Config{
+				DevPortalApiKey:  os.Getenv("DEV_PORTAL_TOKEN"),
+				WalletKey:        os.Getenv("WALLET_KEY"),
+				Web3HttpProvider: os.Getenv("WEB_3_HTTP_PROVIDER_URL_WITH_KEY_POLYGON"),
+				ChainId:          chains.Polygon,
+				TenderlyKey:      os.Getenv("TENDERLY_API_KEY"),
+			},
+			swapParams: swap.AggregationControllerGetSwapParams{
+				Src:      tokens.PolygonFrax,
+				Dst:      tokens.PolygonUsdc,
+				Amount:   "10000000000000000",
+				From:     os.Getenv("WALLET_ADDRESS"),
+				Slippage: 0.5,
+			},
+			approvalType: swap.PermitIfPossible,
 		},
 		{
 			description: "Arbitrum - Swap 0.01 USDC for DAI - Approve - Arbitrum unsuported right now",
@@ -73,6 +84,7 @@ func TestSwapTokensE2E(t *testing.T) {
 				WalletKey:        os.Getenv("WALLET_KEY"),
 				Web3HttpProvider: web3providers.Arbitrum,
 				ChainId:          chains.Arbitrum,
+				TenderlyKey:      os.Getenv("TENDERLY_API_KEY"),
 			},
 			swapParams: swap.AggregationControllerGetSwapParams{
 				Src:      tokens.ArbitrumUsdc,
@@ -90,6 +102,7 @@ func TestSwapTokensE2E(t *testing.T) {
 				WalletKey:        os.Getenv("WALLET_KEY"),
 				Web3HttpProvider: web3providers.Arbitrum,
 				ChainId:          chains.Arbitrum,
+				TenderlyKey:      os.Getenv("TENDERLY_API_KEY"),
 			},
 			swapParams: swap.AggregationControllerGetSwapParams{
 				Src:      tokens.NativeToken,
@@ -108,6 +121,7 @@ func TestSwapTokensE2E(t *testing.T) {
 				WalletKey:        os.Getenv("WALLET_KEY"),
 				Web3HttpProvider: web3providers.Ethereum,
 				ChainId:          chains.Ethereum,
+				TenderlyKey:      os.Getenv("TENDERLY_API_KEY"),
 			},
 			swapParams: swap.AggregationControllerGetSwapParams{
 				Src:      tokens.Ethereum1inch,
@@ -137,22 +151,6 @@ func TestSwapTokensE2E(t *testing.T) {
 				log.Fatalf("Failed to swap tokens: %v", err)
 			}
 			require.NoError(t, err)
-			if tc.removeApprovalAfter {
-
-				allowance, err := onchain.ReadContractAllowance(c.EthClient, common.HexToAddress(tc.swapParams.Src), common.HexToAddress(tc.swapParams.From), common.HexToAddress(contracts.AggregationRouterV5))
-				require.NoError(t, err)
-
-				erc20Config := onchain.Erc20RevokeConfig{
-					ChainId:                 tc.config.ChainId,
-					Key:                     tc.config.WalletKey,
-					Erc20Address:            common.HexToAddress(tc.swapParams.Src),
-					PublicAddress:           common.HexToAddress(tc.swapParams.From),
-					SpenderAddress:          common.HexToAddress(contracts.AggregationRouterV5),
-					AllowanceDecreaseAmount: allowance,
-				}
-				err = onchain.RevokeApprovalForRouter(c.EthClient, c.NonceCache, erc20Config)
-				require.NoError(t, err)
-			}
 		})
 	}
 }

@@ -42,6 +42,7 @@ type Config struct {
 	DevPortalApiKey   string
 	Web3HttpProvider  string
 	WalletKey         string
+	TenderlyKey       string
 }
 
 func (c *Config) validate() error {
@@ -87,6 +88,8 @@ type Client struct {
 	Actions   *ActionService
 	Swap      *SwapService
 	Orderbook *OrderbookService
+
+	TenderlyKey string
 }
 
 // NewClient creates and initializes a new Client instance based on the provided Config.
@@ -144,6 +147,7 @@ func NewClient(config Config) (*Client, error) {
 		PublicAddress: publicAddress,
 		RpcUrlWithKey: config.Web3HttpProvider,
 		NonceCache:    make(map[string]uint64),
+		TenderlyKey:   config.TenderlyKey,
 	}
 
 	c.common.client = c

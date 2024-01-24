@@ -37,7 +37,7 @@ func main() {
 		DisableEstimate: helpers.GetPtr(true),
 	}
 
-	err = c.Actions.SwapTokens(swapParams, false)
+	err = c.Actions.SwapTokens(swapParams, false, swap.PermitIfPossible)
 	if err != nil {
 		log.Fatalf("Failed to swap tokens: %v", err)
 	}
