@@ -63,6 +63,15 @@ type ForkResponse struct {
 	} `json:"simulation_fork"`
 }
 
+type GetForksResponse struct {
+	Forks []ForksResponse `json:"simulation_forks"`
+}
+
+type ForksResponse struct {
+	ID    string `json:"id"`
+	Alias string `json:"alias"`
+}
+
 type ResponseError struct {
 	ErrorStruct struct {
 		Message string `json:"message"`

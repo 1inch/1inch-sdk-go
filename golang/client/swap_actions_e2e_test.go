@@ -4,9 +4,11 @@ import (
 	"fmt"
 	"log"
 	"os"
+	"strings"
 	"testing"
 
 	"github.com/1inch/1inch-sdk/golang/client/swap"
+	"github.com/1inch/1inch-sdk/golang/client/tenderly"
 	"github.com/1inch/1inch-sdk/golang/helpers"
 	"github.com/1inch/1inch-sdk/golang/helpers/consts/chains"
 	"github.com/1inch/1inch-sdk/golang/helpers/consts/tokens"
@@ -78,7 +80,7 @@ func TestSwapTokensTenderlyE2E(t *testing.T) {
 			approvalType: swap.PermitIfPossible,
 		},
 		{
-			description: "Arbitrum - Swap 0.01 USDC for DAI - Approve - Arbitrum unsuported right now",
+			description: "Arbitrum - Swap 0.01 USDC for DAI - Approve - Arbitrum unsupported right now",
 			config: Config{
 				DevPortalApiKey:  os.Getenv("DEV_PORTAL_TOKEN"),
 				WalletKey:        os.Getenv("WALLET_KEY"),
@@ -96,7 +98,7 @@ func TestSwapTokensTenderlyE2E(t *testing.T) {
 			approvalType: swap.PermitIfPossible,
 		},
 		{
-			description: "Arbitrum - Swap $0.01 worth of ETH for USDC - Approve - Native token for ERC20",
+			description: "Arbitrum - Swap $0.01 worth of ETH for USDC - Native token for ERC20",
 			config: Config{
 				DevPortalApiKey:  os.Getenv("DEV_PORTAL_TOKEN"),
 				WalletKey:        os.Getenv("WALLET_KEY"),
@@ -134,6 +136,9 @@ func TestSwapTokensTenderlyE2E(t *testing.T) {
 		},
 	}
 
+	err := cleanupForksFromPreviousTests(os.Getenv("TENDERLY_API_KEY"))
+	require.NoError(t, err, fmt.Errorf("failed to delete forks from previous test runs: %v", err))
+
 	for _, tc := range testcases {
 		t.Run(fmt.Sprintf("%v", tc.description), func(t *testing.T) {
 
@@ -153,4 +158,22 @@ func TestSwapTokensTenderlyE2E(t *testing.T) {
 			require.NoError(t, err)
 		})
 	}
+}
+
+func cleanupForksFromPreviousTests(tenderlyApiKey string) error {
+
+	forksResponse, err := tenderly.GetTenderlyForks(tenderlyApiKey)
+	if err != nil {
+		return fmt.Errorf("failed to get tenderly forks: %v", err)
+	}
+
+	for _, fork := range forksResponse.Forks {
+		if strings.Contains(fork.Alias, "Dev Portal") {
+			err := tenderly.DeleteTenderlyFork(tenderlyApiKey, fork.ID)
+			if err != nil {
+				return fmt.Errorf("failed to delete tenderly fork: %v", err)
+			}
+		}
+	}
+	return nil
 }
