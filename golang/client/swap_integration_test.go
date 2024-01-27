@@ -5,6 +5,7 @@ import (
 	"fmt"
 	"testing"
 
+	"github.com/1inch/1inch-sdk/golang/helpers/consts/chains"
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
 
@@ -18,14 +19,19 @@ func TestApproveAllowanceIntegration(t *testing.T) {
 
 	testcases := []struct {
 		description    string
-		params         swap.ApproveControllerGetAllowanceParams
+		params         swap.ApproveAllowanceParams
 		expectedOutput swap.AllowanceResponse
 	}{
 		{
 			description: "Get approve spender address",
-			params: swap.ApproveControllerGetAllowanceParams{
-				TokenAddress:  tokens.EthereumUsdc,
-				WalletAddress: addresses.Vitalik,
+			params: swap.ApproveAllowanceParams{
+				RequestParams: swap.RequestParams{
+					ChainId: chains.Ethereum,
+				},
+				ApproveControllerGetAllowanceParams: swap.ApproveControllerGetAllowanceParams{
+					TokenAddress:  tokens.EthereumUsdc,
+					WalletAddress: addresses.Vitalik,
+				},
 			},
 			expectedOutput: swap.AllowanceResponse{
 				Allowance: "0",
@@ -55,10 +61,16 @@ func TestApproveSpenderIntegration(t *testing.T) {
 
 	testcases := []struct {
 		description    string
+		params         swap.ApproveSpenderParams
 		expectedOutput swap.SpenderResponse
 	}{
 		{
 			description: "Get approve spender address",
+			params: swap.ApproveSpenderParams{
+				RequestParams: swap.RequestParams{
+					ChainId: chains.Ethereum,
+				},
+			},
 			expectedOutput: swap.SpenderResponse{
 				Address: "0x1111111254eeb25477b68fb85ed929f73a960582",
 			},
@@ -71,7 +83,7 @@ func TestApproveSpenderIntegration(t *testing.T) {
 	for _, tc := range testcases {
 		t.Run(fmt.Sprintf("%v", tc.description), func(t *testing.T) {
 
-			spender, resp, err := c.Swap.ApproveSpender(context.Background())
+			spender, resp, err := c.Swap.ApproveSpender(context.Background(), tc.params)
 			require.NoError(t, err)
 			assert.Equal(t, 200, resp.StatusCode)
 			assert.Equal(t, tc.expectedOutput.Address, spender.Address)
@@ -85,14 +97,19 @@ func TestApproveTransactionIntegration(t *testing.T) {
 
 	testcases := []struct {
 		description    string
-		params         swap.ApproveControllerGetCallDataParams
+		params         swap.ApproveTransactionParams
 		expectedOutput swap.ApproveCallDataResponse
 	}{
 		{
 			description: "Get approve spender address",
-			params: swap.ApproveControllerGetCallDataParams{
-				TokenAddress: tokens.EthereumUsdc,
-				Amount:       nil,
+			params: swap.ApproveTransactionParams{
+				RequestParams: swap.RequestParams{
+					ChainId: chains.Ethereum,
+				},
+				ApproveControllerGetCallDataParams: swap.ApproveControllerGetCallDataParams{
+					TokenAddress: tokens.EthereumUsdc,
+					Amount:       nil,
+				},
 			},
 			expectedOutput: swap.ApproveCallDataResponse{
 				To: tokens.EthereumUsdc,
@@ -120,10 +137,16 @@ func TestGetLiquiditySourcesIntegration(t *testing.T) {
 
 	testcases := []struct {
 		description      string
+		params           swap.GetLiquiditySourcesParams
 		expectedProtocol swap.ProtocolImage
 	}{
 		{
 			description: "Get approve spender address",
+			params: swap.GetLiquiditySourcesParams{
+				RequestParams: swap.RequestParams{
+					ChainId: chains.Ethereum,
+				},
+			},
 			expectedProtocol: swap.ProtocolImage{
 				Id:  "UNISWAP_V2",
 				Img: "Uniswap V2",
@@ -137,7 +160,7 @@ func TestGetLiquiditySourcesIntegration(t *testing.T) {
 	for _, tc := range testcases {
 		t.Run(fmt.Sprintf("%v", tc.description), func(t *testing.T) {
 
-			liquiditySources, resp, err := c.Swap.GetLiquiditySources(context.Background())
+			liquiditySources, resp, err := c.Swap.GetLiquiditySources(context.Background(), tc.params)
 			require.NoError(t, err)
 			assert.Equal(t, 200, resp.StatusCode)
 
@@ -158,10 +181,16 @@ func TestGetTokensIntegration(t *testing.T) {
 
 	testcases := []struct {
 		description   string
+		params        swap.GetTokensParams
 		expectedToken swap.TokenInfo
 	}{
 		{
 			description: "Get approve spender address",
+			params: swap.GetTokensParams{
+				RequestParams: swap.RequestParams{
+					ChainId: chains.Ethereum,
+				},
+			},
 			expectedToken: swap.TokenInfo{
 				Address:  "0xa0b86991c6218b36c1d19d4a2e9eb0ce3606eb48",
 				Decimals: 6,
@@ -178,7 +207,7 @@ func TestGetTokensIntegration(t *testing.T) {
 	for _, tc := range testcases {
 		t.Run(fmt.Sprintf("%v", tc.description), func(t *testing.T) {
 
-			tokens, resp, err := c.Swap.GetTokens(context.Background())
+			tokens, resp, err := c.Swap.GetTokens(context.Background(), tc.params)
 			require.NoError(t, err)
 			assert.Equal(t, 200, resp.StatusCode)
 

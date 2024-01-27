@@ -1,6 +1,12 @@
 package orderbook
 
+type RequestParams struct {
+	ChainId   int
+	WalletKey string
+}
+
 type OrderRequest struct {
+	RequestParams
 	SourceWallet string `json:"sourceWallet" validate:"required,eth_addr"`
 	FromToken    string `json:"fromToken" validate:"required,eth_addr"`
 	ToToken      string `json:"toToken" validate:"required,eth_addr"`

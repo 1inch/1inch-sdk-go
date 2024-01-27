@@ -1,6 +1,9 @@
 package swap
 
 type ExecuteSwapConfig struct {
+	WalletKey          string
+	ChainId            int
+	PublicAddress      string
 	FromToken          string
 	ToToken            string
 	Amount             string

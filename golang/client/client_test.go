@@ -11,69 +11,44 @@ import (
 )
 
 var SimpleEthereumConfig = Config{
-	TargetEnvironment: EnvironmentProduction,
-	ChainId:           chains.Ethereum,
-	DevPortalApiKey:   os.Getenv("DEV_PORTAL_TOKEN"),
-	Web3HttpProvider:  os.Getenv("WEB_3_HTTP_PROVIDER_URL_WITH_KEY"),
-	WalletKey:         os.Getenv("WALLET_KEY"),
+	DevPortalApiKey: os.Getenv("DEV_PORTAL_TOKEN"),
+	Web3HttpProviders: []Web3ProviderConfig{
+		{
+			ChainId: chains.Ethereum,
+			Url:     os.Getenv("WEB_3_HTTP_PROVIDER_URL_WITH_KEY"),
+		},
+	},
 }
 
 func TestNewConfig(t *testing.T) {
 	testcases := []struct {
 		description              string
 		config                   Config
-		expectedEnvironment      string
 		expectedErrorDescription string
 	}{
 		{
-			description: "Production",
+			description: "Success",
 			config: Config{
-				TargetEnvironment: EnvironmentProduction,
-				DevPortalApiKey:   "abc123",
-				Web3HttpProvider:  os.Getenv("WEB_3_HTTP_PROVIDER_URL_WITH_KEY"),
-				ChainId:           chains.Ethereum,
+				DevPortalApiKey: "abc123",
+				Web3HttpProviders: []Web3ProviderConfig{
+					{
+						ChainId: chains.Ethereum,
+						Url:     os.Getenv("WEB_3_HTTP_PROVIDER_URL_WITH_KEY"),
+					},
+				},
 			},
-			expectedEnvironment:      baseUrlProduction.Host,
 			expectedErrorDescription: "",
-		},
-		{
-			description: "Production (excluded entry)",
-			config: Config{
-				DevPortalApiKey:  "abc123",
-				Web3HttpProvider: os.Getenv("WEB_3_HTTP_PROVIDER_URL_WITH_KEY"),
-				ChainId:          chains.Ethereum,
-			},
-			expectedEnvironment:      baseUrlProduction.Host,
-			expectedErrorDescription: "",
-		},
-		{
-			description: "Staging",
-			config: Config{
-				TargetEnvironment: EnvironmentStaging,
-				DevPortalApiKey:   "abc123",
-				Web3HttpProvider:  os.Getenv("WEB_3_HTTP_PROVIDER_URL_WITH_KEY"),
-				ChainId:           chains.Ethereum,
-			},
-			expectedEnvironment:      baseUrlStaging.Host,
-			expectedErrorDescription: "",
-		},
-		{
-			description: "Error - unrecognized environment",
-			config: Config{
-				TargetEnvironment: Environment("invalid"),
-				DevPortalApiKey:   "abc123",
-				Web3HttpProvider:  os.Getenv("WEB_3_HTTP_PROVIDER_URL_WITH_KEY"),
-				ChainId:           chains.Ethereum,
-			},
-			expectedEnvironment:      baseUrlStaging.Host,
-			expectedErrorDescription: "unrecognized environment: invalid",
 		},
 		{
 			description: "Error - no API key",
 			config: Config{
-				DevPortalApiKey:  "",
-				Web3HttpProvider: os.Getenv("WEB_3_HTTP_PROVIDER_URL_WITH_KEY"),
-				ChainId:          chains.Ethereum,
+				DevPortalApiKey: "",
+				Web3HttpProviders: []Web3ProviderConfig{
+					{
+						ChainId: chains.Ethereum,
+						Url:     os.Getenv("WEB_3_HTTP_PROVIDER_URL_WITH_KEY"),
+					},
+				},
 			},
 			expectedErrorDescription: "config validation error: API key is required",
 		},
@@ -81,24 +56,15 @@ func TestNewConfig(t *testing.T) {
 			description: "Error - no web3 provider key",
 			config: Config{
 				DevPortalApiKey: "123",
-				ChainId:         chains.Ethereum,
 			},
-			expectedErrorDescription: "config validation error: web3 provider URL is required",
-		},
-		{
-			description: "Error - no chain ID",
-			config: Config{
-				DevPortalApiKey:  "123",
-				Web3HttpProvider: os.Getenv("WEB_3_HTTP_PROVIDER_URL_WITH_KEY"),
-			},
-			expectedErrorDescription: "config validation error: chain ID is required",
+			expectedErrorDescription: "config validation error: at least one web3 provider URL is required",
 		},
 	}
 
 	for _, tc := range testcases {
 		t.Run(fmt.Sprintf("%v", tc.description), func(t *testing.T) {
 
-			c, err := NewClient(tc.config)
+			_, err := NewClient(tc.config)
 			if tc.expectedErrorDescription != "" {
 				if err == nil {
 					assert.FailNow(t, "Expected error message, but error was nil")
@@ -107,7 +73,6 @@ func TestNewConfig(t *testing.T) {
 				return
 			}
 			require.NoError(t, err)
-			assert.Equal(t, tc.expectedEnvironment, c.BaseURL.Host)
 		})
 	}
 }

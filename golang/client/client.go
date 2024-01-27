@@ -3,7 +3,6 @@ package client
 import (
 	"bytes"
 	"context"
-	"crypto/ecdsa"
 	"encoding/json"
 	"errors"
 	"fmt"
@@ -13,17 +12,11 @@ import (
 	"reflect"
 	"strings"
 
-	"github.com/ethereum/go-ethereum/common"
-	"github.com/ethereum/go-ethereum/crypto"
 	"github.com/ethereum/go-ethereum/ethclient"
 	"github.com/google/go-querystring/query"
 
 	"github.com/1inch/1inch-sdk/golang/helpers"
 )
-
-// This is the base URL for the 1inch API.
-var baseUrlProduction, _ = url.Parse("https://api.1inch.dev")
-var baseUrlStaging, _ = url.Parse("https://fake-staging.1inch.dev")
 
 type Environment string
 
@@ -37,12 +30,14 @@ type service struct {
 }
 
 type Config struct {
-	TargetEnvironment Environment
-	ChainId           int
 	DevPortalApiKey   string
-	Web3HttpProvider  string
-	WalletKey         string
+	Web3HttpProviders []Web3ProviderConfig
 	TenderlyKey       string
+}
+
+type Web3ProviderConfig struct {
+	ChainId int
+	Url     string
 }
 
 func (c *Config) validate() error {
@@ -50,13 +45,8 @@ func (c *Config) validate() error {
 	if c.DevPortalApiKey == "" {
 		return fmt.Errorf("API key is required")
 	}
-	if c.Web3HttpProvider == "" {
-		return fmt.Errorf("web3 provider URL is required")
-	}
-	if c.ChainId == 0 {
-		return fmt.Errorf("chain ID is required")
-	} else if !helpers.IsValidChainId(c.ChainId) {
-		return fmt.Errorf("invalid chain id: %d", c.ChainId)
+	if len(c.Web3HttpProviders) == 0 {
+		return fmt.Errorf("at least one web3 provider URL is required")
 	}
 
 	return nil
@@ -65,21 +55,14 @@ func (c *Config) validate() error {
 type Client struct {
 	// Standard http client in Go
 	httpClient *http.Client
-	// Ethereum client
-	EthClient *ethclient.Client
-	// The chain ID for requests
-	ChainId int
+	// Ethereum client map
+	EthClientMap map[int]*ethclient.Client
 	// The URL of the 1inch API
-	BaseURL *url.URL
+	ApiBaseURL *url.URL
 	// The API key to use for authentication
 	ApiKey string
-	// The key of the wallet that will be used to sign transactions
-	WalletKey string
-	// The public address of the wallet that will be used to sign transactions (derived from the private key)
-	// DO NOT MANUALLY SET
-	PublicAddress common.Address
-	// RPC URL for web3 provider with key
-	RpcUrlWithKey string
+	// When present, tests will simulate swaps on Tenderly
+	TenderlyKey string
 	// Once a transaction has been sent by the SDK, the nonce is tracked internally to avoid RPC desync issues on subsequent transactions
 	NonceCache map[string]uint64
 	// A struct that will contain a reference to this client. Used to separate each API into a unique namespace to aid in method discovery
@@ -88,66 +71,46 @@ type Client struct {
 	Actions   *ActionService
 	Swap      *SwapService
 	Orderbook *OrderbookService
+}
 
-	TenderlyKey string
+func (c *Client) GetEthClient(chainId int) (*ethclient.Client, error) {
+	ethClient, ok := c.EthClientMap[chainId]
+	if !ok {
+		return nil, fmt.Errorf("no client for chain id %d", chainId)
+	}
+	return ethClient, nil
 }
 
 // NewClient creates and initializes a new Client instance based on the provided Config.
 func NewClient(config Config) (*Client, error) {
-
 	// TODO this may be replaceable with https://github.com/go-playground/validator
 	err := config.validate()
 	if err != nil {
 		return nil, fmt.Errorf("config validation error: %v", err)
 	}
 
-	var baseUrl *url.URL
-	switch config.TargetEnvironment {
-	case "":
-		fallthrough
-	case EnvironmentProduction:
-		baseUrl = baseUrlProduction
-	case EnvironmentStaging:
-		baseUrl = baseUrlStaging
-	default:
-		return nil, fmt.Errorf("unrecognized environment: %s", config.TargetEnvironment)
-	}
-
-	publicAddress := common.HexToAddress("0x0")
-	if config.WalletKey != "" {
-		privateKey, err := crypto.HexToECDSA(config.WalletKey)
-		if err != nil {
-			return nil, fmt.Errorf("failed to convert private key: %v", err)
-		}
-
-		publicKey := privateKey.Public()
-		publicKeyECDSA, ok := publicKey.(*ecdsa.PublicKey)
-		if !ok {
-			return nil, fmt.Errorf("could not cast public key to ECDSA")
-		}
-
-		publicAddress = crypto.PubkeyToAddress(*publicKeyECDSA)
-	}
-
 	var ethClient *ethclient.Client
-	if config.Web3HttpProvider != "" {
-		ethClient, err = ethclient.Dial(config.Web3HttpProvider)
+	ethClientMap := make(map[int]*ethclient.Client)
+	for _, provider := range config.Web3HttpProviders {
+		ethClient, err = ethclient.Dial(provider.Url)
 		if err != nil {
 			return nil, fmt.Errorf("failed to create eth client: %v", err)
 		}
+		ethClientMap[provider.ChainId] = ethClient
+	}
+
+	apiBaseUrl, err := url.Parse("https://api.1inch.dev")
+	if err != nil {
+		return nil, fmt.Errorf("failed to parse API base URL: %v", err)
 	}
 
 	c := &Client{
-		httpClient:    &http.Client{},
-		EthClient:     ethClient,
-		ChainId:       config.ChainId,
-		BaseURL:       baseUrl,
-		ApiKey:        config.DevPortalApiKey,
-		WalletKey:     config.WalletKey,
-		PublicAddress: publicAddress,
-		RpcUrlWithKey: config.Web3HttpProvider,
-		NonceCache:    make(map[string]uint64),
-		TenderlyKey:   config.TenderlyKey,
+		httpClient:   &http.Client{},
+		EthClientMap: ethClientMap,
+		ApiBaseURL:   apiBaseUrl,
+		ApiKey:       config.DevPortalApiKey,
+		NonceCache:   make(map[string]uint64),
+		TenderlyKey:  config.TenderlyKey,
 	}
 
 	c.common.client = c
@@ -160,7 +123,7 @@ func NewClient(config Config) (*Client, error) {
 }
 
 func (c *Client) NewRequest(method, urlStr string, body []byte) (*http.Request, error) {
-	u, err := c.BaseURL.Parse(urlStr)
+	u, err := c.ApiBaseURL.Parse(urlStr)
 	if err != nil {
 		return nil, err
 	}
