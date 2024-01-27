@@ -2,6 +2,7 @@ package client
 
 import (
 	"context"
+	"crypto/ecdsa"
 	"encoding/hex"
 	"errors"
 	"fmt"
@@ -14,6 +15,8 @@ import (
 	"github.com/1inch/1inch-sdk/golang/helpers/consts/chains"
 	"github.com/1inch/1inch-sdk/golang/helpers/consts/tokens"
 	"github.com/ethereum/go-ethereum/common"
+	"github.com/ethereum/go-ethereum/crypto"
+	"github.com/ethereum/go-ethereum/ethclient"
 
 	"github.com/1inch/1inch-sdk/golang/client/onchain"
 	"github.com/1inch/1inch-sdk/golang/client/swap"
@@ -47,33 +50,59 @@ type ActionService service
 //   - The Permit feature is used if the token typehash matches a known Permit typehash.
 //
 // Returns nil on successful execution of the swap. Any error during the process is returned as a non-nil error.
-func (s *ActionService) SwapTokens(swapParams swap.AggregationControllerGetSwapParams, skipWarnings bool, approvalType swap.ApprovalType) error {
+func (s *ActionService) SwapTokens(params swap.SwapTokensParams) error {
 
 	// Always disable estimate so we can don onchain approvals for the swaps right before we execute
-	swapParams.DisableEstimate = helpers.GetPtr(true)
+	params.DisableEstimate = helpers.GetPtr(true)
 
-	if s.client.WalletKey == "" {
-		return fmt.Errorf("wallet key must be set in the client config")
+	// TODO find a better way of managing the matching between public and private keys
+	privateKey, err := crypto.HexToECDSA(params.WalletKey)
+	if err != nil {
+		return fmt.Errorf("failed to convert private key: %v", err)
+	}
+
+	publicKey := privateKey.Public()
+	publicKeyECDSA, ok := publicKey.(*ecdsa.PublicKey)
+	if !ok {
+		return fmt.Errorf("could not cast public key to ECDSA")
+	}
+
+	derivedPublicAddress := crypto.PubkeyToAddress(*publicKeyECDSA)
+
+	if strings.ToLower(derivedPublicAddress.Hex()) != strings.ToLower(params.PublicAddress) {
+		return fmt.Errorf("public address does not match with private key")
+	}
+
+	if params.WalletKey == "" {
+		return fmt.Errorf("wallet key must be provided")
+	}
+
+	ethClient, err := s.client.GetEthClient(params.ChainId)
+	if err != nil {
+		return fmt.Errorf("failed to get eth client: %v", err)
 	}
 
 	deadline := time.Now().Add(1 * time.Minute).Unix() // TODO make this configurable
 
 	executeSwapConfig := &swap.ExecuteSwapConfig{
-		FromToken: swapParams.Src,
-		ToToken:   swapParams.Dst,
-		Amount:    swapParams.Amount,
-		Slippage:  swapParams.Slippage,
+		WalletKey:     params.WalletKey,
+		ChainId:       params.ChainId,
+		PublicAddress: params.PublicAddress,
+		FromToken:     params.Src,
+		ToToken:       params.Dst,
+		Amount:        params.Amount,
+		Slippage:      params.Slippage,
+		SkipWarnings:  params.SkipWarnings,
 	}
 
 	var usePermit bool
 
 	// Currently, Permit1 swaps are only tested on Ethereum and Polygon
-	isPermitSupportedForCurrentChain := s.client.ChainId == chains.Ethereum || s.client.ChainId == chains.Polygon
+	isPermitSupportedForCurrentChain := params.ChainId == chains.Ethereum || params.ChainId == chains.Polygon
 
 	var typehash string
-	var err error
-	if isPermitSupportedForCurrentChain && approvalType != swap.ApprovalAlways {
-		typehash, err = onchain.GetTypeHash(s.client.EthClient, swapParams.Src)
+	if isPermitSupportedForCurrentChain && params.ApprovalType != swap.ApprovalAlways {
+		typehash, err = onchain.GetTypeHash(ethClient, params.Src)
 		if err == nil {
 			// Typehash is present which means we can use Permit to save gas
 			if typehash == typehashes.Permit1 {
@@ -84,23 +113,23 @@ func (s *ActionService) SwapTokens(swapParams swap.AggregationControllerGetSwapP
 		}
 	}
 
-	if usePermit || approvalType == swap.PermitAlways {
-		name, err := onchain.ReadContractName(s.client.EthClient, common.HexToAddress(swapParams.Src))
+	if usePermit || params.ApprovalType == swap.PermitAlways {
+		name, err := onchain.ReadContractName(ethClient, common.HexToAddress(params.Src))
 		if err != nil {
 			return fmt.Errorf("failed to read contract name: %v", err)
 		}
 
-		nonce, err := onchain.ReadContractNonce(s.client.EthClient, s.client.PublicAddress, common.HexToAddress(swapParams.Src))
+		nonce, err := onchain.ReadContractNonce(ethClient, derivedPublicAddress, common.HexToAddress(params.Src))
 		if err != nil {
 			return fmt.Errorf("failed to read contract name: %v", err)
 		}
 
 		sig, err := swap.CreatePermitSignature(&swap.PermitSignatureConfig{
-			FromToken:     swapParams.Src,
+			FromToken:     params.Src,
 			Name:          name,
-			PublicAddress: s.client.PublicAddress.Hex(),
-			ChainId:       s.client.ChainId,
-			Key:           s.client.WalletKey,
+			PublicAddress: params.PublicAddress,
+			ChainId:       params.ChainId,
+			Key:           params.WalletKey,
 			Nonce:         nonce,
 			Deadline:      deadline,
 		})
@@ -108,13 +137,13 @@ func (s *ActionService) SwapTokens(swapParams swap.AggregationControllerGetSwapP
 			return fmt.Errorf("failed to create permit signature: %v", err)
 		}
 
-		aggregationRouter, err := contracts.Get1inchRouterFromChainId(s.client.ChainId)
+		aggregationRouter, err := contracts.Get1inchRouterFromChainId(params.ChainId)
 		if err != nil {
 			return fmt.Errorf("failed to get 1inch router address: %v", err)
 		}
 
 		permitParams := swap.CreatePermitParams(&swap.PermitParamsConfig{
-			Owner:     strings.ToLower(s.client.PublicAddress.Hex()), // TODO remove ToLower and see if it still works
+			Owner:     strings.ToLower(params.PublicAddress), // TODO remove ToLower and see if it still works
 			Spender:   aggregationRouter,
 			Value:     amounts.BigMaxUint256,
 			Deadline:  deadline,
@@ -122,20 +151,22 @@ func (s *ActionService) SwapTokens(swapParams swap.AggregationControllerGetSwapP
 		})
 
 		executeSwapConfig.IsPermitSwap = true
-		swapParams.Permit = &permitParams
+		params.Permit = &permitParams
 		fmt.Println("Swapping using Permit1")
 	}
 
 	// Execute swap request
 	// This will return the transaction data used by a wallet to execute the swap
-	swapResponse, _, err := s.client.Swap.GetSwapData(context.Background(), swapParams, true)
+	swapResponse, _, err := s.client.Swap.GetSwapData(context.Background(), swap.GetSwapDataParams{
+		RequestParams:                      params.RequestParams,
+		AggregationControllerGetSwapParams: params.AggregationControllerGetSwapParams,
+	})
 	if err != nil {
 		return fmt.Errorf("failed to get swap: %v", err)
 	}
 
 	executeSwapConfig.TransactionData = swapResponse.Tx.Data
 	executeSwapConfig.EstimatedAmountOut = swapResponse.ToAmount
-	executeSwapConfig.SkipWarnings = skipWarnings
 
 	err = s.client.Swap.ExecuteSwap(executeSwapConfig)
 	if err != nil {
@@ -148,12 +179,17 @@ func (s *ActionService) SwapTokens(swapParams swap.AggregationControllerGetSwapP
 // ExecuteSwap executes a swap on the Ethereum blockchain using swap data generated by GetSwapData
 func (s *SwapService) ExecuteSwap(config *swap.ExecuteSwapConfig) error {
 
-	if s.client.WalletKey == "" {
+	if config.WalletKey == "" {
 		return fmt.Errorf("wallet key must be set in the client config")
 	}
 
+	ethClient, err := s.client.GetEthClient(config.ChainId)
+	if err != nil {
+		return fmt.Errorf("failed to get eth client: %v", err)
+	}
+
 	if !config.SkipWarnings {
-		ok, err := swap.ConfirmExecuteSwapWithUser(config, s.client.EthClient)
+		ok, err := swap.ConfirmExecuteSwapWithUser(config, ethClient)
 		if err != nil {
 			return fmt.Errorf("failed to confirm swap: %v", err)
 		}
@@ -162,18 +198,18 @@ func (s *SwapService) ExecuteSwap(config *swap.ExecuteSwapConfig) error {
 		}
 	}
 
-	aggregationRouter, err := contracts.Get1inchRouterFromChainId(s.client.ChainId)
+	aggregationRouter, err := contracts.Get1inchRouterFromChainId(config.ChainId)
 	if err != nil {
 		return fmt.Errorf("failed to get 1inch router address: %v", err)
 	}
 
 	if !config.IsPermitSwap {
-		err = s.executeSwapWithApproval(aggregationRouter, config.FromToken, config.Amount, config.TransactionData, config.SkipWarnings)
+		err = s.executeSwapWithApproval(config, ethClient, aggregationRouter)
 		if err != nil {
 			return fmt.Errorf("failed to execute swap with approval: %v", err)
 		}
 	} else {
-		err = s.executeSwapWithPermit(config.FromToken, config.TransactionData)
+		err = s.executeSwapWithPermit(config, ethClient)
 		if err != nil {
 			return fmt.Errorf("failed to execute swap with permit: %v", err)
 		}
@@ -182,27 +218,27 @@ func (s *SwapService) ExecuteSwap(config *swap.ExecuteSwapConfig) error {
 	return nil
 }
 
-func (s *SwapService) executeSwapWithApproval(spenderAddress string, fromToken string, amount string, transactionData string, skipWarnings bool) error {
+func (s *SwapService) executeSwapWithApproval(config *swap.ExecuteSwapConfig, ethClient *ethclient.Client, aggregationRouter string) error {
 
 	var value *big.Int
 	var err error
 	var approveFirst bool
-	if fromToken != tokens.NativeToken {
+	if config.FromToken != tokens.NativeToken {
 		// When swapping erc20 tokens, the value set on the transaction will be 0
 		value = big.NewInt(0)
 
-		allowance, err := onchain.ReadContractAllowance(s.client.EthClient, common.HexToAddress(fromToken), s.client.PublicAddress, common.HexToAddress(spenderAddress))
+		allowance, err := onchain.ReadContractAllowance(ethClient, common.HexToAddress(config.FromToken), common.HexToAddress(config.PublicAddress), common.HexToAddress(aggregationRouter))
 		if err != nil {
 			return fmt.Errorf("failed to read allowance: %v", err)
 		}
 
-		amountBig, err := helpers.BigIntFromString(amount)
+		amountBig, err := helpers.BigIntFromString(config.Amount)
 		if err != nil {
 			return fmt.Errorf("failed to convert amount to big.Int: %v", err)
 		}
 		if allowance.Cmp(amountBig) <= 0 {
-			if !skipWarnings {
-				ok, err := swap.ConfirmApprovalWithUser(s.client.EthClient, s.client.PublicAddress.Hex(), fromToken)
+			if !config.SkipWarnings {
+				ok, err := swap.ConfirmApprovalWithUser(ethClient, config.PublicAddress, config.FromToken)
 				if err != nil {
 					return fmt.Errorf("failed to confirm approval: %v", err)
 				}
@@ -216,13 +252,13 @@ func (s *SwapService) executeSwapWithApproval(spenderAddress string, fromToken s
 			// Only run the approval if a tenderly key is not present
 			if s.client.TenderlyKey == "" {
 				erc20Config := onchain.Erc20ApprovalConfig{
-					ChainId:        s.client.ChainId,
-					Key:            s.client.WalletKey,
-					Erc20Address:   common.HexToAddress(fromToken),
-					PublicAddress:  s.client.PublicAddress,
-					SpenderAddress: common.HexToAddress(spenderAddress),
+					ChainId:        config.ChainId,
+					Key:            config.WalletKey,
+					Erc20Address:   common.HexToAddress(config.FromToken),
+					PublicAddress:  common.HexToAddress(config.PublicAddress),
+					SpenderAddress: common.HexToAddress(aggregationRouter),
 				}
-				err = onchain.ApproveTokenForRouter(s.client.EthClient, s.client.NonceCache, erc20Config)
+				err = onchain.ApproveTokenForRouter(ethClient, s.client.NonceCache, erc20Config)
 				if err != nil {
 					return fmt.Errorf("failed to approve token for router: %v", err)
 				}
@@ -231,27 +267,22 @@ func (s *SwapService) executeSwapWithApproval(spenderAddress string, fromToken s
 		}
 	} else {
 		// When swapping from the native token, there is no need for an approval and the amount passed in must be explicitly set
-		value, err = helpers.BigIntFromString(amount)
+		value, err = helpers.BigIntFromString(config.Amount)
 		if err != nil {
 			return fmt.Errorf("failed to convert amount to big.Int: %v", err)
 		}
 	}
 
-	hexData, err := hex.DecodeString(transactionData[2:])
+	hexData, err := hex.DecodeString(config.TransactionData[2:])
 	if err != nil {
 		return fmt.Errorf("failed to decode swap data: %v", err)
 	}
 
-	aggregationRouter, err := contracts.Get1inchRouterFromChainId(s.client.ChainId)
-	if err != nil {
-		return fmt.Errorf("failed to get 1inch router address: %v", err)
-	}
-
 	txConfig := onchain.TxConfig{
 		Description:   "Swap",
-		PublicAddress: s.client.PublicAddress,
-		PrivateKey:    s.client.WalletKey,
-		ChainId:       big.NewInt(int64(s.client.ChainId)),
+		PublicAddress: common.HexToAddress(config.PublicAddress),
+		PrivateKey:    config.WalletKey,
+		ChainId:       big.NewInt(int64(config.ChainId)),
 		Value:         value,
 		To:            aggregationRouter,
 		Data:          hexData,
@@ -259,10 +290,10 @@ func (s *SwapService) executeSwapWithApproval(spenderAddress string, fromToken s
 
 	if s.client.TenderlyKey != "" {
 		_, err := tenderly.SimulateSwap(s.client.TenderlyKey, tenderly.SwapConfig{
-			ChainId:         s.client.ChainId,
-			PublicAddress:   s.client.PublicAddress.Hex(),
-			FromToken:       fromToken,
-			TransactionData: transactionData,
+			ChainId:         config.ChainId,
+			PublicAddress:   config.PublicAddress,
+			FromToken:       config.FromToken,
+			TransactionData: config.TransactionData,
 			ApproveFirst:    approveFirst,
 			Value:           value.String(),
 		})
@@ -270,7 +301,7 @@ func (s *SwapService) executeSwapWithApproval(spenderAddress string, fromToken s
 			return fmt.Errorf("failed to execute tenderly simulation: %v", err)
 		}
 	} else {
-		err = onchain.ExecuteTransaction(txConfig, s.client.EthClient, s.client.NonceCache)
+		err = onchain.ExecuteTransaction(txConfig, ethClient, s.client.NonceCache)
 		if err != nil {
 			return fmt.Errorf("failed to execute transaction: %v", err)
 		}
@@ -278,40 +309,40 @@ func (s *SwapService) executeSwapWithApproval(spenderAddress string, fromToken s
 	return nil
 }
 
-func (s *SwapService) executeSwapWithPermit(fromToken string, transactionData string) error {
+func (s *SwapService) executeSwapWithPermit(config *swap.ExecuteSwapConfig, ethClient *ethclient.Client) error {
 
-	hexData, err := hex.DecodeString(transactionData[2:])
+	hexData, err := hex.DecodeString(config.TransactionData[2:])
 	if err != nil {
 		return fmt.Errorf("failed to decode swap data: %v", err)
 	}
 
-	aggregationRouter, err := contracts.Get1inchRouterFromChainId(s.client.ChainId)
+	aggregationRouter, err := contracts.Get1inchRouterFromChainId(config.ChainId)
 	if err != nil {
 		return fmt.Errorf("failed to get 1inch router address: %v", err)
 	}
 
 	txConfig := onchain.TxConfig{
 		Description:   "Swap",
-		PublicAddress: s.client.PublicAddress,
-		PrivateKey:    s.client.WalletKey,
-		ChainId:       big.NewInt(int64(s.client.ChainId)),
+		PublicAddress: common.HexToAddress(config.PublicAddress),
+		PrivateKey:    config.WalletKey,
+		ChainId:       big.NewInt(int64(config.ChainId)),
 		Value:         big.NewInt(0),
 		To:            aggregationRouter,
 		Data:          hexData,
 	}
 	if s.client.TenderlyKey != "" {
 		_, err := tenderly.SimulateSwap(s.client.TenderlyKey, tenderly.SwapConfig{
-			ChainId:         s.client.ChainId,
-			PublicAddress:   s.client.PublicAddress.Hex(),
-			FromToken:       fromToken,
-			TransactionData: transactionData,
+			ChainId:         config.ChainId,
+			PublicAddress:   config.PublicAddress,
+			FromToken:       config.FromToken,
+			TransactionData: config.TransactionData,
 			Value:           "0",
 		})
 		if err != nil {
 			return fmt.Errorf("failed to execute tenderly simulation: %v", err)
 		}
 	} else {
-		err = onchain.ExecuteTransaction(txConfig, s.client.EthClient, s.client.NonceCache)
+		err = onchain.ExecuteTransaction(txConfig, ethClient, s.client.NonceCache)
 		if err != nil {
 			return fmt.Errorf("failed to execute transaction: %v", err)
 		}

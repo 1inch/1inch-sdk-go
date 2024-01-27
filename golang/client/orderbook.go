@@ -22,11 +22,7 @@ type OrderbookService service
 
 // CreateOrder creates an order in the Limit Order Protocol
 func (s *OrderbookService) CreateOrder(ctx context.Context, params orderbook.OrderRequest) (*orderbook.CreateOrderResponse, *http.Response, error) {
-	u := fmt.Sprintf("/orderbook/v3.0/%d", s.client.ChainId)
-
-	if s.client.WalletKey == "" {
-		return nil, nil, fmt.Errorf("wallet key must be set in the client config")
-	}
+	u := fmt.Sprintf("/orderbook/v3.0/%d", params.ChainId)
 
 	validate := validator.New()
 	err := validate.Struct(params)
@@ -34,7 +30,7 @@ func (s *OrderbookService) CreateOrder(ctx context.Context, params orderbook.Ord
 		return nil, nil, err
 	}
 
-	aggregationRouter, err := contracts.Get1inchRouterFromChainId(s.client.ChainId)
+	aggregationRouter, err := contracts.Get1inchRouterFromChainId(params.ChainId)
 	if err != nil {
 		return nil, nil, fmt.Errorf("failed to get 1inch router address: %v", err)
 	}
@@ -46,7 +42,11 @@ func (s *OrderbookService) CreateOrder(ctx context.Context, params orderbook.Ord
 	fromTokenAddress := common.HexToAddress(params.FromToken)
 	publicAddress := common.HexToAddress(params.SourceWallet)
 	aggregationRouterAddress := common.HexToAddress(aggregationRouter)
-	allowance, err := onchain.ReadContractAllowance(s.client.EthClient, fromTokenAddress, publicAddress, aggregationRouterAddress)
+	ethClient, err := s.client.GetEthClient(params.ChainId)
+	if err != nil {
+		return nil, nil, fmt.Errorf("failed to get eth client: %v", err)
+	}
+	allowance, err := onchain.ReadContractAllowance(ethClient, fromTokenAddress, publicAddress, aggregationRouterAddress)
 	if err != nil {
 		return nil, nil, fmt.Errorf("failed to read allowance: %v", err)
 	}
@@ -57,7 +57,7 @@ func (s *OrderbookService) CreateOrder(ctx context.Context, params orderbook.Ord
 	}
 	if allowance.Cmp(makingAmountBig) <= 0 {
 		if !params.SkipWarnings {
-			ok, err := orderbook.ConfirmApprovalWithUser(s.client.EthClient, params.SourceWallet, params.FromToken)
+			ok, err := orderbook.ConfirmApprovalWithUser(ethClient, params.SourceWallet, params.FromToken)
 			if err != nil {
 				return nil, nil, fmt.Errorf("failed to confirm approval: %v", err)
 			}
@@ -67,25 +67,25 @@ func (s *OrderbookService) CreateOrder(ctx context.Context, params orderbook.Ord
 		}
 
 		erc20Config := onchain.Erc20ApprovalConfig{
-			ChainId:        s.client.ChainId,
-			Key:            s.client.WalletKey,
+			ChainId:        params.ChainId,
+			Key:            params.WalletKey,
 			Erc20Address:   fromTokenAddress,
 			PublicAddress:  publicAddress,
 			SpenderAddress: aggregationRouterAddress,
 		}
-		err := onchain.ApproveTokenForRouter(s.client.EthClient, s.client.NonceCache, erc20Config)
+		err := onchain.ApproveTokenForRouter(ethClient, s.client.NonceCache, erc20Config)
 		if err != nil {
 			return nil, nil, fmt.Errorf("failed to approve token for router: %v", err)
 		}
 	}
 
-	order, err := orderbook.CreateLimitOrder(params, s.client.ChainId, s.client.WalletKey)
+	order, err := orderbook.CreateLimitOrder(params, params.ChainId, params.WalletKey)
 	if err != nil {
 		return nil, nil, err
 	}
 
 	if !params.SkipWarnings {
-		ok, err := orderbook.ConfirmLimitOrderWithUser(order, s.client.EthClient)
+		ok, err := orderbook.ConfirmLimitOrderWithUser(order, ethClient)
 		if err != nil {
 			return nil, nil, err
 		}
@@ -116,8 +116,8 @@ func (s *OrderbookService) CreateOrder(ctx context.Context, params orderbook.Ord
 // TODO Reusing the same request/response objects due to bad swagger spec
 
 // GetOrdersByCreatorAddress returns all orders created by a given address in the Limit Order Protocol
-func (s *OrderbookService) GetOrdersByCreatorAddress(ctx context.Context, address string, params orderbook.LimitOrderV3SubscribedApiControllerGetAllLimitOrdersParams) ([]*orderbook.OrderResponse, *http.Response, error) {
-	u := fmt.Sprintf("/orderbook/v3.0/%d/address/{address}", s.client.ChainId)
+func (s *OrderbookService) GetOrdersByCreatorAddress(ctx context.Context, address string, params orderbook.GetOrdersByCreatorAddressParams) ([]*orderbook.OrderResponse, *http.Response, error) {
+	u := fmt.Sprintf("/orderbook/v3.0/%d/address/{address}", params.ChainId)
 
 	if !helpers.IsEthereumAddress(address) {
 		return nil, nil, clienterrors.NewRequestValidationError("address must be a valid Ethereum address")
@@ -153,8 +153,8 @@ func (s *OrderbookService) GetOrdersByCreatorAddress(ctx context.Context, addres
 }
 
 // GetAllOrders returns all orders in the Limit Order Protocol
-func (s *OrderbookService) GetAllOrders(ctx context.Context, params orderbook.LimitOrderV3SubscribedApiControllerGetAllLimitOrdersParams) ([]*orderbook.OrderResponse, *http.Response, error) {
-	u := fmt.Sprintf("/orderbook/v3.0/%d/all", s.client.ChainId)
+func (s *OrderbookService) GetAllOrders(ctx context.Context, params orderbook.GetAllOrdersParams) ([]*orderbook.OrderResponse, *http.Response, error) {
+	u := fmt.Sprintf("/orderbook/v3.0/%d/all", params.ChainId)
 
 	err := params.Validate()
 	if err != nil {
@@ -181,8 +181,8 @@ func (s *OrderbookService) GetAllOrders(ctx context.Context, params orderbook.Li
 }
 
 // GetCount returns the number of orders in the Limit Order Protocol
-func (s *OrderbookService) GetCount(ctx context.Context, params orderbook.LimitOrderV3SubscribedApiControllerGetAllOrdersCountParams) (*orderbook.CountResponse, *http.Response, error) {
-	u := fmt.Sprintf("/orderbook/v3.0/%d/count", s.client.ChainId)
+func (s *OrderbookService) GetCount(ctx context.Context, params orderbook.GetCountParams) (*orderbook.CountResponse, *http.Response, error) {
+	u := fmt.Sprintf("/orderbook/v3.0/%d/count", params.ChainId)
 
 	err := params.Validate()
 	if err != nil {
@@ -209,10 +209,10 @@ func (s *OrderbookService) GetCount(ctx context.Context, params orderbook.LimitO
 }
 
 // GetEvent returns an event in the Limit Order Protocol by order hash
-func (s *OrderbookService) GetEvent(ctx context.Context, orderHash string) (*orderbook.EventResponse, *http.Response, error) {
-	u := fmt.Sprintf("/orderbook/v3.0/%d/events/{orderHash}", s.client.ChainId)
+func (s *OrderbookService) GetEvent(ctx context.Context, params orderbook.GetEventParams) (*orderbook.EventResponse, *http.Response, error) {
+	u := fmt.Sprintf("/orderbook/v3.0/%d/events/{orderHash}", params.ChainId)
 
-	u, err := ReplacePathVariable(u, "orderHash", orderHash)
+	u, err := ReplacePathVariable(u, "orderHash", params.OrderHash)
 	if err != nil {
 		return nil, nil, err
 	}
@@ -232,8 +232,8 @@ func (s *OrderbookService) GetEvent(ctx context.Context, orderHash string) (*ord
 }
 
 // GetEvents returns all events in the Limit Order Protocol
-func (s *OrderbookService) GetEvents(ctx context.Context, params orderbook.LimitOrderV3SubscribedApiControllerGetEventsParams) ([]*orderbook.EventResponse, *http.Response, error) {
-	u := fmt.Sprintf("/orderbook/v3.0/%d/events", s.client.ChainId)
+func (s *OrderbookService) GetEvents(ctx context.Context, params orderbook.GetEventsParams) ([]*orderbook.EventResponse, *http.Response, error) {
+	u := fmt.Sprintf("/orderbook/v3.0/%d/events", params.ChainId)
 
 	err := params.Validate()
 	if err != nil {
@@ -262,21 +262,21 @@ func (s *OrderbookService) GetEvents(ctx context.Context, params orderbook.Limit
 // TODO untested endpoint
 
 // GetActiveOrdersWithPermit returns all orders in the Limit Order Protocol that are active and have a valid permit
-func (s *OrderbookService) GetActiveOrdersWithPermit(ctx context.Context, wallet string, token string) ([]*orderbook.OrderResponse, *http.Response, error) {
-	u := fmt.Sprintf("/orderbook/v3.0/%d/has-active-orders-with-permit/{walletAddress}/{token}", s.client.ChainId)
+func (s *OrderbookService) GetActiveOrdersWithPermit(ctx context.Context, params orderbook.GetActiveOrdersWithPermitParams) ([]*orderbook.OrderResponse, *http.Response, error) {
+	u := fmt.Sprintf("/orderbook/v3.0/%d/has-active-orders-with-permit/{walletAddress}/{token}", params.ChainId)
 
-	if !helpers.IsEthereumAddress(wallet) {
+	if !helpers.IsEthereumAddress(params.Wallet) {
 		return nil, nil, clienterrors.NewRequestValidationError("wallet must be a valid Ethereum address")
 	}
-	u, err := ReplacePathVariable(u, "walletAddress", wallet)
+	u, err := ReplacePathVariable(u, "walletAddress", params.Wallet)
 	if err != nil {
 		return nil, nil, err
 	}
 
-	if !helpers.IsEthereumAddress(token) {
+	if !helpers.IsEthereumAddress(params.Token) {
 		return nil, nil, clienterrors.NewRequestValidationError("token must be a valid Ethereum address")
 	}
-	u, err = ReplacePathVariable(u, "token", token)
+	u, err = ReplacePathVariable(u, "token", params.Token)
 	if err != nil {
 		return nil, nil, err
 	}

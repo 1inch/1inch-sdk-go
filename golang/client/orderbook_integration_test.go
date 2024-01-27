@@ -24,6 +24,10 @@ func TestCreateOrderIntegration(t *testing.T) {
 		{
 			description: "Success",
 			orderRequest: orderbook.OrderRequest{
+				RequestParams: orderbook.RequestParams{
+					ChainId:   chains.Polygon,
+					WalletKey: os.Getenv("WALLET_KEY"),
+				},
 				SourceWallet: os.Getenv("WALLET_ADDRESS"),
 				FromToken:    tokens.PolygonDai,
 				ToToken:      tokens.PolygonWeth,
@@ -37,11 +41,13 @@ func TestCreateOrderIntegration(t *testing.T) {
 	}
 
 	c, err := NewClient(Config{
-		TargetEnvironment: EnvironmentProduction,
-		ChainId:           chains.Polygon,
-		DevPortalApiKey:   helpers.GetenvSafe("DEV_PORTAL_TOKEN"),
-		WalletKey:         helpers.GetenvSafe("WALLET_KEY"),
-		Web3HttpProvider:  helpers.GetenvSafe("WEB_3_HTTP_PROVIDER_URL_WITH_KEY_POLYGON"),
+		DevPortalApiKey: helpers.GetenvSafe("DEV_PORTAL_TOKEN"),
+		Web3HttpProviders: []Web3ProviderConfig{
+			{
+				ChainId: chains.Polygon,
+				Url:     helpers.GetenvSafe("WEB_3_HTTP_PROVIDER_URL_WITH_KEY_POLYGON"),
+			},
+		},
 	})
 	require.NoError(t, err)
 
@@ -66,9 +72,15 @@ func TestGetAllOrdersIntegration(t *testing.T) {
 
 	testcases := []struct {
 		description string
+		params      orderbook.GetAllOrdersParams
 	}{
 		{
 			description: "Get all orders",
+			params: orderbook.GetAllOrdersParams{
+				RequestParams: orderbook.RequestParams{
+					ChainId: chains.Ethereum,
+				},
+			},
 		},
 	}
 
@@ -82,7 +94,7 @@ func TestGetAllOrdersIntegration(t *testing.T) {
 				helpers.Sleep()
 			})
 
-			orders, resp, err := c.Orderbook.GetAllOrders(context.Background(), orderbook.LimitOrderV3SubscribedApiControllerGetAllLimitOrdersParams{})
+			orders, resp, err := c.Orderbook.GetAllOrders(context.Background(), tc.params)
 			require.NoError(t, err)
 			require.Equal(t, 200, resp.StatusCode)
 
@@ -96,9 +108,15 @@ func TestGetCountIntegration(t *testing.T) {
 
 	testcases := []struct {
 		description string
+		params      orderbook.GetCountParams
 	}{
 		{
 			description: "Get counts",
+			params: orderbook.GetCountParams{
+				RequestParams: orderbook.RequestParams{
+					ChainId: chains.Ethereum,
+				},
+			},
 		},
 	}
 
@@ -112,7 +130,7 @@ func TestGetCountIntegration(t *testing.T) {
 				helpers.Sleep()
 			})
 
-			countResponse, resp, err := c.Orderbook.GetCount(context.Background(), orderbook.LimitOrderV3SubscribedApiControllerGetAllOrdersCountParams{})
+			countResponse, resp, err := c.Orderbook.GetCount(context.Background(), tc.params)
 			require.NoError(t, err)
 			require.Equal(t, 200, resp.StatusCode)
 
@@ -126,9 +144,18 @@ func TestGetEventsIntegration(t *testing.T) {
 
 	testcases := []struct {
 		description string
+		params      orderbook.GetEventsParams
 	}{
 		{
-			description: "Get all events",
+			description: "Get events",
+			params: orderbook.GetEventsParams{
+				RequestParams: orderbook.RequestParams{
+					ChainId: chains.Ethereum,
+				},
+				LimitOrderV3SubscribedApiControllerGetEventsParams: orderbook.LimitOrderV3SubscribedApiControllerGetEventsParams{
+					Limit: 1,
+				},
+			},
 		},
 	}
 
@@ -142,9 +169,7 @@ func TestGetEventsIntegration(t *testing.T) {
 				helpers.Sleep()
 			})
 
-			events, resp, err := c.Orderbook.GetEvents(context.Background(), orderbook.LimitOrderV3SubscribedApiControllerGetEventsParams{
-				Limit: 1,
-			})
+			events, resp, err := c.Orderbook.GetEvents(context.Background(), tc.params)
 			require.NoError(t, err)
 			require.Equal(t, 200, resp.StatusCode)
 

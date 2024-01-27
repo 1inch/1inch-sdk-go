@@ -6,6 +6,7 @@ import (
 	"net/http"
 	"testing"
 
+	"github.com/1inch/1inch-sdk/golang/helpers/consts/chains"
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
 
@@ -29,29 +30,44 @@ func TestApproveAllowance(t *testing.T) {
 	testcases := []struct {
 		description              string
 		handlerFunc              func(w http.ResponseWriter, r *http.Request)
-		params                   swap.ApproveControllerGetAllowanceParams
+		params                   swap.ApproveAllowanceParams
 		expectedOutput           string
 		expectedErrorDescription string
 	}{
 		{
 			description: "Success",
-			params: swap.ApproveControllerGetAllowanceParams{
-				TokenAddress:  tokens.EthereumWeth,
-				WalletAddress: addresses.Vitalik,
+			params: swap.ApproveAllowanceParams{
+				RequestParams: swap.RequestParams{
+					ChainId: chains.Ethereum,
+				},
+				ApproveControllerGetAllowanceParams: swap.ApproveControllerGetAllowanceParams{
+					TokenAddress:  tokens.EthereumWeth,
+					WalletAddress: addresses.Vitalik,
+				},
 			},
 			expectedOutput: "0",
 		},
 		{
 			description: "Error - Exclude tokenAddress",
-			params: swap.ApproveControllerGetAllowanceParams{
-				WalletAddress: addresses.Vitalik,
+			params: swap.ApproveAllowanceParams{
+				RequestParams: swap.RequestParams{
+					ChainId: chains.Ethereum,
+				},
+				ApproveControllerGetAllowanceParams: swap.ApproveControllerGetAllowanceParams{
+					WalletAddress: addresses.Vitalik,
+				},
 			},
 			expectedErrorDescription: "tokenAddress is required",
 		},
 		{
 			description: "Error - Exclude walletAddress",
-			params: swap.ApproveControllerGetAllowanceParams{
-				TokenAddress: tokens.EthereumWeth,
+			params: swap.ApproveAllowanceParams{
+				RequestParams: swap.RequestParams{
+					ChainId: chains.Ethereum,
+				},
+				ApproveControllerGetAllowanceParams: swap.ApproveControllerGetAllowanceParams{
+					TokenAddress: tokens.EthereumWeth,
+				},
 			},
 			expectedErrorDescription: "walletAddress is required",
 		},
@@ -101,22 +117,31 @@ func TestApproveTransaction(t *testing.T) {
 	testcases := []struct {
 		description              string
 		handlerFunc              func(w http.ResponseWriter, r *http.Request)
-		params                   swap.ApproveControllerGetCallDataParams
+		params                   swap.ApproveTransactionParams
 		expectedOutput           swap.ApproveCallDataResponse
 		expectedErrorDescription string
 	}{
 		{
 			description: "Success",
-			params: swap.ApproveControllerGetCallDataParams{
-				TokenAddress: tokens.EthereumUsdc,
+			params: swap.ApproveTransactionParams{
+				RequestParams: swap.RequestParams{
+					ChainId: chains.Ethereum,
+				},
+				ApproveControllerGetCallDataParams: swap.ApproveControllerGetCallDataParams{
+					TokenAddress: tokens.EthereumUsdc,
+				},
 			},
 			expectedOutput: swap.ApproveCallDataResponse{
 				To: tokens.EthereumUsdc,
 			},
 		},
 		{
-			description:              "Error - exclude tokenAddress",
-			params:                   swap.ApproveControllerGetCallDataParams{},
+			description: "Error - exclude tokenAddress",
+			params: swap.ApproveTransactionParams{
+				RequestParams: swap.RequestParams{
+					ChainId: chains.Ethereum,
+				},
+			},
 			expectedErrorDescription: "tokenAddress is required",
 		},
 	}
@@ -162,7 +187,7 @@ func TestGetQuote(t *testing.T) {
 	testcases := []struct {
 		description              string
 		handlerFunc              func(w http.ResponseWriter, r *http.Request)
-		params                   swap.AggregationControllerGetQuoteParams
+		params                   swap.GetQuoteParams
 		expectedOutput           string
 		expectedErrorDescription string
 	}{
@@ -173,42 +198,67 @@ func TestGetQuote(t *testing.T) {
 				assert.Equal(t, tokens.EthereumWeth, r.URL.Query().Get("dst"))
 				assert.Equal(t, amounts.Ten18, r.URL.Query().Get("amount"))
 			},
-			params: swap.AggregationControllerGetQuoteParams{
-				Src:    tokens.EthereumUsdc,
-				Dst:    tokens.EthereumWeth,
-				Amount: amounts.Ten18,
+			params: swap.GetQuoteParams{
+				RequestParams: swap.RequestParams{
+					ChainId: chains.Ethereum,
+				},
+				AggregationControllerGetQuoteParams: swap.AggregationControllerGetQuoteParams{
+					Src:    tokens.EthereumUsdc,
+					Dst:    tokens.EthereumWeth,
+					Amount: amounts.Ten18,
+				},
 			},
 		},
 		{
 			description: "Error - exclude src",
-			params: swap.AggregationControllerGetQuoteParams{
-				Dst:    tokens.EthereumWeth,
-				Amount: amounts.Ten18,
+			params: swap.GetQuoteParams{
+				RequestParams: swap.RequestParams{
+					ChainId: chains.Ethereum,
+				},
+				AggregationControllerGetQuoteParams: swap.AggregationControllerGetQuoteParams{
+					Dst:    tokens.EthereumWeth,
+					Amount: amounts.Ten18,
+				},
 			},
 			expectedErrorDescription: "src is required",
 		},
 		{
 			description: "Error - exclude dst",
-			params: swap.AggregationControllerGetQuoteParams{
-				Src:    tokens.EthereumUsdc,
-				Amount: amounts.Ten18,
+			params: swap.GetQuoteParams{
+				RequestParams: swap.RequestParams{
+					ChainId: chains.Ethereum,
+				},
+				AggregationControllerGetQuoteParams: swap.AggregationControllerGetQuoteParams{
+					Src:    tokens.EthereumUsdc,
+					Amount: amounts.Ten18,
+				},
 			},
 			expectedErrorDescription: "dst is required",
 		},
 		{
 			description: "Error - exclude amount",
-			params: swap.AggregationControllerGetQuoteParams{
-				Src: tokens.EthereumUsdc,
-				Dst: tokens.EthereumWeth,
+			params: swap.GetQuoteParams{
+				RequestParams: swap.RequestParams{
+					ChainId: chains.Ethereum,
+				},
+				AggregationControllerGetQuoteParams: swap.AggregationControllerGetQuoteParams{
+					Src: tokens.EthereumUsdc,
+					Dst: tokens.EthereumWeth,
+				},
 			},
 			expectedErrorDescription: "amount is required",
 		},
 		{
 			description: "Error - src and dst identical",
-			params: swap.AggregationControllerGetQuoteParams{
-				Src:    tokens.EthereumUsdc,
-				Dst:    tokens.EthereumUsdc,
-				Amount: amounts.Ten18,
+			params: swap.GetQuoteParams{
+				RequestParams: swap.RequestParams{
+					ChainId: chains.Ethereum,
+				},
+				AggregationControllerGetQuoteParams: swap.AggregationControllerGetQuoteParams{
+					Src:    tokens.EthereumUsdc,
+					Dst:    tokens.EthereumUsdc,
+					Amount: amounts.Ten18,
+				},
 			},
 			expectedErrorDescription: "src and dst tokens must be different",
 		},
@@ -254,7 +304,7 @@ func TestGetSwap(t *testing.T) {
 	testcases := []struct {
 		description              string
 		handlerFunc              func(w http.ResponseWriter, r *http.Request)
-		params                   swap.AggregationControllerGetSwapParams
+		params                   swap.GetSwapDataParams
 		expectedOutput           string
 		expectedErrorDescription string
 	}{
@@ -266,67 +316,102 @@ func TestGetSwap(t *testing.T) {
 				assert.Equal(t, addresses.Vitalik, r.URL.Query().Get("from"))
 				assert.Equal(t, amounts.Ten18, r.URL.Query().Get("amount"))
 			},
-			params: swap.AggregationControllerGetSwapParams{
-				Src:      tokens.EthereumUsdc,
-				Dst:      tokens.EthereumWeth,
-				From:     addresses.Vitalik,
-				Amount:   amounts.Ten18,
-				Slippage: 0.5,
+			params: swap.GetSwapDataParams{
+				AggregationControllerGetSwapParams: swap.AggregationControllerGetSwapParams{
+					Src:      tokens.EthereumUsdc,
+					Dst:      tokens.EthereumWeth,
+					From:     addresses.Vitalik,
+					Amount:   amounts.Ten18,
+					Slippage: 0.5,
+				},
+				RequestParams: swap.RequestParams{
+					ChainId: chains.Ethereum,
+				},
 			},
 		},
 		{
 			description: "Error - exclude src",
-			params: swap.AggregationControllerGetSwapParams{
-				Dst:    tokens.EthereumWeth,
-				From:   addresses.Vitalik,
-				Amount: amounts.Ten18,
+			params: swap.GetSwapDataParams{
+				AggregationControllerGetSwapParams: swap.AggregationControllerGetSwapParams{
+					Dst:    tokens.EthereumWeth,
+					From:   addresses.Vitalik,
+					Amount: amounts.Ten18,
+				},
+				RequestParams: swap.RequestParams{
+					ChainId: chains.Ethereum,
+				},
 			},
 			expectedErrorDescription: "src is required",
 		},
 		{
 			description: "Error - exclude dst",
-			params: swap.AggregationControllerGetSwapParams{
-				Src:    tokens.EthereumUsdc,
-				From:   addresses.Vitalik,
-				Amount: amounts.Ten18,
+			params: swap.GetSwapDataParams{
+				AggregationControllerGetSwapParams: swap.AggregationControllerGetSwapParams{
+					Src:    tokens.EthereumUsdc,
+					From:   addresses.Vitalik,
+					Amount: amounts.Ten18,
+				},
+				RequestParams: swap.RequestParams{
+					ChainId: chains.Ethereum,
+				},
 			},
 			expectedErrorDescription: "dst is required",
 		},
 		{
 			description: "Error - exclude amount",
-			params: swap.AggregationControllerGetSwapParams{
-				Src:  tokens.EthereumUsdc,
-				Dst:  tokens.EthereumWeth,
-				From: addresses.Vitalik,
+			params: swap.GetSwapDataParams{
+				AggregationControllerGetSwapParams: swap.AggregationControllerGetSwapParams{
+					Src:  tokens.EthereumUsdc,
+					Dst:  tokens.EthereumWeth,
+					From: addresses.Vitalik,
+				},
+				RequestParams: swap.RequestParams{
+					ChainId: chains.Ethereum,
+				},
 			},
 			expectedErrorDescription: "amount is required",
 		},
 		{
 			description: "Error - exclude from",
-			params: swap.AggregationControllerGetSwapParams{
-				Src:    tokens.EthereumUsdc,
-				Dst:    tokens.EthereumWeth,
-				Amount: amounts.Ten18,
+			params: swap.GetSwapDataParams{
+				AggregationControllerGetSwapParams: swap.AggregationControllerGetSwapParams{
+					Src:    tokens.EthereumUsdc,
+					Dst:    tokens.EthereumWeth,
+					Amount: amounts.Ten18,
+				},
+				RequestParams: swap.RequestParams{
+					ChainId: chains.Ethereum,
+				},
 			},
 			expectedErrorDescription: "from is required",
 		},
 		{
 			description: "Error - src and dst identical",
-			params: swap.AggregationControllerGetSwapParams{
-				Src:    tokens.EthereumUsdc,
-				Dst:    tokens.EthereumUsdc,
-				Amount: amounts.Ten18,
-				From:   addresses.Vitalik,
+			params: swap.GetSwapDataParams{
+				AggregationControllerGetSwapParams: swap.AggregationControllerGetSwapParams{
+					Src:    tokens.EthereumUsdc,
+					Dst:    tokens.EthereumUsdc,
+					Amount: amounts.Ten18,
+					From:   addresses.Vitalik,
+				},
+				RequestParams: swap.RequestParams{
+					ChainId: chains.Ethereum,
+				},
 			},
 			expectedErrorDescription: "src and dst tokens must be different",
 		},
 		{
 			description: "Error - slippage is required",
-			params: swap.AggregationControllerGetSwapParams{
-				Src:    tokens.EthereumUsdc,
-				Dst:    tokens.EthereumWeth,
-				Amount: amounts.Ten18,
-				From:   addresses.Vitalik,
+			params: swap.GetSwapDataParams{
+				AggregationControllerGetSwapParams: swap.AggregationControllerGetSwapParams{
+					Src:    tokens.EthereumUsdc,
+					Dst:    tokens.EthereumWeth,
+					Amount: amounts.Ten18,
+					From:   addresses.Vitalik,
+				},
+				RequestParams: swap.RequestParams{
+					ChainId: chains.Ethereum,
+				},
 			},
 			expectedErrorDescription: "slippage is required",
 		},
@@ -345,7 +430,7 @@ func TestGetSwap(t *testing.T) {
 				mux.HandleFunc(endpoint, defaultResponse)
 			}
 
-			_, _, err = c.Swap.GetSwapData(context.Background(), tc.params, true)
+			_, _, err = c.Swap.GetSwapData(context.Background(), tc.params)
 			if tc.expectedErrorDescription != "" {
 				if err == nil {
 					assert.FailNow(t, "Expected error message, but error was nil")

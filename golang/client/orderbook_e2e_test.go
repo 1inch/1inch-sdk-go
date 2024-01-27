@@ -1,6 +1,3 @@
-//go:build e2e
-// +build e2e
-
 package client
 
 import (
@@ -28,12 +25,19 @@ func TestCreateOrderE2E(t *testing.T) {
 		{
 			description: "Polygon - Create limit order offering 1 DAI for 1 USDC",
 			config: Config{
-				DevPortalApiKey:  os.Getenv("DEV_PORTAL_TOKEN"),
-				Web3HttpProvider: os.Getenv("WEB_3_HTTP_PROVIDER_URL_WITH_KEY_POLYGON"),
-				WalletKey:        os.Getenv("WALLET_KEY"),
-				ChainId:          chains.Polygon,
+				DevPortalApiKey: os.Getenv("DEV_PORTAL_TOKEN"),
+				Web3HttpProviders: []Web3ProviderConfig{
+					{
+						ChainId: chains.Polygon,
+						Url:     os.Getenv("WEB_3_HTTP_PROVIDER_URL_WITH_KEY_POLYGON"),
+					},
+				},
 			},
 			createOrderParams: orderbook.OrderRequest{
+				RequestParams: orderbook.RequestParams{
+					ChainId:   chains.Polygon,
+					WalletKey: os.Getenv("WALLET_KEY"),
+				},
 				SourceWallet: os.Getenv("WALLET_ADDRESS"),
 				FromToken:    tokens.PolygonDai,
 				ToToken:      tokens.PolygonUsdc,
@@ -46,12 +50,19 @@ func TestCreateOrderE2E(t *testing.T) {
 		{
 			description: "Ethereum - Create limit order offering 1 DAI for 1 USDC",
 			config: Config{
-				DevPortalApiKey:  os.Getenv("DEV_PORTAL_TOKEN"),
-				Web3HttpProvider: os.Getenv("WEB_3_HTTP_PROVIDER_URL_WITH_KEY"),
-				WalletKey:        os.Getenv("WALLET_KEY"),
-				ChainId:          chains.Ethereum,
+				DevPortalApiKey: os.Getenv("DEV_PORTAL_TOKEN"),
+				Web3HttpProviders: []Web3ProviderConfig{
+					{
+						ChainId: chains.Ethereum,
+						Url:     os.Getenv("WEB_3_HTTP_PROVIDER_URL_WITH_KEY"),
+					},
+				},
 			},
 			createOrderParams: orderbook.OrderRequest{
+				RequestParams: orderbook.RequestParams{
+					ChainId:   chains.Ethereum,
+					WalletKey: os.Getenv("WALLET_KEY"),
+				},
 				SourceWallet: os.Getenv("WALLET_ADDRESS"),
 				FromToken:    tokens.EthereumUsdc,
 				ToToken:      tokens.EthereumDai,
