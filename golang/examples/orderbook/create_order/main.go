@@ -17,10 +17,13 @@ func main() {
 
 	// Build the config for the client
 	config := client.Config{
-		DevPortalApiKey:  os.Getenv("DEV_PORTAL_TOKEN"),
-		Web3HttpProvider: os.Getenv("WEB_3_HTTP_PROVIDER_URL_WITH_KEY_POLYGON"),
-		WalletKey:        os.Getenv("WALLET_KEY"),
-		ChainId:          chains.Polygon,
+		DevPortalApiKey: os.Getenv("DEV_PORTAL_TOKEN"),
+		Web3HttpProviders: []client.Web3ProviderConfig{
+			{
+				ChainId: chains.Polygon,
+				Url:     os.Getenv("WEB_3_HTTP_PROVIDER_URL_WITH_KEY_POLYGON"),
+			},
+		},
 	}
 
 	// Create the 1inch client
@@ -31,11 +34,15 @@ func main() {
 
 	// Build the config for the orders request
 	createOrderParams := orderbook.OrderRequest{
+		RequestParams: orderbook.RequestParams{
+			ChainId:   chains.Polygon,
+			WalletKey: os.Getenv("WALLET_KEY"),
+		},
 		SourceWallet: os.Getenv("WALLET_ADDRESS"),
 		FromToken:    tokens.PolygonDai,
 		ToToken:      tokens.PolygonUsdc,
-		MakingAmount: "1000000000000000000",
-		TakingAmount: "1000000",
+		MakingAmount: "100000000000000000",
+		TakingAmount: "100000",
 		Receiver:     addresses.Zero,
 	}
 

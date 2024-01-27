@@ -15,10 +15,13 @@ func main() {
 
 	// Build the config for the client
 	config := client.Config{
-		DevPortalApiKey:  os.Getenv("DEV_PORTAL_TOKEN"),
-		WalletKey:        os.Getenv("WALLET_KEY"),
-		Web3HttpProvider: os.Getenv("WEB_3_HTTP_PROVIDER_URL_WITH_KEY_POLYGON"),
-		ChainId:          chains.Polygon,
+		DevPortalApiKey: os.Getenv("DEV_PORTAL_TOKEN"),
+		Web3HttpProviders: []client.Web3ProviderConfig{
+			{
+				ChainId: chains.Polygon,
+				Url:     os.Getenv("WEB_3_HTTP_PROVIDER_URL_WITH_KEY_POLYGON"),
+			},
+		},
 	}
 
 	// Create the 1inch client
@@ -28,16 +31,25 @@ func main() {
 	}
 
 	// Build the config for the swap request
-	swapParams := swap.AggregationControllerGetSwapParams{
-		Src:             tokens.PolygonFrax,
-		Dst:             tokens.PolygonUsdc,
-		From:            os.Getenv("WALLET_ADDRESS"),
-		Amount:          "10000000000000000",
-		Slippage:        0.5,
-		DisableEstimate: helpers.GetPtr(true),
+	swapParams := swap.SwapTokensParams{
+		ApprovalType: swap.PermitIfPossible,
+		RequestParams: swap.RequestParams{
+			SkipWarnings:  false,
+			PublicAddress: os.Getenv("WALLET_ADDRESS"),
+			WalletKey:     os.Getenv("WALLET_KEY"),
+			ChainId:       chains.Polygon,
+		},
+		AggregationControllerGetSwapParams: swap.AggregationControllerGetSwapParams{
+			Src:             tokens.PolygonFrax,
+			Dst:             tokens.PolygonUsdc,
+			From:            os.Getenv("WALLET_ADDRESS"),
+			Amount:          "10000000000000000",
+			Slippage:        0.5,
+			DisableEstimate: helpers.GetPtr(true),
+		},
 	}
 
-	err = c.Actions.SwapTokens(swapParams, false, swap.PermitIfPossible)
+	err = c.Actions.SwapTokens(swapParams)
 	if err != nil {
 		log.Fatalf("Failed to swap tokens: %v", err)
 	}

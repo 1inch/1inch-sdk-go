@@ -27,17 +27,19 @@ func setup() (*Client, *http.ServeMux, string, func(), error) {
 	server := httptest.NewServer(mux)
 	c, err := NewClient(
 		Config{
-			TargetEnvironment: EnvironmentProduction,
-			ChainId:           chains.Ethereum,
-			DevPortalApiKey:   os.Getenv("DEV_PORTAL_TOKEN"),
-			Web3HttpProvider:  os.Getenv("WEB_3_HTTP_PROVIDER_URL_WITH_KEY"),
-			WalletKey:         os.Getenv("WALLET_KEY"),
+			DevPortalApiKey: os.Getenv("DEV_PORTAL_TOKEN"),
+			Web3HttpProviders: []Web3ProviderConfig{
+				{
+					ChainId: chains.Ethereum,
+					Url:     os.Getenv("WEB_3_HTTP_PROVIDER_URL_WITH_KEY"),
+				},
+			},
 		})
 	if err != nil {
 		return nil, nil, "", nil, err
 	}
 
 	url, _ := url.Parse(server.URL + "/")
-	c.BaseURL = url
+	c.ApiBaseURL = url
 	return c, mux, server.URL, server.Close, nil
 }

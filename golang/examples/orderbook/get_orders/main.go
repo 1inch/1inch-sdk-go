@@ -17,10 +17,13 @@ func main() {
 
 	// Build the config for the client
 	config := client.Config{
-		DevPortalApiKey:  os.Getenv("DEV_PORTAL_TOKEN"),
-		Web3HttpProvider: os.Getenv("WEB_3_HTTP_PROVIDER_URL_WITH_KEY"),
-		WalletKey:        os.Getenv("WALLET_KEY"),
-		ChainId:          chains.Ethereum,
+		DevPortalApiKey: os.Getenv("DEV_PORTAL_TOKEN"),
+		Web3HttpProviders: []client.Web3ProviderConfig{
+			{
+				ChainId: chains.Polygon,
+				Url:     os.Getenv("WEB_3_HTTP_PROVIDER_URL_WITH_KEY_POLYGON"),
+			},
+		},
 	}
 
 	// Create the 1inch client
@@ -32,10 +35,16 @@ func main() {
 	sortBy := orderbook.LimitOrderV3SubscribedApiControllerGetAllLimitOrdersParamsSortBy("createDateTime")
 
 	// Build the config for the orders request
-	limitOrdersParams := orderbook.LimitOrderV3SubscribedApiControllerGetAllLimitOrdersParams{
-		Page:   helpers.GetPtr(float32(1)),
-		Limit:  helpers.GetPtr(float32(2)),
-		SortBy: &sortBy,
+	limitOrdersParams := orderbook.GetAllOrdersParams{
+		RequestParams: orderbook.RequestParams{
+			ChainId:   137,
+			WalletKey: os.Getenv("WALLET_KEY"),
+		},
+		LimitOrderV3SubscribedApiControllerGetAllLimitOrdersParams: orderbook.LimitOrderV3SubscribedApiControllerGetAllLimitOrdersParams{
+			Page:   helpers.GetPtr(float32(1)),
+			Limit:  helpers.GetPtr(float32(2)),
+			SortBy: &sortBy,
+		},
 	}
 
 	// Execute orders request

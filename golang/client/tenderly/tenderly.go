@@ -15,7 +15,11 @@ import (
 )
 
 func SimulateSwap(tenderlyApiKey string, config SwapConfig) (*SimulationResponse, error) {
-	forkId, err := CreateTenderlyFork(tenderlyApiKey, config.ChainId, "TestFork")
+	name := "Dev Portal - Swap"
+	if config.ApproveFirst {
+		name += " with approval"
+	}
+	forkId, err := CreateTenderlyFork(tenderlyApiKey, config.ChainId, name)
 	if err != nil {
 		return nil, fmt.Errorf("failed to create tenderly fork: %v", err)
 	}
@@ -27,7 +31,7 @@ func SimulateSwap(tenderlyApiKey string, config SwapConfig) (*SimulationResponse
 
 		// Static calldata that approves a large ERC20 spend limit for the v5 router
 		const ApproveErc20Calldata = `0x095ea7b30000000000000000000000001111111254eeb25477b68fb85ed929f73a960582000000000000000000000000000000000000000c9f2c9cd04674edea3fffffff`
-		const ApproveErc20GasLimitStatic = 200000
+		const ApproveErc20GasLimitStatic = 2000000
 
 		fmt.Println("Tenderly: Simulating token approval on Tenderly")
 
@@ -60,7 +64,7 @@ func SimulateSwap(tenderlyApiKey string, config SwapConfig) (*SimulationResponse
 		},
 	}
 
-	// Temporary hard coding 1INCH swaps to use a static balance of 100 to save the implementaiton logic
+	// Temporary hard coding 1INCH swaps to use a static balance of 100 to save the implementation logic
 	if config.FromToken == tokens.Ethereum1inch {
 		stateOverrides["0x111111111117dc0aa78b770fa6a738034120c302"] = StateObject{
 			Storage: map[string]string{
@@ -207,6 +211,62 @@ func CreateTenderlyFork(tenderlyApiKey string, chainId int, alias string) (strin
 	}
 
 	return tenderlyForkResponse.SimulationFork.ForkID, nil
+}
+
+func GetTenderlyForks(tenderlyApiKey string) (*GetForksResponse, error) {
+
+	base, err := url.Parse("https://api.tenderly.co")
+	if err != nil {
+		return nil, err
+	}
+
+	base.Path += fmt.Sprintf("/api/v1/account/Natalia/project/backend-/forks")
+
+	// Set query parameters
+	query := base.Query()
+	query.Set("page", "1")
+	query.Set("perPage", "100")
+	base.RawQuery = query.Encode()
+
+	req, err := http.NewRequest(http.MethodGet, base.String(), nil)
+	if err != nil {
+		return nil, err
+	}
+
+	req.Header.Add("X-Access-Key", tenderlyApiKey)
+
+	httpClient := http.DefaultClient
+	res, err := httpClient.Do(req)
+	if err != nil {
+		return nil, err
+	}
+
+	data, err := io.ReadAll(res.Body)
+	if err != nil {
+		return nil, err
+	}
+	err = res.Body.Close()
+	if err != nil {
+		return nil, err
+	}
+
+	var response GetForksResponse
+	if res.StatusCode == 201 {
+		err = json.Unmarshal(data, &response)
+		if err != nil {
+			return nil, err
+		}
+	} else if res.StatusCode == 404 {
+		return nil, nil
+	} else if res.StatusCode >= 400 {
+		var apiErr ResponseError
+		if err2 := json.Unmarshal(data, &apiErr); err2 != nil {
+			return nil, errors.New(strings.TrimSpace(string(data)))
+		}
+		return nil, apiErr
+	}
+
+	return &response, nil
 }
 
 func DeleteTenderlyFork(tenderlyApiKey string, forkId string) error {
