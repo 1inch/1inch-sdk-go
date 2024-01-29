@@ -19,7 +19,7 @@ func (s *SwapService) ApproveAllowance(ctx context.Context, params swap.ApproveA
 		return nil, nil, err
 	}
 
-	u, err = addQueryParameters(u, params)
+	u, err = addQueryParameters(u, params.ApproveControllerGetAllowanceParams)
 	if err != nil {
 		return nil, nil, err
 	}
@@ -64,7 +64,7 @@ func (s *SwapService) ApproveTransaction(ctx context.Context, params swap.Approv
 		return nil, nil, fmt.Errorf("tokenAddress is required")
 	}
 
-	u, err := addQueryParameters(u, params)
+	u, err := addQueryParameters(u, params.ApproveControllerGetCallDataParams)
 	if err != nil {
 		return nil, nil, err
 	}
@@ -110,7 +110,7 @@ func (s *SwapService) GetQuote(ctx context.Context, params swap.GetQuoteParams) 
 		return nil, nil, err
 	}
 
-	u, err = addQueryParameters(u, params)
+	u, err = addQueryParameters(u, params.AggregationControllerGetQuoteParams)
 	if err != nil {
 		return nil, nil, err
 	}
@@ -140,7 +140,7 @@ func (s *SwapService) GetSwapData(ctx context.Context, params swap.GetSwapDataPa
 		return nil, nil, err
 	}
 
-	u, err = addQueryParameters(u, params)
+	u, err = addQueryParameters(u, params.AggregationControllerGetSwapParams)
 	if err != nil {
 		return nil, nil, err
 	}

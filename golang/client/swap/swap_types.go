@@ -7,6 +7,10 @@ type RequestParams struct {
 	WalletKey     string
 }
 
+type Chain struct {
+	Id int
+}
+
 type SwapTokensParams struct {
 	ApprovalType ApprovalType
 	RequestParams

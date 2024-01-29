@@ -133,7 +133,7 @@ func (s *OrderbookService) GetOrdersByCreatorAddress(ctx context.Context, addres
 		return nil, nil, err
 	}
 
-	u, err = addQueryParameters(u, params)
+	u, err = addQueryParameters(u, params.LimitOrderV3SubscribedApiControllerGetAllLimitOrdersParams)
 	if err != nil {
 		return nil, nil, err
 	}
@@ -161,7 +161,7 @@ func (s *OrderbookService) GetAllOrders(ctx context.Context, params orderbook.Ge
 		return nil, nil, err
 	}
 
-	u, err = addQueryParameters(u, params)
+	u, err = addQueryParameters(u, params.LimitOrderV3SubscribedApiControllerGetAllLimitOrdersParams)
 	if err != nil {
 		return nil, nil, err
 	}
@@ -240,7 +240,7 @@ func (s *OrderbookService) GetEvents(ctx context.Context, params orderbook.GetEv
 		return nil, nil, err
 	}
 
-	u, err = addQueryParameters(u, params)
+	u, err = addQueryParameters(u, params.LimitOrderV3SubscribedApiControllerGetEventsParams)
 	if err != nil {
 		return nil, nil, err
 	}
