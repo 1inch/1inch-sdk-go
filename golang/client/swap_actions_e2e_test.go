@@ -19,14 +19,16 @@ import (
 func TestSwapTokensTenderlyE2E(t *testing.T) {
 
 	testcases := []struct {
-		description    string
-		config         Config
-		swapParams     swap.SwapTokensParams
-		approvalType   swap.ApprovalType
-		expectedOutput string
+		description         string
+		tenderlyDescription string
+		config              Config
+		swapParams          swap.SwapTokensParams
+		approvalType        swap.ApprovalType
+		expectedOutput      string
 	}{
 		{
-			description: "Polygon - Swap 0.01 DAI for USDC - Approval - Does not support traditional permit interface",
+			description:         "Polygon - Swap 0.01 DAI for USDC - Approval - Does not support traditional permit interface",
+			tenderlyDescription: "DP-DAI->USDC-Approval",
 			config: Config{
 				DevPortalApiKey: os.Getenv("DEV_PORTAL_TOKEN"),
 				Web3HttpProviders: []Web3ProviderConfig{
@@ -55,7 +57,8 @@ func TestSwapTokensTenderlyE2E(t *testing.T) {
 			},
 		},
 		{
-			description: "Polygon - Swap 0.01 FRAX for USDC - Approval - Forced",
+			description:         "Polygon - Swap 0.01 FRAX for USDC - Approval - Forced",
+			tenderlyDescription: "DP-FRAX->USDC-Approval",
 			config: Config{
 				DevPortalApiKey: os.Getenv("DEV_PORTAL_TOKEN"),
 				Web3HttpProviders: []Web3ProviderConfig{
@@ -84,7 +87,8 @@ func TestSwapTokensTenderlyE2E(t *testing.T) {
 			},
 		},
 		{
-			description: "Polygon - Swap 0.01 FRAX for USDC - Permit",
+			description:         "Polygon - Swap 0.01 FRAX for USDC - Permit",
+			tenderlyDescription: "DP-FRAX->USDC-Permit",
 			config: Config{
 				DevPortalApiKey: os.Getenv("DEV_PORTAL_TOKEN"),
 				Web3HttpProviders: []Web3ProviderConfig{
@@ -113,7 +117,8 @@ func TestSwapTokensTenderlyE2E(t *testing.T) {
 			},
 		},
 		{
-			description: "Arbitrum - Swap 0.01 USDC for DAI - Approve - Arbitrum unsupported right now",
+			description:         "Arbitrum - Swap 0.01 USDC for DAI - Approve - Arbitrum unsupported right now",
+			tenderlyDescription: "DP-USDC->DAI-Approve",
 			config: Config{
 				DevPortalApiKey: os.Getenv("DEV_PORTAL_TOKEN"),
 				Web3HttpProviders: []Web3ProviderConfig{
@@ -142,7 +147,8 @@ func TestSwapTokensTenderlyE2E(t *testing.T) {
 			},
 		},
 		{
-			description: "Arbitrum - Swap $0.01 worth of ETH for USDC - Native token for ERC20",
+			description:         "Arbitrum - Swap $0.01 worth of ETH for USDC - Native token for ERC20",
+			tenderlyDescription: "DP-ETH->USDC",
 			config: Config{
 				DevPortalApiKey: os.Getenv("DEV_PORTAL_TOKEN"),
 				Web3HttpProviders: []Web3ProviderConfig{
@@ -171,7 +177,8 @@ func TestSwapTokensTenderlyE2E(t *testing.T) {
 			},
 		},
 		{
-			description: "Ethereum - Swap $0.01 worth of 1inch for ETH - Force Permit1",
+			description:         "Ethereum - Swap $0.01 worth of 1inch for ETH - Force Permit1",
+			tenderlyDescription: "DP-1inch->ETH-Permit1",
 			config: Config{
 				DevPortalApiKey: os.Getenv("DEV_PORTAL_TOKEN"),
 				Web3HttpProviders: []Web3ProviderConfig{
