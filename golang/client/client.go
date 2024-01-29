@@ -20,11 +20,6 @@ import (
 
 type Environment string
 
-const (
-	EnvironmentProduction Environment = "Production"
-	EnvironmentStaging    Environment = "Staging"
-)
-
 type service struct {
 	client *Client
 }
