@@ -1,32 +1,32 @@
 package orderbook
 
 type GetOrdersByCreatorAddressParams struct {
-	RequestParams
+	ChainId int
 	LimitOrderV3SubscribedApiControllerGetAllLimitOrdersParams
 }
 
 type GetAllOrdersParams struct {
-	RequestParams
+	ChainId int
 	LimitOrderV3SubscribedApiControllerGetAllLimitOrdersParams
 }
 
 type GetCountParams struct {
-	RequestParams
+	ChainId int
 	LimitOrderV3SubscribedApiControllerGetAllOrdersCountParams
 }
 
 type GetEventParams struct {
-	RequestParams
+	ChainId   int
 	OrderHash string
 }
 
 type GetEventsParams struct {
-	RequestParams
+	ChainId int
 	LimitOrderV3SubscribedApiControllerGetEventsParams
 }
 
 type GetActiveOrdersWithPermitParams struct {
-	RequestParams
-	Wallet string
-	Token  string
+	ChainId int
+	Wallet  string
+	Token   string
 }

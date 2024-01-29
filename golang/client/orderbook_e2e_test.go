@@ -34,10 +34,8 @@ func TestCreateOrderE2E(t *testing.T) {
 				},
 			},
 			createOrderParams: orderbook.OrderRequest{
-				RequestParams: orderbook.RequestParams{
-					ChainId:   chains.Polygon,
-					WalletKey: os.Getenv("WALLET_KEY"),
-				},
+				ChainId:      chains.Polygon,
+				WalletKey:    os.Getenv("WALLET_KEY"),
 				SourceWallet: os.Getenv("WALLET_ADDRESS"),
 				FromToken:    tokens.PolygonDai,
 				ToToken:      tokens.PolygonUsdc,
@@ -59,10 +57,8 @@ func TestCreateOrderE2E(t *testing.T) {
 				},
 			},
 			createOrderParams: orderbook.OrderRequest{
-				RequestParams: orderbook.RequestParams{
-					ChainId:   chains.Ethereum,
-					WalletKey: os.Getenv("WALLET_KEY"),
-				},
+				ChainId:      chains.Ethereum,
+				WalletKey:    os.Getenv("WALLET_KEY"),
 				SourceWallet: os.Getenv("WALLET_ADDRESS"),
 				FromToken:    tokens.EthereumUsdc,
 				ToToken:      tokens.EthereumDai,

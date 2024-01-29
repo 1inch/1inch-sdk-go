@@ -25,9 +25,7 @@ func TestApproveAllowanceIntegration(t *testing.T) {
 		{
 			description: "Get approve spender address",
 			params: swap.ApproveAllowanceParams{
-				RequestParams: swap.RequestParams{
-					ChainId: chains.Ethereum,
-				},
+				ChainId: chains.Ethereum,
 				ApproveControllerGetAllowanceParams: swap.ApproveControllerGetAllowanceParams{
 					TokenAddress:  tokens.EthereumUsdc,
 					WalletAddress: addresses.Vitalik,
@@ -67,9 +65,7 @@ func TestApproveSpenderIntegration(t *testing.T) {
 		{
 			description: "Get approve spender address",
 			params: swap.ApproveSpenderParams{
-				RequestParams: swap.RequestParams{
-					ChainId: chains.Ethereum,
-				},
+				ChainId: chains.Ethereum,
 			},
 			expectedOutput: swap.SpenderResponse{
 				Address: "0x1111111254eeb25477b68fb85ed929f73a960582",
@@ -103,9 +99,7 @@ func TestApproveTransactionIntegration(t *testing.T) {
 		{
 			description: "Get approve spender address",
 			params: swap.ApproveTransactionParams{
-				RequestParams: swap.RequestParams{
-					ChainId: chains.Ethereum,
-				},
+				ChainId: chains.Ethereum,
 				ApproveControllerGetCallDataParams: swap.ApproveControllerGetCallDataParams{
 					TokenAddress: tokens.EthereumUsdc,
 					Amount:       nil,
@@ -143,9 +137,7 @@ func TestGetLiquiditySourcesIntegration(t *testing.T) {
 		{
 			description: "Get approve spender address",
 			params: swap.GetLiquiditySourcesParams{
-				RequestParams: swap.RequestParams{
-					ChainId: chains.Ethereum,
-				},
+				ChainId: chains.Ethereum,
 			},
 			expectedProtocol: swap.ProtocolImage{
 				Id:  "UNISWAP_V2",
@@ -187,9 +179,7 @@ func TestGetTokensIntegration(t *testing.T) {
 		{
 			description: "Get approve spender address",
 			params: swap.GetTokensParams{
-				RequestParams: swap.RequestParams{
-					ChainId: chains.Ethereum,
-				},
+				ChainId: chains.Ethereum,
 			},
 			expectedToken: swap.TokenInfo{
 				Address:  "0xa0b86991c6218b36c1d19d4a2e9eb0ce3606eb48",

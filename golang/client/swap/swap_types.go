@@ -1,46 +1,43 @@
 package swap
 
-type RequestParams struct {
+type SwapTokensParams struct {
+	ApprovalType  ApprovalType
 	ChainId       int
 	SkipWarnings  bool
 	PublicAddress string
 	WalletKey     string
-}
-
-type SwapTokensParams struct {
-	ApprovalType ApprovalType
-	RequestParams
 	AggregationControllerGetSwapParams
 }
 
 type ApproveAllowanceParams struct {
-	RequestParams
+	ChainId int
 	ApproveControllerGetAllowanceParams
 }
 
 type ApproveSpenderParams struct {
-	RequestParams
+	ChainId int
 }
 
 type ApproveTransactionParams struct {
-	RequestParams
+	ChainId int
 	ApproveControllerGetCallDataParams
 }
 
 type GetLiquiditySourcesParams struct {
-	RequestParams
+	ChainId int
 }
 
 type GetQuoteParams struct {
-	RequestParams
+	ChainId int
 	AggregationControllerGetQuoteParams
 }
 
 type GetSwapDataParams struct {
-	RequestParams
+	ChainId      int
+	SkipWarnings bool
 	AggregationControllerGetSwapParams
 }
 
 type GetTokensParams struct {
-	RequestParams
+	ChainId int
 }

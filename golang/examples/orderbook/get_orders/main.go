@@ -36,10 +36,7 @@ func main() {
 
 	// Build the config for the orders request
 	limitOrdersParams := orderbook.GetAllOrdersParams{
-		RequestParams: orderbook.RequestParams{
-			ChainId:   137,
-			WalletKey: os.Getenv("WALLET_KEY"),
-		},
+		ChainId: 137,
 		LimitOrderV3SubscribedApiControllerGetAllLimitOrdersParams: orderbook.LimitOrderV3SubscribedApiControllerGetAllLimitOrdersParams{
 			Page:   helpers.GetPtr(float32(1)),
 			Limit:  helpers.GetPtr(float32(2)),

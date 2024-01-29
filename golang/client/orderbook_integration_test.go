@@ -24,10 +24,8 @@ func TestCreateOrderIntegration(t *testing.T) {
 		{
 			description: "Success",
 			orderRequest: orderbook.OrderRequest{
-				RequestParams: orderbook.RequestParams{
-					ChainId:   chains.Polygon,
-					WalletKey: os.Getenv("WALLET_KEY"),
-				},
+				ChainId:      chains.Polygon,
+				WalletKey:    os.Getenv("WALLET_KEY"),
 				SourceWallet: os.Getenv("WALLET_ADDRESS"),
 				FromToken:    tokens.PolygonDai,
 				ToToken:      tokens.PolygonWeth,
@@ -77,9 +75,7 @@ func TestGetAllOrdersIntegration(t *testing.T) {
 		{
 			description: "Get all orders",
 			params: orderbook.GetAllOrdersParams{
-				RequestParams: orderbook.RequestParams{
-					ChainId: chains.Ethereum,
-				},
+				ChainId: chains.Ethereum,
 			},
 		},
 	}
@@ -113,9 +109,7 @@ func TestGetCountIntegration(t *testing.T) {
 		{
 			description: "Get counts",
 			params: orderbook.GetCountParams{
-				RequestParams: orderbook.RequestParams{
-					ChainId: chains.Ethereum,
-				},
+				ChainId: chains.Ethereum,
 			},
 		},
 	}
@@ -149,9 +143,7 @@ func TestGetEventsIntegration(t *testing.T) {
 		{
 			description: "Get events",
 			params: orderbook.GetEventsParams{
-				RequestParams: orderbook.RequestParams{
-					ChainId: chains.Ethereum,
-				},
+				ChainId: chains.Ethereum,
 				LimitOrderV3SubscribedApiControllerGetEventsParams: orderbook.LimitOrderV3SubscribedApiControllerGetEventsParams{
 					Limit: 1,
 				},

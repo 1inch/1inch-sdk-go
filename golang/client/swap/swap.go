@@ -164,40 +164,44 @@ func ConfirmExecuteSwapWithUser(config *ExecuteSwapConfig, ethClient *ethclient.
 	return confirmExecuteSwapWithUser(config, ethClient, os.Stdin, stdOut)
 }
 
-func confirmExecuteSwapWithUser(config *ExecuteSwapConfig, ethClient *ethclient.Client, reader io.Reader, writer helpers.Printer) (bool, error) {
-	var fromTokenDecimals uint8
-	var fromTokenName string
-	var err error
-	if config.FromToken != tokens.NativeToken {
-		fromTokenDecimals, err = onchain.ReadContractDecimals(ethClient, common.HexToAddress(config.FromToken))
-		if err != nil {
-			return false, fmt.Errorf("failed to read decimals: %v", err)
-		}
+type tokenInfo struct {
+	decimals uint8
+	name     string
+}
 
-		fromTokenName, err = onchain.ReadContractSymbol(ethClient, common.HexToAddress(config.FromToken))
-		if err != nil {
-			return false, fmt.Errorf("failed to read name: %v", err)
-		}
-	} else {
-		fromTokenDecimals = 18
-		fromTokenName = "ETH"
+func getTokenInfo(ethClient *ethclient.Client, tokenAddress string) (*tokenInfo, error) {
+
+	if tokenAddress == tokens.NativeToken {
+		return &tokenInfo{
+			decimals: 18,
+			name:     "ETH",
+		}, nil
 	}
 
-	var toTokenDecimals uint8
-	var toTokenName string
-	if config.ToToken != tokens.NativeToken {
-		toTokenDecimals, err = onchain.ReadContractDecimals(ethClient, common.HexToAddress(config.ToToken))
-		if err != nil {
-			return false, fmt.Errorf("failed to read decimals: %v", err)
-		}
+	decimals, err := onchain.ReadContractDecimals(ethClient, common.HexToAddress(tokenAddress))
+	if err != nil {
+		return nil, fmt.Errorf("failed to read decimals: %v", err)
+	}
 
-		toTokenName, err = onchain.ReadContractSymbol(ethClient, common.HexToAddress(config.ToToken))
-		if err != nil {
-			return false, fmt.Errorf("failed to read name: %v", err)
-		}
-	} else {
-		toTokenDecimals = 18
-		toTokenName = "ETH"
+	name, err := onchain.ReadContractSymbol(ethClient, common.HexToAddress(tokenAddress))
+	if err != nil {
+		return nil, fmt.Errorf("failed to read name: %v", err)
+	}
+
+	return &tokenInfo{
+		decimals: decimals,
+		name:     name,
+	}, nil
+}
+
+func confirmExecuteSwapWithUser(config *ExecuteSwapConfig, ethClient *ethclient.Client, reader io.Reader, writer helpers.Printer) (bool, error) {
+	fromTokeninfo, err := getTokenInfo(ethClient, config.FromToken)
+	if err != nil {
+		return false, fmt.Errorf("failed to get token info: %v", err)
+	}
+	toTokeninfo, err := getTokenInfo(ethClient, config.ToToken)
+	if err != nil {
+		return false, fmt.Errorf("failed to get token info: %v", err)
 	}
 
 	var permitType string
@@ -208,8 +212,8 @@ func confirmExecuteSwapWithUser(config *ExecuteSwapConfig, ethClient *ethclient.
 	}
 
 	writer.Printf("Swap summary:\n")
-	writer.Printf("    %-30s %s %s\n", "Selling: ", helpers.SimplifyValue(config.Amount, int(fromTokenDecimals)), fromTokenName)
-	writer.Printf("    %-30s %s %s\n", "Buying (estimation):", helpers.SimplifyValue(config.EstimatedAmountOut, int(toTokenDecimals)), toTokenName)
+	writer.Printf("    %-30s %s %s\n", "Selling: ", helpers.SimplifyValue(config.Amount, int(fromTokeninfo.decimals)), fromTokeninfo.name)
+	writer.Printf("    %-30s %s %s\n", "Buying (estimation):", helpers.SimplifyValue(config.EstimatedAmountOut, int(toTokeninfo.decimals)), toTokeninfo.name)
 	writer.Printf("    %-30s %v%s\n", "Slippage:", config.Slippage, "%")
 	writer.Printf("    %-30s %s\n", "Permision type:", permitType)
 	writer.Printf("\n")
@@ -234,29 +238,19 @@ func ConfirmSwapDataWithUser(swapResponse *SwapResponse, fromAmount string, slip
 }
 
 func confirmSwapDataWithUser(swapResponse *SwapResponse, fromAmount string, slippage float32, ethClient *ethclient.Client, writer helpers.Printer) error {
-	fromTokenDecimals, err := onchain.ReadContractDecimals(ethClient, common.HexToAddress(swapResponse.FromToken.Address))
-	if err != nil {
-		return fmt.Errorf("failed to read decimals: %v", err)
-	}
 
-	fromTokenName, err := onchain.ReadContractSymbol(ethClient, common.HexToAddress(swapResponse.FromToken.Address))
+	fromTokeninfo, err := getTokenInfo(ethClient, swapResponse.FromToken.Address)
 	if err != nil {
-		return fmt.Errorf("failed to read name: %v", err)
+		return fmt.Errorf("failed to get token info: %v", err)
 	}
-
-	toTokenDecimals, err := onchain.ReadContractDecimals(ethClient, common.HexToAddress(swapResponse.ToToken.Address))
+	toTokeninfo, err := getTokenInfo(ethClient, swapResponse.ToToken.Address)
 	if err != nil {
-		return fmt.Errorf("failed to read decimals: %v", err)
-	}
-
-	toTokenName, err := onchain.ReadContractSymbol(ethClient, common.HexToAddress(swapResponse.ToToken.Address))
-	if err != nil {
-		return fmt.Errorf("failed to read name: %v", err)
+		return fmt.Errorf("failed to get token info: %v", err)
 	}
 
 	writer.Printf("Swap summary:\n")
-	writer.Printf("    %-30s %s %s\n", "Selling: ", helpers.SimplifyValue(fromAmount, int(fromTokenDecimals)), fromTokenName)
-	writer.Printf("    %-30s %s %s\n", "Buying (estimation):", helpers.SimplifyValue(swapResponse.ToAmount, int(toTokenDecimals)), toTokenName)
+	writer.Printf("    %-30s %s %s\n", "Selling: ", helpers.SimplifyValue(fromAmount, int(fromTokeninfo.decimals)), fromTokeninfo.name)
+	writer.Printf("    %-30s %s %s\n", "Buying (estimation):", helpers.SimplifyValue(swapResponse.ToAmount, int(toTokeninfo.decimals)), toTokeninfo.name)
 	writer.Printf("    %-30s %v%s\n", "Slippage:", slippage, "%")
 	writer.Printf("\n")
 	writer.Printf("WARNING: Executing the transaction data generated by this function is irreversible. Make sure the proposed trade looks correct!\n")
