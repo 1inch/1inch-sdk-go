@@ -6,13 +6,13 @@ import (
 	"net/http"
 	"testing"
 
-	"github.com/1inch/1inch-sdk/golang/helpers/consts/chains"
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
 
 	"github.com/1inch/1inch-sdk/golang/client/orderbook"
 	"github.com/1inch/1inch-sdk/golang/helpers"
 	"github.com/1inch/1inch-sdk/golang/helpers/consts/addresses"
+	"github.com/1inch/1inch-sdk/golang/helpers/consts/chains"
 	"github.com/1inch/1inch-sdk/golang/helpers/consts/tokens"
 )
 
@@ -40,9 +40,7 @@ func TestCreateOrder(t *testing.T) {
 			description: "Error - missing fromToken",
 			owner:       addresses.Vitalik,
 			params: orderbook.OrderRequest{
-				RequestParams: orderbook.RequestParams{
-					ChainId: chains.Polygon,
-				},
+				ChainId:      chains.Polygon,
 				ToToken:      tokens.PolygonWeth,
 				TakingAmount: "100",
 				MakingAmount: "100",
@@ -53,9 +51,7 @@ func TestCreateOrder(t *testing.T) {
 			description: "Error - missing fromToken",
 			owner:       addresses.Vitalik,
 			params: orderbook.OrderRequest{
-				RequestParams: orderbook.RequestParams{
-					ChainId: chains.Polygon,
-				},
+				ChainId:      chains.Polygon,
 				FromToken:    tokens.PolygonDai,
 				TakingAmount: "100",
 				MakingAmount: "100",
@@ -67,7 +63,7 @@ func TestCreateOrder(t *testing.T) {
 		//	description: "Error - TakingAmount negative",
 		//	owner:       addresses.Vitalik,
 		//	params: orderbook.OrderRequest{
-		//      RequestParams: orderbook.RequestParams{
+		//      Chain: orderbook.Chain{
 		//      	ChainId:      137,
 		//      },
 		//		FromToken:    tokens.PolygonDai,
@@ -81,7 +77,7 @@ func TestCreateOrder(t *testing.T) {
 		//	description: "Error - MakingAmount negative",
 		//	owner:       addresses.Vitalik,
 		//	params: orderbook.OrderRequest{
-		//      RequestParams: orderbook.RequestParams{
+		//      Chain: orderbook.Chain{
 		//      	ChainId:      137,
 		//      },
 		//		FromToken:    tokens.PolygonDai,
@@ -142,124 +138,100 @@ func TestGetOrdersByCreatorAddress(t *testing.T) {
 	}{
 		{
 			description: "Success",
-			owner:       addresses.Vitalik,
 			params: orderbook.GetOrdersByCreatorAddressParams{
-				RequestParams: orderbook.RequestParams{
-					ChainId: chains.Ethereum,
-				},
+				ChainId:        chains.Ethereum,
+				CreatorAddress: addresses.Vitalik,
 			},
 			expectedOutput: defaultSignature,
 		},
 		{
-			description: "Error - Missing owner address",
+			description: "Error - Missing creator address",
 			params: orderbook.GetOrdersByCreatorAddressParams{
-				RequestParams: orderbook.RequestParams{
-					ChainId: chains.Ethereum,
-				},
-				LimitOrderV3SubscribedApiControllerGetAllLimitOrdersParams: orderbook.LimitOrderV3SubscribedApiControllerGetAllLimitOrdersParams{
-					Page: helpers.GetPtr(float32(0)),
-				},
+				ChainId: chains.Ethereum,
 			},
-			expectedErrorDescription: "address must be a valid Ethereum address",
+			expectedErrorDescription: `'creatorAddress' is required in the request config`,
 		},
 		{
-			description: "Error - Invalid owner address",
-			owner:       "0x0",
+			description: "Error - Invalid creator address",
 			params: orderbook.GetOrdersByCreatorAddressParams{
-				RequestParams: orderbook.RequestParams{
-					ChainId: chains.Ethereum,
-				},
-				LimitOrderV3SubscribedApiControllerGetAllLimitOrdersParams: orderbook.LimitOrderV3SubscribedApiControllerGetAllLimitOrdersParams{
-					Page: helpers.GetPtr(float32(0)),
-				},
+				ChainId:        chains.Ethereum,
+				CreatorAddress: "0x1234",
 			},
-			expectedErrorDescription: "address must be a valid Ethereum address",
+			expectedErrorDescription: `'creatorAddress': not a valid Ethereum address`,
 		},
 		{
 			description: "Error - Invalid page value",
-			owner:       addresses.Vitalik,
 			params: orderbook.GetOrdersByCreatorAddressParams{
-				RequestParams: orderbook.RequestParams{
-					ChainId: chains.Ethereum,
-				},
+				ChainId:        chains.Ethereum,
+				CreatorAddress: addresses.Vitalik,
 				LimitOrderV3SubscribedApiControllerGetAllLimitOrdersParams: orderbook.LimitOrderV3SubscribedApiControllerGetAllLimitOrdersParams{
 					Page: helpers.GetPtr(float32(0)),
 				},
 			},
-			expectedErrorDescription: "page must be greater than 0",
+			expectedErrorDescription: `'page': must be greater than 0`,
 		},
 		{
 			description: "Error - Invalid limit value",
-			owner:       addresses.Vitalik,
 			params: orderbook.GetOrdersByCreatorAddressParams{
-				RequestParams: orderbook.RequestParams{
-					ChainId: chains.Ethereum,
-				},
+				ChainId:        chains.Ethereum,
+				CreatorAddress: addresses.Vitalik,
 				LimitOrderV3SubscribedApiControllerGetAllLimitOrdersParams: orderbook.LimitOrderV3SubscribedApiControllerGetAllLimitOrdersParams{
 					Limit: helpers.GetPtr(float32(0)),
 				},
 			},
-			expectedErrorDescription: "limit must be greater than 0",
+			expectedErrorDescription: `'limit': must be greater than 0`,
 		},
 		{
 			description: "Error - Invalid status",
-			owner:       addresses.Vitalik,
 			params: orderbook.GetOrdersByCreatorAddressParams{
-				RequestParams: orderbook.RequestParams{
-					ChainId: chains.Ethereum,
-				},
+				ChainId:        chains.Ethereum,
+				CreatorAddress: addresses.Vitalik,
 				LimitOrderV3SubscribedApiControllerGetAllLimitOrdersParams: orderbook.LimitOrderV3SubscribedApiControllerGetAllLimitOrdersParams{
 					Page:     helpers.GetPtr(float32(1)),
 					Limit:    helpers.GetPtr(float32(2)),
 					Statuses: &[]float32{0, 2},
 				},
 			},
-			expectedErrorDescription: "statuses can only contain 1, 2, and/or 3",
+			expectedErrorDescription: `'statuses': can only contain 1, 2, and/or 3`,
 		},
 		{
 			description: "Error - Invalid sortBy",
-			owner:       addresses.Vitalik,
 			params: orderbook.GetOrdersByCreatorAddressParams{
-				RequestParams: orderbook.RequestParams{
-					ChainId: chains.Ethereum,
-				},
+				ChainId:        chains.Ethereum,
+				CreatorAddress: addresses.Vitalik,
 				LimitOrderV3SubscribedApiControllerGetAllLimitOrdersParams: orderbook.LimitOrderV3SubscribedApiControllerGetAllLimitOrdersParams{
 					Page:   helpers.GetPtr(float32(1)),
 					Limit:  helpers.GetPtr(float32(2)),
 					SortBy: orderbook.GetSortByParameter("invalid"),
 				},
 			},
-			expectedErrorDescription: "sortBy can only contain createDateTime, takerRate, makerRate, makerAmount, or takerAmount",
+			expectedErrorDescription: `'sortBy': can only contain createDateTime, takerRate, makerRate, makerAmount, or takerAmount`,
 		},
 		{
-			description: "Error - Invalid takerAddress",
-			owner:       addresses.Vitalik,
+			description: "Error - Invalid takerAsset",
 			params: orderbook.GetOrdersByCreatorAddressParams{
-				RequestParams: orderbook.RequestParams{
-					ChainId: chains.Ethereum,
-				},
+				ChainId:        chains.Ethereum,
+				CreatorAddress: addresses.Vitalik,
 				LimitOrderV3SubscribedApiControllerGetAllLimitOrdersParams: orderbook.LimitOrderV3SubscribedApiControllerGetAllLimitOrdersParams{
 					Page:       helpers.GetPtr(float32(1)),
 					Limit:      helpers.GetPtr(float32(2)),
 					TakerAsset: helpers.GetPtr("invalid"),
 				},
 			},
-			expectedErrorDescription: "takerAsset must be a valid Ethereum address",
+			expectedErrorDescription: `'takerAsset': not a valid Ethereum address`,
 		},
 		{
-			description: "Error - Invalid makerAddress",
-			owner:       addresses.Vitalik,
+			description: "Error - Invalid makerAsset",
 			params: orderbook.GetOrdersByCreatorAddressParams{
-				RequestParams: orderbook.RequestParams{
-					ChainId: chains.Ethereum,
-				},
+				ChainId:        chains.Ethereum,
+				CreatorAddress: addresses.Vitalik,
 				LimitOrderV3SubscribedApiControllerGetAllLimitOrdersParams: orderbook.LimitOrderV3SubscribedApiControllerGetAllLimitOrdersParams{
 					Page:       helpers.GetPtr(float32(1)),
 					Limit:      helpers.GetPtr(float32(2)),
 					MakerAsset: helpers.GetPtr("invalid"),
 				},
 			},
-			expectedErrorDescription: "makerAsset must be a valid Ethereum address",
+			expectedErrorDescription: `'makerAsset': not a valid Ethereum address`,
 		},
 	}
 
@@ -276,7 +248,7 @@ func TestGetOrdersByCreatorAddress(t *testing.T) {
 				mux.HandleFunc(endpoint, defaultResponse)
 			}
 
-			allOrders, _, err := c.Orderbook.GetOrdersByCreatorAddress(context.Background(), tc.owner, tc.params)
+			allOrders, _, err := c.Orderbook.GetOrdersByCreatorAddress(context.Background(), tc.params)
 			if tc.expectedErrorDescription != "" {
 				if err == nil {
 					assert.FailNow(t, "Expected error message, but error was nil")
@@ -312,9 +284,7 @@ func TestGetAllOrders(t *testing.T) {
 		{
 			description: "Success",
 			params: orderbook.GetAllOrdersParams{
-				RequestParams: orderbook.RequestParams{
-					ChainId: chains.Ethereum,
-				},
+				ChainId: chains.Ethereum,
 				LimitOrderV3SubscribedApiControllerGetAllLimitOrdersParams: orderbook.LimitOrderV3SubscribedApiControllerGetAllLimitOrdersParams{},
 			},
 			expectedOutput: defaultSignature,
@@ -322,82 +292,70 @@ func TestGetAllOrders(t *testing.T) {
 		{
 			description: "Error - Invalid page value",
 			params: orderbook.GetAllOrdersParams{
-				RequestParams: orderbook.RequestParams{
-					ChainId: chains.Ethereum,
-				},
+				ChainId: chains.Ethereum,
 				LimitOrderV3SubscribedApiControllerGetAllLimitOrdersParams: orderbook.LimitOrderV3SubscribedApiControllerGetAllLimitOrdersParams{
 					Page: helpers.GetPtr(float32(0)),
 				},
 			},
-			expectedErrorDescription: "page must be greater than 0",
+			expectedErrorDescription: `'page': must be greater than 0`,
 		},
 		{
 			description: "Error - Invalid limit value",
 			params: orderbook.GetAllOrdersParams{
-				RequestParams: orderbook.RequestParams{
-					ChainId: chains.Ethereum,
-				},
+				ChainId: chains.Ethereum,
 				LimitOrderV3SubscribedApiControllerGetAllLimitOrdersParams: orderbook.LimitOrderV3SubscribedApiControllerGetAllLimitOrdersParams{
 					Limit: helpers.GetPtr(float32(0)),
 				},
 			},
-			expectedErrorDescription: "limit must be greater than 0",
+			expectedErrorDescription: `config validation error 'limit': must be greater than 0`,
 		},
 		{
 			description: "Error - Invalid status",
 			params: orderbook.GetAllOrdersParams{
-				RequestParams: orderbook.RequestParams{
-					ChainId: chains.Ethereum,
-				},
+				ChainId: chains.Ethereum,
 				LimitOrderV3SubscribedApiControllerGetAllLimitOrdersParams: orderbook.LimitOrderV3SubscribedApiControllerGetAllLimitOrdersParams{
 					Page:     helpers.GetPtr(float32(1)),
 					Limit:    helpers.GetPtr(float32(2)),
 					Statuses: &[]float32{0, 2},
 				},
 			},
-			expectedErrorDescription: "statuses can only contain 1, 2, and/or 3",
+			expectedErrorDescription: `'statuses': can only contain 1, 2, and/or 3`,
 		},
 		{
 			description: "Error - Invalid sortBy",
 			params: orderbook.GetAllOrdersParams{
-				RequestParams: orderbook.RequestParams{
-					ChainId: chains.Ethereum,
-				},
+				ChainId: chains.Ethereum,
 				LimitOrderV3SubscribedApiControllerGetAllLimitOrdersParams: orderbook.LimitOrderV3SubscribedApiControllerGetAllLimitOrdersParams{
 					Page:   helpers.GetPtr(float32(1)),
 					Limit:  helpers.GetPtr(float32(2)),
 					SortBy: orderbook.GetSortByParameter("invalid"),
 				},
 			},
-			expectedErrorDescription: "sortBy can only contain createDateTime, takerRate, makerRate, makerAmount, or takerAmount",
+			expectedErrorDescription: `'sortBy': can only contain createDateTime, takerRate, makerRate, makerAmount, or takerAmount`,
 		},
 		{
-			description: "Error - Invalid takerAddress",
+			description: "Error - Invalid takerAsset",
 			params: orderbook.GetAllOrdersParams{
-				RequestParams: orderbook.RequestParams{
-					ChainId: chains.Ethereum,
-				},
+				ChainId: chains.Ethereum,
 				LimitOrderV3SubscribedApiControllerGetAllLimitOrdersParams: orderbook.LimitOrderV3SubscribedApiControllerGetAllLimitOrdersParams{
 					Page:       helpers.GetPtr(float32(1)),
 					Limit:      helpers.GetPtr(float32(2)),
 					TakerAsset: helpers.GetPtr("invalid"),
 				},
 			},
-			expectedErrorDescription: "takerAsset must be a valid Ethereum address",
+			expectedErrorDescription: `'takerAsset': not a valid Ethereum address`,
 		},
 		{
-			description: "Error - Invalid makerAddress",
+			description: "Error - Invalid makerAsset",
 			params: orderbook.GetAllOrdersParams{
-				RequestParams: orderbook.RequestParams{
-					ChainId: chains.Ethereum,
-				},
+				ChainId: chains.Ethereum,
 				LimitOrderV3SubscribedApiControllerGetAllLimitOrdersParams: orderbook.LimitOrderV3SubscribedApiControllerGetAllLimitOrdersParams{
 					Page:       helpers.GetPtr(float32(1)),
 					Limit:      helpers.GetPtr(float32(2)),
 					MakerAsset: helpers.GetPtr("invalid"),
 				},
 			},
-			expectedErrorDescription: "makerAsset must be a valid Ethereum address",
+			expectedErrorDescription: "'makerAsset': not a valid Ethereum address",
 		},
 	}
 
@@ -448,9 +406,7 @@ func TestGetCount(t *testing.T) {
 		{
 			description: "Success",
 			params: orderbook.GetCountParams{
-				RequestParams: orderbook.RequestParams{
-					ChainId: chains.Ethereum,
-				},
+				ChainId: chains.Ethereum,
 				LimitOrderV3SubscribedApiControllerGetAllOrdersCountParams: orderbook.LimitOrderV3SubscribedApiControllerGetAllOrdersCountParams{},
 			},
 			expectedOutput: defaultCount,
@@ -458,26 +414,22 @@ func TestGetCount(t *testing.T) {
 		{
 			description: "Error - Duplicate statuses",
 			params: orderbook.GetCountParams{
-				RequestParams: orderbook.RequestParams{
-					ChainId: chains.Ethereum,
-				},
+				ChainId: chains.Ethereum,
 				LimitOrderV3SubscribedApiControllerGetAllOrdersCountParams: orderbook.LimitOrderV3SubscribedApiControllerGetAllOrdersCountParams{
 					Statuses: []string{"1", "1"},
 				},
 			},
-			expectedErrorDescription: "statuses must not contain duplicates",
+			expectedErrorDescription: `'statuses': must not contain duplicates`,
 		},
 		{
 			description: "Error - Invalid status",
 			params: orderbook.GetCountParams{
-				RequestParams: orderbook.RequestParams{
-					ChainId: chains.Ethereum,
-				},
+				ChainId: chains.Ethereum,
 				LimitOrderV3SubscribedApiControllerGetAllOrdersCountParams: orderbook.LimitOrderV3SubscribedApiControllerGetAllOrdersCountParams{
 					Statuses: []string{"4"},
 				},
 			},
-			expectedErrorDescription: "statuses can only contain 1, 2, and/or 3",
+			expectedErrorDescription: `'statuses': can only contain 1, 2, and/or 3`,
 		},
 	}
 
@@ -528,9 +480,7 @@ func TestGetEvent(t *testing.T) {
 			description:    "Success",
 			expectedOutput: 48608667,
 			params: orderbook.GetEventParams{
-				RequestParams: orderbook.RequestParams{
-					ChainId: chains.Ethereum,
-				},
+				ChainId:   chains.Ethereum,
 				OrderHash: "123",
 			},
 		},
@@ -584,9 +534,7 @@ func TestGetEvents(t *testing.T) {
 		{
 			description: "Success",
 			params: orderbook.GetEventsParams{
-				RequestParams: orderbook.RequestParams{
-					ChainId: chains.Ethereum,
-				},
+				ChainId: chains.Ethereum,
 				LimitOrderV3SubscribedApiControllerGetEventsParams: orderbook.LimitOrderV3SubscribedApiControllerGetEventsParams{
 					Limit: 1,
 				},
@@ -596,14 +544,12 @@ func TestGetEvents(t *testing.T) {
 		{
 			description: "Error - Limit too small",
 			params: orderbook.GetEventsParams{
-				RequestParams: orderbook.RequestParams{
-					ChainId: chains.Ethereum,
-				},
+				ChainId: chains.Ethereum,
 				LimitOrderV3SubscribedApiControllerGetEventsParams: orderbook.LimitOrderV3SubscribedApiControllerGetEventsParams{
 					Limit: 0,
 				},
 			},
-			expectedErrorDescription: "limit must be greater than 0",
+			expectedErrorDescription: `'chainId': must be greater than 0`,
 		},
 	}
 
@@ -662,24 +608,20 @@ func TestGetActiveOrdersWithPermit(t *testing.T) {
 		{
 			description: "Error - Invalid wallet address",
 			params: orderbook.GetActiveOrdersWithPermitParams{
-				RequestParams: orderbook.RequestParams{
-					ChainId: chains.Ethereum,
-				},
-				Wallet: "0x123",
-				Token:  tokens.EthereumUsdc,
+				ChainId: chains.Ethereum,
+				Wallet:  "0x123",
+				Token:   tokens.EthereumUsdc,
 			},
-			expectedErrorDescription: "wallet must be a valid Ethereum address",
+			expectedErrorDescription: `'wallet': not a valid Ethereum address`,
 		},
 		{
 			description: "Error - Invalid token address",
 			params: orderbook.GetActiveOrdersWithPermitParams{
-				RequestParams: orderbook.RequestParams{
-					ChainId: chains.Ethereum,
-				},
-				Wallet: addresses.Vitalik,
-				Token:  "0x123",
+				ChainId: chains.Ethereum,
+				Wallet:  addresses.Vitalik,
+				Token:   "0x123",
 			},
-			expectedErrorDescription: "token must be a valid Ethereum address",
+			expectedErrorDescription: `'token': not a valid Ethereum address`,
 		},
 	}
 

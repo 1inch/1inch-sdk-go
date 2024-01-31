@@ -158,7 +158,8 @@ func (s *ActionService) SwapTokens(params swap.SwapTokensParams) error {
 	// Execute swap request
 	// This will return the transaction data used by a wallet to execute the swap
 	swapResponse, _, err := s.client.Swap.GetSwapData(context.Background(), swap.GetSwapDataParams{
-		RequestParams:                      params.RequestParams,
+		ChainId:                            params.ChainId,
+		SkipWarnings:                       true, // Always skip the warnings from this endpoint since there will be one done before the transaction execution
 		AggregationControllerGetSwapParams: params.AggregationControllerGetSwapParams,
 	})
 	if err != nil {

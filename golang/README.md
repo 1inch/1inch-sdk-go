@@ -102,6 +102,9 @@ func main() {
 
 More example programs using the SDK can be found in the [examples directory]()
 
+## Tips
+- It is recommended to use private/personal RPC endpoints when using this SDK. Public RPCs tend to have either slow response times, strict rate limits, or both!
+
 ## Project structure
 
 This SDK is powered by a [client struct](https://github.com/1inch/1inch-sdk/blob/9703d3bf4a6d94ad64badd0e346a16d60a0c3509/golang/client/client.go#L60-L60) that contains instances of all Services used to talk to the 1inch APIs
