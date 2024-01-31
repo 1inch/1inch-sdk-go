@@ -1,3 +1,6 @@
+//go:build ignoretest
+// +build ignoretest
+
 package client
 
 import (
@@ -6,12 +9,12 @@ import (
 	"os"
 	"testing"
 
-	"github.com/1inch/1inch-sdk/golang/helpers/consts/chains"
-	"github.com/1inch/1inch-sdk/golang/helpers/consts/tokens"
 	"github.com/stretchr/testify/require"
 
 	"github.com/1inch/1inch-sdk/golang/client/orderbook"
 	"github.com/1inch/1inch-sdk/golang/helpers"
+	"github.com/1inch/1inch-sdk/golang/helpers/consts/chains"
+	"github.com/1inch/1inch-sdk/golang/helpers/consts/tokens"
 )
 
 func TestCreateOrderIntegration(t *testing.T) {

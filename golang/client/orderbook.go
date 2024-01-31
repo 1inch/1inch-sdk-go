@@ -7,15 +7,14 @@ import (
 	"fmt"
 	"net/http"
 
-	"github.com/1inch/1inch-sdk/golang/client/onchain"
-	"github.com/1inch/1inch-sdk/golang/helpers/consts/contracts"
-	"github.com/1inch/1inch-sdk/golang/helpers/consts/tokens"
 	"github.com/ethereum/go-ethereum/common"
 	"github.com/go-playground/validator/v10"
 
-	clienterrors "github.com/1inch/1inch-sdk/golang/client/errors"
+	"github.com/1inch/1inch-sdk/golang/client/onchain"
 	"github.com/1inch/1inch-sdk/golang/client/orderbook"
 	"github.com/1inch/1inch-sdk/golang/helpers"
+	"github.com/1inch/1inch-sdk/golang/helpers/consts/contracts"
+	"github.com/1inch/1inch-sdk/golang/helpers/consts/tokens"
 )
 
 type OrderbookService service
@@ -24,8 +23,8 @@ type OrderbookService service
 func (s *OrderbookService) CreateOrder(ctx context.Context, params orderbook.OrderRequest) (*orderbook.CreateOrderResponse, *http.Response, error) {
 	u := fmt.Sprintf("/orderbook/v3.0/%d", params.ChainId)
 
-	validate := validator.New()
-	err := validate.Struct(params)
+	v := validator.New()
+	err := v.Struct(params)
 	if err != nil {
 		return nil, nil, err
 	}
@@ -116,19 +115,10 @@ func (s *OrderbookService) CreateOrder(ctx context.Context, params orderbook.Ord
 // TODO Reusing the same request/response objects due to bad swagger spec
 
 // GetOrdersByCreatorAddress returns all orders created by a given address in the Limit Order Protocol
-func (s *OrderbookService) GetOrdersByCreatorAddress(ctx context.Context, address string, params orderbook.GetOrdersByCreatorAddressParams) ([]*orderbook.OrderResponse, *http.Response, error) {
-	u := fmt.Sprintf("/orderbook/v3.0/%d/address/{address}", params.ChainId)
+func (s *OrderbookService) GetOrdersByCreatorAddress(ctx context.Context, params orderbook.GetOrdersByCreatorAddressParams) ([]*orderbook.OrderResponse, *http.Response, error) {
+	u := fmt.Sprintf("/orderbook/v3.0/%d/address/%s", params.ChainId, params.CreatorAddress)
 
-	if !helpers.IsEthereumAddress(address) {
-		return nil, nil, clienterrors.NewRequestValidationError("address must be a valid Ethereum address")
-	}
-
-	u, err := ReplacePathVariable(u, "address", address)
-	if err != nil {
-		return nil, nil, err
-	}
-
-	err = params.Validate()
+	err := params.Validate()
 	if err != nil {
 		return nil, nil, err
 	}
@@ -210,9 +200,9 @@ func (s *OrderbookService) GetCount(ctx context.Context, params orderbook.GetCou
 
 // GetEvent returns an event in the Limit Order Protocol by order hash
 func (s *OrderbookService) GetEvent(ctx context.Context, params orderbook.GetEventParams) (*orderbook.EventResponse, *http.Response, error) {
-	u := fmt.Sprintf("/orderbook/v3.0/%d/events/{orderHash}", params.ChainId)
+	u := fmt.Sprintf("/orderbook/v3.0/%d/events/%s", params.ChainId, params.OrderHash)
 
-	u, err := ReplacePathVariable(u, "orderHash", params.OrderHash)
+	err := params.Validate()
 	if err != nil {
 		return nil, nil, err
 	}
@@ -263,20 +253,9 @@ func (s *OrderbookService) GetEvents(ctx context.Context, params orderbook.GetEv
 
 // GetActiveOrdersWithPermit returns all orders in the Limit Order Protocol that are active and have a valid permit
 func (s *OrderbookService) GetActiveOrdersWithPermit(ctx context.Context, params orderbook.GetActiveOrdersWithPermitParams) ([]*orderbook.OrderResponse, *http.Response, error) {
-	u := fmt.Sprintf("/orderbook/v3.0/%d/has-active-orders-with-permit/{walletAddress}/{token}", params.ChainId)
+	u := fmt.Sprintf("/orderbook/v3.0/%d/has-active-orders-with-permit/%s/%s", params.ChainId, params.Token, params.Wallet)
 
-	if !helpers.IsEthereumAddress(params.Wallet) {
-		return nil, nil, clienterrors.NewRequestValidationError("wallet must be a valid Ethereum address")
-	}
-	u, err := ReplacePathVariable(u, "walletAddress", params.Wallet)
-	if err != nil {
-		return nil, nil, err
-	}
-
-	if !helpers.IsEthereumAddress(params.Token) {
-		return nil, nil, clienterrors.NewRequestValidationError("token must be a valid Ethereum address")
-	}
-	u, err = ReplacePathVariable(u, "token", params.Token)
+	err := params.Validate()
 	if err != nil {
 		return nil, nil, err
 	}
