@@ -34,10 +34,8 @@ func main() {
 
 	// Build the config for the orders request
 	createOrderParams := orderbook.OrderRequest{
-		RequestParams: orderbook.RequestParams{
-			ChainId:   chains.Polygon,
-			WalletKey: os.Getenv("WALLET_KEY"),
-		},
+		ChainId:      chains.Polygon,
+		WalletKey:    os.Getenv("WALLET_KEY"),
 		SourceWallet: os.Getenv("WALLET_ADDRESS"),
 		FromToken:    tokens.PolygonDai,
 		ToToken:      tokens.PolygonUsdc,

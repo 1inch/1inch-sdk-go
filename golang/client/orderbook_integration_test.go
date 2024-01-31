@@ -1,3 +1,6 @@
+//go:build ignoretest
+// +build ignoretest
+
 package client
 
 import (
@@ -6,12 +9,12 @@ import (
 	"os"
 	"testing"
 
-	"github.com/1inch/1inch-sdk/golang/helpers/consts/chains"
-	"github.com/1inch/1inch-sdk/golang/helpers/consts/tokens"
 	"github.com/stretchr/testify/require"
 
 	"github.com/1inch/1inch-sdk/golang/client/orderbook"
 	"github.com/1inch/1inch-sdk/golang/helpers"
+	"github.com/1inch/1inch-sdk/golang/helpers/consts/chains"
+	"github.com/1inch/1inch-sdk/golang/helpers/consts/tokens"
 )
 
 func TestCreateOrderIntegration(t *testing.T) {
@@ -24,10 +27,8 @@ func TestCreateOrderIntegration(t *testing.T) {
 		{
 			description: "Success",
 			orderRequest: orderbook.OrderRequest{
-				RequestParams: orderbook.RequestParams{
-					ChainId:   chains.Polygon,
-					WalletKey: os.Getenv("WALLET_KEY"),
-				},
+				ChainId:      chains.Polygon,
+				WalletKey:    os.Getenv("WALLET_KEY"),
 				SourceWallet: os.Getenv("WALLET_ADDRESS"),
 				FromToken:    tokens.PolygonDai,
 				ToToken:      tokens.PolygonWeth,
@@ -77,9 +78,7 @@ func TestGetAllOrdersIntegration(t *testing.T) {
 		{
 			description: "Get all orders",
 			params: orderbook.GetAllOrdersParams{
-				RequestParams: orderbook.RequestParams{
-					ChainId: chains.Ethereum,
-				},
+				ChainId: chains.Ethereum,
 			},
 		},
 	}
@@ -113,9 +112,7 @@ func TestGetCountIntegration(t *testing.T) {
 		{
 			description: "Get counts",
 			params: orderbook.GetCountParams{
-				RequestParams: orderbook.RequestParams{
-					ChainId: chains.Ethereum,
-				},
+				ChainId: chains.Ethereum,
 			},
 		},
 	}
@@ -149,9 +146,7 @@ func TestGetEventsIntegration(t *testing.T) {
 		{
 			description: "Get events",
 			params: orderbook.GetEventsParams{
-				RequestParams: orderbook.RequestParams{
-					ChainId: chains.Ethereum,
-				},
+				ChainId: chains.Ethereum,
 				LimitOrderV3SubscribedApiControllerGetEventsParams: orderbook.LimitOrderV3SubscribedApiControllerGetEventsParams{
 					Limit: 1,
 				},

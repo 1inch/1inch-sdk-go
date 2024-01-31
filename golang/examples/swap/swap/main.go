@@ -35,10 +35,8 @@ func main() {
 
 	// Build the config for the swap request
 	swapParams := swap.GetSwapDataParams{
-		RequestParams: swap.RequestParams{
-			ChainId:      chains.Polygon,
-			SkipWarnings: false,
-		},
+		ChainId:      chains.Polygon,
+		SkipWarnings: false,
 		AggregationControllerGetSwapParams: swap.AggregationControllerGetSwapParams{
 			Src:             tokens.PolygonFrax,
 			Dst:             tokens.PolygonWeth,

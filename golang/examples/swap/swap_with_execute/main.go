@@ -32,13 +32,11 @@ func main() {
 
 	// Build the config for the swap request
 	swapParams := swap.SwapTokensParams{
-		ApprovalType: swap.PermitIfPossible,
-		RequestParams: swap.RequestParams{
-			SkipWarnings:  false,
-			PublicAddress: os.Getenv("WALLET_ADDRESS"),
-			WalletKey:     os.Getenv("WALLET_KEY"),
-			ChainId:       chains.Polygon,
-		},
+		ApprovalType:  swap.PermitIfPossible,
+		SkipWarnings:  false,
+		PublicAddress: os.Getenv("WALLET_ADDRESS"),
+		WalletKey:     os.Getenv("WALLET_KEY"),
+		ChainId:       chains.Polygon,
 		AggregationControllerGetSwapParams: swap.AggregationControllerGetSwapParams{
 			Src:             tokens.PolygonFrax,
 			Dst:             tokens.PolygonUsdc,

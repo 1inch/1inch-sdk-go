@@ -42,6 +42,11 @@ func (s *SwapService) ApproveAllowance(ctx context.Context, params swap.ApproveA
 func (s *SwapService) ApproveSpender(ctx context.Context, params swap.ApproveSpenderParams) (*swap.SpenderResponse, *http.Response, error) {
 	u := fmt.Sprintf("/swap/v5.2/%d/approve/spender", params.ChainId)
 
+	err := params.Validate()
+	if err != nil {
+		return nil, nil, err
+	}
+
 	req, err := s.client.NewRequest("GET", u, nil)
 	if err != nil {
 		return nil, nil, err
@@ -60,11 +65,12 @@ func (s *SwapService) ApproveSpender(ctx context.Context, params swap.ApproveSpe
 func (s *SwapService) ApproveTransaction(ctx context.Context, params swap.ApproveTransactionParams) (*swap.ApproveCallDataResponse, *http.Response, error) {
 	u := fmt.Sprintf("/swap/v5.2/%d/approve/transaction", params.ChainId)
 
-	if params.TokenAddress == "" {
-		return nil, nil, fmt.Errorf("tokenAddress is required")
+	err := params.Validate()
+	if err != nil {
+		return nil, nil, err
 	}
 
-	u, err := addQueryParameters(u, params.ApproveControllerGetCallDataParams)
+	u, err = addQueryParameters(u, params.ApproveControllerGetCallDataParams)
 	if err != nil {
 		return nil, nil, err
 	}
@@ -86,6 +92,11 @@ func (s *SwapService) ApproveTransaction(ctx context.Context, params swap.Approv
 // GetLiquiditySources returns all liquidity sources tracked by the 1inch Aggregation Protocol for a given chain
 func (s *SwapService) GetLiquiditySources(ctx context.Context, params swap.GetLiquiditySourcesParams) (*swap.ProtocolsResponse, *http.Response, error) {
 	u := fmt.Sprintf("/swap/v5.2/%d/liquidity-sources", params.ChainId)
+
+	err := params.Validate()
+	if err != nil {
+		return nil, nil, err
+	}
 
 	req, err := s.client.NewRequest("GET", u, nil)
 	if err != nil {
@@ -128,8 +139,6 @@ func (s *SwapService) GetQuote(ctx context.Context, params swap.GetQuoteParams) 
 
 	return &quote, res, nil
 }
-
-// TODO temporarily adding a bool to the function call until config refactor
 
 // GetSwapData returns a swap quote with transaction data that can be used to execute a swap through the Aggregation Protocol
 func (s *SwapService) GetSwapData(ctx context.Context, params swap.GetSwapDataParams) (*swap.SwapResponse, *http.Response, error) {
@@ -180,6 +189,11 @@ func (s *SwapService) GetSwapData(ctx context.Context, params swap.GetSwapDataPa
 // GetTokens returns all tokens officially tracked by the 1inch Aggregation Protocol for a given chain
 func (s *SwapService) GetTokens(ctx context.Context, params swap.GetTokensParams) (*swap.TokensResponse, *http.Response, error) {
 	u := fmt.Sprintf("/swap/v5.2/%d/tokens", params.ChainId)
+
+	err := params.Validate()
+	if err != nil {
+		return nil, nil, err
+	}
 
 	req, err := s.client.NewRequest("GET", u, nil)
 	if err != nil {
