@@ -1,4 +1,4 @@
-package main
+package project_validation
 
 import (
 	"fmt"
@@ -8,48 +8,42 @@ import (
 	"os"
 	"path/filepath"
 	"strings"
+	"testing"
 )
 
-// This is a helper script to ensure all parameter validation functions in the SDK properly pair each parameter name with the correct string
-// Can only be run when the working directory is set to the "golang" folder of the SDK
+// This is a project validation test to ensure all parameter validation functions in the SDK properly pair each parameter name with the correct string
 
-func main() {
-	currentDir, err := os.Getwd()
+func TestParameterConsistency(t *testing.T) {
+
+	err := validateWorkingDirectory()
 	if err != nil {
-		fmt.Println("Failed to get current directory:", err)
-		return
+		t.Fatalf("Directory error: %v", err)
 	}
 
-	dirName := filepath.Base(currentDir)
-	if dirName != "golang" {
-		fmt.Println(`This script must be run specifically from the "golang" folder of the SDK project.`)
-		return
-	}
-
-	err = filepath.Walk(currentDir, func(path string, info os.FileInfo, err error) error {
+	err = filepath.Walk("./..", func(path string, info os.FileInfo, err error) error {
 		if err != nil {
 			return err
 		}
 		if strings.HasSuffix(path, "types.go") {
-			fmt.Println("Checking file:", trimPath(path))
-			checkFile(path)
+			if err := checkFile(t, path); err != nil {
+				t.Errorf("Failed to check file %v: %v", trimPath(path), err)
+			}
 		}
 		return nil
 	})
-
 	if err != nil {
-		fmt.Println("Error walking through files:", err)
+		t.Fatalf("Error walking through files: %v", err)
 	}
 }
 
-func checkFile(filename string) {
+func checkFile(t *testing.T, filePath string) error {
 	fset := token.NewFileSet()
-	node, err := parser.ParseFile(fset, filename, nil, parser.ParseComments)
+	node, err := parser.ParseFile(fset, filePath, nil, parser.ParseComments)
 	if err != nil {
-		fmt.Println("Error parsing file:", err)
-		return
+		return fmt.Errorf("error parsing file: %w", err)
 	}
 
+	var lastErr error
 	ast.Inspect(node, func(n ast.Node) bool {
 		callExpr, ok := n.(*ast.CallExpr)
 		if !ok {
@@ -60,16 +54,20 @@ func checkFile(filename string) {
 			if ident, ok := selExpr.X.(*ast.Ident); ok && ident.Name == "validate" && selExpr.Sel.Name == "Parameter" {
 				if len(callExpr.Args) >= 4 {
 					firstArg, secondArg := callExpr.Args[0], callExpr.Args[1]
-					checkValidationCall(firstArg, secondArg, fset)
+					if err := checkValidationCall(firstArg, secondArg, fset); err != nil {
+						t.Errorf("%v", err)
+					}
 				}
 			}
 		}
 
 		return true
 	})
+
+	return lastErr
 }
 
-func checkValidationCall(firstArg, secondArg ast.Expr, fset *token.FileSet) {
+func checkValidationCall(firstArg, secondArg ast.Expr, fset *token.FileSet) error {
 	// Extract variable name from the first argument
 	varName := extractVarName(firstArg)
 
@@ -88,10 +86,11 @@ func checkValidationCall(firstArg, secondArg ast.Expr, fset *token.FileSet) {
 			formattedVarName := strings.ToLower(string(actualVarNamePart[0])) + actualVarNamePart[1:]
 
 			if formattedVarName != expectedVarName {
-				reportMismatch(varName, expectedVarName, stringLit, fset, formattedVarName)
+				return reportMismatch(varName, expectedVarName, stringLit, fset, formattedVarName)
 			}
 		}
 	}
+	return nil
 }
 
 func extractVarName(expr ast.Expr) string {
@@ -102,15 +101,25 @@ func extractVarName(expr ast.Expr) string {
 		if ident, ok := v.X.(*ast.Ident); ok {
 			return ident.Name + "." + v.Sel.Name
 		}
+	case *ast.CallExpr:
+		// This block handles type conversion expressions.
+		// Check if the Fun part of the CallExpr is an identifier, which would indicate a type conversion.
+		if ident, ok := v.Fun.(*ast.Ident); ok {
+			// The first argument of the CallExpr should be the variable being converted.
+			if len(v.Args) > 0 {
+				return extractVarName(v.Args[0]) // Recursively extract the name from the first argument.
+			}
+			return ident.Name // If no arguments are found, return the type being converted to.
+		}
 	}
 	return ""
 }
 
-func reportMismatch(varName, varNameAsString string, stringLit *ast.BasicLit, fset *token.FileSet, formattedVarName string) {
+func reportMismatch(varName, varNameAsString string, stringLit *ast.BasicLit, fset *token.FileSet, formattedVarName string) error {
 	position := fset.Position(stringLit.Pos())
 	displayPath := trimPath(position.Filename)
-	fmt.Printf("Mismatch found in %s at line %d: parameter '%s' should have the string literal '%s' next to it, not '%s'.\n",
-		displayPath, position.Line, varName, formattedVarName, varNameAsString)
+	return fmt.Errorf("Mismatch found in %s at line %d: parameter '%s' should have the string literal '%s' next to it, not '%s'.\n",
+		vanityPath(displayPath), position.Line, varName, formattedVarName, varNameAsString)
 }
 
 func trimPath(path string) string {
