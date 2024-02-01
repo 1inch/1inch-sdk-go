@@ -56,10 +56,10 @@ func BigInt(value string, variableName string) error {
 
 func ChainId(value int, variableName string) error {
 	if value == 0 {
-		return fmt.Errorf("%s is required", variableName)
+		return NewParameterMissingError(variableName)
 	}
 	if !helpers.Contains(value, chains.ValidChainIds) {
-		return fmt.Errorf("%d is not a valid chain id - valid chain ids are: %v", value, chains.ValidChainIds)
+		return NewParameterValidationError(variableName, fmt.Sprintf("valid chain ids are: %v", chains.ValidChainIds))
 	}
 	return nil
 }
@@ -79,7 +79,7 @@ func PrivateKey(address string, variableName string) error {
 }
 
 func ApprovalType(value int, variableName string) error {
-	if helpers.Contains(value, []int{0, 1, 2}) {
+	if !helpers.Contains(value, []int{0, 1, 2}) {
 		return NewParameterValidationError(variableName, "invalid approval type")
 	}
 	return nil
@@ -118,6 +118,9 @@ func LimitPointer(value *float32, variableName string) error {
 }
 
 func Limit(value float32, variableName string) error {
+	if value == 0 {
+		return NewParameterMissingError(variableName)
+	}
 	if value < 1 {
 		return NewParameterValidationError(variableName, "must be greater than 0")
 	}
@@ -178,5 +181,13 @@ func SortBy(sortBy string, variableName string) error {
 	if !helpers.Contains(sortBy, validSortBy) {
 		return NewParameterValidationError(variableName, "can only contain createDateTime, takerRate, makerRate, makerAmount, or takerAmount")
 	}
+	return nil
+}
+
+func OrderHash(value string, variableName string) error {
+	if value == "" {
+		return NewParameterMissingError(variableName)
+	}
+	// TODO add criteria that captures valid order hash strings here
 	return nil
 }

@@ -21,12 +21,12 @@ func TestCreateOrderIntegration(t *testing.T) {
 
 	testcases := []struct {
 		description   string
-		orderRequest  orderbook.OrderRequest
+		orderRequest  orderbook.CreateOrderParams
 		expectSuccess bool
 	}{
 		{
 			description: "Success",
-			orderRequest: orderbook.OrderRequest{
+			orderRequest: orderbook.CreateOrderParams{
 				ChainId:      chains.Polygon,
 				WalletKey:    os.Getenv("WALLET_KEY"),
 				SourceWallet: os.Getenv("WALLET_ADDRESS"),

@@ -23,7 +23,7 @@ type Client struct {
 	EthClient *ethclient.Client
 }
 
-func CreateLimitOrder(orderRequest OrderRequest, chainId int, key string) (*Order, error) {
+func CreateLimitOrder(orderRequest CreateOrderParams, chainId int, key string) (*Order, error) {
 
 	orderData := OrderData{
 		MakerAsset:    orderRequest.FromToken,

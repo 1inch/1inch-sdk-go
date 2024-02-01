@@ -15,6 +15,9 @@ func NewParameterMissingError(variableName string) error {
 }
 
 func AggregateValidationErorrs(validationErrors []error) error {
+	if validationErrors == nil || len(validationErrors) == 0 {
+		return nil
+	}
 	builder := strings.Builder{}
 	builder.WriteString("request config errors: \n")
 	for _, err := range validationErrors {
@@ -22,4 +25,12 @@ func AggregateValidationErorrs(validationErrors []error) error {
 		builder.WriteString("\n")
 	}
 	return errors.New(builder.String())
+}
+
+// GetValidatorErrorsCount uses the number of newlines in the error message to know how many errors were returned
+func GetValidatorErrorsCount(validationError error) int {
+	if validationError == nil {
+		return 0
+	}
+	return strings.Count(validationError.Error(), "\n") - 1
 }

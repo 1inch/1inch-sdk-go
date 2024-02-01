@@ -7,13 +7,14 @@ import (
 	"testing"
 	"time"
 
+	"github.com/ethereum/go-ethereum/ethclient"
+	"github.com/stretchr/testify/assert"
+	"github.com/stretchr/testify/require"
+
 	"github.com/1inch/1inch-sdk/golang/helpers"
 	"github.com/1inch/1inch-sdk/golang/helpers/consts/addresses"
 	"github.com/1inch/1inch-sdk/golang/helpers/consts/amounts"
 	"github.com/1inch/1inch-sdk/golang/helpers/consts/tokens"
-	"github.com/ethereum/go-ethereum/ethclient"
-	"github.com/stretchr/testify/assert"
-	"github.com/stretchr/testify/require"
 
 	"github.com/1inch/1inch-sdk/golang/helpers/consts/chains"
 )
@@ -128,7 +129,7 @@ func TestCreateLimitOrder(t *testing.T) {
 
 	tests := []struct {
 		name          string
-		orderRequest  OrderRequest
+		orderRequest  CreateOrderParams
 		chainId       int
 		key           string
 		mockBigInt    func(string) (*big.Int, error)
@@ -138,7 +139,7 @@ func TestCreateLimitOrder(t *testing.T) {
 	}{
 		{
 			name: "happy path",
-			orderRequest: OrderRequest{
+			orderRequest: CreateOrderParams{
 				FromToken:    "0x8f3Cf7ad23Cd3CaDbD9735AFf958023239c6A063",
 				ToToken:      "0x7ceb23fd6bc0add59e62ac25578270cff1b9f619",
 				MakingAmount: "1000000",
@@ -171,7 +172,7 @@ func TestCreateLimitOrder(t *testing.T) {
 		},
 		{
 			name: "empty maker asset",
-			orderRequest: OrderRequest{
+			orderRequest: CreateOrderParams{
 				FromToken:    "",
 				ToToken:      "0x7ceb23fd6bc0add59e62ac25578270cff1b9f619",
 				MakingAmount: "1000000",
@@ -189,7 +190,7 @@ func TestCreateLimitOrder(t *testing.T) {
 		},
 		{
 			name: "empty taker asset",
-			orderRequest: OrderRequest{
+			orderRequest: CreateOrderParams{
 				FromToken:    "0x8f3Cf7ad23Cd3CaDbD9735AFf958023239c6A063",
 				ToToken:      "",
 				MakingAmount: "1000000",
@@ -207,7 +208,7 @@ func TestCreateLimitOrder(t *testing.T) {
 		},
 		{
 			name: "invalid private key",
-			orderRequest: OrderRequest{
+			orderRequest: CreateOrderParams{
 				FromToken:    "0x8f3Cf7ad23Cd3CaDbD9735AFf958023239c6A063",
 				ToToken:      "0x7ceb23fd6bc0add59e62ac25578270cff1b9f619",
 				MakingAmount: "1000000",

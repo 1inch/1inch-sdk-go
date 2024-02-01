@@ -23,7 +23,7 @@ func TestCreateOrderE2E(t *testing.T) {
 	testcases := []struct {
 		description       string
 		config            Config
-		createOrderParams orderbook.OrderRequest
+		createOrderParams orderbook.CreateOrderParams
 		expectedOutput    string
 	}{
 		{
@@ -37,7 +37,7 @@ func TestCreateOrderE2E(t *testing.T) {
 					},
 				},
 			},
-			createOrderParams: orderbook.OrderRequest{
+			createOrderParams: orderbook.CreateOrderParams{
 				ChainId:      chains.Polygon,
 				WalletKey:    os.Getenv("WALLET_KEY"),
 				SourceWallet: os.Getenv("WALLET_ADDRESS"),
@@ -60,7 +60,7 @@ func TestCreateOrderE2E(t *testing.T) {
 					},
 				},
 			},
-			createOrderParams: orderbook.OrderRequest{
+			createOrderParams: orderbook.CreateOrderParams{
 				ChainId:      chains.Ethereum,
 				WalletKey:    os.Getenv("WALLET_KEY"),
 				SourceWallet: os.Getenv("WALLET_ADDRESS"),

@@ -8,7 +8,6 @@ import (
 	"net/http"
 
 	"github.com/ethereum/go-ethereum/common"
-	"github.com/go-playground/validator/v10"
 
 	"github.com/1inch/1inch-sdk/golang/client/onchain"
 	"github.com/1inch/1inch-sdk/golang/client/orderbook"
@@ -20,11 +19,10 @@ import (
 type OrderbookService service
 
 // CreateOrder creates an order in the Limit Order Protocol
-func (s *OrderbookService) CreateOrder(ctx context.Context, params orderbook.OrderRequest) (*orderbook.CreateOrderResponse, *http.Response, error) {
+func (s *OrderbookService) CreateOrder(ctx context.Context, params orderbook.CreateOrderParams) (*orderbook.CreateOrderResponse, *http.Response, error) {
 	u := fmt.Sprintf("/orderbook/v3.0/%d", params.ChainId)
 
-	v := validator.New()
-	err := v.Struct(params)
+	err := params.Validate()
 	if err != nil {
 		return nil, nil, err
 	}

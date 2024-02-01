@@ -7,13 +7,14 @@ import (
 	"strings"
 	"testing"
 
+	"github.com/stretchr/testify/require"
+
 	"github.com/1inch/1inch-sdk/golang/client/swap"
 	"github.com/1inch/1inch-sdk/golang/client/tenderly"
 	"github.com/1inch/1inch-sdk/golang/helpers"
 	"github.com/1inch/1inch-sdk/golang/helpers/consts/chains"
 	"github.com/1inch/1inch-sdk/golang/helpers/consts/tokens"
 	"github.com/1inch/1inch-sdk/golang/helpers/consts/web3providers"
-	"github.com/stretchr/testify/require"
 )
 
 func TestSwapTokensTenderlyE2E(t *testing.T) {
