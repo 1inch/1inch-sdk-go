@@ -52,7 +52,7 @@ func TestIsEthereumAddress(t *testing.T) {
 
 	for _, tc := range testcases {
 		t.Run(tc.description, func(t *testing.T) {
-			err := EthereumAddress(tc.address, "")
+			err := CheckEthereumAddress(tc.address, "")
 			if tc.expectError {
 				require.Error(t, err, fmt.Sprintf("%s should have caused an error", tc.description))
 			} else {
@@ -95,7 +95,7 @@ func TestBigInt(t *testing.T) {
 
 	for _, tc := range testcases {
 		t.Run(tc.description, func(t *testing.T) {
-			err := BigInt(tc.value, "testValue")
+			err := CheckBigInt(tc.value, "testValue")
 			if tc.expectError {
 				require.Error(t, err, fmt.Sprintf("%s should have caused an error", tc.description))
 			} else {
@@ -134,7 +134,7 @@ func TestChainId(t *testing.T) {
 
 	for _, tc := range testcases {
 		t.Run(tc.description, func(t *testing.T) {
-			err := ChainId(tc.value, "testChainId")
+			err := CheckChainId(tc.value, "testChainId")
 			if tc.expectError {
 				require.Error(t, err, fmt.Sprintf("%s should have caused an error", tc.description))
 			} else {
@@ -178,7 +178,7 @@ func TestPrivateKey(t *testing.T) {
 
 	for _, tc := range testcases {
 		t.Run(tc.description, func(t *testing.T) {
-			err := PrivateKey(tc.address, "testPrivateKey")
+			err := CheckPrivateKey(tc.address, "testPrivateKey")
 			if tc.expectError {
 				require.Error(t, err, fmt.Sprintf("%s should have caused an error", tc.description))
 			} else {
@@ -229,7 +229,7 @@ func TestSlippage(t *testing.T) {
 
 	for _, tc := range testcases {
 		t.Run(tc.description, func(t *testing.T) {
-			err := Slippage(tc.value, "testSlippage")
+			err := CheckSlippage(tc.value, "testSlippage")
 			if tc.expectError {
 				require.Error(t, err, fmt.Sprintf("%s should have caused an error", tc.description))
 			} else {
