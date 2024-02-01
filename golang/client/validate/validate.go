@@ -8,15 +8,15 @@ import (
 	"github.com/1inch/1inch-sdk/golang/helpers/consts/chains"
 )
 
-// EthereumAddressPointer exits early if the pointer is nil because nil pointer parameters are optional
-func EthereumAddressPointer(address *string, variableName string) error {
+// CheckEthereumAddressPointer exits early if the pointer is nil because nil pointer parameters are optional
+func CheckEthereumAddressPointer(address *string, variableName string) error {
 	if address == nil {
 		return nil
 	}
-	return EthereumAddress(*address, variableName)
+	return CheckEthereumAddress(*address, variableName)
 }
 
-func EthereumAddress(address string, variableName string) error {
+func CheckEthereumAddress(address string, variableName string) error {
 	if address == "" {
 		return NewParameterMissingError(variableName)
 	}
@@ -30,16 +30,16 @@ func EthereumAddress(address string, variableName string) error {
 	return nil
 }
 
-func BigIntPointer(value *string, variableName string) error {
+func CheckBigIntPointer(value *string, variableName string) error {
 	if value == nil {
 		return nil
 	}
-	return BigInt(*value, variableName)
+	return CheckBigInt(*value, variableName)
 }
 
 var maxBigInt, _ = helpers.BigIntFromString("115792089237316195423570985008687907853269984665640564039457584007913129639935")
 
-func BigInt(value string, variableName string) error {
+func CheckBigInt(value string, variableName string) error {
 	if value == "" {
 		return NewParameterMissingError(variableName)
 	}
@@ -54,7 +54,7 @@ func BigInt(value string, variableName string) error {
 	return nil
 }
 
-func ChainId(value int, variableName string) error {
+func CheckChainId(value int, variableName string) error {
 	if value == 0 {
 		return NewParameterMissingError(variableName)
 	}
@@ -64,7 +64,7 @@ func ChainId(value int, variableName string) error {
 	return nil
 }
 
-func PrivateKey(address string, variableName string) error {
+func CheckPrivateKey(address string, variableName string) error {
 	if address == "" {
 		return NewParameterMissingError(variableName)
 	}
@@ -78,14 +78,14 @@ func PrivateKey(address string, variableName string) error {
 	return nil
 }
 
-func ApprovalType(value int, variableName string) error {
+func CheckApprovalType(value int, variableName string) error {
 	if !helpers.Contains(value, []int{0, 1, 2}) {
 		return NewParameterValidationError(variableName, "invalid approval type")
 	}
 	return nil
 }
 
-func Slippage(value float32, variableName string) error {
+func CheckSlippage(value float32, variableName string) error {
 	// Slippage of '0' is technically allowed, but it is much more likely the user forgot to set it in their request config, so it is disallowed for now
 	if value == 0 {
 		return NewParameterMissingError(variableName)
@@ -96,28 +96,28 @@ func Slippage(value float32, variableName string) error {
 	return nil
 }
 
-func PagePointer(value *float32, variableName string) error {
+func CheckPagePointer(value *float32, variableName string) error {
 	if value == nil {
 		return nil
 	}
-	return Page(*value, variableName)
+	return CheckPage(*value, variableName)
 }
 
-func Page(page float32, variableName string) error {
+func CheckPage(page float32, variableName string) error {
 	if page < 1 {
 		return NewParameterValidationError(variableName, "must be greater than 0")
 	}
 	return nil
 }
 
-func LimitPointer(value *float32, variableName string) error {
+func CheckLimitPointer(value *float32, variableName string) error {
 	if value == nil {
 		return nil
 	}
-	return Limit(*value, variableName)
+	return CheckLimit(*value, variableName)
 }
 
-func Limit(value float32, variableName string) error {
+func CheckLimit(value float32, variableName string) error {
 	if value == 0 {
 		return NewParameterMissingError(variableName)
 	}
@@ -127,14 +127,14 @@ func Limit(value float32, variableName string) error {
 	return nil
 }
 
-func StatusesIntsPointer(value *[]float32, variableName string) error {
+func CheckStatusesIntsPointer(value *[]float32, variableName string) error {
 	if value == nil {
 		return nil
 	}
-	return StatusesInts(*value, variableName)
+	return CheckStatusesInts(*value, variableName)
 }
 
-func StatusesInts(statuses []float32, variableName string) error {
+func CheckStatusesInts(statuses []float32, variableName string) error {
 	if statuses == nil {
 		return nil
 	}
@@ -148,14 +148,14 @@ func StatusesInts(statuses []float32, variableName string) error {
 	return nil
 }
 
-func StatusesStringsPointer(value *[]string, variableName string) error {
+func CheckStatusesStringsPointer(value *[]string, variableName string) error {
 	if value == nil {
 		return nil
 	}
-	return StatusesStrings(*value, variableName)
+	return CheckStatusesStrings(*value, variableName)
 }
 
-func StatusesStrings(statuses []string, variableName string) error {
+func CheckStatusesStrings(statuses []string, variableName string) error {
 	if statuses == nil {
 		return nil
 	}
@@ -169,14 +169,14 @@ func StatusesStrings(statuses []string, variableName string) error {
 	return nil
 }
 
-func SortByPointer(value *string, variableName string) error {
+func CheckSortByPointer(value *string, variableName string) error {
 	if value == nil {
 		return nil
 	}
-	return SortBy(*value, variableName)
+	return CheckSortBy(*value, variableName)
 }
 
-func SortBy(sortBy string, variableName string) error {
+func CheckSortBy(sortBy string, variableName string) error {
 	validSortBy := []string{"createDateTime", "takerRate", "makerRate", "makerAmount", "takerAmount"}
 	if !helpers.Contains(sortBy, validSortBy) {
 		return NewParameterValidationError(variableName, "can only contain createDateTime, takerRate, makerRate, makerAmount, or takerAmount")
@@ -184,7 +184,7 @@ func SortBy(sortBy string, variableName string) error {
 	return nil
 }
 
-func OrderHash(value string, variableName string) error {
+func CheckOrderHash(value string, variableName string) error {
 	if value == "" {
 		return NewParameterMissingError(variableName)
 	}

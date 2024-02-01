@@ -9,7 +9,7 @@ import (
 )
 
 // This is a helper script to ensure all table-driven integration tests call the helpers.sleep() function
-// Can only be run from this directory
+// Can only be run when the working directory is set to the "golang" folder of the SDK
 
 const targetBlock = "helpers.Sleep()"
 
@@ -22,7 +22,7 @@ func main() {
 
 	dirName := filepath.Base(currentDir)
 	if dirName != "golang" {
-		fmt.Println(`This script must be run from within the "golang" folder of the SDK project.`)
+		fmt.Println(`This script must be run specifically from the "golang" folder of the SDK project.`)
 		return
 	}
 

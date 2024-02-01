@@ -14,7 +14,7 @@ func NewParameterMissingError(variableName string) error {
 	return fmt.Errorf("config validation error '%s' is required in the request config", variableName)
 }
 
-func AggregateValidationErorrs(validationErrors []error) error {
+func ConsolidateValidationErorrs(validationErrors []error) error {
 	if validationErrors == nil || len(validationErrors) == 0 {
 		return nil
 	}
