@@ -2,6 +2,47 @@ package orderbook
 
 import "github.com/1inch/1inch-sdk/golang/client/validate"
 
+type CreateOrderParams struct {
+	ChainId      int
+	WalletKey    string
+	SourceWallet string
+	FromToken    string
+	ToToken      string
+	TakingAmount string
+	MakingAmount string
+	Receiver     string
+	SkipWarnings bool
+}
+
+func (params *CreateOrderParams) Validate() error {
+	var validationErrors []error
+	if err := validate.ChainId(params.ChainId, "chainId"); err != nil {
+		validationErrors = append(validationErrors, err)
+	}
+	if err := validate.PrivateKey(params.WalletKey, "walletKey"); err != nil {
+		validationErrors = append(validationErrors, err)
+	}
+	if err := validate.EthereumAddress(params.SourceWallet, "sourceWallet"); err != nil {
+		validationErrors = append(validationErrors, err)
+	}
+	if err := validate.EthereumAddress(params.FromToken, "fromToken"); err != nil {
+		validationErrors = append(validationErrors, err)
+	}
+	if err := validate.EthereumAddress(params.ToToken, "toToken"); err != nil {
+		validationErrors = append(validationErrors, err)
+	}
+	if err := validate.BigInt(params.TakingAmount, "takingAmount"); err != nil {
+		validationErrors = append(validationErrors, err)
+	}
+	if err := validate.BigInt(params.MakingAmount, "makingAmount"); err != nil {
+		validationErrors = append(validationErrors, err)
+	}
+	if err := validate.EthereumAddress(params.Receiver, "receiver"); err != nil {
+		validationErrors = append(validationErrors, err)
+	}
+	return validate.AggregateValidationErorrs(validationErrors)
+}
+
 type GetOrdersByCreatorAddressParams struct {
 	ChainId        int
 	CreatorAddress string
@@ -34,10 +75,7 @@ func (params *GetOrdersByCreatorAddressParams) Validate() error {
 	if err := validate.EthereumAddressPointer(params.MakerAsset, "makerAsset"); err != nil {
 		validationErrors = append(validationErrors, err)
 	}
-	if len(validationErrors) > 0 {
-		return validate.AggregateValidationErorrs(validationErrors)
-	}
-	return nil
+	return validate.AggregateValidationErorrs(validationErrors)
 }
 
 type GetAllOrdersParams struct {
@@ -68,10 +106,7 @@ func (params *GetAllOrdersParams) Validate() error {
 	if err := validate.EthereumAddressPointer(params.MakerAsset, "makerAsset"); err != nil {
 		validationErrors = append(validationErrors, err)
 	}
-	if len(validationErrors) > 0 {
-		return validate.AggregateValidationErorrs(validationErrors)
-	}
-	return nil
+	return validate.AggregateValidationErorrs(validationErrors)
 }
 
 type GetCountParams struct {
@@ -88,10 +123,7 @@ func (params *GetCountParams) Validate() error {
 	if err := validate.StatusesStrings(params.Statuses, "statuses"); err != nil {
 		validationErrors = append(validationErrors, err)
 	}
-	if len(validationErrors) > 0 {
-		return validate.AggregateValidationErorrs(validationErrors)
-	}
-	return nil
+	return validate.AggregateValidationErorrs(validationErrors)
 }
 
 type GetEventParams struct {
@@ -104,10 +136,10 @@ func (params *GetEventParams) Validate() error { // TODO Find validation criteri
 	if err := validate.ChainId(params.ChainId, "chainId"); err != nil {
 		validationErrors = append(validationErrors, err)
 	}
-	if len(validationErrors) > 0 {
-		return validate.AggregateValidationErorrs(validationErrors)
+	if err := validate.OrderHash(params.OrderHash, "orderHash"); err != nil {
+		validationErrors = append(validationErrors, err)
 	}
-	return nil
+	return validate.AggregateValidationErorrs(validationErrors)
 }
 
 type GetEventsParams struct {
@@ -120,13 +152,10 @@ func (params *GetEventsParams) Validate() error {
 	if err := validate.ChainId(params.ChainId, "chainId"); err != nil {
 		validationErrors = append(validationErrors, err)
 	}
-	if err := validate.Limit(params.Limit, "chainId"); err != nil {
+	if err := validate.Limit(params.Limit, "limit"); err != nil {
 		validationErrors = append(validationErrors, err)
 	}
-	if len(validationErrors) > 0 {
-		return validate.AggregateValidationErorrs(validationErrors)
-	}
-	return nil
+	return validate.AggregateValidationErorrs(validationErrors)
 }
 
 type GetActiveOrdersWithPermitParams struct {
@@ -140,14 +169,11 @@ func (params *GetActiveOrdersWithPermitParams) Validate() error {
 	if err := validate.ChainId(params.ChainId, "chainId"); err != nil {
 		validationErrors = append(validationErrors, err)
 	}
-	if err := validate.EthereumAddress(params.Wallet, "wallet"); err != nil {
+	if err := validate.PrivateKey(params.Wallet, "wallet"); err != nil {
 		validationErrors = append(validationErrors, err)
 	}
 	if err := validate.EthereumAddress(params.Token, "token"); err != nil {
 		validationErrors = append(validationErrors, err)
 	}
-	if len(validationErrors) > 0 {
-		return validate.AggregateValidationErorrs(validationErrors)
-	}
-	return nil
+	return validate.AggregateValidationErorrs(validationErrors)
 }

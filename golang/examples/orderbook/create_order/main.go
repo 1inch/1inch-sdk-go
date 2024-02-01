@@ -33,7 +33,7 @@ func main() {
 	}
 
 	// Build the config for the orders request
-	createOrderParams := orderbook.OrderRequest{
+	createOrderParams := orderbook.CreateOrderParams{
 		ChainId:      chains.Polygon,
 		WalletKey:    os.Getenv("WALLET_KEY"),
 		SourceWallet: os.Getenv("WALLET_ADDRESS"),

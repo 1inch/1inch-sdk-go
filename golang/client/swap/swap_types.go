@@ -44,10 +44,7 @@ func (params *SwapTokensParams) Validate() error {
 	if err := validate.Slippage(params.Slippage, "slippage"); err != nil {
 		validationErrors = append(validationErrors, err)
 	}
-	if len(validationErrors) > 0 {
-		return validate.AggregateValidationErorrs(validationErrors)
-	}
-	return nil
+	return validate.AggregateValidationErorrs(validationErrors)
 }
 
 type ApproveAllowanceParams struct {
@@ -66,10 +63,7 @@ func (params *ApproveAllowanceParams) Validate() error {
 	if err := validate.EthereumAddress(params.WalletAddress, "walletAddress"); err != nil {
 		validationErrors = append(validationErrors, err)
 	}
-	if len(validationErrors) > 0 {
-		return validate.AggregateValidationErorrs(validationErrors)
-	}
-	return nil
+	return validate.AggregateValidationErorrs(validationErrors)
 }
 
 type ApproveSpenderParams struct {
@@ -81,10 +75,7 @@ func (params *ApproveSpenderParams) Validate() error {
 	if err := validate.ChainId(params.ChainId, "chainId"); err != nil {
 		validationErrors = append(validationErrors, err)
 	}
-	if len(validationErrors) > 0 {
-		return validate.AggregateValidationErorrs(validationErrors)
-	}
-	return nil
+	return validate.AggregateValidationErorrs(validationErrors)
 }
 
 type ApproveTransactionParams struct {
@@ -103,10 +94,7 @@ func (params *ApproveTransactionParams) Validate() error {
 	if err := validate.BigIntPointer(params.Amount, "amount"); err != nil {
 		validationErrors = append(validationErrors, err)
 	}
-	if len(validationErrors) > 0 {
-		return validate.AggregateValidationErorrs(validationErrors)
-	}
-	return nil
+	return validate.AggregateValidationErorrs(validationErrors)
 }
 
 type GetLiquiditySourcesParams struct {
@@ -118,10 +106,7 @@ func (params *GetLiquiditySourcesParams) Validate() error {
 	if err := validate.ChainId(params.ChainId, "chainId"); err != nil {
 		validationErrors = append(validationErrors, err)
 	}
-	if len(validationErrors) > 0 {
-		return validate.AggregateValidationErorrs(validationErrors)
-	}
-	return nil
+	return validate.AggregateValidationErorrs(validationErrors)
 }
 
 type GetQuoteParams struct {
@@ -143,13 +128,10 @@ func (params *GetQuoteParams) Validate() error {
 	if err := validate.BigInt(params.Amount, "amount"); err != nil {
 		validationErrors = append(validationErrors, err)
 	}
-	if params.Src == params.Dst {
+	if len(params.Src) > 0 && len(params.Dst) > 0 && params.Src == params.Dst {
 		validationErrors = append(validationErrors, errors.New("src and dst tokens must be different"))
 	}
-	if len(validationErrors) > 0 {
-		return validate.AggregateValidationErorrs(validationErrors)
-	}
-	return nil
+	return validate.AggregateValidationErorrs(validationErrors)
 }
 
 type GetSwapDataParams struct {
@@ -178,13 +160,10 @@ func (params *GetSwapDataParams) Validate() error {
 	if err := validate.Slippage(params.Slippage, "slippage"); err != nil {
 		validationErrors = append(validationErrors, err)
 	}
-	if params.Src == params.Dst {
+	if len(params.Src) > 0 && len(params.Dst) > 0 && params.Src == params.Dst {
 		validationErrors = append(validationErrors, errors.New("src and dst tokens must be different"))
 	}
-	if len(validationErrors) > 0 {
-		return validate.AggregateValidationErorrs(validationErrors)
-	}
-	return nil
+	return validate.AggregateValidationErorrs(validationErrors)
 }
 
 type GetTokensParams struct {
@@ -196,8 +175,5 @@ func (params *GetTokensParams) Validate() error {
 	if err := validate.ChainId(params.ChainId, "chainId"); err != nil {
 		validationErrors = append(validationErrors, err)
 	}
-	if len(validationErrors) > 0 {
-		return validate.AggregateValidationErorrs(validationErrors)
-	}
-	return nil
+	return validate.AggregateValidationErorrs(validationErrors)
 }
