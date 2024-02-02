@@ -192,7 +192,7 @@ func TestGetOrdersByCreatorAddress(t *testing.T) {
 					Statuses: &[]float32{0, 2},
 				},
 			},
-			expectedErrorDescription: `'statuses': can only contain 1, 2, and/or 3`,
+			expectedErrorDescription: `'statuses': can only contain [1 2 3]`,
 		},
 		{
 			description: "Error - Invalid sortBy",
@@ -205,7 +205,7 @@ func TestGetOrdersByCreatorAddress(t *testing.T) {
 					SortBy: orderbook.GetSortByParameter("invalid"),
 				},
 			},
-			expectedErrorDescription: `'sortBy': can only contain createDateTime, takerRate, makerRate, makerAmount, or takerAmount`,
+			expectedErrorDescription: `'sortBy': can only contain [createDateTime takerRate makerRate makerAmount takerAmount]`,
 		},
 		{
 			description: "Error - Invalid takerAsset",
@@ -320,7 +320,7 @@ func TestGetAllOrders(t *testing.T) {
 					Statuses: &[]float32{0, 2},
 				},
 			},
-			expectedErrorDescription: `'statuses': can only contain 1, 2, and/or 3`,
+			expectedErrorDescription: `'statuses': can only contain [1 2 3]`,
 		},
 		{
 			description: "Error - Invalid sortBy",
@@ -332,7 +332,7 @@ func TestGetAllOrders(t *testing.T) {
 					SortBy: orderbook.GetSortByParameter("invalid"),
 				},
 			},
-			expectedErrorDescription: `'sortBy': can only contain createDateTime, takerRate, makerRate, makerAmount, or takerAmount`,
+			expectedErrorDescription: `'sortBy': can only contain [createDateTime takerRate makerRate makerAmount takerAmount]`,
 		},
 		{
 			description: "Error - Invalid takerAsset",
@@ -430,7 +430,7 @@ func TestGetCount(t *testing.T) {
 					Statuses: []string{"4"},
 				},
 			},
-			expectedErrorDescription: `'statuses': can only contain 1, 2, and/or 3`,
+			expectedErrorDescription: `'statuses': can only contain [1 2 3]`,
 		},
 	}
 
