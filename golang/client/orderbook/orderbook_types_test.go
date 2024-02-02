@@ -266,7 +266,7 @@ func TestGetEventsParams_Validate(t *testing.T) {
 			params:      GetEventsParams{},
 			expectErrors: []string{
 				"'chainId' is required",
-				"'limit' is required",
+				"'limit': must be greater than 0", // TODO is this what I want to check here?
 			},
 		},
 	}

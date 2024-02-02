@@ -12,7 +12,7 @@ import (
 )
 
 func TestParameterFunctionConsistency(t *testing.T) {
-	err := checkParameterFunctionConsistency("parameter_types.go")
+	err := checkParameterFunctionConsistency("validate.go")
 	assert.NoError(t, err, "Parameter function consistency check failed")
 }
 
@@ -23,7 +23,7 @@ func checkParameterFunctionConsistency(filePath string) error {
 	}
 	defer file.Close()
 
-	caseRegex := regexp.MustCompile(`^[\t\s]*case\s+(\w+):`)
+	funcRegex := regexp.MustCompile(`^func Check(\w+)\(`)
 	scanner := bufio.NewScanner(file)
 
 	lineNumber := 0
@@ -31,12 +31,12 @@ func checkParameterFunctionConsistency(filePath string) error {
 		lineNumber++
 		line := scanner.Text()
 
-		matches := caseRegex.FindStringSubmatch(line)
+		matches := funcRegex.FindStringSubmatch(line)
 		if len(matches) == 2 {
 			caseLabel := matches[1]
 
 			// Move the scanner four lines down
-			for i := 0; i < 4; i++ {
+			for i := 0; i < 3; i++ {
 				if !scanner.Scan() {
 					return fmt.Errorf("expected error message four lines down from case '%s' at line %d, but reached EOF", caseLabel, lineNumber)
 				}
