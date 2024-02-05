@@ -3,7 +3,7 @@ package swap
 import (
 	"errors"
 
-	"github.com/1inch/1inch-sdk/golang/client/validate"
+	"github.com/svanas/1inch-sdk/golang/client/validate"
 )
 
 type SwapTokensParams struct {

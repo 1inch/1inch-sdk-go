@@ -9,11 +9,11 @@ import (
 
 	"github.com/ethereum/go-ethereum/common"
 
-	"github.com/1inch/1inch-sdk/golang/client/onchain"
-	"github.com/1inch/1inch-sdk/golang/client/orderbook"
-	"github.com/1inch/1inch-sdk/golang/helpers"
-	"github.com/1inch/1inch-sdk/golang/helpers/consts/contracts"
-	"github.com/1inch/1inch-sdk/golang/helpers/consts/tokens"
+	"github.com/svanas/1inch-sdk/golang/client/onchain"
+	"github.com/svanas/1inch-sdk/golang/client/orderbook"
+	"github.com/svanas/1inch-sdk/golang/helpers"
+	"github.com/svanas/1inch-sdk/golang/helpers/consts/contracts"
+	"github.com/svanas/1inch-sdk/golang/helpers/consts/tokens"
 )
 
 type OrderbookService service

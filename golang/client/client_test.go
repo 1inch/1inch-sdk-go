@@ -5,9 +5,9 @@ import (
 	"os"
 	"testing"
 
-	"github.com/1inch/1inch-sdk/golang/helpers/consts/chains"
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
+	"github.com/svanas/1inch-sdk/golang/helpers/consts/chains"
 )
 
 var SimpleEthereumConfig = Config{

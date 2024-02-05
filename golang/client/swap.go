@@ -5,7 +5,7 @@ import (
 	"fmt"
 	"net/http"
 
-	"github.com/1inch/1inch-sdk/golang/client/swap"
+	"github.com/svanas/1inch-sdk/golang/client/swap"
 )
 
 type SwapService service

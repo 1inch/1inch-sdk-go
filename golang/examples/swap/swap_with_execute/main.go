@@ -4,11 +4,11 @@ import (
 	"log"
 	"os"
 
-	"github.com/1inch/1inch-sdk/golang/client"
-	"github.com/1inch/1inch-sdk/golang/client/swap"
-	"github.com/1inch/1inch-sdk/golang/helpers"
-	"github.com/1inch/1inch-sdk/golang/helpers/consts/chains"
-	"github.com/1inch/1inch-sdk/golang/helpers/consts/tokens"
+	"github.com/svanas/1inch-sdk/golang/client"
+	"github.com/svanas/1inch-sdk/golang/client/swap"
+	"github.com/svanas/1inch-sdk/golang/helpers"
+	"github.com/svanas/1inch-sdk/golang/helpers/consts/chains"
+	"github.com/svanas/1inch-sdk/golang/helpers/consts/tokens"
 )
 
 func main() {

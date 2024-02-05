@@ -7,7 +7,7 @@ import (
 	"net/url"
 	"os"
 
-	"github.com/1inch/1inch-sdk/golang/helpers/consts/chains"
+	"github.com/svanas/1inch-sdk/golang/helpers/consts/chains"
 )
 
 // setup sets up a test HTTP server along with a Client that is

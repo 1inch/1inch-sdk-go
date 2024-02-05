@@ -15,7 +15,7 @@ import (
 	"github.com/ethereum/go-ethereum/ethclient"
 	"github.com/google/go-querystring/query"
 
-	"github.com/1inch/1inch-sdk/golang/helpers"
+	"github.com/svanas/1inch-sdk/golang/helpers"
 )
 
 type Environment string

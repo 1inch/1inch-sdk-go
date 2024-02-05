@@ -10,8 +10,8 @@ import (
 	"net/url"
 	"strings"
 
-	"github.com/1inch/1inch-sdk/golang/helpers/consts/contracts"
-	"github.com/1inch/1inch-sdk/golang/helpers/consts/tokens"
+	"github.com/svanas/1inch-sdk/golang/helpers/consts/contracts"
+	"github.com/svanas/1inch-sdk/golang/helpers/consts/tokens"
 )
 
 func SimulateSwap(tenderlyApiKey string, config SwapConfig) (*SimulationResponse, error) {

@@ -1,4 +1,4 @@
-module github.com/1inch/1inch-sdk/golang
+module github.com/svanas/1inch-sdk/golang
 
 go 1.19
 

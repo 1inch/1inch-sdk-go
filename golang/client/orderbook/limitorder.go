@@ -14,9 +14,9 @@ import (
 	"github.com/ethereum/go-ethereum/ethclient"
 	"github.com/ethereum/go-ethereum/signer/core/apitypes"
 
-	"github.com/1inch/1inch-sdk/golang/client/onchain"
-	"github.com/1inch/1inch-sdk/golang/helpers"
-	"github.com/1inch/1inch-sdk/golang/helpers/consts/contracts"
+	"github.com/svanas/1inch-sdk/golang/client/onchain"
+	"github.com/svanas/1inch-sdk/golang/helpers"
+	"github.com/svanas/1inch-sdk/golang/helpers/consts/contracts"
 )
 
 type Client struct {

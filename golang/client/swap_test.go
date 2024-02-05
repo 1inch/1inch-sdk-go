@@ -9,11 +9,11 @@ import (
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
 
-	"github.com/1inch/1inch-sdk/golang/client/swap"
-	"github.com/1inch/1inch-sdk/golang/helpers/consts/addresses"
-	"github.com/1inch/1inch-sdk/golang/helpers/consts/amounts"
-	"github.com/1inch/1inch-sdk/golang/helpers/consts/chains"
-	"github.com/1inch/1inch-sdk/golang/helpers/consts/tokens"
+	"github.com/svanas/1inch-sdk/golang/client/swap"
+	"github.com/svanas/1inch-sdk/golang/helpers/consts/addresses"
+	"github.com/svanas/1inch-sdk/golang/helpers/consts/amounts"
+	"github.com/svanas/1inch-sdk/golang/helpers/consts/chains"
+	"github.com/svanas/1inch-sdk/golang/helpers/consts/tokens"
 )
 
 func TestApproveAllowance(t *testing.T) {

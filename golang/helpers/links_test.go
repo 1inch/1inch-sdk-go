@@ -3,8 +3,8 @@ package helpers
 import (
 	"testing"
 
-	"github.com/1inch/1inch-sdk/golang/helpers/consts/chains"
 	"github.com/stretchr/testify/assert"
+	"github.com/svanas/1inch-sdk/golang/helpers/consts/chains"
 )
 
 func TestGetBlockExplorerTxLinkInfo(t *testing.T) {

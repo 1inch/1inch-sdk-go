@@ -1,6 +1,6 @@
 package orderbook
 
-import "github.com/1inch/1inch-sdk/golang/client/validate"
+import "github.com/svanas/1inch-sdk/golang/client/validate"
 
 type CreateOrderParams struct {
 	ChainId      int

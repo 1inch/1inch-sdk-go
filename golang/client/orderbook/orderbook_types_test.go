@@ -6,9 +6,9 @@ import (
 
 	"github.com/stretchr/testify/require"
 
-	"github.com/1inch/1inch-sdk/golang/client/validate"
-	"github.com/1inch/1inch-sdk/golang/helpers"
-	"github.com/1inch/1inch-sdk/golang/helpers/consts/chains"
+	"github.com/svanas/1inch-sdk/golang/client/validate"
+	"github.com/svanas/1inch-sdk/golang/helpers"
+	"github.com/svanas/1inch-sdk/golang/helpers/consts/chains"
 )
 
 func TestCreateOrderParams_Validate(t *testing.T) {

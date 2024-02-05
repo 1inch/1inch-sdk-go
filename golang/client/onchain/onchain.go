@@ -8,17 +8,17 @@ import (
 	"strings"
 	"time"
 
-	"github.com/1inch/1inch-sdk/golang/helpers"
-	"github.com/1inch/1inch-sdk/golang/helpers/consts/amounts"
-	"github.com/1inch/1inch-sdk/golang/helpers/consts/chains"
 	"github.com/ethereum/go-ethereum"
 	"github.com/ethereum/go-ethereum/accounts/abi"
 	"github.com/ethereum/go-ethereum/common"
 	"github.com/ethereum/go-ethereum/core/types"
 	"github.com/ethereum/go-ethereum/crypto"
 	"github.com/ethereum/go-ethereum/ethclient"
+	"github.com/svanas/1inch-sdk/golang/helpers"
+	"github.com/svanas/1inch-sdk/golang/helpers/consts/amounts"
+	"github.com/svanas/1inch-sdk/golang/helpers/consts/chains"
 
-	"github.com/1inch/1inch-sdk/golang/helpers/consts/contracts"
+	"github.com/svanas/1inch-sdk/golang/helpers/consts/contracts"
 )
 
 const gasLimit = uint64(21000000) // TODO make sure this value more dynamic
