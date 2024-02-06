@@ -57,35 +57,28 @@ func TestCreateOrder(t *testing.T) {
 			},
 			expectedErrorDescription: `'toToken' is required in the request config`,
 		},
-		// TODO commenting these out until we make validation logic for big ints represented as strings
-		//{
-		//	description: "Error - TakingAmount negative",
-		//	owner:       addresses.Vitalik,
-		//	params: orderbook.CreateOrderParams{
-		//      Chain: orderbook.Chain{
-		//      	ChainId:      137,
-		//      },
-		//		FromToken:    tokens.PolygonDai,
-		//		ToToken:      tokens.PolygonWeth,
-		//		TakingAmount: "-1",
-		//		MakingAmount: "100",
-		//	},
-		//	expectedErrorDescription: `'TakingAmount' failed on the 'gt' tag`,
-		//},
-		//{
-		//	description: "Error - MakingAmount negative",
-		//	owner:       addresses.Vitalik,
-		//	params: orderbook.CreateOrderParams{
-		//      Chain: orderbook.Chain{
-		//      	ChainId:      137,
-		//      },
-		//		FromToken:    tokens.PolygonDai,
-		//		ToToken:      tokens.PolygonWeth,
-		//		TakingAmount: "100",
-		//		MakingAmount: "-1",
-		//	},
-		//	expectedErrorDescription: `'MakingAmount' failed on the 'gt' tag`,
-		//},
+		{
+			description: "Error - TakingAmount negative",
+			owner:       addresses.Vitalik,
+			params: orderbook.CreateOrderParams{
+				ChainId:      chains.Polygon,
+				FromToken:    tokens.PolygonDai,
+				TakingAmount: "-1",
+				MakingAmount: "100",
+			},
+			expectedErrorDescription: `'takingAmount': must be a positive value`,
+		},
+		{
+			description: "Error - MakingAmount negative",
+			owner:       addresses.Vitalik,
+			params: orderbook.CreateOrderParams{
+				ChainId:      chains.Polygon,
+				FromToken:    tokens.PolygonDai,
+				TakingAmount: "100",
+				MakingAmount: "-1",
+			},
+			expectedErrorDescription: `'makingAmount': must be a positive value`,
+		},
 	}
 
 	for _, tc := range testcases {

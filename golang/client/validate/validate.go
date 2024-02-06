@@ -2,6 +2,7 @@ package validate
 
 import (
 	"fmt"
+	"math/big"
 	"regexp"
 
 	"github.com/1inch/1inch-sdk/golang/helpers"
@@ -47,7 +48,8 @@ func CheckBigIntPointer(parameter interface{}, variableName string) error {
 	return CheckBigInt(*value, variableName)
 }
 
-var maxBigInt, _ = helpers.BigIntFromString("115792089237316195423570985008687907853269984665640564039457584007913129639935")
+var bigIntMax, _ = helpers.BigIntFromString("115792089237316195423570985008687907853269984665640564039457584007913129639935")
+var bigIntZero = big.NewInt(0)
 
 func CheckBigInt(parameter interface{}, variableName string) error {
 	value, ok := parameter.(string)
@@ -60,8 +62,14 @@ func CheckBigInt(parameter interface{}, variableName string) error {
 	}
 
 	parsedValue, err := helpers.BigIntFromString(value)
-	if err != nil || parsedValue.Cmp(maxBigInt) > 0 {
-		return NewParameterValidationError(variableName, "not a valid big integer or too big to fit in uint256")
+	if err != nil {
+		return NewParameterValidationError(variableName, "not a valid value")
+	}
+	if parsedValue.Cmp(bigIntMax) > 0 {
+		return NewParameterValidationError(variableName, "too big to fit in uint256")
+	}
+	if parsedValue.Cmp(bigIntZero) < 0 {
+		return NewParameterValidationError(variableName, "must be a positive value")
 	}
 	return nil
 }
