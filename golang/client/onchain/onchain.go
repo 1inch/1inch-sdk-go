@@ -191,7 +191,7 @@ func ReadContractSymbol(client *ethclient.Client, contractAddress common.Address
 
 	// Unpack the result
 	var contractName string
-	err = parsedABI.UnpackIntoInterface(&contractName, "name", result)
+	err = parsedABI.UnpackIntoInterface(&contractName, "symbol", result)
 	if err != nil {
 		return "", err
 	}
