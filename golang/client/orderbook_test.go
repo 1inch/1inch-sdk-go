@@ -10,7 +10,6 @@ import (
 	"github.com/stretchr/testify/require"
 
 	"github.com/1inch/1inch-sdk/golang/client/orderbook"
-	"github.com/1inch/1inch-sdk/golang/helpers"
 	"github.com/1inch/1inch-sdk/golang/helpers/consts/addresses"
 	"github.com/1inch/1inch-sdk/golang/helpers/consts/chains"
 	"github.com/1inch/1inch-sdk/golang/helpers/consts/tokens"
@@ -157,32 +156,31 @@ func TestGetOrdersByCreatorAddress(t *testing.T) {
 				ChainId:        chains.Ethereum,
 				CreatorAddress: addresses.Vitalik,
 				LimitOrderV3SubscribedApiControllerGetAllLimitOrdersParams: orderbook.LimitOrderV3SubscribedApiControllerGetAllLimitOrdersParams{
-					Page: helpers.GetPtr(float32(0)),
+					Page: -1,
 				},
 			},
 			expectedErrorDescription: `'page': must be greater than 0`,
 		},
-		// TODO this is an edge case about how to differentiate between zero and missing params
-		//{
-		//	description: "Error - Invalid limit value",
-		//	params: orderbook.GetOrdersByCreatorAddressParams{
-		//		ChainId:        chains.Ethereum,
-		//		CreatorAddress: addresses.Vitalik,
-		//		LimitOrderV3SubscribedApiControllerGetAllLimitOrdersParams: orderbook.LimitOrderV3SubscribedApiControllerGetAllLimitOrdersParams{
-		//			Limit: helpers.GetPtr(float32(0)),
-		//		},
-		//	},
-		//	expectedErrorDescription: `'limit': must be greater than 0`,
-		//},
+		{
+			description: "Error - Invalid limit value",
+			params: orderbook.GetOrdersByCreatorAddressParams{
+				ChainId:        chains.Ethereum,
+				CreatorAddress: addresses.Vitalik,
+				LimitOrderV3SubscribedApiControllerGetAllLimitOrdersParams: orderbook.LimitOrderV3SubscribedApiControllerGetAllLimitOrdersParams{
+					Limit: -1,
+				},
+			},
+			expectedErrorDescription: `'limit': must be greater than 0`,
+		},
 		{
 			description: "Error - Invalid status",
 			params: orderbook.GetOrdersByCreatorAddressParams{
 				ChainId:        chains.Ethereum,
 				CreatorAddress: addresses.Vitalik,
 				LimitOrderV3SubscribedApiControllerGetAllLimitOrdersParams: orderbook.LimitOrderV3SubscribedApiControllerGetAllLimitOrdersParams{
-					Page:     helpers.GetPtr(float32(1)),
-					Limit:    helpers.GetPtr(float32(2)),
-					Statuses: &[]float32{0, 2},
+					Page:     1,
+					Limit:    2,
+					Statuses: []float32{0, 2},
 				},
 			},
 			expectedErrorDescription: `'statuses': can only contain [1 2 3]`,
@@ -193,9 +191,9 @@ func TestGetOrdersByCreatorAddress(t *testing.T) {
 				ChainId:        chains.Ethereum,
 				CreatorAddress: addresses.Vitalik,
 				LimitOrderV3SubscribedApiControllerGetAllLimitOrdersParams: orderbook.LimitOrderV3SubscribedApiControllerGetAllLimitOrdersParams{
-					Page:   helpers.GetPtr(float32(1)),
-					Limit:  helpers.GetPtr(float32(2)),
-					SortBy: orderbook.GetSortByParameter("invalid"),
+					Page:   1,
+					Limit:  2,
+					SortBy: "invalid",
 				},
 			},
 			expectedErrorDescription: `'sortBy': can only contain [createDateTime takerRate makerRate makerAmount takerAmount]`,
@@ -206,9 +204,9 @@ func TestGetOrdersByCreatorAddress(t *testing.T) {
 				ChainId:        chains.Ethereum,
 				CreatorAddress: addresses.Vitalik,
 				LimitOrderV3SubscribedApiControllerGetAllLimitOrdersParams: orderbook.LimitOrderV3SubscribedApiControllerGetAllLimitOrdersParams{
-					Page:       helpers.GetPtr(float32(1)),
-					Limit:      helpers.GetPtr(float32(2)),
-					TakerAsset: helpers.GetPtr("invalid"),
+					Page:       1,
+					Limit:      2,
+					TakerAsset: "invalid",
 				},
 			},
 			expectedErrorDescription: `'takerAsset': not a valid Ethereum address`,
@@ -219,9 +217,9 @@ func TestGetOrdersByCreatorAddress(t *testing.T) {
 				ChainId:        chains.Ethereum,
 				CreatorAddress: addresses.Vitalik,
 				LimitOrderV3SubscribedApiControllerGetAllLimitOrdersParams: orderbook.LimitOrderV3SubscribedApiControllerGetAllLimitOrdersParams{
-					Page:       helpers.GetPtr(float32(1)),
-					Limit:      helpers.GetPtr(float32(2)),
-					MakerAsset: helpers.GetPtr("invalid"),
+					Page:       1,
+					Limit:      2,
+					MakerAsset: "invalid",
 				},
 			},
 			expectedErrorDescription: `'makerAsset': not a valid Ethereum address`,
@@ -283,34 +281,23 @@ func TestGetAllOrders(t *testing.T) {
 			expectedOutput: defaultSignature,
 		},
 		{
-			description: "Error - Invalid page value",
+			description: "Error - Invalid limit value",
 			params: orderbook.GetAllOrdersParams{
 				ChainId: chains.Ethereum,
 				LimitOrderV3SubscribedApiControllerGetAllLimitOrdersParams: orderbook.LimitOrderV3SubscribedApiControllerGetAllLimitOrdersParams{
-					Page: helpers.GetPtr(float32(0)),
+					Limit: -1,
 				},
 			},
-			expectedErrorDescription: `'page': must be greater than 0`,
+			expectedErrorDescription: `config validation error 'limit': must be greater than 0`,
 		},
-		// TODO this is an edge case about how to differentiate between zero and missing params1
-		//{
-		//	description: "Error - Invalid limit value",
-		//	params: orderbook.GetAllOrdersParams{
-		//		ChainId: chains.Ethereum,
-		//		LimitOrderV3SubscribedApiControllerGetAllLimitOrdersParams: orderbook.LimitOrderV3SubscribedApiControllerGetAllLimitOrdersParams{
-		//			Limit: helpers.GetPtr(float32(0)),
-		//		},
-		//	},
-		//	expectedErrorDescription: `config validation error 'limit': must be greater than 0`,
-		//},
 		{
 			description: "Error - Invalid status",
 			params: orderbook.GetAllOrdersParams{
 				ChainId: chains.Ethereum,
 				LimitOrderV3SubscribedApiControllerGetAllLimitOrdersParams: orderbook.LimitOrderV3SubscribedApiControllerGetAllLimitOrdersParams{
-					Page:     helpers.GetPtr(float32(1)),
-					Limit:    helpers.GetPtr(float32(2)),
-					Statuses: &[]float32{0, 2},
+					Page:     1,
+					Limit:    2,
+					Statuses: []float32{0, 2},
 				},
 			},
 			expectedErrorDescription: `'statuses': can only contain [1 2 3]`,
@@ -320,9 +307,9 @@ func TestGetAllOrders(t *testing.T) {
 			params: orderbook.GetAllOrdersParams{
 				ChainId: chains.Ethereum,
 				LimitOrderV3SubscribedApiControllerGetAllLimitOrdersParams: orderbook.LimitOrderV3SubscribedApiControllerGetAllLimitOrdersParams{
-					Page:   helpers.GetPtr(float32(1)),
-					Limit:  helpers.GetPtr(float32(2)),
-					SortBy: orderbook.GetSortByParameter("invalid"),
+					Page:   1,
+					Limit:  2,
+					SortBy: "invalid",
 				},
 			},
 			expectedErrorDescription: `'sortBy': can only contain [createDateTime takerRate makerRate makerAmount takerAmount]`,
@@ -332,9 +319,9 @@ func TestGetAllOrders(t *testing.T) {
 			params: orderbook.GetAllOrdersParams{
 				ChainId: chains.Ethereum,
 				LimitOrderV3SubscribedApiControllerGetAllLimitOrdersParams: orderbook.LimitOrderV3SubscribedApiControllerGetAllLimitOrdersParams{
-					Page:       helpers.GetPtr(float32(1)),
-					Limit:      helpers.GetPtr(float32(2)),
-					TakerAsset: helpers.GetPtr("invalid"),
+					Page:       1,
+					Limit:      2,
+					TakerAsset: "invalid",
 				},
 			},
 			expectedErrorDescription: `'takerAsset': not a valid Ethereum address`,
@@ -344,9 +331,9 @@ func TestGetAllOrders(t *testing.T) {
 			params: orderbook.GetAllOrdersParams{
 				ChainId: chains.Ethereum,
 				LimitOrderV3SubscribedApiControllerGetAllLimitOrdersParams: orderbook.LimitOrderV3SubscribedApiControllerGetAllLimitOrdersParams{
-					Page:       helpers.GetPtr(float32(1)),
-					Limit:      helpers.GetPtr(float32(2)),
-					MakerAsset: helpers.GetPtr("invalid"),
+					Page:       1,
+					Limit:      2,
+					MakerAsset: "invalid",
 				},
 			},
 			expectedErrorDescription: "'makerAsset': not a valid Ethereum address",

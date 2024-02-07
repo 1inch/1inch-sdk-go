@@ -18,14 +18,14 @@ type SwapTokensParams struct {
 func (params *SwapTokensParams) Validate() error {
 	var validationErrors []error
 	validationErrors = validate.Parameter(int(params.ApprovalType), "approvalType", validate.CheckApprovalType, validationErrors)
-	validationErrors = validate.Parameter(params.ChainId, "chainId", validate.CheckChainId, validationErrors)
-	validationErrors = validate.Parameter(params.PublicAddress, "publicAddress", validate.CheckEthereumAddress, validationErrors)
-	validationErrors = validate.Parameter(params.WalletKey, "walletKey", validate.CheckPrivateKey, validationErrors)
-	validationErrors = validate.Parameter(params.Src, "src", validate.CheckEthereumAddress, validationErrors)
-	validationErrors = validate.Parameter(params.Dst, "dst", validate.CheckEthereumAddress, validationErrors)
-	validationErrors = validate.Parameter(params.Amount, "amount", validate.CheckBigInt, validationErrors)
-	validationErrors = validate.Parameter(params.From, "from", validate.CheckEthereumAddress, validationErrors)
-	validationErrors = validate.Parameter(params.Slippage, "slippage", validate.CheckSlippage, validationErrors)
+	validationErrors = validate.Parameter(params.ChainId, "chainId", validate.CheckChainIdRequired, validationErrors)
+	validationErrors = validate.Parameter(params.PublicAddress, "publicAddress", validate.CheckEthereumAddressRequired, validationErrors)
+	validationErrors = validate.Parameter(params.WalletKey, "walletKey", validate.CheckPrivateKeyRequired, validationErrors)
+	validationErrors = validate.Parameter(params.Src, "src", validate.CheckEthereumAddressRequired, validationErrors)
+	validationErrors = validate.Parameter(params.Dst, "dst", validate.CheckEthereumAddressRequired, validationErrors)
+	validationErrors = validate.Parameter(params.Amount, "amount", validate.CheckBigIntRequired, validationErrors)
+	validationErrors = validate.Parameter(params.From, "from", validate.CheckEthereumAddressRequired, validationErrors)
+	validationErrors = validate.Parameter(params.Slippage, "slippage", validate.CheckSlippageRequired, validationErrors)
 	return validate.ConsolidateValidationErorrs(validationErrors)
 }
 
@@ -36,9 +36,9 @@ type ApproveAllowanceParams struct {
 
 func (params *ApproveAllowanceParams) Validate() error {
 	var validationErrors []error
-	validationErrors = validate.Parameter(params.ChainId, "chainId", validate.CheckChainId, validationErrors)
-	validationErrors = validate.Parameter(params.TokenAddress, "tokenAddress", validate.CheckEthereumAddress, validationErrors)
-	validationErrors = validate.Parameter(params.WalletAddress, "walletAddress", validate.CheckEthereumAddress, validationErrors)
+	validationErrors = validate.Parameter(params.ChainId, "chainId", validate.CheckChainIdRequired, validationErrors)
+	validationErrors = validate.Parameter(params.TokenAddress, "tokenAddress", validate.CheckEthereumAddressRequired, validationErrors)
+	validationErrors = validate.Parameter(params.WalletAddress, "walletAddress", validate.CheckEthereumAddressRequired, validationErrors)
 	return validate.ConsolidateValidationErorrs(validationErrors)
 }
 
@@ -48,7 +48,7 @@ type ApproveSpenderParams struct {
 
 func (params *ApproveSpenderParams) Validate() error {
 	var validationErrors []error
-	validationErrors = validate.Parameter(params.ChainId, "chainId", validate.CheckChainId, validationErrors)
+	validationErrors = validate.Parameter(params.ChainId, "chainId", validate.CheckChainIdRequired, validationErrors)
 	return validate.ConsolidateValidationErorrs(validationErrors)
 }
 
@@ -59,9 +59,9 @@ type ApproveTransactionParams struct {
 
 func (params *ApproveTransactionParams) Validate() error {
 	var validationErrors []error
-	validationErrors = validate.Parameter(params.ChainId, "chainId", validate.CheckChainId, validationErrors)
-	validationErrors = validate.Parameter(params.TokenAddress, "tokenAddress", validate.CheckEthereumAddress, validationErrors)
-	validationErrors = validate.Parameter(params.Amount, "amount", validate.CheckBigIntPointer, validationErrors)
+	validationErrors = validate.Parameter(params.ChainId, "chainId", validate.CheckChainIdRequired, validationErrors)
+	validationErrors = validate.Parameter(params.TokenAddress, "tokenAddress", validate.CheckEthereumAddressRequired, validationErrors)
+	validationErrors = validate.Parameter(params.Amount, "amount", validate.CheckBigInt, validationErrors)
 	return validate.ConsolidateValidationErorrs(validationErrors)
 }
 
@@ -71,7 +71,7 @@ type GetLiquiditySourcesParams struct {
 
 func (params *GetLiquiditySourcesParams) Validate() error {
 	var validationErrors []error
-	validationErrors = validate.Parameter(params.ChainId, "chainId", validate.CheckChainId, validationErrors)
+	validationErrors = validate.Parameter(params.ChainId, "chainId", validate.CheckChainIdRequired, validationErrors)
 	return validate.ConsolidateValidationErorrs(validationErrors)
 }
 
@@ -82,10 +82,10 @@ type GetQuoteParams struct {
 
 func (params *GetQuoteParams) Validate() error {
 	var validationErrors []error
-	validationErrors = validate.Parameter(params.ChainId, "chainId", validate.CheckChainId, validationErrors)
-	validationErrors = validate.Parameter(params.Src, "src", validate.CheckEthereumAddress, validationErrors)
-	validationErrors = validate.Parameter(params.Dst, "dst", validate.CheckEthereumAddress, validationErrors)
-	validationErrors = validate.Parameter(params.Amount, "amount", validate.CheckBigInt, validationErrors)
+	validationErrors = validate.Parameter(params.ChainId, "chainId", validate.CheckChainIdRequired, validationErrors)
+	validationErrors = validate.Parameter(params.Src, "src", validate.CheckEthereumAddressRequired, validationErrors)
+	validationErrors = validate.Parameter(params.Dst, "dst", validate.CheckEthereumAddressRequired, validationErrors)
+	validationErrors = validate.Parameter(params.Amount, "amount", validate.CheckBigIntRequired, validationErrors)
 	if len(params.Src) > 0 && len(params.Dst) > 0 && params.Src == params.Dst {
 		validationErrors = append(validationErrors, errors.New("src and dst tokens must be different"))
 	}
@@ -100,12 +100,12 @@ type GetSwapDataParams struct {
 
 func (params *GetSwapDataParams) Validate() error {
 	var validationErrors []error
-	validationErrors = validate.Parameter(params.ChainId, "chainId", validate.CheckChainId, validationErrors)
-	validationErrors = validate.Parameter(params.Src, "src", validate.CheckEthereumAddress, validationErrors)
-	validationErrors = validate.Parameter(params.Dst, "dst", validate.CheckEthereumAddress, validationErrors)
-	validationErrors = validate.Parameter(params.Amount, "amount", validate.CheckBigInt, validationErrors)
-	validationErrors = validate.Parameter(params.From, "from", validate.CheckEthereumAddress, validationErrors)
-	validationErrors = validate.Parameter(params.Slippage, "slippage", validate.CheckSlippage, validationErrors)
+	validationErrors = validate.Parameter(params.ChainId, "chainId", validate.CheckChainIdRequired, validationErrors)
+	validationErrors = validate.Parameter(params.Src, "src", validate.CheckEthereumAddressRequired, validationErrors)
+	validationErrors = validate.Parameter(params.Dst, "dst", validate.CheckEthereumAddressRequired, validationErrors)
+	validationErrors = validate.Parameter(params.Amount, "amount", validate.CheckBigIntRequired, validationErrors)
+	validationErrors = validate.Parameter(params.From, "from", validate.CheckEthereumAddressRequired, validationErrors)
+	validationErrors = validate.Parameter(params.Slippage, "slippage", validate.CheckSlippageRequired, validationErrors)
 	if len(params.Src) > 0 && len(params.Dst) > 0 && params.Src == params.Dst {
 		validationErrors = append(validationErrors, errors.New("src and dst tokens must be different"))
 	}
@@ -118,6 +118,6 @@ type GetTokensParams struct {
 
 func (params *GetTokensParams) Validate() error {
 	var validationErrors []error
-	validationErrors = validate.Parameter(params.ChainId, "chainId", validate.CheckChainId, validationErrors)
+	validationErrors = validate.Parameter(params.ChainId, "chainId", validate.CheckChainIdRequired, validationErrors)
 	return validate.ConsolidateValidationErorrs(validationErrors)
 }

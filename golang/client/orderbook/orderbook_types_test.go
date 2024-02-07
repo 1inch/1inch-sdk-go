@@ -7,7 +7,6 @@ import (
 	"github.com/stretchr/testify/require"
 
 	"github.com/1inch/1inch-sdk/golang/client/validate"
-	"github.com/1inch/1inch-sdk/golang/helpers"
 	"github.com/1inch/1inch-sdk/golang/helpers/consts/chains"
 )
 
@@ -75,12 +74,12 @@ func TestGetOrdersByCreatorAddressParams_Validate(t *testing.T) {
 				ChainId:        chains.Ethereum,
 				CreatorAddress: "0x1234567890abcdef1234567890abcdef12345678",
 				LimitOrderV3SubscribedApiControllerGetAllLimitOrdersParams: LimitOrderV3SubscribedApiControllerGetAllLimitOrdersParams{
-					Page:       helpers.GetPtr(float32(1)),
-					Limit:      helpers.GetPtr(float32(1)),
-					Statuses:   helpers.GetPtr([]float32{1}),
-					SortBy:     helpers.GetPtr(LimitOrderV3SubscribedApiControllerGetAllLimitOrdersParamsSortByCreateDateTime),
-					TakerAsset: helpers.GetPtr("0x1234567890abcdef1234567890abcdef12345678"),
-					MakerAsset: helpers.GetPtr("0x1234567890abcdef1234567890abcdef12345678"),
+					Page:       1,
+					Limit:      1,
+					Statuses:   []float32{1},
+					SortBy:     LimitOrderV3SubscribedApiControllerGetAllLimitOrdersParamsSortByCreateDateTime,
+					TakerAsset: "0x1234567890abcdef1234567890abcdef12345678",
+					MakerAsset: "0x1234567890abcdef1234567890abcdef12345678",
 				},
 			},
 		},
@@ -124,12 +123,12 @@ func TestGetAllOrdersParams_Validate(t *testing.T) {
 			params: GetAllOrdersParams{
 				ChainId: chains.Ethereum,
 				LimitOrderV3SubscribedApiControllerGetAllLimitOrdersParams: LimitOrderV3SubscribedApiControllerGetAllLimitOrdersParams{
-					Page:       helpers.GetPtr(float32(1)),
-					Limit:      helpers.GetPtr(float32(1)),
-					Statuses:   helpers.GetPtr([]float32{1}),
-					SortBy:     helpers.GetPtr(LimitOrderV3SubscribedApiControllerGetAllLimitOrdersParamsSortByCreateDateTime),
-					TakerAsset: helpers.GetPtr("0x1234567890abcdef1234567890abcdef12345678"),
-					MakerAsset: helpers.GetPtr("0x1234567890abcdef1234567890abcdef12345678"),
+					Page:       1,
+					Limit:      1,
+					Statuses:   []float32{1},
+					SortBy:     LimitOrderV3SubscribedApiControllerGetAllLimitOrdersParamsSortByCreateDateTime,
+					TakerAsset: "0x1234567890abcdef1234567890abcdef12345678",
+					MakerAsset: "0x1234567890abcdef1234567890abcdef12345678",
 				},
 			},
 		},
@@ -256,17 +255,26 @@ func TestGetEventsParams_Validate(t *testing.T) {
 			description: "Valid parameters",
 			params: GetEventsParams{
 				ChainId: chains.Ethereum,
-				LimitOrderV3SubscribedApiControllerGetEventsParams: LimitOrderV3SubscribedApiControllerGetEventsParams{
-					Limit: 1,
-				},
 			},
 		},
 		{
-			description: "Missing required parameters",
-			params:      GetEventsParams{},
+			description: "Invalid chain id",
+			params: GetEventsParams{
+				ChainId: -1,
+			},
 			expectErrors: []string{
-				"'chainId' is required",
-				"'limit': must be greater than 0", // TODO is this what I want to check here?
+				"'chainId': is invalid",
+			},
+		},
+		{
+			description: "Invalid limit parameter",
+			params: GetEventsParams{
+				ChainId: chains.Ethereum,
+				LimitOrderV3SubscribedApiControllerGetEventsParams: LimitOrderV3SubscribedApiControllerGetEventsParams{
+					Limit: -1,
+				}},
+			expectErrors: []string{
+				"'limit': must be greater than 0",
 			},
 		},
 	}

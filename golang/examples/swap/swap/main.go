@@ -8,7 +8,6 @@ import (
 
 	"github.com/1inch/1inch-sdk/golang/client"
 	"github.com/1inch/1inch-sdk/golang/client/swap"
-	"github.com/1inch/1inch-sdk/golang/helpers"
 	"github.com/1inch/1inch-sdk/golang/helpers/consts/amounts"
 	"github.com/1inch/1inch-sdk/golang/helpers/consts/chains"
 	"github.com/1inch/1inch-sdk/golang/helpers/consts/tokens"
@@ -42,7 +41,7 @@ func main() {
 			Dst:             tokens.PolygonWeth,
 			From:            os.Getenv("WALLET_ADDRESS"),
 			Amount:          amounts.Ten16,
-			DisableEstimate: helpers.GetPtr(true),
+			DisableEstimate: true,
 			Slippage:        0.5,
 		},
 	}

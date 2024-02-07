@@ -9,7 +9,6 @@ import (
 
 	"github.com/1inch/1inch-sdk/golang/client"
 	"github.com/1inch/1inch-sdk/golang/client/orderbook"
-	"github.com/1inch/1inch-sdk/golang/helpers"
 	"github.com/1inch/1inch-sdk/golang/helpers/consts/chains"
 )
 
@@ -32,15 +31,13 @@ func main() {
 		log.Fatalf("Failed to create client: %v", err)
 	}
 
-	sortBy := orderbook.LimitOrderV3SubscribedApiControllerGetAllLimitOrdersParamsSortBy("createDateTime")
-
 	// Build the config for the orders request
 	limitOrdersParams := orderbook.GetAllOrdersParams{
 		ChainId: 137,
 		LimitOrderV3SubscribedApiControllerGetAllLimitOrdersParams: orderbook.LimitOrderV3SubscribedApiControllerGetAllLimitOrdersParams{
-			Page:   helpers.GetPtr(float32(1)),
-			Limit:  helpers.GetPtr(float32(2)),
-			SortBy: &sortBy,
+			Page:   1,
+			Limit:  2,
+			SortBy: "createDateTime",
 		},
 	}
 

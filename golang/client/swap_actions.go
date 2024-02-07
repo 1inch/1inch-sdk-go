@@ -10,13 +10,14 @@ import (
 	"strings"
 	"time"
 
+	"github.com/ethereum/go-ethereum/common"
+	"github.com/ethereum/go-ethereum/crypto"
+	"github.com/ethereum/go-ethereum/ethclient"
+
 	"github.com/1inch/1inch-sdk/golang/client/tenderly"
 	"github.com/1inch/1inch-sdk/golang/helpers"
 	"github.com/1inch/1inch-sdk/golang/helpers/consts/chains"
 	"github.com/1inch/1inch-sdk/golang/helpers/consts/tokens"
-	"github.com/ethereum/go-ethereum/common"
-	"github.com/ethereum/go-ethereum/crypto"
-	"github.com/ethereum/go-ethereum/ethclient"
 
 	"github.com/1inch/1inch-sdk/golang/client/onchain"
 	"github.com/1inch/1inch-sdk/golang/client/swap"
@@ -53,7 +54,7 @@ type ActionService service
 func (s *ActionService) SwapTokens(params swap.SwapTokensParams) error {
 
 	// Always disable estimate so we can don onchain approvals for the swaps right before we execute
-	params.DisableEstimate = helpers.GetPtr(true)
+	params.DisableEstimate = true
 
 	// TODO find a better way of managing the matching between public and private keys
 	privateKey, err := crypto.HexToECDSA(params.WalletKey)
@@ -151,7 +152,7 @@ func (s *ActionService) SwapTokens(params swap.SwapTokensParams) error {
 		})
 
 		executeSwapConfig.IsPermitSwap = true
-		params.Permit = &permitParams
+		params.Permit = permitParams
 		fmt.Println("Swapping using Permit1")
 	}
 

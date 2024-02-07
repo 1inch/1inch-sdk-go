@@ -60,7 +60,8 @@
                 "VND",
                 "ZAR"
               ],
-              "type": "string"
+              "type": "string",
+              "x-go-type-skip-optional-pointer": true
             }
           }
         ],
@@ -243,7 +244,8 @@
                 "VND",
                 "ZAR"
               ],
-              "type": "string"
+              "type": "string",
+              "x-go-type-skip-optional-pointer": true
             }
           }
         ],
@@ -319,7 +321,8 @@
             "type": "array",
             "items": {
               "type": "string"
-            }
+            },
+            "x-go-type-skip-optional-pointer": true
           }
         },
         "required": ["codes"]
@@ -332,12 +335,14 @@
             "type": "array",
             "items": {
               "type": "string"
-            }
+            },
+            "x-go-type-skip-optional-pointer": true
           },
           "currency": {
             "type": "string",
             "enum": ["USD"],
-            "description": "If no currency provided, then price returned in native Wei"
+            "description": "If no currency provided, then price returned in native Wei",
+            "x-go-type-skip-optional-pointer": true
           }
         },
         "required": ["tokens"]

@@ -102,7 +102,7 @@ func TestApproveTransactionIntegration(t *testing.T) {
 				ChainId: chains.Ethereum,
 				ApproveControllerGetCallDataParams: swap.ApproveControllerGetCallDataParams{
 					TokenAddress: tokens.EthereumUsdc,
-					Amount:       nil,
+					Amount:       "",
 				},
 			},
 			expectedOutput: swap.ApproveCallDataResponse{
@@ -184,7 +184,7 @@ func TestGetTokensIntegration(t *testing.T) {
 			expectedToken: swap.TokenInfo{
 				Address:  "0xa0b86991c6218b36c1d19d4a2e9eb0ce3606eb48",
 				Decimals: 6,
-				Eip2612:  helpers.GetPtr(true),
+				Eip2612:  true,
 				Name:     "USD Coin",
 				Symbol:   "USDC",
 			},
