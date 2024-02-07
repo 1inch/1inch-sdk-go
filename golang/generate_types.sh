@@ -23,6 +23,45 @@ check_and_fix_incorrect_number_arrays() {
     fi
 }
 
+add_pointer_skip_field() {
+  local api_swagger_file_name="$1"
+
+  jq '
+           # Function to add x-go-type-skip-optional-pointer to schema objects if not already present
+           def add_skip_pointer:
+             if .type and (.["x-go-type-skip-optional-pointer"] // false) != true then
+               . + {"x-go-type-skip-optional-pointer": true}
+             else
+               .
+             end;
+
+           # Apply to path parameters
+           .paths |= map_values(
+             . as $path |
+             . | map_values(
+               if .parameters then
+                 .parameters |= map(
+                   if .required == false and .schema then .schema |= add_skip_pointer else . end
+                 )
+               else . end |
+               if .requestBody? then
+                 .requestBody.content."application/json".schema |= add_skip_pointer
+               else . end
+             )
+           ) |
+
+           # Apply to components schemas
+           .components.schemas |= map_values(
+             if .properties then
+               .properties |= map_values(add_skip_pointer)
+             else . end
+           )
+         ' $api_swagger_file_name > ${api_swagger_file_name}.tmp || {
+          echo "Error: Failed to run jq on $api_swagger_file_name."
+          exit 1
+      }
+}
+
 # Check that the script is being run from within the golang folder specifically
 current_folder_name=$(basename "$PWD")
 
@@ -123,6 +162,14 @@ for api_swagger_file_name in "$swagger_dir"/*-swagger.json; do
 
     # Check for all known incorrect schema types and fix them if they exist
     check_and_fix_incorrect_number_arrays "$api_swagger_file_name"
+
+    # Add x-go-type-skip-optional-pointer to schema objects and parameters if not already present
+    add_pointer_skip_field "$api_swagger_file_name"
+
+    mv ${api_swagger_file_name}.tmp $api_swagger_file_name || {
+        echo "Error: Failed to overwrite the temporary jq file back to $api_swagger_file_name."
+        exit 1
+    }
 
     # Generate the swagger output into the new directory
     output_file="$output_dir/$package_name/${types_file_name}"

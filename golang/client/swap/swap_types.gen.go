@@ -90,10 +90,10 @@ type QuoteResponse struct {
 	FromToken *TokenInfo `json:"fromToken,omitempty"`
 
 	// Gas Estimated gas
-	Gas *float32 `json:"gas,omitempty"`
+	Gas float32 `json:"gas,omitempty"`
 
 	// Protocols Selected protocols in a path
-	Protocols *[][][]SelectedProtocol `json:"protocols,omitempty"`
+	Protocols [][][]SelectedProtocol `json:"protocols,omitempty"`
 
 	// ToAmount Expected amount of destination token
 	ToAmount string `json:"toAmount"`
@@ -150,7 +150,7 @@ type SwapResponse struct {
 	FromToken *TokenInfo `json:"fromToken,omitempty"`
 
 	// Protocols Selected protocols in a path
-	Protocols *[][][]SelectedProtocol `json:"protocols,omitempty"`
+	Protocols [][][]SelectedProtocol `json:"protocols,omitempty"`
 
 	// ToAmount Expected amount of destination token
 	ToAmount string `json:"toAmount"`
@@ -164,15 +164,15 @@ type SwapResponse struct {
 
 // TokenInfo defines model for TokenInfo.
 type TokenInfo struct {
-	Address       string    `json:"address"`
-	Decimals      float32   `json:"decimals"`
-	DomainVersion *string   `json:"domainVersion,omitempty"`
-	Eip2612       *bool     `json:"eip2612,omitempty"`
-	IsFoT         *bool     `json:"isFoT,omitempty"`
-	LogoURI       string    `json:"logoURI"`
-	Name          string    `json:"name"`
-	Symbol        string    `json:"symbol"`
-	Tags          *[]string `json:"tags,omitempty"`
+	Address       string   `json:"address"`
+	Decimals      float32  `json:"decimals"`
+	DomainVersion string   `json:"domainVersion,omitempty"`
+	Eip2612       bool     `json:"eip2612,omitempty"`
+	IsFoT         bool     `json:"isFoT,omitempty"`
+	LogoURI       string   `json:"logoURI"`
+	Name          string   `json:"name"`
+	Symbol        string   `json:"symbol"`
+	Tags          []string `json:"tags,omitempty"`
 }
 
 // TokensResponse defines model for TokensResponse.
@@ -205,7 +205,7 @@ type ApproveControllerGetCallDataParams struct {
 	TokenAddress string `url:"tokenAddress" json:"tokenAddress"`
 
 	// Amount The number of tokens that the 1inch Router is allowed to swap.If not specified, it will be allowed to spend an infinite amount of tokens.
-	Amount *string `url:"amount,omitempty" json:"amount,omitempty"`
+	Amount string `url:"amount,omitempty" json:"amount,omitempty"`
 }
 
 // AggregationControllerGetQuoteParams defines parameters for AggregationControllerGetQuote.
@@ -215,27 +215,27 @@ type AggregationControllerGetQuoteParams struct {
 	Amount string `url:"amount" json:"amount"`
 
 	// Protocols All supported liquidity sources by default
-	Protocols *string `url:"protocols,omitempty" json:"protocols,omitempty"`
+	Protocols string `url:"protocols,omitempty" json:"protocols,omitempty"`
 
 	// Fee Partner fee. min: 0; max: 3 Should be the same for /quote and /swap
-	Fee *float32 `url:"fee,omitempty" json:"fee,omitempty"`
+	Fee float32 `url:"fee,omitempty" json:"fee,omitempty"`
 
 	// GasPrice Network price per gas in wei. By default fast network gas price
-	GasPrice        *string  `url:"gasPrice,omitempty" json:"gasPrice,omitempty"`
-	ComplexityLevel *float32 `url:"complexityLevel,omitempty" json:"complexityLevel,omitempty"`
-	Parts           *float32 `url:"parts,omitempty" json:"parts,omitempty"`
-	MainRouteParts  *float32 `url:"mainRouteParts,omitempty" json:"mainRouteParts,omitempty"`
-	GasLimit        *float32 `url:"gasLimit,omitempty" json:"gasLimit,omitempty"`
+	GasPrice        string  `url:"gasPrice,omitempty" json:"gasPrice,omitempty"`
+	ComplexityLevel float32 `url:"complexityLevel,omitempty" json:"complexityLevel,omitempty"`
+	Parts           float32 `url:"parts,omitempty" json:"parts,omitempty"`
+	MainRouteParts  float32 `url:"mainRouteParts,omitempty" json:"mainRouteParts,omitempty"`
+	GasLimit        float32 `url:"gasLimit,omitempty" json:"gasLimit,omitempty"`
 
 	// IncludeTokensInfo Return fromToken and toToken info in response
-	IncludeTokensInfo *bool `url:"includeTokensInfo,omitempty" json:"includeTokensInfo,omitempty"`
+	IncludeTokensInfo bool `url:"includeTokensInfo,omitempty" json:"includeTokensInfo,omitempty"`
 
 	// IncludeProtocols Return used swap protocols in response
-	IncludeProtocols *bool `url:"includeProtocols,omitempty" json:"includeProtocols,omitempty"`
+	IncludeProtocols bool `url:"includeProtocols,omitempty" json:"includeProtocols,omitempty"`
 
 	// IncludeGas Return approximated gas in response
-	IncludeGas      *bool   `url:"includeGas,omitempty" json:"includeGas,omitempty"`
-	ConnectorTokens *string `url:"connectorTokens,omitempty" json:"connectorTokens,omitempty"`
+	IncludeGas      bool   `url:"includeGas,omitempty" json:"includeGas,omitempty"`
+	ConnectorTokens string `url:"connectorTokens,omitempty" json:"connectorTokens,omitempty"`
 }
 
 // AggregationControllerGetSwapParams defines parameters for AggregationControllerGetSwap.
@@ -251,38 +251,38 @@ type AggregationControllerGetSwapParams struct {
 	Slippage float32 `url:"slippage" json:"slippage"`
 
 	// Protocols All supported liquidity sources by default
-	Protocols *string `url:"protocols,omitempty" json:"protocols,omitempty"`
+	Protocols string `url:"protocols,omitempty" json:"protocols,omitempty"`
 
 	// Fee Partner fee. min: 0; max: 3 Should be the same for /quote and /swap
-	Fee *float32 `url:"fee,omitempty" json:"fee,omitempty"`
+	Fee float32 `url:"fee,omitempty" json:"fee,omitempty"`
 
 	// GasPrice Network price per gas in wei. By default fast network gas price
-	GasPrice        *string  `url:"gasPrice,omitempty" json:"gasPrice,omitempty"`
-	ComplexityLevel *float32 `url:"complexityLevel,omitempty" json:"complexityLevel,omitempty"`
-	Parts           *float32 `url:"parts,omitempty" json:"parts,omitempty"`
-	MainRouteParts  *float32 `url:"mainRouteParts,omitempty" json:"mainRouteParts,omitempty"`
-	GasLimit        *float32 `url:"gasLimit,omitempty" json:"gasLimit,omitempty"`
+	GasPrice        string  `url:"gasPrice,omitempty" json:"gasPrice,omitempty"`
+	ComplexityLevel float32 `url:"complexityLevel,omitempty" json:"complexityLevel,omitempty"`
+	Parts           float32 `url:"parts,omitempty" json:"parts,omitempty"`
+	MainRouteParts  float32 `url:"mainRouteParts,omitempty" json:"mainRouteParts,omitempty"`
+	GasLimit        float32 `url:"gasLimit,omitempty" json:"gasLimit,omitempty"`
 
 	// IncludeTokensInfo Return fromToken and toToken info in response
-	IncludeTokensInfo *bool `url:"includeTokensInfo,omitempty" json:"includeTokensInfo,omitempty"`
+	IncludeTokensInfo bool `url:"includeTokensInfo,omitempty" json:"includeTokensInfo,omitempty"`
 
 	// IncludeProtocols Return used swap protocols in response
-	IncludeProtocols *bool `url:"includeProtocols,omitempty" json:"includeProtocols,omitempty"`
+	IncludeProtocols bool `url:"includeProtocols,omitempty" json:"includeProtocols,omitempty"`
 
 	// IncludeGas Return approximated gas in response
-	IncludeGas      *bool   `url:"includeGas,omitempty" json:"includeGas,omitempty"`
-	ConnectorTokens *string `url:"connectorTokens,omitempty" json:"connectorTokens,omitempty"`
+	IncludeGas      bool   `url:"includeGas,omitempty" json:"includeGas,omitempty"`
+	ConnectorTokens string `url:"connectorTokens,omitempty" json:"connectorTokens,omitempty"`
 
 	// Permit https://eips.ethereum.org/EIPS/eip-2612
-	Permit *string `url:"permit,omitempty" json:"permit,omitempty"`
+	Permit string `url:"permit,omitempty" json:"permit,omitempty"`
 
 	// Receiver This address will receive funds after the swap. By default same address as "from" param
-	Receiver *string `url:"receiver,omitempty" json:"receiver,omitempty"`
-	Referrer *string `url:"referrer,omitempty" json:"referrer,omitempty"`
+	Receiver string `url:"receiver,omitempty" json:"receiver,omitempty"`
+	Referrer string `url:"referrer,omitempty" json:"referrer,omitempty"`
 
 	// AllowPartialFill By default set to false
-	AllowPartialFill *bool `url:"allowPartialFill,omitempty" json:"allowPartialFill,omitempty"`
+	AllowPartialFill bool `url:"allowPartialFill,omitempty" json:"allowPartialFill,omitempty"`
 
 	// DisableEstimate Enable this flag to disable onchain simulation
-	DisableEstimate *bool `url:"disableEstimate,omitempty" json:"disableEstimate,omitempty"`
+	DisableEstimate bool `url:"disableEstimate,omitempty" json:"disableEstimate,omitempty"`
 }

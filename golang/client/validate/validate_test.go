@@ -39,11 +39,6 @@ func TestIsEthereumAddress(t *testing.T) {
 			expectError: true,
 		},
 		{
-			description: "Invalid empty address",
-			address:     "",
-			expectError: true,
-		},
-		{
 			description: "Invalid address with non-hex characters",
 			address:     "0xGHIJKL7890abcdef1234567890abcdef12345678",
 			expectError: true,
@@ -75,11 +70,6 @@ func TestBigInt(t *testing.T) {
 		{
 			description: "Value exceeding uint256 range",
 			value:       "115792089237316195423570985008687907853269984665640564039457584007913129639936",
-			expectError: true,
-		},
-		{
-			description: "Empty value",
-			value:       "",
 			expectError: true,
 		},
 		{
@@ -125,11 +115,6 @@ func TestChainId(t *testing.T) {
 			value:       999999,
 			expectError: true,
 		},
-		{
-			description: "Chain id is required",
-			value:       0,
-			expectError: true,
-		},
 	}
 
 	for _, tc := range testcases {
@@ -169,11 +154,6 @@ func TestPrivateKey(t *testing.T) {
 			address:     "a0b1c2d3e4f5a6b7c8d9e0f1a2b3c4d5e6f7a8b9c0d1e2f3a4b5c6d7e8f9a0b1a2b3",
 			expectError: true,
 		},
-		{
-			description: "Empty private key",
-			address:     "",
-			expectError: true,
-		},
 	}
 
 	for _, tc := range testcases {
@@ -205,11 +185,6 @@ func TestSlippage(t *testing.T) {
 		{
 			description: "Valid slippage value - mid range",
 			value:       25,
-		},
-		{
-			description: "Invalid slippage value - empty",
-			value:       0,
-			expectError: true,
 		},
 		{
 			description: "Invalid slippage value - below lower boundary",

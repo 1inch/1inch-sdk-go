@@ -24,10 +24,10 @@ const (
 // LimitOrderV3Data defines model for LimitOrderV3Data.
 type LimitOrderV3Data struct {
 	// AllowedSender An address of the wallet or contract who will be able to fill this order (equals to Zero address on public orders)
-	AllowedSender *string `json:"allowedSender,omitempty"`
+	AllowedSender string `json:"allowedSender,omitempty"`
 
 	// Interactions Merged offsets of each field in interactions
-	Interactions *string `json:"interactions,omitempty"`
+	Interactions string `json:"interactions,omitempty"`
 
 	// Maker An address of the maker (wallet or contract address)
 	Maker string `json:"maker"`
@@ -39,10 +39,10 @@ type LimitOrderV3Data struct {
 	MakingAmount string `json:"makingAmount"`
 
 	// Offsets An interaction call data. ABI encoded set of makerAssetData, takerAssetData, getMakingAmount, getTakingAmount, predicate, permit, preInteraction, postInteraction
-	Offsets *string `json:"offsets,omitempty"`
+	Offsets string `json:"offsets,omitempty"`
 
 	// Receiver An address of the wallet or contract who will receive filled amount (equals to Zero address for receiver == makerAddress)
-	Receiver *string `json:"receiver,omitempty"`
+	Receiver string `json:"receiver,omitempty"`
 
 	// Salt Some unique value. It is necessary to be able to create limit orders with the same parameters (so that they have a different hash)
 	Salt string `json:"salt"`
@@ -69,20 +69,20 @@ type LimitOrderV3Request struct {
 // LimitOrderV3SubscribedApiControllerGetLimitOrderParams defines parameters for LimitOrderV3SubscribedApiControllerGetLimitOrder.
 type LimitOrderV3SubscribedApiControllerGetLimitOrderParams struct {
 	// Page Pagination step, default: 1 (page = offset / limit)
-	Page *float32 `url:"page,omitempty" json:"page,omitempty"`
+	Page float32 `url:"page,omitempty" json:"page,omitempty"`
 
 	// Limit Number of limit orders to receive (default: 100, max: 500)
-	Limit *float32 `url:"limit,omitempty" json:"limit,omitempty"`
+	Limit float32 `url:"limit,omitempty" json:"limit,omitempty"`
 
 	// Statuses JSON an array of statuses by which limit orders will be filtered: 1 - valid limit orders, 2 - temporary invalid limit orders, 3 - invalid limit orders
-	Statuses *[]float32                                                    `url:"statuses,omitempty" json:"statuses,omitempty"`
-	SortBy   *LimitOrderV3SubscribedApiControllerGetLimitOrderParamsSortBy `url:"sortBy,omitempty" json:"sortBy,omitempty"`
+	Statuses []float32                                                    `url:"statuses,omitempty" json:"statuses,omitempty"`
+	SortBy   LimitOrderV3SubscribedApiControllerGetLimitOrderParamsSortBy `url:"sortBy,omitempty" json:"sortBy,omitempty"`
 
 	// TakerAsset Address of the taker asset
-	TakerAsset *string `url:"takerAsset,omitempty" json:"takerAsset,omitempty"`
+	TakerAsset string `url:"takerAsset,omitempty" json:"takerAsset,omitempty"`
 
 	// MakerAsset Address of the maker asset
-	MakerAsset *string `url:"makerAsset,omitempty" json:"makerAsset,omitempty"`
+	MakerAsset string `url:"makerAsset,omitempty" json:"makerAsset,omitempty"`
 }
 
 // LimitOrderV3SubscribedApiControllerGetLimitOrderParamsSortBy defines parameters for LimitOrderV3SubscribedApiControllerGetLimitOrder.
@@ -91,20 +91,20 @@ type LimitOrderV3SubscribedApiControllerGetLimitOrderParamsSortBy string
 // LimitOrderV3SubscribedApiControllerGetAllLimitOrdersParams defines parameters for LimitOrderV3SubscribedApiControllerGetAllLimitOrders.
 type LimitOrderV3SubscribedApiControllerGetAllLimitOrdersParams struct {
 	// Page Pagination step, default: 1 (page = offset / limit)
-	Page *float32 `url:"page,omitempty" json:"page,omitempty"`
+	Page float32 `url:"page,omitempty" json:"page,omitempty"`
 
 	// Limit Number of limit orders to receive (default: 100, max: 500)
-	Limit *float32 `url:"limit,omitempty" json:"limit,omitempty"`
+	Limit float32 `url:"limit,omitempty" json:"limit,omitempty"`
 
 	// Statuses JSON an array of statuses by which limit orders will be filtered: 1 - valid limit orders, 2 - temporary invalid limit orders, 3 - invalid limit orders
-	Statuses *[]float32                                                        `url:"statuses,omitempty" json:"statuses,omitempty"`
-	SortBy   *LimitOrderV3SubscribedApiControllerGetAllLimitOrdersParamsSortBy `url:"sortBy,omitempty" json:"sortBy,omitempty"`
+	Statuses []float32                                                        `url:"statuses,omitempty" json:"statuses,omitempty"`
+	SortBy   LimitOrderV3SubscribedApiControllerGetAllLimitOrdersParamsSortBy `url:"sortBy,omitempty" json:"sortBy,omitempty"`
 
 	// TakerAsset Address of the maker asset
-	TakerAsset *string `url:"takerAsset,omitempty" json:"takerAsset,omitempty"`
+	TakerAsset string `url:"takerAsset,omitempty" json:"takerAsset,omitempty"`
 
 	// MakerAsset Address of the maker asset
-	MakerAsset *string `url:"makerAsset,omitempty" json:"makerAsset,omitempty"`
+	MakerAsset string `url:"makerAsset,omitempty" json:"makerAsset,omitempty"`
 }
 
 // LimitOrderV3SubscribedApiControllerGetAllLimitOrdersParamsSortBy defines parameters for LimitOrderV3SubscribedApiControllerGetAllLimitOrders.

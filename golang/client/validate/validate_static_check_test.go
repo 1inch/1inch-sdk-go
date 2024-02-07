@@ -23,7 +23,7 @@ func checkParameterFunctionConsistency(filePath string) error {
 	}
 	defer file.Close()
 
-	funcRegex := regexp.MustCompile(`^func Check(\w+)\(`)
+	funcRegex := regexp.MustCompile(`^func Check(\w+)(Required)?\(`)
 	scanner := bufio.NewScanner(file)
 
 	lineNumber := 0

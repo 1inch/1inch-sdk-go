@@ -39,7 +39,8 @@
             "in": "query",
             "description": "All supported liquidity sources by default",
             "schema": {
-              "type": "string"
+              "type": "string",
+              "x-go-type-skip-optional-pointer": true
             }
           },
           {
@@ -50,7 +51,8 @@
             "schema": {
               "minimum": 0,
               "maximum": 3,
-              "type": "number"
+              "type": "number",
+              "x-go-type-skip-optional-pointer": true
             }
           },
           {
@@ -59,7 +61,8 @@
             "in": "query",
             "description": "Network price per gas in wei. By default fast network gas price",
             "schema": {
-              "type": "string"
+              "type": "string",
+              "x-go-type-skip-optional-pointer": true
             }
           },
           {
@@ -69,7 +72,8 @@
             "schema": {
               "minimum": 0,
               "maximum": 2,
-              "type": "number"
+              "type": "number",
+              "x-go-type-skip-optional-pointer": true
             }
           },
           {
@@ -79,7 +83,8 @@
             "schema": {
               "minimum": 0,
               "maximum": 50,
-              "type": "number"
+              "type": "number",
+              "x-go-type-skip-optional-pointer": true
             }
           },
           {
@@ -89,7 +94,8 @@
             "schema": {
               "minimum": 0,
               "maximum": 10,
-              "type": "number"
+              "type": "number",
+              "x-go-type-skip-optional-pointer": true
             }
           },
           {
@@ -99,7 +105,8 @@
             "schema": {
               "minimum": 100000,
               "maximum": 11500000,
-              "type": "number"
+              "type": "number",
+              "x-go-type-skip-optional-pointer": true
             }
           },
           {
@@ -108,7 +115,8 @@
             "in": "query",
             "description": "Return fromToken and toToken info in response",
             "schema": {
-              "type": "boolean"
+              "type": "boolean",
+              "x-go-type-skip-optional-pointer": true
             }
           },
           {
@@ -117,7 +125,8 @@
             "in": "query",
             "description": "Return used swap protocols in response",
             "schema": {
-              "type": "boolean"
+              "type": "boolean",
+              "x-go-type-skip-optional-pointer": true
             }
           },
           {
@@ -126,7 +135,8 @@
             "in": "query",
             "description": "Return approximated gas in response",
             "schema": {
-              "type": "boolean"
+              "type": "boolean",
+              "x-go-type-skip-optional-pointer": true
             }
           },
           {
@@ -136,7 +146,8 @@
             "schema": {
               "minimum": 0,
               "maximum": 5,
-              "type": "string"
+              "type": "string",
+              "x-go-type-skip-optional-pointer": true
             }
           }
         ],
@@ -224,7 +235,8 @@
             "in": "query",
             "description": "All supported liquidity sources by default",
             "schema": {
-              "type": "string"
+              "type": "string",
+              "x-go-type-skip-optional-pointer": true
             }
           },
           {
@@ -235,7 +247,8 @@
             "schema": {
               "minimum": 0,
               "maximum": 3,
-              "type": "number"
+              "type": "number",
+              "x-go-type-skip-optional-pointer": true
             }
           },
           {
@@ -244,7 +257,8 @@
             "in": "query",
             "description": "Network price per gas in wei. By default fast network gas price",
             "schema": {
-              "type": "string"
+              "type": "string",
+              "x-go-type-skip-optional-pointer": true
             }
           },
           {
@@ -254,7 +268,8 @@
             "schema": {
               "minimum": 0,
               "maximum": 2,
-              "type": "number"
+              "type": "number",
+              "x-go-type-skip-optional-pointer": true
             }
           },
           {
@@ -264,7 +279,8 @@
             "schema": {
               "minimum": 0,
               "maximum": 50,
-              "type": "number"
+              "type": "number",
+              "x-go-type-skip-optional-pointer": true
             }
           },
           {
@@ -274,7 +290,8 @@
             "schema": {
               "minimum": 0,
               "maximum": 10,
-              "type": "number"
+              "type": "number",
+              "x-go-type-skip-optional-pointer": true
             }
           },
           {
@@ -284,7 +301,8 @@
             "schema": {
               "minimum": 100000,
               "maximum": 11500000,
-              "type": "number"
+              "type": "number",
+              "x-go-type-skip-optional-pointer": true
             }
           },
           {
@@ -293,7 +311,8 @@
             "in": "query",
             "description": "Return fromToken and toToken info in response",
             "schema": {
-              "type": "boolean"
+              "type": "boolean",
+              "x-go-type-skip-optional-pointer": true
             }
           },
           {
@@ -302,7 +321,8 @@
             "in": "query",
             "description": "Return used swap protocols in response",
             "schema": {
-              "type": "boolean"
+              "type": "boolean",
+              "x-go-type-skip-optional-pointer": true
             }
           },
           {
@@ -311,7 +331,8 @@
             "in": "query",
             "description": "Return approximated gas in response",
             "schema": {
-              "type": "boolean"
+              "type": "boolean",
+              "x-go-type-skip-optional-pointer": true
             }
           },
           {
@@ -321,7 +342,8 @@
             "schema": {
               "minimum": 0,
               "maximum": 5,
-              "type": "string"
+              "type": "string",
+              "x-go-type-skip-optional-pointer": true
             }
           },
           {
@@ -330,7 +352,8 @@
             "in": "query",
             "description": "https://eips.ethereum.org/EIPS/eip-2612",
             "schema": {
-              "type": "string"
+              "type": "string",
+              "x-go-type-skip-optional-pointer": true
             }
           },
           {
@@ -339,7 +362,8 @@
             "in": "query",
             "description": "This address will receive funds after the swap. By default same address as \"from\" param",
             "schema": {
-              "type": "string"
+              "type": "string",
+              "x-go-type-skip-optional-pointer": true
             }
           },
           {
@@ -347,7 +371,8 @@
             "required": false,
             "in": "query",
             "schema": {
-              "type": "string"
+              "type": "string",
+              "x-go-type-skip-optional-pointer": true
             }
           },
           {
@@ -356,7 +381,8 @@
             "in": "query",
             "description": "By default set to false",
             "schema": {
-              "type": "boolean"
+              "type": "boolean",
+              "x-go-type-skip-optional-pointer": true
             }
           },
           {
@@ -365,7 +391,8 @@
             "in": "query",
             "description": "Enable this flag to disable onchain simulation",
             "schema": {
-              "type": "boolean"
+              "type": "boolean",
+              "x-go-type-skip-optional-pointer": true
             }
           }
         ],
@@ -436,7 +463,8 @@
             "example": "100000000000",
             "description": "The number of tokens that the 1inch Router is allowed to swap.If not specified, it will be allowed to spend an infinite amount of tokens.",
             "schema": {
-              "type": "string"
+              "type": "string",
+              "x-go-type-skip-optional-pointer": true
             }
           }
         ],
@@ -553,7 +581,8 @@
             "type": "object",
             "additionalProperties": {
               "$ref": "#/components/schemas/TokenInfo"
-            }
+            },
+            "x-go-type-skip-optional-pointer": true
           }
         },
         "required": ["tokens"]
@@ -563,41 +592,50 @@
         "properties": {
           "address": {
             "type": "string",
-            "example": "0x111111111117dc0aa78b770fa6a738034120c302"
+            "example": "0x111111111117dc0aa78b770fa6a738034120c302",
+            "x-go-type-skip-optional-pointer": true
           },
           "symbol": {
             "type": "string",
-            "example": "1INCH"
+            "example": "1INCH",
+            "x-go-type-skip-optional-pointer": true
           },
           "name": {
             "type": "string",
-            "example": "1INCH Token"
+            "example": "1INCH Token",
+            "x-go-type-skip-optional-pointer": true
           },
           "decimals": {
             "type": "number",
-            "example": 18
+            "example": 18,
+            "x-go-type-skip-optional-pointer": true
           },
           "logoURI": {
             "type": "string",
-            "example": "https://tokens.1inch.io/0x111111111117dc0aa78b770fa6a738034120c302.png"
+            "example": "https://tokens.1inch.io/0x111111111117dc0aa78b770fa6a738034120c302.png",
+            "x-go-type-skip-optional-pointer": true
           },
           "domainVersion": {
-            "type": "string"
+            "type": "string",
+            "x-go-type-skip-optional-pointer": true
           },
           "eip2612": {
             "type": "boolean",
-            "example": true
+            "example": true,
+            "x-go-type-skip-optional-pointer": true
           },
           "isFoT": {
             "type": "boolean",
-            "example": false
+            "example": false,
+            "x-go-type-skip-optional-pointer": true
           },
           "tags": {
             "example": ["tokens"],
             "type": "array",
             "items": {
               "type": "string"
-            }
+            },
+            "x-go-type-skip-optional-pointer": true
           }
         },
         "required": ["address", "symbol", "name", "decimals", "logoURI"]
@@ -624,7 +662,8 @@
           "toAmount": {
             "type": "string",
             "description": "Expected amount of destination token",
-            "example": "62131879850006790961"
+            "example": "62131879850006790961",
+            "x-go-type-skip-optional-pointer": true
           },
           "protocols": {
             "type": "array",
@@ -637,12 +676,14 @@
                   "$ref": "#/components/schemas/SelectedProtocol"
                 }
               }
-            }
+            },
+            "x-go-type-skip-optional-pointer": true
           },
           "gas": {
             "type": "number",
             "description": "Estimated gas",
-            "example": 100000
+            "example": 100000,
+            "x-go-type-skip-optional-pointer": true
           }
         },
         "required": ["toAmount"]
@@ -651,10 +692,12 @@
         "type": "object",
         "properties": {
           "type": {
-            "type": "string"
+            "type": "string",
+            "x-go-type-skip-optional-pointer": true
           },
           "value": {
-            "type": "string"
+            "type": "string",
+            "x-go-type-skip-optional-pointer": true
           }
         },
         "required": ["type", "value"]
@@ -665,30 +708,35 @@
           "error": {
             "type": "string",
             "description": "Error code description",
-            "example": "Bad Request"
+            "example": "Bad Request",
+            "x-go-type-skip-optional-pointer": true
           },
           "description": {
             "type": "string",
             "description": "Error description",
-            "example": "insufficient liquidity"
+            "example": "insufficient liquidity",
+            "x-go-type-skip-optional-pointer": true
           },
           "statusCode": {
             "type": "number",
             "description": "HTTP code",
             "enum": [400, 500],
-            "example": 400
+            "example": 400,
+            "x-go-type-skip-optional-pointer": true
           },
           "requestId": {
             "type": "string",
             "description": "Request id",
-            "example": "2a92c18a-5c20-4f0d-a0da-e8b5b3602ad6"
+            "example": "2a92c18a-5c20-4f0d-a0da-e8b5b3602ad6",
+            "x-go-type-skip-optional-pointer": true
           },
           "meta": {
             "description": "Meta information",
             "type": "array",
             "items": {
               "$ref": "#/components/schemas/HttpExceptionMeta"
-            }
+            },
+            "x-go-type-skip-optional-pointer": true
           }
         },
         "required": ["error", "description", "statusCode", "requestId", "meta"]
@@ -698,27 +746,33 @@
         "properties": {
           "from": {
             "type": "string",
-            "example": "0x1111111111111111111111111111111111111111"
+            "example": "0x1111111111111111111111111111111111111111",
+            "x-go-type-skip-optional-pointer": true
           },
           "to": {
             "type": "string",
-            "example": "0x1111111254eeb25477b68fb85ed929f73a960582"
+            "example": "0x1111111254eeb25477b68fb85ed929f73a960582",
+            "x-go-type-skip-optional-pointer": true
           },
           "data": {
             "type": "string",
-            "example": "0x0502b1c50000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000002386f26fc10000000000000000000000000000000000000000000000000003556e53186804ca3e0000000000000000000000000000000000000000000000000000000000000080000000000000000000000000000000000000000000000000000000000000000180000000000000003b6d034026aad2da94c59524ac0d93f6d6cbf9071d7086f2"
+            "example": "0x0502b1c50000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000002386f26fc10000000000000000000000000000000000000000000000000003556e53186804ca3e0000000000000000000000000000000000000000000000000000000000000080000000000000000000000000000000000000000000000000000000000000000180000000000000003b6d034026aad2da94c59524ac0d93f6d6cbf9071d7086f2",
+            "x-go-type-skip-optional-pointer": true
           },
           "value": {
             "type": "string",
-            "example": "10000000000000000"
+            "example": "10000000000000000",
+            "x-go-type-skip-optional-pointer": true
           },
           "gasPrice": {
             "type": "string",
-            "example": "6994090150"
+            "example": "6994090150",
+            "x-go-type-skip-optional-pointer": true
           },
           "gas": {
             "type": "number",
-            "example": 121363
+            "example": 121363,
+            "x-go-type-skip-optional-pointer": true
           }
         },
         "required": ["from", "to", "data", "value", "gasPrice", "gas"]
@@ -745,7 +799,8 @@
           "toAmount": {
             "type": "string",
             "description": "Expected amount of destination token",
-            "example": "62131879850006790961"
+            "example": "62131879850006790961",
+            "x-go-type-skip-optional-pointer": true
           },
           "protocols": {
             "type": "array",
@@ -758,7 +813,8 @@
                   "$ref": "#/components/schemas/SelectedProtocol"
                 }
               }
-            }
+            },
+            "x-go-type-skip-optional-pointer": true
           },
           "tx": {
             "description": "Transaction object",
@@ -777,30 +833,35 @@
           "error": {
             "type": "string",
             "description": "Error code description",
-            "example": "Bad Request"
+            "example": "Bad Request",
+            "x-go-type-skip-optional-pointer": true
           },
           "description": {
             "type": "string",
             "description": "Error description",
-            "example": "cannot estimate"
+            "example": "cannot estimate",
+            "x-go-type-skip-optional-pointer": true
           },
           "statusCode": {
             "type": "number",
             "description": "HTTP code",
             "enum": [400, 500],
-            "example": 400
+            "example": 400,
+            "x-go-type-skip-optional-pointer": true
           },
           "requestId": {
             "type": "string",
             "description": "Request id",
-            "example": "2a92c18a-5c20-4f0d-a0da-e8b5b3602ad6"
+            "example": "2a92c18a-5c20-4f0d-a0da-e8b5b3602ad6",
+            "x-go-type-skip-optional-pointer": true
           },
           "meta": {
             "description": "Meta information",
             "type": "array",
             "items": {
               "$ref": "#/components/schemas/HttpExceptionMeta"
-            }
+            },
+            "x-go-type-skip-optional-pointer": true
           }
         },
         "required": ["error", "description", "statusCode", "requestId", "meta"]
@@ -811,7 +872,8 @@
           "address": {
             "type": "string",
             "description": "Address of the 1inch Router that is trusted to spend funds for the swap",
-            "example": "0x1111111254eeb25477b68fb85ed929f73a960582"
+            "example": "0x1111111254eeb25477b68fb85ed929f73a960582",
+            "x-go-type-skip-optional-pointer": true
           }
         },
         "required": ["address"]
@@ -822,22 +884,26 @@
           "data": {
             "type": "string",
             "description": "The encoded data to call the approve method on the swapped token contract",
-            "example": "0x095ea7b30000000000000000000000001111111254eeb25477b68fb85ed929f73a960582ffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffff"
+            "example": "0x095ea7b30000000000000000000000001111111254eeb25477b68fb85ed929f73a960582ffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffff",
+            "x-go-type-skip-optional-pointer": true
           },
           "gasPrice": {
             "type": "string",
             "description": "Network high gas price in wei",
-            "example": "1000000000"
+            "example": "1000000000",
+            "x-go-type-skip-optional-pointer": true
           },
           "to": {
             "type": "string",
             "description": "Token address that will be allowed to exchange through 1inch Router",
-            "example": "0x111111111117dc0aa78b770fa6a738034120c302"
+            "example": "0x111111111117dc0aa78b770fa6a738034120c302",
+            "x-go-type-skip-optional-pointer": true
           },
           "value": {
             "type": "string",
             "description": "Native token value in wei (for approve is always 0)",
-            "example": "0"
+            "example": "0",
+            "x-go-type-skip-optional-pointer": true
           }
         },
         "required": ["data", "gasPrice", "to", "value"]
@@ -848,7 +914,8 @@
           "allowance": {
             "type": "string",
             "description": "Allowance amount",
-            "example": "115792089237316195423570985008687907853269984665640564039457584007913129639935"
+            "example": "115792089237316195423570985008687907853269984665640564039457584007913129639935",
+            "x-go-type-skip-optional-pointer": true
           }
         },
         "required": ["allowance"]
@@ -858,19 +925,23 @@
         "properties": {
           "id": {
             "type": "string",
-            "description": "Protocol id"
+            "description": "Protocol id",
+            "x-go-type-skip-optional-pointer": true
           },
           "title": {
             "type": "string",
-            "description": "Protocol title"
+            "description": "Protocol title",
+            "x-go-type-skip-optional-pointer": true
           },
           "img": {
             "type": "string",
-            "description": "Protocol logo image"
+            "description": "Protocol logo image",
+            "x-go-type-skip-optional-pointer": true
           },
           "img_color": {
             "type": "string",
-            "description": "Protocol logo image in color"
+            "description": "Protocol logo image in color",
+            "x-go-type-skip-optional-pointer": true
           }
         },
         "required": ["id", "title", "img", "img_color"]
@@ -883,7 +954,8 @@
             "type": "array",
             "items": {
               "$ref": "#/components/schemas/ProtocolImage"
-            }
+            },
+            "x-go-type-skip-optional-pointer": true
           }
         },
         "required": ["protocols"]
@@ -894,22 +966,26 @@
           "name": {
             "type": "string",
             "description": "Protocol id",
-            "example": "UNISWAP_V3"
+            "example": "UNISWAP_V3",
+            "x-go-type-skip-optional-pointer": true
           },
           "part": {
             "type": "number",
             "description": "Protocol share",
-            "example": 100
+            "example": 100,
+            "x-go-type-skip-optional-pointer": true
           },
           "fromTokenAddress": {
             "type": "string",
             "description": "Source token to swap on protocol",
-            "example": "0xeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeee"
+            "example": "0xeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeee",
+            "x-go-type-skip-optional-pointer": true
           },
           "toTokenAddress": {
             "type": "string",
             "description": "Destination token to swap on protocol",
-            "example": "0x111111111117dc0aa78b770fa6a738034120c302"
+            "example": "0x111111111117dc0aa78b770fa6a738034120c302",
+            "x-go-type-skip-optional-pointer": true
           }
         },
         "required": ["name", "part", "fromTokenAddress", "toTokenAddress"]

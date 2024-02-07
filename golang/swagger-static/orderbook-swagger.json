@@ -11,7 +11,9 @@
           "required": true,
           "content": {
             "application/json": {
-              "schema": { "$ref": "#/components/schemas/LimitOrderV3Request" }
+              "schema": {
+                "$ref": "#/components/schemas/LimitOrderV3Request"
+              }
             }
           }
         },
@@ -19,7 +21,9 @@
           "201": {
             "description": "The limit order has been successfully saved"
           },
-          "400": { "description": "Input data is invalid" },
+          "400": {
+            "description": "Input data is invalid"
+          },
           "403": {
             "description": "Max valid orders per user: 100. Cancel previous orders to create new ones"
           }
@@ -38,7 +42,9 @@
             "in": "path",
             "description": "Address of limit orders creator",
             "example": "0x0000000000000000000000000000000000000000",
-            "schema": { "type": "string" }
+            "schema": {
+              "type": "string"
+            }
           },
           {
             "name": "page",
@@ -46,7 +52,10 @@
             "in": "query",
             "description": "Pagination step, default: 1 (page = offset / limit)",
             "example": 1,
-            "schema": { "type": "number" }
+            "schema": {
+              "type": "number",
+              "x-go-type-skip-optional-pointer": true
+            }
           },
           {
             "name": "limit",
@@ -54,7 +63,10 @@
             "in": "query",
             "description": "Number of limit orders to receive (default: 100, max: 500)",
             "example": 100,
-            "schema": { "type": "number" }
+            "schema": {
+              "type": "number",
+              "x-go-type-skip-optional-pointer": true
+            }
           },
           {
             "name": "statuses",
@@ -62,7 +74,13 @@
             "in": "query",
             "description": "JSON an array of statuses by which limit orders will be filtered: 1 - valid limit orders, 2 - temporary invalid limit orders, 3 - invalid limit orders",
             "example": "[1,2,3]",
-            "schema": { "type": "array", "items": { "type": "number" } }
+            "schema": {
+              "type": "array",
+              "items": {
+                "type": "number"
+              },
+              "x-go-type-skip-optional-pointer": true
+            }
           },
           {
             "name": "sortBy",
@@ -76,7 +94,8 @@
                 "makerAmount",
                 "takerAmount"
               ],
-              "type": "string"
+              "type": "string",
+              "x-go-type-skip-optional-pointer": true
             }
           },
           {
@@ -84,18 +103,26 @@
             "required": false,
             "in": "query",
             "description": "Address of the taker asset",
-            "schema": { "type": "string" }
+            "schema": {
+              "type": "string",
+              "x-go-type-skip-optional-pointer": true
+            }
           },
           {
             "name": "makerAsset",
             "required": false,
             "in": "query",
             "description": "Address of the maker asset",
-            "schema": { "type": "string" }
+            "schema": {
+              "type": "string",
+              "x-go-type-skip-optional-pointer": true
+            }
           }
         ],
         "responses": {
-          "200": { "description": "Array of queried limit orders" },
+          "200": {
+            "description": "Array of queried limit orders"
+          },
           "400": {
             "description": "Input data is invalid or address is not provided"
           }
@@ -114,7 +141,10 @@
             "in": "query",
             "description": "Pagination step, default: 1 (page = offset / limit)",
             "example": 1,
-            "schema": { "type": "number" }
+            "schema": {
+              "type": "number",
+              "x-go-type-skip-optional-pointer": true
+            }
           },
           {
             "name": "limit",
@@ -122,7 +152,10 @@
             "in": "query",
             "description": "Number of limit orders to receive (default: 100, max: 500)",
             "example": 100,
-            "schema": { "type": "number" }
+            "schema": {
+              "type": "number",
+              "x-go-type-skip-optional-pointer": true
+            }
           },
           {
             "name": "statuses",
@@ -130,7 +163,13 @@
             "in": "query",
             "description": "JSON an array of statuses by which limit orders will be filtered: 1 - valid limit orders, 2 - temporary invalid limit orders, 3 - invalid limit orders",
             "example": "[1,2,3]",
-            "schema": { "type": "array", "items": { "type": "number" } }
+            "schema": {
+              "type": "array",
+              "items": {
+                "type": "number"
+              },
+              "x-go-type-skip-optional-pointer": true
+            }
           },
           {
             "name": "sortBy",
@@ -144,7 +183,8 @@
                 "makerAmount",
                 "takerAmount"
               ],
-              "type": "string"
+              "type": "string",
+              "x-go-type-skip-optional-pointer": true
             }
           },
           {
@@ -152,19 +192,29 @@
             "required": false,
             "in": "query",
             "description": "Address of the maker asset",
-            "schema": { "type": "string" }
+            "schema": {
+              "type": "string",
+              "x-go-type-skip-optional-pointer": true
+            }
           },
           {
             "name": "makerAsset",
             "required": false,
             "in": "query",
             "description": "Address of the maker asset",
-            "schema": { "type": "string" }
+            "schema": {
+              "type": "string",
+              "x-go-type-skip-optional-pointer": true
+            }
           }
         ],
         "responses": {
-          "200": { "description": "Array of queried limit orders" },
-          "400": { "description": "Input data is invalid" }
+          "200": {
+            "description": "Array of queried limit orders"
+          },
+          "400": {
+            "description": "Input data is invalid"
+          }
         },
         "tags": ["Limit Order V3"]
       }
@@ -177,10 +227,19 @@
             "name": "statuses",
             "required": true,
             "in": "query",
-            "schema": { "type": "array", "items": { "type": "string" } }
+            "schema": {
+              "type": "array",
+              "items": {
+                "type": "string"
+              }
+            }
           }
         ],
-        "responses": { "200": { "description": "" } },
+        "responses": {
+          "200": {
+            "description": ""
+          }
+        },
         "tags": ["Limit Order V3"]
       }
     },
@@ -192,10 +251,16 @@
             "name": "orderHash",
             "required": true,
             "in": "path",
-            "schema": { "type": "string" }
+            "schema": {
+              "type": "string"
+            }
           }
         ],
-        "responses": { "200": { "description": "" } },
+        "responses": {
+          "200": {
+            "description": ""
+          }
+        },
         "tags": ["Limit Order V3"]
       }
     },
@@ -207,10 +272,16 @@
             "name": "limit",
             "required": true,
             "in": "query",
-            "schema": { "type": "number" }
+            "schema": {
+              "type": "number"
+            }
           }
         ],
-        "responses": { "200": { "description": "" } },
+        "responses": {
+          "200": {
+            "description": ""
+          }
+        },
         "tags": ["Limit Order V3"]
       }
     },
@@ -222,16 +293,24 @@
             "name": "walletAddress",
             "required": true,
             "in": "path",
-            "schema": { "type": "string" }
+            "schema": {
+              "type": "string"
+            }
           },
           {
             "name": "token",
             "required": true,
             "in": "path",
-            "schema": { "type": "string" }
+            "schema": {
+              "type": "string"
+            }
           }
         ],
-        "responses": { "200": { "description": "" } },
+        "responses": {
+          "200": {
+            "description": ""
+          }
+        },
         "tags": ["Limit Order V3"]
       }
     }
@@ -251,47 +330,57 @@
         "properties": {
           "makerAsset": {
             "type": "string",
-            "description": "Address of the maker asset"
+            "description": "Address of the maker asset",
+            "x-go-type-skip-optional-pointer": true
           },
           "takerAsset": {
             "type": "string",
-            "description": "Address of the taker asset"
+            "description": "Address of the taker asset",
+            "x-go-type-skip-optional-pointer": true
           },
           "maker": {
             "type": "string",
-            "description": "An address of the maker (wallet or contract address)"
+            "description": "An address of the maker (wallet or contract address)",
+            "x-go-type-skip-optional-pointer": true
           },
           "allowedSender": {
             "type": "string",
             "description": "An address of the wallet or contract who will be able to fill this order (equals to Zero address on public orders)",
-            "default": "0x0000000000000000000000000000000000000000"
+            "default": "0x0000000000000000000000000000000000000000",
+            "x-go-type-skip-optional-pointer": true
           },
           "receiver": {
             "type": "string",
             "description": "An address of the wallet or contract who will receive filled amount (equals to Zero address for receiver == makerAddress)",
-            "default": "0x0000000000000000000000000000000000000000"
+            "default": "0x0000000000000000000000000000000000000000",
+            "x-go-type-skip-optional-pointer": true
           },
           "makingAmount": {
             "type": "string",
-            "description": "Order maker's token amount"
+            "description": "Order maker's token amount",
+            "x-go-type-skip-optional-pointer": true
           },
           "takingAmount": {
             "type": "string",
-            "description": "Order taker's token amount"
+            "description": "Order taker's token amount",
+            "x-go-type-skip-optional-pointer": true
           },
           "salt": {
             "type": "string",
-            "description": "Some unique value. It is necessary to be able to create limit orders with the same parameters (so that they have a different hash)"
+            "description": "Some unique value. It is necessary to be able to create limit orders with the same parameters (so that they have a different hash)",
+            "x-go-type-skip-optional-pointer": true
           },
           "offsets": {
             "type": "string",
             "description": "An interaction call data. ABI encoded set of makerAssetData, takerAssetData, getMakingAmount, getTakingAmount, predicate, permit, preInteraction, postInteraction",
-            "default": "0x"
+            "default": "0x",
+            "x-go-type-skip-optional-pointer": true
           },
           "interactions": {
             "type": "string",
             "description": "Merged offsets of each field in interactions",
-            "default": "0"
+            "default": "0",
+            "x-go-type-skip-optional-pointer": true
           }
         },
         "required": [
@@ -308,15 +397,21 @@
         "properties": {
           "orderHash": {
             "type": "string",
-            "description": "Hash of the limit order typed data"
+            "description": "Hash of the limit order typed data",
+            "x-go-type-skip-optional-pointer": true
           },
           "signature": {
             "type": "string",
-            "description": "Signature of the limit order typed data (using signTypedData_v4)"
+            "description": "Signature of the limit order typed data (using signTypedData_v4)",
+            "x-go-type-skip-optional-pointer": true
           },
           "data": {
             "description": "Limit order data",
-            "allOf": [{ "$ref": "#/components/schemas/LimitOrderV3Data" }]
+            "allOf": [
+              {
+                "$ref": "#/components/schemas/LimitOrderV3Data"
+              }
+            ]
           }
         },
         "required": ["orderHash", "signature", "data"]
