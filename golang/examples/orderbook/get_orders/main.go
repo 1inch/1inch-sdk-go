@@ -50,7 +50,7 @@ func main() {
 	prettyPrintOrderResponse(allOrdersResponse)
 }
 
-func prettyPrintOrderResponse(orders []*orderbook.OrderResponse) {
+func prettyPrintOrderResponse(orders []orderbook.OrderResponse) {
 	for _, order := range orders {
 		jsonOrder, err := json.MarshalIndent(order, "", "  ")
 		if err != nil {
