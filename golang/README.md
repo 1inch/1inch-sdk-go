@@ -100,18 +100,18 @@ func main() {
 
 ```
 
-More example programs using the SDK can be found in the [examples directory]()
+More example programs using the SDK can be found in the [examples directory](https://github.com/1inch/1inch-sdk/blob/main/golang/examples)
 
 ## Tips
 - It is recommended to use private/personal RPC endpoints when using this SDK. Public RPCs tend to have either slow response times, strict rate limits, or both!
 
 ## Project structure
 
-This SDK is powered by a [client struct](https://github.com/1inch/1inch-sdk/blob/9703d3bf4a6d94ad64badd0e346a16d60a0c3509/golang/client/client.go#L60-L60) that contains instances of all Services used to talk to the 1inch APIs
+This SDK is powered by a [client struct](https://github.com/1inch/1inch-sdk/blob/main/golang/client/client.go) that contains instances of all Services used to talk to the 1inch APIs
 
-Each Service is simply a struct that contains all endpoints from a given 1inch API (see [SwapService](https://github.com/1inch/1inch-sdk/blob/9703d3bf4a6d94ad64badd0e346a16d60a0c3509/golang/client/swap.go#L11-L11))
+Each Service is simply a struct that contains all endpoints from a given 1inch API (see [SwapService](https://github.com/1inch/1inch-sdk/blob/main/golang/client/swap.go))
 
-Each Service uses various types and functions to do its job that are kept separate from the main service file. These can be found in the accompanying folder within the client directory (see the [swap](https://github.com/1inch/1inch-sdk/tree/9703d3bf4a6d94ad64badd0e346a16d60a0c3509/golang/client/swap) package) 
+Each Service uses various types and functions to do its job that are kept separate from the main service file. These can be found in the accompanying folder within the client directory (see the [swap](https://github.com/1inch/1inch-sdk/tree/main/golang/client/swap) package) 
 
 ## Issues/Suggestions
 
