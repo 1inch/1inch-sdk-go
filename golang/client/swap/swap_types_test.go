@@ -7,6 +7,7 @@ import (
 
 	"github.com/1inch/1inch-sdk/golang/client/validate"
 	"github.com/1inch/1inch-sdk/golang/helpers/consts/chains"
+	"github.com/1inch/1inch-sdk/golang/helpers/consts/tokens"
 )
 
 func TestSwapTokensParams_Validate(t *testing.T) {
@@ -300,6 +301,22 @@ func TestGetSwapDataParams_Validate(t *testing.T) {
 				"'amount' is required",
 				"'from' is required",
 				"'slippage' is required",
+			},
+		},
+		{
+			description: "Error - src and dst tokens are identical",
+			params: GetSwapDataParams{
+				ChainId: chains.Ethereum,
+				AggregationControllerGetSwapParams: AggregationControllerGetSwapParams{
+					Src:      tokens.EthereumUsdc,
+					Dst:      tokens.EthereumUsdc,
+					Amount:   "10000",
+					From:     "0x1234567890abcdef1234567890abcdef12345678",
+					Slippage: 0.5,
+				},
+			},
+			expectErrors: []string{
+				"src and dst tokens must be different",
 			},
 		},
 	}

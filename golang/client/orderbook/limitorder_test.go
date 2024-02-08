@@ -130,8 +130,6 @@ func TestCreateLimitOrder(t *testing.T) {
 	tests := []struct {
 		name          string
 		orderRequest  CreateOrderParams
-		chainId       int
-		key           string
 		mockBigInt    func(string) (*big.Int, error)
 		expectedOrder *Order
 		expectError   bool
@@ -140,18 +138,18 @@ func TestCreateLimitOrder(t *testing.T) {
 		{
 			name: "happy path",
 			orderRequest: CreateOrderParams{
-				FromToken:    "0x8f3Cf7ad23Cd3CaDbD9735AFf958023239c6A063",
-				ToToken:      "0x7ceb23fd6bc0add59e62ac25578270cff1b9f619",
+				ChainId:      chains.Polygon,
+				PrivateKey:   os.Getenv("WALLET_KEY"),
+				MakerAsset:   "0x8f3Cf7ad23Cd3CaDbD9735AFf958023239c6A063",
+				TakerAsset:   "0x7ceb23fd6bc0add59e62ac25578270cff1b9f619",
 				MakingAmount: "1000000",
 				TakingAmount: "1000000000",
-				SourceWallet: "0x2c9b2DBdbA8A9c969Ac24153f5C1c23CB0e63914",
+				Maker:        "0x2c9b2DBdbA8A9c969Ac24153f5C1c23CB0e63914",
 				//AllowedSender: "0x0000000000000000000000000000000000000000",
-				Receiver: "0x0000000000000000000000000000000000000000",
+				Taker: "0x0000000000000000000000000000000000000000",
 				//Offsets:       "0",
 				//Interactions:  "0x",
 			},
-			chainId: chains.Polygon,
-			key:     os.Getenv("WALLET_KEY"),
 			expectedOrder: &Order{
 				OrderHash: "0xaba6be89f39d5c6fce46648caaa974a0bc31a842b157b29a99f05d4c2fa7b781",
 				Signature: "0xfc1e704bcd719c076396f2e4795501aec5f50607ef8ec123d0f9306f9420b8543bcee9e934a86c8ecf1a57723463108568743b4c8da03f699a1127a46112e8371c",
@@ -173,54 +171,54 @@ func TestCreateLimitOrder(t *testing.T) {
 		{
 			name: "empty maker asset",
 			orderRequest: CreateOrderParams{
-				FromToken:    "",
-				ToToken:      "0x7ceb23fd6bc0add59e62ac25578270cff1b9f619",
+				ChainId:      chains.Polygon,
+				PrivateKey:   os.Getenv("WALLET_KEY"),
+				MakerAsset:   "",
+				TakerAsset:   "0x7ceb23fd6bc0add59e62ac25578270cff1b9f619",
 				MakingAmount: "1000000",
 				TakingAmount: "1000000000",
-				SourceWallet: "0x2c9b2DBdbA8A9c969Ac24153f5C1c23CB0e63914",
+				Maker:        "0x2c9b2DBdbA8A9c969Ac24153f5C1c23CB0e63914",
 				//AllowedSender: "0x0000000000000000000000000000000000000000",
-				Receiver: "0x0000000000000000000000000000000000000000",
+				Taker: "0x0000000000000000000000000000000000000000",
 				//Offsets:       "0",
 				//Interactions:  "0x",
 			},
-			chainId:       chains.Polygon,
-			key:           os.Getenv("WALLET_KEY"),
 			expectError:   true,
 			expectedError: "error hashing typed data",
 		},
 		{
 			name: "empty taker asset",
 			orderRequest: CreateOrderParams{
-				FromToken:    "0x8f3Cf7ad23Cd3CaDbD9735AFf958023239c6A063",
-				ToToken:      "",
+				ChainId:      chains.Polygon,
+				PrivateKey:   os.Getenv("WALLET_KEY"),
+				MakerAsset:   "0x8f3Cf7ad23Cd3CaDbD9735AFf958023239c6A063",
+				TakerAsset:   "",
 				MakingAmount: "1000000",
 				TakingAmount: "1000000000",
-				SourceWallet: "0x2c9b2DBdbA8A9c969Ac24153f5C1c23CB0e63914",
+				Maker:        "0x2c9b2DBdbA8A9c969Ac24153f5C1c23CB0e63914",
 				//AllowedSender: "0x0000000000000000000000000000000000000000",
-				Receiver: "0x0000000000000000000000000000000000000000",
+				Taker: "0x0000000000000000000000000000000000000000",
 				//Offsets:       "0",
 				//Interactions:  "0x",
 			},
-			chainId:       chains.Polygon,
-			key:           os.Getenv("WALLET_KEY"),
 			expectError:   true,
 			expectedError: "error hashing typed data",
 		},
 		{
 			name: "invalid private key",
 			orderRequest: CreateOrderParams{
-				FromToken:    "0x8f3Cf7ad23Cd3CaDbD9735AFf958023239c6A063",
-				ToToken:      "0x7ceb23fd6bc0add59e62ac25578270cff1b9f619",
+				ChainId:      chains.Polygon,
+				PrivateKey:   "invalid_private_key", // non-hex or short length key
+				MakerAsset:   "0x8f3Cf7ad23Cd3CaDbD9735AFf958023239c6A063",
+				TakerAsset:   "0x7ceb23fd6bc0add59e62ac25578270cff1b9f619",
 				MakingAmount: "1000000",
 				TakingAmount: "1000000000",
-				SourceWallet: "0x2c9b2DBdbA8A9c969Ac24153f5C1c23CB0e63914",
+				Maker:        "0x2c9b2DBdbA8A9c969Ac24153f5C1c23CB0e63914",
 				//AllowedSender: "0x0000000000000000000000000000000000000000",
-				Receiver: "0x0000000000000000000000000000000000000000",
+				Taker: "0x0000000000000000000000000000000000000000",
 				//Offsets:       "0",
 				//Interactions:  "0x",
 			},
-			chainId:       chains.Polygon,
-			key:           "invalid_private_key", // non-hex or short length key
 			expectError:   true,
 			expectedError: "error converting private key to ECDSA",
 		},
@@ -235,7 +233,7 @@ func TestCreateLimitOrder(t *testing.T) {
 
 	for _, tc := range tests {
 		t.Run(tc.name, func(t *testing.T) {
-			result, err := CreateLimitOrder(tc.orderRequest, tc.chainId, tc.key)
+			result, err := CreateLimitOrder(tc.orderRequest)
 
 			if tc.expectError {
 				assert.Error(t, err)

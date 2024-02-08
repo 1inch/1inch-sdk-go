@@ -35,13 +35,13 @@ func main() {
 	// Build the config for the orders request
 	createOrderParams := orderbook.CreateOrderParams{
 		ChainId:      chains.Polygon,
-		WalletKey:    os.Getenv("WALLET_KEY"),
-		SourceWallet: os.Getenv("WALLET_ADDRESS"),
-		FromToken:    tokens.PolygonDai,
-		ToToken:      tokens.PolygonUsdc,
+		PrivateKey:   os.Getenv("WALLET_KEY"),
+		Maker:        os.Getenv("WALLET_ADDRESS"),
+		MakerAsset:   tokens.PolygonDai,
+		TakerAsset:   tokens.PolygonUsdc,
 		MakingAmount: "100000000000000000",
 		TakingAmount: "100000",
-		Receiver:     addresses.Zero,
+		Taker:        addresses.Zero,
 	}
 
 	// Execute orders request

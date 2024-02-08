@@ -1,29 +1,39 @@
 package orderbook
 
-import "github.com/1inch/1inch-sdk/golang/client/validate"
+import (
+	"github.com/1inch/1inch-sdk/golang/client/validate"
+	"github.com/1inch/1inch-sdk/golang/helpers/consts/tokens"
+)
 
 type CreateOrderParams struct {
 	ChainId      int
-	WalletKey    string
-	SourceWallet string
-	FromToken    string
-	ToToken      string
+	PrivateKey   string
+	Maker        string
+	MakerAsset   string
+	TakerAsset   string
 	TakingAmount string
 	MakingAmount string
-	Receiver     string
+	Taker        string
 	SkipWarnings bool
 }
 
 func (params *CreateOrderParams) Validate() error {
 	var validationErrors []error
 	validationErrors = validate.Parameter(params.ChainId, "chainId", validate.CheckChainIdRequired, validationErrors)
-	validationErrors = validate.Parameter(params.WalletKey, "walletKey", validate.CheckPrivateKeyRequired, validationErrors)
-	validationErrors = validate.Parameter(params.SourceWallet, "sourceWallet", validate.CheckEthereumAddressRequired, validationErrors)
-	validationErrors = validate.Parameter(params.FromToken, "fromToken", validate.CheckEthereumAddressRequired, validationErrors)
-	validationErrors = validate.Parameter(params.ToToken, "toToken", validate.CheckEthereumAddressRequired, validationErrors)
+	validationErrors = validate.Parameter(params.PrivateKey, "privateKey", validate.CheckPrivateKeyRequired, validationErrors)
+	validationErrors = validate.Parameter(params.Maker, "maker", validate.CheckEthereumAddressRequired, validationErrors)
+	validationErrors = validate.Parameter(params.MakerAsset, "makerAsset", validate.CheckEthereumAddressRequired, validationErrors)
+	validationErrors = validate.Parameter(params.TakerAsset, "takerAsset", validate.CheckEthereumAddressRequired, validationErrors)
 	validationErrors = validate.Parameter(params.TakingAmount, "takingAmount", validate.CheckBigIntRequired, validationErrors)
 	validationErrors = validate.Parameter(params.MakingAmount, "makingAmount", validate.CheckBigIntRequired, validationErrors)
-	validationErrors = validate.Parameter(params.Receiver, "receiver", validate.CheckEthereumAddressRequired, validationErrors)
+	validationErrors = validate.Parameter(params.Taker, "taker", validate.CheckEthereumAddress, validationErrors)
+	if params.MakerAsset == params.TakerAsset && (params.MakerAsset != "" && params.TakerAsset != "") {
+		validationErrors = append(validationErrors, validate.NewParameterCustomError("maker asset and taker asset cannot be the same"))
+	}
+	if params.MakerAsset == tokens.NativeToken || params.TakerAsset == tokens.NativeToken {
+		validationErrors = append(validationErrors, validate.NewParameterCustomError("native gas token is not supported as maker or taker asset"))
+	}
+
 	return validate.ConsolidateValidationErorrs(validationErrors)
 }
 

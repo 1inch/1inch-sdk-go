@@ -158,6 +158,7 @@ func CheckSlippageRequired(parameter interface{}, variableName string) error {
 	}
 	return CheckSlippage(value, variableName)
 }
+
 func CheckSlippage(parameter interface{}, variableName string) error {
 	value, ok := parameter.(float32)
 	if !ok {

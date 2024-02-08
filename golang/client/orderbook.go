@@ -12,8 +12,8 @@ import (
 	"github.com/1inch/1inch-sdk/golang/client/onchain"
 	"github.com/1inch/1inch-sdk/golang/client/orderbook"
 	"github.com/1inch/1inch-sdk/golang/helpers"
+	"github.com/1inch/1inch-sdk/golang/helpers/consts/addresses"
 	"github.com/1inch/1inch-sdk/golang/helpers/consts/contracts"
-	"github.com/1inch/1inch-sdk/golang/helpers/consts/tokens"
 )
 
 type OrderbookService service
@@ -27,17 +27,18 @@ func (s *OrderbookService) CreateOrder(ctx context.Context, params orderbook.Cre
 		return nil, nil, err
 	}
 
+	// To post an order that is open to anyone, the taker address must be the zero address
+	if params.Taker == "" {
+		params.Taker = addresses.Zero
+	}
+
 	aggregationRouter, err := contracts.Get1inchRouterFromChainId(params.ChainId)
 	if err != nil {
 		return nil, nil, fmt.Errorf("failed to get 1inch router address: %v", err)
 	}
 
-	if params.FromToken == tokens.NativeToken || params.ToToken == tokens.NativeToken {
-		return nil, nil, errors.New("native gas token is not supported")
-	}
-
-	fromTokenAddress := common.HexToAddress(params.FromToken)
-	publicAddress := common.HexToAddress(params.SourceWallet)
+	fromTokenAddress := common.HexToAddress(params.MakerAsset)
+	publicAddress := common.HexToAddress(params.Maker)
 	aggregationRouterAddress := common.HexToAddress(aggregationRouter)
 	ethClient, err := s.client.GetEthClient(params.ChainId)
 	if err != nil {
@@ -54,7 +55,7 @@ func (s *OrderbookService) CreateOrder(ctx context.Context, params orderbook.Cre
 	}
 	if allowance.Cmp(makingAmountBig) <= 0 {
 		if !params.SkipWarnings {
-			ok, err := orderbook.ConfirmApprovalWithUser(ethClient, params.SourceWallet, params.FromToken)
+			ok, err := orderbook.ConfirmApprovalWithUser(ethClient, params.Maker, params.MakerAsset)
 			if err != nil {
 				return nil, nil, fmt.Errorf("failed to confirm approval: %v", err)
 			}
@@ -65,7 +66,7 @@ func (s *OrderbookService) CreateOrder(ctx context.Context, params orderbook.Cre
 
 		erc20Config := onchain.Erc20ApprovalConfig{
 			ChainId:        params.ChainId,
-			Key:            params.WalletKey,
+			Key:            params.PrivateKey,
 			Erc20Address:   fromTokenAddress,
 			PublicAddress:  publicAddress,
 			SpenderAddress: aggregationRouterAddress,
@@ -76,7 +77,7 @@ func (s *OrderbookService) CreateOrder(ctx context.Context, params orderbook.Cre
 		}
 	}
 
-	order, err := orderbook.CreateLimitOrder(params, params.ChainId, params.WalletKey)
+	order, err := orderbook.CreateLimitOrder(params)
 	if err != nil {
 		return nil, nil, err
 	}

@@ -9,12 +9,45 @@ import (
 	"github.com/1inch/1inch-sdk/golang/helpers/consts/chains"
 )
 
+func TestIsEthereumAddressRequired(t *testing.T) {
+	testcases := []struct {
+		description string
+		address     string
+		expectError bool
+	}{
+		{
+			description: "Invalid address - empty",
+			address:     "",
+			expectError: true,
+		},
+		{
+			description: "Valid address",
+			address:     "0x1234567890abcdef1234567890abcdef12345678",
+		},
+	}
+
+	for _, tc := range testcases {
+		t.Run(tc.description, func(t *testing.T) {
+			err := CheckEthereumAddressRequired(tc.address, "testValue")
+			if tc.expectError {
+				require.Error(t, err, fmt.Sprintf("%s should have caused an error", tc.description))
+			} else {
+				require.NoError(t, err, fmt.Sprintf("%s should not have caused an error", tc.description))
+			}
+		})
+	}
+}
+
 func TestIsEthereumAddress(t *testing.T) {
 	testcases := []struct {
 		description string
 		address     string
 		expectError bool
 	}{
+		{
+			description: "Valid address - empty",
+			address:     "",
+		},
 		{
 			description: "Valid address with lowercase letters",
 			address:     "0x1234567890abcdef1234567890abcdef12345678",
@@ -47,7 +80,36 @@ func TestIsEthereumAddress(t *testing.T) {
 
 	for _, tc := range testcases {
 		t.Run(tc.description, func(t *testing.T) {
-			err := CheckEthereumAddress(tc.address, "")
+			err := CheckEthereumAddress(tc.address, "testValue")
+			if tc.expectError {
+				require.Error(t, err, fmt.Sprintf("%s should have caused an error", tc.description))
+			} else {
+				require.NoError(t, err, fmt.Sprintf("%s should not have caused an error", tc.description))
+			}
+		})
+	}
+}
+
+func TestBigIntRequired(t *testing.T) {
+	testcases := []struct {
+		description string
+		address     string
+		expectError bool
+	}{
+		{
+			description: "Invalid big int - empty",
+			address:     "",
+			expectError: true,
+		},
+		{
+			description: "Valid big int",
+			address:     "1",
+		},
+	}
+
+	for _, tc := range testcases {
+		t.Run(tc.description, func(t *testing.T) {
+			err := CheckBigIntRequired(tc.address, "testValue")
 			if tc.expectError {
 				require.Error(t, err, fmt.Sprintf("%s should have caused an error", tc.description))
 			} else {
@@ -59,33 +121,71 @@ func TestIsEthereumAddress(t *testing.T) {
 
 func TestBigInt(t *testing.T) {
 	testcases := []struct {
-		description string
-		value       string
-		expectError bool
+		description   string
+		value         string
+		expectedError string
 	}{
+		{
+			description: "Valid big integer - empty",
+			value:       "",
+		},
 		{
 			description: "Valid big integer within uint256 range",
 			value:       "1234567890",
 		},
 		{
-			description: "Value exceeding uint256 range",
-			value:       "115792089237316195423570985008687907853269984665640564039457584007913129639936",
-			expectError: true,
-		},
-		{
-			description: "Invalid numeric string",
-			value:       "123abc456",
-			expectError: true,
-		},
-		{
 			description: "Maximum uint256 value",
 			value:       "115792089237316195423570985008687907853269984665640564039457584007913129639935",
+		},
+		{
+			description:   "Value exceeding uint256 range",
+			value:         "115792089237316195423570985008687907853269984665640564039457584007913129639936",
+			expectedError: "too big to fit in uint256",
+		},
+		{
+			description:   "Invalid numeric string",
+			value:         "123abc456",
+			expectedError: "not a valid value",
+		},
+		{
+			description:   "Negative uint256 value",
+			value:         "-1",
+			expectedError: "must be a positive value",
 		},
 	}
 
 	for _, tc := range testcases {
 		t.Run(tc.description, func(t *testing.T) {
 			err := CheckBigInt(tc.value, "testValue")
+			if tc.expectedError != "" {
+				require.Contains(t, err.Error(), tc.expectedError, fmt.Sprintf("%s should have caused an error", tc.description))
+			} else {
+				require.NoError(t, err, fmt.Sprintf("%s should not have caused an error", tc.description))
+			}
+		})
+	}
+}
+
+func TestChainIdRequired(t *testing.T) {
+	testcases := []struct {
+		description string
+		value       int
+		expectError bool
+	}{
+		{
+			description: "Invalid chain id - zero",
+			value:       0,
+			expectError: true,
+		},
+		{
+			description: "Valid chain id - Ethereum",
+			value:       chains.Ethereum,
+		},
+	}
+
+	for _, tc := range testcases {
+		t.Run(tc.description, func(t *testing.T) {
+			err := CheckChainIdRequired(tc.value, "testValue")
 			if tc.expectError {
 				require.Error(t, err, fmt.Sprintf("%s should have caused an error", tc.description))
 			} else {
@@ -97,11 +197,14 @@ func TestBigInt(t *testing.T) {
 
 func TestChainId(t *testing.T) {
 	testcases := []struct {
-		description  string
-		value        int
-		variableName string
-		expectError  bool
+		description string
+		value       int
+		expectError bool
 	}{
+		{
+			description: "Valid chain id - zero",
+			value:       0,
+		},
 		{
 			description: "Valid chain id - Ethereum",
 			value:       chains.Ethereum,
@@ -119,7 +222,36 @@ func TestChainId(t *testing.T) {
 
 	for _, tc := range testcases {
 		t.Run(tc.description, func(t *testing.T) {
-			err := CheckChainId(tc.value, "testChainId")
+			err := CheckChainId(tc.value, "testValue")
+			if tc.expectError {
+				require.Error(t, err, fmt.Sprintf("%s should have caused an error", tc.description))
+			} else {
+				require.NoError(t, err, fmt.Sprintf("%s should not have caused an error", tc.description))
+			}
+		})
+	}
+}
+
+func TestPrivateKeyRequired(t *testing.T) {
+	testcases := []struct {
+		description string
+		address     string
+		expectError bool
+	}{
+		{
+			description: "Invalid empty private key",
+			address:     "",
+			expectError: true,
+		},
+		{
+			description: "Valid private key",
+			address:     "a0b1c2d3e4f5a6b7c8d9e0f1a2b3c4d5e6f7a8b9c0d1e2f3a4b5c6d7e8f9a0b1",
+		},
+	}
+
+	for _, tc := range testcases {
+		t.Run(tc.description, func(t *testing.T) {
+			err := CheckPrivateKeyRequired(tc.address, "testValue")
 			if tc.expectError {
 				require.Error(t, err, fmt.Sprintf("%s should have caused an error", tc.description))
 			} else {
@@ -135,6 +267,10 @@ func TestPrivateKey(t *testing.T) {
 		address     string
 		expectError bool
 	}{
+		{
+			description: "Valid empty private key",
+			address:     "",
+		},
 		{
 			description: "Valid private key",
 			address:     "a0b1c2d3e4f5a6b7c8d9e0f1a2b3c4d5e6f7a8b9c0d1e2f3a4b5c6d7e8f9a0b1",
@@ -158,7 +294,73 @@ func TestPrivateKey(t *testing.T) {
 
 	for _, tc := range testcases {
 		t.Run(tc.description, func(t *testing.T) {
-			err := CheckPrivateKey(tc.address, "testPrivateKey")
+			err := CheckPrivateKey(tc.address, "testValue")
+			if tc.expectError {
+				require.Error(t, err, fmt.Sprintf("%s should have caused an error", tc.description))
+			} else {
+				require.NoError(t, err, fmt.Sprintf("%s should not have caused an error", tc.description))
+			}
+		})
+	}
+}
+
+func TestApprovalType(t *testing.T) {
+	testcases := []struct {
+		description  string
+		approvalType int
+		expectError  bool
+	}{
+		{
+			description:  "Valid approval type 0 (PermitIfPossible)",
+			approvalType: 0,
+		},
+		{
+			description:  "Valid approval type 1 (PermitAlways)",
+			approvalType: 1,
+		},
+		{
+			description:  "Valid approval type 2 (ApprovalAlways)",
+			approvalType: 2,
+		},
+		{
+			description:  "Invalid approval type",
+			approvalType: 3,
+			expectError:  true,
+		},
+	}
+
+	for _, tc := range testcases {
+		t.Run(tc.description, func(t *testing.T) {
+			err := CheckApprovalType(tc.approvalType, "testValue")
+			if tc.expectError {
+				require.Error(t, err, fmt.Sprintf("%s should have caused an error", tc.description))
+			} else {
+				require.NoError(t, err, fmt.Sprintf("%s should not have caused an error", tc.description))
+			}
+		})
+	}
+}
+
+func TestSlippageRequired(t *testing.T) {
+	testcases := []struct {
+		description string
+		value       float32
+		expectError bool
+	}{
+		{
+			description: "Invalid slippage value - zero",
+			value:       0,
+			expectError: true,
+		},
+		{
+			description: "Valid slippage value",
+			value:       1,
+		},
+	}
+
+	for _, tc := range testcases {
+		t.Run(tc.description, func(t *testing.T) {
+			err := CheckSlippageRequired(tc.value, "testValue")
 			if tc.expectError {
 				require.Error(t, err, fmt.Sprintf("%s should have caused an error", tc.description))
 			} else {
@@ -174,6 +376,10 @@ func TestSlippage(t *testing.T) {
 		value       float32
 		expectError bool
 	}{
+		{
+			description: "Valid slippage value - zero",
+			value:       0,
+		},
 		{
 			description: "Valid slippage value - lower boundary",
 			value:       0.01,
@@ -204,7 +410,275 @@ func TestSlippage(t *testing.T) {
 
 	for _, tc := range testcases {
 		t.Run(tc.description, func(t *testing.T) {
-			err := CheckSlippage(tc.value, "testSlippage")
+			err := CheckSlippage(tc.value, "testValue")
+			if tc.expectError {
+				require.Error(t, err, fmt.Sprintf("%s should have caused an error", tc.description))
+			} else {
+				require.NoError(t, err, fmt.Sprintf("%s should not have caused an error", tc.description))
+			}
+		})
+	}
+}
+
+func TestCheckPage(t *testing.T) {
+	testcases := []struct {
+		description string
+		value       float32
+		expectError bool
+	}{
+		{
+			description: "Valid page value - zero",
+			value:       0,
+		},
+		{
+			description: "Valid page value - positive integer",
+			value:       1,
+		},
+		{
+			description: "Invalid page value - negative integer",
+			value:       -1,
+			expectError: true,
+		},
+	}
+
+	for _, tc := range testcases {
+		t.Run(tc.description, func(t *testing.T) {
+			err := CheckPage(tc.value, "testValue")
+			if tc.expectError {
+				require.Error(t, err, fmt.Sprintf("%s should have caused an error", tc.description))
+			} else {
+				require.NoError(t, err, fmt.Sprintf("%s should not have caused an error", tc.description))
+			}
+		})
+	}
+}
+
+func TestCheckLimit(t *testing.T) {
+	testcases := []struct {
+		description string
+		value       float32
+		expectError bool
+	}{
+		{
+			description: "Valid limit value - zero",
+			value:       0,
+		},
+		{
+			description: "Valid limit value - positive integer",
+			value:       1,
+		},
+		{
+			description: "Invalid limit value - negative integer",
+			value:       -1,
+			expectError: true,
+		},
+	}
+
+	for _, tc := range testcases {
+		t.Run(tc.description, func(t *testing.T) {
+			err := CheckLimit(tc.value, "testValue")
+			if tc.expectError {
+				require.Error(t, err, fmt.Sprintf("%s should have caused an error", tc.description))
+			} else {
+				require.NoError(t, err, fmt.Sprintf("%s should not have caused an error", tc.description))
+			}
+		})
+	}
+}
+
+func TestCheckCheckStatusesInts(t *testing.T) {
+	testcases := []struct {
+		description string
+		values      []float32
+		expectError bool
+	}{
+		{
+			description: "Valid status int - nil",
+			values:      nil,
+		},
+		{
+			description: "Valid status int - 1",
+			values:      []float32{1},
+		},
+		{
+			description: "Valid status int - 2",
+			values:      []float32{2},
+		},
+		{
+			description: "Valid status int - 3",
+			values:      []float32{3},
+		},
+		{
+			description: "Valid status int combo - 1 and 2",
+			values:      []float32{1, 2},
+		},
+		{
+			description: "Invalid status int combo - 1 twice",
+			values:      []float32{1, 1},
+			expectError: true,
+		},
+		{
+			description: "Invalid status int combo - 0",
+			values:      []float32{0},
+			expectError: true,
+		},
+	}
+
+	for _, tc := range testcases {
+		t.Run(tc.description, func(t *testing.T) {
+			err := CheckStatusesInts(tc.values, "testValues")
+			if tc.expectError {
+				require.Error(t, err, fmt.Sprintf("%s should have caused an error", tc.description))
+			} else {
+				require.NoError(t, err, fmt.Sprintf("%s should not have caused an error", tc.description))
+			}
+		})
+	}
+}
+
+func TestCheckCheckStatusesStrings(t *testing.T) {
+	testcases := []struct {
+		description string
+		values      []string
+		expectError bool
+	}{
+		{
+			description: "Valid status int - nil",
+			values:      nil,
+		},
+		{
+			description: "Valid status int - 1",
+			values:      []string{"1"},
+		},
+		{
+			description: "Valid status int - 2",
+			values:      []string{"2"},
+		},
+		{
+			description: "Valid status int - 3",
+			values:      []string{"3"},
+		},
+		{
+			description: "Valid status int combo - 1 and 2",
+			values:      []string{"1", "2"},
+		},
+		{
+			description: "Invalid status int combo - 1 twice",
+			values:      []string{"1", "1"},
+			expectError: true,
+		},
+		{
+			description: "Invalid status int combo - 0",
+			values:      []string{"0"},
+			expectError: true,
+		},
+	}
+
+	for _, tc := range testcases {
+		t.Run(tc.description, func(t *testing.T) {
+			err := CheckStatusesStrings(tc.values, "testValues")
+			if tc.expectError {
+				require.Error(t, err, fmt.Sprintf("%s should have caused an error", tc.description))
+			} else {
+				require.NoError(t, err, fmt.Sprintf("%s should not have caused an error", tc.description))
+			}
+		})
+	}
+}
+
+func TestCheckSortBy(t *testing.T) {
+	testcases := []struct {
+		description string
+		value       string
+		expectError bool
+	}{
+		{
+			description: "Valid sortBy parameter - empty",
+			value:       "",
+		},
+		{
+			description: "Valid sortBy parameter - createDateTime",
+			value:       "createDateTime",
+		},
+		{
+			description: "Valid sortBy parameter - takerRate",
+			value:       "takerRate",
+		},
+		{
+			description: "Valid sortBy parameter - makerRate",
+			value:       "makerRate",
+		},
+		{
+			description: "Valid sortBy parameter - makerAmount",
+			value:       "makerAmount",
+		},
+		{
+			description: "Valid sortBy parameter - takerAmount",
+			value:       "takerAmount",
+		},
+		{
+			description: "Invalid sortBy parameter - random",
+			value:       "random",
+			expectError: true,
+		},
+	}
+
+	for _, tc := range testcases {
+		t.Run(tc.description, func(t *testing.T) {
+			err := CheckSortBy(tc.value, "testValue")
+			if tc.expectError {
+				require.Error(t, err, fmt.Sprintf("%s should have caused an error", tc.description))
+			} else {
+				require.NoError(t, err, fmt.Sprintf("%s should not have caused an error", tc.description))
+			}
+		})
+	}
+}
+
+func TestCheckOrderHashRequired(t *testing.T) {
+	testcases := []struct {
+		description string
+		value       string
+		expectError bool
+	}{
+		{
+			description: "Invalid sortBy parameter - empty",
+			value:       "",
+			expectError: true,
+		},
+		{
+			description: "Valid sortBy parameter - createDateTime",
+			value:       "0x123",
+		},
+	}
+
+	for _, tc := range testcases {
+		t.Run(tc.description, func(t *testing.T) {
+			err := CheckOrderHashRequired(tc.value, "testValue")
+			if tc.expectError {
+				require.Error(t, err, fmt.Sprintf("%s should have caused an error", tc.description))
+			} else {
+				require.NoError(t, err, fmt.Sprintf("%s should not have caused an error", tc.description))
+			}
+		})
+	}
+}
+
+func TestCheckOrderHash(t *testing.T) {
+	testcases := []struct {
+		description string
+		value       string
+		expectError bool
+	}{
+		{
+			description: "Valid sortBy parameter - empty",
+			value:       "",
+		},
+	}
+
+	for _, tc := range testcases {
+		t.Run(tc.description, func(t *testing.T) {
+			err := CheckOrderHash(tc.value, "testValue")
 			if tc.expectError {
 				require.Error(t, err, fmt.Sprintf("%s should have caused an error", tc.description))
 			} else {
