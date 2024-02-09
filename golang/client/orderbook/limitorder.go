@@ -23,22 +23,22 @@ type Client struct {
 	EthClient *ethclient.Client
 }
 
-func CreateLimitOrder(orderRequest CreateOrderParams, chainId int, key string) (*Order, error) {
+func CreateLimitOrder(orderRequest CreateOrderParams) (*Order, error) {
 
 	orderData := OrderData{
-		MakerAsset:    orderRequest.FromToken,
-		TakerAsset:    orderRequest.ToToken,
+		MakerAsset:    orderRequest.MakerAsset,
+		TakerAsset:    orderRequest.TakerAsset,
 		MakingAmount:  orderRequest.MakingAmount,
 		TakingAmount:  orderRequest.TakingAmount,
 		Salt:          GenerateSalt(),
-		Maker:         orderRequest.SourceWallet,
+		Maker:         orderRequest.Maker,
 		AllowedSender: "0x0000000000000000000000000000000000000000", // TODO use this
-		Receiver:      orderRequest.Receiver,
+		Receiver:      orderRequest.Taker,
 		Offsets:       "0",  // TODO use this
 		Interactions:  "0x", // TODO use this
 	}
 
-	aggregationRouter, err := contracts.Get1inchRouterFromChainId(chainId)
+	aggregationRouter, err := contracts.Get1inchRouterFromChainId(orderRequest.ChainId)
 	if err != nil {
 		return nil, fmt.Errorf("failed to get 1inch router address: %v", err)
 	}
@@ -47,7 +47,7 @@ func CreateLimitOrder(orderRequest CreateOrderParams, chainId int, key string) (
 	domainData := apitypes.TypedDataDomain{
 		Name:              contracts.AggregationRouterV5Name,
 		Version:           contracts.AggregationRouterV5VersionNumber,
-		ChainId:           math.NewHexOrDecimal256(int64(chainId)),
+		ChainId:           math.NewHexOrDecimal256(int64(orderRequest.ChainId)),
 		VerifyingContract: aggregationRouter,
 	}
 
@@ -110,7 +110,7 @@ func CreateLimitOrder(orderRequest CreateOrderParams, chainId int, key string) (
 	challengeHash := crypto.Keccak256Hash(rawData)
 	challengeHashHex := challengeHash.Hex()
 
-	privateKey, err := crypto.HexToECDSA(key)
+	privateKey, err := crypto.HexToECDSA(orderRequest.PrivateKey)
 	if err != nil {
 		return nil, fmt.Errorf("error converting private key to ECDSA: %v", err)
 	}

@@ -106,7 +106,7 @@ func (params *GetSwapDataParams) Validate() error {
 	validationErrors = validate.Parameter(params.Amount, "amount", validate.CheckBigIntRequired, validationErrors)
 	validationErrors = validate.Parameter(params.From, "from", validate.CheckEthereumAddressRequired, validationErrors)
 	validationErrors = validate.Parameter(params.Slippage, "slippage", validate.CheckSlippageRequired, validationErrors)
-	if len(params.Src) > 0 && len(params.Dst) > 0 && params.Src == params.Dst {
+	if params.Src == params.Dst && len(params.Src) > 0 && len(params.Dst) > 0 {
 		validationErrors = append(validationErrors, errors.New("src and dst tokens must be different"))
 	}
 	return validate.ConsolidateValidationErorrs(validationErrors)

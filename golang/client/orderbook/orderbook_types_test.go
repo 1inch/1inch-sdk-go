@@ -8,6 +8,7 @@ import (
 
 	"github.com/1inch/1inch-sdk/golang/client/validate"
 	"github.com/1inch/1inch-sdk/golang/helpers/consts/chains"
+	"github.com/1inch/1inch-sdk/golang/helpers/consts/tokens"
 )
 
 func TestCreateOrderParams_Validate(t *testing.T) {
@@ -20,13 +21,12 @@ func TestCreateOrderParams_Validate(t *testing.T) {
 			description: "Valid parameters",
 			params: CreateOrderParams{
 				ChainId:      chains.Ethereum,
-				WalletKey:    "a0b1c2d3e4f5a6b7c8d9e0f1a2b3c4d5e6f7a8b9c0d1e2f3a4b5c6d7e8f9a0b1",
-				SourceWallet: "0x1234567890abcdef1234567890abcdef12345678",
-				FromToken:    "0x1234567890abcdef1234567890abcdef12345678",
-				ToToken:      "0x1234567890abcdef1234567890abcdef12345678",
+				PrivateKey:   "a0b1c2d3e4f5a6b7c8d9e0f1a2b3c4d5e6f7a8b9c0d1e2f3a4b5c6d7e8f9a0b1",
+				Maker:        "0x1234567890abcdef1234567890abcdef12345678",
+				MakerAsset:   "0x1234567890abcdef1234567890abcdef12345678",
+				TakerAsset:   "0x1234567890abcdef1234567890abcdef12345679",
 				TakingAmount: "1000000000000000000",
 				MakingAmount: "2000000000000000000",
-				Receiver:     "0x1234567890abcdef1234567890abcdef12345678",
 			},
 		},
 		{
@@ -34,13 +34,42 @@ func TestCreateOrderParams_Validate(t *testing.T) {
 			params:      CreateOrderParams{},
 			expectErrors: []string{
 				"'chainId' is required",
-				"'walletKey' is required",
-				"'sourceWallet' is required",
-				"'fromToken' is required",
-				"'toToken' is required",
+				"'privateKey' is required",
+				"'maker' is required",
+				"'makerAsset' is required",
+				"'takerAsset' is required",
 				"'takingAmount' is required",
 				"'makingAmount' is required",
-				"'receiver' is required",
+			},
+		},
+		{
+			description: "Error - MakerAsset is native token",
+			params: CreateOrderParams{
+				ChainId:      chains.Ethereum,
+				PrivateKey:   "a0b1c2d3e4f5a6b7c8d9e0f1a2b3c4d5e6f7a8b9c0d1e2f3a4b5c6d7e8f9a0b1",
+				Maker:        "0x1234567890abcdef1234567890abcdef12345678",
+				MakerAsset:   tokens.NativeToken,
+				TakerAsset:   tokens.EthereumUsdc,
+				TakingAmount: "1000000000000000000",
+				MakingAmount: "2000000000000000000",
+			},
+			expectErrors: []string{
+				"native gas token is not supported as maker or taker asset",
+			},
+		},
+		{
+			description: "Error - TakerAsset is native token",
+			params: CreateOrderParams{
+				ChainId:      chains.Ethereum,
+				PrivateKey:   "a0b1c2d3e4f5a6b7c8d9e0f1a2b3c4d5e6f7a8b9c0d1e2f3a4b5c6d7e8f9a0b1",
+				Maker:        "0x1234567890abcdef1234567890abcdef12345678",
+				MakerAsset:   tokens.EthereumUsdc,
+				TakerAsset:   tokens.NativeToken,
+				TakingAmount: "1000000000000000000",
+				MakingAmount: "2000000000000000000",
+			},
+			expectErrors: []string{
+				"native gas token is not supported as maker or taker asset",
 			},
 		},
 	}
