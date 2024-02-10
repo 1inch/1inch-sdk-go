@@ -671,7 +671,7 @@ func TestCheckOrderHash(t *testing.T) {
 		expectError bool
 	}{
 		{
-			description: "Valid sortBy parameter - empty",
+			description: "Valid parameter - empty",
 			value:       "",
 		},
 	}
@@ -679,6 +679,232 @@ func TestCheckOrderHash(t *testing.T) {
 	for _, tc := range testcases {
 		t.Run(tc.description, func(t *testing.T) {
 			err := CheckOrderHash(tc.value, "testValue")
+			if tc.expectError {
+				require.Error(t, err, fmt.Sprintf("%s should have caused an error", tc.description))
+			} else {
+				require.NoError(t, err, fmt.Sprintf("%s should not have caused an error", tc.description))
+			}
+		})
+	}
+}
+
+func TestCheckProtocols(t *testing.T) {
+	testcases := []struct {
+		description string
+		value       string
+		expectError bool
+	}{
+		{
+			description: "Valid protocols string - empty",
+			value:       "",
+		},
+		{
+			description: "Valid protocols string - one protocol",
+			value:       "UNISWAP",
+		},
+		{
+			description: "Valid protocols string - two protocols",
+			value:       "UNISWAP,UNISWAP_V2",
+		},
+		{
+			description: "Valid protocols string - many protocols",
+			value:       "UNISWAP,UNISWAP_V2,UNISWAP_V3",
+		},
+		{
+			description: "Invalid protocols string - trailing comma",
+			value:       "UNISWAP,UNISWAP_V2,",
+			expectError: true,
+		},
+		{
+			description: "Invalid protocols string - whitespace",
+			value:       "UNISWAP, UNISWAP_V2,",
+			expectError: true,
+		},
+		{
+			description: "Invalid protocols string - special characters",
+			value:       "UNISWAP,UNISWAP*_V2",
+			expectError: true,
+		},
+		{
+			description: "Invalid protocols string - duplicate protocols",
+			value:       "UNISWAP,UNISWAP",
+			expectError: true,
+		},
+	}
+
+	for _, tc := range testcases {
+		t.Run(tc.description, func(t *testing.T) {
+			err := CheckProtocols(tc.value, "testValue")
+			if tc.expectError {
+				require.Error(t, err, fmt.Sprintf("%s should have caused an error", tc.description))
+			} else {
+				require.NoError(t, err, fmt.Sprintf("%s should not have caused an error", tc.description))
+			}
+		})
+	}
+}
+
+func TestCheckFee(t *testing.T) {
+	testcases := []struct {
+		description string
+		value       float32
+		expectError bool
+	}{
+		{
+			description: "Valid fee - empty/min",
+			value:       0,
+		},
+		{
+			description: "Valid fee - max",
+			value:       3,
+		},
+		{
+			description: "Invalid fee - negative",
+			value:       -0.01,
+			expectError: true,
+		},
+		{
+			description: "Invalid fee - too high",
+			value:       3.0001,
+			expectError: true,
+		},
+	}
+
+	for _, tc := range testcases {
+		t.Run(tc.description, func(t *testing.T) {
+			err := CheckFee(tc.value, "testValue")
+			if tc.expectError {
+				require.Error(t, err, fmt.Sprintf("%s should have caused an error", tc.description))
+			} else {
+				require.NoError(t, err, fmt.Sprintf("%s should not have caused an error", tc.description))
+			}
+		})
+	}
+}
+
+func TestCheckFloat32NonNegativeWhole(t *testing.T) {
+	testcases := []struct {
+		description string
+		value       float32
+		expectError bool
+	}{
+		{
+			description: "Valid float32 - zero",
+			value:       0,
+		},
+		{
+			description: "Valid float32 - positive",
+			value:       1,
+		},
+		{
+			description: "Invalid float32 - negative",
+			value:       -1,
+			expectError: true,
+		},
+		{
+			description: "Invalid float32 - decimal",
+			value:       0.5,
+			expectError: true,
+		},
+	}
+
+	for _, tc := range testcases {
+		t.Run(tc.description, func(t *testing.T) {
+			err := CheckFloat32NonNegativeWhole(tc.value, "testValue")
+			if tc.expectError {
+				require.Error(t, err, fmt.Sprintf("%s should have caused an error", tc.description))
+			} else {
+				require.NoError(t, err, fmt.Sprintf("%s should not have caused an error", tc.description))
+			}
+		})
+	}
+}
+
+func TestCheckConnectorTokens(t *testing.T) {
+	testcases := []struct {
+		description string
+		value       string
+		expectError bool
+	}{
+		{
+			description: "Valid connector tokens string - empty",
+			value:       "",
+		},
+		{
+			description: "Valid connector tokens string - ethereum address",
+			value:       "0xA0b86991c6218b36c1d19D4a2e9Eb0cE3606eB48",
+		},
+		{
+			description: "Valid connector tokens string - two ethereum addresses",
+			value:       "0xA0b86991c6218b36c1d19D4a2e9Eb0cE3606eB48,0x6b175474e89094c44da98b954eedeac495271d0f",
+		},
+		{
+			description: "Valid connector tokens string - many ethereum addresses",
+			value:       "0xA0b86991c6218b36c1d19D4a2e9Eb0cE3606eB48,0x6b175474e89094c44da98b954eedeac495271d0f",
+		},
+		{
+			description: "Invalid connector tokens string - trailing comma",
+			value:       "0xA0b86991c6218b36c1d19D4a2e9Eb0cE3606eB48,0x6b175474e89094c44da98b954eedeac495271d0f,",
+			expectError: true,
+		},
+		{
+			description: "Invalid connector tokens string - whitespace",
+			value:       "0xA0b86991c6218b36c1d19D4a2e9Eb0cE3606eB48, 0x6b175474e89094c44da98b954eedeac495271d0f,",
+			expectError: true,
+		},
+		{
+			description: "Invalid connector tokens string - invalid characters",
+			value:       "0xP0b86991c6218b36c1d19D4a2e9Eb0cE3606eB48",
+			expectError: true,
+		},
+		{
+			description: "Invalid connector tokens string - wrong length address",
+			value:       "0xEA0b86991c6218b36c1d19D4a2e9Eb0cE3606eB48",
+			expectError: true,
+		},
+		{
+			description: "Invalid connector tokens string - duplicate addresses",
+			value:       "0xA0b86991c6218b36c1d19D4a2e9Eb0cE3606eB48,0xA0b86991c6218b36c1d19D4a2e9Eb0cE3606eB48",
+			expectError: true,
+		},
+	}
+
+	for _, tc := range testcases {
+		t.Run(tc.description, func(t *testing.T) {
+			err := CheckConnectorTokens(tc.value, "testValue")
+			if tc.expectError {
+				require.Error(t, err, fmt.Sprintf("%s should have caused an error", tc.description))
+			} else {
+				require.NoError(t, err, fmt.Sprintf("%s should not have caused an error", tc.description))
+			}
+		})
+	}
+}
+
+func TestCheckPermitHash(t *testing.T) {
+	testcases := []struct {
+		description string
+		value       string
+		expectError bool
+	}{
+		{
+			description: "Valid permit hash - empty",
+			value:       "",
+		},
+		{
+			description: "Valid permit hash",
+			value:       "0x00000000000000000000000050c5df26654b5efbdd0c54a062dfa6012933defe0000000000000000000000001111111254eeb25477b68fb85ed929f73a960582ffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffff0000000000000000000000000000000000000000000000000000000065c6e1b4000000000000000000000000000000000000000000000000000000000000001bc5d700e912fc92bdc59fd1a4963278199a0fc69e95aa8e4b6a3b2bc7387bc2c86137bb710e3dbd3ab0b02762c805902bf9e5f23548ef8431c22dbb7db800d523",
+		},
+		{
+			description: "Invalid permit hash - invalid character",
+			value:       "0xT6487c5cb7c4b20202d34117abc57b1c7d91570e100d8a16eced3dbbe8b22eee41339c0772fc6affe3bb8b2a72e9e3e2e2b061d351936c1d534fcfe8d336073d1b",
+			expectError: true,
+		},
+	}
+
+	for _, tc := range testcases {
+		t.Run(tc.description, func(t *testing.T) {
+			err := CheckPermitHash(tc.value, "testValue")
 			if tc.expectError {
 				require.Error(t, err, fmt.Sprintf("%s should have caused an error", tc.description))
 			} else {

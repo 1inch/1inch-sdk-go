@@ -121,6 +121,12 @@ func (s *SwapService) GetQuote(ctx context.Context, params swap.GetQuoteParams) 
 		return nil, nil, err
 	}
 
+	// Token info is used by certain parts of the SDK and more info by default is helpful to integrators
+	// Because we use generated structs with concrete types, extra data is forced on regardless of what the user passes in.
+	params.IncludeTokensInfo = true
+	params.IncludeGas = true
+	params.IncludeProtocols = true
+
 	u, err = addQueryParameters(u, params.AggregationControllerGetQuoteParams)
 	if err != nil {
 		return nil, nil, err
@@ -149,6 +155,12 @@ func (s *SwapService) GetSwapData(ctx context.Context, params swap.GetSwapDataPa
 		return nil, nil, err
 	}
 
+	// Token info is used by certain parts of the SDK and more info by default is helpful to integrators
+	// Because we use generated structs with concrete types, extra data is forced on regardless of what the user passes in.
+	params.IncludeTokensInfo = true
+	params.IncludeGas = true
+	params.IncludeProtocols = true
+
 	u, err = addQueryParameters(u, params.AggregationControllerGetSwapParams)
 	if err != nil {
 		return nil, nil, err
@@ -164,20 +176,8 @@ func (s *SwapService) GetSwapData(ctx context.Context, params swap.GetSwapDataPa
 		return nil, nil, err
 	}
 
-	swapResponse.FromToken = &swap.TokenInfo{
-		Address: params.Src,
-	}
-	swapResponse.ToToken = &swap.TokenInfo{
-		Address: params.Dst,
-	}
-
-	ethClient, err := s.client.GetEthClient(params.ChainId)
-	if err != nil {
-		return nil, nil, err
-	}
-
 	if !params.SkipWarnings {
-		err = swap.ConfirmSwapDataWithUser(&swapResponse, params.Amount, params.Slippage, ethClient)
+		err = swap.ConfirmSwapDataWithUser(&swapResponse, params.Amount, params.Slippage)
 		if err != nil {
 			return nil, nil, err
 		}

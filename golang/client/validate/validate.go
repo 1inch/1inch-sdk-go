@@ -4,6 +4,7 @@ import (
 	"fmt"
 	"math/big"
 	"regexp"
+	"strings"
 
 	"github.com/1inch/1inch-sdk/golang/helpers"
 	"github.com/1inch/1inch-sdk/golang/helpers/consts/chains"
@@ -21,6 +22,7 @@ func CheckEthereumAddressRequired(parameter interface{}, variableName string) er
 
 	return CheckEthereumAddress(value, variableName)
 }
+
 func CheckEthereumAddress(parameter interface{}, variableName string) error {
 	value, ok := parameter.(string)
 	if !ok {
@@ -115,6 +117,7 @@ func CheckPrivateKeyRequired(parameter interface{}, variableName string) error {
 
 	return CheckPrivateKey(address, variableName)
 }
+
 func CheckPrivateKey(parameter interface{}, variableName string) error {
 	address, ok := parameter.(string)
 	if !ok {
@@ -267,6 +270,7 @@ func CheckOrderHashRequired(parameter interface{}, variableName string) error {
 	}
 	return CheckOrderHash(value, variableName)
 }
+
 func CheckOrderHash(parameter interface{}, variableName string) error {
 	value, ok := parameter.(string)
 	if !ok {
@@ -277,5 +281,127 @@ func CheckOrderHash(parameter interface{}, variableName string) error {
 		return nil
 	}
 	// TODO add criteria that captures valid order hash strings here
+	return nil
+}
+
+func CheckProtocols(parameter interface{}, variableName string) error {
+	value, ok := parameter.(string)
+	if !ok {
+		return fmt.Errorf("for parameter '%v' to be validated as '%v', it must be a string", variableName, "Protocols")
+	}
+
+	if value == "" {
+		return nil
+	}
+
+	pattern := `^[a-zA-Z0-9_]+(,[a-zA-Z0-9_]+)*$`
+	re := regexp.MustCompile(pattern)
+
+	ok = re.MatchString(value)
+	if !ok {
+		return NewParameterValidationError(variableName, "must be formatted as a single-string list exactly in the format 'Protocol1,Protocol2,Protocol3' without any "+
+			"spaces between each protocol name. These names must match the exact protocol id used by the 1inch APIs "+
+			"(use the Swap service's GetLiquiditySources function to see this list). Additionally, there cannot be a trailing comma at the end of the list.")
+	}
+
+	if ok {
+		addresses := strings.Split(value, ",")
+		addressesMap := make(map[string]bool)
+		for _, address := range addresses {
+			if _, exists := addressesMap[address]; exists {
+				return NewParameterValidationError(variableName, "Duplicate protocol found in list")
+			}
+			addressesMap[address] = true
+		}
+	}
+
+	return nil
+}
+
+func CheckFee(parameter interface{}, variableName string) error {
+	value, ok := parameter.(float32)
+	if !ok {
+		return fmt.Errorf("for parameter '%v' to be validated as '%v', it must be a string", variableName, "Fee")
+	}
+
+	if value < 0 {
+		return NewParameterValidationError(variableName, "must be a positive value")
+	}
+
+	if value > 3 {
+		return NewParameterValidationError(variableName, "must be a value between 0 and 3")
+	}
+
+	return nil
+}
+
+func CheckFloat32NonNegativeWhole(parameter interface{}, variableName string) error {
+	value, ok := parameter.(float32)
+	if !ok {
+		return fmt.Errorf("for parameter '%v' to be validated as '%v', it must be a string", variableName, "Float32NonNegativeWhole")
+	}
+
+	if value < 0 {
+		return NewParameterValidationError(variableName, "must be 0 or greater")
+	}
+
+	// Cast it to an int to truncate it, then cast back to float32 for the comparison
+	if float32(int(value)) != value {
+		return NewParameterValidationError(variableName, "must be an integer")
+	}
+
+	return nil
+}
+
+func CheckConnectorTokens(parameter interface{}, variableName string) error {
+	value, ok := parameter.(string)
+	if !ok {
+		return fmt.Errorf("for parameter '%v' to be validated as '%v', it must be a string", variableName, "ConnectorTokens")
+	}
+
+	if value == "" {
+		return nil
+	}
+
+	pattern := `^0x[a-fA-F0-9]{40}(,0x[a-fA-F0-9]{40})*$`
+	re := regexp.MustCompile(pattern)
+
+	ok = re.MatchString(value)
+	if !ok {
+		return NewParameterValidationError(variableName, "must be formatted as a single-string list exactly in the format '0x123,0x456,0x789' "+
+			"without any spaces between each protocol name. Additionally, there cannot be a trailing comma at the end of the list.")
+	}
+
+	if ok {
+		// Split the string by commas to get individual addresses
+		addresses := strings.Split(value, ",")
+
+		// Use a map to check for duplicates
+		addressesMap := make(map[string]bool)
+
+		for _, address := range addresses {
+			if _, exists := addressesMap[address]; exists {
+				return NewParameterValidationError(variableName, "Duplicate address found in list")
+			}
+			addressesMap[address] = true
+		}
+	}
+
+	return nil
+}
+
+func CheckPermitHash(parameter interface{}, variableName string) error {
+	value, ok := parameter.(string)
+	if !ok {
+		return fmt.Errorf("for parameter '%v' to be validated as '%v', it must be a string", variableName, "PermitHash")
+	}
+	if value == "" {
+		return nil
+	}
+
+	re := regexp.MustCompile(`^0x[a-fA-F0-9]*$`)
+	if !re.MatchString(value) {
+		return NewParameterValidationError(variableName, "not a valid permit hash")
+	}
 	return nil
 }

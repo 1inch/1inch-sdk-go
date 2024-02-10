@@ -89,8 +89,6 @@ func (s *ActionService) SwapTokens(params swap.SwapTokensParams) error {
 		WalletKey:     params.WalletKey,
 		ChainId:       params.ChainId,
 		PublicAddress: params.PublicAddress,
-		FromToken:     params.Src,
-		ToToken:       params.Dst,
 		Amount:        params.Amount,
 		Slippage:      params.Slippage,
 		SkipWarnings:  params.SkipWarnings,
@@ -105,11 +103,9 @@ func (s *ActionService) SwapTokens(params swap.SwapTokensParams) error {
 	if isPermitSupportedForCurrentChain && params.ApprovalType != swap.ApprovalAlways {
 		typehash, err = onchain.GetTypeHash(ethClient, params.Src)
 		if err == nil {
-			// Typehash is present which means we can use Permit to save gas
+			// If a typehash for Permit1 is present, use that instead of Approve
 			if typehash == typehashes.Permit1 {
 				usePermit = true
-			} else {
-				fmt.Printf("WARN: Typehash exists, but it is not recognized: %v\n", typehash)
 			}
 		}
 	}
@@ -169,6 +165,14 @@ func (s *ActionService) SwapTokens(params swap.SwapTokensParams) error {
 
 	executeSwapConfig.TransactionData = swapResponse.Tx.Data
 	executeSwapConfig.EstimatedAmountOut = swapResponse.ToAmount
+	executeSwapConfig.ToToken = swapResponse.ToToken
+
+	// We will use static data for native token details since they are not ERC20s
+	if params.Src == tokens.NativeToken {
+		executeSwapConfig.FromToken = getNativeTokenDetails(params.ChainId)
+	} else {
+		executeSwapConfig.FromToken = swapResponse.FromToken
+	}
 
 	err = s.client.Swap.ExecuteSwap(executeSwapConfig)
 	if err != nil {
@@ -191,7 +195,7 @@ func (s *SwapService) ExecuteSwap(config *swap.ExecuteSwapConfig) error {
 	}
 
 	if !config.SkipWarnings {
-		ok, err := swap.ConfirmExecuteSwapWithUser(config, ethClient)
+		ok, err := swap.ConfirmExecuteSwapWithUser(config)
 		if err != nil {
 			return fmt.Errorf("failed to confirm swap: %v", err)
 		}
@@ -225,11 +229,11 @@ func (s *SwapService) executeSwapWithApproval(config *swap.ExecuteSwapConfig, et
 	var value *big.Int
 	var err error
 	var approveFirst bool
-	if config.FromToken != tokens.NativeToken {
+	if config.FromToken.Address != tokens.NativeToken {
 		// When swapping erc20 tokens, the value set on the transaction will be 0
 		value = big.NewInt(0)
 
-		allowance, err := onchain.ReadContractAllowance(ethClient, common.HexToAddress(config.FromToken), common.HexToAddress(config.PublicAddress), common.HexToAddress(aggregationRouter))
+		allowance, err := onchain.ReadContractAllowance(ethClient, common.HexToAddress(config.FromToken.Address), common.HexToAddress(config.PublicAddress), common.HexToAddress(aggregationRouter))
 		if err != nil {
 			return fmt.Errorf("failed to read allowance: %v", err)
 		}
@@ -240,7 +244,7 @@ func (s *SwapService) executeSwapWithApproval(config *swap.ExecuteSwapConfig, et
 		}
 		if allowance.Cmp(amountBig) <= 0 {
 			if !config.SkipWarnings {
-				ok, err := swap.ConfirmApprovalWithUser(ethClient, config.PublicAddress, config.FromToken)
+				ok, err := swap.ConfirmApprovalWithUser(ethClient, config.PublicAddress, config.FromToken.Address)
 				if err != nil {
 					return fmt.Errorf("failed to confirm approval: %v", err)
 				}
@@ -256,7 +260,7 @@ func (s *SwapService) executeSwapWithApproval(config *swap.ExecuteSwapConfig, et
 				erc20Config := onchain.Erc20ApprovalConfig{
 					ChainId:        config.ChainId,
 					Key:            config.WalletKey,
-					Erc20Address:   common.HexToAddress(config.FromToken),
+					Erc20Address:   common.HexToAddress(config.FromToken.Address),
 					PublicAddress:  common.HexToAddress(config.PublicAddress),
 					SpenderAddress: common.HexToAddress(aggregationRouter),
 				}
@@ -294,7 +298,7 @@ func (s *SwapService) executeSwapWithApproval(config *swap.ExecuteSwapConfig, et
 		_, err := tenderly.SimulateSwap(s.client.TenderlyKey, tenderly.SwapConfig{
 			ChainId:         config.ChainId,
 			PublicAddress:   config.PublicAddress,
-			FromToken:       config.FromToken,
+			FromToken:       config.FromToken.Address,
 			TransactionData: config.TransactionData,
 			ApproveFirst:    approveFirst,
 			Value:           value.String(),
@@ -336,7 +340,7 @@ func (s *SwapService) executeSwapWithPermit(config *swap.ExecuteSwapConfig, ethC
 		_, err := tenderly.SimulateSwap(s.client.TenderlyKey, tenderly.SwapConfig{
 			ChainId:         config.ChainId,
 			PublicAddress:   config.PublicAddress,
-			FromToken:       config.FromToken,
+			FromToken:       config.FromToken.Address,
 			TransactionData: config.TransactionData,
 			Value:           "0",
 		})
@@ -350,4 +354,43 @@ func (s *SwapService) executeSwapWithPermit(config *swap.ExecuteSwapConfig, ethC
 		}
 	}
 	return nil
+}
+
+func getNativeTokenDetails(chainId int) *swap.TokenInfo {
+	var tokenSymbol string
+	switch chainId {
+	case chains.Arbitrum:
+		tokenSymbol = "ETH"
+	case chains.Aurora:
+		tokenSymbol = "AURORA"
+	case chains.Avalanche:
+		tokenSymbol = "AVAX"
+	case chains.Base:
+		tokenSymbol = "ETH"
+	case chains.BSC:
+		tokenSymbol = "BNB"
+	case chains.Ethereum:
+		tokenSymbol = "ETH"
+	case chains.Fantom:
+		tokenSymbol = "FTM"
+	case chains.Gnosis:
+		tokenSymbol = "GNO"
+	case chains.Klayton:
+		tokenSymbol = "KLAY"
+	case chains.Optimism:
+		tokenSymbol = "ETH"
+	case chains.Polygon:
+		tokenSymbol = "MATIC"
+	case chains.ZkSyncEra:
+		tokenSymbol = "ETH"
+	default:
+		tokenSymbol = "UNKNOWN"
+	}
+
+	// TODO need to verify that all native tokens behave the same as ETH on Ethereum
+	return &swap.TokenInfo{
+		Address:  tokens.NativeToken,
+		Symbol:   tokenSymbol,
+		Decimals: 18,
+	}
 }
