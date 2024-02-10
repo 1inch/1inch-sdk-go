@@ -4,8 +4,8 @@ type ExecuteSwapConfig struct {
 	WalletKey          string
 	ChainId            int
 	PublicAddress      string
-	FromToken          string
-	ToToken            string
+	FromToken          *TokenInfo
+	ToToken            *TokenInfo
 	Amount             string
 	Slippage           float32
 	EstimatedAmountOut string

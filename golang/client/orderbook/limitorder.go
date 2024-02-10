@@ -187,7 +187,7 @@ func ConfirmApprovalWithUser(ethClient *ethclient.Client, publicAddress string, 
 }
 
 func confirmApprovalWithUser(ethClient *ethclient.Client, publicAddress string, tokenAddress string, reader io.Reader, writer helpers.Printer) (bool, error) {
-	tokenName, err := onchain.ReadContractSymbol(ethClient, common.HexToAddress(tokenAddress))
+	tokenSymbol, err := onchain.ReadContractSymbol(ethClient, common.HexToAddress(tokenAddress))
 	if err != nil {
 		return false, fmt.Errorf("failed to read name: %v", err)
 	}
@@ -197,7 +197,7 @@ func confirmApprovalWithUser(ethClient *ethclient.Client, publicAddress string, 
 		"onchain, then run the SDK again\n")
 	writer.Printf("Approval summary:\n")
 	writer.Printf("    %-30s %s\n", "Wallet:", publicAddress)
-	writer.Printf("    %-30s %s\n", "Selling: ", tokenName)
+	writer.Printf("    %-30s %s\n", "Selling: ", tokenSymbol)
 	writer.Printf("    %-30s %s\n", "Approval amount: ", "unlimited")
 	writer.Printf("\n")
 	writer.Printf("Would you like post an onchain unlimited approval now? [y/N]: ")

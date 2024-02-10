@@ -8,15 +8,14 @@ import (
 	"os"
 	"strings"
 
-	"github.com/1inch/1inch-sdk/golang/client/onchain"
-	"github.com/1inch/1inch-sdk/golang/helpers"
-	"github.com/1inch/1inch-sdk/golang/helpers/consts/tokens"
 	"github.com/ethereum/go-ethereum/common"
 	"github.com/ethereum/go-ethereum/common/math"
 	"github.com/ethereum/go-ethereum/crypto"
 	"github.com/ethereum/go-ethereum/ethclient"
 	"github.com/ethereum/go-ethereum/signer/core/apitypes"
 
+	"github.com/1inch/1inch-sdk/golang/client/onchain"
+	"github.com/1inch/1inch-sdk/golang/helpers"
 	"github.com/1inch/1inch-sdk/golang/helpers/consts/amounts"
 	"github.com/1inch/1inch-sdk/golang/helpers/consts/contracts"
 )
@@ -159,51 +158,12 @@ func ConvertSignatureToVRSString(signature string) string {
 	return padStringWithZeroes(signature[128:]) + signature[:128]
 }
 
-func ConfirmExecuteSwapWithUser(config *ExecuteSwapConfig, ethClient *ethclient.Client) (bool, error) {
+func ConfirmExecuteSwapWithUser(config *ExecuteSwapConfig) (bool, error) {
 	stdOut := helpers.StdOutPrinter{}
-	return confirmExecuteSwapWithUser(config, ethClient, os.Stdin, stdOut)
+	return confirmExecuteSwapWithUser(config, os.Stdin, stdOut)
 }
 
-type tokenInfo struct {
-	decimals uint8
-	name     string
-}
-
-func getTokenInfo(ethClient *ethclient.Client, tokenAddress string) (*tokenInfo, error) {
-
-	if tokenAddress == tokens.NativeToken {
-		return &tokenInfo{
-			decimals: 18,
-			name:     "ETH",
-		}, nil
-	}
-
-	decimals, err := onchain.ReadContractDecimals(ethClient, common.HexToAddress(tokenAddress))
-	if err != nil {
-		return nil, fmt.Errorf("failed to read decimals: %v", err)
-	}
-
-	name, err := onchain.ReadContractSymbol(ethClient, common.HexToAddress(tokenAddress))
-	if err != nil {
-		return nil, fmt.Errorf("failed to read name: %v", err)
-	}
-
-	return &tokenInfo{
-		decimals: decimals,
-		name:     name,
-	}, nil
-}
-
-func confirmExecuteSwapWithUser(config *ExecuteSwapConfig, ethClient *ethclient.Client, reader io.Reader, writer helpers.Printer) (bool, error) {
-	fromTokeninfo, err := getTokenInfo(ethClient, config.FromToken)
-	if err != nil {
-		return false, fmt.Errorf("failed to get token info: %v", err)
-	}
-	toTokeninfo, err := getTokenInfo(ethClient, config.ToToken)
-	if err != nil {
-		return false, fmt.Errorf("failed to get token info: %v", err)
-	}
-
+func confirmExecuteSwapWithUser(config *ExecuteSwapConfig, reader io.Reader, writer helpers.Printer) (bool, error) {
 	var permitType string
 	if config.IsPermitSwap {
 		permitType = "Permit1"
@@ -212,8 +172,8 @@ func confirmExecuteSwapWithUser(config *ExecuteSwapConfig, ethClient *ethclient.
 	}
 
 	writer.Printf("Swap summary:\n")
-	writer.Printf("    %-30s %s %s\n", "Selling: ", helpers.SimplifyValue(config.Amount, int(fromTokeninfo.decimals)), fromTokeninfo.name)
-	writer.Printf("    %-30s %s %s\n", "Buying (estimation):", helpers.SimplifyValue(config.EstimatedAmountOut, int(toTokeninfo.decimals)), toTokeninfo.name)
+	writer.Printf("    %-30s %s %s\n", "Selling: ", helpers.SimplifyValue(config.Amount, int(config.FromToken.Decimals)), config.FromToken.Symbol)
+	writer.Printf("    %-30s %s %s\n", "Buying (estimation):", helpers.SimplifyValue(config.EstimatedAmountOut, int(config.ToToken.Decimals)), config.ToToken.Symbol)
 	writer.Printf("    %-30s %v%s\n", "Slippage:", config.Slippage, "%")
 	writer.Printf("    %-30s %s\n", "Permision type:", permitType)
 	writer.Printf("\n")
@@ -232,25 +192,15 @@ func confirmExecuteSwapWithUser(config *ExecuteSwapConfig, ethClient *ethclient.
 	}
 }
 
-func ConfirmSwapDataWithUser(swapResponse *SwapResponse, fromAmount string, slippage float32, ethClient *ethclient.Client) error {
+func ConfirmSwapDataWithUser(swapResponse *SwapResponse, fromAmount string, slippage float32) error {
 	stdOut := helpers.StdOutPrinter{}
-	return confirmSwapDataWithUser(swapResponse, fromAmount, slippage, ethClient, stdOut)
+	return confirmSwapDataWithUser(swapResponse, fromAmount, slippage, stdOut)
 }
 
-func confirmSwapDataWithUser(swapResponse *SwapResponse, fromAmount string, slippage float32, ethClient *ethclient.Client, writer helpers.Printer) error {
-
-	fromTokeninfo, err := getTokenInfo(ethClient, swapResponse.FromToken.Address)
-	if err != nil {
-		return fmt.Errorf("failed to get token info: %v", err)
-	}
-	toTokeninfo, err := getTokenInfo(ethClient, swapResponse.ToToken.Address)
-	if err != nil {
-		return fmt.Errorf("failed to get token info: %v", err)
-	}
-
+func confirmSwapDataWithUser(swapResponse *SwapResponse, fromAmount string, slippage float32, writer helpers.Printer) error {
 	writer.Printf("Swap summary:\n")
-	writer.Printf("    %-30s %s %s\n", "Selling: ", helpers.SimplifyValue(fromAmount, int(fromTokeninfo.decimals)), fromTokeninfo.name)
-	writer.Printf("    %-30s %s %s\n", "Buying (estimation):", helpers.SimplifyValue(swapResponse.ToAmount, int(toTokeninfo.decimals)), toTokeninfo.name)
+	writer.Printf("    %-30s %s %s\n", "Selling: ", helpers.SimplifyValue(fromAmount, int(swapResponse.FromToken.Decimals)), swapResponse.FromToken.Symbol)
+	writer.Printf("    %-30s %s %s\n", "Buying (estimation):", helpers.SimplifyValue(swapResponse.ToAmount, int(swapResponse.ToToken.Decimals)), swapResponse.ToToken.Symbol)
 	writer.Printf("    %-30s %v%s\n", "Slippage:", slippage, "%")
 	writer.Printf("\n")
 	writer.Printf("WARNING: Executing the transaction data generated by this function is irreversible. Make sure the proposed trade looks correct!\n")
