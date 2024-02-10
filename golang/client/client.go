@@ -136,7 +136,6 @@ func (c *Client) NewRequest(method, urlStr string, body []byte) (*http.Request, 
 	}
 
 	req.Header.Set("User-Agent", "GolangSDK/0.0.3-developer-preview")
-
 	if body != nil {
 		req.Header.Set("Content-Type", "application/json")
 	}
@@ -145,7 +144,6 @@ func (c *Client) NewRequest(method, urlStr string, body []byte) (*http.Request, 
 }
 
 func (c *Client) Do(ctx context.Context, req *http.Request, v interface{}) (*http.Response, error) {
-	req.Header.Set("Content-Type", "application/json")
 	req.Header.Set("Authorization", fmt.Sprintf("Bearer %s", c.ApiKey))
 
 	req.WithContext(ctx)
