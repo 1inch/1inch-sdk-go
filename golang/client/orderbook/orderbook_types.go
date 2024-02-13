@@ -8,6 +8,7 @@ import (
 type CreateOrderParams struct {
 	ChainId      int
 	PrivateKey   string
+	ExpireAfter  int64
 	Maker        string
 	MakerAsset   string
 	TakerAsset   string
@@ -22,6 +23,7 @@ func (params *CreateOrderParams) Validate() error {
 	validationErrors = validate.Parameter(params.ChainId, "chainId", validate.CheckChainIdRequired, validationErrors)
 	validationErrors = validate.Parameter(params.PrivateKey, "privateKey", validate.CheckPrivateKeyRequired, validationErrors)
 	validationErrors = validate.Parameter(params.Maker, "maker", validate.CheckEthereumAddressRequired, validationErrors)
+	validationErrors = validate.Parameter(params.ExpireAfter, "expireAfter", validate.CheckExpireAfter, validationErrors)
 	validationErrors = validate.Parameter(params.MakerAsset, "makerAsset", validate.CheckEthereumAddressRequired, validationErrors)
 	validationErrors = validate.Parameter(params.TakerAsset, "takerAsset", validate.CheckEthereumAddressRequired, validationErrors)
 	validationErrors = validate.Parameter(params.TakingAmount, "takingAmount", validate.CheckBigIntRequired, validationErrors)

@@ -5,6 +5,7 @@ import (
 	"math/big"
 	"regexp"
 	"strings"
+	"time"
 
 	"github.com/1inch/1inch-sdk/golang/helpers"
 	"github.com/1inch/1inch-sdk/golang/helpers/consts/chains"
@@ -335,6 +336,8 @@ func CheckFee(parameter interface{}, variableName string) error {
 	return nil
 }
 
+//  TODO The enforced naming pattern for the variable name string literal doesn't work for generic types like "Float32NonNegativeWhole"
+
 func CheckFloat32NonNegativeWhole(parameter interface{}, variableName string) error {
 	value, ok := parameter.(float32)
 	if !ok {
@@ -402,6 +405,21 @@ func CheckPermitHash(parameter interface{}, variableName string) error {
 	re := regexp.MustCompile(`^0x[a-fA-F0-9]*$`)
 	if !re.MatchString(value) {
 		return NewParameterValidationError(variableName, "not a valid permit hash")
+	}
+	return nil
+}
+
+func CheckExpireAfter(parameter interface{}, variableName string) error {
+	value, ok := parameter.(int64)
+	if !ok {
+		return fmt.Errorf("for parameter '%v' to be validated as '%v', it must be a string", variableName, "ExpireAfter")
+	}
+	if value == 0 {
+		return nil
+	}
+
+	if value < time.Now().Unix() {
+		return NewParameterValidationError(variableName, "must be a future timestamp")
 	}
 	return nil
 }

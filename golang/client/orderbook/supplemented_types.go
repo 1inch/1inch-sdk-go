@@ -3,7 +3,7 @@ package orderbook
 import "time"
 
 type CreateOrderResponse struct {
-	Success bool
+	Success bool `json:"success"`
 }
 
 type OrderResponse struct {

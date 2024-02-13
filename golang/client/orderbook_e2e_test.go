@@ -1,6 +1,3 @@
-//go:build ignoretest
-// +build ignoretest
-
 package client
 
 import (

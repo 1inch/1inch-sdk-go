@@ -4,6 +4,7 @@ import (
 	"bufio"
 	"fmt"
 	"io"
+	"math/big"
 	"os"
 	"strings"
 	"time"
@@ -23,7 +24,9 @@ type Client struct {
 	EthClient *ethclient.Client
 }
 
-func CreateLimitOrder(orderRequest CreateOrderParams) (*Order, error) {
+func CreateLimitOrderMessage(orderRequest CreateOrderParams, interactions []string) (*Order, error) {
+
+	offsets := getOffsets(interactions)
 
 	orderData := OrderData{
 		MakerAsset:    orderRequest.MakerAsset,
@@ -34,8 +37,8 @@ func CreateLimitOrder(orderRequest CreateOrderParams) (*Order, error) {
 		Maker:         orderRequest.Maker,
 		AllowedSender: "0x0000000000000000000000000000000000000000", // TODO use this
 		Receiver:      orderRequest.Taker,
-		Offsets:       "0",  // TODO use this
-		Interactions:  "0x", // TODO use this
+		Offsets:       fmt.Sprintf("%v", offsets),
+		Interactions:  interactions[4], // The 5th entry in this slice is the predicate and is the only field needed
 	}
 
 	aggregationRouter, err := contracts.Get1inchRouterFromChainId(orderRequest.ChainId)
@@ -132,6 +135,60 @@ func CreateLimitOrder(orderRequest CreateOrderParams) (*Order, error) {
 		Signature: signatureHex,
 		Data:      orderData,
 	}, err
+}
+
+func GetInteractions(client *ethclient.Client, seriesNonceManager string, expiration int64, maker string) ([]string, error) {
+
+	currentNonce, err := onchain.GetTimeSeriesManagerNonce(client, seriesNonceManager, maker)
+	if err != nil {
+		return nil, err
+	}
+
+	timeBelowAndNonceEqualsCalldata, err := onchain.GetTimestampBelowAndNonceEqualsCalldata(expiration, currentNonce, maker)
+
+	if err != nil {
+		return nil, fmt.Errorf("failed to get predicate calldata: %v", err)
+	}
+
+	predicate, err := onchain.GetPredicateCalldata(seriesNonceManager, timeBelowAndNonceEqualsCalldata)
+	if err != nil {
+		return nil, fmt.Errorf("failed to get predicate calldata: %v", err)
+	}
+
+	makerAssetData := `0x`
+	takerAssetData := `0x`
+	getMakingAmount := `0x`
+	getTakingAmount := `0x`
+	permit := `0x`
+	preInteraction := `0x`
+	postInteraction := `0x`
+
+	return []string{makerAssetData, takerAssetData, getMakingAmount, getTakingAmount, fmt.Sprintf("0x%x", predicate), permit, preInteraction, postInteraction}, nil
+}
+
+func getOffsets(interactions []string) *big.Int {
+	var lengthMap []int
+	for _, interaction := range interactions {
+		if interaction[:2] == "0x" {
+			lengthMap = append(lengthMap, len(interaction)/2-1)
+		} else {
+			lengthMap = append(lengthMap, len(interaction)/2)
+		}
+	}
+
+	cumulativeSum := 0
+	bytesAccumulator := big.NewInt(0)
+	var index uint64
+
+	for _, length := range lengthMap {
+		cumulativeSum += length
+		shiftVal := big.NewInt(int64(cumulativeSum))
+		shiftVal.Lsh(shiftVal, uint(32*index))           // Shift left
+		bytesAccumulator.Add(bytesAccumulator, shiftVal) // Add to accumulator
+		index++
+	}
+
+	return bytesAccumulator
 }
 
 func ConfirmLimitOrderWithUser(order *Order, ethClient *ethclient.Client) (bool, error) {
