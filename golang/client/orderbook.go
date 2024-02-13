@@ -6,6 +6,7 @@ import (
 	"errors"
 	"fmt"
 	"net/http"
+	"time"
 
 	"github.com/ethereum/go-ethereum/common"
 
@@ -25,6 +26,11 @@ func (s *OrderbookService) CreateOrder(ctx context.Context, params orderbook.Cre
 	err := params.Validate()
 	if err != nil {
 		return nil, nil, err
+	}
+
+	// Orders only last one minute if not specified in the request
+	if params.ExpireAfter == 0 {
+		params.ExpireAfter = time.Now().Add(time.Minute).Unix()
 	}
 
 	// To post an order that is open to anyone, the taker address must be the zero address
@@ -77,7 +83,17 @@ func (s *OrderbookService) CreateOrder(ctx context.Context, params orderbook.Cre
 		}
 	}
 
-	order, err := orderbook.CreateLimitOrder(params)
+	seriesNonceManager, err := contracts.GetSeriesNonceManagerFromChainId(params.ChainId)
+	if err != nil {
+		return nil, nil, fmt.Errorf("failed to get series nonce manager address: %v", err)
+	}
+
+	interactions, err := orderbook.GetInteractions(ethClient, seriesNonceManager, params.ExpireAfter, params.Maker)
+	if err != nil {
+		return nil, nil, fmt.Errorf("failed to get interactions: %v", err)
+	}
+
+	order, err := orderbook.CreateLimitOrderMessage(params, interactions)
 	if err != nil {
 		return nil, nil, err
 	}

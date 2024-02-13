@@ -367,7 +367,7 @@ func getNativeTokenDetails(chainId int) *swap.TokenInfo {
 		tokenSymbol = "AVAX"
 	case chains.Base:
 		tokenSymbol = "ETH"
-	case chains.BSC:
+	case chains.Bsc:
 		tokenSymbol = "BNB"
 	case chains.Ethereum:
 		tokenSymbol = "ETH"
