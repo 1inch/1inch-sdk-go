@@ -32,3 +32,21 @@ type Erc20RevokeConfig struct {
 	SpenderAddress          common.Address
 	AllowanceDecreaseAmount *big.Int
 }
+
+type PermitSignatureConfig struct {
+	FromToken     string
+	Name          string
+	PublicAddress string
+	ChainId       int
+	Key           string
+	Nonce         int64
+	Deadline      int64
+}
+
+type PermitParamsConfig struct {
+	Owner     string
+	Spender   string
+	Value     *big.Int
+	Deadline  int64
+	Signature string
+}

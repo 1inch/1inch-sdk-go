@@ -2,18 +2,22 @@ package client
 
 import (
 	"context"
+	"crypto/ecdsa"
 	"encoding/json"
 	"errors"
 	"fmt"
 	"net/http"
+	"strings"
 	"time"
 
 	"github.com/ethereum/go-ethereum/common"
+	"github.com/ethereum/go-ethereum/crypto"
 
 	"github.com/1inch/1inch-sdk/golang/client/onchain"
 	"github.com/1inch/1inch-sdk/golang/client/orderbook"
 	"github.com/1inch/1inch-sdk/golang/helpers"
 	"github.com/1inch/1inch-sdk/golang/helpers/consts/addresses"
+	"github.com/1inch/1inch-sdk/golang/helpers/consts/amounts"
 	"github.com/1inch/1inch-sdk/golang/helpers/consts/contracts"
 )
 
@@ -50,36 +54,89 @@ func (s *OrderbookService) CreateOrder(ctx context.Context, params orderbook.Cre
 	if err != nil {
 		return nil, nil, fmt.Errorf("failed to get eth client: %v", err)
 	}
-	allowance, err := onchain.ReadContractAllowance(ethClient, fromTokenAddress, publicAddress, aggregationRouterAddress)
+
+	privateKey, err := crypto.HexToECDSA(params.PrivateKey)
 	if err != nil {
-		return nil, nil, fmt.Errorf("failed to read allowance: %v", err)
+		return nil, nil, fmt.Errorf("failed to convert private key: %v", err)
 	}
 
-	makingAmountBig, err := helpers.BigIntFromString(params.MakingAmount)
-	if err != nil {
-		return nil, nil, fmt.Errorf("failed to parse making amount: %v", err)
+	publicKey := privateKey.Public()
+	publicKeyECDSA, ok := publicKey.(*ecdsa.PublicKey)
+	if !ok {
+		return nil, nil, fmt.Errorf("could not cast public key to ECDSA")
 	}
-	if allowance.Cmp(makingAmountBig) <= 0 {
-		if !params.SkipWarnings {
-			ok, err := orderbook.ConfirmApprovalWithUser(ethClient, params.Maker, params.MakerAsset)
-			if err != nil {
-				return nil, nil, fmt.Errorf("failed to confirm approval: %v", err)
-			}
-			if !ok {
-				return nil, nil, errors.New("user rejected approval")
-			}
-		}
 
-		erc20Config := onchain.Erc20ApprovalConfig{
-			ChainId:        params.ChainId,
-			Key:            params.PrivateKey,
-			Erc20Address:   fromTokenAddress,
-			PublicAddress:  publicAddress,
-			SpenderAddress: aggregationRouterAddress,
-		}
-		err := onchain.ApproveTokenForRouter(ethClient, s.client.NonceCache, erc20Config)
+	derivedPublicAddress := crypto.PubkeyToAddress(*publicKeyECDSA)
+
+	usePermit := onchain.ShouldUsePermit(ethClient, params.ChainId, params.MakerAsset)
+	permitParams := "0x"
+
+	if usePermit {
+		name, err := onchain.ReadContractName(ethClient, common.HexToAddress(params.MakerAsset))
 		if err != nil {
-			return nil, nil, fmt.Errorf("failed to approve token for router: %v", err)
+			return nil, nil, fmt.Errorf("failed to read contract name: %v", err)
+		}
+
+		nonce, err := onchain.ReadContractNonce(ethClient, derivedPublicAddress, common.HexToAddress(params.MakerAsset))
+		if err != nil {
+			return nil, nil, fmt.Errorf("failed to read contract name: %v", err)
+		}
+
+		deadline := time.Now().Add(1 * time.Minute).Unix() // TODO make this configurable
+
+		sig, err := onchain.CreatePermitSignature(&onchain.PermitSignatureConfig{
+			FromToken:     params.MakerAsset,
+			Name:          name,
+			PublicAddress: derivedPublicAddress.Hex(),
+			ChainId:       params.ChainId,
+			Key:           params.PrivateKey,
+			Nonce:         nonce,
+			Deadline:      deadline,
+		})
+
+		permitParams = onchain.CreatePermitParams(&onchain.PermitParamsConfig{
+			Owner:     strings.ToLower(derivedPublicAddress.Hex()), // TODO remove ToLower and see if it still works
+			Spender:   aggregationRouter,
+			Value:     amounts.BigMaxUint256,
+			Deadline:  deadline,
+			Signature: sig,
+		})
+
+		if err != nil {
+			return nil, nil, fmt.Errorf("failed to create permit signature: %v", err)
+		}
+	} else {
+		allowance, err := onchain.ReadContractAllowance(ethClient, fromTokenAddress, publicAddress, aggregationRouterAddress)
+		if err != nil {
+			return nil, nil, fmt.Errorf("failed to read allowance: %v", err)
+		}
+
+		makingAmountBig, err := helpers.BigIntFromString(params.MakingAmount)
+		if err != nil {
+			return nil, nil, fmt.Errorf("failed to parse making amount: %v", err)
+		}
+		if allowance.Cmp(makingAmountBig) <= 0 {
+			if !params.SkipWarnings {
+				ok, err := orderbook.ConfirmApprovalWithUser(ethClient, params.Maker, params.MakerAsset)
+				if err != nil {
+					return nil, nil, fmt.Errorf("failed to confirm approval: %v", err)
+				}
+				if !ok {
+					return nil, nil, errors.New("user rejected approval")
+				}
+			}
+
+			erc20Config := onchain.Erc20ApprovalConfig{
+				ChainId:        params.ChainId,
+				Key:            params.PrivateKey,
+				Erc20Address:   fromTokenAddress,
+				PublicAddress:  publicAddress,
+				SpenderAddress: aggregationRouterAddress,
+			}
+			err := onchain.ApproveTokenForRouter(ethClient, s.client.NonceCache, erc20Config)
+			if err != nil {
+				return nil, nil, fmt.Errorf("failed to approve token for router: %v", err)
+			}
 		}
 	}
 
@@ -88,7 +145,7 @@ func (s *OrderbookService) CreateOrder(ctx context.Context, params orderbook.Cre
 		return nil, nil, fmt.Errorf("failed to get series nonce manager address: %v", err)
 	}
 
-	interactions, err := orderbook.GetInteractions(ethClient, seriesNonceManager, params.ExpireAfter, params.Maker)
+	interactions, err := orderbook.GetInteractions(ethClient, seriesNonceManager, params.ExpireAfter, params.Maker, params.MakerAsset, permitParams)
 	if err != nil {
 		return nil, nil, fmt.Errorf("failed to get interactions: %v", err)
 	}

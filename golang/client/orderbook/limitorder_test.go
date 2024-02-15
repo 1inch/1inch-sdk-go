@@ -303,3 +303,50 @@ func TestConfirmTradeWithUser(t *testing.T) {
 		})
 	}
 }
+
+func TestConcatenateInteractions(t *testing.T) {
+
+	tests := []struct {
+		name           string
+		interactions   []string
+		expectedResult string
+	}{
+		{
+			name:           "Empty slice",
+			interactions:   []string{},
+			expectedResult: "0x",
+		},
+		{
+			name:           "Single element without prefix",
+			interactions:   []string{"abcdef"},
+			expectedResult: "0xabcdef",
+		},
+		{
+			name:           "Single element with prefix",
+			interactions:   []string{"0x123456"},
+			expectedResult: "0x123456",
+		},
+		{
+			name:           "Multiple elements mixed prefixes",
+			interactions:   []string{"0xabcdef", "123456", "0x7890"},
+			expectedResult: "0xabcdef1234567890",
+		},
+		{
+			name:           "Multiple elements all with prefix",
+			interactions:   []string{"0xabcdef", "0x123456", "0x7890"},
+			expectedResult: "0xabcdef1234567890",
+		},
+		{
+			name:           "Multiple elements none with prefix",
+			interactions:   []string{"abcdef", "123456", "7890"},
+			expectedResult: "0xabcdef1234567890",
+		},
+	}
+
+	for _, tc := range tests {
+		t.Run(tc.name, func(t *testing.T) {
+			result := concatenateInteractions(tc.interactions)
+			assert.Equal(t, tc.expectedResult, result)
+		})
+	}
+}

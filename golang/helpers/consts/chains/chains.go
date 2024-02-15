@@ -9,7 +9,7 @@ const (
 	Ethereum  = 1
 	Fantom    = 250
 	Gnosis    = 100
-	Klayton   = 8217
+	Klaytn    = 8217
 	Optimism  = 10
 	Polygon   = 137
 	ZkSyncEra = 324
@@ -17,4 +17,4 @@ const (
 
 // TODO Can I move this somewhere else to avoid conflicting with autocomplete?
 
-var ValidChainIds = []int{Arbitrum, Aurora, Avalanche, Base, Bsc, Ethereum, Fantom, Gnosis, Klayton, Optimism, Polygon, ZkSyncEra}
+var ValidChainIds = []int{Arbitrum, Aurora, Avalanche, Base, Bsc, Ethereum, Fantom, Gnosis, Klaytn, Optimism, Polygon, ZkSyncEra}

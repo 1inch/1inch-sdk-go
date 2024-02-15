@@ -37,7 +37,7 @@ func main() {
 		ChainId:      chains.Polygon,
 		PrivateKey:   os.Getenv("WALLET_KEY"),
 		Maker:        os.Getenv("WALLET_ADDRESS"),
-		MakerAsset:   tokens.PolygonDai,
+		MakerAsset:   tokens.PolygonFrax,
 		TakerAsset:   tokens.PolygonUsdc,
 		MakingAmount: "100000000000000000",
 		TakingAmount: "100000",

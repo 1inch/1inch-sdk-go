@@ -23,7 +23,6 @@ import (
 	"github.com/1inch/1inch-sdk/golang/client/swap"
 	"github.com/1inch/1inch-sdk/golang/helpers/consts/amounts"
 	"github.com/1inch/1inch-sdk/golang/helpers/consts/contracts"
-	"github.com/1inch/1inch-sdk/golang/helpers/consts/typehashes"
 )
 
 // This file provides helper functions that execute swaps onchain.
@@ -95,19 +94,8 @@ func (s *ActionService) SwapTokens(params swap.SwapTokensParams) error {
 	}
 
 	var usePermit bool
-
-	// Currently, Permit1 swaps are only tested on Ethereum and Polygon
-	isPermitSupportedForCurrentChain := params.ChainId == chains.Ethereum || params.ChainId == chains.Polygon
-
-	var typehash string
-	if isPermitSupportedForCurrentChain && params.ApprovalType != swap.ApprovalAlways {
-		typehash, err = onchain.GetTypeHash(ethClient, params.Src)
-		if err == nil {
-			// If a typehash for Permit1 is present, use that instead of Approve
-			if typehash == typehashes.Permit1 {
-				usePermit = true
-			}
-		}
+	if params.ApprovalType != swap.ApprovalAlways {
+		usePermit = onchain.ShouldUsePermit(ethClient, params.ChainId, params.Src)
 	}
 
 	if usePermit || params.ApprovalType == swap.PermitAlways {
@@ -121,7 +109,7 @@ func (s *ActionService) SwapTokens(params swap.SwapTokensParams) error {
 			return fmt.Errorf("failed to read contract name: %v", err)
 		}
 
-		sig, err := swap.CreatePermitSignature(&swap.PermitSignatureConfig{
+		sig, err := onchain.CreatePermitSignature(&onchain.PermitSignatureConfig{
 			FromToken:     params.Src,
 			Name:          name,
 			PublicAddress: params.PublicAddress,
@@ -139,7 +127,7 @@ func (s *ActionService) SwapTokens(params swap.SwapTokensParams) error {
 			return fmt.Errorf("failed to get 1inch router address: %v", err)
 		}
 
-		permitParams := swap.CreatePermitParams(&swap.PermitParamsConfig{
+		permitParams := onchain.CreatePermitParams(&onchain.PermitParamsConfig{
 			Owner:     strings.ToLower(params.PublicAddress), // TODO remove ToLower and see if it still works
 			Spender:   aggregationRouter,
 			Value:     amounts.BigMaxUint256,
@@ -375,7 +363,7 @@ func getNativeTokenDetails(chainId int) *swap.TokenInfo {
 		tokenSymbol = "FTM"
 	case chains.Gnosis:
 		tokenSymbol = "GNO"
-	case chains.Klayton:
+	case chains.Klaytn:
 		tokenSymbol = "KLAY"
 	case chains.Optimism:
 		tokenSymbol = "ETH"
