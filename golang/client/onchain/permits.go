@@ -16,32 +16,6 @@ import (
 	"github.com/1inch/1inch-sdk/golang/helpers/consts/typehashes"
 )
 
-func ShouldUsePermit(ethClient *ethclient.Client, chainId int, srcToken string) bool {
-	// Currently, Permit1 swaps are only tested on Ethereum and Polygon
-	isPermitSupportedForCurrentChain := chainId == chains.Ethereum || chainId == chains.Polygon
-
-	if isPermitSupportedForCurrentChain {
-		typehash, err := GetTypeHash(ethClient, srcToken)
-		if err == nil {
-			// If a typehash for Permit1 is present, use that instead of Approve
-			if typehash == typehashes.Permit1 {
-				return true
-			}
-		}
-	}
-	return false
-}
-
-type PermitSignatureConfig struct {
-	FromToken     string
-	Name          string
-	PublicAddress string
-	ChainId       int
-	Key           string
-	Nonce         int64
-	Deadline      int64
-}
-
 func CreatePermitSignature(config *PermitSignatureConfig) (string, error) {
 	// Domain Data
 	domainData := apitypes.TypedDataDomain{
@@ -139,12 +113,20 @@ func CreatePermitParams(config *PermitParamsConfig) string {
 		ConvertSignatureToVRSString(signatureNoPrefix)
 }
 
-type PermitParamsConfig struct {
-	Owner     string
-	Spender   string
-	Value     *big.Int
-	Deadline  int64
-	Signature string
+func ShouldUsePermit(ethClient *ethclient.Client, chainId int, srcToken string) bool {
+	// Currently, Permit1 swaps are only tested on Ethereum and Polygon
+	isPermitSupportedForCurrentChain := chainId == chains.Ethereum || chainId == chains.Polygon
+
+	if isPermitSupportedForCurrentChain {
+		typehash, err := GetTypeHash(ethClient, srcToken)
+		if err == nil {
+			// If a typehash for Permit1 is present, use that instead of Approve
+			if typehash == typehashes.Permit1 {
+				return true
+			}
+		}
+	}
+	return false
 }
 
 func padStringWithZeroes(s string) string {
