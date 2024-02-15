@@ -35,10 +35,10 @@ func CreateLimitOrderMessage(orderRequest CreateOrderParams, interactions []stri
 		TakingAmount:  orderRequest.TakingAmount,
 		Salt:          GenerateSalt(),
 		Maker:         orderRequest.Maker,
-		AllowedSender: "0x0000000000000000000000000000000000000000", // TODO use this
+		AllowedSender: "0x0000000000000000000000000000000000000000",
 		Receiver:      orderRequest.Taker,
 		Offsets:       fmt.Sprintf("%v", offsets),
-		Interactions:  interactions[4], // The 5th entry in this slice is the predicate and is the only field needed
+		Interactions:  concatenateInteractions(interactions),
 	}
 
 	aggregationRouter, err := contracts.Get1inchRouterFromChainId(orderRequest.ChainId)
@@ -137,7 +137,7 @@ func CreateLimitOrderMessage(orderRequest CreateOrderParams, interactions []stri
 	}, err
 }
 
-func GetInteractions(client *ethclient.Client, seriesNonceManager string, expiration int64, maker string) ([]string, error) {
+func GetInteractions(client *ethclient.Client, seriesNonceManager string, expiration int64, maker string, makerAsset string, permit string) ([]string, error) {
 
 	currentNonce, err := onchain.GetTimeSeriesManagerNonce(client, seriesNonceManager, maker)
 	if err != nil {
@@ -159,11 +159,15 @@ func GetInteractions(client *ethclient.Client, seriesNonceManager string, expira
 	takerAssetData := `0x`
 	getMakingAmount := `0x`
 	getTakingAmount := `0x`
-	permit := `0x`
 	preInteraction := `0x`
 	postInteraction := `0x`
 
-	return []string{makerAssetData, takerAssetData, getMakingAmount, getTakingAmount, fmt.Sprintf("0x%x", predicate), permit, preInteraction, postInteraction}, nil
+	// The maker token must be prepended to permit data for limit orders
+	if permit != "0x" {
+		permit = makerAsset + Trim0x(permit)
+	}
+
+	return []string{makerAssetData, takerAssetData, getMakingAmount, getTakingAmount, fmt.Sprintf("0x%x", predicate), permit, preInteraction, postInteraction}, nil //TODO remove leading 0x from predicate
 }
 
 func getOffsets(interactions []string) *big.Int {
@@ -284,6 +288,14 @@ func CumulativeSum(initial int) func(int) int {
 		sum += value
 		return sum
 	}
+}
+
+func concatenateInteractions(interactions []string) string {
+	interactionsConcatenated := "0x"
+	for _, interaction := range interactions {
+		interactionsConcatenated += strings.TrimPrefix(interaction, "0x")
+	}
+	return interactionsConcatenated
 }
 
 var GenerateSalt = func() string {
