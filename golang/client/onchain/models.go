@@ -36,6 +36,7 @@ type Erc20RevokeConfig struct {
 type PermitSignatureConfig struct {
 	FromToken     string
 	Name          string
+	Version       string
 	PublicAddress string
 	ChainId       int
 	Key           string
@@ -50,3 +51,11 @@ type PermitParamsConfig struct {
 	Deadline  int64
 	Signature string
 }
+
+type ApprovalType int
+
+const (
+	PermitIfPossible ApprovalType = iota
+	PermitAlways
+	ApprovalAlways
+)

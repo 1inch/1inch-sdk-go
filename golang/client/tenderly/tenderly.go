@@ -6,20 +6,23 @@ import (
 	"errors"
 	"fmt"
 	"io"
+	"math/big"
 	"net/http"
 	"net/url"
 	"strings"
 
+	"github.com/ethereum/go-ethereum/common"
+	"github.com/ethereum/go-ethereum/crypto"
+
 	"github.com/1inch/1inch-sdk/golang/helpers/consts/contracts"
-	"github.com/1inch/1inch-sdk/golang/helpers/consts/tokens"
 )
 
-func SimulateSwap(tenderlyApiKey string, config SwapConfig) (*SimulationResponse, error) {
-	name := "Dev Portal - Swap"
+func SimulateSwap(config SwapConfig) (*SimulationResponse, error) {
+	name := fmt.Sprintf("DP - Swap %s->%s", config.FromTokenSymbol, config.ToTokenSymbol)
 	if config.ApproveFirst {
 		name += " with approval"
 	}
-	forkId, err := CreateTenderlyFork(tenderlyApiKey, config.ChainId, name)
+	forkId, err := CreateTenderlyFork(config.TenderlyApiKey, config.ChainId, name)
 	if err != nil {
 		return nil, fmt.Errorf("failed to create tenderly fork: %v", err)
 	}
@@ -46,8 +49,9 @@ func SimulateSwap(tenderlyApiKey string, config SwapConfig) (*SimulationResponse
 			GenerateAccessList: true,
 			SaveIfFails:        true,
 			SimulationType:     "quick",
+			StateObjects:       config.OverridesMap,
 		}
-		tokenApprovalResponse, errApprove := ExecuteTenderlySimulationRequest(tenderlyApiKey, forkId, tokenApprovalSimulationRequest)
+		tokenApprovalResponse, errApprove := ExecuteTenderlySimulationRequest(config.TenderlyApiKey, forkId, tokenApprovalSimulationRequest)
 		if errApprove != nil {
 			return nil, fmt.Errorf("request to approve tokens on Tenderly failed: %v\n", errApprove)
 		}
@@ -57,23 +61,7 @@ func SimulateSwap(tenderlyApiKey string, config SwapConfig) (*SimulationResponse
 		fmt.Printf("Tenderly: Pre-approval simulation complete. Link to results: %s\n", preApprovalSimulationUrl)
 	}
 
-	// Always set the balance of the sending wallet to 1 ETH
-	stateOverrides := map[string]StateObject{
-		config.PublicAddress: {
-			Balance: "1000000000000000000", // 1 Ether in wei
-		},
-	}
-
-	// Temporary hard coding 1INCH swaps to use a static balance of 100 to save the implementation logic
-	if config.FromToken == tokens.Ethereum1inch {
-		stateOverrides["0x111111111117dc0aa78b770fa6a738034120c302"] = StateObject{
-			Storage: map[string]string{
-				"0x39c953eb19bbd67c4c3fd8344cb9af0980b96fc08605b375e22a196c732d92a8": "0x0000000000000000000000000000000000000000000000056bc75e2d63100000",
-			},
-		}
-	}
-
-	swapSimulationResponse, err := ExecuteTenderlySimulationRequest(tenderlyApiKey, forkId, &SimulateRequest{
+	swapSimulationResponse, err := ExecuteTenderlySimulationRequest(config.TenderlyApiKey, forkId, &SimulateRequest{
 		From:               config.PublicAddress,
 		To:                 contracts.AggregationRouterV5,
 		Input:              config.TransactionData,
@@ -85,7 +73,7 @@ func SimulateSwap(tenderlyApiKey string, config SwapConfig) (*SimulationResponse
 		GenerateAccessList: true,
 		SaveIfFails:        true,
 		SimulationType:     "quick",
-		StateObjects:       stateOverrides,
+		StateObjects:       config.OverridesMap,
 	})
 	if err != nil {
 		return nil, fmt.Errorf("request to tenderly failed: %v\n", err)
@@ -311,4 +299,27 @@ func DeleteTenderlyFork(tenderlyApiKey string, forkId string) error {
 	}
 
 	return nil
+}
+
+// GetStorageSlotHash returns the hash of the storage slot for the given address and slot
+// This is used to override the state of a contract in a Tenderly simulation
+func GetStorageSlotHash(address string, slot int64) string {
+
+	addressConverted := common.HexToAddress(address)
+
+	// Convert the address to a 32-byte array
+	addressBytes := addressConverted.Bytes()
+	addressPadded := append(make([]byte, 12), addressBytes...) // Left-pad the address bytes to 32 bytes
+
+	slotBigInt := big.NewInt(slot)
+	slotBytes := slotBigInt.Bytes()
+	slotPadded := common.LeftPadBytes(slotBytes, 32) // Ensure the slot is 32 bytes
+
+	// Concatenate the padded address and padded slot
+	data := append(addressPadded, slotPadded...)
+
+	// Compute the hash
+	hash := crypto.Keccak256Hash(data)
+
+	return hash.Hex()
 }

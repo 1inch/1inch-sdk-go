@@ -27,7 +27,6 @@ type service struct {
 type Config struct {
 	DevPortalApiKey   string
 	Web3HttpProviders []Web3ProviderConfig
-	TenderlyKey       string
 }
 
 type Web3ProviderConfig struct {
@@ -65,8 +64,6 @@ type Client struct {
 	// The API key to use for authentication
 	ApiKey string
 	// When present, tests will simulate swaps on Tenderly
-	TenderlyKey string
-	// Once a transaction has been sent by the SDK, the nonce is tracked internally to avoid RPC desync issues on subsequent transactions
 	NonceCache map[string]uint64
 	// A struct that will contain a reference to this client. Used to separate each API into a unique namespace to aid in method discovery
 	common service
@@ -91,10 +88,9 @@ func NewClient(config Config) (*Client, error) {
 		return nil, fmt.Errorf("config validation error: %v", err)
 	}
 
-	var ethClient *ethclient.Client
 	ethClientMap := make(map[int]*ethclient.Client)
 	for _, provider := range config.Web3HttpProviders {
-		ethClient, err = ethclient.Dial(provider.Url)
+		ethClient, err := ethclient.Dial(provider.Url)
 		if err != nil {
 			return nil, fmt.Errorf("failed to create eth client: %v", err)
 		}
@@ -112,7 +108,6 @@ func NewClient(config Config) (*Client, error) {
 		ApiBaseURL:   apiBaseUrl,
 		ApiKey:       config.DevPortalApiKey,
 		NonceCache:   make(map[string]uint64),
-		TenderlyKey:  config.TenderlyKey,
 	}
 
 	c.common.client = c

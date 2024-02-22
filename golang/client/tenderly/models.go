@@ -2,10 +2,23 @@ package tenderly
 
 import "time"
 
+type contextKey int
+
+const SwapConfigKey contextKey = 0
+
+type SimulationConfig struct {
+	TenderlyApiKey string
+	OverridesMap   map[string]StateObject
+}
+
 type SwapConfig struct {
+	TenderlyApiKey  string
+	OverridesMap    map[string]StateObject
 	ChainId         int
 	PublicAddress   string
 	FromToken       string
+	FromTokenSymbol string
+	ToTokenSymbol   string
 	Value           string
 	TransactionData string
 	ApproveFirst    bool
@@ -50,6 +63,7 @@ type SimulateRequest struct {
 type StateObject struct {
 	Balance string            `json:"balance,omitempty"`
 	Storage map[string]string `json:"storage,omitempty"`
+	Value   map[string]string `json:"value,omitempty"`
 }
 
 type ForkRequest struct {

@@ -13,11 +13,3 @@ type ExecuteSwapConfig struct {
 	IsPermitSwap       bool
 	SkipWarnings       bool
 }
-
-type ApprovalType int
-
-const (
-	PermitIfPossible ApprovalType = iota
-	PermitAlways
-	ApprovalAlways
-)

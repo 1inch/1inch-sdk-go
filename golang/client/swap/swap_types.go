@@ -3,11 +3,12 @@ package swap
 import (
 	"errors"
 
+	"github.com/1inch/1inch-sdk/golang/client/onchain"
 	"github.com/1inch/1inch-sdk/golang/client/validate"
 )
 
 type SwapTokensParams struct {
-	ApprovalType  ApprovalType
+	ApprovalType  onchain.ApprovalType
 	ChainId       int
 	SkipWarnings  bool
 	PublicAddress string

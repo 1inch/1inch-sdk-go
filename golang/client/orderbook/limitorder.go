@@ -20,10 +20,6 @@ import (
 	"github.com/1inch/1inch-sdk/golang/helpers/consts/contracts"
 )
 
-type Client struct {
-	EthClient *ethclient.Client
-}
-
 func CreateLimitOrderMessage(orderRequest CreateOrderParams, interactions []string) (*Order, error) {
 
 	offsets := getOffsets(interactions)

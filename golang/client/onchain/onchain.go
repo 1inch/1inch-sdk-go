@@ -38,7 +38,7 @@ func GetNonce(ethClient *ethclient.Client, key string, publicAddress common.Addr
 	return nonce, nil
 }
 
-func ExecuteTransaction(txConfig TxConfig, ethClient *ethclient.Client, nonceCache map[string]uint64) error {
+func ExecuteTransaction(ctx context.Context, txConfig TxConfig, ethClient *ethclient.Client, nonceCache map[string]uint64) error {
 
 	nonceCacheKey := fmt.Sprintf("%s+%d", txConfig.PublicAddress, txConfig.ChainId.Int64())
 	nonce, err := GetNonce(ethClient, nonceCacheKey, txConfig.PublicAddress, nonceCache)
@@ -65,7 +65,7 @@ func ExecuteTransaction(txConfig TxConfig, ethClient *ethclient.Client, nonceCac
 	fmt.Printf("Transaction sent! (%s)\n", txConfig.Description)
 	helpers.PrintBlockExplorerTxLink(int(txConfig.ChainId.Int64()), swapTxSigned.Hash().String())
 
-	_, err = WaitForTransaction(ethClient, swapTxSigned.Hash())
+	_, err = WaitForTransaction(ctx, ethClient, swapTxSigned.Hash())
 	if err != nil {
 		return fmt.Errorf("failed to get transaction receipt: %v", err)
 	}
@@ -170,6 +170,36 @@ func ReadContractName(client *ethclient.Client, contractAddress common.Address) 
 	return contractName, nil
 }
 
+func ReadContractVersion(client *ethclient.Client, contractAddress common.Address) (string, error) {
+	method := "version"
+
+	parsedABI, err := abi.JSON(strings.NewReader(abis.Erc20)) // Make a generic version of this ABI
+	if err != nil {
+		return "", err
+	}
+
+	// Construct the call message
+	msg := ethereum.CallMsg{
+		To:   &contractAddress,
+		Data: parsedABI.Methods[method].ID,
+	}
+
+	// Query the blockchain
+	result, err := client.CallContract(context.Background(), msg, nil)
+	if err != nil {
+		return "1", nil // Many contracts don't have a version, so just return 1 if the call fails
+	}
+
+	// Unpack the result
+	var contractVersion string
+	err = parsedABI.UnpackIntoInterface(&contractVersion, method, result)
+	if err != nil {
+		return "", err
+	}
+
+	return contractVersion, nil
+}
+
 // ReadContractSymbol reads the 'symbol' public variable from a contract.
 func ReadContractSymbol(client *ethclient.Client, contractAddress common.Address) (string, error) {
 	parsedABI, err := abi.JSON(strings.NewReader(abis.Erc20)) // Make a generic version of this ABI
@@ -230,7 +260,7 @@ func ReadContractDecimals(client *ethclient.Client, contractAddress common.Addre
 
 // ReadContractNonce reads the 'nonces' public variable from a contract.
 func ReadContractNonce(client *ethclient.Client, publicAddress common.Address, contractAddress common.Address) (int64, error) {
-	parsedABI, err := abi.JSON(strings.NewReader(abis.Erc20)) // Make a generic version of this ABI
+	parsedABI, err := abi.JSON(strings.NewReader(abis.Erc20))
 	if err != nil {
 		return -1, err
 	}
@@ -336,7 +366,7 @@ func GetTypeHash(client *ethclient.Client, addressAsString string) (string, erro
 	return resultAsString, nil
 }
 
-func ApproveTokenForRouter(client *ethclient.Client, nonceCache map[string]uint64, config Erc20ApprovalConfig) error {
+func ApproveTokenForRouter(ctx context.Context, client *ethclient.Client, nonceCache map[string]uint64, config Erc20ApprovalConfig) error {
 	// Parse the USDC contract ABI to get the 'Approve' function signature
 	parsedABI, err := abi.JSON(strings.NewReader(abis.Erc20))
 	if err != nil {
@@ -358,7 +388,7 @@ func ApproveTokenForRouter(client *ethclient.Client, nonceCache map[string]uint6
 		To:            config.Erc20Address.Hex(),
 		Data:          data,
 	}
-	err = ExecuteTransaction(txConfig, client, nonceCache)
+	err = ExecuteTransaction(ctx, txConfig, client, nonceCache)
 	if err != nil {
 		return fmt.Errorf("failed to execute transaction: %v", err)
 	}
@@ -470,7 +500,7 @@ func GetPredicateCalldata(seriesNonceManager string, getTimestampBelowAndNonceEq
 	return data, nil
 }
 
-func RevokeApprovalForRouter(client *ethclient.Client, nonceCache map[string]uint64, config Erc20RevokeConfig) error {
+func RevokeApprovalForRouter(ctx context.Context, client *ethclient.Client, nonceCache map[string]uint64, config Erc20RevokeConfig) error {
 	// Parse the USDC contract ABI to get the 'Approve' function signature
 	parsedABI, err := abi.JSON(strings.NewReader(abis.Erc20))
 	if err != nil {
@@ -492,14 +522,14 @@ func RevokeApprovalForRouter(client *ethclient.Client, nonceCache map[string]uin
 		To:            config.Erc20Address.Hex(),
 		Data:          data,
 	}
-	err = ExecuteTransaction(txConfig, client, nonceCache)
+	err = ExecuteTransaction(ctx, txConfig, client, nonceCache)
 	if err != nil {
 		return fmt.Errorf("failed to execute transaction: %v", err)
 	}
 	return nil
 }
 
-func WaitForTransaction(client *ethclient.Client, txHash common.Hash) (*types.Receipt, error) {
+func WaitForTransaction(ctx context.Context, client *ethclient.Client, txHash common.Hash) (*types.Receipt, error) {
 	for {
 		receipt, err := client.TransactionReceipt(context.Background(), txHash)
 		if receipt != nil {
@@ -511,7 +541,7 @@ func WaitForTransaction(client *ethclient.Client, txHash common.Hash) (*types.Re
 		}
 		select {
 		case <-time.After(1000 * time.Millisecond): // check again after a delay
-		case <-context.Background().Done():
+		case <-ctx.Done():
 			fmt.Println("Context cancelled")
 			return nil, context.Background().Err()
 		}

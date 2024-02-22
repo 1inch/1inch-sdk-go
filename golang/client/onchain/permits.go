@@ -5,22 +5,82 @@ import (
 	"math/big"
 	"strings"
 
+	"github.com/ethereum/go-ethereum/common"
 	"github.com/ethereum/go-ethereum/common/math"
 	"github.com/ethereum/go-ethereum/crypto"
 	"github.com/ethereum/go-ethereum/ethclient"
 	"github.com/ethereum/go-ethereum/signer/core/apitypes"
 
 	"github.com/1inch/1inch-sdk/golang/helpers/consts/amounts"
-	"github.com/1inch/1inch-sdk/golang/helpers/consts/chains"
 	"github.com/1inch/1inch-sdk/golang/helpers/consts/contracts"
 	"github.com/1inch/1inch-sdk/golang/helpers/consts/typehashes"
 )
 
+type CreatePermitConfig struct {
+	EthClient     *ethclient.Client
+	MakerAsset    string
+	PublicAddress common.Address
+	ChainId       int
+	PrivateKey    string
+	Deadline      int64
+}
+
+func CreatePermit(config *CreatePermitConfig) (string, error) {
+
+	// TODO due to a bug in the Limit Order API, we must check the version of the contract before attempting permit generation
+	// If the version of the contract is not 1, we exit early and default to an approval
+	version, err := ReadContractVersion(config.EthClient, common.HexToAddress(config.MakerAsset))
+	if err != nil {
+		return "0x", fmt.Errorf("failed to read contract version: %v", err)
+	}
+	if version != "1" {
+		return "0x", fmt.Errorf("contract version is not 1")
+	}
+
+	name, err := ReadContractName(config.EthClient, common.HexToAddress(config.MakerAsset))
+	if err != nil {
+		return "0x", fmt.Errorf("failed to read contract name: %v", err)
+	}
+
+	nonce, err := ReadContractNonce(config.EthClient, config.PublicAddress, common.HexToAddress(config.MakerAsset))
+	if err != nil {
+		return "0x", fmt.Errorf("failed to read contract nonce: %v", err)
+	}
+
+	sig, err := CreatePermitSignature(&PermitSignatureConfig{
+		FromToken:     config.MakerAsset,
+		Name:          name,
+		Version:       version,
+		PublicAddress: config.PublicAddress.Hex(),
+		ChainId:       config.ChainId,
+		Key:           config.PrivateKey,
+		Nonce:         nonce,
+		Deadline:      config.Deadline,
+	})
+	if err != nil {
+		return "0x", fmt.Errorf("failed to create permit signature: %v", err)
+	}
+
+	aggregationRouter, err := contracts.Get1inchRouterFromChainId(config.ChainId)
+	if err != nil {
+		return "0x", fmt.Errorf("failed to get 1inch router address: %v", err)
+	}
+
+	return CreatePermitParams(&PermitParamsConfig{
+		Owner:     config.PublicAddress.Hex(),
+		Spender:   aggregationRouter,
+		Value:     amounts.BigMaxUint256,
+		Deadline:  config.Deadline,
+		Signature: sig,
+	}), nil
+}
+
 func CreatePermitSignature(config *PermitSignatureConfig) (string, error) {
+
 	// Domain Data
 	domainData := apitypes.TypedDataDomain{
 		Name:              config.Name,
-		Version:           "1",
+		Version:           config.Version,
 		ChainId:           math.NewHexOrDecimal256(int64(config.ChainId)),
 		VerifyingContract: config.FromToken,
 	}
@@ -114,16 +174,11 @@ func CreatePermitParams(config *PermitParamsConfig) string {
 }
 
 func ShouldUsePermit(ethClient *ethclient.Client, chainId int, srcToken string) bool {
-	// Currently, Permit1 swaps are only tested on Ethereum and Polygon
-	isPermitSupportedForCurrentChain := chainId == chains.Ethereum || chainId == chains.Polygon
-
-	if isPermitSupportedForCurrentChain {
-		typehash, err := GetTypeHash(ethClient, srcToken)
-		if err == nil {
-			// If a typehash for Permit1 is present, use that instead of Approve
-			if typehash == typehashes.Permit1 {
-				return true
-			}
+	typehash, err := GetTypeHash(ethClient, srcToken) // TODO this typehash lookup can miss many permit1-enabled tokens
+	if err == nil {
+		// If a typehash for Permit1 is present, use that instead of Approve
+		if typehash == typehashes.Permit1 {
+			return true
 		}
 	}
 	return false
