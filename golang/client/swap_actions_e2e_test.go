@@ -1,6 +1,7 @@
 package client
 
 import (
+	"context"
 	"fmt"
 	"log"
 	"os"
@@ -9,13 +10,17 @@ import (
 
 	"github.com/stretchr/testify/require"
 
+	"github.com/1inch/1inch-sdk/golang/client/onchain"
 	"github.com/1inch/1inch-sdk/golang/client/swap"
 	"github.com/1inch/1inch-sdk/golang/client/tenderly"
 	"github.com/1inch/1inch-sdk/golang/helpers"
+	"github.com/1inch/1inch-sdk/golang/helpers/consts/amounts"
 	"github.com/1inch/1inch-sdk/golang/helpers/consts/chains"
 	"github.com/1inch/1inch-sdk/golang/helpers/consts/tokens"
 	"github.com/1inch/1inch-sdk/golang/helpers/consts/web3providers"
 )
+
+const ten18Hex = "0x0000000000000000000000000000000000000000000000000DE0B6B3A7640000"
 
 func TestSwapTokensTenderlyE2E(t *testing.T) {
 
@@ -24,7 +29,8 @@ func TestSwapTokensTenderlyE2E(t *testing.T) {
 		tenderlyDescription string
 		config              Config
 		swapParams          swap.SwapTokensParams
-		approvalType        swap.ApprovalType
+		stateOverrides      map[string]tenderly.StateObject
+		approvalType        onchain.ApprovalType
 		expectedOutput      string
 	}{
 		{
@@ -38,21 +44,67 @@ func TestSwapTokensTenderlyE2E(t *testing.T) {
 						Url:     os.Getenv("WEB_3_HTTP_PROVIDER_URL_WITH_KEY_POLYGON"),
 					},
 				},
-				TenderlyKey: os.Getenv("TENDERLY_API_KEY"),
 			},
 			swapParams: swap.SwapTokensParams{
 				AggregationControllerGetSwapParams: swap.AggregationControllerGetSwapParams{
 					Src:      tokens.PolygonDai,
 					Dst:      tokens.PolygonUsdc,
 					Amount:   "10000000000000000",
-					From:     os.Getenv("WALLET_ADDRESS"),
+					From:     os.Getenv("WALLET_ADDRESS_EMPTY"),
 					Slippage: 0.5,
 				},
 				SkipWarnings:  true,
 				ChainId:       chains.Polygon,
-				WalletKey:     os.Getenv("WALLET_KEY"),
-				PublicAddress: os.Getenv("WALLET_ADDRESS"),
-				ApprovalType:  swap.PermitIfPossible,
+				WalletKey:     os.Getenv("WALLET_KEY_EMPTY"),
+				PublicAddress: os.Getenv("WALLET_ADDRESS_EMPTY"),
+				ApprovalType:  onchain.PermitIfPossible,
+			},
+			stateOverrides: map[string]tenderly.StateObject{
+				os.Getenv("WALLET_ADDRESS_EMPTY"): {
+					Balance: amounts.Ten18,
+				},
+				tokens.PolygonDai: {
+					Storage: map[string]string{
+						tenderly.GetStorageSlotHash(os.Getenv("WALLET_ADDRESS_EMPTY"), 0): ten18Hex,
+					},
+				},
+			},
+		},
+		{
+			description:         "Polygon - Swap 0.01 USDC for DAI - Permit - Contract has a version value of 2",
+			tenderlyDescription: "DP-USDC->DAI-Approval",
+			config: Config{
+				DevPortalApiKey: os.Getenv("DEV_PORTAL_TOKEN"),
+				Web3HttpProviders: []Web3ProviderConfig{
+					{
+						ChainId: chains.Polygon,
+						Url:     os.Getenv("WEB_3_HTTP_PROVIDER_URL_WITH_KEY_POLYGON"),
+					},
+				},
+			},
+			swapParams: swap.SwapTokensParams{
+				AggregationControllerGetSwapParams: swap.AggregationControllerGetSwapParams{
+					Src:      tokens.PolygonUsdc,
+					Dst:      tokens.PolygonDai,
+					Amount:   amounts.Ten6,
+					From:     os.Getenv("WALLET_ADDRESS_EMPTY"),
+					Slippage: 0.5,
+				},
+				SkipWarnings:  true,
+				ChainId:       chains.Polygon,
+				WalletKey:     os.Getenv("WALLET_KEY_EMPTY"),
+				PublicAddress: os.Getenv("WALLET_ADDRESS_EMPTY"),
+				ApprovalType:  onchain.PermitIfPossible,
+			},
+			stateOverrides: map[string]tenderly.StateObject{
+				os.Getenv("WALLET_ADDRESS_EMPTY"): {
+					Balance: amounts.Ten18,
+				},
+				tokens.PolygonUsdc: {
+					Storage: map[string]string{
+						tenderly.GetStorageSlotHash(os.Getenv("WALLET_ADDRESS_EMPTY"), 9): ten18Hex,
+					},
+				},
 			},
 		},
 		{
@@ -66,21 +118,30 @@ func TestSwapTokensTenderlyE2E(t *testing.T) {
 						Url:     os.Getenv("WEB_3_HTTP_PROVIDER_URL_WITH_KEY_POLYGON"),
 					},
 				},
-				TenderlyKey: os.Getenv("TENDERLY_API_KEY"),
 			},
 			swapParams: swap.SwapTokensParams{
 				AggregationControllerGetSwapParams: swap.AggregationControllerGetSwapParams{
 					Src:      tokens.PolygonFrax,
 					Dst:      tokens.PolygonUsdc,
 					Amount:   "10000000000000000",
-					From:     os.Getenv("WALLET_ADDRESS"),
+					From:     os.Getenv("WALLET_ADDRESS_EMPTY"),
 					Slippage: 0.5,
 				},
 				SkipWarnings:  true,
 				ChainId:       chains.Polygon,
-				WalletKey:     os.Getenv("WALLET_KEY"),
-				PublicAddress: os.Getenv("WALLET_ADDRESS"),
-				ApprovalType:  swap.ApprovalAlways,
+				WalletKey:     os.Getenv("WALLET_KEY_EMPTY"),
+				PublicAddress: os.Getenv("WALLET_ADDRESS_EMPTY"),
+				ApprovalType:  onchain.ApprovalAlways,
+			},
+			stateOverrides: map[string]tenderly.StateObject{
+				os.Getenv("WALLET_ADDRESS_EMPTY"): {
+					Balance: amounts.Ten18,
+				},
+				tokens.PolygonFrax: {
+					Storage: map[string]string{
+						tenderly.GetStorageSlotHash(os.Getenv("WALLET_ADDRESS_EMPTY"), 0): ten18Hex,
+					},
+				},
 			},
 		},
 		{
@@ -94,21 +155,30 @@ func TestSwapTokensTenderlyE2E(t *testing.T) {
 						Url:     os.Getenv("WEB_3_HTTP_PROVIDER_URL_WITH_KEY_POLYGON"),
 					},
 				},
-				TenderlyKey: os.Getenv("TENDERLY_API_KEY"),
 			},
 			swapParams: swap.SwapTokensParams{
 				AggregationControllerGetSwapParams: swap.AggregationControllerGetSwapParams{
 					Src:      tokens.PolygonFrax,
 					Dst:      tokens.PolygonUsdc,
 					Amount:   "10000000000000000",
-					From:     os.Getenv("WALLET_ADDRESS"),
+					From:     os.Getenv("WALLET_ADDRESS_EMPTY"),
 					Slippage: 0.5,
 				},
 				SkipWarnings:  true,
 				ChainId:       chains.Polygon,
-				WalletKey:     os.Getenv("WALLET_KEY"),
-				PublicAddress: os.Getenv("WALLET_ADDRESS"),
-				ApprovalType:  swap.PermitIfPossible,
+				WalletKey:     os.Getenv("WALLET_KEY_EMPTY"),
+				PublicAddress: os.Getenv("WALLET_ADDRESS_EMPTY"),
+				ApprovalType:  onchain.PermitIfPossible,
+			},
+			stateOverrides: map[string]tenderly.StateObject{
+				os.Getenv("WALLET_ADDRESS_EMPTY"): {
+					Balance: amounts.Ten18,
+				},
+				tokens.PolygonFrax: {
+					Storage: map[string]string{
+						tenderly.GetStorageSlotHash(os.Getenv("WALLET_ADDRESS_EMPTY"), 0): ten18Hex,
+					},
+				},
 			},
 		},
 		{
@@ -122,21 +192,30 @@ func TestSwapTokensTenderlyE2E(t *testing.T) {
 						Url:     web3providers.Arbitrum,
 					},
 				},
-				TenderlyKey: os.Getenv("TENDERLY_API_KEY"),
 			},
 			swapParams: swap.SwapTokensParams{
 				AggregationControllerGetSwapParams: swap.AggregationControllerGetSwapParams{
 					Src:      tokens.ArbitrumUsdc,
 					Dst:      tokens.ArbitrumDai,
 					Amount:   "10000",
-					From:     os.Getenv("WALLET_ADDRESS"),
+					From:     os.Getenv("WALLET_ADDRESS_EMPTY"),
 					Slippage: 0.5,
 				},
 				SkipWarnings:  true,
 				ChainId:       chains.Arbitrum,
-				WalletKey:     os.Getenv("WALLET_KEY"),
-				PublicAddress: os.Getenv("WALLET_ADDRESS"),
-				ApprovalType:  swap.PermitIfPossible,
+				WalletKey:     os.Getenv("WALLET_KEY_EMPTY"),
+				PublicAddress: os.Getenv("WALLET_ADDRESS_EMPTY"),
+				ApprovalType:  onchain.PermitIfPossible,
+			},
+			stateOverrides: map[string]tenderly.StateObject{
+				os.Getenv("WALLET_ADDRESS_EMPTY"): {
+					Balance: amounts.Ten18,
+				},
+				tokens.ArbitrumUsdc: {
+					Storage: map[string]string{
+						tenderly.GetStorageSlotHash(os.Getenv("WALLET_ADDRESS_EMPTY"), 9): ten18Hex,
+					},
+				},
 			},
 		},
 		{
@@ -150,21 +229,30 @@ func TestSwapTokensTenderlyE2E(t *testing.T) {
 						Url:     web3providers.Arbitrum,
 					},
 				},
-				TenderlyKey: os.Getenv("TENDERLY_API_KEY"),
 			},
 			swapParams: swap.SwapTokensParams{
 				AggregationControllerGetSwapParams: swap.AggregationControllerGetSwapParams{
 					Src:      tokens.NativeToken,
 					Dst:      tokens.ArbitrumUsdc,
 					Amount:   "3974301376798",
-					From:     os.Getenv("WALLET_ADDRESS"),
+					From:     os.Getenv("WALLET_ADDRESS_EMPTY"),
 					Slippage: 0.5,
 				},
 				SkipWarnings:  true,
 				ChainId:       chains.Arbitrum,
-				WalletKey:     os.Getenv("WALLET_KEY"),
-				PublicAddress: os.Getenv("WALLET_ADDRESS"),
-				ApprovalType:  swap.PermitIfPossible,
+				WalletKey:     os.Getenv("WALLET_KEY_EMPTY"),
+				PublicAddress: os.Getenv("WALLET_ADDRESS_EMPTY"),
+				ApprovalType:  onchain.PermitIfPossible,
+			},
+			stateOverrides: map[string]tenderly.StateObject{
+				os.Getenv("WALLET_ADDRESS_EMPTY"): {
+					Balance: amounts.Ten18,
+				},
+				tokens.NativeToken: {
+					Storage: map[string]string{
+						tenderly.GetStorageSlotHash(os.Getenv("WALLET_ADDRESS_EMPTY"), 0): ten18Hex,
+					},
+				},
 			},
 		},
 		{
@@ -178,30 +266,80 @@ func TestSwapTokensTenderlyE2E(t *testing.T) {
 						Url:     web3providers.Ethereum,
 					},
 				},
-				TenderlyKey: os.Getenv("TENDERLY_API_KEY"),
 			},
 			swapParams: swap.SwapTokensParams{
 				AggregationControllerGetSwapParams: swap.AggregationControllerGetSwapParams{
 					Src:      tokens.Ethereum1inch,
 					Dst:      tokens.NativeToken,
 					Amount:   "20000000000000000",
-					From:     os.Getenv("WALLET_ADDRESS"),
+					From:     os.Getenv("WALLET_ADDRESS_EMPTY"),
 					Slippage: 0.5,
 				},
 				ChainId:       chains.Ethereum,
 				SkipWarnings:  true,
-				WalletKey:     os.Getenv("WALLET_KEY"),
-				PublicAddress: os.Getenv("WALLET_ADDRESS"),
-				ApprovalType:  swap.PermitAlways,
+				WalletKey:     os.Getenv("WALLET_KEY_EMPTY"),
+				PublicAddress: os.Getenv("WALLET_ADDRESS_EMPTY"),
+				ApprovalType:  onchain.PermitAlways,
+			},
+			stateOverrides: map[string]tenderly.StateObject{
+				os.Getenv("WALLET_ADDRESS_EMPTY"): {
+					Balance: amounts.Ten18,
+				},
+				tokens.Ethereum1inch: {
+					Storage: map[string]string{
+						tenderly.GetStorageSlotHash(os.Getenv("WALLET_ADDRESS_EMPTY"), 0): ten18Hex,
+					},
+				},
+			},
+		},
+		{
+			description:         "Ethereum - Swap $0.01 worth of USDC for ETH - Version 2 - Permit1",
+			tenderlyDescription: "DP-1inch->ETH-Permit1",
+			config: Config{
+				DevPortalApiKey: os.Getenv("DEV_PORTAL_TOKEN"),
+				Web3HttpProviders: []Web3ProviderConfig{
+					{
+						ChainId: chains.Ethereum,
+						Url:     web3providers.Ethereum,
+					},
+				},
+			},
+			swapParams: swap.SwapTokensParams{
+				AggregationControllerGetSwapParams: swap.AggregationControllerGetSwapParams{
+					Src:      tokens.EthereumUsdc,
+					Dst:      tokens.NativeToken,
+					Amount:   amounts.Ten6,
+					From:     os.Getenv("WALLET_ADDRESS_EMPTY"),
+					Slippage: 0.5,
+				},
+				ChainId:       chains.Ethereum,
+				SkipWarnings:  true,
+				WalletKey:     os.Getenv("WALLET_KEY_EMPTY"),
+				PublicAddress: os.Getenv("WALLET_ADDRESS_EMPTY"),
+				ApprovalType:  onchain.PermitAlways,
+			},
+			stateOverrides: map[string]tenderly.StateObject{
+				os.Getenv("WALLET_ADDRESS_EMPTY"): {
+					Balance: amounts.Ten18,
+				},
+				tokens.EthereumUsdc: {
+					Storage: map[string]string{
+						tenderly.GetStorageSlotHash(os.Getenv("WALLET_ADDRESS_EMPTY"), 9): ten18Hex,
+					},
+				},
 			},
 		},
 	}
 
-	err := cleanupForksFromPreviousTests(os.Getenv("TENDERLY_API_KEY"))
-	require.NoError(t, err, fmt.Errorf("failed to delete forks from previous test runs: %v", err))
+	//TODO set this up to have some form of configurations that enable the tests to run onchain
+	tenderlyApiKey := os.Getenv("TENDERLY_API_KEY")
+	if tenderlyApiKey != "" {
+		err := cleanupForksFromPreviousTests(tenderlyApiKey)
+		require.NoError(t, err, fmt.Errorf("failed to delete forks from previous test runs: %v", err))
+	}
 
 	for _, tc := range testcases {
-		t.Run(fmt.Sprintf("%v", tc.description), func(t *testing.T) {
+		t.Run(tc.description, func(t *testing.T) {
 
 			t.Cleanup(func() {
 				helpers.Sleep()
@@ -211,8 +349,16 @@ func TestSwapTokensTenderlyE2E(t *testing.T) {
 			c, err := NewClient(tc.config)
 			require.NoError(t, err)
 
+			ctx := context.Background()
+			if tenderlyApiKey != "" {
+				ctx = context.WithValue(ctx, tenderly.SwapConfigKey, tenderly.SimulationConfig{
+					TenderlyApiKey: tenderlyApiKey,
+					OverridesMap:   tc.stateOverrides,
+				})
+			}
+
 			// Swap tokens
-			err = c.Actions.SwapTokens(tc.swapParams)
+			err = c.Actions.SwapTokens(ctx, tc.swapParams)
 			if err != nil {
 				log.Fatalf("Failed to swap tokens: %v", err)
 			}
@@ -229,7 +375,7 @@ func cleanupForksFromPreviousTests(tenderlyApiKey string) error {
 	}
 
 	for _, fork := range forksResponse.Forks {
-		if strings.Contains(fork.Alias, "Dev Portal") {
+		if strings.HasPrefix(fork.Alias, "DP") {
 			err := tenderly.DeleteTenderlyFork(tenderlyApiKey, fork.ID)
 			if err != nil {
 				return fmt.Errorf("failed to delete tenderly fork: %v", err)

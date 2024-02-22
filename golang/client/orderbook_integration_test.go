@@ -10,6 +10,7 @@ import (
 
 	"github.com/1inch/1inch-sdk/golang/client/orderbook"
 	"github.com/1inch/1inch-sdk/golang/helpers"
+	"github.com/1inch/1inch-sdk/golang/helpers/consts/amounts"
 	"github.com/1inch/1inch-sdk/golang/helpers/consts/chains"
 	"github.com/1inch/1inch-sdk/golang/helpers/consts/tokens"
 )
@@ -25,12 +26,12 @@ func TestCreateOrderIntegration(t *testing.T) {
 			description: "Success",
 			orderRequest: orderbook.CreateOrderParams{
 				ChainId:      chains.Polygon,
-				PrivateKey:   os.Getenv("WALLET_KEY"),
-				Maker:        os.Getenv("WALLET_ADDRESS"),
-				MakerAsset:   tokens.PolygonDai,
+				PrivateKey:   os.Getenv("WALLET_KEY_EMPTY"),
+				Maker:        os.Getenv("WALLET_ADDRESS_EMPTY"),
+				MakerAsset:   tokens.PolygonFrax,
 				TakerAsset:   tokens.PolygonWeth,
-				TakingAmount: "1000000000000000000",
-				MakingAmount: "1000000000000000000",
+				TakingAmount: amounts.Ten6,
+				MakingAmount: amounts.Ten18,
 				Taker:        "0x0000000000000000000000000000000000000000",
 				SkipWarnings: true,
 			},

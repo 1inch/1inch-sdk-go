@@ -7,7 +7,6 @@ import (
 	"errors"
 	"fmt"
 	"net/http"
-	"strings"
 	"time"
 
 	"github.com/ethereum/go-ethereum/common"
@@ -15,9 +14,9 @@ import (
 
 	"github.com/1inch/1inch-sdk/golang/client/onchain"
 	"github.com/1inch/1inch-sdk/golang/client/orderbook"
+	"github.com/1inch/1inch-sdk/golang/client/tenderly"
 	"github.com/1inch/1inch-sdk/golang/helpers"
 	"github.com/1inch/1inch-sdk/golang/helpers/consts/addresses"
-	"github.com/1inch/1inch-sdk/golang/helpers/consts/amounts"
 	"github.com/1inch/1inch-sdk/golang/helpers/consts/contracts"
 )
 
@@ -68,44 +67,28 @@ func (s *OrderbookService) CreateOrder(ctx context.Context, params orderbook.Cre
 
 	derivedPublicAddress := crypto.PubkeyToAddress(*publicKeyECDSA)
 
-	usePermit := onchain.ShouldUsePermit(ethClient, params.ChainId, params.MakerAsset)
+	var usePermit bool
+	if params.ApprovalType != onchain.ApprovalAlways {
+		usePermit = onchain.ShouldUsePermit(ethClient, params.ChainId, params.MakerAsset)
+	}
+
 	permitParams := "0x"
-
-	if usePermit {
-		name, err := onchain.ReadContractName(ethClient, common.HexToAddress(params.MakerAsset))
-		if err != nil {
-			return nil, nil, fmt.Errorf("failed to read contract name: %v", err)
-		}
-
-		nonce, err := onchain.ReadContractNonce(ethClient, derivedPublicAddress, common.HexToAddress(params.MakerAsset))
-		if err != nil {
-			return nil, nil, fmt.Errorf("failed to read contract name: %v", err)
-		}
-
-		deadline := time.Now().Add(1 * time.Minute).Unix() // TODO make this configurable
-
-		sig, err := onchain.CreatePermitSignature(&onchain.PermitSignatureConfig{
-			FromToken:     params.MakerAsset,
-			Name:          name,
-			PublicAddress: derivedPublicAddress.Hex(),
+	if usePermit || params.ApprovalType == onchain.PermitAlways {
+		permitParams, err = onchain.CreatePermit(&onchain.CreatePermitConfig{
+			EthClient:     ethClient,
+			MakerAsset:    params.MakerAsset,
+			PublicAddress: derivedPublicAddress,
 			ChainId:       params.ChainId,
-			Key:           params.PrivateKey,
-			Nonce:         nonce,
-			Deadline:      deadline,
+			PrivateKey:    params.PrivateKey,
+			Deadline:      params.ExpireAfter,
 		})
-
-		permitParams = onchain.CreatePermitParams(&onchain.PermitParamsConfig{
-			Owner:     strings.ToLower(derivedPublicAddress.Hex()), // TODO remove ToLower and see if it still works
-			Spender:   aggregationRouter,
-			Value:     amounts.BigMaxUint256,
-			Deadline:  deadline,
-			Signature: sig,
-		})
-
 		if err != nil {
-			return nil, nil, fmt.Errorf("failed to create permit signature: %v", err)
+			fmt.Printf("failed to create permit: %v", err)
+			fmt.Println("defaulting to Approval")
 		}
-	} else {
+	}
+
+	if permitParams == "0x" {
 		allowance, err := onchain.ReadContractAllowance(ethClient, fromTokenAddress, publicAddress, aggregationRouterAddress)
 		if err != nil {
 			return nil, nil, fmt.Errorf("failed to read allowance: %v", err)
@@ -126,16 +109,20 @@ func (s *OrderbookService) CreateOrder(ctx context.Context, params orderbook.Cre
 				}
 			}
 
-			erc20Config := onchain.Erc20ApprovalConfig{
-				ChainId:        params.ChainId,
-				Key:            params.PrivateKey,
-				Erc20Address:   fromTokenAddress,
-				PublicAddress:  publicAddress,
-				SpenderAddress: aggregationRouterAddress,
-			}
-			err := onchain.ApproveTokenForRouter(ethClient, s.client.NonceCache, erc20Config)
-			if err != nil {
-				return nil, nil, fmt.Errorf("failed to approve token for router: %v", err)
+			// Only run the approval if Tenderly data is not present
+			if _, ok = ctx.Value(tenderly.SwapConfigKey).(tenderly.SimulationConfig); !ok {
+				erc20Config := onchain.Erc20ApprovalConfig{
+					ChainId:        params.ChainId,
+					Key:            params.PrivateKey,
+					Erc20Address:   fromTokenAddress,
+					PublicAddress:  publicAddress,
+					SpenderAddress: aggregationRouterAddress,
+				}
+				err := onchain.ApproveTokenForRouter(ctx, ethClient, s.client.NonceCache, erc20Config)
+				if err != nil {
+					return nil, nil, fmt.Errorf("failed to approve token for router: %v", err)
+				}
+				helpers.Sleep()
 			}
 		}
 	}
