@@ -90,11 +90,11 @@ func NewClient(config Config) (*Client, error) {
 
 	ethClientMap := make(map[int]*ethclient.Client)
 	for _, provider := range config.Web3HttpProviders {
-		client, err := ethclient.Dial(provider.Url)
+		ethClient, err := ethclient.Dial(provider.Url)
 		if err != nil {
 			return nil, fmt.Errorf("failed to create eth client: %v", err)
 		}
-		ethClientMap[provider.ChainId] = client
+		ethClientMap[provider.ChainId] = ethClient
 	}
 
 	apiBaseUrl, err := url.Parse("https://api.1inch.dev")
