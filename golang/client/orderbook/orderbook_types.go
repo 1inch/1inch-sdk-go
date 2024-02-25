@@ -8,7 +8,6 @@ import (
 
 type CreateOrderParams struct {
 	ApprovalType           onchain.ApprovalType
-	FailIfApprovalIsNeeded bool
 	ChainId                int
 	PrivateKey             string
 	ExpireAfter            int64
@@ -19,6 +18,7 @@ type CreateOrderParams struct {
 	MakingAmount           string
 	Taker                  string
 	SkipWarnings           bool
+	FailIfApprovalIsNeeded bool
 }
 
 func (params *CreateOrderParams) Validate() error {
