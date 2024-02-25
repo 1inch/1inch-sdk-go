@@ -99,6 +99,11 @@ func (s *OrderbookService) CreateOrder(ctx context.Context, params orderbook.Cre
 			return nil, nil, fmt.Errorf("failed to parse making amount: %v", err)
 		}
 		if allowance.Cmp(makingAmountBig) <= 0 {
+
+			if params.FailIfApprovalIsNeeded {
+				return nil, nil, errors.New("1inch router does not have approval for this token")
+			}
+
 			if !params.SkipWarnings {
 				ok, err := orderbook.ConfirmApprovalWithUser(ethClient, params.Maker, params.MakerAsset)
 				if err != nil {

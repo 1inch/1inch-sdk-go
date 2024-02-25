@@ -143,7 +143,6 @@ func (s *ActionService) SwapTokens(ctx context.Context, params swap.SwapTokensPa
 
 		executeSwapConfig.IsPermitSwap = true
 		params.Permit = permitParams
-		fmt.Println("Swapping using Permit1")
 	}
 
 	// Execute swap request
