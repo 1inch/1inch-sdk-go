@@ -7,17 +7,18 @@ import (
 )
 
 type CreateOrderParams struct {
-	ApprovalType onchain.ApprovalType
-	ChainId      int
-	PrivateKey   string
-	ExpireAfter  int64
-	Maker        string
-	MakerAsset   string
-	TakerAsset   string
-	TakingAmount string
-	MakingAmount string
-	Taker        string
-	SkipWarnings bool
+	ApprovalType           onchain.ApprovalType
+	ChainId                int
+	PrivateKey             string
+	ExpireAfter            int64
+	Maker                  string
+	MakerAsset             string
+	TakerAsset             string
+	TakingAmount           string
+	MakingAmount           string
+	Taker                  string
+	SkipWarnings           bool
+	FailIfApprovalIsNeeded bool
 }
 
 func (params *CreateOrderParams) Validate() error {

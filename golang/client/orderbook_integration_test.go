@@ -20,7 +20,7 @@ func TestCreateOrderIntegration(t *testing.T) {
 	testcases := []struct {
 		description   string
 		orderRequest  orderbook.CreateOrderParams
-		expectSuccess bool
+		expectedError string
 	}{
 		{
 			description: "Success",
@@ -35,7 +35,22 @@ func TestCreateOrderIntegration(t *testing.T) {
 				Taker:        "0x0000000000000000000000000000000000000000",
 				SkipWarnings: true,
 			},
-			expectSuccess: true,
+		},
+		{
+			description: "Failure - No approval with error",
+			orderRequest: orderbook.CreateOrderParams{
+				ChainId:                chains.Polygon,
+				PrivateKey:             os.Getenv("WALLET_KEY_EMPTY"),
+				Maker:                  os.Getenv("WALLET_ADDRESS_EMPTY"),
+				MakerAsset:             tokens.PolygonDai,
+				TakerAsset:             tokens.PolygonWeth,
+				TakingAmount:           amounts.Ten6,
+				MakingAmount:           amounts.Ten18,
+				Taker:                  "0x0000000000000000000000000000000000000000",
+				SkipWarnings:           true,
+				FailIfApprovalIsNeeded: true,
+			},
+			expectedError: "1inch router does not have approval",
 		},
 	}
 
@@ -51,18 +66,22 @@ func TestCreateOrderIntegration(t *testing.T) {
 	require.NoError(t, err)
 
 	for _, tc := range testcases {
-		t.Run(fmt.Sprintf("%v", tc.description), func(t *testing.T) {
+		t.Run(tc.description, func(t *testing.T) {
 
 			t.Cleanup(func() {
 				helpers.Sleep()
 			})
 
 			orderResponse, resp, err := c.Orderbook.CreateOrder(context.Background(), tc.orderRequest)
-			require.NoError(t, err)
-			require.Equal(t, 201, resp.StatusCode)
+			if tc.expectedError != "" {
+				require.Contains(t, err.Error(), tc.expectedError)
+			} else {
+				require.NoError(t, err)
+				require.Equal(t, 201, resp.StatusCode)
 
-			require.NotNil(t, orderResponse)
-			require.True(t, orderResponse.Success)
+				require.NotNil(t, orderResponse)
+				require.True(t, orderResponse.Success)
+			}
 		})
 	}
 }

@@ -8,6 +8,7 @@ import (
 	"github.com/1inch/1inch-sdk/golang/client"
 	"github.com/1inch/1inch-sdk/golang/client/onchain"
 	"github.com/1inch/1inch-sdk/golang/client/swap"
+	"github.com/1inch/1inch-sdk/golang/helpers/consts/amounts"
 	"github.com/1inch/1inch-sdk/golang/helpers/consts/chains"
 	"github.com/1inch/1inch-sdk/golang/helpers/consts/tokens"
 )
@@ -42,7 +43,7 @@ func main() {
 			Src:             tokens.PolygonFrax,
 			Dst:             tokens.PolygonUsdc,
 			From:            os.Getenv("WALLET_ADDRESS"),
-			Amount:          "10000000000000000",
+			Amount:          amounts.Ten16,
 			Slippage:        0.5,
 			DisableEstimate: true,
 		},
