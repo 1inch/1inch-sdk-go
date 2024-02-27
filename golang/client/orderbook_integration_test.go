@@ -50,7 +50,7 @@ func TestCreateOrderIntegration(t *testing.T) {
 				SkipWarnings:           true,
 				FailIfApprovalIsNeeded: true,
 			},
-			expectedError: "1inch router does not have approval",
+			expectedError: orderbook.ErrorFailWhenApprovalIsNeeded.Error(),
 		},
 	}
 
