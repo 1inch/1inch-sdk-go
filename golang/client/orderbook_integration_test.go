@@ -74,7 +74,7 @@ func TestCreateOrderIntegration(t *testing.T) {
 
 			orderResponse, resp, err := c.Orderbook.CreateOrder(context.Background(), tc.orderRequest)
 			if tc.expectedError != "" {
-				require.Contains(t, err.Error(), tc.expectedError)
+				require.Equal(t, err.Error(), tc.expectedError)
 			} else {
 				require.NoError(t, err)
 				require.Equal(t, 201, resp.StatusCode)
