@@ -101,7 +101,7 @@ func (s *OrderbookService) CreateOrder(ctx context.Context, params orderbook.Cre
 		if allowance.Cmp(makingAmountBig) <= 0 {
 
 			if params.FailIfApprovalIsNeeded {
-				return nil, nil, errors.New("1inch router does not have approval for this token")
+				return nil, nil, orderbook.ErrorFailWhenApprovalIsNeeded
 			}
 
 			if !params.SkipWarnings {

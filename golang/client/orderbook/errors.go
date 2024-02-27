@@ -1,0 +1,5 @@
+package orderbook
+
+import "errors"
+
+var ErrorFailWhenApprovalIsNeeded = errors.New("1inch router does not have approval")
