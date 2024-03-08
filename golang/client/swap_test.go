@@ -6,10 +6,10 @@ import (
 	"net/http"
 	"testing"
 
+	"github.com/1inch/1inch-sdk/golang/client/models"
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
 
-	"github.com/1inch/1inch-sdk/golang/client/swap"
 	"github.com/1inch/1inch-sdk/golang/helpers/consts/addresses"
 	"github.com/1inch/1inch-sdk/golang/helpers/consts/amounts"
 	"github.com/1inch/1inch-sdk/golang/helpers/consts/chains"
@@ -30,15 +30,15 @@ func TestApproveAllowance(t *testing.T) {
 	testcases := []struct {
 		description              string
 		handlerFunc              func(w http.ResponseWriter, r *http.Request)
-		params                   swap.ApproveAllowanceParams
+		params                   models.ApproveAllowanceParams
 		expectedOutput           string
 		expectedErrorDescription string
 	}{
 		{
 			description: "Success",
-			params: swap.ApproveAllowanceParams{
+			params: models.ApproveAllowanceParams{
 				ChainId: chains.Ethereum,
-				ApproveControllerGetAllowanceParams: swap.ApproveControllerGetAllowanceParams{
+				ApproveControllerGetAllowanceParams: models.ApproveControllerGetAllowanceParams{
 					TokenAddress:  tokens.EthereumWeth,
 					WalletAddress: addresses.Vitalik,
 				},
@@ -91,19 +91,19 @@ func TestApproveTransaction(t *testing.T) {
 	testcases := []struct {
 		description              string
 		handlerFunc              func(w http.ResponseWriter, r *http.Request)
-		params                   swap.ApproveTransactionParams
-		expectedOutput           swap.ApproveCallDataResponse
+		params                   models.ApproveTransactionParams
+		expectedOutput           models.ApproveCallDataResponse
 		expectedErrorDescription string
 	}{
 		{
 			description: "Success",
-			params: swap.ApproveTransactionParams{
+			params: models.ApproveTransactionParams{
 				ChainId: chains.Ethereum,
-				ApproveControllerGetCallDataParams: swap.ApproveControllerGetCallDataParams{
+				ApproveControllerGetCallDataParams: models.ApproveControllerGetCallDataParams{
 					TokenAddress: tokens.EthereumUsdc,
 				},
 			},
-			expectedOutput: swap.ApproveCallDataResponse{
+			expectedOutput: models.ApproveCallDataResponse{
 				To: tokens.EthereumUsdc,
 			},
 		},
@@ -150,7 +150,7 @@ func TestGetQuote(t *testing.T) {
 	testcases := []struct {
 		description              string
 		handlerFunc              func(w http.ResponseWriter, r *http.Request)
-		params                   swap.GetQuoteParams
+		params                   models.GetQuoteParams
 		expectedOutput           string
 		expectedErrorDescription string
 	}{
@@ -161,9 +161,9 @@ func TestGetQuote(t *testing.T) {
 				assert.Equal(t, tokens.EthereumWeth, r.URL.Query().Get("dst"))
 				assert.Equal(t, amounts.Ten18, r.URL.Query().Get("amount"))
 			},
-			params: swap.GetQuoteParams{
+			params: models.GetQuoteParams{
 				ChainId: chains.Ethereum,
-				AggregationControllerGetQuoteParams: swap.AggregationControllerGetQuoteParams{
+				AggregationControllerGetQuoteParams: models.AggregationControllerGetQuoteParams{
 					Src:    tokens.EthereumUsdc,
 					Dst:    tokens.EthereumWeth,
 					Amount: amounts.Ten18,
@@ -212,7 +212,7 @@ func TestGetSwap(t *testing.T) {
 	testcases := []struct {
 		description              string
 		handlerFunc              func(w http.ResponseWriter, r *http.Request)
-		params                   swap.GetSwapDataParams
+		params                   models.GetSwapDataParams
 		expectedOutput           string
 		expectedErrorDescription string
 	}{
@@ -224,8 +224,8 @@ func TestGetSwap(t *testing.T) {
 				assert.Equal(t, addresses.Vitalik, r.URL.Query().Get("from"))
 				assert.Equal(t, amounts.Ten18, r.URL.Query().Get("amount"))
 			},
-			params: swap.GetSwapDataParams{
-				AggregationControllerGetSwapParams: swap.AggregationControllerGetSwapParams{
+			params: models.GetSwapDataParams{
+				AggregationControllerGetSwapParams: models.AggregationControllerGetSwapParams{
 					Src:      tokens.EthereumUsdc,
 					Dst:      tokens.EthereumWeth,
 					From:     addresses.Vitalik,

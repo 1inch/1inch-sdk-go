@@ -1,10 +1,10 @@
-package swap
+package models
 
 import (
 	"errors"
 
-	"github.com/1inch/1inch-sdk/golang/client/onchain"
-	"github.com/1inch/1inch-sdk/golang/client/validate"
+	"github.com/1inch/1inch-sdk/golang/internal/onchain"
+	"github.com/1inch/1inch-sdk/golang/internal/validate"
 )
 
 type SwapTokensParams struct {

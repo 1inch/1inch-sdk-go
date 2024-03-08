@@ -1,9 +1,9 @@
-package orderbook
+package models
 
 import (
-	"github.com/1inch/1inch-sdk/golang/client/onchain"
-	"github.com/1inch/1inch-sdk/golang/client/validate"
 	"github.com/1inch/1inch-sdk/golang/helpers/consts/tokens"
+	"github.com/1inch/1inch-sdk/golang/internal/onchain"
+	"github.com/1inch/1inch-sdk/golang/internal/validate"
 )
 
 type CreateOrderParams struct {

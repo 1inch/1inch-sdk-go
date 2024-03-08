@@ -9,21 +9,22 @@ import (
 	"net/http"
 	"time"
 
-	"github.com/ethereum/go-ethereum/common"
-	"github.com/ethereum/go-ethereum/crypto"
-
-	"github.com/1inch/1inch-sdk/golang/client/onchain"
-	"github.com/1inch/1inch-sdk/golang/client/orderbook"
-	"github.com/1inch/1inch-sdk/golang/client/tenderly"
+	"github.com/1inch/1inch-sdk/golang/client/models"
 	"github.com/1inch/1inch-sdk/golang/helpers"
 	"github.com/1inch/1inch-sdk/golang/helpers/consts/addresses"
 	"github.com/1inch/1inch-sdk/golang/helpers/consts/contracts"
+	"github.com/1inch/1inch-sdk/golang/internal/onchain"
+	"github.com/1inch/1inch-sdk/golang/internal/orderbook"
+	"github.com/1inch/1inch-sdk/golang/internal/tenderly"
+
+	"github.com/ethereum/go-ethereum/common"
+	"github.com/ethereum/go-ethereum/crypto"
 )
 
 type OrderbookService service
 
 // CreateOrder creates an order in the Limit Order Protocol
-func (s *OrderbookService) CreateOrder(ctx context.Context, params orderbook.CreateOrderParams) (*orderbook.CreateOrderResponse, *http.Response, error) {
+func (s *OrderbookService) CreateOrder(ctx context.Context, params models.CreateOrderParams) (*models.CreateOrderResponse, *http.Response, error) {
 	u := fmt.Sprintf("/orderbook/v3.0/%d", params.ChainId)
 
 	err := params.Validate()
@@ -101,7 +102,7 @@ func (s *OrderbookService) CreateOrder(ctx context.Context, params orderbook.Cre
 		if allowance.Cmp(makingAmountBig) <= 0 {
 
 			if params.FailIfApprovalIsNeeded {
-				return nil, nil, orderbook.ErrorFailWhenApprovalIsNeeded
+				return nil, nil, models.ErrorFailWhenApprovalIsNeeded
 			}
 
 			if !params.SkipWarnings {
@@ -167,7 +168,7 @@ func (s *OrderbookService) CreateOrder(ctx context.Context, params orderbook.Cre
 		return nil, nil, err
 	}
 
-	var createOrderResponse orderbook.CreateOrderResponse
+	var createOrderResponse models.CreateOrderResponse
 	res, err := s.client.Do(ctx, req, &createOrderResponse)
 	if err != nil {
 		return nil, nil, err
@@ -179,7 +180,7 @@ func (s *OrderbookService) CreateOrder(ctx context.Context, params orderbook.Cre
 // TODO Reusing the same request/response objects due to bad swagger spec
 
 // GetOrdersByCreatorAddress returns all orders created by a given address in the Limit Order Protocol
-func (s *OrderbookService) GetOrdersByCreatorAddress(ctx context.Context, params orderbook.GetOrdersByCreatorAddressParams) ([]orderbook.OrderResponse, *http.Response, error) {
+func (s *OrderbookService) GetOrdersByCreatorAddress(ctx context.Context, params models.GetOrdersByCreatorAddressParams) ([]models.OrderResponse, *http.Response, error) {
 	u := fmt.Sprintf("/orderbook/v3.0/%d/address/%s", params.ChainId, params.CreatorAddress)
 
 	err := params.Validate()
@@ -197,7 +198,7 @@ func (s *OrderbookService) GetOrdersByCreatorAddress(ctx context.Context, params
 		return nil, nil, err
 	}
 
-	var ordersResponse []orderbook.OrderResponse
+	var ordersResponse []models.OrderResponse
 	res, err := s.client.Do(ctx, req, &ordersResponse)
 	if err != nil {
 		return nil, nil, err
@@ -207,7 +208,7 @@ func (s *OrderbookService) GetOrdersByCreatorAddress(ctx context.Context, params
 }
 
 // GetAllOrders returns all orders in the Limit Order Protocol
-func (s *OrderbookService) GetAllOrders(ctx context.Context, params orderbook.GetAllOrdersParams) ([]orderbook.OrderResponse, *http.Response, error) {
+func (s *OrderbookService) GetAllOrders(ctx context.Context, params models.GetAllOrdersParams) ([]models.OrderResponse, *http.Response, error) {
 	u := fmt.Sprintf("/orderbook/v3.0/%d/all", params.ChainId)
 
 	err := params.Validate()
@@ -225,7 +226,7 @@ func (s *OrderbookService) GetAllOrders(ctx context.Context, params orderbook.Ge
 		return nil, nil, err
 	}
 
-	var allOrdersResponse []orderbook.OrderResponse
+	var allOrdersResponse []models.OrderResponse
 	res, err := s.client.Do(ctx, req, &allOrdersResponse)
 	if err != nil {
 		return nil, nil, err
@@ -235,7 +236,7 @@ func (s *OrderbookService) GetAllOrders(ctx context.Context, params orderbook.Ge
 }
 
 // GetCount returns the number of orders in the Limit Order Protocol
-func (s *OrderbookService) GetCount(ctx context.Context, params orderbook.GetCountParams) (*orderbook.CountResponse, *http.Response, error) {
+func (s *OrderbookService) GetCount(ctx context.Context, params models.GetCountParams) (*models.CountResponse, *http.Response, error) {
 	u := fmt.Sprintf("/orderbook/v3.0/%d/count", params.ChainId)
 
 	err := params.Validate()
@@ -253,7 +254,7 @@ func (s *OrderbookService) GetCount(ctx context.Context, params orderbook.GetCou
 		return nil, nil, err
 	}
 
-	var count orderbook.CountResponse
+	var count models.CountResponse
 	res, err := s.client.Do(ctx, req, &count)
 	if err != nil {
 		return nil, nil, err
@@ -263,7 +264,7 @@ func (s *OrderbookService) GetCount(ctx context.Context, params orderbook.GetCou
 }
 
 // GetEvent returns an event in the Limit Order Protocol by order hash
-func (s *OrderbookService) GetEvent(ctx context.Context, params orderbook.GetEventParams) (*orderbook.EventResponse, *http.Response, error) {
+func (s *OrderbookService) GetEvent(ctx context.Context, params models.GetEventParams) (*models.EventResponse, *http.Response, error) {
 	u := fmt.Sprintf("/orderbook/v3.0/%d/events/%s", params.ChainId, params.OrderHash)
 
 	err := params.Validate()
@@ -276,7 +277,7 @@ func (s *OrderbookService) GetEvent(ctx context.Context, params orderbook.GetEve
 		return nil, nil, err
 	}
 
-	var event orderbook.EventResponse
+	var event models.EventResponse
 	res, err := s.client.Do(ctx, req, &event)
 	if err != nil {
 		return nil, nil, err
@@ -286,7 +287,7 @@ func (s *OrderbookService) GetEvent(ctx context.Context, params orderbook.GetEve
 }
 
 // GetEvents returns all events in the Limit Order Protocol
-func (s *OrderbookService) GetEvents(ctx context.Context, params orderbook.GetEventsParams) ([]orderbook.EventResponse, *http.Response, error) {
+func (s *OrderbookService) GetEvents(ctx context.Context, params models.GetEventsParams) ([]models.EventResponse, *http.Response, error) {
 	u := fmt.Sprintf("/orderbook/v3.0/%d/events", params.ChainId)
 
 	err := params.Validate()
@@ -304,7 +305,7 @@ func (s *OrderbookService) GetEvents(ctx context.Context, params orderbook.GetEv
 		return nil, nil, err
 	}
 
-	var events []orderbook.EventResponse
+	var events []models.EventResponse
 	res, err := s.client.Do(ctx, req, &events)
 	if err != nil {
 		return nil, nil, err
@@ -316,7 +317,7 @@ func (s *OrderbookService) GetEvents(ctx context.Context, params orderbook.GetEv
 // TODO untested endpoint
 
 // GetActiveOrdersWithPermit returns all orders in the Limit Order Protocol that are active and have a valid permit
-func (s *OrderbookService) GetActiveOrdersWithPermit(ctx context.Context, params orderbook.GetActiveOrdersWithPermitParams) ([]orderbook.OrderResponse, *http.Response, error) {
+func (s *OrderbookService) GetActiveOrdersWithPermit(ctx context.Context, params models.GetActiveOrdersWithPermitParams) ([]models.OrderResponse, *http.Response, error) {
 	u := fmt.Sprintf("/orderbook/v3.0/%d/has-active-orders-with-permit/%s/%s", params.ChainId, params.Token, params.Wallet)
 
 	err := params.Validate()
@@ -329,7 +330,7 @@ func (s *OrderbookService) GetActiveOrdersWithPermit(ctx context.Context, params
 		return nil, nil, err
 	}
 
-	var orders []orderbook.OrderResponse
+	var orders []models.OrderResponse
 	res, err := s.client.Do(ctx, req, &orders)
 	if err != nil {
 		return nil, nil, err

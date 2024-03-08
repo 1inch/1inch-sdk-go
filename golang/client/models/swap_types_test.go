@@ -1,11 +1,11 @@
-package swap
+package models
 
 import (
 	"testing"
 
+	"github.com/1inch/1inch-sdk/golang/internal/validate"
 	"github.com/stretchr/testify/require"
 
-	"github.com/1inch/1inch-sdk/golang/client/validate"
 	"github.com/1inch/1inch-sdk/golang/helpers/consts/chains"
 	"github.com/1inch/1inch-sdk/golang/helpers/consts/tokens"
 )

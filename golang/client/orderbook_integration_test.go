@@ -6,9 +6,9 @@ import (
 	"os"
 	"testing"
 
+	"github.com/1inch/1inch-sdk/golang/client/models"
 	"github.com/stretchr/testify/require"
 
-	"github.com/1inch/1inch-sdk/golang/client/orderbook"
 	"github.com/1inch/1inch-sdk/golang/helpers"
 	"github.com/1inch/1inch-sdk/golang/helpers/consts/amounts"
 	"github.com/1inch/1inch-sdk/golang/helpers/consts/chains"
@@ -19,12 +19,12 @@ func TestCreateOrderIntegration(t *testing.T) {
 
 	testcases := []struct {
 		description   string
-		orderRequest  orderbook.CreateOrderParams
+		orderRequest  models.CreateOrderParams
 		expectedError string
 	}{
 		{
 			description: "Success",
-			orderRequest: orderbook.CreateOrderParams{
+			orderRequest: models.CreateOrderParams{
 				ChainId:      chains.Polygon,
 				PrivateKey:   os.Getenv("WALLET_KEY_EMPTY"),
 				Maker:        os.Getenv("WALLET_ADDRESS_EMPTY"),
@@ -38,7 +38,7 @@ func TestCreateOrderIntegration(t *testing.T) {
 		},
 		{
 			description: "Failure - No approval with error",
-			orderRequest: orderbook.CreateOrderParams{
+			orderRequest: models.CreateOrderParams{
 				ChainId:                chains.Polygon,
 				PrivateKey:             os.Getenv("WALLET_KEY_EMPTY"),
 				Maker:                  os.Getenv("WALLET_ADDRESS_EMPTY"),
@@ -50,7 +50,7 @@ func TestCreateOrderIntegration(t *testing.T) {
 				SkipWarnings:           true,
 				FailIfApprovalIsNeeded: true,
 			},
-			expectedError: orderbook.ErrorFailWhenApprovalIsNeeded.Error(),
+			expectedError: models.ErrorFailWhenApprovalIsNeeded.Error(),
 		},
 	}
 
@@ -90,11 +90,11 @@ func TestGetAllOrdersIntegration(t *testing.T) {
 
 	testcases := []struct {
 		description string
-		params      orderbook.GetAllOrdersParams
+		params      models.GetAllOrdersParams
 	}{
 		{
 			description: "Get all orders",
-			params: orderbook.GetAllOrdersParams{
+			params: models.GetAllOrdersParams{
 				ChainId: chains.Ethereum,
 			},
 		},
@@ -124,11 +124,11 @@ func TestGetCountIntegration(t *testing.T) {
 
 	testcases := []struct {
 		description string
-		params      orderbook.GetCountParams
+		params      models.GetCountParams
 	}{
 		{
 			description: "Get counts",
-			params: orderbook.GetCountParams{
+			params: models.GetCountParams{
 				ChainId: chains.Ethereum,
 			},
 		},
@@ -158,13 +158,13 @@ func TestGetEventsIntegration(t *testing.T) {
 
 	testcases := []struct {
 		description string
-		params      orderbook.GetEventsParams
+		params      models.GetEventsParams
 	}{
 		{
 			description: "Get events",
-			params: orderbook.GetEventsParams{
+			params: models.GetEventsParams{
 				ChainId: chains.Ethereum,
-				LimitOrderV3SubscribedApiControllerGetEventsParams: orderbook.LimitOrderV3SubscribedApiControllerGetEventsParams{
+				LimitOrderV3SubscribedApiControllerGetEventsParams: models.LimitOrderV3SubscribedApiControllerGetEventsParams{
 					Limit: 1,
 				},
 			},

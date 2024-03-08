@@ -9,22 +9,23 @@ import (
 	"strings"
 	"time"
 
+	"github.com/1inch/1inch-sdk/golang/client/models"
 	"github.com/ethereum/go-ethereum/common"
 	"github.com/ethereum/go-ethereum/common/math"
 	"github.com/ethereum/go-ethereum/crypto"
 	"github.com/ethereum/go-ethereum/ethclient"
 	"github.com/ethereum/go-ethereum/signer/core/apitypes"
 
-	"github.com/1inch/1inch-sdk/golang/client/onchain"
 	"github.com/1inch/1inch-sdk/golang/helpers"
 	"github.com/1inch/1inch-sdk/golang/helpers/consts/contracts"
+	"github.com/1inch/1inch-sdk/golang/internal/onchain"
 )
 
-func CreateLimitOrderMessage(orderRequest CreateOrderParams, interactions []string) (*Order, error) {
+func CreateLimitOrderMessage(orderRequest models.CreateOrderParams, interactions []string) (*models.Order, error) {
 
 	offsets := getOffsets(interactions)
 
-	orderData := OrderData{
+	orderData := models.OrderData{
 		MakerAsset:    orderRequest.MakerAsset,
 		TakerAsset:    orderRequest.TakerAsset,
 		MakingAmount:  orderRequest.MakingAmount,
@@ -126,7 +127,7 @@ func CreateLimitOrderMessage(orderRequest CreateOrderParams, interactions []stri
 	// convert signature to hex string
 	signatureHex := fmt.Sprintf("0x%x", signature)
 
-	return &Order{
+	return &models.Order{
 		OrderHash: challengeHashHex,
 		Signature: signatureHex,
 		Data:      orderData,
@@ -191,12 +192,12 @@ func getOffsets(interactions []string) *big.Int {
 	return bytesAccumulator
 }
 
-func ConfirmLimitOrderWithUser(order *Order, ethClient *ethclient.Client) (bool, error) {
+func ConfirmLimitOrderWithUser(order *models.Order, ethClient *ethclient.Client) (bool, error) {
 	stdOut := helpers.StdOutPrinter{}
 	return confirmLimitOrderWithUser(order, ethClient, os.Stdin, stdOut)
 }
 
-func confirmLimitOrderWithUser(order *Order, ethClient *ethclient.Client, reader io.Reader, writer helpers.Printer) (bool, error) {
+func confirmLimitOrderWithUser(order *models.Order, ethClient *ethclient.Client, reader io.Reader, writer helpers.Printer) (bool, error) {
 	makerTokenDecimals, err := onchain.ReadContractDecimals(ethClient, common.HexToAddress(order.Data.MakerAsset))
 	if err != nil {
 		return false, fmt.Errorf("failed to read decimals: %v", err)

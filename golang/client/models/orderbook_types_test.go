@@ -1,4 +1,4 @@
-package orderbook
+package models
 
 import (
 	"fmt"
@@ -6,9 +6,9 @@ import (
 
 	"github.com/stretchr/testify/require"
 
-	"github.com/1inch/1inch-sdk/golang/client/validate"
 	"github.com/1inch/1inch-sdk/golang/helpers/consts/chains"
 	"github.com/1inch/1inch-sdk/golang/helpers/consts/tokens"
+	"github.com/1inch/1inch-sdk/golang/internal/validate"
 )
 
 func TestCreateOrderParams_Validate(t *testing.T) {

@@ -8,7 +8,7 @@ import (
 	"os"
 
 	"github.com/1inch/1inch-sdk/golang/client"
-	"github.com/1inch/1inch-sdk/golang/client/orderbook"
+	"github.com/1inch/1inch-sdk/golang/client/models"
 	"github.com/1inch/1inch-sdk/golang/helpers/consts/chains"
 )
 
@@ -32,9 +32,9 @@ func main() {
 	}
 
 	// Build the config for the orders request
-	limitOrdersParams := orderbook.GetAllOrdersParams{
+	limitOrdersParams := models.GetAllOrdersParams{
 		ChainId: 137,
-		LimitOrderV3SubscribedApiControllerGetAllLimitOrdersParams: orderbook.LimitOrderV3SubscribedApiControllerGetAllLimitOrdersParams{
+		LimitOrderV3SubscribedApiControllerGetAllLimitOrdersParams: models.LimitOrderV3SubscribedApiControllerGetAllLimitOrdersParams{
 			Page:   1,
 			Limit:  2,
 			SortBy: "createDateTime",
@@ -50,7 +50,7 @@ func main() {
 	prettyPrintOrderResponse(allOrdersResponse)
 }
 
-func prettyPrintOrderResponse(orders []orderbook.OrderResponse) {
+func prettyPrintOrderResponse(orders []models.OrderResponse) {
 	for _, order := range orders {
 		jsonOrder, err := json.MarshalIndent(order, "", "  ")
 		if err != nil {
