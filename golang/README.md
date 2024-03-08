@@ -47,8 +47,7 @@ import (
 	"os"
 
 	"github.com/1inch/1inch-sdk/golang/client"
-	"github.com/1inch/1inch-sdk/golang/client/swap"
-	"github.com/1inch/1inch-sdk/golang/helpers"
+	"github.com/1inch/1inch-sdk/golang/client/models"
 	"github.com/1inch/1inch-sdk/golang/helpers/consts/amounts"
 	"github.com/1inch/1inch-sdk/golang/helpers/consts/chains"
 	"github.com/1inch/1inch-sdk/golang/helpers/consts/tokens"
@@ -74,12 +73,10 @@ func main() {
 	}
 
 	// Build the config for the swap request
-	swapParams := swap.GetSwapDataParams{
-		RequestParams: swap.RequestParams{
-			ChainId:      chains.Polygon,
-			SkipWarnings: false,
-		},
-		AggregationControllerGetSwapParams: swap.AggregationControllerGetSwapParams{
+	swapParams := models.GetSwapDataParams{
+		ChainId:      chains.Polygon,
+		SkipWarnings: false,
+		AggregationControllerGetSwapParams: models.AggregationControllerGetSwapParams{
 			Src:             tokens.PolygonFrax,
 			Dst:             tokens.PolygonWeth,
 			From:            os.Getenv("WALLET_ADDRESS"),
@@ -97,6 +94,7 @@ func main() {
 	fmt.Printf("\nContract to send transaction to: %v\n", swapData.Tx.To)
 	fmt.Printf("Transaction data: %v\n", swapData.Tx.Data)
 }
+
 
 ```
 
