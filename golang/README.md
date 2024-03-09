@@ -9,9 +9,10 @@ This is a Go SDK to simplify interactions with the 1inch Dev Portal APIs. When c
 Beyond mirroring the Developer Portal APIs, this SDK also supports token approvals, permit signature generation, and the execution of 1inch swaps onchain for EOA wallets.
 
 Jump To:
+* [Supported APIs](#supported-apis)
 * [Getting Started](#getting-started)
-* [Current Functionality](#current-functionality)
-
+* [Getting Help](#getting-help)
+* [Development](#development)
 
 ## Supported APIs
 
