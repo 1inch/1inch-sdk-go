@@ -42,7 +42,7 @@ func main() {
 	}
 
 	// Execute orders request
-	allOrdersResponse, _, err := c.Orderbook.GetAllOrders(context.Background(), limitOrdersParams)
+	allOrdersResponse, _, err := c.OrderbookApi.GetAllOrders(context.Background(), limitOrdersParams)
 	if err != nil {
 		log.Fatalf("Failed to get quote: %v", err)
 	}

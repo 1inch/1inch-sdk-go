@@ -64,7 +64,7 @@ func TestCreateOrder(t *testing.T) {
 				mux.HandleFunc(endpoint, defaultResponse)
 			}
 
-			createOrderResponse, _, err := c.Orderbook.CreateOrder(context.Background(), tc.params)
+			createOrderResponse, _, err := c.OrderbookApi.CreateOrder(context.Background(), tc.params)
 			if tc.expectedErrorDescription != "" {
 				if err == nil {
 					assert.FailNow(t, "Expected error message, but error was nil")
@@ -121,7 +121,7 @@ func TestGetOrdersByCreatorAddress(t *testing.T) {
 				mux.HandleFunc(endpoint, defaultResponse)
 			}
 
-			allOrders, _, err := c.Orderbook.GetOrdersByCreatorAddress(context.Background(), tc.params)
+			allOrders, _, err := c.OrderbookApi.GetOrdersByCreatorAddress(context.Background(), tc.params)
 			if tc.expectedErrorDescription != "" {
 				if err == nil {
 					assert.FailNow(t, "Expected error message, but error was nil")
@@ -177,7 +177,7 @@ func TestGetAllOrders(t *testing.T) {
 				mux.HandleFunc(endpoint, defaultResponse)
 			}
 
-			allOrders, _, err := c.Orderbook.GetAllOrders(context.Background(), tc.params)
+			allOrders, _, err := c.OrderbookApi.GetAllOrders(context.Background(), tc.params)
 			if tc.expectedErrorDescription != "" {
 				if err == nil {
 					assert.FailNow(t, "Expected error message, but error was nil")
@@ -231,7 +231,7 @@ func TestGetCount(t *testing.T) {
 				mux.HandleFunc(endpoint, defaultResponse)
 			}
 
-			countResponse, _, err := c.Orderbook.GetCount(context.Background(), tc.params)
+			countResponse, _, err := c.OrderbookApi.GetCount(context.Background(), tc.params)
 			if tc.expectedErrorDescription != "" {
 				if err == nil {
 					assert.FailNow(t, "Expected error message, but error was nil")
@@ -284,7 +284,7 @@ func TestGetEvent(t *testing.T) {
 				mux.HandleFunc(endpoint, defaultResponse)
 			}
 
-			eventResponse, _, err := c.Orderbook.GetEvent(context.Background(), tc.params)
+			eventResponse, _, err := c.OrderbookApi.GetEvent(context.Background(), tc.params)
 			if tc.expectedErrorDescription != "" {
 				if err == nil {
 					assert.FailNow(t, "Expected error message, but error was nil")
@@ -341,7 +341,7 @@ func TestGetEvents(t *testing.T) {
 				mux.HandleFunc(endpoint, defaultResponse)
 			}
 
-			eventsResponse, _, err := c.Orderbook.GetEvents(context.Background(), tc.params)
+			eventsResponse, _, err := c.OrderbookApi.GetEvents(context.Background(), tc.params)
 			if tc.expectedErrorDescription != "" {
 				if err == nil {
 					assert.FailNow(t, "Expected error message, but error was nil")
@@ -395,7 +395,7 @@ func TestGetEvents(t *testing.T) {
 //				mux.HandleFunc(endpoint, defaultResponse)
 //			}
 //
-//			ordersResponse, _, err := c.Orderbook.GetActiveOrdersWithPermit(context.Background(), tc.params)
+//			ordersResponse, _, err := c.OrderbookApi.GetActiveOrdersWithPermit(context.Background(), tc.params)
 //			if tc.expectedErrorDescription != "" {
 //				if err == nil {
 //					assert.FailNow(t, "Expected error message, but error was nil")

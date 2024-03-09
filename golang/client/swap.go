@@ -6,13 +6,12 @@ import (
 	"net/http"
 
 	"github.com/1inch/1inch-sdk/golang/client/models"
-	"github.com/1inch/1inch-sdk/golang/internal/swap"
 )
 
 type SwapService service
 
-// ApproveAllowance returns the allowance the 1inch router has to spend a token on behalf of a wallet
-func (s *SwapService) ApproveAllowance(ctx context.Context, params models.ApproveAllowanceParams) (*models.AllowanceResponse, *http.Response, error) {
+// GetApproveAllowance returns the allowance the 1inch router has to spend a token on behalf of a wallet
+func (s *SwapService) GetApproveAllowance(ctx context.Context, params models.ApproveAllowanceParams) (*models.AllowanceResponse, *http.Response, error) {
 	u := fmt.Sprintf("/swap/v5.2/%d/approve/allowance", params.ChainId)
 
 	err := params.Validate()
@@ -39,8 +38,8 @@ func (s *SwapService) ApproveAllowance(ctx context.Context, params models.Approv
 	return &allowanceResponse, res, nil
 }
 
-// ApproveSpender returns the address of the 1inch router contract
-func (s *SwapService) ApproveSpender(ctx context.Context, params models.ApproveSpenderParams) (*models.SpenderResponse, *http.Response, error) {
+// GetApproveSpender returns the address of the 1inch router contract
+func (s *SwapService) GetApproveSpender(ctx context.Context, params models.ApproveSpenderParams) (*models.SpenderResponse, *http.Response, error) {
 	u := fmt.Sprintf("/swap/v5.2/%d/approve/spender", params.ChainId)
 
 	err := params.Validate()
@@ -62,8 +61,8 @@ func (s *SwapService) ApproveSpender(ctx context.Context, params models.ApproveS
 	return &spender, res, nil
 }
 
-// ApproveTransaction returns the transaction data for approving the 1inch router to spend a token on behalf of a wallet
-func (s *SwapService) ApproveTransaction(ctx context.Context, params models.ApproveTransactionParams) (*models.ApproveCallDataResponse, *http.Response, error) {
+// GetApproveTransaction returns the transaction data for approving the 1inch router to spend a token on behalf of a wallet
+func (s *SwapService) GetApproveTransaction(ctx context.Context, params models.ApproveTransactionParams) (*models.ApproveCallDataResponse, *http.Response, error) {
 	u := fmt.Sprintf("/swap/v5.2/%d/approve/transaction", params.ChainId)
 
 	err := params.Validate()
@@ -147,8 +146,8 @@ func (s *SwapService) GetQuote(ctx context.Context, params models.GetQuoteParams
 	return &quote, res, nil
 }
 
-// GetSwapData returns a swap quote with transaction data that can be used to execute a swap through the Aggregation Protocol
-func (s *SwapService) GetSwapData(ctx context.Context, params models.GetSwapDataParams) (*models.SwapResponse, *http.Response, error) {
+// GetSwap returns a swap quote with transaction data that can be used to execute a swap through the Aggregation Protocol
+func (s *SwapService) GetSwap(ctx context.Context, params models.GetSwapParams) (*models.SwapResponse, *http.Response, error) {
 	u := fmt.Sprintf("/swap/v5.2/%d/swap", params.ChainId)
 
 	err := params.Validate()
@@ -176,14 +175,6 @@ func (s *SwapService) GetSwapData(ctx context.Context, params models.GetSwapData
 	if err != nil {
 		return nil, nil, err
 	}
-
-	if !params.SkipWarnings {
-		err = swap.ConfirmSwapDataWithUser(&swapResponse, params.Amount, params.Slippage)
-		if err != nil {
-			return nil, nil, err
-		}
-	}
-
 	return &swapResponse, res, nil
 }
 

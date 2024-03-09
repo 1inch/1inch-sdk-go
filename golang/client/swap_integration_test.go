@@ -47,7 +47,7 @@ func TestApproveAllowanceIntegration(t *testing.T) {
 				helpers.Sleep()
 			})
 
-			allowance, resp, err := c.Swap.ApproveAllowance(context.Background(), tc.params)
+			allowance, resp, err := c.SwapApi.GetApproveAllowance(context.Background(), tc.params)
 			require.NoError(t, err)
 			assert.Equal(t, 200, resp.StatusCode)
 			assert.Equal(t, tc.expectedOutput.Allowance, allowance.Allowance)
@@ -79,7 +79,7 @@ func TestApproveSpenderIntegration(t *testing.T) {
 	for _, tc := range testcases {
 		t.Run(fmt.Sprintf("%v", tc.description), func(t *testing.T) {
 
-			spender, resp, err := c.Swap.ApproveSpender(context.Background(), tc.params)
+			spender, resp, err := c.SwapApi.GetApproveSpender(context.Background(), tc.params)
 			require.NoError(t, err)
 			assert.Equal(t, 200, resp.StatusCode)
 			assert.Equal(t, tc.expectedOutput.Address, spender.Address)
@@ -117,7 +117,7 @@ func TestApproveTransactionIntegration(t *testing.T) {
 	for _, tc := range testcases {
 		t.Run(fmt.Sprintf("%v", tc.description), func(t *testing.T) {
 
-			transaction, resp, err := c.Swap.ApproveTransaction(context.Background(), tc.params)
+			transaction, resp, err := c.SwapApi.GetApproveTransaction(context.Background(), tc.params)
 			require.NoError(t, err)
 			assert.Equal(t, 200, resp.StatusCode)
 			assert.Equal(t, tc.expectedOutput.To, transaction.To)
@@ -152,7 +152,7 @@ func TestGetLiquiditySourcesIntegration(t *testing.T) {
 	for _, tc := range testcases {
 		t.Run(fmt.Sprintf("%v", tc.description), func(t *testing.T) {
 
-			liquiditySources, resp, err := c.Swap.GetLiquiditySources(context.Background(), tc.params)
+			liquiditySources, resp, err := c.SwapApi.GetLiquiditySources(context.Background(), tc.params)
 			require.NoError(t, err)
 			assert.Equal(t, 200, resp.StatusCode)
 
@@ -197,7 +197,7 @@ func TestGetTokensIntegration(t *testing.T) {
 	for _, tc := range testcases {
 		t.Run(fmt.Sprintf("%v", tc.description), func(t *testing.T) {
 
-			tokens, resp, err := c.Swap.GetTokens(context.Background(), tc.params)
+			tokens, resp, err := c.SwapApi.GetTokens(context.Background(), tc.params)
 			require.NoError(t, err)
 			assert.Equal(t, 200, resp.StatusCode)
 

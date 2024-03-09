@@ -2,6 +2,7 @@ package main
 
 import (
 	"context"
+	"encoding/json"
 	"fmt"
 	"log"
 	"os"
@@ -11,6 +12,7 @@ import (
 	"github.com/1inch/1inch-sdk/golang/helpers/consts/amounts"
 	"github.com/1inch/1inch-sdk/golang/helpers/consts/chains"
 	"github.com/1inch/1inch-sdk/golang/helpers/consts/tokens"
+	"github.com/1inch/1inch-sdk/golang/helpers/consts/web3providers"
 )
 
 func main() {
@@ -21,7 +23,7 @@ func main() {
 		Web3HttpProviders: []client.Web3ProviderConfig{
 			{
 				ChainId: chains.Polygon,
-				Url:     os.Getenv("WEB_3_HTTP_PROVIDER_URL_WITH_KEY_POLYGON"),
+				Url:     web3providers.Polygon,
 			},
 		},
 	}
@@ -33,8 +35,9 @@ func main() {
 	}
 
 	// Build the config for the swap request
-	swapParams := models.GetSwapDataParams{
-		ChainId: chains.Polygon,
+	swapParams := models.GetSwapParams{
+		ChainId:      chains.Polygon,
+		SkipWarnings: false,
 		AggregationControllerGetSwapParams: models.AggregationControllerGetSwapParams{
 			Src:             tokens.PolygonFrax,
 			Dst:             tokens.PolygonWeth,
@@ -45,11 +48,15 @@ func main() {
 		},
 	}
 
-	swapData, _, err := c.Swap.GetSwapData(context.Background(), swapParams)
+	swapData, _, err := c.SwapApi.GetSwap(context.Background(), swapParams)
 	if err != nil {
 		log.Fatalf("Failed to swap tokens: %v", err)
 	}
 
-	fmt.Printf("\nContract to send transaction to: %v\n", swapData.Tx.To)
-	fmt.Printf("Transaction data: %v\n", swapData.Tx.Data)
+	swapDataRawIndented, err := json.MarshalIndent(swapData, "", "  ")
+	if err != nil {
+		log.Fatalf("Failed to marshal swap data: %v", err)
+	}
+
+	fmt.Printf("%s\n", string(swapDataRawIndented))
 }

@@ -60,7 +60,7 @@ func TestApproveAllowance(t *testing.T) {
 				mux.HandleFunc(endpoint, defaultResponse)
 			}
 
-			allowanceResponse, _, err := c.Swap.ApproveAllowance(context.Background(), tc.params)
+			allowanceResponse, _, err := c.SwapApi.GetApproveAllowance(context.Background(), tc.params)
 			if tc.expectedErrorDescription != "" {
 				if err == nil {
 					assert.FailNow(t, "Expected error message, but error was nil")
@@ -122,7 +122,7 @@ func TestApproveTransaction(t *testing.T) {
 				mux.HandleFunc(endpoint, defaultResponse)
 			}
 
-			approveTransactionResponse, _, err := c.Swap.ApproveTransaction(context.Background(), tc.params)
+			approveTransactionResponse, _, err := c.SwapApi.GetApproveTransaction(context.Background(), tc.params)
 			if tc.expectedErrorDescription != "" {
 				if err == nil {
 					assert.FailNow(t, "Expected error message, but error was nil")
@@ -185,7 +185,7 @@ func TestGetQuote(t *testing.T) {
 				mux.HandleFunc(endpoint, defaultResponse)
 			}
 
-			_, _, err = c.Swap.GetQuote(context.Background(), tc.params)
+			_, _, err = c.SwapApi.GetQuote(context.Background(), tc.params)
 			if tc.expectedErrorDescription != "" {
 				if err == nil {
 					assert.FailNow(t, "Expected error message, but error was nil")
@@ -212,7 +212,7 @@ func TestGetSwap(t *testing.T) {
 	testcases := []struct {
 		description              string
 		handlerFunc              func(w http.ResponseWriter, r *http.Request)
-		params                   models.GetSwapDataParams
+		params                   models.GetSwapParams
 		expectedOutput           string
 		expectedErrorDescription string
 	}{
@@ -224,7 +224,7 @@ func TestGetSwap(t *testing.T) {
 				assert.Equal(t, addresses.Vitalik, r.URL.Query().Get("from"))
 				assert.Equal(t, amounts.Ten18, r.URL.Query().Get("amount"))
 			},
-			params: models.GetSwapDataParams{
+			params: models.GetSwapParams{
 				AggregationControllerGetSwapParams: models.AggregationControllerGetSwapParams{
 					Src:      tokens.EthereumUsdc,
 					Dst:      tokens.EthereumWeth,
@@ -251,7 +251,7 @@ func TestGetSwap(t *testing.T) {
 				mux.HandleFunc(endpoint, defaultResponse)
 			}
 
-			_, _, err = c.Swap.GetSwapData(context.Background(), tc.params)
+			_, _, err = c.SwapApi.GetSwap(context.Background(), tc.params)
 			if tc.expectedErrorDescription != "" {
 				if err == nil {
 					assert.FailNow(t, "Expected error message, but error was nil")

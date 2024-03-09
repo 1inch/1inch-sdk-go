@@ -45,7 +45,7 @@ func main() {
 	}
 
 	// Execute orders request
-	createOrderResponse, _, err := c.Orderbook.CreateOrder(context.Background(), createOrderParams)
+	createOrderResponse, _, err := c.OrderbookApi.CreateOrder(context.Background(), createOrderParams)
 	if err != nil {
 		log.Fatalf("Failed to create order: %v", err)
 	}

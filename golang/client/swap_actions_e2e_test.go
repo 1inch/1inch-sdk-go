@@ -358,7 +358,7 @@ func TestSwapTokensTenderlyE2E(t *testing.T) {
 			}
 
 			// Swap tokens
-			err = c.Actions.SwapTokens(ctx, tc.swapParams)
+			err = c.Actions.swapTokens(ctx, tc.swapParams)
 			if err != nil {
 				log.Fatalf("Failed to swap tokens: %v", err)
 			}

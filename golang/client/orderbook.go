@@ -101,7 +101,7 @@ func (s *OrderbookService) CreateOrder(ctx context.Context, params models.Create
 		}
 		if allowance.Cmp(makingAmountBig) <= 0 {
 
-			if params.FailIfApprovalIsNeeded {
+			if !params.EnableOnchainApprovalsIfNeeded {
 				return nil, nil, models.ErrorFailWhenApprovalIsNeeded
 			}
 

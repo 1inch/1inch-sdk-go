@@ -141,7 +141,7 @@ func TestCreateOrderE2E(t *testing.T) {
 					TenderlyApiKey: tenderlyApiKey,
 				})
 			}
-			_, _, err = c.Orderbook.CreateOrder(ctx, tc.createOrderParams)
+			_, _, err = c.OrderbookApi.CreateOrder(ctx, tc.createOrderParams)
 			require.NoError(t, err)
 		})
 	}
