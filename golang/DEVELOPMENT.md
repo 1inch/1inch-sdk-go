@@ -1,3 +1,5 @@
+This SDK will be open for contributions from the community. Contribution guidelines will be added soon!
+
 ### Type generation
 
 Type generation is done using the `generate_types.sh` script. To add a new swagger file or update an existing one, place the swagger file in `swagger-static` and run the script. It will generate the types file and place it in the appropriately-named sub-folder inside the `client` directory
