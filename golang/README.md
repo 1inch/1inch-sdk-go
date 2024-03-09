@@ -139,7 +139,7 @@ Each Service uses various types and functions to do its job that are kept separa
 
 ## Issues/Suggestions
 
-For any problems you have with the SDK or suggestions for improvements, please create an 
+For any problems you have with the SDK or suggestions for improvements, please create an [issue](https://github.com/1inch/1inch-sdk/issues) here on GitHub
 
 ## Development
 
