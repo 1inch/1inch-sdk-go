@@ -37,7 +37,7 @@ go mod init hello1inch
 
 ###### Add SDK Dependencies
 ```
-go get github.com/1inch/1inch-sdk/golang
+go get github.com/1inch/1inch-sdk/golang/client
 ```
 
 ###### Write Code
