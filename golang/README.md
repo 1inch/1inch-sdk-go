@@ -2,33 +2,26 @@
 
 The SDK requires a minimum version of Go `1.21`.
 
-Check out the [release notes]() for information about the latest bug fixes, updates, and features added to the SDK.
+Check out the [release notes](https://github.com/1inch/1inch-sdk//blob/main/CHANGELOG.md) for information about the latest bug fixes, updates, and features added to the SDK.
+
+This is a Go SDK to simplify interactions with the 1inch Dev Portal APIs. When complete, it will support all endpoints tracked by our official docs [here](https://portal.1inch.dev/documentation/authentication). See the [Current Functionality](#current-functionality) section for an up-to-date view of the SDK functionality.
+
+Beyond mirroring the Developer Portal APIs, this SDK also supports token approvals, permit signature generation, and the execution of 1inch swaps onchain for EOA wallets.
 
 Jump To:
 * [Getting Started](#getting-started)
+* [Current Functionality](#current-functionality)
 
-## Overview
 
-This is a Go SDK to simplify interactions with the 1inch Dev Portal APIs. When complete, it will support all endpoints tracked by our official docs [here](https://portal.1inch.dev/documentation/authentication). See the `Current Functionality` section for an up-to-date view of the SDK functionality.
-
-Beyond mirroring the Developer Portal APIs, this SDK also supports token approvals, permit signature generation, and the execution of 1inch swaps onchain for EOA wallets. 
-
-## Current Functionality
-
-**Supported APIs**
+## Supported APIs
 
 *Swap API*
-- All endpoints supported
-- Ethereum, Polygon, and Arbitrum tested (but should support all 1inch-supported chains)
-- Swaps can be executed onchain from within the SDK using `Permit1` when supported and `Approve` in all other cases
+- [Developer Portal Docs](https://portal.1inch.dev/documentation/swap)
+- [SDK Example](https://github.com/1inch/1inch-sdk/blob/main/golang/client/examples/swap/get_swap/main.go)
 
 *Orderbook API*
-- Most endpoints supported
-- Posting orders to Ethereum and Polygon is working. Other chains likely will not work at the moment
-
-## Versioning
-
-This library is currently in the developer preview phase (versions 0.x.x). There will be significant changes to the design of this library leading up to a 1.0.0 release. You can expect the API calls, library structure, etc. to break between each release. Once the library version reaches 1.0.0 and beyond, it will follow traditional semver conventions. 
+- [Developer Portal Docs](https://portal.1inch.dev/documentation/orderbook)
+- [SDK Example](https://github.com/1inch/1inch-sdk/blob/main/golang/client/examples/orderbook/get_orders/main.go)
 
 ## Getting started
 
@@ -129,18 +122,7 @@ More example programs using the SDK can be found in the [examples directory](htt
 
 If you have questions, want to discuss the tool, or have found a bug, please open an [issue](https://github.com/1inch/1inch-sdk/issues) here on GitHub
 
-## Project structure
-
-This SDK is powered by a [client struct](https://github.com/1inch/1inch-sdk/blob/main/golang/client/client.go) that contains instances of all Services used to talk to the 1inch APIs
-
-Each Service maps 1-to-1 with the underlying Dev Portal REST API. See [SwapService](https://github.com/1inch/1inch-sdk/blob/main/golang/client/swap.go) as an example. Under each function, you will find the matching REST API path)
-
-Each Service uses various types and functions to do its job that are kept separate from the main service file. These can be found in the accompanying folder within the client directory (see the [swap](https://github.com/1inch/1inch-sdk/tree/main/golang/client/swap) package) 
-
-## Issues/Suggestions
-
-For any problems you have with the SDK or suggestions for improvements, please create an [issue](https://github.com/1inch/1inch-sdk/issues) here on GitHub
 
 ## Development
 
-Please see our [SDK Developer Guide]() if you would like to contribute 
+Please see our [SDK Developer Guide](https://github.com/1inch/1inch-sdk/blob/main/golang/DEVELOPMENT.md) if you would like to contribute 
