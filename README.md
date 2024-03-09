@@ -1,6 +1,6 @@
 # Developer Portal SDKs
 
-This repo will host a collection of open source SDKs used to access the Developer Portal APIs. 
+This repository will host a collection of open source SDKs used to access the Developer Portal APIs. 
 
 ## Overview
 

@@ -1,4 +1,4 @@
-package orderbook
+package models
 
 import "time"
 

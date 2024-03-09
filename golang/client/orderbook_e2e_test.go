@@ -5,17 +5,17 @@ import (
 	"os"
 	"testing"
 
-	"github.com/stretchr/testify/require"
-
-	"github.com/1inch/1inch-sdk/golang/client/onchain"
-	"github.com/1inch/1inch-sdk/golang/client/orderbook"
-	"github.com/1inch/1inch-sdk/golang/client/tenderly"
+	"github.com/1inch/1inch-sdk/golang/client/models"
 	"github.com/1inch/1inch-sdk/golang/helpers"
 	"github.com/1inch/1inch-sdk/golang/helpers/consts/addresses"
 	"github.com/1inch/1inch-sdk/golang/helpers/consts/amounts"
 	"github.com/1inch/1inch-sdk/golang/helpers/consts/chains"
 	"github.com/1inch/1inch-sdk/golang/helpers/consts/tokens"
 	"github.com/1inch/1inch-sdk/golang/helpers/consts/web3providers"
+	"github.com/1inch/1inch-sdk/golang/internal/onchain"
+	"github.com/1inch/1inch-sdk/golang/internal/tenderly"
+
+	"github.com/stretchr/testify/require"
 )
 
 func TestCreateOrderE2E(t *testing.T) {
@@ -23,7 +23,7 @@ func TestCreateOrderE2E(t *testing.T) {
 	testcases := []struct {
 		description       string
 		config            Config
-		createOrderParams orderbook.CreateOrderParams
+		createOrderParams models.CreateOrderParams
 		expectedOutput    string
 	}{
 		{
@@ -37,7 +37,7 @@ func TestCreateOrderE2E(t *testing.T) {
 					},
 				},
 			},
-			createOrderParams: orderbook.CreateOrderParams{
+			createOrderParams: models.CreateOrderParams{
 				ChainId:      chains.Arbitrum,
 				PrivateKey:   os.Getenv("WALLET_KEY_EMPTY"),
 				Maker:        os.Getenv("WALLET_ADDRESS_EMPTY"),
@@ -60,7 +60,7 @@ func TestCreateOrderE2E(t *testing.T) {
 					},
 				},
 			},
-			createOrderParams: orderbook.CreateOrderParams{
+			createOrderParams: models.CreateOrderParams{
 				ChainId:      chains.Polygon,
 				PrivateKey:   os.Getenv("WALLET_KEY_EMPTY"),
 				Maker:        os.Getenv("WALLET_ADDRESS_EMPTY"),
@@ -83,7 +83,7 @@ func TestCreateOrderE2E(t *testing.T) {
 					},
 				},
 			},
-			createOrderParams: orderbook.CreateOrderParams{
+			createOrderParams: models.CreateOrderParams{
 				ChainId:      chains.Ethereum,
 				PrivateKey:   os.Getenv("WALLET_KEY_EMPTY"),
 				Maker:        os.Getenv("WALLET_ADDRESS_EMPTY"),
@@ -107,7 +107,7 @@ func TestCreateOrderE2E(t *testing.T) {
 					},
 				},
 			},
-			createOrderParams: orderbook.CreateOrderParams{
+			createOrderParams: models.CreateOrderParams{
 				ApprovalType: onchain.PermitAlways,
 				ChainId:      chains.Bsc,
 				PrivateKey:   os.Getenv("WALLET_KEY_EMPTY"),
@@ -141,7 +141,7 @@ func TestCreateOrderE2E(t *testing.T) {
 					TenderlyApiKey: tenderlyApiKey,
 				})
 			}
-			_, _, err = c.Orderbook.CreateOrder(ctx, tc.createOrderParams)
+			_, _, err = c.OrderbookApi.CreateOrder(ctx, tc.createOrderParams)
 			require.NoError(t, err)
 		})
 	}

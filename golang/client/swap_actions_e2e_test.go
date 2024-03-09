@@ -8,11 +8,11 @@ import (
 	"strings"
 	"testing"
 
+	"github.com/1inch/1inch-sdk/golang/client/models"
+	"github.com/1inch/1inch-sdk/golang/internal/onchain"
+	"github.com/1inch/1inch-sdk/golang/internal/tenderly"
 	"github.com/stretchr/testify/require"
 
-	"github.com/1inch/1inch-sdk/golang/client/onchain"
-	"github.com/1inch/1inch-sdk/golang/client/swap"
-	"github.com/1inch/1inch-sdk/golang/client/tenderly"
 	"github.com/1inch/1inch-sdk/golang/helpers"
 	"github.com/1inch/1inch-sdk/golang/helpers/consts/amounts"
 	"github.com/1inch/1inch-sdk/golang/helpers/consts/chains"
@@ -28,7 +28,7 @@ func TestSwapTokensTenderlyE2E(t *testing.T) {
 		description         string
 		tenderlyDescription string
 		config              Config
-		swapParams          swap.SwapTokensParams
+		swapParams          models.SwapTokensParams
 		stateOverrides      map[string]tenderly.StateObject
 		approvalType        onchain.ApprovalType
 		expectedOutput      string
@@ -45,8 +45,8 @@ func TestSwapTokensTenderlyE2E(t *testing.T) {
 					},
 				},
 			},
-			swapParams: swap.SwapTokensParams{
-				AggregationControllerGetSwapParams: swap.AggregationControllerGetSwapParams{
+			swapParams: models.SwapTokensParams{
+				AggregationControllerGetSwapParams: models.AggregationControllerGetSwapParams{
 					Src:      tokens.PolygonDai,
 					Dst:      tokens.PolygonUsdc,
 					Amount:   "10000000000000000",
@@ -82,8 +82,8 @@ func TestSwapTokensTenderlyE2E(t *testing.T) {
 					},
 				},
 			},
-			swapParams: swap.SwapTokensParams{
-				AggregationControllerGetSwapParams: swap.AggregationControllerGetSwapParams{
+			swapParams: models.SwapTokensParams{
+				AggregationControllerGetSwapParams: models.AggregationControllerGetSwapParams{
 					Src:      tokens.PolygonUsdc,
 					Dst:      tokens.PolygonDai,
 					Amount:   amounts.Ten6,
@@ -119,8 +119,8 @@ func TestSwapTokensTenderlyE2E(t *testing.T) {
 					},
 				},
 			},
-			swapParams: swap.SwapTokensParams{
-				AggregationControllerGetSwapParams: swap.AggregationControllerGetSwapParams{
+			swapParams: models.SwapTokensParams{
+				AggregationControllerGetSwapParams: models.AggregationControllerGetSwapParams{
 					Src:      tokens.PolygonFrax,
 					Dst:      tokens.PolygonUsdc,
 					Amount:   "10000000000000000",
@@ -156,8 +156,8 @@ func TestSwapTokensTenderlyE2E(t *testing.T) {
 					},
 				},
 			},
-			swapParams: swap.SwapTokensParams{
-				AggregationControllerGetSwapParams: swap.AggregationControllerGetSwapParams{
+			swapParams: models.SwapTokensParams{
+				AggregationControllerGetSwapParams: models.AggregationControllerGetSwapParams{
 					Src:      tokens.PolygonFrax,
 					Dst:      tokens.PolygonUsdc,
 					Amount:   "10000000000000000",
@@ -193,8 +193,8 @@ func TestSwapTokensTenderlyE2E(t *testing.T) {
 					},
 				},
 			},
-			swapParams: swap.SwapTokensParams{
-				AggregationControllerGetSwapParams: swap.AggregationControllerGetSwapParams{
+			swapParams: models.SwapTokensParams{
+				AggregationControllerGetSwapParams: models.AggregationControllerGetSwapParams{
 					Src:      tokens.ArbitrumUsdc,
 					Dst:      tokens.ArbitrumDai,
 					Amount:   "10000",
@@ -230,8 +230,8 @@ func TestSwapTokensTenderlyE2E(t *testing.T) {
 					},
 				},
 			},
-			swapParams: swap.SwapTokensParams{
-				AggregationControllerGetSwapParams: swap.AggregationControllerGetSwapParams{
+			swapParams: models.SwapTokensParams{
+				AggregationControllerGetSwapParams: models.AggregationControllerGetSwapParams{
 					Src:      tokens.NativeToken,
 					Dst:      tokens.ArbitrumUsdc,
 					Amount:   "3974301376798",
@@ -267,8 +267,8 @@ func TestSwapTokensTenderlyE2E(t *testing.T) {
 					},
 				},
 			},
-			swapParams: swap.SwapTokensParams{
-				AggregationControllerGetSwapParams: swap.AggregationControllerGetSwapParams{
+			swapParams: models.SwapTokensParams{
+				AggregationControllerGetSwapParams: models.AggregationControllerGetSwapParams{
 					Src:      tokens.Ethereum1inch,
 					Dst:      tokens.NativeToken,
 					Amount:   "20000000000000000",
@@ -304,8 +304,8 @@ func TestSwapTokensTenderlyE2E(t *testing.T) {
 					},
 				},
 			},
-			swapParams: swap.SwapTokensParams{
-				AggregationControllerGetSwapParams: swap.AggregationControllerGetSwapParams{
+			swapParams: models.SwapTokensParams{
+				AggregationControllerGetSwapParams: models.AggregationControllerGetSwapParams{
 					Src:      tokens.EthereumUsdc,
 					Dst:      tokens.NativeToken,
 					Amount:   amounts.Ten6,
@@ -358,7 +358,7 @@ func TestSwapTokensTenderlyE2E(t *testing.T) {
 			}
 
 			// Swap tokens
-			err = c.Actions.SwapTokens(ctx, tc.swapParams)
+			err = c.Actions.swapTokens(ctx, tc.swapParams)
 			if err != nil {
 				log.Fatalf("Failed to swap tokens: %v", err)
 			}

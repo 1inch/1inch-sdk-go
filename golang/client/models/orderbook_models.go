@@ -1,4 +1,4 @@
-package orderbook
+package models
 
 type Order struct {
 	OrderHash string    `json:"orderHash"`

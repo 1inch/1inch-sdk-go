@@ -1,10 +1,10 @@
-package swap
+package models
 
 import (
 	"errors"
 
-	"github.com/1inch/1inch-sdk/golang/client/onchain"
-	"github.com/1inch/1inch-sdk/golang/client/validate"
+	"github.com/1inch/1inch-sdk/golang/internal/onchain"
+	"github.com/1inch/1inch-sdk/golang/internal/validate"
 )
 
 type SwapTokensParams struct {
@@ -114,13 +114,13 @@ func (params *GetQuoteParams) Validate() error {
 	return validate.ConsolidateValidationErorrs(validationErrors)
 }
 
-type GetSwapDataParams struct {
+type GetSwapParams struct {
 	ChainId      int
 	SkipWarnings bool
 	AggregationControllerGetSwapParams
 }
 
-func (params *GetSwapDataParams) Validate() error {
+func (params *GetSwapParams) Validate() error {
 	var validationErrors []error
 	validationErrors = validate.Parameter(params.ChainId, "chainId", validate.CheckChainIdRequired, validationErrors)
 	validationErrors = validate.Parameter(params.Src, "src", validate.CheckEthereumAddressRequired, validationErrors)

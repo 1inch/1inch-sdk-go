@@ -1,11 +1,11 @@
-package swap
+package models
 
 import (
 	"testing"
 
+	"github.com/1inch/1inch-sdk/golang/internal/validate"
 	"github.com/stretchr/testify/require"
 
-	"github.com/1inch/1inch-sdk/golang/client/validate"
 	"github.com/1inch/1inch-sdk/golang/helpers/consts/chains"
 	"github.com/1inch/1inch-sdk/golang/helpers/consts/tokens"
 )
@@ -275,12 +275,12 @@ func TestGetQuoteParams_Validate(t *testing.T) {
 func TestGetSwapDataParams_Validate(t *testing.T) {
 	testCases := []struct {
 		description  string
-		params       GetSwapDataParams
+		params       GetSwapParams
 		expectErrors []string
 	}{
 		{
 			description: "Valid parameters",
-			params: GetSwapDataParams{
+			params: GetSwapParams{
 				ChainId: chains.Ethereum,
 				AggregationControllerGetSwapParams: AggregationControllerGetSwapParams{
 					Src:      "0x1234567890abcdef1234567890abcdef12345678",
@@ -293,7 +293,7 @@ func TestGetSwapDataParams_Validate(t *testing.T) {
 		},
 		{
 			description: "Missing required parameters",
-			params:      GetSwapDataParams{},
+			params:      GetSwapParams{},
 			expectErrors: []string{
 				"'chainId' is required",
 				"'src' is required",
@@ -305,7 +305,7 @@ func TestGetSwapDataParams_Validate(t *testing.T) {
 		},
 		{
 			description: "Error - src and dst tokens are identical",
-			params: GetSwapDataParams{
+			params: GetSwapParams{
 				ChainId: chains.Ethereum,
 				AggregationControllerGetSwapParams: AggregationControllerGetSwapParams{
 					Src:      tokens.EthereumUsdc,

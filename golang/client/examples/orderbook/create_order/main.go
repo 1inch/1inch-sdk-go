@@ -6,7 +6,7 @@ import (
 	"os"
 
 	"github.com/1inch/1inch-sdk/golang/client"
-	"github.com/1inch/1inch-sdk/golang/client/orderbook"
+	"github.com/1inch/1inch-sdk/golang/client/models"
 	"github.com/1inch/1inch-sdk/golang/helpers"
 	"github.com/1inch/1inch-sdk/golang/helpers/consts/addresses"
 	"github.com/1inch/1inch-sdk/golang/helpers/consts/chains"
@@ -33,7 +33,7 @@ func main() {
 	}
 
 	// Build the config for the orders request
-	createOrderParams := orderbook.CreateOrderParams{
+	createOrderParams := models.CreateOrderParams{
 		ChainId:      chains.Polygon,
 		PrivateKey:   os.Getenv("WALLET_KEY"),
 		Maker:        os.Getenv("WALLET_ADDRESS"),
@@ -45,7 +45,7 @@ func main() {
 	}
 
 	// Execute orders request
-	createOrderResponse, _, err := c.Orderbook.CreateOrder(context.Background(), createOrderParams)
+	createOrderResponse, _, err := c.OrderbookApi.CreateOrder(context.Background(), createOrderParams)
 	if err != nil {
 		log.Fatalf("Failed to create order: %v", err)
 	}

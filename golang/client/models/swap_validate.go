@@ -1,6 +1,8 @@
-package swap
+package models
 
-import "errors"
+import (
+	"errors"
+)
 
 func (params *AggregationControllerGetSwapParams) Validate() error {
 	if params.Src == "" {

@@ -7,6 +7,7 @@ import (
 	"testing"
 	"time"
 
+	"github.com/1inch/1inch-sdk/golang/client/models"
 	"github.com/ethereum/go-ethereum/ethclient"
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
@@ -129,16 +130,16 @@ func TestCreateLimitOrder(t *testing.T) {
 
 	tests := []struct {
 		name          string
-		orderRequest  CreateOrderParams
+		orderRequest  models.CreateOrderParams
 		interactions  []string // TODO Revisit this to make it more encapsulated
 		mockBigInt    func(string) (*big.Int, error)
-		expectedOrder *Order
+		expectedOrder *models.Order
 		expectError   bool
 		expectedError string
 	}{
 		{
 			name: "happy path",
-			orderRequest: CreateOrderParams{
+			orderRequest: models.CreateOrderParams{
 				ChainId:      chains.Polygon,
 				PrivateKey:   os.Getenv("WALLET_KEY"),
 				MakerAsset:   "0x8f3Cf7ad23Cd3CaDbD9735AFf958023239c6A063",
@@ -149,10 +150,10 @@ func TestCreateLimitOrder(t *testing.T) {
 				Taker:        "0x0000000000000000000000000000000000000000",
 			},
 			interactions: []string{"0x", "0x", "0x", "0x", "0xbf15fcd8000000000000000000000000a5eb255ef45dfb48b5d133d08833def69871691d000000000000000000000000000000000000000000000000000000000000004000000000000000000000000000000000000000000000000000000000000000242cc2878d0071150dff0000000000000050c5df26654b5efbdd0c54a062dfa6012933defe00000000000000000000000000000000000000000000000000000000", "0x", "0x", "0x"},
-			expectedOrder: &Order{
+			expectedOrder: &models.Order{
 				OrderHash: "0xdc9344cfa6d3b4da5a2ad3283e02826d3f569b4472443390d3e1cfe86cacd13f",
 				Signature: "0x317ed3e021851542deeafb4897ef091b010317772b7299477121d0f46cdd32cf1403429b13d2337b459c7a982ac71144ceaad88dd08d5b7c7b8abbe1618070ab1b",
-				Data: OrderData{
+				Data: models.OrderData{
 					MakerAsset:    "0x8f3Cf7ad23Cd3CaDbD9735AFf958023239c6A063",
 					TakerAsset:    "0x7ceb23fd6bc0add59e62ac25578270cff1b9f619",
 					MakingAmount:  "1000000",
@@ -169,7 +170,7 @@ func TestCreateLimitOrder(t *testing.T) {
 		},
 		{
 			name: "empty maker asset",
-			orderRequest: CreateOrderParams{
+			orderRequest: models.CreateOrderParams{
 				ChainId:      chains.Polygon,
 				PrivateKey:   os.Getenv("WALLET_KEY"),
 				MakerAsset:   "",
@@ -185,7 +186,7 @@ func TestCreateLimitOrder(t *testing.T) {
 		},
 		{
 			name: "empty taker asset",
-			orderRequest: CreateOrderParams{
+			orderRequest: models.CreateOrderParams{
 				ChainId:      chains.Polygon,
 				PrivateKey:   os.Getenv("WALLET_KEY"),
 				MakerAsset:   "0x8f3Cf7ad23Cd3CaDbD9735AFf958023239c6A063",
@@ -201,7 +202,7 @@ func TestCreateLimitOrder(t *testing.T) {
 		},
 		{
 			name: "invalid private key",
-			orderRequest: CreateOrderParams{
+			orderRequest: models.CreateOrderParams{
 				ChainId:      chains.Polygon,
 				PrivateKey:   "invalid_private_key", // non-hex or short length key
 				MakerAsset:   "0x8f3Cf7ad23Cd3CaDbD9735AFf958023239c6A063",
@@ -247,8 +248,8 @@ func TestCreateLimitOrder(t *testing.T) {
 
 func TestConfirmTradeWithUser(t *testing.T) {
 
-	order := &Order{
-		Data: OrderData{
+	order := &models.Order{
+		Data: models.OrderData{
 			MakerAsset:   tokens.EthereumUsdc,
 			TakerAsset:   tokens.EthereumDai,
 			MakingAmount: amounts.Ten6 + "1",

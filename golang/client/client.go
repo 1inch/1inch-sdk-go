@@ -68,9 +68,9 @@ type Client struct {
 	// A struct that will contain a reference to this client. Used to separate each API into a unique namespace to aid in method discovery
 	common service
 	// Isolated namespaces for each API
-	Actions   *ActionService
-	Swap      *SwapService
-	Orderbook *OrderbookService
+	Actions      *ActionService
+	SwapApi      *SwapService
+	OrderbookApi *OrderbookService
 }
 
 func (c *Client) GetEthClient(chainId int) (*ethclient.Client, error) {
@@ -113,8 +113,8 @@ func NewClient(config Config) (*Client, error) {
 	c.common.client = c
 
 	c.Actions = (*ActionService)(&c.common)
-	c.Swap = (*SwapService)(&c.common)
-	c.Orderbook = (*OrderbookService)(&c.common)
+	c.SwapApi = (*SwapService)(&c.common)
+	c.OrderbookApi = (*OrderbookService)(&c.common)
 
 	return c, nil
 }

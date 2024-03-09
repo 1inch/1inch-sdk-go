@@ -7,19 +7,20 @@ import (
 	"os"
 	"strings"
 
+	"github.com/1inch/1inch-sdk/golang/client/models"
 	"github.com/ethereum/go-ethereum/common"
 	"github.com/ethereum/go-ethereum/ethclient"
 
-	"github.com/1inch/1inch-sdk/golang/client/onchain"
 	"github.com/1inch/1inch-sdk/golang/helpers"
+	"github.com/1inch/1inch-sdk/golang/internal/onchain"
 )
 
-func ConfirmExecuteSwapWithUser(config *ExecuteSwapConfig) (bool, error) {
+func ConfirmExecuteSwapWithUser(config *models.ExecuteSwapConfig) (bool, error) {
 	stdOut := helpers.StdOutPrinter{}
 	return confirmExecuteSwapWithUser(config, os.Stdin, stdOut)
 }
 
-func confirmExecuteSwapWithUser(config *ExecuteSwapConfig, reader io.Reader, writer helpers.Printer) (bool, error) {
+func confirmExecuteSwapWithUser(config *models.ExecuteSwapConfig, reader io.Reader, writer helpers.Printer) (bool, error) {
 	var permitType string
 	if config.IsPermitSwap {
 		permitType = "Permit1"
@@ -48,12 +49,12 @@ func confirmExecuteSwapWithUser(config *ExecuteSwapConfig, reader io.Reader, wri
 	}
 }
 
-func ConfirmSwapDataWithUser(swapResponse *SwapResponse, fromAmount string, slippage float32) error {
+func ConfirmSwapDataWithUser(swapResponse *models.SwapResponse, fromAmount string, slippage float32) error {
 	stdOut := helpers.StdOutPrinter{}
 	return confirmSwapDataWithUser(swapResponse, fromAmount, slippage, stdOut)
 }
 
-func confirmSwapDataWithUser(swapResponse *SwapResponse, fromAmount string, slippage float32, writer helpers.Printer) error {
+func confirmSwapDataWithUser(swapResponse *models.SwapResponse, fromAmount string, slippage float32, writer helpers.Printer) error {
 	writer.Printf("Swap summary:\n")
 	writer.Printf("    %-30s %s %s\n", "Selling: ", helpers.SimplifyValue(fromAmount, int(swapResponse.FromToken.Decimals)), swapResponse.FromToken.Symbol)
 	writer.Printf("    %-30s %s %s\n", "Buying (estimation):", helpers.SimplifyValue(swapResponse.ToAmount, int(swapResponse.ToToken.Decimals)), swapResponse.ToToken.Symbol)

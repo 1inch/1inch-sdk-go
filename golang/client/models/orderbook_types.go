@@ -1,24 +1,24 @@
-package orderbook
+package models
 
 import (
-	"github.com/1inch/1inch-sdk/golang/client/onchain"
-	"github.com/1inch/1inch-sdk/golang/client/validate"
 	"github.com/1inch/1inch-sdk/golang/helpers/consts/tokens"
+	"github.com/1inch/1inch-sdk/golang/internal/onchain"
+	"github.com/1inch/1inch-sdk/golang/internal/validate"
 )
 
 type CreateOrderParams struct {
-	ApprovalType           onchain.ApprovalType
-	ChainId                int
-	PrivateKey             string
-	ExpireAfter            int64
-	Maker                  string
-	MakerAsset             string
-	TakerAsset             string
-	TakingAmount           string
-	MakingAmount           string
-	Taker                  string
-	SkipWarnings           bool
-	FailIfApprovalIsNeeded bool
+	ApprovalType                   onchain.ApprovalType
+	ChainId                        int
+	PrivateKey                     string
+	ExpireAfter                    int64
+	Maker                          string
+	MakerAsset                     string
+	TakerAsset                     string
+	TakingAmount                   string
+	MakingAmount                   string
+	Taker                          string
+	SkipWarnings                   bool
+	EnableOnchainApprovalsIfNeeded bool
 }
 
 func (params *CreateOrderParams) Validate() error {

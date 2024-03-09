@@ -6,9 +6,9 @@ import (
 	"os"
 	"testing"
 
+	"github.com/1inch/1inch-sdk/golang/client/models"
 	"github.com/stretchr/testify/require"
 
-	"github.com/1inch/1inch-sdk/golang/client/orderbook"
 	"github.com/1inch/1inch-sdk/golang/helpers"
 	"github.com/1inch/1inch-sdk/golang/helpers/consts/amounts"
 	"github.com/1inch/1inch-sdk/golang/helpers/consts/chains"
@@ -19,12 +19,12 @@ func TestCreateOrderIntegration(t *testing.T) {
 
 	testcases := []struct {
 		description   string
-		orderRequest  orderbook.CreateOrderParams
+		orderRequest  models.CreateOrderParams
 		expectedError string
 	}{
 		{
 			description: "Success",
-			orderRequest: orderbook.CreateOrderParams{
+			orderRequest: models.CreateOrderParams{
 				ChainId:      chains.Polygon,
 				PrivateKey:   os.Getenv("WALLET_KEY_EMPTY"),
 				Maker:        os.Getenv("WALLET_ADDRESS_EMPTY"),
@@ -38,19 +38,19 @@ func TestCreateOrderIntegration(t *testing.T) {
 		},
 		{
 			description: "Failure - No approval with error",
-			orderRequest: orderbook.CreateOrderParams{
-				ChainId:                chains.Polygon,
-				PrivateKey:             os.Getenv("WALLET_KEY_EMPTY"),
-				Maker:                  os.Getenv("WALLET_ADDRESS_EMPTY"),
-				MakerAsset:             tokens.PolygonDai,
-				TakerAsset:             tokens.PolygonWeth,
-				TakingAmount:           amounts.Ten6,
-				MakingAmount:           amounts.Ten18,
-				Taker:                  "0x0000000000000000000000000000000000000000",
-				SkipWarnings:           true,
-				FailIfApprovalIsNeeded: true,
+			orderRequest: models.CreateOrderParams{
+				ChainId:                        chains.Polygon,
+				PrivateKey:                     os.Getenv("WALLET_KEY_EMPTY"),
+				Maker:                          os.Getenv("WALLET_ADDRESS_EMPTY"),
+				MakerAsset:                     tokens.PolygonDai,
+				TakerAsset:                     tokens.PolygonWeth,
+				TakingAmount:                   amounts.Ten6,
+				MakingAmount:                   amounts.Ten18,
+				Taker:                          "0x0000000000000000000000000000000000000000",
+				SkipWarnings:                   true,
+				EnableOnchainApprovalsIfNeeded: false,
 			},
-			expectedError: orderbook.ErrorFailWhenApprovalIsNeeded.Error(),
+			expectedError: models.ErrorFailWhenApprovalIsNeeded.Error(),
 		},
 	}
 
@@ -72,7 +72,7 @@ func TestCreateOrderIntegration(t *testing.T) {
 				helpers.Sleep()
 			})
 
-			orderResponse, resp, err := c.Orderbook.CreateOrder(context.Background(), tc.orderRequest)
+			orderResponse, resp, err := c.OrderbookApi.CreateOrder(context.Background(), tc.orderRequest)
 			if tc.expectedError != "" {
 				require.Equal(t, err.Error(), tc.expectedError)
 			} else {
@@ -90,11 +90,11 @@ func TestGetAllOrdersIntegration(t *testing.T) {
 
 	testcases := []struct {
 		description string
-		params      orderbook.GetAllOrdersParams
+		params      models.GetAllOrdersParams
 	}{
 		{
 			description: "Get all orders",
-			params: orderbook.GetAllOrdersParams{
+			params: models.GetAllOrdersParams{
 				ChainId: chains.Ethereum,
 			},
 		},
@@ -110,7 +110,7 @@ func TestGetAllOrdersIntegration(t *testing.T) {
 				helpers.Sleep()
 			})
 
-			orders, resp, err := c.Orderbook.GetAllOrders(context.Background(), tc.params)
+			orders, resp, err := c.OrderbookApi.GetAllOrders(context.Background(), tc.params)
 			require.NoError(t, err)
 			require.Equal(t, 200, resp.StatusCode)
 
@@ -124,11 +124,11 @@ func TestGetCountIntegration(t *testing.T) {
 
 	testcases := []struct {
 		description string
-		params      orderbook.GetCountParams
+		params      models.GetCountParams
 	}{
 		{
 			description: "Get counts",
-			params: orderbook.GetCountParams{
+			params: models.GetCountParams{
 				ChainId: chains.Ethereum,
 			},
 		},
@@ -144,7 +144,7 @@ func TestGetCountIntegration(t *testing.T) {
 				helpers.Sleep()
 			})
 
-			countResponse, resp, err := c.Orderbook.GetCount(context.Background(), tc.params)
+			countResponse, resp, err := c.OrderbookApi.GetCount(context.Background(), tc.params)
 			require.NoError(t, err)
 			require.Equal(t, 200, resp.StatusCode)
 
@@ -158,13 +158,13 @@ func TestGetEventsIntegration(t *testing.T) {
 
 	testcases := []struct {
 		description string
-		params      orderbook.GetEventsParams
+		params      models.GetEventsParams
 	}{
 		{
 			description: "Get events",
-			params: orderbook.GetEventsParams{
+			params: models.GetEventsParams{
 				ChainId: chains.Ethereum,
-				LimitOrderV3SubscribedApiControllerGetEventsParams: orderbook.LimitOrderV3SubscribedApiControllerGetEventsParams{
+				LimitOrderV3SubscribedApiControllerGetEventsParams: models.LimitOrderV3SubscribedApiControllerGetEventsParams{
 					Limit: 1,
 				},
 			},
@@ -181,7 +181,7 @@ func TestGetEventsIntegration(t *testing.T) {
 				helpers.Sleep()
 			})
 
-			events, resp, err := c.Orderbook.GetEvents(context.Background(), tc.params)
+			events, resp, err := c.OrderbookApi.GetEvents(context.Background(), tc.params)
 			require.NoError(t, err)
 			require.Equal(t, 200, resp.StatusCode)
 

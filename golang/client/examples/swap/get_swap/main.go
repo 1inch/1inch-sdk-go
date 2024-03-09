@@ -2,15 +2,17 @@ package main
 
 import (
 	"context"
+	"encoding/json"
+	"fmt"
 	"log"
 	"os"
 
 	"github.com/1inch/1inch-sdk/golang/client"
-	"github.com/1inch/1inch-sdk/golang/client/onchain"
-	"github.com/1inch/1inch-sdk/golang/client/swap"
+	"github.com/1inch/1inch-sdk/golang/client/models"
 	"github.com/1inch/1inch-sdk/golang/helpers/consts/amounts"
 	"github.com/1inch/1inch-sdk/golang/helpers/consts/chains"
 	"github.com/1inch/1inch-sdk/golang/helpers/consts/tokens"
+	"github.com/1inch/1inch-sdk/golang/helpers/consts/web3providers"
 )
 
 func main() {
@@ -21,7 +23,7 @@ func main() {
 		Web3HttpProviders: []client.Web3ProviderConfig{
 			{
 				ChainId: chains.Polygon,
-				Url:     os.Getenv("WEB_3_HTTP_PROVIDER_URL_WITH_KEY_POLYGON"),
+				Url:     web3providers.Polygon,
 			},
 		},
 	}
@@ -33,24 +35,28 @@ func main() {
 	}
 
 	// Build the config for the swap request
-	swapParams := swap.SwapTokensParams{
-		ApprovalType:  onchain.PermitIfPossible,
-		SkipWarnings:  false,
-		PublicAddress: os.Getenv("WALLET_ADDRESS"),
-		WalletKey:     os.Getenv("WALLET_KEY"),
-		ChainId:       chains.Polygon,
-		AggregationControllerGetSwapParams: swap.AggregationControllerGetSwapParams{
+	swapParams := models.GetSwapParams{
+		ChainId:      chains.Polygon,
+		SkipWarnings: false,
+		AggregationControllerGetSwapParams: models.AggregationControllerGetSwapParams{
 			Src:             tokens.PolygonFrax,
-			Dst:             tokens.PolygonUsdc,
+			Dst:             tokens.PolygonWeth,
 			From:            os.Getenv("WALLET_ADDRESS"),
 			Amount:          amounts.Ten16,
-			Slippage:        0.5,
 			DisableEstimate: true,
+			Slippage:        0.5,
 		},
 	}
 
-	err = c.Actions.SwapTokens(context.Background(), swapParams)
+	swapData, _, err := c.SwapApi.GetSwap(context.Background(), swapParams)
 	if err != nil {
 		log.Fatalf("Failed to swap tokens: %v", err)
 	}
+
+	swapDataRawIndented, err := json.MarshalIndent(swapData, "", "  ")
+	if err != nil {
+		log.Fatalf("Failed to marshal swap data: %v", err)
+	}
+
+	fmt.Printf("%s\n", string(swapDataRawIndented))
 }

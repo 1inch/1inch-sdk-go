@@ -10,49 +10,32 @@ import (
 	"strings"
 	"time"
 
+	"github.com/1inch/1inch-sdk/golang/client/models"
+	"github.com/1inch/1inch-sdk/golang/helpers"
+	"github.com/1inch/1inch-sdk/golang/helpers/consts/amounts"
+	"github.com/1inch/1inch-sdk/golang/helpers/consts/chains"
+	"github.com/1inch/1inch-sdk/golang/helpers/consts/contracts"
+	"github.com/1inch/1inch-sdk/golang/helpers/consts/tokens"
+	"github.com/1inch/1inch-sdk/golang/internal/onchain"
+	"github.com/1inch/1inch-sdk/golang/internal/swap"
+	"github.com/1inch/1inch-sdk/golang/internal/tenderly"
+
 	"github.com/ethereum/go-ethereum/common"
 	"github.com/ethereum/go-ethereum/crypto"
 	"github.com/ethereum/go-ethereum/ethclient"
-
-	"github.com/1inch/1inch-sdk/golang/client/tenderly"
-	"github.com/1inch/1inch-sdk/golang/helpers"
-	"github.com/1inch/1inch-sdk/golang/helpers/consts/chains"
-	"github.com/1inch/1inch-sdk/golang/helpers/consts/tokens"
-
-	"github.com/1inch/1inch-sdk/golang/client/onchain"
-	"github.com/1inch/1inch-sdk/golang/client/swap"
-	"github.com/1inch/1inch-sdk/golang/helpers/consts/amounts"
-	"github.com/1inch/1inch-sdk/golang/helpers/consts/contracts"
 )
 
 // This file provides helper functions that execute swaps onchain.
 
 type ActionService service
 
-// TODO temporarily adding a bool to the function call until config refactor
+// swapTokens is a helper function that executes swaps onchain from within the SDK
+// If you would like to manage this transaction data yourself, please use the GetSwap method on the main Swap service instead
+//
+// NOTE: due to high gas costs, this method has been temporarily made private until gas configurations and summaries are put in place to protect large unexpected transaction fees
+func (s *ActionService) swapTokens(ctx context.Context, params models.SwapTokensParams) error {
 
-// SwapTokens executes a token swap operation using the 1inch Swap API.
-//
-// The helper function takes a client, swap parameters, and a flag to skip warnings. It executes the proposed swap onchain, using Permit if available.
-//
-// Parameters:
-//   - c: A pointer to the client.Client instance. This client should be initialized and connected to the Ethereum network.
-//   - swapParams: The parameters for the swap operation, of type swap.AggregationControllerGetSwapParams. It should contain details such as the source and destination tokens, the amount to swap, and the slippage tolerance.
-//   - skipWarnings: A boolean flag indicating whether to skip warning prompts. If true, warning prompts will be suppressed; otherwise, they will be displayed.
-//
-// The function performs several key operations:
-//   - Sets a 10-minute Permit1 deadline for the swap operation.
-//   - Checks if the source token supports Permit1. If Permit1 is supported, it tries to use that instead of the traditional `Approve` swap.
-//   - Executes the swap request onchain
-//
-// Note:
-//   - The function currently has a hardcoded 10-minute deadline. Future versions will make this configurable.
-//   - The Permit feature is used if the token typehash matches a known Permit typehash.
-//
-// Returns nil on successful execution of the swap. Any error during the process is returned as a non-nil error.
-func (s *ActionService) SwapTokens(ctx context.Context, params swap.SwapTokensParams) error {
-
-	// Always disable estimate so we can don onchain approvals for the swaps right before we execute
+	// Always disable estimate so we can do onchain approvals for the swaps right before we execute
 	params.DisableEstimate = true
 
 	// TODO find a better way of managing the matching between public and private keys
@@ -84,7 +67,7 @@ func (s *ActionService) SwapTokens(ctx context.Context, params swap.SwapTokensPa
 
 	deadline := time.Now().Add(1 * time.Minute).Unix() // TODO make this configurable
 
-	executeSwapConfig := &swap.ExecuteSwapConfig{
+	executeSwapConfig := &models.ExecuteSwapConfig{
 		WalletKey:     params.WalletKey,
 		ChainId:       params.ChainId,
 		PublicAddress: params.PublicAddress,
@@ -147,7 +130,7 @@ func (s *ActionService) SwapTokens(ctx context.Context, params swap.SwapTokensPa
 
 	// Execute swap request
 	// This will return the transaction data used by a wallet to execute the swap
-	swapResponse, _, err := s.client.Swap.GetSwapData(ctx, swap.GetSwapDataParams{
+	swapResponse, _, err := s.client.SwapApi.GetSwap(ctx, models.GetSwapParams{
 		ChainId:                            params.ChainId,
 		SkipWarnings:                       true, // Always skip the warnings from this endpoint since there will be one done before the transaction execution
 		AggregationControllerGetSwapParams: params.AggregationControllerGetSwapParams,
@@ -167,7 +150,7 @@ func (s *ActionService) SwapTokens(ctx context.Context, params swap.SwapTokensPa
 		executeSwapConfig.FromToken = swapResponse.FromToken
 	}
 
-	err = s.client.Swap.ExecuteSwap(ctx, executeSwapConfig)
+	err = s.client.SwapApi.ExecuteSwap(ctx, executeSwapConfig)
 	if err != nil {
 		return fmt.Errorf("failed to execute swap: %v", err)
 	}
@@ -175,8 +158,8 @@ func (s *ActionService) SwapTokens(ctx context.Context, params swap.SwapTokensPa
 	return nil
 }
 
-// ExecuteSwap executes a swap on the Ethereum blockchain using swap data generated by GetSwapData
-func (s *SwapService) ExecuteSwap(ctx context.Context, config *swap.ExecuteSwapConfig) error {
+// ExecuteSwap executes a swap on the Ethereum blockchain using swap data generated by GetSwap
+func (s *SwapService) ExecuteSwap(ctx context.Context, config *models.ExecuteSwapConfig) error {
 
 	if config.WalletKey == "" {
 		return fmt.Errorf("wallet key must be set in the client config")
@@ -212,7 +195,7 @@ func (s *SwapService) ExecuteSwap(ctx context.Context, config *swap.ExecuteSwapC
 	return nil
 }
 
-func (s *SwapService) executeSwapWithApproval(ctx context.Context, config *swap.ExecuteSwapConfig, ethClient *ethclient.Client) error {
+func (s *SwapService) executeSwapWithApproval(ctx context.Context, config *models.ExecuteSwapConfig, ethClient *ethclient.Client) error {
 
 	aggregationRouter, err := contracts.Get1inchRouterFromChainId(config.ChainId)
 	if err != nil {
@@ -312,7 +295,7 @@ func (s *SwapService) executeSwapWithApproval(ctx context.Context, config *swap.
 	return nil
 }
 
-func (s *SwapService) executeSwapWithPermit(ctx context.Context, config *swap.ExecuteSwapConfig, ethClient *ethclient.Client) error {
+func (s *SwapService) executeSwapWithPermit(ctx context.Context, config *models.ExecuteSwapConfig, ethClient *ethclient.Client) error {
 
 	hexData, err := hex.DecodeString(config.TransactionData[2:])
 	if err != nil {
@@ -359,7 +342,7 @@ func (s *SwapService) executeSwapWithPermit(ctx context.Context, config *swap.Ex
 	return nil
 }
 
-func getNativeTokenDetails(chainId int) *swap.TokenInfo {
+func getNativeTokenDetails(chainId int) *models.TokenInfo {
 	var tokenSymbol string
 	switch chainId {
 	case chains.Arbitrum:
@@ -391,7 +374,7 @@ func getNativeTokenDetails(chainId int) *swap.TokenInfo {
 	}
 
 	// TODO need to verify that all native tokens behave the same as ETH on Ethereum
-	return &swap.TokenInfo{
+	return &models.TokenInfo{
 		Address:  tokens.NativeToken,
 		Symbol:   tokenSymbol,
 		Decimals: 18,

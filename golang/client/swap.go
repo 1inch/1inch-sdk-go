@@ -5,13 +5,13 @@ import (
 	"fmt"
 	"net/http"
 
-	"github.com/1inch/1inch-sdk/golang/client/swap"
+	"github.com/1inch/1inch-sdk/golang/client/models"
 )
 
 type SwapService service
 
-// ApproveAllowance returns the allowance the 1inch router has to spend a token on behalf of a wallet
-func (s *SwapService) ApproveAllowance(ctx context.Context, params swap.ApproveAllowanceParams) (*swap.AllowanceResponse, *http.Response, error) {
+// GetApproveAllowance returns the allowance the 1inch router has to spend a token on behalf of a wallet
+func (s *SwapService) GetApproveAllowance(ctx context.Context, params models.ApproveAllowanceParams) (*models.AllowanceResponse, *http.Response, error) {
 	u := fmt.Sprintf("/swap/v5.2/%d/approve/allowance", params.ChainId)
 
 	err := params.Validate()
@@ -29,7 +29,7 @@ func (s *SwapService) ApproveAllowance(ctx context.Context, params swap.ApproveA
 		return nil, nil, err
 	}
 
-	var allowanceResponse swap.AllowanceResponse
+	var allowanceResponse models.AllowanceResponse
 	res, err := s.client.Do(ctx, req, &allowanceResponse)
 	if err != nil {
 		return nil, nil, err
@@ -38,8 +38,8 @@ func (s *SwapService) ApproveAllowance(ctx context.Context, params swap.ApproveA
 	return &allowanceResponse, res, nil
 }
 
-// ApproveSpender returns the address of the 1inch router contract
-func (s *SwapService) ApproveSpender(ctx context.Context, params swap.ApproveSpenderParams) (*swap.SpenderResponse, *http.Response, error) {
+// GetApproveSpender returns the address of the 1inch router contract
+func (s *SwapService) GetApproveSpender(ctx context.Context, params models.ApproveSpenderParams) (*models.SpenderResponse, *http.Response, error) {
 	u := fmt.Sprintf("/swap/v5.2/%d/approve/spender", params.ChainId)
 
 	err := params.Validate()
@@ -52,7 +52,7 @@ func (s *SwapService) ApproveSpender(ctx context.Context, params swap.ApproveSpe
 		return nil, nil, err
 	}
 
-	var spender swap.SpenderResponse
+	var spender models.SpenderResponse
 	res, err := s.client.Do(ctx, req, &spender)
 	if err != nil {
 		return nil, nil, err
@@ -61,8 +61,8 @@ func (s *SwapService) ApproveSpender(ctx context.Context, params swap.ApproveSpe
 	return &spender, res, nil
 }
 
-// ApproveTransaction returns the transaction data for approving the 1inch router to spend a token on behalf of a wallet
-func (s *SwapService) ApproveTransaction(ctx context.Context, params swap.ApproveTransactionParams) (*swap.ApproveCallDataResponse, *http.Response, error) {
+// GetApproveTransaction returns the transaction data for approving the 1inch router to spend a token on behalf of a wallet
+func (s *SwapService) GetApproveTransaction(ctx context.Context, params models.ApproveTransactionParams) (*models.ApproveCallDataResponse, *http.Response, error) {
 	u := fmt.Sprintf("/swap/v5.2/%d/approve/transaction", params.ChainId)
 
 	err := params.Validate()
@@ -80,7 +80,7 @@ func (s *SwapService) ApproveTransaction(ctx context.Context, params swap.Approv
 		return nil, nil, err
 	}
 
-	var approveCallData swap.ApproveCallDataResponse
+	var approveCallData models.ApproveCallDataResponse
 	res, err := s.client.Do(ctx, req, &approveCallData)
 	if err != nil {
 		return nil, nil, err
@@ -90,7 +90,7 @@ func (s *SwapService) ApproveTransaction(ctx context.Context, params swap.Approv
 }
 
 // GetLiquiditySources returns all liquidity sources tracked by the 1inch Aggregation Protocol for a given chain
-func (s *SwapService) GetLiquiditySources(ctx context.Context, params swap.GetLiquiditySourcesParams) (*swap.ProtocolsResponse, *http.Response, error) {
+func (s *SwapService) GetLiquiditySources(ctx context.Context, params models.GetLiquiditySourcesParams) (*models.ProtocolsResponse, *http.Response, error) {
 	u := fmt.Sprintf("/swap/v5.2/%d/liquidity-sources", params.ChainId)
 
 	err := params.Validate()
@@ -103,7 +103,7 @@ func (s *SwapService) GetLiquiditySources(ctx context.Context, params swap.GetLi
 		return nil, nil, err
 	}
 
-	var liquiditySources swap.ProtocolsResponse
+	var liquiditySources models.ProtocolsResponse
 	res, err := s.client.Do(ctx, req, &liquiditySources)
 	if err != nil {
 		return nil, nil, err
@@ -113,7 +113,7 @@ func (s *SwapService) GetLiquiditySources(ctx context.Context, params swap.GetLi
 }
 
 // GetQuote returns the quote for a potential swap through the Aggregation Protocol
-func (s *SwapService) GetQuote(ctx context.Context, params swap.GetQuoteParams) (*swap.QuoteResponse, *http.Response, error) {
+func (s *SwapService) GetQuote(ctx context.Context, params models.GetQuoteParams) (*models.QuoteResponse, *http.Response, error) {
 	u := fmt.Sprintf("/swap/v5.2/%d/quote", params.ChainId)
 
 	err := params.Validate()
@@ -137,7 +137,7 @@ func (s *SwapService) GetQuote(ctx context.Context, params swap.GetQuoteParams) 
 		return nil, nil, err
 	}
 
-	var quote swap.QuoteResponse
+	var quote models.QuoteResponse
 	res, err := s.client.Do(ctx, req, &quote)
 	if err != nil {
 		return nil, nil, err
@@ -146,8 +146,8 @@ func (s *SwapService) GetQuote(ctx context.Context, params swap.GetQuoteParams) 
 	return &quote, res, nil
 }
 
-// GetSwapData returns a swap quote with transaction data that can be used to execute a swap through the Aggregation Protocol
-func (s *SwapService) GetSwapData(ctx context.Context, params swap.GetSwapDataParams) (*swap.SwapResponse, *http.Response, error) {
+// GetSwap returns a swap quote with transaction data that can be used to execute a swap through the Aggregation Protocol
+func (s *SwapService) GetSwap(ctx context.Context, params models.GetSwapParams) (*models.SwapResponse, *http.Response, error) {
 	u := fmt.Sprintf("/swap/v5.2/%d/swap", params.ChainId)
 
 	err := params.Validate()
@@ -170,24 +170,16 @@ func (s *SwapService) GetSwapData(ctx context.Context, params swap.GetSwapDataPa
 		return nil, nil, err
 	}
 
-	var swapResponse swap.SwapResponse
+	var swapResponse models.SwapResponse
 	res, err := s.client.Do(ctx, req, &swapResponse)
 	if err != nil {
 		return nil, nil, err
 	}
-
-	if !params.SkipWarnings {
-		err = swap.ConfirmSwapDataWithUser(&swapResponse, params.Amount, params.Slippage)
-		if err != nil {
-			return nil, nil, err
-		}
-	}
-
 	return &swapResponse, res, nil
 }
 
 // GetTokens returns all tokens officially tracked by the 1inch Aggregation Protocol for a given chain
-func (s *SwapService) GetTokens(ctx context.Context, params swap.GetTokensParams) (*swap.TokensResponse, *http.Response, error) {
+func (s *SwapService) GetTokens(ctx context.Context, params models.GetTokensParams) (*models.TokensResponse, *http.Response, error) {
 	u := fmt.Sprintf("/swap/v5.2/%d/tokens", params.ChainId)
 
 	err := params.Validate()
@@ -200,7 +192,7 @@ func (s *SwapService) GetTokens(ctx context.Context, params swap.GetTokensParams
 		return nil, nil, err
 	}
 
-	var tokens swap.TokensResponse
+	var tokens models.TokensResponse
 	res, err := s.client.Do(ctx, req, &tokens)
 	if err != nil {
 		return nil, nil, err

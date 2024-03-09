@@ -1,4 +1,4 @@
-package swap
+package models
 
 type ExecuteSwapConfig struct {
 	WalletKey          string

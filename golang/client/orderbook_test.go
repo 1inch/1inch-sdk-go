@@ -7,10 +7,10 @@ import (
 	"os"
 	"testing"
 
+	"github.com/1inch/1inch-sdk/golang/client/models"
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
 
-	"github.com/1inch/1inch-sdk/golang/client/orderbook"
 	"github.com/1inch/1inch-sdk/golang/helpers/consts/addresses"
 	"github.com/1inch/1inch-sdk/golang/helpers/consts/chains"
 	"github.com/1inch/1inch-sdk/golang/helpers/consts/tokens"
@@ -31,14 +31,14 @@ func TestCreateOrder(t *testing.T) {
 		description              string
 		handlerFunc              func(w http.ResponseWriter, r *http.Request)
 		owner                    string
-		params                   orderbook.CreateOrderParams
+		params                   models.CreateOrderParams
 		expectedOutput           string
 		expectedErrorDescription string
 	}{
 		{
 			description: "Error - MakerAsset is native token",
 			owner:       addresses.Vitalik,
-			params: orderbook.CreateOrderParams{
+			params: models.CreateOrderParams{
 				ChainId:      chains.Ethereum,
 				PrivateKey:   os.Getenv("WALLET_KEY"),
 				Maker:        addresses.Vitalik,
@@ -64,7 +64,7 @@ func TestCreateOrder(t *testing.T) {
 				mux.HandleFunc(endpoint, defaultResponse)
 			}
 
-			createOrderResponse, _, err := c.Orderbook.CreateOrder(context.Background(), tc.params)
+			createOrderResponse, _, err := c.OrderbookApi.CreateOrder(context.Background(), tc.params)
 			if tc.expectedErrorDescription != "" {
 				if err == nil {
 					assert.FailNow(t, "Expected error message, but error was nil")
@@ -94,13 +94,13 @@ func TestGetOrdersByCreatorAddress(t *testing.T) {
 		description              string
 		handlerFunc              func(w http.ResponseWriter, r *http.Request)
 		owner                    string
-		params                   orderbook.GetOrdersByCreatorAddressParams
+		params                   models.GetOrdersByCreatorAddressParams
 		expectedOutput           string
 		expectedErrorDescription string
 	}{
 		{
 			description: "Success",
-			params: orderbook.GetOrdersByCreatorAddressParams{
+			params: models.GetOrdersByCreatorAddressParams{
 				ChainId:        chains.Ethereum,
 				CreatorAddress: addresses.Vitalik,
 			},
@@ -121,7 +121,7 @@ func TestGetOrdersByCreatorAddress(t *testing.T) {
 				mux.HandleFunc(endpoint, defaultResponse)
 			}
 
-			allOrders, _, err := c.Orderbook.GetOrdersByCreatorAddress(context.Background(), tc.params)
+			allOrders, _, err := c.OrderbookApi.GetOrdersByCreatorAddress(context.Background(), tc.params)
 			if tc.expectedErrorDescription != "" {
 				if err == nil {
 					assert.FailNow(t, "Expected error message, but error was nil")
@@ -150,15 +150,15 @@ func TestGetAllOrders(t *testing.T) {
 	testcases := []struct {
 		description              string
 		handlerFunc              func(w http.ResponseWriter, r *http.Request)
-		params                   orderbook.GetAllOrdersParams
+		params                   models.GetAllOrdersParams
 		expectedOutput           string
 		expectedErrorDescription string
 	}{
 		{
 			description: "Success",
-			params: orderbook.GetAllOrdersParams{
+			params: models.GetAllOrdersParams{
 				ChainId: chains.Ethereum,
-				LimitOrderV3SubscribedApiControllerGetAllLimitOrdersParams: orderbook.LimitOrderV3SubscribedApiControllerGetAllLimitOrdersParams{},
+				LimitOrderV3SubscribedApiControllerGetAllLimitOrdersParams: models.LimitOrderV3SubscribedApiControllerGetAllLimitOrdersParams{},
 			},
 			expectedOutput: defaultSignature,
 		},
@@ -177,7 +177,7 @@ func TestGetAllOrders(t *testing.T) {
 				mux.HandleFunc(endpoint, defaultResponse)
 			}
 
-			allOrders, _, err := c.Orderbook.GetAllOrders(context.Background(), tc.params)
+			allOrders, _, err := c.OrderbookApi.GetAllOrders(context.Background(), tc.params)
 			if tc.expectedErrorDescription != "" {
 				if err == nil {
 					assert.FailNow(t, "Expected error message, but error was nil")
@@ -204,15 +204,15 @@ func TestGetCount(t *testing.T) {
 	testcases := []struct {
 		description              string
 		handlerFunc              func(w http.ResponseWriter, r *http.Request)
-		params                   orderbook.GetCountParams
+		params                   models.GetCountParams
 		expectedOutput           int
 		expectedErrorDescription string
 	}{
 		{
 			description: "Success",
-			params: orderbook.GetCountParams{
+			params: models.GetCountParams{
 				ChainId: chains.Ethereum,
-				LimitOrderV3SubscribedApiControllerGetAllOrdersCountParams: orderbook.LimitOrderV3SubscribedApiControllerGetAllOrdersCountParams{},
+				LimitOrderV3SubscribedApiControllerGetAllOrdersCountParams: models.LimitOrderV3SubscribedApiControllerGetAllOrdersCountParams{},
 			},
 			expectedOutput: defaultCount,
 		},
@@ -231,7 +231,7 @@ func TestGetCount(t *testing.T) {
 				mux.HandleFunc(endpoint, defaultResponse)
 			}
 
-			countResponse, _, err := c.Orderbook.GetCount(context.Background(), tc.params)
+			countResponse, _, err := c.OrderbookApi.GetCount(context.Background(), tc.params)
 			if tc.expectedErrorDescription != "" {
 				if err == nil {
 					assert.FailNow(t, "Expected error message, but error was nil")
@@ -257,14 +257,14 @@ func TestGetEvent(t *testing.T) {
 	testcases := []struct {
 		description              string
 		handlerFunc              func(w http.ResponseWriter, r *http.Request)
-		params                   orderbook.GetEventParams
+		params                   models.GetEventParams
 		expectedOutput           int
 		expectedErrorDescription string
 	}{
 		{
 			description:    "Success",
 			expectedOutput: 48608667,
-			params: orderbook.GetEventParams{
+			params: models.GetEventParams{
 				ChainId:   chains.Ethereum,
 				OrderHash: "123",
 			},
@@ -284,7 +284,7 @@ func TestGetEvent(t *testing.T) {
 				mux.HandleFunc(endpoint, defaultResponse)
 			}
 
-			eventResponse, _, err := c.Orderbook.GetEvent(context.Background(), tc.params)
+			eventResponse, _, err := c.OrderbookApi.GetEvent(context.Background(), tc.params)
 			if tc.expectedErrorDescription != "" {
 				if err == nil {
 					assert.FailNow(t, "Expected error message, but error was nil")
@@ -312,15 +312,15 @@ func TestGetEvents(t *testing.T) {
 	testcases := []struct {
 		description              string
 		handlerFunc              func(w http.ResponseWriter, r *http.Request)
-		params                   orderbook.GetEventsParams
+		params                   models.GetEventsParams
 		expectedOutput           int
 		expectedErrorDescription string
 	}{
 		{
 			description: "Success",
-			params: orderbook.GetEventsParams{
+			params: models.GetEventsParams{
 				ChainId: chains.Ethereum,
-				LimitOrderV3SubscribedApiControllerGetEventsParams: orderbook.LimitOrderV3SubscribedApiControllerGetEventsParams{
+				LimitOrderV3SubscribedApiControllerGetEventsParams: models.LimitOrderV3SubscribedApiControllerGetEventsParams{
 					Limit: 1,
 				},
 			},
@@ -341,7 +341,7 @@ func TestGetEvents(t *testing.T) {
 				mux.HandleFunc(endpoint, defaultResponse)
 			}
 
-			eventsResponse, _, err := c.Orderbook.GetEvents(context.Background(), tc.params)
+			eventsResponse, _, err := c.OrderbookApi.GetEvents(context.Background(), tc.params)
 			if tc.expectedErrorDescription != "" {
 				if err == nil {
 					assert.FailNow(t, "Expected error message, but error was nil")
@@ -395,7 +395,7 @@ func TestGetEvents(t *testing.T) {
 //				mux.HandleFunc(endpoint, defaultResponse)
 //			}
 //
-//			ordersResponse, _, err := c.Orderbook.GetActiveOrdersWithPermit(context.Background(), tc.params)
+//			ordersResponse, _, err := c.OrderbookApi.GetActiveOrdersWithPermit(context.Background(), tc.params)
 //			if tc.expectedErrorDescription != "" {
 //				if err == nil {
 //					assert.FailNow(t, "Expected error message, but error was nil")
