@@ -2,7 +2,7 @@
 
 The SDK requires a minimum version of Go `1.21`.
 
-Check out the [release notes](https://github.com/1inch/1inch-sdk//blob/main/CHANGELOG.md) for information about the latest bug fixes, updates, and features added to the SDK.
+Check out the [release notes](https://github.com/1inch/1inch-sdk/blob/main/golang/CHANGELOG.md) for information about the latest bug fixes, updates, and features added to the SDK.
 
 This is a Go SDK to simplify interactions with the 1inch Dev Portal APIs. When complete, it will support all endpoints tracked by our official docs [here](https://portal.1inch.dev/documentation/authentication). See the [Current Functionality](#current-functionality) section for an up-to-date view of the SDK functionality.
 
