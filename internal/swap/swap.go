@@ -7,12 +7,12 @@ import (
 	"os"
 	"strings"
 
-	"github.com/1inch/1inch-sdk/golang/client/models"
+	"github.com/1inch/1inch-sdk-go/client/models"
 	"github.com/ethereum/go-ethereum/common"
 	"github.com/ethereum/go-ethereum/ethclient"
 
-	"github.com/1inch/1inch-sdk/golang/helpers"
-	"github.com/1inch/1inch-sdk/golang/internal/onchain"
+	"github.com/1inch/1inch-sdk-go/helpers"
+	"github.com/1inch/1inch-sdk-go/internal/onchain"
 )
 
 func ConfirmExecuteSwapWithUser(config *models.ExecuteSwapConfig) (bool, error) {

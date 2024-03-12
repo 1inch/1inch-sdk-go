@@ -7,8 +7,8 @@ import (
 	"net/url"
 	"os"
 
-	"github.com/1inch/1inch-sdk/golang/client/models"
-	"github.com/1inch/1inch-sdk/golang/helpers/consts/chains"
+	"github.com/1inch/1inch-sdk-go/client/models"
+	"github.com/1inch/1inch-sdk-go/helpers/consts/chains"
 )
 
 // setup sets up a test HTTP server along with a Client that is

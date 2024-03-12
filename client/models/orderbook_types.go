@@ -1,9 +1,9 @@
 package models
 
 import (
-	"github.com/1inch/1inch-sdk/golang/helpers/consts/tokens"
-	"github.com/1inch/1inch-sdk/golang/internal/onchain"
-	"github.com/1inch/1inch-sdk/golang/internal/validate"
+	"github.com/1inch/1inch-sdk-go/helpers/consts/tokens"
+	"github.com/1inch/1inch-sdk-go/internal/onchain"
+	"github.com/1inch/1inch-sdk-go/internal/validate"
 )
 
 type CreateOrderParams struct {

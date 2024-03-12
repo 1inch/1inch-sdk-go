@@ -7,8 +7,8 @@ import (
 	"strings"
 	"time"
 
-	"github.com/1inch/1inch-sdk/golang/helpers"
-	"github.com/1inch/1inch-sdk/golang/helpers/consts/chains"
+	"github.com/1inch/1inch-sdk-go/helpers"
+	"github.com/1inch/1inch-sdk-go/helpers/consts/chains"
 )
 
 func CheckEthereumAddressRequired(parameter interface{}, variableName string) error {

@@ -9,16 +9,16 @@ import (
 	"strings"
 	"time"
 
-	"github.com/1inch/1inch-sdk/golang/client/models"
+	"github.com/1inch/1inch-sdk-go/client/models"
 	"github.com/ethereum/go-ethereum/common"
 	"github.com/ethereum/go-ethereum/common/math"
 	"github.com/ethereum/go-ethereum/crypto"
 	"github.com/ethereum/go-ethereum/ethclient"
 	"github.com/ethereum/go-ethereum/signer/core/apitypes"
 
-	"github.com/1inch/1inch-sdk/golang/helpers"
-	"github.com/1inch/1inch-sdk/golang/helpers/consts/contracts"
-	"github.com/1inch/1inch-sdk/golang/internal/onchain"
+	"github.com/1inch/1inch-sdk-go/helpers"
+	"github.com/1inch/1inch-sdk-go/helpers/consts/contracts"
+	"github.com/1inch/1inch-sdk-go/internal/onchain"
 )
 
 func CreateLimitOrderMessage(orderRequest models.CreateOrderParams, interactions []string) (*models.Order, error) {

@@ -3,8 +3,8 @@ package contracts
 import (
 	"fmt"
 
-	"github.com/1inch/1inch-sdk/golang/helpers"
-	"github.com/1inch/1inch-sdk/golang/helpers/consts/chains"
+	"github.com/1inch/1inch-sdk-go/helpers"
+	"github.com/1inch/1inch-sdk-go/helpers/consts/chains"
 )
 
 const AggregationRouterV5 = "0x1111111254eeb25477b68fb85ed929f73a960582" // Contract address is identical for all chains except zkSync

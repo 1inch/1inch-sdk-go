@@ -6,13 +6,13 @@ import (
 	"os"
 	"testing"
 
-	"github.com/1inch/1inch-sdk/golang/client/models"
+	"github.com/1inch/1inch-sdk-go/client/models"
 	"github.com/stretchr/testify/require"
 
-	"github.com/1inch/1inch-sdk/golang/helpers"
-	"github.com/1inch/1inch-sdk/golang/helpers/consts/amounts"
-	"github.com/1inch/1inch-sdk/golang/helpers/consts/chains"
-	"github.com/1inch/1inch-sdk/golang/helpers/consts/tokens"
+	"github.com/1inch/1inch-sdk-go/helpers"
+	"github.com/1inch/1inch-sdk-go/helpers/consts/amounts"
+	"github.com/1inch/1inch-sdk-go/helpers/consts/chains"
+	"github.com/1inch/1inch-sdk-go/helpers/consts/tokens"
 )
 
 func TestCreateOrderIntegration(t *testing.T) {

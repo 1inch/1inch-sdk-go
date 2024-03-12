@@ -14,7 +14,7 @@ import (
 	"github.com/ethereum/go-ethereum/common"
 	"github.com/ethereum/go-ethereum/crypto"
 
-	"github.com/1inch/1inch-sdk/golang/helpers/consts/contracts"
+	"github.com/1inch/1inch-sdk-go/helpers/consts/contracts"
 )
 
 func SimulateSwap(config SwapConfig) (*SimulationResponse, error) {

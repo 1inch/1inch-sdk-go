@@ -15,10 +15,10 @@ import (
 	"github.com/ethereum/go-ethereum/crypto"
 	"github.com/ethereum/go-ethereum/ethclient"
 
-	"github.com/1inch/1inch-sdk/golang/helpers"
-	"github.com/1inch/1inch-sdk/golang/helpers/consts/abis"
-	"github.com/1inch/1inch-sdk/golang/helpers/consts/amounts"
-	"github.com/1inch/1inch-sdk/golang/helpers/consts/chains"
+	"github.com/1inch/1inch-sdk-go/helpers"
+	"github.com/1inch/1inch-sdk-go/helpers/consts/abis"
+	"github.com/1inch/1inch-sdk-go/helpers/consts/amounts"
+	"github.com/1inch/1inch-sdk-go/helpers/consts/chains"
 )
 
 const gasLimit = uint64(21000000) // TODO make sure this value more dynamic
