@@ -10,22 +10,22 @@ import (
 	"time"
 
 	"github.com/1inch/1inch-sdk-go/client/models"
+	"github.com/ethereum/go-ethereum/common"
+	"github.com/ethereum/go-ethereum/crypto"
+
 	"github.com/1inch/1inch-sdk-go/helpers"
 	"github.com/1inch/1inch-sdk-go/helpers/consts/addresses"
 	"github.com/1inch/1inch-sdk-go/helpers/consts/contracts"
 	"github.com/1inch/1inch-sdk-go/internal/onchain"
 	"github.com/1inch/1inch-sdk-go/internal/orderbook"
 	"github.com/1inch/1inch-sdk-go/internal/tenderly"
-
-	"github.com/ethereum/go-ethereum/common"
-	"github.com/ethereum/go-ethereum/crypto"
 )
 
 type OrderbookService service
 
 // CreateOrder creates an order in the Limit Order Protocol
 func (s *OrderbookService) CreateOrder(ctx context.Context, params models.CreateOrderParams) (*models.CreateOrderResponse, *http.Response, error) {
-	u := fmt.Sprintf("/orderbook/v3.0/%d", params.ChainId)
+	u := fmt.Sprintf("/orderbook/v4.0/%d", params.ChainId)
 
 	err := params.Validate()
 	if err != nil {
@@ -138,12 +138,24 @@ func (s *OrderbookService) CreateOrder(ctx context.Context, params models.Create
 		return nil, nil, fmt.Errorf("failed to get series nonce manager address: %v", err)
 	}
 
-	interactions, err := orderbook.GetInteractions(ethClient, seriesNonceManager, params.ExpireAfter, params.Maker, params.MakerAsset, permitParams)
+	currentNonce, err := onchain.GetTimeSeriesManagerNonce(ethClient, seriesNonceManager, params.Maker)
+	if err != nil {
+		return nil, nil, fmt.Errorf("failed to get series nonce: %v", err)
+	}
+
+	interactions, err := orderbook.GetInteractions(params.MakerAsset, permitParams)
 	if err != nil {
 		return nil, nil, fmt.Errorf("failed to get interactions: %v", err)
 	}
 
-	order, err := orderbook.CreateLimitOrderMessage(params, interactions)
+	fmt.Printf("interactions: %v\n", interactions)
+
+	//hasExtension := true // Currently, a predicate is always used to expire the order, so extensions is always true. This will be more dynamic in the future
+	hasExtension := false
+
+	makerTraits := orderbook.BuildMakerTraits(params.Taker, false, false, false, hasExtension, false, false, params.ExpireAfter, currentNonce.Int64(), 0) // TODO: Series 0 always?
+
+	order, err := orderbook.CreateLimitOrderMessage(params, interactions, makerTraits)
 	if err != nil {
 		return nil, nil, err
 	}
@@ -163,6 +175,8 @@ func (s *OrderbookService) CreateOrder(ctx context.Context, params models.Create
 		return nil, nil, err
 	}
 
+	fmt.Printf("Full requestion: %s\n", body)
+
 	req, err := s.client.NewRequest("POST", u, body)
 	if err != nil {
 		return nil, nil, err
@@ -181,7 +195,7 @@ func (s *OrderbookService) CreateOrder(ctx context.Context, params models.Create
 
 // GetOrdersByCreatorAddress returns all orders created by a given address in the Limit Order Protocol
 func (s *OrderbookService) GetOrdersByCreatorAddress(ctx context.Context, params models.GetOrdersByCreatorAddressParams) ([]models.OrderResponse, *http.Response, error) {
-	u := fmt.Sprintf("/orderbook/v3.0/%d/address/%s", params.ChainId, params.CreatorAddress)
+	u := fmt.Sprintf("/orderbook/v4.0/%d/address/%s", params.ChainId, params.CreatorAddress)
 
 	err := params.Validate()
 	if err != nil {
@@ -209,7 +223,7 @@ func (s *OrderbookService) GetOrdersByCreatorAddress(ctx context.Context, params
 
 // GetAllOrders returns all orders in the Limit Order Protocol
 func (s *OrderbookService) GetAllOrders(ctx context.Context, params models.GetAllOrdersParams) ([]models.OrderResponse, *http.Response, error) {
-	u := fmt.Sprintf("/orderbook/v3.0/%d/all", params.ChainId)
+	u := fmt.Sprintf("/orderbook/v4.0/%d/all", params.ChainId)
 
 	err := params.Validate()
 	if err != nil {

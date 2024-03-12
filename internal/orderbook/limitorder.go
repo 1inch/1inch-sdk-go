@@ -21,22 +21,87 @@ import (
 	"github.com/1inch/1inch-sdk-go/internal/onchain"
 )
 
-func CreateLimitOrderMessage(orderRequest models.CreateOrderParams, interactions []string) (*models.Order, error) {
+const (
+	unwrapWethFlag          = 247
+	allowMultipleFillsFlag  = 254
+	needEpochCheckFlag      = 250
+	usePermit2Flag          = 248
+	hasExtensionFlag        = 249
+	needPreinteractionFlag  = 252
+	needPostinteractionFlag = 251
+)
 
-	offsets := getOffsets(interactions)
+func BuildMakerTraits(allowedSender string, shouldCheckEpoch bool, usePermit2 bool, unwrapWeth bool, hasExtension bool, hasPreInteraction bool, hasPostInteraction bool, expiry int64, nonce int64, series int64) string {
+	// Convert allowedSender from hex string to big.Int
+	allowedSenderInt := new(big.Int)
+	allowedSenderInt.SetString(allowedSender, 16)
+
+	// Initialize tempPredicate as big.Int
+	tempPredicate := new(big.Int)
+	tempPredicate.Lsh(big.NewInt(series), 160)
+	tempPredicate.Or(tempPredicate, new(big.Int).Lsh(big.NewInt(nonce), 120))
+	tempPredicate.Or(tempPredicate, new(big.Int).Lsh(big.NewInt(expiry), 80))
+	tempPredicate.Or(tempPredicate, new(big.Int).And(allowedSenderInt, new(big.Int).Sub(new(big.Int).Lsh(big.NewInt(1), 80), big.NewInt(1))))
+
+	if unwrapWeth {
+		tempPredicate.Or(tempPredicate, big.NewInt(1).Lsh(big.NewInt(1), unwrapWethFlag))
+	}
+	// This flag must be set
+	tempPredicate.Or(tempPredicate, big.NewInt(1).Lsh(big.NewInt(1), allowMultipleFillsFlag))
+
+	if shouldCheckEpoch {
+		tempPredicate.Or(tempPredicate, big.NewInt(1).Lsh(big.NewInt(1), needEpochCheckFlag))
+	}
+	if usePermit2 {
+		tempPredicate.Or(tempPredicate, big.NewInt(1).Lsh(big.NewInt(1), usePermit2Flag))
+	}
+	if hasExtension {
+		tempPredicate.Or(tempPredicate, big.NewInt(1).Lsh(big.NewInt(1), hasExtensionFlag))
+	}
+	if hasPreInteraction {
+		tempPredicate.Or(tempPredicate, big.NewInt(1).Lsh(big.NewInt(1), needPreinteractionFlag))
+	}
+	if hasPostInteraction {
+		tempPredicate.Or(tempPredicate, big.NewInt(1).Lsh(big.NewInt(1), needPostinteractionFlag))
+	}
+
+	// Pad the predicate to 32 bytes with 0's on the left and convert to hex string
+	paddedPredicate := fmt.Sprintf("%032x", tempPredicate)
+	return "0x" + paddedPredicate
+}
+
+func BuildExtension(interactions string, offsets *big.Int) string {
+	if interactions == "0x" {
+		return "0x"
+	}
+	offsetsBytes := offsets.Bytes()
+	paddedOffsetHex := fmt.Sprintf("%064x", offsetsBytes)
+	return "0x" + paddedOffsetHex + strings.TrimPrefix(interactions, "0x")
+}
+
+func CreateLimitOrderMessage(orderRequest models.CreateOrderParams, interactions []string, makerTraits string) (*models.Order, error) {
+
+	//offsets := getOffsets(interactions)
+	//
+	//interactionsConcatenated := concatenateInteractions(interactions)
+	//
+	//extension := BuildExtension(interactionsConcatenated, offsets)
+	extension := "0x"
 
 	orderData := models.OrderData{
 		MakerAsset:    orderRequest.MakerAsset,
 		TakerAsset:    orderRequest.TakerAsset,
 		MakingAmount:  orderRequest.MakingAmount,
 		TakingAmount:  orderRequest.TakingAmount,
-		Salt:          GenerateSalt(),
+		Salt:          GenerateSaltNew(extension),
 		Maker:         orderRequest.Maker,
 		AllowedSender: "0x0000000000000000000000000000000000000000",
 		Receiver:      orderRequest.Taker,
-		Offsets:       fmt.Sprintf("%v", offsets),
-		Interactions:  concatenateInteractions(interactions),
+		MakerTraits:   makerTraits,
+		Extension:     extension,
 	}
+
+	fmt.Printf("Salt: %v\n", orderData.Salt)
 
 	aggregationRouter, err := contracts.Get1inchRouterFromChainId(orderRequest.ChainId)
 	if err != nil {
@@ -45,23 +110,24 @@ func CreateLimitOrderMessage(orderRequest models.CreateOrderParams, interactions
 
 	// Set up the domain data
 	domainData := apitypes.TypedDataDomain{
-		Name:              contracts.AggregationRouterV5Name,
-		Version:           contracts.AggregationRouterV5VersionNumber,
+		Name:              contracts.AggregationRouterV6Name,
+		Version:           contracts.AggregationRouterV6VersionNumber,
 		ChainId:           math.NewHexOrDecimal256(int64(orderRequest.ChainId)),
 		VerifyingContract: aggregationRouter,
 	}
 
+	fmt.Printf("MakerTraits: %v\n", orderData.MakerTraits)
+	fmt.Printf("Extension: %v\n", orderData.Extension)
+
 	orderMessage := apitypes.TypedDataMessage{
-		"salt":          orderData.Salt,
-		"makerAsset":    orderData.MakerAsset,
-		"takerAsset":    orderData.TakerAsset,
-		"maker":         orderData.Maker,
-		"receiver":      orderData.Receiver,
-		"allowedSender": orderData.AllowedSender,
-		"makingAmount":  orderData.MakingAmount,
-		"takingAmount":  orderData.TakingAmount,
-		"offsets":       orderData.Offsets,
-		"interactions":  common.FromHex(orderData.Interactions),
+		"salt":         orderData.Salt,
+		"makerAsset":   orderData.MakerAsset,
+		"takerAsset":   orderData.TakerAsset,
+		"maker":        orderData.Maker,
+		"receiver":     orderData.Receiver,
+		"makingAmount": orderData.MakingAmount,
+		"takingAmount": orderData.TakingAmount,
+		"makerTraits":  orderData.MakerTraits,
 	}
 
 	typedData := apitypes.TypedData{
@@ -74,15 +140,13 @@ func CreateLimitOrderMessage(orderRequest models.CreateOrderParams, interactions
 			},
 			"Order": {
 				{Name: "salt", Type: "uint256"},
-				{Name: "makerAsset", Type: "address"},
-				{Name: "takerAsset", Type: "address"},
 				{Name: "maker", Type: "address"},
 				{Name: "receiver", Type: "address"},
-				{Name: "allowedSender", Type: "address"},
+				{Name: "makerAsset", Type: "address"},
+				{Name: "takerAsset", Type: "address"},
 				{Name: "makingAmount", Type: "uint256"},
 				{Name: "takingAmount", Type: "uint256"},
-				{Name: "offsets", Type: "uint256"},
-				{Name: "interactions", Type: "bytes"},
+				{Name: "makerTraits", Type: "uint256"},
 			},
 		},
 		PrimaryType: "Order",
@@ -127,6 +191,8 @@ func CreateLimitOrderMessage(orderRequest models.CreateOrderParams, interactions
 	// convert signature to hex string
 	signatureHex := fmt.Sprintf("0x%x", signature)
 
+	fmt.Printf("Orderhash: %v\n", challengeHashHex)
+
 	return &models.Order{
 		OrderHash: challengeHashHex,
 		Signature: signatureHex,
@@ -134,28 +200,24 @@ func CreateLimitOrderMessage(orderRequest models.CreateOrderParams, interactions
 	}, err
 }
 
-func GetInteractions(client *ethclient.Client, seriesNonceManager string, expiration int64, maker string, makerAsset string, permit string) ([]string, error) {
+func GetInteractions(makerAsset string, permit string) ([]string, error) {
 
-	currentNonce, err := onchain.GetTimeSeriesManagerNonce(client, seriesNonceManager, maker)
-	if err != nil {
-		return nil, err
-	}
-
-	timeBelowAndNonceEqualsCalldata, err := onchain.GetTimestampBelowAndNonceEqualsCalldata(expiration, currentNonce, maker)
-
-	if err != nil {
-		return nil, fmt.Errorf("failed to get predicate calldata: %v", err)
-	}
-
-	predicate, err := onchain.GetPredicateCalldata(seriesNonceManager, timeBelowAndNonceEqualsCalldata)
-	if err != nil {
-		return nil, fmt.Errorf("failed to get predicate calldata: %v", err)
-	}
+	//timeBelowAndNonceEqualsCalldata, err := onchain.GetTimestampBelowAndNonceEqualsCalldata(expiration, currentNonce, maker)
+	//
+	//if err != nil {
+	//	return nil, fmt.Errorf("failed to get predicate calldata: %v", err)
+	//}
+	//
+	//predicate, err := onchain.GetPredicateCalldata(seriesNonceManager, timeBelowAndNonceEqualsCalldata)
+	//if err != nil {
+	//	return nil, fmt.Errorf("failed to get predicate calldata: %v", err)
+	//}
 
 	makerAssetData := `0x`
 	takerAssetData := `0x`
 	getMakingAmount := `0x`
 	getTakingAmount := `0x`
+	predicate := `0x`
 	preInteraction := `0x`
 	postInteraction := `0x`
 
@@ -164,7 +226,8 @@ func GetInteractions(client *ethclient.Client, seriesNonceManager string, expira
 		permit = makerAsset + Trim0x(permit)
 	}
 
-	return []string{makerAssetData, takerAssetData, getMakingAmount, getTakingAmount, fmt.Sprintf("0x%x", predicate), permit, preInteraction, postInteraction}, nil //TODO remove leading 0x from predicate
+	return []string{makerAssetData, takerAssetData, getMakingAmount, getTakingAmount, predicate, permit, preInteraction, postInteraction}, nil //TODO remove leading 0x from predicate
+	//return []string{makerAssetData, takerAssetData, getMakingAmount, getTakingAmount, "0x", "0x", preInteraction, postInteraction}, nil
 }
 
 func getOffsets(interactions []string) *big.Int {
@@ -297,4 +360,16 @@ func concatenateInteractions(interactions []string) string {
 
 var GenerateSalt = func() string {
 	return fmt.Sprintf("%d", time.Now().UnixNano()/int64(time.Millisecond))
+}
+
+var GenerateSaltNew = func(extension string) string {
+
+	if extension == "0x" {
+		return GenerateSalt()
+	}
+
+	hash := crypto.Keccak256([]byte(Trim0x(extension)))
+	salt := new(big.Int).SetBytes(hash)
+	salt.And(salt, new(big.Int).Sub(new(big.Int).Lsh(big.NewInt(1), 160), big.NewInt(1)))
+	return fmt.Sprintf("0x%x", salt)
 }

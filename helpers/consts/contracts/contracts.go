@@ -8,9 +8,12 @@ import (
 )
 
 const AggregationRouterV5 = "0x1111111254eeb25477b68fb85ed929f73a960582" // Contract address is identical for all chains except zkSync
+const AggregationRouterV6 = "0x111111125421cA6dc452d289314280a0f8842A65" // Contract address is identical for all chains except zkSync
 const AggregationV5RouterZkSyncEra = "0x6e2B76966cbD9cF4cC2Fa0D76d24d5241E0ABC2F"
 const AggregationRouterV5Name = "1inch Aggregation Router"
 const AggregationRouterV5VersionNumber = "5"
+const AggregationRouterV6Name = "1inch Aggregation Router"
+const AggregationRouterV6VersionNumber = "6"
 
 // Series Nonce Manager contract addresses are taken from limit-order-protocol/deployments
 
@@ -31,7 +34,7 @@ func Get1inchRouterFromChainId(chainId int) (string, error) {
 		if chainId == chains.ZkSyncEra {
 			return AggregationV5RouterZkSyncEra, nil
 		} else {
-			return AggregationRouterV5, nil
+			return AggregationRouterV6, nil
 		}
 	} else {
 		return "", fmt.Errorf("unrecognized chain id: %d", chainId)

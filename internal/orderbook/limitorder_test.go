@@ -15,9 +15,8 @@ import (
 	"github.com/1inch/1inch-sdk-go/helpers"
 	"github.com/1inch/1inch-sdk-go/helpers/consts/addresses"
 	"github.com/1inch/1inch-sdk-go/helpers/consts/amounts"
-	"github.com/1inch/1inch-sdk-go/helpers/consts/tokens"
-
 	"github.com/1inch/1inch-sdk-go/helpers/consts/chains"
+	"github.com/1inch/1inch-sdk-go/helpers/consts/tokens"
 )
 
 func TestTrim0x(t *testing.T) {
@@ -132,6 +131,7 @@ func TestCreateLimitOrder(t *testing.T) {
 		name          string
 		orderRequest  models.CreateOrderParams
 		interactions  []string // TODO Revisit this to make it more encapsulated
+		makerTraits   string
 		mockBigInt    func(string) (*big.Int, error)
 		expectedOrder *models.Order
 		expectError   bool
@@ -162,8 +162,8 @@ func TestCreateLimitOrder(t *testing.T) {
 					Maker:         "0x2c9b2DBdbA8A9c969Ac24153f5C1c23CB0e63914",
 					AllowedSender: "0x0000000000000000000000000000000000000000",
 					Receiver:      "0x0000000000000000000000000000000000000000",
-					Offsets:       "4421431254442149611168492388118363282642987198110904030635476664713216",
-					Interactions:  "0xbf15fcd8000000000000000000000000a5eb255ef45dfb48b5d133d08833def69871691d000000000000000000000000000000000000000000000000000000000000004000000000000000000000000000000000000000000000000000000000000000242cc2878d0071150dff0000000000000050c5df26654b5efbdd0c54a062dfa6012933defe00000000000000000000000000000000000000000000000000000000",
+					//Offsets:       "4421431254442149611168492388118363282642987198110904030635476664713216",
+					//Interactions:  "0xbf15fcd8000000000000000000000000a5eb255ef45dfb48b5d133d08833def69871691d000000000000000000000000000000000000000000000000000000000000004000000000000000000000000000000000000000000000000000000000000000242cc2878d0071150dff0000000000000050c5df26654b5efbdd0c54a062dfa6012933defe00000000000000000000000000000000000000000000000000000000",
 				},
 			},
 			expectError: false,
@@ -227,7 +227,7 @@ func TestCreateLimitOrder(t *testing.T) {
 
 	for _, tc := range tests {
 		t.Run(tc.name, func(t *testing.T) {
-			result, err := CreateLimitOrderMessage(tc.orderRequest, tc.interactions)
+			result, err := CreateLimitOrderMessage(tc.orderRequest, tc.interactions, tc.makerTraits)
 
 			if tc.expectError {
 				assert.Error(t, err)
@@ -351,3 +351,72 @@ func TestConcatenateInteractions(t *testing.T) {
 		})
 	}
 }
+
+func TestBuildMakerTraits(t *testing.T) {
+
+	tests := []struct {
+		name           string
+		allowedSender  string
+		expiry         int64
+		nonce          int64
+		series         int64
+		hasExtension   bool
+		expectedResult string
+	}{
+		{
+			name:           "Simple",
+			allowedSender:  "0x0000000000000000000000000000000000000000",
+			expiry:         int64(1709675246),
+			nonce:          int64(0),
+			series:         int64(0),
+			hasExtension:   false,
+			expectedResult: "0x40000000000000000000000000000000000065e792ee00000000000000000000",
+		},
+		{
+			name:           "Has extension",
+			allowedSender:  "0x0000000000000000000000000000000000000000",
+			expiry:         int64(1709675246),
+			nonce:          int64(0),
+			series:         int64(0),
+			hasExtension:   true,
+			expectedResult: "0x42000000000000000000000000000000000065e792ee00000000000000000000",
+		},
+	}
+
+	for _, tc := range tests {
+		t.Run(tc.name, func(t *testing.T) {
+			result := BuildMakerTraits(tc.allowedSender, false, false, false, tc.hasExtension, false, false, tc.expiry, tc.nonce, tc.series)
+			assert.Equal(t, tc.expectedResult, result)
+		})
+	}
+}
+
+//func TestBuildMakerTraits(t *testing.T) {
+//
+//	tests := []struct {
+//		name           string
+//		allowedSender  string
+//		expiry         int64
+//		nonce          int64
+//		series         int64
+//		hasExtension   bool
+//		expectedResult string
+//	}{
+//		{
+//			name:           "Simple",
+//			allowedSender:  "0x0000000000000000000000000000000000000000",
+//			expiry:         int64(1709675246),
+//			nonce:          int64(0),
+//			series:         int64(0),
+//			hasExtension:   false,
+//			expectedResult: "0x40000000000000000000000000000000000065e792ee00000000000000000000",
+//		},
+//	}
+//
+//	for _, tc := range tests {
+//		t.Run(tc.name, func(t *testing.T) {
+//			result := BuildExtension()
+//			assert.Equal(t, tc.expectedResult, result)
+//		})
+//	}
+//}

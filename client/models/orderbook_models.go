@@ -15,6 +15,6 @@ type OrderData struct {
 	Maker         string `json:"maker"`
 	AllowedSender string `json:"allowedSender"`
 	Receiver      string `json:"receiver"`
-	Offsets       string `json:"offsets"`
-	Interactions  string `json:"interactions"`
+	MakerTraits   string `json:"makerTraits"`
+	Extension     string `json:"extension"`
 }
