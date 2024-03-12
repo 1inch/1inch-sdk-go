@@ -9,15 +9,14 @@ import (
 	"testing"
 
 	"github.com/1inch/1inch-sdk/golang/client/models"
-	"github.com/1inch/1inch-sdk/golang/internal/onchain"
-	"github.com/1inch/1inch-sdk/golang/internal/tenderly"
-	"github.com/stretchr/testify/require"
-
 	"github.com/1inch/1inch-sdk/golang/helpers"
 	"github.com/1inch/1inch-sdk/golang/helpers/consts/amounts"
 	"github.com/1inch/1inch-sdk/golang/helpers/consts/chains"
 	"github.com/1inch/1inch-sdk/golang/helpers/consts/tokens"
 	"github.com/1inch/1inch-sdk/golang/helpers/consts/web3providers"
+	"github.com/1inch/1inch-sdk/golang/internal/onchain"
+	"github.com/1inch/1inch-sdk/golang/internal/tenderly"
+	"github.com/stretchr/testify/require"
 )
 
 const ten18Hex = "0x0000000000000000000000000000000000000000000000000DE0B6B3A7640000"
@@ -27,7 +26,7 @@ func TestSwapTokensTenderlyE2E(t *testing.T) {
 	testcases := []struct {
 		description         string
 		tenderlyDescription string
-		config              Config
+		config              models.Config
 		swapParams          models.SwapTokensParams
 		stateOverrides      map[string]tenderly.StateObject
 		approvalType        onchain.ApprovalType
@@ -36,9 +35,9 @@ func TestSwapTokensTenderlyE2E(t *testing.T) {
 		{
 			description:         "Polygon - Swap 0.01 DAI for USDC - Approval - Does not support traditional permit interface",
 			tenderlyDescription: "DP-DAI->USDC-Approval",
-			config: Config{
+			config: models.Config{
 				DevPortalApiKey: os.Getenv("DEV_PORTAL_TOKEN"),
-				Web3HttpProviders: []Web3ProviderConfig{
+				Web3HttpProviders: []models.Web3Provider{
 					{
 						ChainId: chains.Polygon,
 						Url:     os.Getenv("WEB_3_HTTP_PROVIDER_URL_WITH_KEY_POLYGON"),
@@ -73,9 +72,9 @@ func TestSwapTokensTenderlyE2E(t *testing.T) {
 		{
 			description:         "Polygon - Swap 0.01 USDC for DAI - Permit - Contract has a version value of 2",
 			tenderlyDescription: "DP-USDC->DAI-Approval",
-			config: Config{
+			config: models.Config{
 				DevPortalApiKey: os.Getenv("DEV_PORTAL_TOKEN"),
-				Web3HttpProviders: []Web3ProviderConfig{
+				Web3HttpProviders: []models.Web3Provider{
 					{
 						ChainId: chains.Polygon,
 						Url:     os.Getenv("WEB_3_HTTP_PROVIDER_URL_WITH_KEY_POLYGON"),
@@ -110,9 +109,9 @@ func TestSwapTokensTenderlyE2E(t *testing.T) {
 		{
 			description:         "Polygon - Swap 0.01 FRAX for USDC - Approval - Forced",
 			tenderlyDescription: "DP-FRAX->USDC-Approval",
-			config: Config{
+			config: models.Config{
 				DevPortalApiKey: os.Getenv("DEV_PORTAL_TOKEN"),
-				Web3HttpProviders: []Web3ProviderConfig{
+				Web3HttpProviders: []models.Web3Provider{
 					{
 						ChainId: chains.Polygon,
 						Url:     os.Getenv("WEB_3_HTTP_PROVIDER_URL_WITH_KEY_POLYGON"),
@@ -147,9 +146,9 @@ func TestSwapTokensTenderlyE2E(t *testing.T) {
 		{
 			description:         "Polygon - Swap 0.01 FRAX for USDC - Permit",
 			tenderlyDescription: "DP-FRAX->USDC-Permit",
-			config: Config{
+			config: models.Config{
 				DevPortalApiKey: os.Getenv("DEV_PORTAL_TOKEN"),
-				Web3HttpProviders: []Web3ProviderConfig{
+				Web3HttpProviders: []models.Web3Provider{
 					{
 						ChainId: chains.Polygon,
 						Url:     os.Getenv("WEB_3_HTTP_PROVIDER_URL_WITH_KEY_POLYGON"),
@@ -184,9 +183,9 @@ func TestSwapTokensTenderlyE2E(t *testing.T) {
 		{
 			description:         "Arbitrum - Swap 0.01 USDC for DAI - Approve - Arbitrum unsupported right now",
 			tenderlyDescription: "DP-USDC->DAI-Approve",
-			config: Config{
+			config: models.Config{
 				DevPortalApiKey: os.Getenv("DEV_PORTAL_TOKEN"),
-				Web3HttpProviders: []Web3ProviderConfig{
+				Web3HttpProviders: []models.Web3Provider{
 					{
 						ChainId: chains.Arbitrum,
 						Url:     web3providers.Arbitrum,
@@ -221,9 +220,9 @@ func TestSwapTokensTenderlyE2E(t *testing.T) {
 		{
 			description:         "Arbitrum - Swap $0.01 worth of ETH for USDC - Native token for ERC20",
 			tenderlyDescription: "DP-ETH->USDC",
-			config: Config{
+			config: models.Config{
 				DevPortalApiKey: os.Getenv("DEV_PORTAL_TOKEN"),
-				Web3HttpProviders: []Web3ProviderConfig{
+				Web3HttpProviders: []models.Web3Provider{
 					{
 						ChainId: chains.Arbitrum,
 						Url:     web3providers.Arbitrum,
@@ -258,9 +257,9 @@ func TestSwapTokensTenderlyE2E(t *testing.T) {
 		{
 			description:         "Ethereum - Swap $0.01 worth of 1inch for ETH - Force Permit1",
 			tenderlyDescription: "DP-1inch->ETH-Permit1",
-			config: Config{
+			config: models.Config{
 				DevPortalApiKey: os.Getenv("DEV_PORTAL_TOKEN"),
-				Web3HttpProviders: []Web3ProviderConfig{
+				Web3HttpProviders: []models.Web3Provider{
 					{
 						ChainId: chains.Ethereum,
 						Url:     web3providers.Ethereum,
@@ -295,9 +294,9 @@ func TestSwapTokensTenderlyE2E(t *testing.T) {
 		{
 			description:         "Ethereum - Swap $0.01 worth of USDC for ETH - Version 2 - Permit1",
 			tenderlyDescription: "DP-1inch->ETH-Permit1",
-			config: Config{
+			config: models.Config{
 				DevPortalApiKey: os.Getenv("DEV_PORTAL_TOKEN"),
-				Web3HttpProviders: []Web3ProviderConfig{
+				Web3HttpProviders: []models.Web3Provider{
 					{
 						ChainId: chains.Ethereum,
 						Url:     web3providers.Ethereum,

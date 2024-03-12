@@ -12,46 +12,15 @@ import (
 	"reflect"
 	"strings"
 
+	"github.com/1inch/1inch-sdk/golang/client/models"
 	"github.com/ethereum/go-ethereum/ethclient"
 	"github.com/google/go-querystring/query"
 
 	"github.com/1inch/1inch-sdk/golang/helpers"
 )
 
-type Environment string
-
 type service struct {
 	client *Client
-}
-
-type Config struct {
-	DevPortalApiKey   string
-	Web3HttpProviders []Web3ProviderConfig
-}
-
-type Web3ProviderConfig struct {
-	ChainId int
-	Url     string
-}
-
-func (c *Config) validate() error {
-
-	if c.DevPortalApiKey == "" {
-		return fmt.Errorf("API key is required")
-	}
-	if len(c.Web3HttpProviders) == 0 {
-		return fmt.Errorf("at least one web3 provider URL is required")
-	}
-	for _, provider := range c.Web3HttpProviders {
-		if provider.ChainId == 0 {
-			return fmt.Errorf("all web3 providers must have a chain ID set")
-		}
-		if provider.Url == "" {
-			return fmt.Errorf("all web3 providers must have a URL set")
-		}
-	}
-
-	return nil
 }
 
 type Client struct {
@@ -73,17 +42,9 @@ type Client struct {
 	OrderbookApi *OrderbookService
 }
 
-func (c *Client) GetEthClient(chainId int) (*ethclient.Client, error) {
-	ethClient, ok := c.EthClientMap[chainId]
-	if !ok {
-		return nil, fmt.Errorf("no client for chain id %d", chainId)
-	}
-	return ethClient, nil
-}
-
 // NewClient creates and initializes a new Client instance based on the provided Config.
-func NewClient(config Config) (*Client, error) {
-	err := config.validate()
+func NewClient(config models.Config) (*Client, error) {
+	err := config.Validate()
 	if err != nil {
 		return nil, fmt.Errorf("config validation error: %v", err)
 	}
@@ -117,6 +78,14 @@ func NewClient(config Config) (*Client, error) {
 	c.OrderbookApi = (*OrderbookService)(&c.common)
 
 	return c, nil
+}
+
+func (c *Client) GetEthClient(chainId int) (*ethclient.Client, error) {
+	ethClient, ok := c.EthClientMap[chainId]
+	if !ok {
+		return nil, fmt.Errorf("no client for chain id %d", chainId)
+	}
+	return ethClient, nil
 }
 
 func (c *Client) NewRequest(method, urlStr string, body []byte) (*http.Request, error) {
