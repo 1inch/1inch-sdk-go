@@ -1,4 +1,4 @@
-module github.com/1inch/1inch-sdk/golang
+module github.com/1inch/1inch-sdk-go
 
 go 1.21.1
 

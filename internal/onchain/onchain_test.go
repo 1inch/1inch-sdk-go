@@ -7,7 +7,7 @@ import (
 
 	"github.com/stretchr/testify/require"
 
-	"github.com/1inch/1inch-sdk/golang/helpers/consts/amounts"
+	"github.com/1inch/1inch-sdk-go/helpers/consts/amounts"
 )
 
 func TestCreatePermitParams(t *testing.T) {

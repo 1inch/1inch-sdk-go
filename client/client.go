@@ -12,11 +12,11 @@ import (
 	"reflect"
 	"strings"
 
-	"github.com/1inch/1inch-sdk/golang/client/models"
+	"github.com/1inch/1inch-sdk-go/client/models"
 	"github.com/ethereum/go-ethereum/ethclient"
 	"github.com/google/go-querystring/query"
 
-	"github.com/1inch/1inch-sdk/golang/helpers"
+	"github.com/1inch/1inch-sdk-go/helpers"
 )
 
 type service struct {

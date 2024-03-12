@@ -7,12 +7,12 @@ import (
 	"log"
 	"os"
 
-	"github.com/1inch/1inch-sdk/golang/client"
-	"github.com/1inch/1inch-sdk/golang/client/models"
-	"github.com/1inch/1inch-sdk/golang/helpers/consts/amounts"
-	"github.com/1inch/1inch-sdk/golang/helpers/consts/chains"
-	"github.com/1inch/1inch-sdk/golang/helpers/consts/tokens"
-	"github.com/1inch/1inch-sdk/golang/helpers/consts/web3providers"
+	"github.com/1inch/1inch-sdk-go/client"
+	"github.com/1inch/1inch-sdk-go/client/models"
+	"github.com/1inch/1inch-sdk-go/helpers/consts/amounts"
+	"github.com/1inch/1inch-sdk-go/helpers/consts/chains"
+	"github.com/1inch/1inch-sdk-go/helpers/consts/tokens"
+	"github.com/1inch/1inch-sdk-go/helpers/consts/web3providers"
 )
 
 func main() {

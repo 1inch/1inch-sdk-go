@@ -5,7 +5,7 @@ import (
 
 	"github.com/stretchr/testify/require"
 
-	"github.com/1inch/1inch-sdk/golang/helpers/consts/chains"
+	"github.com/1inch/1inch-sdk-go/helpers/consts/chains"
 )
 
 func TestCreatePermitSignature(t *testing.T) {
