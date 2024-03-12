@@ -14,7 +14,6 @@ import (
 	"github.com/1inch/1inch-sdk/golang/helpers/consts/web3providers"
 	"github.com/1inch/1inch-sdk/golang/internal/onchain"
 	"github.com/1inch/1inch-sdk/golang/internal/tenderly"
-
 	"github.com/stretchr/testify/require"
 )
 
@@ -22,15 +21,15 @@ func TestCreateOrderE2E(t *testing.T) {
 
 	testcases := []struct {
 		description       string
-		config            Config
+		config            models.Config
 		createOrderParams models.CreateOrderParams
 		expectedOutput    string
 	}{
 		{
 			description: "Arbitrum - Create limit order offering 1 FRAX for 1 DAI",
-			config: Config{
+			config: models.Config{
 				DevPortalApiKey: os.Getenv("DEV_PORTAL_TOKEN"),
-				Web3HttpProviders: []Web3ProviderConfig{
+				Web3HttpProviders: []models.Web3Provider{
 					{
 						ChainId: chains.Arbitrum,
 						Url:     web3providers.Arbitrum,
@@ -51,9 +50,9 @@ func TestCreateOrderE2E(t *testing.T) {
 		},
 		{
 			description: "Polygon - Create limit order offering 1 FRAX for 1 DAI",
-			config: Config{
+			config: models.Config{
 				DevPortalApiKey: os.Getenv("DEV_PORTAL_TOKEN"),
-				Web3HttpProviders: []Web3ProviderConfig{
+				Web3HttpProviders: []models.Web3Provider{
 					{
 						ChainId: chains.Polygon,
 						Url:     os.Getenv("WEB_3_HTTP_PROVIDER_URL_WITH_KEY_POLYGON"),
@@ -74,9 +73,9 @@ func TestCreateOrderE2E(t *testing.T) {
 		},
 		{
 			description: "Ethereum - Create limit order offering 1 1INCH for 1 DAI",
-			config: Config{
+			config: models.Config{
 				DevPortalApiKey: os.Getenv("DEV_PORTAL_TOKEN"),
-				Web3HttpProviders: []Web3ProviderConfig{
+				Web3HttpProviders: []models.Web3Provider{
 					{
 						ChainId: chains.Ethereum,
 						Url:     os.Getenv("WEB_3_HTTP_PROVIDER_URL_WITH_KEY"),
@@ -98,9 +97,9 @@ func TestCreateOrderE2E(t *testing.T) {
 		},
 		{
 			description: "BSC - Create limit order offering 1 USDC for 1 DAI",
-			config: Config{
+			config: models.Config{
 				DevPortalApiKey: os.Getenv("DEV_PORTAL_TOKEN"),
-				Web3HttpProviders: []Web3ProviderConfig{
+				Web3HttpProviders: []models.Web3Provider{
 					{
 						ChainId: chains.Bsc,
 						Url:     web3providers.Bsc,

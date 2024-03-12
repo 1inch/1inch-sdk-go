@@ -7,6 +7,7 @@ import (
 	"net/url"
 	"os"
 
+	"github.com/1inch/1inch-sdk/golang/client/models"
 	"github.com/1inch/1inch-sdk/golang/helpers/consts/chains"
 )
 
@@ -26,9 +27,9 @@ func setup() (*Client, *http.ServeMux, string, func(), error) {
 	// the base URL of the client will have its destination swapped to use this new test server for requests
 	server := httptest.NewServer(mux)
 	c, err := NewClient(
-		Config{
+		models.Config{
 			DevPortalApiKey: os.Getenv("DEV_PORTAL_TOKEN"),
-			Web3HttpProviders: []Web3ProviderConfig{
+			Web3HttpProviders: []models.Web3Provider{
 				{
 					ChainId: chains.Ethereum,
 					Url:     os.Getenv("WEB_3_HTTP_PROVIDER_URL_WITH_KEY"),

@@ -5,14 +5,15 @@ import (
 	"os"
 	"testing"
 
+	"github.com/1inch/1inch-sdk/golang/client/models"
 	"github.com/1inch/1inch-sdk/golang/helpers/consts/chains"
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
 )
 
-var SimpleEthereumConfig = Config{
+var SimpleEthereumConfig = models.Config{
 	DevPortalApiKey: os.Getenv("DEV_PORTAL_TOKEN"),
-	Web3HttpProviders: []Web3ProviderConfig{
+	Web3HttpProviders: []models.Web3Provider{
 		{
 			ChainId: chains.Ethereum,
 			Url:     os.Getenv("WEB_3_HTTP_PROVIDER_URL_WITH_KEY"),
@@ -23,14 +24,14 @@ var SimpleEthereumConfig = Config{
 func TestNewConfig(t *testing.T) {
 	testcases := []struct {
 		description              string
-		config                   Config
+		config                   models.Config
 		expectedErrorDescription string
 	}{
 		{
 			description: "Success",
-			config: Config{
+			config: models.Config{
 				DevPortalApiKey: "abc123",
-				Web3HttpProviders: []Web3ProviderConfig{
+				Web3HttpProviders: []models.Web3Provider{
 					{
 						ChainId: chains.Ethereum,
 						Url:     os.Getenv("WEB_3_HTTP_PROVIDER_URL_WITH_KEY"),
@@ -41,9 +42,9 @@ func TestNewConfig(t *testing.T) {
 		},
 		{
 			description: "Error - no API key",
-			config: Config{
+			config: models.Config{
 				DevPortalApiKey: "",
-				Web3HttpProviders: []Web3ProviderConfig{
+				Web3HttpProviders: []models.Web3Provider{
 					{
 						ChainId: chains.Ethereum,
 						Url:     os.Getenv("WEB_3_HTTP_PROVIDER_URL_WITH_KEY"),
@@ -54,7 +55,7 @@ func TestNewConfig(t *testing.T) {
 		},
 		{
 			description: "Error - no web3 provider key",
-			config: Config{
+			config: models.Config{
 				DevPortalApiKey: "123",
 			},
 			expectedErrorDescription: "config validation error: at least one web3 provider URL is required",

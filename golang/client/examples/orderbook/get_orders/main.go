@@ -15,9 +15,9 @@ import (
 func main() {
 
 	// Build the config for the client
-	config := client.Config{
+	config := models.Config{
 		DevPortalApiKey: os.Getenv("DEV_PORTAL_TOKEN"),
-		Web3HttpProviders: []client.Web3ProviderConfig{
+		Web3HttpProviders: []models.Web3Provider{
 			{
 				ChainId: chains.Polygon,
 				Url:     os.Getenv("WEB_3_HTTP_PROVIDER_URL_WITH_KEY_POLYGON"),
