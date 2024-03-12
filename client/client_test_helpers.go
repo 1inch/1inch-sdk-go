@@ -27,7 +27,7 @@ func setup() (*Client, *http.ServeMux, string, func(), error) {
 	// the base URL of the client will have its destination swapped to use this new test server for requests
 	server := httptest.NewServer(mux)
 	c, err := NewClient(
-		models.Config{
+		models.ClientConfig{
 			DevPortalApiKey: os.Getenv("DEV_PORTAL_TOKEN"),
 			Web3HttpProviders: []models.Web3Provider{
 				{

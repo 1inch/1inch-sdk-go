@@ -42,8 +42,8 @@ type Client struct {
 	OrderbookApi *OrderbookService
 }
 
-// NewClient creates and initializes a new Client instance based on the provided Config.
-func NewClient(config models.Config) (*Client, error) {
+// NewClient creates and initializes a new Client instance based on the provided ClientConfig.
+func NewClient(config models.ClientConfig) (*Client, error) {
 	err := config.Validate()
 	if err != nil {
 		return nil, fmt.Errorf("config validation error: %v", err)
