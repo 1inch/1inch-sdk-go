@@ -332,10 +332,12 @@ func TestSwapTokensTenderlyE2E(t *testing.T) {
 
 	//TODO set this up to have some form of configurations that enable the tests to run onchain
 	tenderlyApiKey := os.Getenv("TENDERLY_API_KEY")
-	if tenderlyApiKey != "" {
-		err := cleanupForksFromPreviousTests(tenderlyApiKey)
-		require.NoError(t, err, fmt.Errorf("failed to delete forks from previous test runs: %v", err))
+	if tenderlyApiKey == "" {
+		fmt.Printf("No Tenderly API key present in environment, skipping e2e tests")
+		return
 	}
+	err := cleanupForksFromPreviousTests(tenderlyApiKey)
+	require.NoError(t, err, fmt.Errorf("failed to delete forks from previous test runs: %v", err))
 
 	for _, tc := range testcases {
 		t.Run(tc.description, func(t *testing.T) {

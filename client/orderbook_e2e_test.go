@@ -2,6 +2,7 @@ package client
 
 import (
 	"context"
+	"fmt"
 	"os"
 	"testing"
 
@@ -123,6 +124,10 @@ func TestCreateOrderE2E(t *testing.T) {
 
 	//TODO set this up to have some form of configurations that enable the tests to run onchain and should also cleanup any previous test runs
 	tenderlyApiKey := os.Getenv("TENDERLY_API_KEY")
+	if tenderlyApiKey == "" {
+		fmt.Printf("No Tenderly API key present in environment, skipping e2e tests")
+		return
+	}
 
 	for _, tc := range testcases {
 		t.Run(tc.description, func(t *testing.T) {
