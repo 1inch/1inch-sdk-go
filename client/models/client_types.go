@@ -2,7 +2,7 @@ package models
 
 import "fmt"
 
-type Config struct {
+type ClientConfig struct {
 	DevPortalApiKey   string
 	Web3HttpProviders []Web3Provider
 }
@@ -12,7 +12,7 @@ type Web3Provider struct {
 	Url     string
 }
 
-func (c *Config) Validate() error {
+func (c *ClientConfig) Validate() error {
 
 	if c.DevPortalApiKey == "" {
 		return fmt.Errorf("API key is required")

@@ -11,7 +11,7 @@ import (
 	"github.com/stretchr/testify/require"
 )
 
-var SimpleEthereumConfig = models.Config{
+var SimpleEthereumConfig = models.ClientConfig{
 	DevPortalApiKey: os.Getenv("DEV_PORTAL_TOKEN"),
 	Web3HttpProviders: []models.Web3Provider{
 		{
@@ -24,12 +24,12 @@ var SimpleEthereumConfig = models.Config{
 func TestNewConfig(t *testing.T) {
 	testcases := []struct {
 		description              string
-		config                   models.Config
+		config                   models.ClientConfig
 		expectedErrorDescription string
 	}{
 		{
 			description: "Success",
-			config: models.Config{
+			config: models.ClientConfig{
 				DevPortalApiKey: "abc123",
 				Web3HttpProviders: []models.Web3Provider{
 					{
@@ -42,7 +42,7 @@ func TestNewConfig(t *testing.T) {
 		},
 		{
 			description: "Error - no API key",
-			config: models.Config{
+			config: models.ClientConfig{
 				DevPortalApiKey: "",
 				Web3HttpProviders: []models.Web3Provider{
 					{
@@ -55,7 +55,7 @@ func TestNewConfig(t *testing.T) {
 		},
 		{
 			description: "Error - no web3 provider key",
-			config: models.Config{
+			config: models.ClientConfig{
 				DevPortalApiKey: "123",
 			},
 			expectedErrorDescription: "config validation error: at least one web3 provider URL is required",

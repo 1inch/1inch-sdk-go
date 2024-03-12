@@ -18,7 +18,7 @@ import (
 func main() {
 
 	// Build the config for the client
-	config := models.Config{
+	config := models.ClientConfig{
 		DevPortalApiKey: os.Getenv("DEV_PORTAL_TOKEN"),
 		Web3HttpProviders: []models.Web3Provider{
 			{

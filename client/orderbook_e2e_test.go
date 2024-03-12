@@ -22,13 +22,13 @@ func TestCreateOrderE2E(t *testing.T) {
 
 	testcases := []struct {
 		description       string
-		config            models.Config
+		config            models.ClientConfig
 		createOrderParams models.CreateOrderParams
 		expectedOutput    string
 	}{
 		{
 			description: "Arbitrum - Create limit order offering 1 FRAX for 1 DAI",
-			config: models.Config{
+			config: models.ClientConfig{
 				DevPortalApiKey: os.Getenv("DEV_PORTAL_TOKEN"),
 				Web3HttpProviders: []models.Web3Provider{
 					{
@@ -51,7 +51,7 @@ func TestCreateOrderE2E(t *testing.T) {
 		},
 		{
 			description: "Polygon - Create limit order offering 1 FRAX for 1 DAI",
-			config: models.Config{
+			config: models.ClientConfig{
 				DevPortalApiKey: os.Getenv("DEV_PORTAL_TOKEN"),
 				Web3HttpProviders: []models.Web3Provider{
 					{
@@ -74,7 +74,7 @@ func TestCreateOrderE2E(t *testing.T) {
 		},
 		{
 			description: "Ethereum - Create limit order offering 1 1INCH for 1 DAI",
-			config: models.Config{
+			config: models.ClientConfig{
 				DevPortalApiKey: os.Getenv("DEV_PORTAL_TOKEN"),
 				Web3HttpProviders: []models.Web3Provider{
 					{
@@ -98,7 +98,7 @@ func TestCreateOrderE2E(t *testing.T) {
 		},
 		{
 			description: "BSC - Create limit order offering 1 USDC for 1 DAI",
-			config: models.Config{
+			config: models.ClientConfig{
 				DevPortalApiKey: os.Getenv("DEV_PORTAL_TOKEN"),
 				Web3HttpProviders: []models.Web3Provider{
 					{

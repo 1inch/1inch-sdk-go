@@ -54,7 +54,7 @@ func TestCreateOrderIntegration(t *testing.T) {
 		},
 	}
 
-	c, err := NewClient(models.Config{
+	c, err := NewClient(models.ClientConfig{
 		DevPortalApiKey: helpers.GetenvSafe("DEV_PORTAL_TOKEN"),
 		Web3HttpProviders: []models.Web3Provider{
 			{
