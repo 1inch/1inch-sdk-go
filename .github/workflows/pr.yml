@@ -1,0 +1,60 @@
+name: PR validation
+
+on:
+  pull_request:
+    paths-ignore:
+      - '**.md'
+      - '**.png'
+      - .gitignore
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout code into workspace directory
+        uses: actions/checkout@v3
+        with:
+          token: ${{ secrets.PULL_TOKEN }}
+
+      - name: Set up Go 1.21
+        uses: actions/setup-go@v3
+        with:
+          go-version: '1.21.0'
+
+      - name: Build
+        run: make -j build
+
+  test:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout code into workspace directory
+        uses: actions/checkout@v3
+        with:
+          token: ${{ secrets.PULL_TOKEN }}
+
+      - name: Set up Go 1.21
+        uses: actions/setup-go@v3
+        with:
+          go-version: '1.21.0'
+
+      - name: Unit tests
+        run: make test
+
+  lint:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Set up Go 1.21
+        uses: actions/setup-go@v3
+        with:
+          go-version: 1.21
+      - name: Checkout code into workspace directory
+        uses: actions/checkout@v3
+        with:
+          token: ${{ secrets.PULL_TOKEN }}
+
+      - name: Lint
+        uses: golangci/golangci-lint-action@v3
+        with:
+          args: --timeout=3m
+          version: v1.54.1
+          skip-cache: true
