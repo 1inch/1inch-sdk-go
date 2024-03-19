@@ -1,4 +1,4 @@
-package project_validation
+package validation
 
 import (
 	"fmt"
@@ -16,7 +16,7 @@ func validateWorkingDirectory() error {
 	}
 
 	dirName := filepath.Base(currentDir)
-	if dirName != "project-validation" {
+	if dirName != "validation" {
 		return fmt.Errorf("%v. Current directory: %v", projectValidationError, currentDir)
 	}
 	return nil

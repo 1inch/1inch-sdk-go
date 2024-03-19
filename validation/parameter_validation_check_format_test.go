@@ -1,4 +1,4 @@
-package project_validation
+package validation
 
 import (
 	"fmt"
