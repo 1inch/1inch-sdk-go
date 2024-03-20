@@ -15,7 +15,6 @@ import (
 	"github.com/1inch/1inch-sdk-go/helpers/consts/contracts"
 	"github.com/1inch/1inch-sdk-go/internal/onchain"
 	"github.com/1inch/1inch-sdk-go/internal/orderbook"
-	"github.com/1inch/1inch-sdk-go/internal/tenderly"
 
 	"github.com/ethereum/go-ethereum/common"
 	"github.com/ethereum/go-ethereum/crypto"
@@ -115,21 +114,19 @@ func (s *OrderbookService) CreateOrder(ctx context.Context, params models.Create
 				}
 			}
 
-			// Only run the approval if Tenderly data is not present
-			if _, ok = ctx.Value(tenderly.SwapConfigKey).(tenderly.SimulationConfig); !ok {
-				erc20Config := onchain.Erc20ApprovalConfig{
-					ChainId:        params.ChainId,
-					Key:            params.PrivateKey,
-					Erc20Address:   fromTokenAddress,
-					PublicAddress:  publicAddress,
-					SpenderAddress: aggregationRouterAddress,
-				}
-				err := onchain.ApproveTokenForRouter(ctx, ethClient, s.client.NonceCache, erc20Config)
-				if err != nil {
-					return nil, nil, fmt.Errorf("failed to approve token for router: %v", err)
-				}
-				helpers.Sleep()
+			erc20Config := onchain.Erc20ApprovalConfig{
+				ChainId:        params.ChainId,
+				Key:            params.PrivateKey,
+				Erc20Address:   fromTokenAddress,
+				PublicAddress:  publicAddress,
+				SpenderAddress: aggregationRouterAddress,
 			}
+			err := onchain.ApproveTokenForRouter(ctx, ethClient, s.client.NonceCache, erc20Config)
+			if err != nil {
+				return nil, nil, fmt.Errorf("failed to approve token for router: %v", err)
+			}
+			helpers.Sleep()
+
 		}
 	}
 

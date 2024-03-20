@@ -11,5 +11,4 @@ type ExecuteSwapConfig struct {
 	EstimatedAmountOut string
 	TransactionData    string
 	IsPermitSwap       bool
-	SkipWarnings       bool
 }

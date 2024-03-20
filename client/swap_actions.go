@@ -4,7 +4,6 @@ import (
 	"context"
 	"crypto/ecdsa"
 	"encoding/hex"
-	"errors"
 	"fmt"
 	"math/big"
 	"strings"
@@ -17,7 +16,6 @@ import (
 	"github.com/1inch/1inch-sdk-go/helpers/consts/contracts"
 	"github.com/1inch/1inch-sdk-go/helpers/consts/tokens"
 	"github.com/1inch/1inch-sdk-go/internal/onchain"
-	"github.com/1inch/1inch-sdk-go/internal/swap"
 
 	"github.com/ethereum/go-ethereum/common"
 	"github.com/ethereum/go-ethereum/crypto"
@@ -72,7 +70,6 @@ func (s *ActionService) swapTokens(ctx context.Context, params models.SwapTokens
 		PublicAddress: params.PublicAddress,
 		Amount:        params.Amount,
 		Slippage:      params.Slippage,
-		SkipWarnings:  params.SkipWarnings,
 	}
 
 	var usePermit bool
@@ -169,16 +166,6 @@ func (s *SwapService) ExecuteSwap(ctx context.Context, config *models.ExecuteSwa
 		return fmt.Errorf("failed to get eth client: %v", err)
 	}
 
-	if !config.SkipWarnings {
-		ok, err := swap.ConfirmExecuteSwapWithUser(config)
-		if err != nil {
-			return fmt.Errorf("failed to confirm swap: %v", err)
-		}
-		if !ok {
-			return errors.New("user rejected trade")
-		}
-	}
-
 	if !config.IsPermitSwap {
 		err = s.executeSwapWithApproval(ctx, config, ethClient)
 		if err != nil {
@@ -216,16 +203,6 @@ func (s *SwapService) executeSwapWithApproval(ctx context.Context, config *model
 			return fmt.Errorf("failed to convert amount to big.Int: %v", err)
 		}
 		if allowance.Cmp(amountBig) <= 0 {
-			if !config.SkipWarnings {
-				ok, err := swap.ConfirmApprovalWithUser(ethClient, config.PublicAddress, config.FromToken.Address)
-				if err != nil {
-					return fmt.Errorf("failed to confirm approval: %v", err)
-				}
-				if !ok {
-					return errors.New("user rejected approval")
-				}
-			}
-
 			erc20Config := onchain.Erc20ApprovalConfig{
 				ChainId:        config.ChainId,
 				Key:            config.WalletKey,
