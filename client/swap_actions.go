@@ -18,7 +18,6 @@ import (
 	"github.com/1inch/1inch-sdk-go/helpers/consts/tokens"
 	"github.com/1inch/1inch-sdk-go/internal/onchain"
 	"github.com/1inch/1inch-sdk-go/internal/swap"
-	"github.com/1inch/1inch-sdk-go/internal/tenderly"
 
 	"github.com/ethereum/go-ethereum/common"
 	"github.com/ethereum/go-ethereum/crypto"
@@ -35,7 +34,7 @@ type ActionService service
 // NOTE: due to high gas costs, this method has been temporarily made private until gas configurations and summaries are put in place to protect large unexpected transaction fees
 func (s *ActionService) swapTokens(ctx context.Context, params models.SwapTokensParams) error {
 
-	// Always disable estimate so we can do onchain approvals for the swaps right before we execute
+	// Always disable estimate, so we can do onchain approvals for the swaps right before we execute
 	params.DisableEstimate = true
 
 	// TODO find a better way of managing the matching between public and private keys
@@ -203,7 +202,6 @@ func (s *SwapService) executeSwapWithApproval(ctx context.Context, config *model
 	}
 
 	var value *big.Int
-	var approveFirst bool
 	if config.FromToken.Address != tokens.NativeToken {
 		// When swapping erc20 tokens, the value set on the transaction will be 0
 		value = big.NewInt(0)
@@ -228,23 +226,19 @@ func (s *SwapService) executeSwapWithApproval(ctx context.Context, config *model
 				}
 			}
 
-			approveFirst = true
-
-			// Only run the approval if Tenderly data is not present
-			if _, ok := ctx.Value(tenderly.SwapConfigKey).(tenderly.SimulationConfig); !ok {
-				erc20Config := onchain.Erc20ApprovalConfig{
-					ChainId:        config.ChainId,
-					Key:            config.WalletKey,
-					Erc20Address:   common.HexToAddress(config.FromToken.Address),
-					PublicAddress:  common.HexToAddress(config.PublicAddress),
-					SpenderAddress: common.HexToAddress(aggregationRouter),
-				}
-				err = onchain.ApproveTokenForRouter(ctx, ethClient, s.client.NonceCache, erc20Config)
-				if err != nil {
-					return fmt.Errorf("failed to approve token for router: %v", err)
-				}
-				helpers.Sleep()
+			erc20Config := onchain.Erc20ApprovalConfig{
+				ChainId:        config.ChainId,
+				Key:            config.WalletKey,
+				Erc20Address:   common.HexToAddress(config.FromToken.Address),
+				PublicAddress:  common.HexToAddress(config.PublicAddress),
+				SpenderAddress: common.HexToAddress(aggregationRouter),
 			}
+			err = onchain.ApproveTokenForRouter(ctx, ethClient, s.client.NonceCache, erc20Config)
+			if err != nil {
+				return fmt.Errorf("failed to approve token for router: %v", err)
+			}
+			helpers.Sleep()
+
 		}
 	} else {
 		// When swapping from the native token, there is no need for an approval and the amount passed in must be explicitly set
@@ -269,29 +263,11 @@ func (s *SwapService) executeSwapWithApproval(ctx context.Context, config *model
 		Data:          hexData,
 	}
 
-	// Check for injected Tenderly data
-	if simulationConfig, ok := ctx.Value(tenderly.SwapConfigKey).(tenderly.SimulationConfig); ok {
-		_, err := tenderly.SimulateSwap(tenderly.SwapConfig{
-			TenderlyApiKey:  simulationConfig.TenderlyApiKey,
-			OverridesMap:    simulationConfig.OverridesMap,
-			ChainId:         config.ChainId,
-			PublicAddress:   config.PublicAddress,
-			FromToken:       config.FromToken.Address,
-			FromTokenSymbol: config.FromToken.Symbol,
-			ToTokenSymbol:   config.ToToken.Symbol,
-			TransactionData: config.TransactionData,
-			ApproveFirst:    approveFirst,
-			Value:           value.String(),
-		})
-		if err != nil {
-			return fmt.Errorf("failed to execute tenderly simulation: %v", err)
-		}
-	} else {
-		err = onchain.ExecuteTransaction(ctx, txConfig, ethClient, s.client.NonceCache)
-		if err != nil {
-			return fmt.Errorf("failed to execute transaction: %v", err)
-		}
+	err = onchain.ExecuteTransaction(ctx, txConfig, ethClient, s.client.NonceCache)
+	if err != nil {
+		return fmt.Errorf("failed to execute transaction: %v", err)
 	}
+
 	return nil
 }
 
@@ -317,28 +293,11 @@ func (s *SwapService) executeSwapWithPermit(ctx context.Context, config *models.
 		Data:          hexData,
 	}
 
-	// Check for injected Tenderly data
-	if simulationConfig, ok := ctx.Value(tenderly.SwapConfigKey).(tenderly.SimulationConfig); ok {
-		_, err := tenderly.SimulateSwap(tenderly.SwapConfig{
-			TenderlyApiKey:  simulationConfig.TenderlyApiKey,
-			OverridesMap:    simulationConfig.OverridesMap,
-			ChainId:         config.ChainId,
-			PublicAddress:   config.PublicAddress,
-			FromToken:       config.FromToken.Address,
-			FromTokenSymbol: config.FromToken.Symbol,
-			ToTokenSymbol:   config.ToToken.Symbol,
-			Value:           "0",
-			TransactionData: config.TransactionData,
-		})
-		if err != nil {
-			return fmt.Errorf("failed to execute tenderly simulation: %v", err)
-		}
-	} else {
-		err = onchain.ExecuteTransaction(ctx, txConfig, ethClient, s.client.NonceCache)
-		if err != nil {
-			return fmt.Errorf("failed to execute transaction: %v", err)
-		}
+	err = onchain.ExecuteTransaction(ctx, txConfig, ethClient, s.client.NonceCache)
+	if err != nil {
+		return fmt.Errorf("failed to execute transaction: %v", err)
 	}
+
 	return nil
 }
 
