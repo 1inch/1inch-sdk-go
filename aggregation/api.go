@@ -3,156 +3,162 @@ package aggregation
 import (
 	"context"
 	"fmt"
-	"github.com/1inch/1inch-sdk-go/internal/helpers"
-	"github.com/google/go-querystring/query"
-	"net/http"
-	"net/url"
-	"reflect"
+	"github.com/1inch/1inch-sdk-go/internal/http_executor"
 )
 
 // GetApproveAllowance returns the allowance the 1inch router has to spend a token on behalf of a wallet
-func (api *apiActions) GetApproveAllowance(ctx context.Context, params ApproveAllowanceParams) (*AllowanceResponse, *http.Response, error) {
+func (api *apiActions) GetApproveAllowance(ctx context.Context, params ApproveAllowanceParams) (*AllowanceResponse, error) {
 	u := fmt.Sprintf("/swap/v5.2/%d/approve/allowance", params.ChainId)
 
 	err := params.Validate()
 	if err != nil {
-		return nil, nil, err
+		return nil, err
 	}
 
-	u, err = getQueryParameters(u, params.ApproveControllerGetAllowanceParams)
+	u, err = http_executor.AddQueryParameters(u, params.ApproveControllerGetAllowanceParams)
 	if err != nil {
-		return nil, nil, err
+		return nil, err
 	}
 
-	req, err := api.httpClient.NewRequest("GET", u, nil)
-	if err != nil {
-		return nil, nil, err
+	payload := RequestPayload{
+		Method: "GET",
+		Params: u,
+		Body:   nil,
 	}
 
 	var allowanceResponse AllowanceResponse
-	res, err := s.client.Do(ctx, req, &allowanceResponse)
+	err = api.httpExecutor.ExecuteRequest(ctx, payload, &allowanceResponse)
 	if err != nil {
-		return nil, nil, err
+		return nil, err
 	}
 
-	return &allowanceResponse, res, nil
+	return &allowanceResponse, nil
 }
 
 // GetApproveSpender returns the address of the 1inch router contract
-func (s *apiActions) GetApproveSpender(ctx context.Context, params ApproveSpenderParams) (*SpenderResponse, *http.Response, error) {
+func (api *apiActions) GetApproveSpender(ctx context.Context, params ApproveSpenderParams) (*SpenderResponse, error) {
 	u := fmt.Sprintf("/swap/v5.2/%d/approve/spender", params.ChainId)
 
 	err := params.Validate()
 	if err != nil {
-		return nil, nil, err
+		return nil, err
 	}
 
-	req, err := s.client.NewRequest("GET", u, nil)
+	u, err = http_executor.AddQueryParameters(u, params)
 	if err != nil {
-		return nil, nil, err
+		return nil, err
+	}
+
+	payload := RequestPayload{
+		Method: "GET",
+		Params: u,
+		Body:   nil,
 	}
 
 	var spender SpenderResponse
-	res, err := s.client.Do(ctx, req, &spender)
+	err = api.httpExecutor.ExecuteRequest(ctx, payload, &spender)
 	if err != nil {
-		return nil, nil, err
+		return nil, err
 	}
 
-	return &spender, res, nil
+	return &spender, nil
 }
 
 // GetApproveTransaction returns the transaction data for approving the 1inch router to spend a token on behalf of a wallet
-func (s *apiActions) GetApproveTransaction(ctx context.Context, params ApproveTransactionParams) (*ApproveCallDataResponse, *http.Response, error) {
+func (api *apiActions) GetApproveTransaction(ctx context.Context, params ApproveTransactionParams) (*ApproveCallDataResponse, error) {
 	u := fmt.Sprintf("/swap/v5.2/%d/approve/transaction", params.ChainId)
 
 	err := params.Validate()
 	if err != nil {
-		return nil, nil, err
+		return nil, err
 	}
 
-	u, err = getQueryParameters(u, params.ApproveControllerGetCallDataParams)
+	u, err = http_executor.AddQueryParameters(u, params.ApproveControllerGetCallDataParams)
 	if err != nil {
-		return nil, nil, err
+		return nil, err
 	}
 
-	req, err := s.client.NewRequest("GET", u, nil)
-	if err != nil {
-		return nil, nil, err
+	payload := RequestPayload{
+		Method: "GET",
+		Params: u,
+		Body:   nil,
 	}
 
 	var approveCallData ApproveCallDataResponse
-	res, err := s.client.Do(ctx, req, &approveCallData)
+	err = api.httpExecutor.ExecuteRequest(ctx, payload, &approveCallData)
 	if err != nil {
-		return nil, nil, err
+		return nil, err
 	}
-
-	return &approveCallData, res, nil
+	return &approveCallData, nil
 }
 
 // GetLiquiditySources returns all liquidity sources tracked by the 1inch Aggregation Protocol for a given chain
-func (s *apiActions) GetLiquiditySources(ctx context.Context, params GetLiquiditySourcesParams) (*ProtocolsResponse, *http.Response, error) {
+func (api *apiActions) GetLiquiditySources(ctx context.Context, params GetLiquiditySourcesParams) (*ProtocolsResponse, error) {
 	u := fmt.Sprintf("/swap/v5.2/%d/liquidity-sources", params.ChainId)
 
 	err := params.Validate()
 	if err != nil {
-		return nil, nil, err
+		return nil, err
 	}
 
-	req, err := s.client.NewRequest("GET", u, nil)
-	if err != nil {
-		return nil, nil, err
+	payload := RequestPayload{
+		Method: "GET",
+		Params: u,
+		Body:   nil,
 	}
 
 	var liquiditySources ProtocolsResponse
-	res, err := s.client.Do(ctx, req, &liquiditySources)
+	err = api.httpExecutor.ExecuteRequest(ctx, payload, &liquiditySources)
 	if err != nil {
-		return nil, nil, err
+		return nil, err
 	}
 
-	return &liquiditySources, res, nil
+	return &liquiditySources, nil
 }
 
 // GetQuote returns the quote for a potential swap through the Aggregation Protocol
-func (s *apiActions) GetQuote(ctx context.Context, params GetQuoteParams) (*QuoteResponse, *http.Response, error) {
+func (api *apiActions) GetQuote(ctx context.Context, params GetQuoteParams) (*QuoteResponse, error) {
 	u := fmt.Sprintf("/swap/v5.2/%d/quote", params.ChainId)
 
 	err := params.Validate()
 	if err != nil {
-		return nil, nil, err
+		return nil, err
 	}
 
+	// TODO: cleanup
 	// Token info is used by certain parts of the SDK and more info by default is helpful to integrators
 	// Because we use generated structs with concrete types, extra data is forced on regardless of what the user passes in.
 	params.IncludeTokensInfo = true
 	params.IncludeGas = true
 	params.IncludeProtocols = true
 
-	u, err = getQueryParameters(u, params.AggregationControllerGetQuoteParams)
+	u, err = http_executor.AddQueryParameters(u, params.AggregationControllerGetQuoteParams)
 	if err != nil {
-		return nil, nil, err
+		return nil, err
 	}
 
-	req, err := s.client.NewRequest("GET", u, nil)
-	if err != nil {
-		return nil, nil, err
+	payload := RequestPayload{
+		Method: "GET",
+		Params: u,
+		Body:   nil,
 	}
 
 	var quote QuoteResponse
-	res, err := s.client.Do(ctx, req, &quote)
+	err = api.httpExecutor.ExecuteRequest(ctx, payload, &quote)
 	if err != nil {
-		return nil, nil, err
+		return nil, err
 	}
 
-	return &quote, res, nil
+	return &quote, nil
 }
 
 // GetSwap returns a swap quote with transaction data that can be used to execute a swap through the Aggregation Protocol
-func (s *apiActions) GetSwap(ctx context.Context, params GetSwapParams) (*SwapResponse, *http.Response, error) {
+func (api *apiActions) GetSwap(ctx context.Context, params GetSwapParams) (*SwapResponse, error) {
 	u := fmt.Sprintf("/swap/v5.2/%d/swap", params.ChainId)
 
 	err := params.Validate()
 	if err != nil {
-		return nil, nil, err
+		return nil, err
 	}
 
 	// Token info is used by certain parts of the SDK and more info by default is helpful to integrators
@@ -161,74 +167,46 @@ func (s *apiActions) GetSwap(ctx context.Context, params GetSwapParams) (*SwapRe
 	params.IncludeGas = true
 	params.IncludeProtocols = true
 
-	u, err = getQueryParameters(u, params.AggregationControllerGetSwapParams)
+	u, err = http_executor.AddQueryParameters(u, params.AggregationControllerGetSwapParams)
 	if err != nil {
-		return nil, nil, err
+		return nil, err
 	}
-	req, err := s.client.NewRequest("GET", u, nil)
-	if err != nil {
-		return nil, nil, err
+
+	payload := RequestPayload{
+		Method: "GET",
+		Params: u,
+		Body:   nil,
 	}
 
 	var swapResponse SwapResponse
-	res, err := s.client.Do(ctx, req, &swapResponse)
+	err = api.httpExecutor.ExecuteRequest(ctx, payload, &swapResponse)
 	if err != nil {
-		return nil, nil, err
+		return nil, err
 	}
-	return &swapResponse, res, nil
+
+	return &swapResponse, nil
 }
 
 // GetTokens returns all tokens officially tracked by the 1inch Aggregation Protocol for a given chain
-func (s *apiActions) GetTokens(ctx context.Context, params GetTokensParams) (*TokensResponse, *http.Response, error) {
+func (api *apiActions) GetTokens(ctx context.Context, params GetTokensParams) (*TokensResponse, error) {
 	u := fmt.Sprintf("/swap/v5.2/%d/tokens", params.ChainId)
 
 	err := params.Validate()
 	if err != nil {
-		return nil, nil, err
+		return nil, err
 	}
 
-	req, err := s.client.NewRequest("GET", u, nil)
-	if err != nil {
-		return nil, nil, err
+	payload := RequestPayload{
+		Method: "GET",
+		Params: u,
+		Body:   nil,
 	}
 
 	var tokens TokensResponse
-	res, err := s.client.Do(ctx, req, &tokens)
+	err = api.httpExecutor.ExecuteRequest(ctx, payload, &tokens)
 	if err != nil {
-		return nil, nil, err
+		return nil, err
 	}
 
-	return &tokens, res, nil
-}
-
-// addQueryParameters adds the parameters in the struct params as URL query parameters to s.
-// params must be a struct whose fields may contain "url" tags.
-func getQueryParameters(s string, params interface{}) (string, error) {
-	v := reflect.ValueOf(params)
-	if v.Kind() == reflect.Ptr && v.IsNil() {
-		return s, nil
-	}
-
-	u, err := url.Parse(s)
-	if err != nil {
-		return s, err
-	}
-
-	qs, err := query.Values(params)
-	if err != nil {
-		return s, err
-	}
-
-	for k, v := range qs {
-		if helpers.IsScientificNotation(v[0]) {
-			expanded, err := helpers.ExpandScientificNotation(v[0])
-			if err != nil {
-				return "", fmt.Errorf("failed to expand scientific notation for parameter %v with a value of %v: %v", k, v, err)
-			}
-			v[0] = expanded
-		}
-	}
-
-	u.RawQuery = qs.Encode()
-	return u.String(), nil
+	return &tokens, nil
 }
