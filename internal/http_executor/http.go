@@ -33,12 +33,18 @@ type Client struct {
 
 type RequestPayload struct {
 	Method string
-	Params string
+	Params interface{}
+	U      string
 	Body   []byte
 }
 
 func (c *Client) ExecuteRequest(ctx context.Context, payload RequestPayload, v interface{}) error {
-	fullURL, err := c.baseURL.Parse(payload.Params)
+	u, err := addQueryParameters(payload.U, payload.Params)
+	if err != nil {
+		return err
+	}
+
+	fullURL, err := c.baseURL.Parse(u)
 	if err != nil {
 		return err
 	}
@@ -106,9 +112,9 @@ func (c *Client) handleErrorResponse(resp *http.Response) error {
 	return fmt.Errorf("HTTP %d: %s", resp.StatusCode, apiError.Message)
 }
 
-// AddQueryParameters adds the parameters in the struct params as URL query parameters to s.
+// addQueryParameters adds the parameters in the struct params as URL query parameters to s.
 // params must be a struct whose fields may contain "url" tags.
-func AddQueryParameters(s string, params interface{}) (string, error) {
+func addQueryParameters(s string, params interface{}) (string, error) {
 	v := reflect.ValueOf(params)
 	if v.Kind() == reflect.Ptr && v.IsNil() {
 		return s, nil

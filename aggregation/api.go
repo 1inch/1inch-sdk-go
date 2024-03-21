@@ -3,11 +3,10 @@ package aggregation
 import (
 	"context"
 	"fmt"
-	"github.com/1inch/1inch-sdk-go/internal/http_executor"
 )
 
 // GetApproveAllowance returns the allowance the 1inch router has to spend a token on behalf of a wallet
-func (api *apiActions) GetApproveAllowance(ctx context.Context, params ApproveAllowanceParams) (*AllowanceResponse, error) {
+func (api *api) GetApproveAllowance(ctx context.Context, params ApproveAllowanceParams) (*AllowanceResponse, error) {
 	u := fmt.Sprintf("/swap/v5.2/%d/approve/allowance", params.ChainId)
 
 	err := params.Validate()
@@ -15,14 +14,10 @@ func (api *apiActions) GetApproveAllowance(ctx context.Context, params ApproveAl
 		return nil, err
 	}
 
-	u, err = http_executor.AddQueryParameters(u, params.ApproveControllerGetAllowanceParams)
-	if err != nil {
-		return nil, err
-	}
-
 	payload := RequestPayload{
 		Method: "GET",
-		Params: u,
+		Params: params.ApproveControllerGetAllowanceParams,
+		U:      u,
 		Body:   nil,
 	}
 
@@ -36,7 +31,7 @@ func (api *apiActions) GetApproveAllowance(ctx context.Context, params ApproveAl
 }
 
 // GetApproveSpender returns the address of the 1inch router contract
-func (api *apiActions) GetApproveSpender(ctx context.Context, params ApproveSpenderParams) (*SpenderResponse, error) {
+func (api *api) GetApproveSpender(ctx context.Context, params ApproveSpenderParams) (*SpenderResponse, error) {
 	u := fmt.Sprintf("/swap/v5.2/%d/approve/spender", params.ChainId)
 
 	err := params.Validate()
@@ -44,14 +39,10 @@ func (api *apiActions) GetApproveSpender(ctx context.Context, params ApproveSpen
 		return nil, err
 	}
 
-	u, err = http_executor.AddQueryParameters(u, params)
-	if err != nil {
-		return nil, err
-	}
-
 	payload := RequestPayload{
 		Method: "GET",
-		Params: u,
+		U:      u,
+		Params: nil,
 		Body:   nil,
 	}
 
@@ -65,7 +56,7 @@ func (api *apiActions) GetApproveSpender(ctx context.Context, params ApproveSpen
 }
 
 // GetApproveTransaction returns the transaction data for approving the 1inch router to spend a token on behalf of a wallet
-func (api *apiActions) GetApproveTransaction(ctx context.Context, params ApproveTransactionParams) (*ApproveCallDataResponse, error) {
+func (api *api) GetApproveTransaction(ctx context.Context, params ApproveTransactionParams) (*ApproveCallDataResponse, error) {
 	u := fmt.Sprintf("/swap/v5.2/%d/approve/transaction", params.ChainId)
 
 	err := params.Validate()
@@ -73,14 +64,10 @@ func (api *apiActions) GetApproveTransaction(ctx context.Context, params Approve
 		return nil, err
 	}
 
-	u, err = http_executor.AddQueryParameters(u, params.ApproveControllerGetCallDataParams)
-	if err != nil {
-		return nil, err
-	}
-
 	payload := RequestPayload{
 		Method: "GET",
-		Params: u,
+		Params: params.ApproveControllerGetCallDataParams,
+		U:      u,
 		Body:   nil,
 	}
 
@@ -93,7 +80,7 @@ func (api *apiActions) GetApproveTransaction(ctx context.Context, params Approve
 }
 
 // GetLiquiditySources returns all liquidity sources tracked by the 1inch Aggregation Protocol for a given chain
-func (api *apiActions) GetLiquiditySources(ctx context.Context, params GetLiquiditySourcesParams) (*ProtocolsResponse, error) {
+func (api *api) GetLiquiditySources(ctx context.Context, params GetLiquiditySourcesParams) (*ProtocolsResponse, error) {
 	u := fmt.Sprintf("/swap/v5.2/%d/liquidity-sources", params.ChainId)
 
 	err := params.Validate()
@@ -103,7 +90,8 @@ func (api *apiActions) GetLiquiditySources(ctx context.Context, params GetLiquid
 
 	payload := RequestPayload{
 		Method: "GET",
-		Params: u,
+		Params: nil,
+		U:      u,
 		Body:   nil,
 	}
 
@@ -117,7 +105,7 @@ func (api *apiActions) GetLiquiditySources(ctx context.Context, params GetLiquid
 }
 
 // GetQuote returns the quote for a potential swap through the Aggregation Protocol
-func (api *apiActions) GetQuote(ctx context.Context, params GetQuoteParams) (*QuoteResponse, error) {
+func (api *api) GetQuote(ctx context.Context, params GetQuoteParams) (*QuoteResponse, error) {
 	u := fmt.Sprintf("/swap/v5.2/%d/quote", params.ChainId)
 
 	err := params.Validate()
@@ -132,14 +120,10 @@ func (api *apiActions) GetQuote(ctx context.Context, params GetQuoteParams) (*Qu
 	params.IncludeGas = true
 	params.IncludeProtocols = true
 
-	u, err = http_executor.AddQueryParameters(u, params.AggregationControllerGetQuoteParams)
-	if err != nil {
-		return nil, err
-	}
-
 	payload := RequestPayload{
 		Method: "GET",
-		Params: u,
+		Params: params.AggregationControllerGetQuoteParams,
+		U:      u,
 		Body:   nil,
 	}
 
@@ -153,7 +137,7 @@ func (api *apiActions) GetQuote(ctx context.Context, params GetQuoteParams) (*Qu
 }
 
 // GetSwap returns a swap quote with transaction data that can be used to execute a swap through the Aggregation Protocol
-func (api *apiActions) GetSwap(ctx context.Context, params GetSwapParams) (*SwapResponse, error) {
+func (api *api) GetSwap(ctx context.Context, params GetSwapParams) (*SwapResponse, error) {
 	u := fmt.Sprintf("/swap/v5.2/%d/swap", params.ChainId)
 
 	err := params.Validate()
@@ -167,14 +151,10 @@ func (api *apiActions) GetSwap(ctx context.Context, params GetSwapParams) (*Swap
 	params.IncludeGas = true
 	params.IncludeProtocols = true
 
-	u, err = http_executor.AddQueryParameters(u, params.AggregationControllerGetSwapParams)
-	if err != nil {
-		return nil, err
-	}
-
 	payload := RequestPayload{
 		Method: "GET",
-		Params: u,
+		Params: params.AggregationControllerGetSwapParams,
+		U:      u,
 		Body:   nil,
 	}
 
@@ -188,7 +168,7 @@ func (api *apiActions) GetSwap(ctx context.Context, params GetSwapParams) (*Swap
 }
 
 // GetTokens returns all tokens officially tracked by the 1inch Aggregation Protocol for a given chain
-func (api *apiActions) GetTokens(ctx context.Context, params GetTokensParams) (*TokensResponse, error) {
+func (api *api) GetTokens(ctx context.Context, params GetTokensParams) (*TokensResponse, error) {
 	u := fmt.Sprintf("/swap/v5.2/%d/tokens", params.ChainId)
 
 	err := params.Validate()
@@ -198,7 +178,8 @@ func (api *apiActions) GetTokens(ctx context.Context, params GetTokensParams) (*
 
 	payload := RequestPayload{
 		Method: "GET",
-		Params: u,
+		Params: nil,
+		U:      u,
 		Body:   nil,
 	}
 
