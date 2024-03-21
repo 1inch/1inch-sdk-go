@@ -1,11 +1,10 @@
 package onchain
 
 import (
+	"github.com/1inch/1inch-sdk-go/internal/helpers/consts/chains"
 	"testing"
 
 	"github.com/stretchr/testify/require"
-
-	"github.com/1inch/1inch-sdk-go/helpers/consts/chains"
 )
 
 func TestCreatePermitSignature(t *testing.T) {

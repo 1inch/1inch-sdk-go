@@ -3,6 +3,8 @@ package orderbook
 import (
 	"bufio"
 	"fmt"
+	helpers2 "github.com/1inch/1inch-sdk-go/internal/helpers"
+	"github.com/1inch/1inch-sdk-go/internal/helpers/consts/contracts"
 	"io"
 	"math/big"
 	"os"
@@ -17,7 +19,6 @@ import (
 	"github.com/ethereum/go-ethereum/signer/core/apitypes"
 
 	"github.com/1inch/1inch-sdk-go/helpers"
-	"github.com/1inch/1inch-sdk-go/helpers/consts/contracts"
 	"github.com/1inch/1inch-sdk-go/internal/onchain"
 )
 
@@ -220,8 +221,8 @@ func confirmLimitOrderWithUser(order *models.Order, ethClient *ethclient.Client,
 
 	writer.Printf("Order summary:\n")
 	writer.Printf("    %-30s %s\n", "Wallet:", order.Data.Maker)
-	writer.Printf("    %-30s %s %s\n", "Selling: ", helpers.SimplifyValue(order.Data.MakingAmount, int(makerTokenDecimals)), makerTokenName)
-	writer.Printf("    %-30s %s %s\n", "Buying:", helpers.SimplifyValue(order.Data.TakingAmount, int(takerTokenDecimals)), takerTokenName)
+	writer.Printf("    %-30s %s %s\n", "Selling: ", helpers2.SimplifyValue(order.Data.MakingAmount, int(makerTokenDecimals)), makerTokenName)
+	writer.Printf("    %-30s %s %s\n", "Buying:", helpers2.SimplifyValue(order.Data.TakingAmount, int(takerTokenDecimals)), takerTokenName)
 	writer.Printf("\n")
 	writer.Printf("WARNING: This order will be officially posted to the 1inch Limit Order protocol where anyone will be able to execute in onchain immediately. " +
 		"Once executed, the results are irreversible. Make sure the proposed trade looks correct before continuing!\n")

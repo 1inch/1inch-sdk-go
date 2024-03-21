@@ -1,17 +1,17 @@
-package client
+package aggregation
 
 import (
 	"context"
 	"fmt"
+	"github.com/1inch/1inch-sdk-go/internal/helpers"
+	"github.com/google/go-querystring/query"
 	"net/http"
-
-	"github.com/1inch/1inch-sdk-go/client/models"
+	"net/url"
+	"reflect"
 )
 
-type SwapService service
-
 // GetApproveAllowance returns the allowance the 1inch router has to spend a token on behalf of a wallet
-func (s *SwapService) GetApproveAllowance(ctx context.Context, params models.ApproveAllowanceParams) (*models.AllowanceResponse, *http.Response, error) {
+func (api *apiActions) GetApproveAllowance(ctx context.Context, params ApproveAllowanceParams) (*AllowanceResponse, *http.Response, error) {
 	u := fmt.Sprintf("/swap/v5.2/%d/approve/allowance", params.ChainId)
 
 	err := params.Validate()
@@ -19,17 +19,17 @@ func (s *SwapService) GetApproveAllowance(ctx context.Context, params models.App
 		return nil, nil, err
 	}
 
-	u, err = addQueryParameters(u, params.ApproveControllerGetAllowanceParams)
+	u, err = getQueryParameters(u, params.ApproveControllerGetAllowanceParams)
 	if err != nil {
 		return nil, nil, err
 	}
 
-	req, err := s.client.NewRequest("GET", u, nil)
+	req, err := api.httpClient.NewRequest("GET", u, nil)
 	if err != nil {
 		return nil, nil, err
 	}
 
-	var allowanceResponse models.AllowanceResponse
+	var allowanceResponse AllowanceResponse
 	res, err := s.client.Do(ctx, req, &allowanceResponse)
 	if err != nil {
 		return nil, nil, err
@@ -39,7 +39,7 @@ func (s *SwapService) GetApproveAllowance(ctx context.Context, params models.App
 }
 
 // GetApproveSpender returns the address of the 1inch router contract
-func (s *SwapService) GetApproveSpender(ctx context.Context, params models.ApproveSpenderParams) (*models.SpenderResponse, *http.Response, error) {
+func (s *apiActions) GetApproveSpender(ctx context.Context, params ApproveSpenderParams) (*SpenderResponse, *http.Response, error) {
 	u := fmt.Sprintf("/swap/v5.2/%d/approve/spender", params.ChainId)
 
 	err := params.Validate()
@@ -52,7 +52,7 @@ func (s *SwapService) GetApproveSpender(ctx context.Context, params models.Appro
 		return nil, nil, err
 	}
 
-	var spender models.SpenderResponse
+	var spender SpenderResponse
 	res, err := s.client.Do(ctx, req, &spender)
 	if err != nil {
 		return nil, nil, err
@@ -62,7 +62,7 @@ func (s *SwapService) GetApproveSpender(ctx context.Context, params models.Appro
 }
 
 // GetApproveTransaction returns the transaction data for approving the 1inch router to spend a token on behalf of a wallet
-func (s *SwapService) GetApproveTransaction(ctx context.Context, params models.ApproveTransactionParams) (*models.ApproveCallDataResponse, *http.Response, error) {
+func (s *apiActions) GetApproveTransaction(ctx context.Context, params ApproveTransactionParams) (*ApproveCallDataResponse, *http.Response, error) {
 	u := fmt.Sprintf("/swap/v5.2/%d/approve/transaction", params.ChainId)
 
 	err := params.Validate()
@@ -70,7 +70,7 @@ func (s *SwapService) GetApproveTransaction(ctx context.Context, params models.A
 		return nil, nil, err
 	}
 
-	u, err = addQueryParameters(u, params.ApproveControllerGetCallDataParams)
+	u, err = getQueryParameters(u, params.ApproveControllerGetCallDataParams)
 	if err != nil {
 		return nil, nil, err
 	}
@@ -80,7 +80,7 @@ func (s *SwapService) GetApproveTransaction(ctx context.Context, params models.A
 		return nil, nil, err
 	}
 
-	var approveCallData models.ApproveCallDataResponse
+	var approveCallData ApproveCallDataResponse
 	res, err := s.client.Do(ctx, req, &approveCallData)
 	if err != nil {
 		return nil, nil, err
@@ -90,7 +90,7 @@ func (s *SwapService) GetApproveTransaction(ctx context.Context, params models.A
 }
 
 // GetLiquiditySources returns all liquidity sources tracked by the 1inch Aggregation Protocol for a given chain
-func (s *SwapService) GetLiquiditySources(ctx context.Context, params models.GetLiquiditySourcesParams) (*models.ProtocolsResponse, *http.Response, error) {
+func (s *apiActions) GetLiquiditySources(ctx context.Context, params GetLiquiditySourcesParams) (*ProtocolsResponse, *http.Response, error) {
 	u := fmt.Sprintf("/swap/v5.2/%d/liquidity-sources", params.ChainId)
 
 	err := params.Validate()
@@ -103,7 +103,7 @@ func (s *SwapService) GetLiquiditySources(ctx context.Context, params models.Get
 		return nil, nil, err
 	}
 
-	var liquiditySources models.ProtocolsResponse
+	var liquiditySources ProtocolsResponse
 	res, err := s.client.Do(ctx, req, &liquiditySources)
 	if err != nil {
 		return nil, nil, err
@@ -113,7 +113,7 @@ func (s *SwapService) GetLiquiditySources(ctx context.Context, params models.Get
 }
 
 // GetQuote returns the quote for a potential swap through the Aggregation Protocol
-func (s *SwapService) GetQuote(ctx context.Context, params models.GetQuoteParams) (*models.QuoteResponse, *http.Response, error) {
+func (s *apiActions) GetQuote(ctx context.Context, params GetQuoteParams) (*QuoteResponse, *http.Response, error) {
 	u := fmt.Sprintf("/swap/v5.2/%d/quote", params.ChainId)
 
 	err := params.Validate()
@@ -127,7 +127,7 @@ func (s *SwapService) GetQuote(ctx context.Context, params models.GetQuoteParams
 	params.IncludeGas = true
 	params.IncludeProtocols = true
 
-	u, err = addQueryParameters(u, params.AggregationControllerGetQuoteParams)
+	u, err = getQueryParameters(u, params.AggregationControllerGetQuoteParams)
 	if err != nil {
 		return nil, nil, err
 	}
@@ -137,7 +137,7 @@ func (s *SwapService) GetQuote(ctx context.Context, params models.GetQuoteParams
 		return nil, nil, err
 	}
 
-	var quote models.QuoteResponse
+	var quote QuoteResponse
 	res, err := s.client.Do(ctx, req, &quote)
 	if err != nil {
 		return nil, nil, err
@@ -147,7 +147,7 @@ func (s *SwapService) GetQuote(ctx context.Context, params models.GetQuoteParams
 }
 
 // GetSwap returns a swap quote with transaction data that can be used to execute a swap through the Aggregation Protocol
-func (s *SwapService) GetSwap(ctx context.Context, params models.GetSwapParams) (*models.SwapResponse, *http.Response, error) {
+func (s *apiActions) GetSwap(ctx context.Context, params GetSwapParams) (*SwapResponse, *http.Response, error) {
 	u := fmt.Sprintf("/swap/v5.2/%d/swap", params.ChainId)
 
 	err := params.Validate()
@@ -161,7 +161,7 @@ func (s *SwapService) GetSwap(ctx context.Context, params models.GetSwapParams) 
 	params.IncludeGas = true
 	params.IncludeProtocols = true
 
-	u, err = addQueryParameters(u, params.AggregationControllerGetSwapParams)
+	u, err = getQueryParameters(u, params.AggregationControllerGetSwapParams)
 	if err != nil {
 		return nil, nil, err
 	}
@@ -170,7 +170,7 @@ func (s *SwapService) GetSwap(ctx context.Context, params models.GetSwapParams) 
 		return nil, nil, err
 	}
 
-	var swapResponse models.SwapResponse
+	var swapResponse SwapResponse
 	res, err := s.client.Do(ctx, req, &swapResponse)
 	if err != nil {
 		return nil, nil, err
@@ -179,7 +179,7 @@ func (s *SwapService) GetSwap(ctx context.Context, params models.GetSwapParams) 
 }
 
 // GetTokens returns all tokens officially tracked by the 1inch Aggregation Protocol for a given chain
-func (s *SwapService) GetTokens(ctx context.Context, params models.GetTokensParams) (*models.TokensResponse, *http.Response, error) {
+func (s *apiActions) GetTokens(ctx context.Context, params GetTokensParams) (*TokensResponse, *http.Response, error) {
 	u := fmt.Sprintf("/swap/v5.2/%d/tokens", params.ChainId)
 
 	err := params.Validate()
@@ -192,11 +192,43 @@ func (s *SwapService) GetTokens(ctx context.Context, params models.GetTokensPara
 		return nil, nil, err
 	}
 
-	var tokens models.TokensResponse
+	var tokens TokensResponse
 	res, err := s.client.Do(ctx, req, &tokens)
 	if err != nil {
 		return nil, nil, err
 	}
 
 	return &tokens, res, nil
+}
+
+// addQueryParameters adds the parameters in the struct params as URL query parameters to s.
+// params must be a struct whose fields may contain "url" tags.
+func getQueryParameters(s string, params interface{}) (string, error) {
+	v := reflect.ValueOf(params)
+	if v.Kind() == reflect.Ptr && v.IsNil() {
+		return s, nil
+	}
+
+	u, err := url.Parse(s)
+	if err != nil {
+		return s, err
+	}
+
+	qs, err := query.Values(params)
+	if err != nil {
+		return s, err
+	}
+
+	for k, v := range qs {
+		if helpers.IsScientificNotation(v[0]) {
+			expanded, err := helpers.ExpandScientificNotation(v[0])
+			if err != nil {
+				return "", fmt.Errorf("failed to expand scientific notation for parameter %v with a value of %v: %v", k, v, err)
+			}
+			v[0] = expanded
+		}
+	}
+
+	u.RawQuery = qs.Encode()
+	return u.String(), nil
 }

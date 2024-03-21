@@ -1,6 +1,8 @@
 package amounts
 
-import "github.com/1inch/1inch-sdk-go/helpers"
+import (
+	"github.com/1inch/1inch-sdk-go/internal/helpers"
+)
 
 const (
 	Ten5  = "100000"

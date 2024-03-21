@@ -3,6 +3,9 @@ package client
 import (
 	"context"
 	"fmt"
+	"github.com/1inch/1inch-sdk-go/internal/helpers/consts/addresses"
+	"github.com/1inch/1inch-sdk-go/internal/helpers/consts/chains"
+	"github.com/1inch/1inch-sdk-go/internal/helpers/consts/tokens"
 	"net/http"
 	"os"
 	"testing"
@@ -10,10 +13,6 @@ import (
 	"github.com/1inch/1inch-sdk-go/client/models"
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
-
-	"github.com/1inch/1inch-sdk-go/helpers/consts/addresses"
-	"github.com/1inch/1inch-sdk-go/helpers/consts/chains"
-	"github.com/1inch/1inch-sdk-go/helpers/consts/tokens"
 )
 
 func TestCreateOrder(t *testing.T) {

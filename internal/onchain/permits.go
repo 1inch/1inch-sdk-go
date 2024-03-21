@@ -2,6 +2,9 @@ package onchain
 
 import (
 	"fmt"
+	"github.com/1inch/1inch-sdk-go/internal/helpers/consts/amounts"
+	"github.com/1inch/1inch-sdk-go/internal/helpers/consts/contracts"
+	"github.com/1inch/1inch-sdk-go/internal/helpers/consts/typehashes"
 	"math/big"
 	"strings"
 
@@ -10,10 +13,6 @@ import (
 	"github.com/ethereum/go-ethereum/crypto"
 	"github.com/ethereum/go-ethereum/ethclient"
 	"github.com/ethereum/go-ethereum/signer/core/apitypes"
-
-	"github.com/1inch/1inch-sdk-go/helpers/consts/amounts"
-	"github.com/1inch/1inch-sdk-go/helpers/consts/contracts"
-	"github.com/1inch/1inch-sdk-go/helpers/consts/typehashes"
 )
 
 type CreatePermitConfig struct {

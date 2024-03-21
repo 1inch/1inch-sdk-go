@@ -1,7 +1,7 @@
 package models
 
 import (
-	"github.com/1inch/1inch-sdk-go/helpers/consts/tokens"
+	"github.com/1inch/1inch-sdk-go/internal/helpers/consts/tokens"
 	"github.com/1inch/1inch-sdk-go/internal/onchain"
 	"github.com/1inch/1inch-sdk-go/internal/validate"
 )

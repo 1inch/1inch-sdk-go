@@ -4,15 +4,15 @@ import (
 	"context"
 	"encoding/json"
 	"fmt"
+	"github.com/1inch/1inch-sdk-go/internal/helpers/consts/amounts"
+	"github.com/1inch/1inch-sdk-go/internal/helpers/consts/chains"
+	"github.com/1inch/1inch-sdk-go/internal/helpers/consts/tokens"
+	"github.com/1inch/1inch-sdk-go/internal/helpers/consts/web3providers"
 	"log"
 	"os"
 
 	"github.com/1inch/1inch-sdk-go/client"
 	"github.com/1inch/1inch-sdk-go/client/models"
-	"github.com/1inch/1inch-sdk-go/helpers/consts/amounts"
-	"github.com/1inch/1inch-sdk-go/helpers/consts/chains"
-	"github.com/1inch/1inch-sdk-go/helpers/consts/tokens"
-	"github.com/1inch/1inch-sdk-go/helpers/consts/web3providers"
 )
 
 func main() {
