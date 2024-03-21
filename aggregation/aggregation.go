@@ -1,22 +1,9 @@
 package aggregation
 
-import (
-	"context"
-)
-
-type RequestPayload struct {
-	Method string
-	Params interface{}
-	U      string
-	Body   []byte
-}
-
-type httpExecutor interface {
-	ExecuteRequest(ctx context.Context, payload RequestPayload, v interface{}) error
-}
+import "github.com/1inch/1inch-sdk-go/internal/common"
 
 type api struct {
-	httpExecutor httpExecutor
+	httpExecutor common.HttpExecutor
 }
 
 type Client struct {

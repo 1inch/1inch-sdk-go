@@ -3,6 +3,7 @@ package aggregation
 import (
 	"context"
 	"fmt"
+	"github.com/1inch/1inch-sdk-go/internal/common"
 )
 
 // GetApproveAllowance returns the allowance the 1inch router has to spend a token on behalf of a wallet
@@ -14,7 +15,7 @@ func (api *api) GetApproveAllowance(ctx context.Context, params ApproveAllowance
 		return nil, err
 	}
 
-	payload := RequestPayload{
+	payload := common.RequestPayload{
 		Method: "GET",
 		Params: params.ApproveControllerGetAllowanceParams,
 		U:      u,
@@ -39,7 +40,7 @@ func (api *api) GetApproveSpender(ctx context.Context, params ApproveSpenderPara
 		return nil, err
 	}
 
-	payload := RequestPayload{
+	payload := common.RequestPayload{
 		Method: "GET",
 		U:      u,
 		Params: nil,
@@ -64,7 +65,7 @@ func (api *api) GetApproveTransaction(ctx context.Context, params ApproveTransac
 		return nil, err
 	}
 
-	payload := RequestPayload{
+	payload := common.RequestPayload{
 		Method: "GET",
 		Params: params.ApproveControllerGetCallDataParams,
 		U:      u,
@@ -88,7 +89,7 @@ func (api *api) GetLiquiditySources(ctx context.Context, params GetLiquiditySour
 		return nil, err
 	}
 
-	payload := RequestPayload{
+	payload := common.RequestPayload{
 		Method: "GET",
 		Params: nil,
 		U:      u,
@@ -120,11 +121,10 @@ func (api *api) GetQuote(ctx context.Context, params GetQuoteParams) (*QuoteResp
 	params.IncludeGas = true
 	params.IncludeProtocols = true
 
-	payload := RequestPayload{
+	payload := common.RequestPayload{
 		Method: "GET",
 		Params: params.AggregationControllerGetQuoteParams,
 		U:      u,
-		Body:   nil,
 	}
 
 	var quote QuoteResponse
@@ -151,7 +151,7 @@ func (api *api) GetSwap(ctx context.Context, params GetSwapParams) (*SwapRespons
 	params.IncludeGas = true
 	params.IncludeProtocols = true
 
-	payload := RequestPayload{
+	payload := common.RequestPayload{
 		Method: "GET",
 		Params: params.AggregationControllerGetSwapParams,
 		U:      u,
@@ -176,7 +176,7 @@ func (api *api) GetTokens(ctx context.Context, params GetTokensParams) (*TokensR
 		return nil, err
 	}
 
-	payload := RequestPayload{
+	payload := common.RequestPayload{
 		Method: "GET",
 		Params: nil,
 		U:      u,

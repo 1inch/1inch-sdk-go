@@ -5,6 +5,7 @@ import (
 	"context"
 	"encoding/json"
 	"fmt"
+	"github.com/1inch/1inch-sdk-go/internal/common"
 	"github.com/1inch/1inch-sdk-go/internal/helpers"
 	"github.com/google/go-querystring/query"
 	"io"
@@ -31,14 +32,7 @@ type Client struct {
 	apiKey string
 }
 
-type RequestPayload struct {
-	Method string
-	Params interface{}
-	U      string
-	Body   []byte
-}
-
-func (c *Client) ExecuteRequest(ctx context.Context, payload RequestPayload, v interface{}) error {
+func (c *Client) ExecuteRequest(ctx context.Context, payload common.RequestPayload, v interface{}) error {
 	u, err := addQueryParameters(payload.U, payload.Params)
 	if err != nil {
 		return err

@@ -2,6 +2,7 @@ package http_executor
 
 import (
 	"context"
+	"github.com/1inch/1inch-sdk-go/internal/common"
 	"io"
 	"net/http"
 	"net/http/httptest"
@@ -32,7 +33,7 @@ func TestExecuteRequest_Success(t *testing.T) {
 	}
 
 	// The data to be sent in the request
-	data := RequestPayload{
+	data := common.RequestPayload{
 		Method: "GET",
 		Params: nil,
 		U:      "/test",
@@ -80,7 +81,7 @@ func TestExecuteRequest_SuccessfulPOST(t *testing.T) {
 		apiKey:     "testApiKey",
 	}
 
-	payload := RequestPayload{
+	payload := common.RequestPayload{
 		Method: "POST",
 		U:      "/test",
 		Body:   []byte(`{"key":"value"}`),
@@ -115,7 +116,7 @@ func TestExecuteRequest_ServerErrorPOST(t *testing.T) {
 		apiKey:     "testApiKey",
 	}
 
-	payload := RequestPayload{
+	payload := common.RequestPayload{
 		Method: "POST",
 		U:      "/error", // Endpoint to trigger an error
 		Body:   []byte(`{"key":"value"}`),
@@ -157,7 +158,7 @@ func TestAuthorizationKey(t *testing.T) {
 		apiKey:     expectedAPIKey,
 	}
 
-	payload := RequestPayload{
+	payload := common.RequestPayload{
 		Method: "GET", // Method can be anything for this test
 		U:      "/",   // Endpoint can be anything for this test
 	}
