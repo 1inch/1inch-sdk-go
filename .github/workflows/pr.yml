@@ -13,8 +13,6 @@ jobs:
     steps:
       - name: Checkout code into workspace directory
         uses: actions/checkout@v3
-        with:
-          token: ${{ secrets.PULL_TOKEN }}
 
       - name: Set up Go 1.21
         uses: actions/setup-go@v3
@@ -33,8 +31,6 @@ jobs:
           go-version: 1.21
       - name: Checkout code into workspace directory
         uses: actions/checkout@v3
-        with:
-          token: ${{ secrets.PULL_TOKEN }}
 
       - name: Lint
         uses: golangci/golangci-lint-action@v3
