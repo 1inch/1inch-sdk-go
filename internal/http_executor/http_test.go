@@ -11,9 +11,7 @@ import (
 )
 
 func TestExecuteRequest_Success(t *testing.T) {
-	// Setup a mock HTTP server
 	mockServer := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
-		// Respond with a dummy JSON object
 		w.WriteHeader(http.StatusOK)
 		_, err := io.WriteString(w, `{"result":"success"}`)
 		if err != nil {
@@ -22,17 +20,14 @@ func TestExecuteRequest_Success(t *testing.T) {
 	}))
 	defer mockServer.Close()
 
-	// Parse the mock server URL
 	baseURL, _ := url.Parse(mockServer.URL)
 
-	// Initialize the client with the mock server base URL
 	client := &Client{
 		baseURL:    baseURL,
 		apiKey:     "testApiKey",
 		httpClient: *mockServer.Client(),
 	}
 
-	// The data to be sent in the request
 	data := common.RequestPayload{
 		Method: "GET",
 		Params: nil,
@@ -40,36 +35,30 @@ func TestExecuteRequest_Success(t *testing.T) {
 		Body:   nil,
 	}
 
-	// The structure to store the response
 	var result struct {
 		Result string `json:"result"`
 	}
 
-	// Execute the request
 	err := client.ExecuteRequest(context.Background(), data, &result)
 	if err != nil {
 		t.Fatalf("Expected no error, got %v", err)
 	}
 
-	// Check the response body
 	if result.Result != "success" {
 		t.Errorf("Expected result 'success', got '%s'", result.Result)
 	}
 }
 
 func TestExecuteRequest_SuccessfulPOST(t *testing.T) {
-	// Setup mock server
 	mockServer := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 		if r.Method != "POST" {
 			t.Errorf("Expected 'POST', got '%s'", r.Method)
 		}
 
-		// Check for the presence of expected header
 		if r.Header.Get("Content-Type") != "application/json" {
 			t.Errorf("Expected 'Content-Type' of 'application/json', got '%s'", r.Header.Get("Content-Type"))
 		}
 
-		// Respond with a dummy JSON object
 		w.WriteHeader(http.StatusOK)
 		io.WriteString(w, `{"status":"success"}`)
 	}))
@@ -98,13 +87,11 @@ func TestExecuteRequest_SuccessfulPOST(t *testing.T) {
 }
 
 func TestExecuteRequest_ServerErrorPOST(t *testing.T) {
-	// Setup mock server
 	mockServer := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 		if r.Method != "POST" {
 			t.Errorf("Expected 'POST', got '%s'", r.Method)
 		}
 
-		// Simulate server error
 		w.WriteHeader(http.StatusInternalServerError)
 		io.WriteString(w, `{"message":"internal server error"}`)
 	}))
@@ -112,13 +99,13 @@ func TestExecuteRequest_ServerErrorPOST(t *testing.T) {
 
 	client := Client{
 		httpClient: *mockServer.Client(),
-		baseURL:    mustParseURL(mockServer.URL), // Helper function to parse URL
+		baseURL:    mustParseURL(mockServer.URL),
 		apiKey:     "testApiKey",
 	}
 
 	payload := common.RequestPayload{
 		Method: "POST",
-		U:      "/error", // Endpoint to trigger an error
+		U:      "/error",
 		Body:   []byte(`{"key":"value"}`),
 	}
 
@@ -128,7 +115,6 @@ func TestExecuteRequest_ServerErrorPOST(t *testing.T) {
 		t.Fatalf("Expected an error, got nil")
 	}
 
-	// Assuming your error handling includes parsing the error response and including it in the error message
 	expectedErrorMessage := "processing response failed: HTTP 500: internal server error"
 	if err.Error() != expectedErrorMessage {
 		t.Errorf("Expected error message '%s', got '%s'", expectedErrorMessage, err.Error())
@@ -136,10 +122,8 @@ func TestExecuteRequest_ServerErrorPOST(t *testing.T) {
 }
 
 func TestAuthorizationKey(t *testing.T) {
-	// Expected API key value
 	expectedAPIKey := "testApiKey"
 
-	// Setup mock server
 	mockServer := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 		authHeader := r.Header.Get("Authorization")
 		if authHeader != "Bearer "+expectedAPIKey {
@@ -159,8 +143,8 @@ func TestAuthorizationKey(t *testing.T) {
 	}
 
 	payload := common.RequestPayload{
-		Method: "GET", // Method can be anything for this test
-		U:      "/",   // Endpoint can be anything for this test
+		Method: "GET",
+		U:      "/",
 	}
 
 	var response interface{}
@@ -171,7 +155,6 @@ func TestAuthorizationKey(t *testing.T) {
 	}
 }
 
-// Helper function to parse URL and ensure no error is returned
 func mustParseURL(u string) *url.URL {
 	url, err := url.Parse(u)
 	if err != nil {

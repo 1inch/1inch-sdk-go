@@ -7,4 +7,5 @@ type api struct {
 }
 
 type Client struct {
+	api
 }
