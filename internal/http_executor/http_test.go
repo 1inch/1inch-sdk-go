@@ -10,7 +10,7 @@ import (
 	"testing"
 )
 
-func TestExecuteRequest_Success(t *testing.T) {
+func TestExecuteRequest_SuccessGET(t *testing.T) {
 	mockServer := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 		w.WriteHeader(http.StatusOK)
 		_, err := io.WriteString(w, `{"result":"success"}`)

@@ -114,13 +114,6 @@ func (api *api) GetQuote(ctx context.Context, params GetQuoteParams) (*QuoteResp
 		return nil, err
 	}
 
-	// TODO: cleanup
-	// Token info is used by certain parts of the SDK and more info by default is helpful to integrators
-	// Because we use generated structs with concrete types, extra data is forced on regardless of what the user passes in.
-	params.IncludeTokensInfo = true
-	params.IncludeGas = true
-	params.IncludeProtocols = true
-
 	payload := common.RequestPayload{
 		Method: "GET",
 		Params: params.AggregationControllerGetQuoteParams,
