@@ -2,6 +2,10 @@ package orderbook
 
 import (
 	"bytes"
+	"github.com/1inch/1inch-sdk-go/internal/helpers/consts/addresses"
+	"github.com/1inch/1inch-sdk-go/internal/helpers/consts/amounts"
+	"github.com/1inch/1inch-sdk-go/internal/helpers/consts/chains"
+	"github.com/1inch/1inch-sdk-go/internal/helpers/consts/tokens"
 	"math/big"
 	"os"
 	"testing"
@@ -13,11 +17,6 @@ import (
 	"github.com/stretchr/testify/require"
 
 	"github.com/1inch/1inch-sdk-go/helpers"
-	"github.com/1inch/1inch-sdk-go/helpers/consts/addresses"
-	"github.com/1inch/1inch-sdk-go/helpers/consts/amounts"
-	"github.com/1inch/1inch-sdk-go/helpers/consts/tokens"
-
-	"github.com/1inch/1inch-sdk-go/helpers/consts/chains"
 )
 
 func TestTrim0x(t *testing.T) {

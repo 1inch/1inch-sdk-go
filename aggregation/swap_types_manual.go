@@ -1,4 +1,4 @@
-package models
+package aggregation
 
 type ExecuteSwapConfig struct {
 	WalletKey          string

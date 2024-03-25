@@ -1,4 +1,4 @@
-package models
+package aggregation
 
 import (
 	"errors"
@@ -8,11 +8,10 @@ import (
 )
 
 type SwapTokensParams struct {
-	ApprovalType  onchain.ApprovalType
-	ChainId       int
-	SkipWarnings  bool
-	PublicAddress string
-	WalletKey     string
+	ApprovalType onchain.ApprovalType
+	ChainId      int
+	Address      string
+	WalletKey    string
 	AggregationControllerGetSwapParams
 }
 
@@ -22,7 +21,7 @@ func (params *SwapTokensParams) Validate() error {
 	var validationErrors []error
 	validationErrors = validate.Parameter(int(params.ApprovalType), "approvalType", validate.CheckApprovalType, validationErrors)
 	validationErrors = validate.Parameter(params.ChainId, "chainId", validate.CheckChainIdRequired, validationErrors)
-	validationErrors = validate.Parameter(params.PublicAddress, "publicAddress", validate.CheckEthereumAddressRequired, validationErrors)
+	validationErrors = validate.Parameter(params.Address, "publicAddress", validate.CheckEthereumAddressRequired, validationErrors)
 	validationErrors = validate.Parameter(params.WalletKey, "walletKey", validate.CheckPrivateKeyRequired, validationErrors)
 	validationErrors = validate.Parameter(params.Src, "src", validate.CheckEthereumAddressRequired, validationErrors)
 	validationErrors = validate.Parameter(params.Dst, "dst", validate.CheckEthereumAddressRequired, validationErrors)

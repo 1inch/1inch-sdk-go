@@ -6,6 +6,8 @@ import (
 	"encoding/json"
 	"errors"
 	"fmt"
+	"github.com/1inch/1inch-sdk-go/aggregation"
+	"github.com/1inch/1inch-sdk-go/internal/helpers"
 	"io"
 	"net/http"
 	"net/url"
@@ -15,8 +17,6 @@ import (
 	"github.com/1inch/1inch-sdk-go/client/models"
 	"github.com/ethereum/go-ethereum/ethclient"
 	"github.com/google/go-querystring/query"
-
-	"github.com/1inch/1inch-sdk-go/helpers"
 )
 
 type service struct {
@@ -37,8 +37,8 @@ type Client struct {
 	// A struct that will contain a reference to this client. Used to separate each API into a unique namespace to aid in method discovery
 	common service
 	// Isolated namespaces for each API
-	Actions      *ActionService
-	SwapApi      *SwapService
+	Actions      *aggregation.ActionService
+	SwapApi      *aggregation.SwapService
 	OrderbookApi *OrderbookService
 }
 
@@ -73,8 +73,8 @@ func NewClient(config models.ClientConfig) (*Client, error) {
 
 	c.common.client = c
 
-	c.Actions = (*ActionService)(&c.common)
-	c.SwapApi = (*SwapService)(&c.common)
+	c.Actions = (*aggregation.ActionService)(&c.common)
+	c.SwapApi = (*aggregation.SwapService)(&c.common)
 	c.OrderbookApi = (*OrderbookService)(&c.common)
 
 	return c, nil

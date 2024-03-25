@@ -2,8 +2,7 @@ package helpers
 
 import (
 	"fmt"
-
-	"github.com/1inch/1inch-sdk-go/helpers/consts/chains"
+	"github.com/1inch/1inch-sdk-go/internal/helpers/consts/chains"
 )
 
 func PrintBlockExplorerTxLink(chainId int, txHash string) {

@@ -1,13 +1,12 @@
-package models
+package aggregation
 
 import (
+	"github.com/1inch/1inch-sdk-go/internal/helpers/consts/chains"
+	"github.com/1inch/1inch-sdk-go/internal/helpers/consts/tokens"
 	"testing"
 
 	"github.com/1inch/1inch-sdk-go/internal/validate"
 	"github.com/stretchr/testify/require"
-
-	"github.com/1inch/1inch-sdk-go/helpers/consts/chains"
-	"github.com/1inch/1inch-sdk-go/helpers/consts/tokens"
 )
 
 func TestSwapTokensParams_Validate(t *testing.T) {
@@ -19,9 +18,9 @@ func TestSwapTokensParams_Validate(t *testing.T) {
 		{
 			description: "Valid parameters",
 			params: SwapTokensParams{
-				ChainId:       chains.Ethereum,
-				PublicAddress: "0x1234567890abcdef1234567890abcdef12345678",
-				WalletKey:     "a0b1c2d3e4f5a6b7c8d9e0f1a2b3c4d5e6f7a8b9c0d1e2f3a4b5c6d7e8f9a0b1",
+				ChainId:   chains.Ethereum,
+				Address:   "0x1234567890abcdef1234567890abcdef12345678",
+				WalletKey: "a0b1c2d3e4f5a6b7c8d9e0f1a2b3c4d5e6f7a8b9c0d1e2f3a4b5c6d7e8f9a0b1",
 				AggregationControllerGetSwapParams: AggregationControllerGetSwapParams{
 					Src:      "0x1234567890abcdef1234567890abcdef12345678",
 					Dst:      "0x1234567890abcdef1234567890abcdef12345679",

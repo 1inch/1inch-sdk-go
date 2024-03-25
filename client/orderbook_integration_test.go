@@ -3,6 +3,10 @@ package client
 import (
 	"context"
 	"fmt"
+	helpers2 "github.com/1inch/1inch-sdk-go/internal/helpers"
+	"github.com/1inch/1inch-sdk-go/internal/helpers/consts/amounts"
+	"github.com/1inch/1inch-sdk-go/internal/helpers/consts/chains"
+	"github.com/1inch/1inch-sdk-go/internal/helpers/consts/tokens"
 	"os"
 	"testing"
 
@@ -10,9 +14,6 @@ import (
 	"github.com/stretchr/testify/require"
 
 	"github.com/1inch/1inch-sdk-go/helpers"
-	"github.com/1inch/1inch-sdk-go/helpers/consts/amounts"
-	"github.com/1inch/1inch-sdk-go/helpers/consts/chains"
-	"github.com/1inch/1inch-sdk-go/helpers/consts/tokens"
 )
 
 func TestCreateOrderIntegration(t *testing.T) {
@@ -55,11 +56,11 @@ func TestCreateOrderIntegration(t *testing.T) {
 	}
 
 	c, err := NewClient(models.ClientConfig{
-		DevPortalApiKey: helpers.GetenvSafe("DEV_PORTAL_TOKEN"),
+		DevPortalApiKey: helpers2.GetenvSafe("DEV_PORTAL_TOKEN"),
 		Web3HttpProviders: []models.Web3Provider{
 			{
 				ChainId: chains.Polygon,
-				Url:     helpers.GetenvSafe("WEB_3_HTTP_PROVIDER_URL_WITH_KEY_POLYGON"),
+				Url:     helpers2.GetenvSafe("WEB_3_HTTP_PROVIDER_URL_WITH_KEY_POLYGON"),
 			},
 		},
 	})

@@ -1,13 +1,12 @@
 package onchain
 
 import (
+	"github.com/1inch/1inch-sdk-go/internal/helpers/consts/amounts"
 	"math/big"
 	"strings"
 	"testing"
 
 	"github.com/stretchr/testify/require"
-
-	"github.com/1inch/1inch-sdk-go/helpers/consts/amounts"
 )
 
 func TestCreatePermitParams(t *testing.T) {

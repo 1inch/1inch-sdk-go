@@ -4,6 +4,10 @@ import (
 	"context"
 	"errors"
 	"fmt"
+	"github.com/1inch/1inch-sdk-go/internal/helpers"
+	"github.com/1inch/1inch-sdk-go/internal/helpers/consts/abis"
+	"github.com/1inch/1inch-sdk-go/internal/helpers/consts/amounts"
+	"github.com/1inch/1inch-sdk-go/internal/helpers/consts/chains"
 	"math/big"
 	"strings"
 	"time"
@@ -14,11 +18,6 @@ import (
 	"github.com/ethereum/go-ethereum/core/types"
 	"github.com/ethereum/go-ethereum/crypto"
 	"github.com/ethereum/go-ethereum/ethclient"
-
-	"github.com/1inch/1inch-sdk-go/helpers"
-	"github.com/1inch/1inch-sdk-go/helpers/consts/abis"
-	"github.com/1inch/1inch-sdk-go/helpers/consts/amounts"
-	"github.com/1inch/1inch-sdk-go/helpers/consts/chains"
 )
 
 const gasLimit = uint64(21000000) // TODO make sure this value more dynamic
