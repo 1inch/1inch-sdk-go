@@ -136,36 +136,3 @@ func TestGetQuote(t *testing.T) {
 		t.Errorf("Expected quote to be %+v, got %+v", expectedQuote, *quote)
 	}
 }
-
-// temp here
-// todo: remove and rewrite
-//func TestGetQuoteReal(t *testing.T) {
-//	ctx := context.Background()
-//
-//	base, err := url.Parse("https://api.1inch.dev/")
-//	if err != nil {
-//		t.Fatalf("failed with an URL base: %v", err)
-//	}
-//	client := http_executor.DefaultHttpClient(base, "YOUR API KEY")
-//
-//	a := api{
-//		httpExecutor: &client,
-//	}
-//
-//	resp, err := a.GetQuote(ctx, GetQuoteParams{
-//		ChainId: chains.Ethereum,
-//		AggregationControllerGetQuoteParams: AggregationControllerGetQuoteParams{
-//			Src:    "0x6b175474e89094c44da98b954eedeac495271d0f",
-//			Dst:    "0xc02aaa39b223fe8d0a0e5c4f27ead9083c756cc2",
-//			Amount: "1000000000000000000",
-//		},
-//	})
-//
-//	if err != nil {
-//		t.Fatalf("GetQuote returned an error: %v", err)
-//	}
-//	expectedQuote := QuoteResponse{ /* define expected quote response */ }
-//	if !reflect.DeepEqual(*resp, expectedQuote) {
-//		t.Errorf("Expected quote to be %+v, got %+v", expectedQuote, *resp)
-//	}
-//}
