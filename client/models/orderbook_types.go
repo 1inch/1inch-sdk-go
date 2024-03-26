@@ -17,7 +17,7 @@ type CreateOrderParams struct {
 	TakingAmount                   string
 	MakingAmount                   string
 	Taker                          string
-	SkipWarnings                   bool
+	ShowSummaryBeforeExecution     bool
 	EnableOnchainApprovalsIfNeeded bool
 }
 

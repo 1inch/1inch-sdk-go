@@ -33,7 +33,7 @@ func SimulateSwap(config SwapConfig) (*SimulationResponse, error) {
 		fmt.Printf("Tenderly: Non-ETH token is being swapped! Executing request to approve %s for swapping\n", config.FromToken)
 
 		// Static calldata that approves a large ERC20 spend limit for the v5 router
-		const ApproveErc20Calldata = `0x095ea7b30000000000000000000000001111111254eeb25477b68fb85ed929f73a960582000000000000000000000000000000000000000c9f2c9cd04674edea3fffffff`
+		const ApproveErc20Calldata = `0x095ea7b3000000000000000000000000111111125421ca6dc452d289314280a0f8842a6500000000000000000000000000000000000000000000d3c21bcecceda1000000`
 		const ApproveErc20GasLimitStatic = 2000000
 
 		fmt.Println("Tenderly: Simulating token approval on Tenderly")
@@ -61,9 +61,16 @@ func SimulateSwap(config SwapConfig) (*SimulationResponse, error) {
 		fmt.Printf("Tenderly: Pre-approval simulation complete. Link to results: %s\n", preApprovalSimulationUrl)
 	}
 
+	aggregationRouter, err := contracts.Get1inchRouterFromChainId(config.ChainId)
+	if err != nil {
+		return nil, fmt.Errorf("failed to get 1inch router address: %v", err)
+	}
+
+	fmt.Printf("aggregationRouter: %v\n", aggregationRouter)
+
 	swapSimulationResponse, err := ExecuteTenderlySimulationRequest(config.TenderlyApiKey, forkId, &SimulateRequest{
 		From:               config.PublicAddress,
-		To:                 contracts.AggregationRouterV5,
+		To:                 aggregationRouter,
 		Input:              config.TransactionData,
 		Gas:                30000000, // picked randomly
 		Root:               root,     // TODO verify this works

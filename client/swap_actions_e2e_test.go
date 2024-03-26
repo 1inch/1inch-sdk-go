@@ -8,6 +8,8 @@ import (
 	"strings"
 	"testing"
 
+	"github.com/stretchr/testify/require"
+
 	"github.com/1inch/1inch-sdk-go/client/models"
 	"github.com/1inch/1inch-sdk-go/helpers"
 	"github.com/1inch/1inch-sdk-go/helpers/consts/amounts"
@@ -16,7 +18,6 @@ import (
 	"github.com/1inch/1inch-sdk-go/helpers/consts/web3providers"
 	"github.com/1inch/1inch-sdk-go/internal/onchain"
 	"github.com/1inch/1inch-sdk-go/internal/tenderly"
-	"github.com/stretchr/testify/require"
 )
 
 const ten18Hex = "0x0000000000000000000000000000000000000000000000000DE0B6B3A7640000"

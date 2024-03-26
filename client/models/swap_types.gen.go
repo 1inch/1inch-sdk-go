@@ -147,7 +147,7 @@ type SwapRequestErrorStatusCode float32
 // SwapResponse defines model for SwapResponse.
 type SwapResponse struct {
 	// FromToken Source token info
-	FromToken *TokenInfo `json:"fromToken,omitempty"`
+	FromToken *TokenInfo `json:"srcToken,omitempty"`
 
 	// Protocols Selected protocols in a path
 	Protocols [][][]SelectedProtocol `json:"protocols,omitempty"`
@@ -156,7 +156,7 @@ type SwapResponse struct {
 	ToAmount string `json:"toAmount"`
 
 	// ToToken Destination token info
-	ToToken *TokenInfo `json:"toToken,omitempty"`
+	ToToken *TokenInfo `json:"dstToken,omitempty"`
 
 	// Tx Transaction object
 	Tx TransactionData `json:"tx"`

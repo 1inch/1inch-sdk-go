@@ -7,10 +7,10 @@ import (
 	"os"
 	"testing"
 
-	"github.com/1inch/1inch-sdk-go/client/models"
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
 
+	"github.com/1inch/1inch-sdk-go/client/models"
 	"github.com/1inch/1inch-sdk-go/helpers/consts/addresses"
 	"github.com/1inch/1inch-sdk-go/helpers/consts/chains"
 	"github.com/1inch/1inch-sdk-go/helpers/consts/tokens"
@@ -18,7 +18,7 @@ import (
 
 func TestCreateOrder(t *testing.T) {
 
-	endpoint := "/orderbook/v3.0/1/"
+	endpoint := "/orderbook/v4.0/1/"
 	defaultResponse := func(w http.ResponseWriter, r *http.Request) {
 		fmt.Fprint(w, `[
 	{
@@ -80,7 +80,7 @@ func TestCreateOrder(t *testing.T) {
 
 func TestGetOrdersByCreatorAddress(t *testing.T) {
 
-	endpoint := "/orderbook/v3.0/1/address/"
+	endpoint := "/orderbook/v4.0/1/address/"
 	defaultSignature := "0x68ca7fe03901373166c85d8e37587cb93bf9befc34c419dedd4d855e05c934e0731194f1b411a878f96a65f9fea7c61cca2e5e7d8c80dba9e35c3126b90b0c961b"
 	defaultResponse := func(w http.ResponseWriter, r *http.Request) {
 		fmt.Fprint(w, `[
@@ -137,7 +137,7 @@ func TestGetOrdersByCreatorAddress(t *testing.T) {
 
 func TestGetAllOrders(t *testing.T) {
 
-	endpoint := "/orderbook/v3.0/1/all"
+	endpoint := "/orderbook/v4.0/1/all"
 	defaultSignature := "0x68ca7fe03901373166c85d8e37587cb93bf9befc34c419dedd4d855e05c934e0731194f1b411a878f96a65f9fea7c61cca2e5e7d8c80dba9e35c3126b90b0c961b"
 	defaultResponse := func(w http.ResponseWriter, r *http.Request) {
 		fmt.Fprint(w, `[
@@ -193,7 +193,7 @@ func TestGetAllOrders(t *testing.T) {
 
 func TestGetCount(t *testing.T) {
 
-	endpoint := "/orderbook/v3.0/1/count"
+	endpoint := "/orderbook/v4.0/1/count"
 	defaultCount := 1
 	defaultResponse := func(w http.ResponseWriter, r *http.Request) {
 		fmt.Fprint(w, `{
@@ -247,7 +247,7 @@ func TestGetCount(t *testing.T) {
 
 func TestGetEvent(t *testing.T) {
 
-	endpoint := "/orderbook/v3.0/1/events/"
+	endpoint := "/orderbook/v4.0/1/events/"
 	defaultResponse := func(w http.ResponseWriter, r *http.Request) {
 		fmt.Fprint(w, `{
         	"id": 48608667
@@ -300,7 +300,7 @@ func TestGetEvent(t *testing.T) {
 
 func TestGetEvents(t *testing.T) {
 
-	endpoint := "/orderbook/v3.0/1/events"
+	endpoint := "/orderbook/v4.0/1/events"
 	defaultResponse := func(w http.ResponseWriter, r *http.Request) {
 		fmt.Fprint(w, `[
 		{
@@ -358,7 +358,7 @@ func TestGetEvents(t *testing.T) {
 // TODO fix tests once docs are available
 //func TestGetActiveOrdersWithPermit(t *testing.T) {
 //
-//	endpoint := "/orderbook/v3.0/1/has-active-orders-with-permit/"
+//	endpoint := "/orderbook/v4.0/1/has-active-orders-with-permit/"
 //	defaultResponse := func(w http.ResponseWriter, r *http.Request) {
 //		fmt.Fprint(w, `[
 //		{

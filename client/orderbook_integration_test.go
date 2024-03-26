@@ -6,9 +6,9 @@ import (
 	"os"
 	"testing"
 
-	"github.com/1inch/1inch-sdk-go/client/models"
 	"github.com/stretchr/testify/require"
 
+	"github.com/1inch/1inch-sdk-go/client/models"
 	"github.com/1inch/1inch-sdk-go/helpers"
 	"github.com/1inch/1inch-sdk-go/helpers/consts/amounts"
 	"github.com/1inch/1inch-sdk-go/helpers/consts/chains"
@@ -22,20 +22,20 @@ func TestCreateOrderIntegration(t *testing.T) {
 		orderRequest  models.CreateOrderParams
 		expectedError string
 	}{
-		{
-			description: "Success",
-			orderRequest: models.CreateOrderParams{
-				ChainId:      chains.Polygon,
-				PrivateKey:   os.Getenv("WALLET_KEY_EMPTY"),
-				Maker:        os.Getenv("WALLET_ADDRESS_EMPTY"),
-				MakerAsset:   tokens.PolygonFrax,
-				TakerAsset:   tokens.PolygonWeth,
-				TakingAmount: amounts.Ten6,
-				MakingAmount: amounts.Ten18,
-				Taker:        "0x0000000000000000000000000000000000000000",
-				SkipWarnings: true,
-			},
-		},
+		// TODO disabled while permits are disabled on orderbook
+		//{
+		//	description: "Success",
+		//	orderRequest: models.CreateOrderParams{
+		//		ChainId:      chains.Polygon,
+		//		PrivateKey:   os.Getenv("WALLET_KEY_EMPTY"),
+		//		Maker:        os.Getenv("WALLET_ADDRESS_EMPTY"),
+		//		MakerAsset:   tokens.PolygonFrax,
+		//		TakerAsset:   tokens.PolygonWeth,
+		//		TakingAmount: amounts.Ten6,
+		//		MakingAmount: amounts.Ten18,
+		//		Taker:        "0x0000000000000000000000000000000000000000",
+		//	},
+		//},
 		{
 			description: "Failure - No approval with error",
 			orderRequest: models.CreateOrderParams{
@@ -47,7 +47,7 @@ func TestCreateOrderIntegration(t *testing.T) {
 				TakingAmount:                   amounts.Ten6,
 				MakingAmount:                   amounts.Ten18,
 				Taker:                          "0x0000000000000000000000000000000000000000",
-				SkipWarnings:                   true,
+				ShowSummaryBeforeExecution:     true,
 				EnableOnchainApprovalsIfNeeded: false,
 			},
 			expectedError: models.ErrorFailWhenApprovalIsNeeded.Error(),

@@ -1,7 +1,6 @@
 package models
 
 import (
-	"fmt"
 	"testing"
 
 	"github.com/stretchr/testify/require"
@@ -126,8 +125,6 @@ func TestGetOrdersByCreatorAddressParams_Validate(t *testing.T) {
 		t.Run(tc.description, func(t *testing.T) {
 			err := tc.params.Validate()
 
-			fmt.Printf("Errors: %v\n", err)
-
 			if len(tc.expectErrors) > 0 {
 				require.Error(t, err)
 				for _, expectedError := range tc.expectErrors {
@@ -174,8 +171,6 @@ func TestGetAllOrdersParams_Validate(t *testing.T) {
 		t.Run(tc.description, func(t *testing.T) {
 			err := tc.params.Validate()
 
-			fmt.Printf("Errors: %v\n", err)
-
 			if len(tc.expectErrors) > 0 {
 				require.Error(t, err)
 				for _, expectedError := range tc.expectErrors {
@@ -217,8 +212,6 @@ func TestGetCountParams_Validate(t *testing.T) {
 		t.Run(tc.description, func(t *testing.T) {
 			err := tc.params.Validate()
 
-			fmt.Printf("Errors: %v\n", err)
-
 			if len(tc.expectErrors) > 0 {
 				require.Error(t, err)
 				for _, expectedError := range tc.expectErrors {
@@ -258,8 +251,6 @@ func TestGetEventParams_Validate(t *testing.T) {
 	for _, tc := range testCases {
 		t.Run(tc.description, func(t *testing.T) {
 			err := tc.params.Validate()
-
-			fmt.Printf("Errors: %v\n", err)
 
 			if len(tc.expectErrors) > 0 {
 				require.Error(t, err)
@@ -312,8 +303,6 @@ func TestGetEventsParams_Validate(t *testing.T) {
 		t.Run(tc.description, func(t *testing.T) {
 			err := tc.params.Validate()
 
-			fmt.Printf("Errors: %v\n", err)
-
 			if len(tc.expectErrors) > 0 {
 				require.Error(t, err)
 				for _, expectedError := range tc.expectErrors {
@@ -355,8 +344,6 @@ func TestGetActiveOrdersWithPermitParams_Validate(t *testing.T) {
 	for _, tc := range testCases {
 		t.Run(tc.description, func(t *testing.T) {
 			err := tc.params.Validate()
-
-			fmt.Printf("Errors: %v\n", err)
 
 			if len(tc.expectErrors) > 0 {
 				require.Error(t, err)

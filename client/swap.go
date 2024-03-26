@@ -12,7 +12,7 @@ type SwapService service
 
 // GetApproveAllowance returns the allowance the 1inch router has to spend a token on behalf of a wallet
 func (s *SwapService) GetApproveAllowance(ctx context.Context, params models.ApproveAllowanceParams) (*models.AllowanceResponse, *http.Response, error) {
-	u := fmt.Sprintf("/swap/v5.2/%d/approve/allowance", params.ChainId)
+	u := fmt.Sprintf("/swap/v6.0/%d/approve/allowance", params.ChainId)
 
 	err := params.Validate()
 	if err != nil {
@@ -40,7 +40,7 @@ func (s *SwapService) GetApproveAllowance(ctx context.Context, params models.App
 
 // GetApproveSpender returns the address of the 1inch router contract
 func (s *SwapService) GetApproveSpender(ctx context.Context, params models.ApproveSpenderParams) (*models.SpenderResponse, *http.Response, error) {
-	u := fmt.Sprintf("/swap/v5.2/%d/approve/spender", params.ChainId)
+	u := fmt.Sprintf("/swap/v6.0/%d/approve/spender", params.ChainId)
 
 	err := params.Validate()
 	if err != nil {
@@ -63,7 +63,7 @@ func (s *SwapService) GetApproveSpender(ctx context.Context, params models.Appro
 
 // GetApproveTransaction returns the transaction data for approving the 1inch router to spend a token on behalf of a wallet
 func (s *SwapService) GetApproveTransaction(ctx context.Context, params models.ApproveTransactionParams) (*models.ApproveCallDataResponse, *http.Response, error) {
-	u := fmt.Sprintf("/swap/v5.2/%d/approve/transaction", params.ChainId)
+	u := fmt.Sprintf("/swap/v6.0/%d/approve/transaction", params.ChainId)
 
 	err := params.Validate()
 	if err != nil {
@@ -91,7 +91,7 @@ func (s *SwapService) GetApproveTransaction(ctx context.Context, params models.A
 
 // GetLiquiditySources returns all liquidity sources tracked by the 1inch Aggregation Protocol for a given chain
 func (s *SwapService) GetLiquiditySources(ctx context.Context, params models.GetLiquiditySourcesParams) (*models.ProtocolsResponse, *http.Response, error) {
-	u := fmt.Sprintf("/swap/v5.2/%d/liquidity-sources", params.ChainId)
+	u := fmt.Sprintf("/swap/v6.0/%d/liquidity-sources", params.ChainId)
 
 	err := params.Validate()
 	if err != nil {
@@ -114,7 +114,7 @@ func (s *SwapService) GetLiquiditySources(ctx context.Context, params models.Get
 
 // GetQuote returns the quote for a potential swap through the Aggregation Protocol
 func (s *SwapService) GetQuote(ctx context.Context, params models.GetQuoteParams) (*models.QuoteResponse, *http.Response, error) {
-	u := fmt.Sprintf("/swap/v5.2/%d/quote", params.ChainId)
+	u := fmt.Sprintf("/swap/v6.0/%d/quote", params.ChainId)
 
 	err := params.Validate()
 	if err != nil {
@@ -148,7 +148,7 @@ func (s *SwapService) GetQuote(ctx context.Context, params models.GetQuoteParams
 
 // GetSwap returns a swap quote with transaction data that can be used to execute a swap through the Aggregation Protocol
 func (s *SwapService) GetSwap(ctx context.Context, params models.GetSwapParams) (*models.SwapResponse, *http.Response, error) {
-	u := fmt.Sprintf("/swap/v5.2/%d/swap", params.ChainId)
+	u := fmt.Sprintf("/swap/v6.0/%d/swap", params.ChainId)
 
 	err := params.Validate()
 	if err != nil {
@@ -180,7 +180,7 @@ func (s *SwapService) GetSwap(ctx context.Context, params models.GetSwapParams) 
 
 // GetTokens returns all tokens officially tracked by the 1inch Aggregation Protocol for a given chain
 func (s *SwapService) GetTokens(ctx context.Context, params models.GetTokensParams) (*models.TokensResponse, *http.Response, error) {
-	u := fmt.Sprintf("/swap/v5.2/%d/tokens", params.ChainId)
+	u := fmt.Sprintf("/swap/v6.0/%d/tokens", params.ChainId)
 
 	err := params.Validate()
 	if err != nil {

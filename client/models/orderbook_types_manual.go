@@ -48,3 +48,16 @@ type EventResponse struct {
 	BlockNumber          int       `json:"blockNumber"`
 	CreateDateTime       time.Time `json:"createDateTime"`
 }
+
+type BuildMakerTraitsParams struct {
+	AllowedSender      string
+	ShouldCheckEpoch   bool
+	UsePermit2         bool
+	UnwrapWeth         bool
+	HasExtension       bool
+	HasPreInteraction  bool
+	HasPostInteraction bool
+	Expiry             int64
+	Nonce              int64
+	Series             int64
+}

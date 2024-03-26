@@ -5,10 +5,10 @@ import (
 	"fmt"
 	"testing"
 
-	"github.com/1inch/1inch-sdk-go/client/models"
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
 
+	"github.com/1inch/1inch-sdk-go/client/models"
 	"github.com/1inch/1inch-sdk-go/helpers"
 	"github.com/1inch/1inch-sdk-go/helpers/consts/addresses"
 	"github.com/1inch/1inch-sdk-go/helpers/consts/chains"
@@ -68,7 +68,7 @@ func TestApproveSpenderIntegration(t *testing.T) {
 				ChainId: chains.Ethereum,
 			},
 			expectedOutput: models.SpenderResponse{
-				Address: "0x1111111254eeb25477b68fb85ed929f73a960582",
+				Address: "0x111111125421ca6dc452d289314280a0f8842a65",
 			},
 		},
 	}

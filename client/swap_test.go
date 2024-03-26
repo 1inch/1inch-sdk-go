@@ -6,10 +6,10 @@ import (
 	"net/http"
 	"testing"
 
-	"github.com/1inch/1inch-sdk-go/client/models"
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
 
+	"github.com/1inch/1inch-sdk-go/client/models"
 	"github.com/1inch/1inch-sdk-go/helpers/consts/addresses"
 	"github.com/1inch/1inch-sdk-go/helpers/consts/amounts"
 	"github.com/1inch/1inch-sdk-go/helpers/consts/chains"
@@ -18,7 +18,7 @@ import (
 
 func TestApproveAllowance(t *testing.T) {
 
-	endpoint := "/swap/v5.2/1/approve/allowance"
+	endpoint := "/swap/v6.0/1/approve/allowance"
 	defaultResponse := func(w http.ResponseWriter, r *http.Request) {
 		fmt.Fprint(w,
 			`{
@@ -76,7 +76,7 @@ func TestApproveAllowance(t *testing.T) {
 
 func TestApproveTransaction(t *testing.T) {
 
-	endpoint := "/swap/v5.2/1/approve/transaction"
+	endpoint := "/swap/v6.0/1/approve/transaction"
 	defaultResponse := func(w http.ResponseWriter, r *http.Request) {
 		fmt.Fprint(w,
 			`{
@@ -138,7 +138,7 @@ func TestApproveTransaction(t *testing.T) {
 
 func TestGetQuote(t *testing.T) {
 
-	endpoint := "/swap/v5.2/1/quote"
+	endpoint := "/swap/v6.0/1/quote"
 	defaultResponse := func(w http.ResponseWriter, r *http.Request) {
 		fmt.Fprint(w,
 			`{
@@ -200,7 +200,7 @@ func TestGetQuote(t *testing.T) {
 
 func TestGetSwap(t *testing.T) {
 
-	endpoint := "/swap/v5.2/1/swap"
+	endpoint := "/swap/v6.0/1/swap"
 	defaultResponse := func(w http.ResponseWriter, r *http.Request) {
 		fmt.Fprint(w,
 			`{

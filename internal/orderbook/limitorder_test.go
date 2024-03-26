@@ -7,10 +7,11 @@ import (
 	"testing"
 	"time"
 
-	"github.com/1inch/1inch-sdk-go/client/models"
 	"github.com/ethereum/go-ethereum/ethclient"
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
+
+	"github.com/1inch/1inch-sdk-go/client/models"
 
 	"github.com/1inch/1inch-sdk-go/helpers"
 	"github.com/1inch/1inch-sdk-go/helpers/consts/addresses"
@@ -151,19 +152,18 @@ func TestCreateLimitOrder(t *testing.T) {
 			},
 			interactions: []string{"0x", "0x", "0x", "0x", "0xbf15fcd8000000000000000000000000a5eb255ef45dfb48b5d133d08833def69871691d000000000000000000000000000000000000000000000000000000000000004000000000000000000000000000000000000000000000000000000000000000242cc2878d0071150dff0000000000000050c5df26654b5efbdd0c54a062dfa6012933defe00000000000000000000000000000000000000000000000000000000", "0x", "0x", "0x"},
 			expectedOrder: &models.Order{
-				OrderHash: "0xdc9344cfa6d3b4da5a2ad3283e02826d3f569b4472443390d3e1cfe86cacd13f",
-				Signature: "0x317ed3e021851542deeafb4897ef091b010317772b7299477121d0f46cdd32cf1403429b13d2337b459c7a982ac71144ceaad88dd08d5b7c7b8abbe1618070ab1b",
+				OrderHash: "0x0e1ad9460b8d3fde73528fbd44ca7e67e5a7a445c95c0642b71e3bfd71640381",
+				Signature: "0x2aef61e71a3bfdb8795d5b1b6aae478a4f41b06bfab17e9b27bf8c663d5b5c4d120aae345eac4e7968424729f1e56b08e0a5ade189c8f2395d22adae68114a9c1b",
 				Data: models.OrderData{
 					MakerAsset:    "0x8f3Cf7ad23Cd3CaDbD9735AFf958023239c6A063",
 					TakerAsset:    "0x7ceb23fd6bc0add59e62ac25578270cff1b9f619",
+					Extension:     "0x",
 					MakingAmount:  "1000000",
 					TakingAmount:  "1000000000",
 					Salt:          "100000000",
 					Maker:         "0x2c9b2DBdbA8A9c969Ac24153f5C1c23CB0e63914",
 					AllowedSender: "0x0000000000000000000000000000000000000000",
 					Receiver:      "0x0000000000000000000000000000000000000000",
-					//Offsets:       "4421431254442149611168492388118363282642987198110904030635476664713216",
-					//Interactions:  "0xbf15fcd8000000000000000000000000a5eb255ef45dfb48b5d133d08833def69871691d000000000000000000000000000000000000000000000000000000000000004000000000000000000000000000000000000000000000000000000000000000242cc2878d0071150dff0000000000000050c5df26654b5efbdd0c54a062dfa6012933defe00000000000000000000000000000000000000000000000000000000",
 				},
 			},
 			expectError: false,
@@ -227,7 +227,7 @@ func TestCreateLimitOrder(t *testing.T) {
 
 	for _, tc := range tests {
 		t.Run(tc.name, func(t *testing.T) {
-			result, err := CreateLimitOrderMessage(tc.orderRequest, tc.interactions, tc.makerTraits)
+			result, err := CreateLimitOrderMessage(tc.orderRequest, tc.makerTraits)
 
 			if tc.expectError {
 				assert.Error(t, err)
@@ -360,7 +360,6 @@ func TestBuildMakerTraits(t *testing.T) {
 		expiry         int64
 		nonce          int64
 		series         int64
-		hasExtension   bool
 		expectedResult string
 	}{
 		{
@@ -369,23 +368,24 @@ func TestBuildMakerTraits(t *testing.T) {
 			expiry:         int64(1709675246),
 			nonce:          int64(0),
 			series:         int64(0),
-			hasExtension:   false,
 			expectedResult: "0x40000000000000000000000000000000000065e792ee00000000000000000000",
-		},
-		{
-			name:           "Has extension",
-			allowedSender:  "0x0000000000000000000000000000000000000000",
-			expiry:         int64(1709675246),
-			nonce:          int64(0),
-			series:         int64(0),
-			hasExtension:   true,
-			expectedResult: "0x42000000000000000000000000000000000065e792ee00000000000000000000",
 		},
 	}
 
 	for _, tc := range tests {
 		t.Run(tc.name, func(t *testing.T) {
-			result := BuildMakerTraits(tc.allowedSender, false, false, false, tc.hasExtension, false, false, tc.expiry, tc.nonce, tc.series)
+			result := BuildMakerTraits(models.BuildMakerTraitsParams{
+				AllowedSender:      tc.allowedSender,
+				ShouldCheckEpoch:   false,
+				UsePermit2:         false,
+				UnwrapWeth:         false,
+				HasExtension:       false,
+				HasPreInteraction:  false,
+				HasPostInteraction: false,
+				Expiry:             tc.expiry,
+				Nonce:              tc.nonce,
+				Series:             tc.series,
+			})
 			assert.Equal(t, tc.expectedResult, result)
 		})
 	}

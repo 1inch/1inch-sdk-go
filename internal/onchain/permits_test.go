@@ -31,7 +31,7 @@ func TestCreatePermitSignature(t *testing.T) {
 			version:           "1",
 			nonce:             0,
 			deadline:          1704250835,
-			expectedSignature: "0x0d95c0246c1356df4653606e586e97447a516c937b5dd758fa0e56f2f8dd1f952b222c24a337e89dfbe20a8e112a7c6d004a3170598b9d4941aa38126920c9ed1b",
+			expectedSignature: "0x55dcf81b7366e4f6e5e5f5b335340164b4f4e6d2b4a63c7dbaf937a2f1a4ec380263e1676c814d72ef969a8ce4da2eb78d8b4d60b8b70a1b820a214cdf21acb21b",
 		},
 	}
 
