@@ -3,6 +3,7 @@ package aggregation
 import (
 	"github.com/1inch/1inch-sdk-go/internal/common"
 	"github.com/1inch/1inch-sdk-go/internal/http_executor"
+	"github.com/1inch/1inch-sdk-go/internal/web3_provider"
 	"net/url"
 )
 
@@ -12,6 +13,7 @@ type api struct {
 
 type Client struct {
 	api
+	Wallet web3_provider.Wallet
 }
 
 // todo: not done
@@ -27,3 +29,20 @@ func DefaultClient() *Client {
 	}
 	return &c
 }
+
+func example() {
+
+	// allowance()
+	// approve()
+	// sign()
+	// broadcast()
+
+	// permit()
+
+	// swapData()
+	// sign()
+	// broadcast()
+}
+
+// manipulate txs
+// each action -> return
