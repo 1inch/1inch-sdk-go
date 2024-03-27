@@ -66,8 +66,6 @@ func SimulateSwap(config SwapConfig) (*SimulationResponse, error) {
 		return nil, fmt.Errorf("failed to get 1inch router address: %v", err)
 	}
 
-	fmt.Printf("aggregationRouter: %v\n", aggregationRouter)
-
 	swapSimulationResponse, err := ExecuteTenderlySimulationRequest(config.TenderlyApiKey, forkId, &SimulateRequest{
 		From:               config.PublicAddress,
 		To:                 aggregationRouter,
