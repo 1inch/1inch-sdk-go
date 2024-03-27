@@ -390,33 +390,3 @@ func TestBuildMakerTraits(t *testing.T) {
 		})
 	}
 }
-
-//func TestBuildMakerTraits(t *testing.T) {
-//
-//	tests := []struct {
-//		name           string
-//		allowedSender  string
-//		expiry         int64
-//		nonce          int64
-//		series         int64
-//		hasExtension   bool
-//		expectedResult string
-//	}{
-//		{
-//			name:           "Simple",
-//			allowedSender:  "0x0000000000000000000000000000000000000000",
-//			expiry:         int64(1709675246),
-//			nonce:          int64(0),
-//			series:         int64(0),
-//			hasExtension:   false,
-//			expectedResult: "0x40000000000000000000000000000000000065e792ee00000000000000000000",
-//		},
-//	}
-//
-//	for _, tc := range tests {
-//		t.Run(tc.name, func(t *testing.T) {
-//			result := BuildExtension()
-//			assert.Equal(t, tc.expectedResult, result)
-//		})
-//	}
-//}
