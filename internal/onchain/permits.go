@@ -75,7 +75,6 @@ func CreatePermit(config *CreatePermitConfig) (string, error) {
 }
 
 func CreatePermitSignature(config *PermitSignatureConfig) (string, error) {
-
 	// Domain Data
 	domainData := apitypes.TypedDataDomain{
 		Name:              config.Name,

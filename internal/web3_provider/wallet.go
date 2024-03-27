@@ -5,8 +5,9 @@ import (
 	"crypto/ecdsa"
 	"fmt"
 	"github.com/ethereum/go-ethereum/common"
+	"github.com/ethereum/go-ethereum/core/types"
 	"github.com/ethereum/go-ethereum/crypto"
-	"log"
+	"math/big"
 )
 
 func (w Wallet) Nonce(ctx context.Context) (uint64, error) {
@@ -18,19 +19,34 @@ func (w Wallet) Nonce(ctx context.Context) (uint64, error) {
 }
 
 func (w Wallet) Address() common.Address {
-	privateKey, err := crypto.HexToECDSA(w.privateKeyHex)
+	publicKey := w.privateKey.Public()
+
+	return crypto.PubkeyToAddress(*publicKey.(*ecdsa.PublicKey))
+}
+
+func (w Wallet) Balance(ctx context.Context) (*big.Int, error) {
+	balance, err := w.ethClient.BalanceAt(ctx, w.address, nil)
 	if err != nil {
-		log.Fatalf("Invalid private key: %v", err)
+		return nil, fmt.Errorf("failed to retrieve balance: %v", err)
 	}
 
-	publicKey := privateKey.Public()
+	return balance, nil
+}
 
-	publicKeyECDSA, ok := publicKey.(*ecdsa.PublicKey)
-	if !ok {
-		log.Fatal("Error casting public key to ECDSA")
+func (w Wallet) Sign(tx *types.Transaction) (*types.Transaction, error) {
+	signedTx, err := types.SignTx(tx, types.NewEIP155Signer(w.chainID), w.privateKey)
+	if err != nil {
+		return nil, err
 	}
 
-	address := crypto.PubkeyToAddress(*publicKeyECDSA)
+	return signedTx, nil
+}
 
-	return address
+func (w Wallet) BroadcastTransaction(ctx context.Context, tx *types.Transaction) error {
+	err := w.ethClient.SendTransaction(ctx, tx)
+	if err != nil {
+		return fmt.Errorf("failed to broadcast transaction: %v", err)
+	}
+
+	return nil
 }
