@@ -1,21 +1,15 @@
 package web3_provider
 
+import (
+	"github.com/ethereum/go-ethereum/common"
+	"github.com/ethereum/go-ethereum/ethclient"
+)
+
 type TransactionExecutor interface {
 }
 
-type Wallet interface {
-	Nonce()
-	Address()
-	Balance()
-
-	Sign(transaction string) (string, error)
-	BroadcastTransaction(transaction string) error
-
-	// will generate the data for transaction or transaction itself
-	TokenPermit()
-	TokenApprove()
-
-	// view functions
-	TokenBalance()
-	TokenAllowance()
+type Wallet struct {
+	ethClient     ethclient.Client
+	address       common.Address
+	privateKeyHex string
 }
