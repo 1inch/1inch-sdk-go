@@ -31,6 +31,7 @@ type ContractPermitData struct {
 	Amount        string
 }
 
+// TokenPermit Will return an erc2612 string struct if possible
 func (w Wallet) TokenPermit(cd ContractPermitData) (string, error) {
 	domainData := apitypes.TypedDataDomain{
 		Name:              cd.Name,
@@ -100,7 +101,7 @@ func (w Wallet) TokenPermit(cd ContractPermitData) (string, error) {
 		ConvertSignatureToVRSString(signatureHex), nil
 }
 
-func (w Wallet) GetContractDetailsForPermit(ctx context.Context, token common.Address, deadline int64) (*ContractPermitData, error) {
+func (w Wallet) GetContractDetailsForPermit(ctx context.Context, token common.Address, spender common.Address, deadline int64) (*ContractPermitData, error) {
 	parsedABI, err := abi.JSON(strings.NewReader(abis.Erc20)) // Make a generic version of this ABI
 	if err != nil {
 		return nil, err
@@ -129,12 +130,12 @@ func (w Wallet) GetContractDetailsForPermit(ctx context.Context, token common.Ad
 	return &ContractPermitData{
 		FromToken:     token.Hex(),
 		PublicAddress: w.address.Hex(),
+		Spender:       spender.Hex(),
 		ChainId:       int(w.chainID.Int64()),
+		Deadline:      deadline,
 		Name:          contractName,
 		Version:       contractVersion,
 		Nonce:         contractNonce,
-		Deadline:      deadline,
-		Spender:       "",
 	}, nil
 }
 
