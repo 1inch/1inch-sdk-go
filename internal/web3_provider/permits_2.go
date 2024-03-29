@@ -2,19 +2,25 @@ package web3_provider
 
 import (
 	"context"
+	"fmt"
+	"math/big"
 	"strconv"
 	"strings"
 
 	"github.com/ethereum/go-ethereum"
 	"github.com/ethereum/go-ethereum/accounts/abi"
 	"github.com/ethereum/go-ethereum/common"
+	"github.com/ethereum/go-ethereum/common/math"
+	"github.com/ethereum/go-ethereum/crypto"
 	"github.com/ethereum/go-ethereum/ethclient"
+	"github.com/ethereum/go-ethereum/signer/core/apitypes"
 
 	"github.com/1inch/1inch-sdk-go/internal/helpers/consts/abis"
 )
 
 type ContractPermitData struct {
 	FromToken     string
+	Spender       string
 	Name          string
 	Version       string
 	PublicAddress string
@@ -22,10 +28,76 @@ type ContractPermitData struct {
 	Key           string
 	Nonce         int64
 	Deadline      int64
+	Amount        string
 }
 
 func (w Wallet) TokenPermit(cd ContractPermitData) (string, error) {
-	return "", nil
+	domainData := apitypes.TypedDataDomain{
+		Name:              cd.Name,
+		Version:           cd.Version,
+		ChainId:           math.NewHexOrDecimal256(int64(cd.ChainId)),
+		VerifyingContract: cd.FromToken,
+	}
+
+	// Order Message
+	orderMessage := apitypes.TypedDataMessage{
+		"owner":    cd.PublicAddress,
+		"spender":  cd.Spender,
+		"value":    cd.Amount,
+		"nonce":    big.NewInt(cd.Nonce),
+		"deadline": big.NewInt(cd.Deadline),
+	}
+
+	// Typed Data
+	typedData := apitypes.TypedData{
+		Types: map[string][]apitypes.Type{
+			"EIP712Domain": {
+				{Name: "name", Type: "string"},
+				{Name: "version", Type: "string"},
+				{Name: "chainId", Type: "uint256"},
+				{Name: "verifyingContract", Type: "address"},
+			},
+			"Permit": {
+				{Name: "owner", Type: "address"},
+				{Name: "spender", Type: "address"},
+				{Name: "value", Type: "uint256"},
+				{Name: "nonce", Type: "uint256"},
+				{Name: "deadline", Type: "uint256"},
+			},
+		},
+		PrimaryType: "Permit",
+		Domain:      domainData,
+		Message:     orderMessage,
+	}
+
+	typedDataHash, err := typedData.HashStruct(typedData.PrimaryType, typedData.Message)
+	if err != nil {
+		return "", fmt.Errorf("error hashing typed data: %v", err)
+	}
+	domainSeparator, err := typedData.HashStruct("EIP712Domain", typedData.Domain.Map())
+	if err != nil {
+		return "", fmt.Errorf("error hashing domain separator: %v", err)
+	}
+
+	rawData := []byte(fmt.Sprintf("\x19\x01%s%s", string(domainSeparator), string(typedDataHash)))
+	challengeHash := crypto.Keccak256Hash(rawData)
+
+	signature, err := crypto.Sign(challengeHash.Bytes(), w.privateKey)
+	if err != nil {
+		return "", fmt.Errorf("error signing challenge hash: %v", err)
+	}
+	signature[64] += 27 // Adjust the `v` value
+
+	// Convert signature to hex string
+	signatureHex := fmt.Sprintf("%x", signature)
+	ownerNoPrefix := Remove0xPrefix(w.address.Hex())
+	spenderNoPrefix := Remove0xPrefix(cd.Spender)
+
+	return "0x" + padStringWithZeroes(ownerNoPrefix) +
+		padStringWithZeroes(spenderNoPrefix) +
+		padStringWithZeroes(fmt.Sprintf("%x", cd.Amount)) +
+		padStringWithZeroes(fmt.Sprintf("%x", cd.Deadline)) +
+		ConvertSignatureToVRSString(signatureHex), nil
 }
 
 func (w Wallet) GetContractDetailsForPermit(ctx context.Context, token common.Address, deadline int64) (*ContractPermitData, error) {
@@ -62,6 +134,7 @@ func (w Wallet) GetContractDetailsForPermit(ctx context.Context, token common.Ad
 		Version:       contractVersion,
 		Nonce:         contractNonce,
 		Deadline:      deadline,
+		Spender:       "",
 	}, nil
 }
 
@@ -88,4 +161,27 @@ func callAndUnpackContractMethod(ctx context.Context, token common.Address, pars
 	}
 
 	return returnValue, nil
+}
+
+func padStringWithZeroes(s string) string {
+	if len(s) >= 64 {
+		return s
+	}
+	return strings.Repeat("0", 64-len(s)) + s
+}
+
+func Remove0xPrefix(s string) string {
+	if strings.HasPrefix(s, "0x") {
+		return s[2:]
+	}
+	return s
+}
+
+// ConvertSignatureToVRSString converts a signature from rsv to padded vrs format
+func ConvertSignatureToVRSString(signature string) string {
+	// explicit breakdown
+	//r := signature[:66]
+	//s := signature[66:128]
+	//v := signature[128:]
+	return padStringWithZeroes(signature[128:]) + signature[:128]
 }
