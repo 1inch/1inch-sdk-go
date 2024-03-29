@@ -2,11 +2,12 @@ package main
 
 import (
 	"context"
+	"log"
+	"os"
+
 	"github.com/1inch/1inch-sdk-go/internal/helpers/consts/addresses"
 	"github.com/1inch/1inch-sdk-go/internal/helpers/consts/chains"
 	"github.com/1inch/1inch-sdk-go/internal/helpers/consts/tokens"
-	"log"
-	"os"
 
 	"github.com/1inch/1inch-sdk-go/client"
 	"github.com/1inch/1inch-sdk-go/client/models"

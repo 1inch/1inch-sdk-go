@@ -1,12 +1,14 @@
 package aggregation
 
 import (
-	"github.com/1inch/1inch-sdk-go/internal/helpers/consts/chains"
-	"github.com/1inch/1inch-sdk-go/internal/helpers/consts/tokens"
 	"testing"
 
-	"github.com/1inch/1inch-sdk-go/internal/validate"
+	"github.com/1inch/1inch-sdk-go/internal/helpers/consts/chains"
+	"github.com/1inch/1inch-sdk-go/internal/helpers/consts/tokens"
+
 	"github.com/stretchr/testify/require"
+
+	"github.com/1inch/1inch-sdk-go/internal/validate"
 )
 
 func TestSwapTokensParams_Validate(t *testing.T) {

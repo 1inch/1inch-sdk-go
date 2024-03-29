@@ -2,9 +2,10 @@ package models
 
 import (
 	"fmt"
+	"testing"
+
 	"github.com/1inch/1inch-sdk-go/internal/helpers/consts/chains"
 	"github.com/1inch/1inch-sdk-go/internal/helpers/consts/tokens"
-	"testing"
 
 	"github.com/stretchr/testify/require"
 

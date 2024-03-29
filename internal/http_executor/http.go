@@ -5,13 +5,15 @@ import (
 	"context"
 	"encoding/json"
 	"fmt"
-	"github.com/1inch/1inch-sdk-go/internal/common"
-	"github.com/1inch/1inch-sdk-go/internal/helpers"
-	"github.com/google/go-querystring/query"
 	"io"
 	"net/http"
 	"net/url"
 	"reflect"
+
+	"github.com/google/go-querystring/query"
+
+	"github.com/1inch/1inch-sdk-go/internal/common"
+	"github.com/1inch/1inch-sdk-go/internal/helpers"
 )
 
 func DefaultHttpClient(baseURL *url.URL, apiKey string) Client {

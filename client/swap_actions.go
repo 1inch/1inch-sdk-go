@@ -120,6 +120,8 @@ func (s *ActionService) swapTokens(ctx context.Context, params models.SwapTokens
 			Signature: sig,
 		})
 
+		// name, version, fromToken, Address, ChainID. nonce, Deadline, spender, value
+
 		executeSwapConfig.IsPermitSwap = true
 		params.Permit = permitParams
 	}

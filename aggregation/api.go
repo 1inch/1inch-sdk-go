@@ -3,6 +3,7 @@ package aggregation
 import (
 	"context"
 	"fmt"
+
 	"github.com/1inch/1inch-sdk-go/internal/common"
 )
 

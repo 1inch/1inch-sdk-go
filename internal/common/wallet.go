@@ -2,9 +2,10 @@ package common
 
 import (
 	"context"
+	"math/big"
+
 	gethCommon "github.com/ethereum/go-ethereum/common"
 	"github.com/ethereum/go-ethereum/core/types"
-	"math/big"
 )
 
 type Wallet interface {
@@ -16,7 +17,7 @@ type Wallet interface {
 	BroadcastTransaction(ctx context.Context, tx *types.Transaction) error
 
 	// will generate the data for transaction or transaction itself
-	TokenPermit()
+	TokenPermit() (string, error)
 	TokenApprove()
 
 	// view functions

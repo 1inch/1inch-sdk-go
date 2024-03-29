@@ -1,4 +1,4 @@
-package onchain
+package web3_provider
 
 import (
 	"fmt"
@@ -26,7 +26,6 @@ type CreatePermitConfig struct {
 }
 
 func CreatePermit(config *CreatePermitConfig) (string, error) {
-
 	// TODO due to a bug in the Limit Order API, we must check the version of the contract before attempting permit generation
 	// If the version of the contract is not 1, we exit early and default to an approval
 	version, err := ReadContractVersion(config.EthClient, common.HexToAddress(config.MakerAsset))

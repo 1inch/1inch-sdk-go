@@ -1,4 +1,4 @@
-package onchain
+package web3_provider
 
 import (
 	"context"

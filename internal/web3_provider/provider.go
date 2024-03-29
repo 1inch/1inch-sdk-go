@@ -2,9 +2,10 @@ package web3_provider
 
 import (
 	"crypto/ecdsa"
+	"math/big"
+
 	"github.com/ethereum/go-ethereum/common"
 	"github.com/ethereum/go-ethereum/ethclient"
-	"math/big"
 )
 
 type TransactionExecutor interface {

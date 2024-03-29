@@ -4,10 +4,11 @@ import (
 	"context"
 	"crypto/ecdsa"
 	"fmt"
+	"math/big"
+
 	"github.com/ethereum/go-ethereum/common"
 	"github.com/ethereum/go-ethereum/core/types"
 	"github.com/ethereum/go-ethereum/crypto"
-	"math/big"
 )
 
 func (w Wallet) Nonce(ctx context.Context) (uint64, error) {
@@ -20,7 +21,6 @@ func (w Wallet) Nonce(ctx context.Context) (uint64, error) {
 
 func (w Wallet) Address() common.Address {
 	publicKey := w.privateKey.Public()
-
 	return crypto.PubkeyToAddress(*publicKey.(*ecdsa.PublicKey))
 }
 
@@ -29,7 +29,6 @@ func (w Wallet) Balance(ctx context.Context) (*big.Int, error) {
 	if err != nil {
 		return nil, fmt.Errorf("failed to retrieve balance: %v", err)
 	}
-
 	return balance, nil
 }
 
@@ -38,7 +37,6 @@ func (w Wallet) Sign(tx *types.Transaction) (*types.Transaction, error) {
 	if err != nil {
 		return nil, err
 	}
-
 	return signedTx, nil
 }
 
@@ -47,6 +45,5 @@ func (w Wallet) BroadcastTransaction(ctx context.Context, tx *types.Transaction)
 	if err != nil {
 		return fmt.Errorf("failed to broadcast transaction: %v", err)
 	}
-
 	return nil
 }

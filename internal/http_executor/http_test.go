@@ -2,12 +2,13 @@ package http_executor
 
 import (
 	"context"
-	"github.com/1inch/1inch-sdk-go/internal/common"
 	"io"
 	"net/http"
 	"net/http/httptest"
 	"net/url"
 	"testing"
+
+	"github.com/1inch/1inch-sdk-go/internal/common"
 )
 
 func TestExecuteRequest_SuccessGET(t *testing.T) {

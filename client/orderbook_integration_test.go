@@ -3,15 +3,17 @@ package client
 import (
 	"context"
 	"fmt"
+	"os"
+	"testing"
+
 	helpers2 "github.com/1inch/1inch-sdk-go/internal/helpers"
 	"github.com/1inch/1inch-sdk-go/internal/helpers/consts/amounts"
 	"github.com/1inch/1inch-sdk-go/internal/helpers/consts/chains"
 	"github.com/1inch/1inch-sdk-go/internal/helpers/consts/tokens"
-	"os"
-	"testing"
+
+	"github.com/stretchr/testify/require"
 
 	"github.com/1inch/1inch-sdk-go/client/models"
-	"github.com/stretchr/testify/require"
 
 	"github.com/1inch/1inch-sdk-go/helpers"
 )
