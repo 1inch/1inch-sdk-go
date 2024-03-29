@@ -17,10 +17,23 @@ type Wallet interface {
 	BroadcastTransaction(ctx context.Context, tx *types.Transaction) error
 
 	// will generate the data for transaction or transaction itself
-	TokenPermit() (string, error)
-	TokenApprove()
+	TokenPermit(cd ContractPermitData) (string, error)
+	//TokenApprove()
 
 	// view functions
-	TokenBalance()
-	TokenAllowance()
+	//TokenBalance()
+	//TokenAllowance()
+}
+
+type ContractPermitData struct {
+	FromToken     string
+	Spender       string
+	Name          string
+	Version       string
+	PublicAddress string
+	ChainId       int
+	Key           string
+	Nonce         int64
+	Deadline      int64
+	Amount        string
 }

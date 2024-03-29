@@ -17,3 +17,12 @@ type Wallet struct {
 	privateKey *ecdsa.PrivateKey
 	chainID    *big.Int
 }
+
+func DefaultWalletProvider(pk string, nodeURL string, chainID *big.Int) *Wallet {
+	return &Wallet{
+		ethClient:  ethclient.Client{},
+		address:    common.Address{},
+		privateKey: nil,
+		chainID:    nil,
+	}
+}

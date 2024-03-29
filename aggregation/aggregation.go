@@ -1,6 +1,7 @@
 package aggregation
 
 import (
+	"math/big"
 	"net/url"
 
 	"github.com/1inch/1inch-sdk-go/internal/common"
@@ -14,7 +15,7 @@ type api struct {
 
 type Client struct {
 	api
-	Wallet web3_provider.Wallet
+	Wallet common.Wallet
 }
 
 // todo: not done
@@ -25,8 +26,11 @@ func DefaultClient() *Client {
 	api := api{
 		httpExecutor: &executor,
 	}
+
+	w := web3_provider.DefaultWalletProvider("", "", big.NewInt(1))
 	c := Client{
-		api,
+		api:    api,
+		Wallet: w,
 	}
 	return &c
 }

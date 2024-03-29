@@ -9,30 +9,18 @@ import (
 
 	"github.com/ethereum/go-ethereum"
 	"github.com/ethereum/go-ethereum/accounts/abi"
-	"github.com/ethereum/go-ethereum/common"
+	gethCommon "github.com/ethereum/go-ethereum/common"
 	"github.com/ethereum/go-ethereum/common/math"
 	"github.com/ethereum/go-ethereum/crypto"
 	"github.com/ethereum/go-ethereum/ethclient"
 	"github.com/ethereum/go-ethereum/signer/core/apitypes"
 
+	"github.com/1inch/1inch-sdk-go/internal/common"
 	"github.com/1inch/1inch-sdk-go/internal/helpers/consts/abis"
 )
 
-type ContractPermitData struct {
-	FromToken     string
-	Spender       string
-	Name          string
-	Version       string
-	PublicAddress string
-	ChainId       int
-	Key           string
-	Nonce         int64
-	Deadline      int64
-	Amount        string
-}
-
 // TokenPermit Will return an erc2612 string struct if possible
-func (w Wallet) TokenPermit(cd ContractPermitData) (string, error) {
+func (w Wallet) TokenPermit(cd common.ContractPermitData) (string, error) {
 	domainData := apitypes.TypedDataDomain{
 		Name:              cd.Name,
 		Version:           cd.Version,
@@ -101,7 +89,7 @@ func (w Wallet) TokenPermit(cd ContractPermitData) (string, error) {
 		ConvertSignatureToVRSString(signatureHex), nil
 }
 
-func (w Wallet) GetContractDetailsForPermit(ctx context.Context, token common.Address, spender common.Address, deadline int64) (*ContractPermitData, error) {
+func (w Wallet) GetContractDetailsForPermit(ctx context.Context, token gethCommon.Address, spender gethCommon.Address, deadline int64) (*common.ContractPermitData, error) {
 	parsedABI, err := abi.JSON(strings.NewReader(abis.Erc20)) // Make a generic version of this ABI
 	if err != nil {
 		return nil, err
@@ -117,7 +105,7 @@ func (w Wallet) GetContractDetailsForPermit(ctx context.Context, token common.Ad
 		return nil, err
 	}
 
-	contractNonceStr, err := callAndUnpackContractMethod(ctx, token, parsedABI, &w.ethClient, "nonce", []common.Address{token})
+	contractNonceStr, err := callAndUnpackContractMethod(ctx, token, parsedABI, &w.ethClient, "nonce", []gethCommon.Address{token})
 	if err != nil {
 		return nil, err
 	}
@@ -127,7 +115,7 @@ func (w Wallet) GetContractDetailsForPermit(ctx context.Context, token common.Ad
 		return nil, err
 	}
 
-	return &ContractPermitData{
+	return &common.ContractPermitData{
 		FromToken:     token.Hex(),
 		PublicAddress: w.address.Hex(),
 		Spender:       spender.Hex(),
@@ -139,7 +127,7 @@ func (w Wallet) GetContractDetailsForPermit(ctx context.Context, token common.Ad
 	}, nil
 }
 
-func callAndUnpackContractMethod(ctx context.Context, token common.Address, parsedABI abi.ABI, client *ethclient.Client, methodName string, methodArgs ...interface{}) (string, error) {
+func callAndUnpackContractMethod(ctx context.Context, token gethCommon.Address, parsedABI abi.ABI, client *ethclient.Client, methodName string, methodArgs ...interface{}) (string, error) {
 	data, err := parsedABI.Pack(methodName, methodArgs...)
 	if err != nil {
 		return "", err
