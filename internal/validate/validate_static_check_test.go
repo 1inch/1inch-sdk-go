@@ -69,7 +69,7 @@ func checkParameterFunctionConsistency(filePath string) (int, error) {
 
 			// Initialize caseLabel with the first capture group
 			caseLabel := matches[1]
-			
+
 			caseLabel = strings.TrimSuffix(caseLabel, "Required")
 
 			// Move the scanner four lines down
