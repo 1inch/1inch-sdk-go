@@ -20,6 +20,21 @@ import (
 
 // TokenPermit Will return an erc2612 string struct if possible
 func (w Wallet) TokenPermit(cd common.ContractPermitData) (string, error) {
+	ownerNoPrefix := Remove0xPrefix(w.address.Hex())
+	spenderNoPrefix := Remove0xPrefix(cd.Spender)
+	signature, err := w.signature(cd)
+	if err != nil {
+		return "", err
+	}
+
+	return "0x" + padStringWithZeroes(ownerNoPrefix) +
+		padStringWithZeroes(spenderNoPrefix) +
+		padStringWithZeroes(fmt.Sprintf("%x", cd.Amount)) +
+		padStringWithZeroes(fmt.Sprintf("%x", cd.Deadline)) +
+		ConvertSignatureToVRSString(signature), nil
+}
+
+func (w Wallet) signature(cd common.ContractPermitData) (string, error) {
 	domainData := apitypes.TypedDataDomain{
 		Name:              cd.Name,
 		Version:           cd.Version,
@@ -83,14 +98,7 @@ func (w Wallet) TokenPermit(cd common.ContractPermitData) (string, error) {
 
 	// Convert signature to hex string
 	signatureHex := fmt.Sprintf("%x", signature)
-	ownerNoPrefix := Remove0xPrefix(w.address.Hex())
-	spenderNoPrefix := Remove0xPrefix(cd.Spender)
-
-	return "0x" + padStringWithZeroes(ownerNoPrefix) +
-		padStringWithZeroes(spenderNoPrefix) +
-		padStringWithZeroes(fmt.Sprintf("%x", cd.Amount)) +
-		padStringWithZeroes(fmt.Sprintf("%x", cd.Deadline)) +
-		ConvertSignatureToVRSString(signatureHex), nil
+	return signatureHex, nil
 }
 
 func (w Wallet) GetContractDetailsForPermit(ctx context.Context, token gethCommon.Address, spender gethCommon.Address, deadline int64) (*common.ContractPermitData, error) {
