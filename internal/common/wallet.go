@@ -32,7 +32,6 @@ type ContractPermitData struct {
 	Version       string
 	PublicAddress string
 	ChainId       int
-	Key           string
 	Nonce         int64
 	Deadline      int64
 	Amount        string
