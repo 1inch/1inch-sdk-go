@@ -89,17 +89,17 @@ func (w Wallet) TokenPermit(cd common.ContractPermitData) (string, error) {
 }
 
 func (w Wallet) GetContractDetailsForPermit(ctx context.Context, token gethCommon.Address, spender gethCommon.Address, deadline int64) (*common.ContractPermitData, error) {
-	contractName, err := callAndUnpackContractMethod(ctx, token, *w.erc20ABI, &w.ethClient, "name")
+	contractName, err := callAndUnpackContractMethod(ctx, token, *w.erc20ABI, w.ethClient, "name")
 	if err != nil {
 		return nil, err
 	}
 
-	contractVersion, err := callAndUnpackContractMethod(ctx, token, *w.erc20ABI, &w.ethClient, "version")
+	contractVersion, err := callAndUnpackContractMethod(ctx, token, *w.erc20ABI, w.ethClient, "version")
 	if err != nil {
 		return nil, err
 	}
 
-	contractNonceStr, err := callAndUnpackContractMethod(ctx, token, *w.erc20ABI, &w.ethClient, "nonce", []gethCommon.Address{token})
+	contractNonceStr, err := callAndUnpackContractMethod(ctx, token, *w.erc20ABI, w.ethClient, "nonce", []gethCommon.Address{token})
 	if err != nil {
 		return nil, err
 	}
@@ -113,7 +113,7 @@ func (w Wallet) GetContractDetailsForPermit(ctx context.Context, token gethCommo
 		FromToken:     token.Hex(),
 		PublicAddress: w.address.Hex(),
 		Spender:       spender.Hex(),
-		ChainId:       int(w.chainID.Int64()),
+		ChainId:       int(w.ChainId.Int64()),
 		Deadline:      deadline,
 		Name:          contractName,
 		Version:       contractVersion,

@@ -1,9 +1,6 @@
 package aggregation
 
 import (
-	"math/big"
-	"net/url"
-
 	"github.com/1inch/1inch-sdk-go/internal/common"
 	"github.com/1inch/1inch-sdk-go/internal/http_executor"
 	"github.com/1inch/1inch-sdk-go/internal/web3_provider"
@@ -18,19 +15,23 @@ type Client struct {
 	Wallet common.Wallet
 }
 
-// todo: not done
-func DefaultClient() *Client {
-	// todo: move to input params, that will be validated before
-	u, _ := url.Parse("https://api.1inch.dev")
-	executor := http_executor.DefaultHttpClient(u, "")
+func NewClient(cfg *Configuration) (*Client, error) {
+	executor := http_executor.DefaultHttpClient(cfg.ApiURL, cfg.ApiKey)
 	api := api{
 		httpExecutor: &executor,
 	}
 
-	w := web3_provider.DefaultWalletProvider("", "", big.NewInt(1))
 	c := Client{
-		api:    api,
-		Wallet: w,
+		api: api,
 	}
-	return &c
+
+	if cfg.WalletConfig != nil {
+		w, err := web3_provider.DefaultWalletProvider(cfg.WalletConfig.PrivateKey, cfg.WalletConfig.NodeURL, cfg.ChainId)
+		if err != nil {
+			return nil, err
+		}
+		c.Wallet = w
+	}
+
+	return &c, nil
 }
