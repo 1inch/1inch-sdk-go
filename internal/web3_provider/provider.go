@@ -14,9 +14,6 @@ import (
 	"github.com/1inch/1inch-sdk-go/internal/helpers/consts/abis"
 )
 
-type TransactionExecutor interface {
-}
-
 type Wallet struct {
 	ethClient  *ethclient.Client
 	address    *common.Address

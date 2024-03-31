@@ -27,11 +27,16 @@ func (w Wallet) TokenPermit(cd common.ContractPermitData) (string, error) {
 		VerifyingContract: cd.FromToken,
 	}
 
+	amount, ok := new(big.Int).SetString(cd.Amount, 10)
+	if !ok {
+		return "", fmt.Errorf("failed to convert string (%v) to big.Int", cd.Amount)
+	}
+
 	// Order Message
 	orderMessage := apitypes.TypedDataMessage{
 		"owner":    cd.PublicAddress,
 		"spender":  cd.Spender,
-		"value":    cd.Amount,
+		"value":    amount,
 		"nonce":    big.NewInt(cd.Nonce),
 		"deadline": big.NewInt(cd.Deadline),
 	}
