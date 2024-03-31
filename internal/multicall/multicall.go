@@ -116,8 +116,8 @@ func Call(ctx context.Context, params CallParams) ([]byte, error) {
 	return resp, nil
 }
 
-func GetEvmHelperContract(chainId int) (string, error) {
-	switch chainId {
+func GetEvmHelperContract(ChainId int) (string, error) {
+	switch ChainId {
 	case chains.Ethereum:
 		return multicallContractEthereum, nil
 	case chains.Bsc:
@@ -143,6 +143,6 @@ func GetEvmHelperContract(chainId int) (string, error) {
 	case chains.Base:
 		return multicallContractBase, nil
 	default:
-		return "", fmt.Errorf("chain %d is not supported", chainId)
+		return "", fmt.Errorf("chain %d is not supported", ChainId)
 	}
 }
