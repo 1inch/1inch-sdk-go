@@ -57,7 +57,7 @@ func TestCreatePermitSignature(t *testing.T) {
 			spender:           "0x1111111254eeb25477b68fb85ed929f73a960582",
 			amount:            "115792089237316195423570985008687907853269984665640564039457584007913129639935",
 			deadline:          1704250835,
-			expectedSignature: "0x0d95c0246c1356df4653606e586e97447a516c937b5dd758fa0e56f2f8dd1f952b222c24a337e89dfbe20a8e112a7c6d004a3170598b9d4941aa38126920c9ed1b",
+			expectedSignature: "0d95c0246c1356df4653606e586e97447a516c937b5dd758fa0e56f2f8dd1f952b222c24a337e89dfbe20a8e112a7c6d004a3170598b9d4941aa38126920c9ed1b",
 		},
 	}
 
@@ -75,7 +75,7 @@ func TestCreatePermitSignature(t *testing.T) {
 				Amount:        tc.amount,
 			}
 
-			result, err := w.TokenPermit(d)
+			result, err := w.signature(d)
 			require.NoError(t, err)
 			require.Equal(t, tc.expectedSignature, result)
 		})
