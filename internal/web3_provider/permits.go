@@ -20,8 +20,8 @@ import (
 
 // TokenPermit Will return an erc2612 string struct if possible
 func (w Wallet) TokenPermit(cd common.ContractPermitData) (string, error) {
-	ownerNoPrefix := Remove0xPrefix(w.address.Hex())
-	spenderNoPrefix := Remove0xPrefix(cd.Spender)
+	ownerNoPrefix := remove0xPrefix(w.address.Hex())
+	spenderNoPrefix := remove0xPrefix(cd.Spender)
 	signature, err := w.createPermitSignature(&cd)
 	if err != nil {
 		return "", err
@@ -31,7 +31,7 @@ func (w Wallet) TokenPermit(cd common.ContractPermitData) (string, error) {
 		padStringWithZeroes(spenderNoPrefix) +
 		padStringWithZeroes(fmt.Sprintf("%x", cd.Amount)) +
 		padStringWithZeroes(fmt.Sprintf("%x", cd.Deadline)) +
-		ConvertSignatureToVRSString(signature), nil
+		convertSignatureToVRSString(signature), nil
 }
 
 func (w Wallet) createPermitSignature(cd *common.ContractPermitData) (string, error) {
@@ -166,7 +166,7 @@ func padStringWithZeroes(s string) string {
 	return strings.Repeat("0", 64-len(s)) + s
 }
 
-func Remove0xPrefix(s string) string {
+func remove0xPrefix(s string) string {
 	if strings.HasPrefix(s, "0x") {
 		return s[2:]
 	}
@@ -174,7 +174,7 @@ func Remove0xPrefix(s string) string {
 }
 
 // ConvertSignatureToVRSString converts a createPermitSignature from rsv to padded vrs format
-func ConvertSignatureToVRSString(signature string) string {
+func convertSignatureToVRSString(signature string) string {
 	// explicit breakdown
 	//r := createPermitSignature[:66]
 	//s := createPermitSignature[66:128]
