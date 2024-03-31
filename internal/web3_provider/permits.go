@@ -16,7 +16,6 @@ import (
 	"github.com/ethereum/go-ethereum/signer/core/apitypes"
 
 	"github.com/1inch/1inch-sdk-go/internal/common"
-	"github.com/1inch/1inch-sdk-go/internal/helpers/consts/abis"
 )
 
 // TokenPermit Will return an erc2612 string struct if possible
@@ -90,22 +89,17 @@ func (w Wallet) TokenPermit(cd common.ContractPermitData) (string, error) {
 }
 
 func (w Wallet) GetContractDetailsForPermit(ctx context.Context, token gethCommon.Address, spender gethCommon.Address, deadline int64) (*common.ContractPermitData, error) {
-	parsedABI, err := abi.JSON(strings.NewReader(abis.Erc20)) // Make a generic version of this ABI
+	contractName, err := callAndUnpackContractMethod(ctx, token, *w.erc20ABI, &w.ethClient, "name")
 	if err != nil {
 		return nil, err
 	}
 
-	contractName, err := callAndUnpackContractMethod(ctx, token, parsedABI, &w.ethClient, "name")
+	contractVersion, err := callAndUnpackContractMethod(ctx, token, *w.erc20ABI, &w.ethClient, "version")
 	if err != nil {
 		return nil, err
 	}
 
-	contractVersion, err := callAndUnpackContractMethod(ctx, token, parsedABI, &w.ethClient, "version")
-	if err != nil {
-		return nil, err
-	}
-
-	contractNonceStr, err := callAndUnpackContractMethod(ctx, token, parsedABI, &w.ethClient, "nonce", []gethCommon.Address{token})
+	contractNonceStr, err := callAndUnpackContractMethod(ctx, token, *w.erc20ABI, &w.ethClient, "nonce", []gethCommon.Address{token})
 	if err != nil {
 		return nil, err
 	}
