@@ -4,13 +4,14 @@ import (
 	"context"
 	"errors"
 	"fmt"
+	"math/big"
+	"strings"
+	"time"
+
 	"github.com/1inch/1inch-sdk-go/internal/helpers"
 	"github.com/1inch/1inch-sdk-go/internal/helpers/consts/abis"
 	"github.com/1inch/1inch-sdk-go/internal/helpers/consts/amounts"
 	"github.com/1inch/1inch-sdk-go/internal/helpers/consts/chains"
-	"math/big"
-	"strings"
-	"time"
 
 	"github.com/ethereum/go-ethereum"
 	"github.com/ethereum/go-ethereum/accounts/abi"

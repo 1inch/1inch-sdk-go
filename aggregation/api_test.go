@@ -3,10 +3,11 @@ package aggregation
 import (
 	"context"
 	"fmt"
-	"github.com/1inch/1inch-sdk-go/internal/common"
-	"github.com/1inch/1inch-sdk-go/internal/helpers/consts/chains"
 	"reflect"
 	"testing"
+
+	"github.com/1inch/1inch-sdk-go/internal/common"
+	"github.com/1inch/1inch-sdk-go/internal/helpers/consts/chains"
 )
 
 type MockHttpExecutor struct {

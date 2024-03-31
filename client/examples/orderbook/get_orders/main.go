@@ -4,9 +4,10 @@ import (
 	"context"
 	"encoding/json"
 	"fmt"
-	"github.com/1inch/1inch-sdk-go/internal/helpers/consts/chains"
 	"log"
 	"os"
+
+	"github.com/1inch/1inch-sdk-go/internal/helpers/consts/chains"
 
 	"github.com/1inch/1inch-sdk-go/client"
 	"github.com/1inch/1inch-sdk-go/client/models"

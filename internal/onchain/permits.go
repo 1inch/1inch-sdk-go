@@ -2,11 +2,12 @@ package onchain
 
 import (
 	"fmt"
+	"math/big"
+	"strings"
+
 	"github.com/1inch/1inch-sdk-go/internal/helpers/consts/amounts"
 	"github.com/1inch/1inch-sdk-go/internal/helpers/consts/contracts"
 	"github.com/1inch/1inch-sdk-go/internal/helpers/consts/typehashes"
-	"math/big"
-	"strings"
 
 	"github.com/ethereum/go-ethereum/common"
 	"github.com/ethereum/go-ethereum/common/math"
@@ -75,7 +76,6 @@ func CreatePermit(config *CreatePermitConfig) (string, error) {
 }
 
 func CreatePermitSignature(config *PermitSignatureConfig) (string, error) {
-
 	// Domain Data
 	domainData := apitypes.TypedDataDomain{
 		Name:              config.Name,

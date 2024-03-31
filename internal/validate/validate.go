@@ -2,12 +2,13 @@ package validate
 
 import (
 	"fmt"
-	helpers2 "github.com/1inch/1inch-sdk-go/internal/helpers"
-	"github.com/1inch/1inch-sdk-go/internal/helpers/consts/chains"
 	"math/big"
 	"regexp"
 	"strings"
 	"time"
+
+	helpers2 "github.com/1inch/1inch-sdk-go/internal/helpers"
+	"github.com/1inch/1inch-sdk-go/internal/helpers/consts/chains"
 )
 
 func CheckEthereumAddressRequired(parameter interface{}, variableName string) error {

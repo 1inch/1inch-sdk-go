@@ -6,17 +6,19 @@ import (
 	"encoding/json"
 	"errors"
 	"fmt"
-	"github.com/1inch/1inch-sdk-go/aggregation"
-	"github.com/1inch/1inch-sdk-go/internal/helpers"
 	"io"
 	"net/http"
 	"net/url"
 	"reflect"
 	"strings"
 
-	"github.com/1inch/1inch-sdk-go/client/models"
+	"github.com/1inch/1inch-sdk-go/aggregation"
+	"github.com/1inch/1inch-sdk-go/internal/helpers"
+
 	"github.com/ethereum/go-ethereum/ethclient"
 	"github.com/google/go-querystring/query"
+
+	"github.com/1inch/1inch-sdk-go/client/models"
 )
 
 type service struct {

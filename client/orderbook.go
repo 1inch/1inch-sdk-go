@@ -6,11 +6,12 @@ import (
 	"encoding/json"
 	"errors"
 	"fmt"
+	"net/http"
+	"time"
+
 	helpers2 "github.com/1inch/1inch-sdk-go/internal/helpers"
 	"github.com/1inch/1inch-sdk-go/internal/helpers/consts/addresses"
 	"github.com/1inch/1inch-sdk-go/internal/helpers/consts/contracts"
-	"net/http"
-	"time"
 
 	"github.com/1inch/1inch-sdk-go/client/models"
 	"github.com/1inch/1inch-sdk-go/helpers"

@@ -2,6 +2,7 @@ package helpers
 
 import (
 	"fmt"
+
 	"github.com/1inch/1inch-sdk-go/internal/helpers/consts/chains"
 )
 

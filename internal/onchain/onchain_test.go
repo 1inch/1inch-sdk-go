@@ -1,10 +1,11 @@
 package onchain
 
 import (
-	"github.com/1inch/1inch-sdk-go/internal/helpers/consts/amounts"
 	"math/big"
 	"strings"
 	"testing"
+
+	"github.com/1inch/1inch-sdk-go/internal/helpers/consts/amounts"
 
 	"github.com/stretchr/testify/require"
 )

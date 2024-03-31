@@ -28,7 +28,9 @@
             "description": "Max valid orders per user: 100. Cancel previous orders to create new ones"
           }
         },
-        "tags": ["Limit Order V3"]
+        "tags": [
+          "Limit Order V3"
+        ]
       }
     },
     "/v3.0/1/address/{address}": {
@@ -127,7 +129,9 @@
             "description": "Input data is invalid or address is not provided"
           }
         },
-        "tags": ["Limit Order V3"]
+        "tags": [
+          "Limit Order V3"
+        ]
       }
     },
     "/v3.0/1/all": {
@@ -216,7 +220,9 @@
             "description": "Input data is invalid"
           }
         },
-        "tags": ["Limit Order V3"]
+        "tags": [
+          "Limit Order V3"
+        ]
       }
     },
     "/v3.0/1/count": {
@@ -240,7 +246,9 @@
             "description": ""
           }
         },
-        "tags": ["Limit Order V3"]
+        "tags": [
+          "Limit Order V3"
+        ]
       }
     },
     "/v3.0/1/events/{orderHash}": {
@@ -261,7 +269,9 @@
             "description": ""
           }
         },
-        "tags": ["Limit Order V3"]
+        "tags": [
+          "Limit Order V3"
+        ]
       }
     },
     "/v3.0/1/events": {
@@ -282,7 +292,9 @@
             "description": ""
           }
         },
-        "tags": ["Limit Order V3"]
+        "tags": [
+          "Limit Order V3"
+        ]
       }
     },
     "/v3.0/1/has-active-orders-with-permit/{walletAddress}/{token}": {
@@ -311,7 +323,9 @@
             "description": ""
           }
         },
-        "tags": ["Limit Order V3"]
+        "tags": [
+          "Limit Order V3"
+        ]
       }
     }
   },
@@ -414,7 +428,11 @@
             ]
           }
         },
-        "required": ["orderHash", "signature", "data"]
+        "required": [
+          "orderHash",
+          "signature",
+          "data"
+        ]
       }
     }
   }
