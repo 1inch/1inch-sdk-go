@@ -8,7 +8,6 @@ import (
 	"strings"
 	"time"
 
-	"github.com/1inch/1inch-sdk-go/internal/helpers"
 	"github.com/1inch/1inch-sdk-go/internal/helpers/consts/abis"
 	"github.com/1inch/1inch-sdk-go/internal/helpers/consts/amounts"
 	"github.com/1inch/1inch-sdk-go/internal/helpers/consts/chains"
@@ -42,8 +41,14 @@ func ExecuteTransaction(ctx context.Context, txConfig TxConfig, ethClient *ethcl
 
 	nonceCacheKey := fmt.Sprintf("%s+%d", txConfig.PublicAddress, txConfig.ChainId.Int64())
 	nonce, err := GetNonce(ethClient, nonceCacheKey, txConfig.PublicAddress, nonceCache)
+	if err != nil {
+		return fmt.Errorf("failed to GetNonce: %v", err)
+	}
 
 	swapTx, err := GetTx(ethClient, nonce, txConfig)
+	if err != nil {
+		return fmt.Errorf("failed to GetTx: %v", err)
+	}
 
 	signingKey, err := crypto.HexToECDSA(txConfig.PrivateKey)
 	if err != nil {
@@ -63,7 +68,7 @@ func ExecuteTransaction(ctx context.Context, txConfig TxConfig, ethClient *ethcl
 	}
 
 	fmt.Printf("Transaction sent! (%s)\n", txConfig.Description)
-	helpers.PrintBlockExplorerTxLink(int(txConfig.ChainId.Int64()), swapTxSigned.Hash().String())
+	//helpers.PrintBlockExplorerTxLink(int(txConfig.ChainId.Int64()), swapTxSigned.Hash().String())
 
 	_, err = WaitForTransaction(ctx, ethClient, swapTxSigned.Hash())
 	if err != nil {
@@ -397,7 +402,7 @@ func ApproveTokenForRouter(ctx context.Context, client *ethclient.Client, nonceC
 
 func GetTimestampBelowCalldata(expiration int64) ([]byte, error) {
 
-	expiration = time.Now().UnixMilli()
+	//expiration = time.Now().UnixMilli()
 
 	parsedABI, err := abi.JSON(strings.NewReader(abis.SeriesNonceManager))
 	if err != nil {

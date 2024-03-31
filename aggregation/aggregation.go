@@ -34,20 +34,3 @@ func DefaultClient() *Client {
 	}
 	return &c
 }
-
-func example() {
-
-	// allowance()
-	// approve()
-	// sign()
-	// broadcast()
-
-	// permit()
-
-	// swapData()
-	// sign()
-	// broadcast()
-}
-
-// manipulate txs
-// each action -> return
