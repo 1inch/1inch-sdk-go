@@ -1,4 +1,4 @@
-package aggregation
+package models
 
 import (
 	"testing"
