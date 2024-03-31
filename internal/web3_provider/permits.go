@@ -22,7 +22,7 @@ import (
 func (w Wallet) TokenPermit(cd common.ContractPermitData) (string, error) {
 	ownerNoPrefix := Remove0xPrefix(w.address.Hex())
 	spenderNoPrefix := Remove0xPrefix(cd.Spender)
-	signature, err := w.signature(cd)
+	signature, err := w.createPermitSignature(&cd)
 	if err != nil {
 		return "", err
 	}
@@ -34,7 +34,7 @@ func (w Wallet) TokenPermit(cd common.ContractPermitData) (string, error) {
 		ConvertSignatureToVRSString(signature), nil
 }
 
-func (w Wallet) signature(cd common.ContractPermitData) (string, error) {
+func (w Wallet) createPermitSignature(cd *common.ContractPermitData) (string, error) {
 	domainData := apitypes.TypedDataDomain{
 		Name:              cd.Name,
 		Version:           cd.Version,
@@ -96,7 +96,7 @@ func (w Wallet) signature(cd common.ContractPermitData) (string, error) {
 	}
 	signature[64] += 27 // Adjust the `v` value
 
-	// Convert signature to hex string
+	// Convert createPermitSignature to hex string
 	signatureHex := fmt.Sprintf("%x", signature)
 	return signatureHex, nil
 }
@@ -173,11 +173,11 @@ func Remove0xPrefix(s string) string {
 	return s
 }
 
-// ConvertSignatureToVRSString converts a signature from rsv to padded vrs format
+// ConvertSignatureToVRSString converts a createPermitSignature from rsv to padded vrs format
 func ConvertSignatureToVRSString(signature string) string {
 	// explicit breakdown
-	//r := signature[:66]
-	//s := signature[66:128]
-	//v := signature[128:]
+	//r := createPermitSignature[:66]
+	//s := createPermitSignature[66:128]
+	//v := createPermitSignature[128:]
 	return padStringWithZeroes(signature[128:]) + signature[:128]
 }

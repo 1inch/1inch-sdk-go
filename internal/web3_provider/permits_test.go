@@ -75,7 +75,7 @@ func TestCreatePermitSignature(t *testing.T) {
 				Amount:        tc.amount,
 			}
 
-			result, err := w.signature(d)
+			result, err := w.createPermitSignature(&d)
 			require.NoError(t, err)
 			require.Equal(t, tc.expectedSignature, result)
 		})
