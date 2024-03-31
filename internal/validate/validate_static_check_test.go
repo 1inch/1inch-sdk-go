@@ -69,11 +69,8 @@ func checkParameterFunctionConsistency(filePath string) (int, error) {
 
 			// Initialize caseLabel with the first capture group
 			caseLabel := matches[1]
-
-			// If the function name ends with "Required", remove "Required" from the caseLabel
-			if strings.HasSuffix(caseLabel, "Required") {
-				caseLabel = strings.TrimSuffix(caseLabel, "Required")
-			}
+			
+			caseLabel = strings.TrimSuffix(caseLabel, "Required")
 
 			// Move the scanner four lines down
 			for i := 0; i < 3; i++ {

@@ -6,10 +6,10 @@ import (
 	"github.com/1inch/1inch-sdk-go/internal/helpers/consts/chains"
 )
 
-func PrintBlockExplorerTxLink(chainId int, txHash string) {
-	output := GetBlockExplorerTxLinkInfo(chainId, txHash)
-	fmt.Printf(output)
-}
+//func PrintBlockExplorerTxLink(chainId int, txHash string) {
+//	output := GetBlockExplorerTxLinkInfo(chainId, txHash)
+//	fmt.Printf(output)
+//}
 
 func GetBlockExplorerTxLinkInfo(chainId int, txHash string) string {
 	const etherscanBaseURL = "https://etherscan.io/tx/"

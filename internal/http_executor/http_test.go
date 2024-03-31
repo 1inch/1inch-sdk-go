@@ -61,7 +61,10 @@ func TestExecuteRequest_SuccessfulPOST(t *testing.T) {
 		}
 
 		w.WriteHeader(http.StatusOK)
-		io.WriteString(w, `{"status":"success"}`)
+		_, err := io.WriteString(w, `{"status":"success"}`)
+		if err != nil {
+			t.Fatalf("Expected no error, got %v", err)
+		}
 	}))
 	defer mockServer.Close()
 
@@ -94,7 +97,10 @@ func TestExecuteRequest_ServerErrorPOST(t *testing.T) {
 		}
 
 		w.WriteHeader(http.StatusInternalServerError)
-		io.WriteString(w, `{"message":"internal server error"}`)
+		_, err := io.WriteString(w, `{"message":"internal server error"}`)
+		if err != nil {
+			t.Fatalf("Expected no error, got %v", err)
+		}
 	}))
 	defer mockServer.Close()
 
@@ -133,7 +139,10 @@ func TestAuthorizationKey(t *testing.T) {
 
 		// If the Authorization header is as expected, respond with 200 OK
 		w.WriteHeader(http.StatusOK)
-		io.WriteString(w, `{"status":"success"}`)
+		_, err := io.WriteString(w, `{"status":"success"}`)
+		if err != nil {
+			t.Fatalf("Expected no error, got %v", err)
+		}
 	}))
 	defer mockServer.Close()
 
