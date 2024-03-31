@@ -10,10 +10,10 @@ import (
 	"github.com/ethereum/go-ethereum/ethclient"
 	"github.com/stretchr/testify/require"
 
-	"github.com/1inch/1inch-sdk-go/helpers/consts/abis"
-	"github.com/1inch/1inch-sdk-go/helpers/consts/chains"
-	"github.com/1inch/1inch-sdk-go/helpers/consts/tokens"
-	"github.com/1inch/1inch-sdk-go/helpers/consts/web3providers"
+	"github.com/1inch/1inch-sdk-go/internal/helpers/consts/abis"
+	"github.com/1inch/1inch-sdk-go/internal/helpers/consts/chains"
+	"github.com/1inch/1inch-sdk-go/internal/helpers/consts/tokens"
+	"github.com/1inch/1inch-sdk-go/internal/helpers/consts/web3providers"
 )
 
 const (
@@ -43,11 +43,11 @@ func TestMulticallEthereumSuccess(t *testing.T) {
 	require.NoError(t, err)
 
 	var tokenName string
-	err = parsedABI.Unpack(&tokenName, nameMethod, resp[0])
+	err = parsedABI.UnpackIntoInterface(&tokenName, nameMethod, resp[0])
 	require.NoError(t, err)
 	require.Equal(t, "USD Coin", tokenName)
 
-	err = parsedABI.Unpack(&tokenName, nameMethod, resp[1])
+	err = parsedABI.UnpackIntoInterface(&tokenName, nameMethod, resp[1])
 	require.NoError(t, err)
 	require.Equal(t, "Dai Stablecoin", tokenName)
 }
@@ -74,11 +74,11 @@ func TestMulticallPolygonSuccess(t *testing.T) {
 	require.NoError(t, err)
 
 	var tokenName string
-	err = parsedABI.Unpack(&tokenName, symbolMethod, resp[0])
+	err = parsedABI.UnpackIntoInterface(&tokenName, symbolMethod, resp[0])
 	require.NoError(t, err)
 	require.Equal(t, "USDC", tokenName)
 
-	err = parsedABI.Unpack(&tokenName, symbolMethod, resp[1])
+	err = parsedABI.UnpackIntoInterface(&tokenName, symbolMethod, resp[1])
 	require.NoError(t, err)
 	require.Equal(t, "DAI", tokenName)
 }

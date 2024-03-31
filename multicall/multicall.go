@@ -10,7 +10,7 @@ import (
 	"github.com/ethereum/go-ethereum/accounts/abi"
 	"github.com/ethereum/go-ethereum/common"
 
-	"github.com/1inch/1inch-sdk-go/helpers/consts/chains"
+	"github.com/1inch/1inch-sdk-go/internal/helpers/consts/chains"
 )
 
 const multicallMethod = "multicall"
@@ -91,7 +91,7 @@ func MultiCall(ctx context.Context, params MulticallParams) ([][]byte, error) {
 		return nil, ErrEmptyResponse
 	}
 
-	err = multicallContract.Unpack(&multicallResponse, multicallMethod, resp)
+	err = multicallContract.UnpackIntoInterface(&multicallResponse, multicallMethod, resp)
 	if err != nil {
 		return nil, err
 	}
