@@ -65,7 +65,7 @@ func TestCreatePermitSignature(t *testing.T) {
 		t.Run(tc.description, func(t *testing.T) {
 			d := common.ContractPermitData{
 				FromToken:     tc.fromToken,
-				Spender:       tc.publicAddress,
+				Spender:       tc.spender,
 				Name:          tc.name,
 				Version:       tc.version,
 				PublicAddress: tc.publicAddress,
