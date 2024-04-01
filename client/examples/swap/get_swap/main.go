@@ -8,10 +8,10 @@ package main
 //	"log"
 //	"os"
 //
-//	"github.com/1inch/1inch-sdk-go/internal/helpers/consts/amounts"
-//	"github.com/1inch/1inch-sdk-go/internal/helpers/consts/chains"
-//	"github.com/1inch/1inch-sdk-go/internal/helpers/consts/tokens"
-//	"github.com/1inch/1inch-sdk-go/internal/helpers/consts/web3providers"
+//	"github.com/1inch/1inch-sdk-go/internal/helpers/constants/amounts"
+//	"github.com/1inch/1inch-sdk-go/internal/helpers/constants/chains"
+//	"github.com/1inch/1inch-sdk-go/internal/helpers/constants/tokens"
+//	"github.com/1inch/1inch-sdk-go/internal/helpers/constants/web3providers"
 //
 //	"github.com/1inch/1inch-sdk-go/client"
 //	"github.com/1inch/1inch-sdk-go/client/models"

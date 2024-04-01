@@ -15,7 +15,7 @@ import (
 	"github.com/ethereum/go-ethereum/ethclient"
 	"github.com/ethereum/go-ethereum/signer/core/apitypes"
 
-	"github.com/1inch/1inch-sdk-go/internal/common"
+	"github.com/1inch/1inch-sdk-go/common"
 )
 
 // TokenPermit Will return an erc2612 string struct if possible

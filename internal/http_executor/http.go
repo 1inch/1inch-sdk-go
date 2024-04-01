@@ -6,14 +6,15 @@ import (
 	"encoding/json"
 	"fmt"
 	"io"
+	"math/big"
 	"net/http"
 	"net/url"
 	"reflect"
+	"regexp"
 
 	"github.com/google/go-querystring/query"
 
-	"github.com/1inch/1inch-sdk-go/internal/common"
-	"github.com/1inch/1inch-sdk-go/internal/helpers"
+	"github.com/1inch/1inch-sdk-go/common"
 )
 
 func DefaultHttpClient(apiUrl string, apiKey string) (*Client, error) {
@@ -130,8 +131,8 @@ func addQueryParameters(s string, params interface{}) (string, error) {
 	}
 
 	for k, v := range qs {
-		if helpers.IsScientificNotation(v[0]) {
-			expanded, err := helpers.ExpandScientificNotation(v[0])
+		if isScientificNotation(v[0]) {
+			expanded, err := expandScientificNotation(v[0])
 			if err != nil {
 				return "", fmt.Errorf("failed to expand scientific notation for parameter %v with a value of %v: %v", k, v, err)
 			}
@@ -141,4 +142,24 @@ func addQueryParameters(s string, params interface{}) (string, error) {
 
 	u.RawQuery = qs.Encode()
 	return u.String(), nil
+}
+
+// isScientificNotation checks if the string is in scientific notation (like 1e+18).
+func isScientificNotation(s string) bool {
+	// This regular expression matches strings in the format of "1e+18", "2.3e-4", etc.
+	re := regexp.MustCompile(`^[+-]?\d+(\.\d+)?[eE][+-]?\d+$`)
+	return re.MatchString(s)
+}
+
+func expandScientificNotation(s string) (string, error) {
+	f, _, err := big.ParseFloat(s, 10, 0, big.ToNearestEven)
+	if err != nil {
+		return "", err
+	}
+
+	// Use a precision that is sufficient to handle small numbers.
+	// The precision here is set to a large number to ensure accuracy for small decimal values.
+	f.SetPrec(64)
+
+	return f.Text('f', -1), nil // -1 ensures that insignificant zeroes are not omitted
 }

@@ -6,7 +6,8 @@ import (
 	"github.com/ethereum/go-ethereum/core/types"
 
 	"github.com/1inch/1inch-sdk-go/aggregation/models"
-	"github.com/1inch/1inch-sdk-go/internal/common"
+	"github.com/1inch/1inch-sdk-go/common"
+
 	"github.com/1inch/1inch-sdk-go/internal/http_executor"
 	"github.com/1inch/1inch-sdk-go/internal/web3_provider"
 )
@@ -87,7 +88,7 @@ func testSDK() {
 	}
 	client, err := NewClient(config)
 
-	swapData, err := client.GetSwap(context.Background(), models.GetSwapParams{
+	_, err = client.GetSwap(context.Background(), models.GetSwapParams{
 		ChainId:                            1,
 		SkipWarnings:                       false,
 		AggregationControllerGetSwapParams: models.AggregationControllerGetSwapParams{},

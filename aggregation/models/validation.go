@@ -3,12 +3,13 @@ package models
 import (
 	"errors"
 
-	"github.com/1inch/1inch-sdk-go/internal/onchain"
 	"github.com/1inch/1inch-sdk-go/internal/validate"
 )
 
+type ApprovalType int
+
 type SwapTokensParams struct {
-	ApprovalType onchain.ApprovalType
+	ApprovalType ApprovalType
 	ChainId      int
 	Address      string
 	WalletKey    string

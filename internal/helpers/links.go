@@ -3,7 +3,7 @@ package helpers
 import (
 	"fmt"
 
-	"github.com/1inch/1inch-sdk-go/internal/helpers/consts/chains"
+	"github.com/1inch/1inch-sdk-go/constants"
 )
 
 //func PrintBlockExplorerTxLink(chainId int, txHash string) {
@@ -19,10 +19,10 @@ func GetBlockExplorerTxLinkInfo(chainId int, txHash string) string {
 
 	var baseUrl, serviceName string
 	switch chainId {
-	case chains.Ethereum:
+	case constants.Ethereum:
 		baseUrl = etherscanBaseURL
 		serviceName = etherscan
-	case chains.Polygon:
+	case constants.Polygon:
 		baseUrl = polygonScanBaseURL
 		serviceName = polygonScan
 	default:

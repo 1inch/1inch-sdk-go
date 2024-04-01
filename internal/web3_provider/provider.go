@@ -11,7 +11,7 @@ import (
 	"github.com/ethereum/go-ethereum/crypto"
 	"github.com/ethereum/go-ethereum/ethclient"
 
-	"github.com/1inch/1inch-sdk-go/internal/helpers/consts/abis"
+	"github.com/1inch/1inch-sdk-go/constants"
 )
 
 type Wallet struct {
@@ -23,7 +23,7 @@ type Wallet struct {
 }
 
 func DefaultWalletProvider(pk string, nodeURL string, ChainId uint64) (*Wallet, error) {
-	erc20ABI, err := abi.JSON(strings.NewReader(abis.Erc20)) // Make a generic version of this ABI
+	erc20ABI, err := abi.JSON(strings.NewReader(constants.Erc20ABI)) // Make a generic version of this ABI
 	if err != nil {
 		return nil, err
 	}
