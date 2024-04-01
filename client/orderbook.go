@@ -11,8 +11,8 @@ package client
 //	"time"
 //
 //	helpers2 "github.com/1inch/1inch-sdk-go/internal/helpers"
-//	"github.com/1inch/1inch-sdk-go/internal/helpers/consts/addresses"
-//	"github.com/1inch/1inch-sdk-go/internal/helpers/consts/contracts"
+//	"github.com/1inch/1inch-sdk-go/internal/helpers/constants/addresses"
+//	"github.com/1inch/1inch-sdk-go/internal/helpers/constants/contracts"
 //
 //	"github.com/1inch/1inch-sdk-go/client/models"
 //	"github.com/1inch/1inch-sdk-go/helpers"
