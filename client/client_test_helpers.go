@@ -8,7 +8,7 @@ package client
 //	"net/url"
 //	"os"
 //
-//	"github.com/1inch/1inch-sdk-go/internal/helpers/consts/chains"
+//	"github.com/1inch/1inch-sdk-go/internal/helpers/constants/chains"
 //
 //	"github.com/1inch/1inch-sdk-go/client/models"
 //)

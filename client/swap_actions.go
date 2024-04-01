@@ -12,10 +12,10 @@ package client
 //
 //	"github.com/1inch/1inch-sdk-go/client/models"
 //	"github.com/1inch/1inch-sdk-go/helpers"
-//	"github.com/1inch/1inch-sdk-go/helpers/consts/amounts"
-//	"github.com/1inch/1inch-sdk-go/helpers/consts/chains"
-//	"github.com/1inch/1inch-sdk-go/helpers/consts/contracts"
-//	"github.com/1inch/1inch-sdk-go/helpers/consts/tokens"
+//	"github.com/1inch/1inch-sdk-go/helpers/constants/amounts"
+//	"github.com/1inch/1inch-sdk-go/helpers/constants/chains"
+//	"github.com/1inch/1inch-sdk-go/helpers/constants/contracts"
+//	"github.com/1inch/1inch-sdk-go/helpers/constants/tokens"
 //	"github.com/1inch/1inch-sdk-go/internal/onchain"
 //
 //	"github.com/ethereum/go-ethereum/common"

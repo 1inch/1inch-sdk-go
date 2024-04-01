@@ -11,7 +11,7 @@ package orderbook
 //	"time"
 //
 //	helpers2 "github.com/1inch/1inch-sdk-go/internal/helpers"
-//	"github.com/1inch/1inch-sdk-go/internal/helpers/consts/contracts"
+//	"github.com/1inch/1inch-sdk-go/internal/helpers/constants/contracts"
 //
 //	"github.com/ethereum/go-ethereum/common"
 //	"github.com/ethereum/go-ethereum/common/math"

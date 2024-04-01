@@ -6,7 +6,7 @@ package client
 //	"os"
 //	"testing"
 //
-//	"github.com/1inch/1inch-sdk-go/internal/helpers/consts/chains"
+//	"github.com/1inch/1inch-sdk-go/internal/helpers/constants/chains"
 //
 //	"github.com/stretchr/testify/assert"
 //	"github.com/stretchr/testify/require"
