@@ -16,13 +16,16 @@ import (
 	"github.com/1inch/1inch-sdk-go/internal/helpers"
 )
 
-func DefaultHttpClient(baseURL *url.URL, apiKey string) Client {
-	httpClient := http.Client{}
-	return Client{
-		httpClient,
-		baseURL,
-		apiKey,
+func DefaultHttpClient(apiUrl string, apiKey string) (*Client, error) {
+	baseURL, err := url.Parse(apiUrl)
+	if err != nil {
+		return nil, err
 	}
+	return &Client{
+		httpClient: *http.DefaultClient,
+		baseURL:    baseURL,
+		apiKey:     apiKey,
+	}, nil
 }
 
 type Client struct {
