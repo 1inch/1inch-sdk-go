@@ -3,13 +3,13 @@ package models
 import (
 	"testing"
 
-	"github.com/1inch/1inch-sdk-go/internal/helpers/consts/chains"
-	"github.com/1inch/1inch-sdk-go/internal/helpers/consts/tokens"
-
 	"github.com/stretchr/testify/require"
 
+	"github.com/1inch/1inch-sdk-go/constants"
 	"github.com/1inch/1inch-sdk-go/internal/validate"
 )
+
+const ethereumUsdc = "0xa0b86991c6218b36c1d19d4a2e9eb0ce3606eb48"
 
 func TestSwapTokensParams_Validate(t *testing.T) {
 	testCases := []struct {
@@ -20,7 +20,7 @@ func TestSwapTokensParams_Validate(t *testing.T) {
 		{
 			description: "Valid parameters",
 			params: SwapTokensParams{
-				ChainId:   chains.Ethereum,
+				ChainId:   constants.Ethereum,
 				Address:   "0x1234567890abcdef1234567890abcdef12345678",
 				WalletKey: "a0b1c2d3e4f5a6b7c8d9e0f1a2b3c4d5e6f7a8b9c0d1e2f3a4b5c6d7e8f9a0b1",
 				AggregationControllerGetSwapParams: AggregationControllerGetSwapParams{
@@ -74,7 +74,7 @@ func TestApproveAllowanceParams_Validate(t *testing.T) {
 		{
 			description: "Valid parameters",
 			params: ApproveAllowanceParams{
-				ChainId: chains.Ethereum,
+				ChainId: constants.Ethereum,
 				ApproveControllerGetAllowanceParams: ApproveControllerGetAllowanceParams{
 					TokenAddress:  "0x1234567890abcdef1234567890abcdef12345678",
 					WalletAddress: "0x1234567890abcdef1234567890abcdef12345678",
@@ -118,7 +118,7 @@ func TestApproveSpenderParams_Validate(t *testing.T) {
 		{
 			description: "Valid parameters",
 			params: ApproveSpenderParams{
-				ChainId: chains.Ethereum,
+				ChainId: constants.Ethereum,
 			},
 		},
 		{
@@ -156,7 +156,7 @@ func TestApproveTransactionParams_Validate(t *testing.T) {
 		{
 			description: "Valid parameters",
 			params: ApproveTransactionParams{
-				ChainId: chains.Ethereum,
+				ChainId: constants.Ethereum,
 				ApproveControllerGetCallDataParams: ApproveControllerGetCallDataParams{
 					TokenAddress: "0x1234567890abcdef1234567890abcdef12345678",
 				},
@@ -198,7 +198,7 @@ func TestGetLiquiditySourcesParams_Validate(t *testing.T) {
 		{
 			description: "Valid parameters",
 			params: GetLiquiditySourcesParams{
-				ChainId: chains.Ethereum,
+				ChainId: constants.Ethereum,
 			},
 		},
 		{
@@ -236,7 +236,7 @@ func TestGetQuoteParams_Validate(t *testing.T) {
 		{
 			description: "Valid parameters",
 			params: GetQuoteParams{
-				ChainId: chains.Ethereum,
+				ChainId: constants.Ethereum,
 				AggregationControllerGetQuoteParams: AggregationControllerGetQuoteParams{
 					Src:    "0x1234567890abcdef1234567890abcdef12345678",
 					Dst:    "0x1234567890abcdef1234567890abcdef12345679",
@@ -282,7 +282,7 @@ func TestGetSwapDataParams_Validate(t *testing.T) {
 		{
 			description: "Valid parameters",
 			params: GetSwapParams{
-				ChainId: chains.Ethereum,
+				ChainId: constants.Ethereum,
 				AggregationControllerGetSwapParams: AggregationControllerGetSwapParams{
 					Src:      "0x1234567890abcdef1234567890abcdef12345678",
 					Dst:      "0x1234567890abcdef1234567890abcdef12345679",
@@ -307,10 +307,10 @@ func TestGetSwapDataParams_Validate(t *testing.T) {
 		{
 			description: "Error - src and dst tokens are identical",
 			params: GetSwapParams{
-				ChainId: chains.Ethereum,
+				ChainId: constants.Ethereum,
 				AggregationControllerGetSwapParams: AggregationControllerGetSwapParams{
-					Src:      tokens.EthereumUsdc,
-					Dst:      tokens.EthereumUsdc,
+					Src:      ethereumUsdc,
+					Dst:      ethereumUsdc,
 					Amount:   "10000",
 					From:     "0x1234567890abcdef1234567890abcdef12345678",
 					Slippage: 0.5,
@@ -348,7 +348,7 @@ func TestGetTokensParams_Validate(t *testing.T) {
 		{
 			description: "Valid parameters",
 			params: GetTokensParams{
-				ChainId: chains.Ethereum,
+				ChainId: constants.Ethereum,
 			},
 		},
 		{

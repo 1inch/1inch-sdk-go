@@ -5,7 +5,7 @@ import (
 	"fmt"
 
 	"github.com/1inch/1inch-sdk-go/aggregation/models"
-	"github.com/1inch/1inch-sdk-go/internal/common"
+	"github.com/1inch/1inch-sdk-go/common"
 )
 
 // GetApproveAllowance returns the allowance the 1inch router has to spend a token on behalf of a wallet

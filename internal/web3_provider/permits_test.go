@@ -11,12 +11,12 @@ import (
 	"github.com/ethereum/go-ethereum/ethclient"
 	"github.com/stretchr/testify/require"
 
-	"github.com/1inch/1inch-sdk-go/internal/common"
-	"github.com/1inch/1inch-sdk-go/internal/helpers/consts/abis"
+	"github.com/1inch/1inch-sdk-go/common"
+	"github.com/1inch/1inch-sdk-go/constants"
 )
 
 func Test_createPermitSignature(t *testing.T) {
-	erc20ABI, err := abi.JSON(strings.NewReader(abis.Erc20)) // Make a generic version of this ABI
+	erc20ABI, err := abi.JSON(strings.NewReader(constants.Erc20ABI)) // Make a generic version of this ABI
 	require.NoError(t, err)
 
 	privateKey, err := crypto.HexToECDSA("ad21c0552a3b52e94520da713455cc347e4e89628a334be24d85b8083848434f")
@@ -83,7 +83,7 @@ func Test_createPermitSignature(t *testing.T) {
 }
 
 func TestTokenPermit(t *testing.T) {
-	erc20ABI, err := abi.JSON(strings.NewReader(abis.Erc20)) // Make a generic version of this ABI
+	erc20ABI, err := abi.JSON(strings.NewReader(constants.Erc20ABI)) // Make a generic version of this ABI
 	require.NoError(t, err)
 
 	privateKey, err := crypto.HexToECDSA("ad21c0552a3b52e94520da713455cc347e4e89628a334be24d85b8083848434f")
