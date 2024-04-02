@@ -2,6 +2,7 @@ package aggregation
 
 import (
 	"context"
+	"math/big"
 
 	"github.com/ethereum/go-ethereum/core/types"
 
@@ -88,16 +89,23 @@ func testSDK() {
 	}
 	client, err := NewClient(config)
 
-	_, err = client.GetSwap(context.Background(), models.GetSwapParams{
-		ChainId:                            1,
-		SkipWarnings:                       false,
-		AggregationControllerGetSwapParams: models.AggregationControllerGetSwapParams{},
-	})
+	swapData, err := client.GetSwap(context.Background(), models.AggregationControllerGetSwapParams{})
 	if err != nil {
 		return
 	}
 
-	signedTx, err := client.Wallet.Sign(&types.Transaction{})
+	tx := types.NewTx(&types.DynamicFeeTx{
+		ChainID:   big.NewInt(1), // Ethereum mainnet chain ID
+		Nonce:     0,
+		Gas:       uint64(swapData.Tx.Gas),
+		To:        nil,
+		Value:     big.NewInt(1),
+		Data:      nil,
+		GasTipCap: big.NewInt(1),
+		GasFeeCap: big.NewInt(1),
+	})
+
+	signedTx, err := client.Wallet.Sign(tx)
 	if err != nil {
 		return
 	}
