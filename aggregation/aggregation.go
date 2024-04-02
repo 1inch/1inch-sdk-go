@@ -2,9 +2,6 @@ package aggregation
 
 import (
 	"context"
-	"math/big"
-
-	"github.com/ethereum/go-ethereum/core/types"
 
 	"github.com/1inch/1inch-sdk-go/aggregation/models"
 	"github.com/1inch/1inch-sdk-go/common"
@@ -36,6 +33,7 @@ type Client struct {
 }
 
 type api struct {
+	chainId      uint64
 	httpExecutor common.HttpExecutor
 }
 
@@ -89,28 +87,29 @@ func testSDK() {
 	}
 	client, err := NewClient(config)
 
-	swapData, err := client.GetSwap(context.Background(), models.AggregationControllerGetSwapParams{})
+	ctx := context.Background()
+
+	swapData, err := client.GetSwap(ctx, models.AggregationControllerGetSwapParams{})
 	if err != nil {
 		return
 	}
 
-	tx := types.NewTx(&types.DynamicFeeTx{
-		ChainID:   big.NewInt(1), // Ethereum mainnet chain ID
-		Nonce:     0,
-		Gas:       uint64(swapData.Tx.Gas),
-		To:        nil,
-		Value:     big.NewInt(1),
-		Data:      nil,
-		GasTipCap: big.NewInt(1),
-		GasFeeCap: big.NewInt(1),
-	})
+	nonce, err := client.Wallet.Nonce(ctx)
+	if err != nil {
+		return
+	}
+
+	tx, err := client.BuildSwapTransaction(swapData, nonce, nil, nil)
+	if err != nil {
+		return
+	}
 
 	signedTx, err := client.Wallet.Sign(tx)
 	if err != nil {
 		return
 	}
 
-	err = client.Wallet.BroadcastTransaction(context.Background(), signedTx)
+	err = client.Wallet.BroadcastTransaction(ctx, signedTx)
 	if err != nil {
 		return
 	}
