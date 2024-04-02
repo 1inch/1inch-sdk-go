@@ -177,7 +177,7 @@ package client
 //	return &createOrderResponse, res, nil
 //}
 //
-//// TODO Reusing the same request/response objects due to bad swagger spec
+//// TODO Reusing the same request/response objects due to bad openapi spec
 //
 //// GetOrdersByCreatorAddress returns all orders created by a given address in the Limit Order Protocol
 //func (s *OrderbookService) GetOrdersByCreatorAddress(ctx context.Context, params models.GetOrdersByCreatorAddressParams) ([]models.OrderResponse, *http.Response, error) {
