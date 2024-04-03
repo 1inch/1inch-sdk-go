@@ -99,7 +99,17 @@ func testSDK() {
 		return
 	}
 
-	tx, err := client.BuildSwapTransaction(swapData, nonce, nil, nil)
+	gasTip, err := client.Wallet.GetGasTipCap(ctx)
+	if err != nil {
+		return
+	}
+
+	gasFee, err := client.Wallet.GetGasFeeCap(ctx)
+	if err != nil {
+		return
+	}
+
+	tx, err := client.BuildSwapTransaction(swapData, nonce, gasTip, gasFee)
 	if err != nil {
 		return
 	}

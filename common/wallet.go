@@ -13,10 +13,12 @@ type Wallet interface {
 	Address() gethCommon.Address
 	Balance(ctx context.Context) (*big.Int, error)
 
+	GetGasTipCap(ctx context.Context) (*big.Int, error)
+	GetGasFeeCap(ctx context.Context) (*big.Int, error)
+
 	Sign(tx *types.Transaction) (*types.Transaction, error)
 	BroadcastTransaction(ctx context.Context, tx *types.Transaction) error
 
-	// will generate the data for transaction or transaction itself
 	TokenPermit(cd ContractPermitData) (string, error)
 	//TokenApprove()
 
