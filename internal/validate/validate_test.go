@@ -4,9 +4,10 @@ import (
 	"fmt"
 	"testing"
 
-	"github.com/1inch/1inch-sdk-go/internal/helpers/consts/chains"
-
+	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
+
+	"github.com/1inch/1inch-sdk-go/constants"
 )
 
 func TestIsEthereumAddressRequired(t *testing.T) {
@@ -179,7 +180,7 @@ func TestChainIdRequired(t *testing.T) {
 		},
 		{
 			description: "Valid chain id - Ethereum",
-			value:       chains.Ethereum,
+			value:       constants.Ethereum,
 		},
 	}
 
@@ -207,11 +208,11 @@ func TestChainId(t *testing.T) {
 		},
 		{
 			description: "Valid chain id - Ethereum",
-			value:       chains.Ethereum,
+			value:       constants.Ethereum,
 		},
 		{
 			description: "Valid chain id - Polygon",
-			value:       chains.Polygon,
+			value:       constants.Polygon,
 		},
 		{
 			description: "Invalid chain id",
@@ -943,6 +944,106 @@ func TestExpireAfter(t *testing.T) {
 			} else {
 				require.NoError(t, err, fmt.Sprintf("%s should not have caused an error", tc.description))
 			}
+		})
+	}
+}
+
+func TestIsBigInt(t *testing.T) {
+	testCases := []struct {
+		description string
+		input       string
+		expectError bool
+	}{
+		{
+			description: "Max big value",
+			input:       "115792089237316195423570985008687907853269984665640564039457584007913129639935",
+		},
+		{
+			description: "Max big value + 1",
+			input:       "115792089237316195423570985008687907853269984665640564039457584007913129639936",
+		},
+	}
+
+	for _, tc := range testCases {
+		t.Run(tc.description, func(t *testing.T) {
+			_, err := BigIntFromString(tc.input)
+			require.NoError(t, err)
+		})
+	}
+}
+
+func TestIsSubset(t *testing.T) {
+	testCases := []struct {
+		description string
+		sliceA      []int
+		sliceB      []int
+		expected    bool
+	}{
+		{
+			description: "sliceA is a subset of sliceB",
+			sliceA:      []int{1, 2},
+			sliceB:      []int{1, 2, 3, 4},
+			expected:    true,
+		},
+		{
+			description: "sliceA is not a subset of sliceB",
+			sliceA:      []int{1, 2, 5},
+			sliceB:      []int{1, 2, 3, 4},
+			expected:    false,
+		},
+		{
+			description: "sliceA is empty",
+			sliceA:      []int{},
+			sliceB:      []int{1, 2, 3, 4},
+			expected:    true,
+		},
+		{
+			description: "both slices are empty",
+			sliceA:      []int{},
+			sliceB:      []int{},
+			expected:    true,
+		},
+	}
+
+	for _, tc := range testCases {
+		t.Run(tc.description, func(t *testing.T) {
+			result := IsSubset(tc.sliceA, tc.sliceB)
+			assert.Equal(t, tc.expected, result, fmt.Sprintf("%v: expected %v, got %v", tc.description, tc.expected, result))
+		})
+	}
+}
+
+func TestContains(t *testing.T) {
+	testCases := []struct {
+		description string
+		value       int
+		slice       []int
+		expected    bool
+	}{
+		{
+			description: "value is present in the slice",
+			value:       1,
+			slice:       []int{1, 2, 3},
+			expected:    true,
+		},
+		{
+			description: "value is not present in the slice",
+			value:       4,
+			slice:       []int{1, 2, 3},
+			expected:    false,
+		},
+		{
+			description: "slice is empty",
+			value:       1,
+			slice:       []int{},
+			expected:    false,
+		},
+	}
+
+	for _, tc := range testCases {
+		t.Run(tc.description, func(t *testing.T) {
+			result := Contains(tc.value, tc.slice)
+			assert.Equal(t, tc.expected, result, fmt.Sprintf("%v: expected %v, got %v", tc.description, tc.expected, result))
 		})
 	}
 }
