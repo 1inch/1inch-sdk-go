@@ -14,27 +14,22 @@ const ethereumUsdc = "0xa0b86991c6218b36c1d19d4a2e9eb0ce3606eb48"
 func TestSwapTokensParams_Validate(t *testing.T) {
 	testCases := []struct {
 		description  string
-		params       SwapTokensParams
+		params       AggregationControllerGetSwapParams
 		expectErrors []string
 	}{
 		{
 			description: "Valid parameters",
-			params: SwapTokensParams{
-				ChainId:   constants.Ethereum,
-				Address:   "0x1234567890abcdef1234567890abcdef12345678",
-				WalletKey: "a0b1c2d3e4f5a6b7c8d9e0f1a2b3c4d5e6f7a8b9c0d1e2f3a4b5c6d7e8f9a0b1",
-				AggregationControllerGetSwapParams: AggregationControllerGetSwapParams{
-					Src:      "0x1234567890abcdef1234567890abcdef12345678",
-					Dst:      "0x1234567890abcdef1234567890abcdef12345679",
-					Amount:   "10000",
-					From:     "0x1234567890abcdef1234567890abcdef12345678",
-					Slippage: 0.5,
-				},
+			params: AggregationControllerGetSwapParams{
+				Src:      "0x1234567890abcdef1234567890abcdef12345678",
+				Dst:      "0x1234567890abcdef1234567890abcdef12345679",
+				Amount:   "10000",
+				From:     "0x1234567890abcdef1234567890abcdef12345678",
+				Slippage: 0.5,
 			},
 		},
 		{
 			description: "Missing required parameters",
-			params:      SwapTokensParams{},
+			params:      AggregationControllerGetSwapParams{},
 			expectErrors: []string{
 				"'chainId' is required",
 				"'publicAddress' is required",
