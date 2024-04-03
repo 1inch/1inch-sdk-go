@@ -30,7 +30,7 @@ func (w Wallet) Balance(ctx context.Context) (*big.Int, error) {
 }
 
 func (w Wallet) Sign(tx *types.Transaction) (*types.Transaction, error) {
-	signedTx, err := types.SignTx(tx, types.NewEIP155Signer(w.ChainId), w.privateKey)
+	signedTx, err := types.SignTx(tx, types.LatestSignerForChainID(w.ChainId), w.privateKey)
 	if err != nil {
 		return nil, err
 	}
@@ -51,4 +51,8 @@ func (w Wallet) GetGasTipCap(ctx context.Context) (*big.Int, error) {
 
 func (w Wallet) GetGasFeeCap(ctx context.Context) (*big.Int, error) {
 	return w.ethClient.SuggestGasPrice(ctx)
+}
+
+func (w Wallet) TransactionReceipt(ctx context.Context, txHash common.Hash) (*types.Receipt, error) {
+	return w.ethClient.TransactionReceipt(ctx, txHash)
 }

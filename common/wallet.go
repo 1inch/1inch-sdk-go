@@ -25,6 +25,8 @@ type Wallet interface {
 	// view functions
 	//TokenBalance()
 	//TokenAllowance()
+
+	TransactionReceipt(ctx context.Context, txHash gethCommon.Hash) (*types.Receipt, error)
 }
 
 type ContractPermitData struct {

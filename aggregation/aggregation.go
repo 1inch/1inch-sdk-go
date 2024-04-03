@@ -1,9 +1,6 @@
 package aggregation
 
 import (
-	"context"
-
-	"github.com/1inch/1inch-sdk-go/aggregation/models"
 	"github.com/1inch/1inch-sdk-go/common"
 
 	"github.com/1inch/1inch-sdk-go/internal/http_executor"
@@ -57,6 +54,7 @@ func DefaultConfiguration(nodeUrl string, privateKey string, chainId uint64, api
 
 	a := api{
 		httpExecutor: executor,
+		chainId:      chainId,
 	}
 
 	walletCfg, err := DefaultWalletConfiguration(nodeUrl, privateKey, chainId)
@@ -78,49 +76,4 @@ func DefaultWalletConfiguration(nodeUrl string, privateKey string, chainId uint6
 	return &WalletConfiguration{
 		Wallet: w,
 	}, nil
-}
-
-func testSDK() {
-	config, err := DefaultConfiguration("", "", 1, "", "")
-	if err != nil {
-		return
-	}
-	client, err := NewClient(config)
-
-	ctx := context.Background()
-
-	swapData, err := client.GetSwap(ctx, models.AggregationControllerGetSwapParams{})
-	if err != nil {
-		return
-	}
-
-	nonce, err := client.Wallet.Nonce(ctx)
-	if err != nil {
-		return
-	}
-
-	gasTip, err := client.Wallet.GetGasTipCap(ctx)
-	if err != nil {
-		return
-	}
-
-	gasFee, err := client.Wallet.GetGasFeeCap(ctx)
-	if err != nil {
-		return
-	}
-
-	tx, err := client.BuildSwapTransaction(swapData, nonce, gasTip, gasFee)
-	if err != nil {
-		return
-	}
-
-	signedTx, err := client.Wallet.Sign(tx)
-	if err != nil {
-		return
-	}
-
-	err = client.Wallet.BroadcastTransaction(ctx, signedTx)
-	if err != nil {
-		return
-	}
 }
