@@ -44,3 +44,11 @@ func (w Wallet) BroadcastTransaction(ctx context.Context, tx *types.Transaction)
 	}
 	return nil
 }
+
+func (w Wallet) GetGasTipCap(ctx context.Context) (*big.Int, error) {
+	return w.ethClient.SuggestGasTipCap(ctx)
+}
+
+func (w Wallet) GetGasFeeCap(ctx context.Context) (*big.Int, error) {
+	return w.ethClient.SuggestGasPrice(ctx)
+}
