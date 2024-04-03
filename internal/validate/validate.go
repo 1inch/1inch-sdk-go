@@ -8,7 +8,6 @@ import (
 	"time"
 
 	"github.com/1inch/1inch-sdk-go/constants"
-	"github.com/1inch/1inch-sdk-go/internal/helpers"
 )
 
 func CheckEthereumAddressRequired(parameter interface{}, variableName string) error {
@@ -40,7 +39,7 @@ func CheckEthereumAddress(parameter interface{}, variableName string) error {
 	return nil
 }
 
-var bigIntMax, _ = helpers.BigIntFromString("115792089237316195423570985008687907853269984665640564039457584007913129639935")
+var bigIntMax, _ = BigIntFromString("115792089237316195423570985008687907853269984665640564039457584007913129639935")
 var bigIntZero = big.NewInt(0)
 
 func CheckBigIntRequired(parameter interface{}, variableName string) error {
@@ -65,7 +64,7 @@ func CheckBigInt(parameter interface{}, variableName string) error {
 		return nil
 	}
 
-	parsedValue, err := helpers.BigIntFromString(value)
+	parsedValue, err := BigIntFromString(value)
 	if err != nil {
 		return NewParameterValidationError(variableName, "not a valid value")
 	}
@@ -100,7 +99,7 @@ func CheckChainId(parameter interface{}, variableName string) error {
 		return nil
 	}
 
-	if !helpers.Contains(value, constants.ValidChainIds) {
+	if !Contains(value, constants.ValidChainIds) {
 		return NewParameterValidationError(variableName, fmt.Sprintf("is invalid, valid chain ids are: %v", constants.ValidChainIds))
 	}
 	return nil
@@ -146,7 +145,7 @@ func CheckApprovalType(parameter interface{}, variableName string) error {
 		return nil
 	}
 
-	if !helpers.Contains(value, []int{0, 1, 2}) {
+	if !Contains(value, []int{0, 1, 2}) {
 		return NewParameterValidationError(variableName, "invalid approval type")
 	}
 	return nil
@@ -217,11 +216,11 @@ func CheckStatusesInts(parameter interface{}, variableName string) error {
 		return nil
 	}
 
-	if helpers.HasDuplicates(value) {
+	if HasDuplicates(value) {
 		return NewParameterValidationError(variableName, "must not contain duplicates")
 	}
 	validStatuses := []float32{1, 2, 3}
-	if !helpers.IsSubset(value, validStatuses) {
+	if !IsSubset(value, validStatuses) {
 		return NewParameterValidationError(variableName, fmt.Sprintf("can only contain %v", validStatuses))
 	}
 	return nil
@@ -233,11 +232,11 @@ func CheckStatusesStrings(parameter interface{}, variableName string) error {
 		return fmt.Errorf("for parameter '%v' to be validated as '%v', it must be a []string", variableName, "StatusesStrings")
 	}
 
-	if helpers.HasDuplicates(value) {
+	if HasDuplicates(value) {
 		return NewParameterValidationError(variableName, "must not contain duplicates")
 	}
 	validStatuses := []string{"1", "2", "3"}
-	if !helpers.IsSubset(value, validStatuses) {
+	if !IsSubset(value, validStatuses) {
 		return NewParameterValidationError(variableName, fmt.Sprintf("can only contain %v", validStatuses))
 	}
 	return nil
@@ -254,7 +253,7 @@ func CheckSortBy(parameter interface{}, variableName string) error {
 	}
 
 	validSortBy := []string{"createDateTime", "takerRate", "makerRate", "makerAmount", "takerAmount"}
-	if !helpers.Contains(value, validSortBy) {
+	if !Contains(value, validSortBy) {
 		return NewParameterValidationError(variableName, fmt.Sprintf("can only contain %v", validSortBy))
 	}
 	return nil
@@ -422,4 +421,51 @@ func CheckExpireAfter(parameter interface{}, variableName string) error {
 		return NewParameterValidationError(variableName, "must be a future timestamp")
 	}
 	return nil
+}
+
+func BigIntFromString(s string) (*big.Int, error) {
+	bigInt, ok := new(big.Int).SetString(s, 10) // base 10 for decimal
+	if !ok {
+		return nil, fmt.Errorf("failed to convert string (%v) to big.Int", s)
+	}
+	return bigInt, nil
+}
+
+// HasDuplicates checks if the provided slice contains any duplicate elements.
+// It accepts a slice of any comparable type and returns true if there are duplicates, otherwise it returns false.
+func HasDuplicates[T comparable](slice []T) bool {
+	seen := make(map[T]bool)
+	for _, v := range slice {
+		if seen[v] {
+			return true
+		}
+		seen[v] = true
+	}
+	return false
+}
+
+// IsSubset checks if all elements of sliceA are also present in sliceB.
+// It returns true if sliceA is a subset of sliceB, otherwise it returns false.
+func IsSubset[T comparable](sliceA, sliceB []T) bool {
+	setB := make(map[T]bool)
+	for _, v := range sliceB {
+		setB[v] = true
+	}
+
+	for _, v := range sliceA {
+		if !setB[v] {
+			return false
+		}
+	}
+	return true
+}
+
+// Contains checks if the slice contains the given value.
+func Contains[T comparable](value T, sliceB []T) bool {
+	for _, v := range sliceB {
+		if v == value {
+			return true
+		}
+	}
+	return false
 }

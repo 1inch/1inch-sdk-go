@@ -31,9 +31,6 @@ func TestSwapTokensParams_Validate(t *testing.T) {
 			description: "Missing required parameters",
 			params:      AggregationControllerGetSwapParams{},
 			expectErrors: []string{
-				"'chainId' is required",
-				"'publicAddress' is required",
-				"'walletKey' is required",
 				"'src' is required",
 				"'dst' is required",
 				"'amount' is required",
@@ -271,27 +268,23 @@ func TestGetQuoteParams_Validate(t *testing.T) {
 func TestGetSwapDataParams_Validate(t *testing.T) {
 	testCases := []struct {
 		description  string
-		params       GetSwapParams
+		params       AggregationControllerGetSwapParams
 		expectErrors []string
 	}{
 		{
 			description: "Valid parameters",
-			params: GetSwapParams{
-				ChainId: constants.Ethereum,
-				AggregationControllerGetSwapParams: AggregationControllerGetSwapParams{
-					Src:      "0x1234567890abcdef1234567890abcdef12345678",
-					Dst:      "0x1234567890abcdef1234567890abcdef12345679",
-					Amount:   "10000",
-					From:     "0x1234567890abcdef1234567890abcdef12345678",
-					Slippage: 0.5,
-				},
+			params: AggregationControllerGetSwapParams{
+				Src:      "0x1234567890abcdef1234567890abcdef12345678",
+				Dst:      "0x1234567890abcdef1234567890abcdef12345679",
+				Amount:   "10000",
+				From:     "0x1234567890abcdef1234567890abcdef12345678",
+				Slippage: 0.5,
 			},
 		},
 		{
 			description: "Missing required parameters",
-			params:      GetSwapParams{},
+			params:      AggregationControllerGetSwapParams{},
 			expectErrors: []string{
-				"'chainId' is required",
 				"'src' is required",
 				"'dst' is required",
 				"'amount' is required",
@@ -301,15 +294,12 @@ func TestGetSwapDataParams_Validate(t *testing.T) {
 		},
 		{
 			description: "Error - src and dst tokens are identical",
-			params: GetSwapParams{
-				ChainId: constants.Ethereum,
-				AggregationControllerGetSwapParams: AggregationControllerGetSwapParams{
-					Src:      ethereumUsdc,
-					Dst:      ethereumUsdc,
-					Amount:   "10000",
-					From:     "0x1234567890abcdef1234567890abcdef12345678",
-					Slippage: 0.5,
-				},
+			params: AggregationControllerGetSwapParams{
+				Src:      ethereumUsdc,
+				Dst:      ethereumUsdc,
+				Amount:   "10000",
+				From:     "0x1234567890abcdef1234567890abcdef12345678",
+				Slippage: 0.5,
 			},
 			expectErrors: []string{
 				"src and dst tokens must be different",

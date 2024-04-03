@@ -2,8 +2,6 @@ package constants
 
 import (
 	"fmt"
-
-	"github.com/1inch/1inch-sdk-go/internal/helpers"
 )
 
 const AggregationRouterV5 = "0x1111111254eeb25477b68fb85ed929f73a960582" // Contract address is identical for all chains except zkSync
@@ -24,18 +22,6 @@ const SeriesNonceManagerGnosis = "0x11431a89893025D2a48dCA4EddC396f8C8117187"
 const SeriesNonceManagerKlaytn = "0x7871769b3816b23dB12E83a482aAc35F1FD35D4B"
 const SeriesNonceManagerOptimism = "0x32d12a25f539E341089050E2d26794F041fC9dF8"
 const SeriesNonceManagerPolygon = "0xa5eb255EF45dFb48B5d133d08833DEF69871691D"
-
-func Get1inchRouterFromChainId(chainId int) (string, error) {
-	if helpers.Contains(chainId, ValidChainIds) {
-		if chainId == ZkSyncEra {
-			return AggregationV5RouterZkSyncEra, nil
-		} else {
-			return AggregationRouterV5, nil
-		}
-	} else {
-		return "", fmt.Errorf("unrecognized chain id: %d", chainId)
-	}
-}
 
 func GetSeriesNonceManagerFromChainId(chainId int) (string, error) {
 	switch chainId {
