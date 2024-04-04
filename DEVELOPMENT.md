@@ -21,13 +21,13 @@ the [swap](https://github.com/1inch/1inch-sdk/tree/main/golang/client/swap) pack
 
 ### Type generation
 
-Type generation is done using the `generate_types.sh` script. To add a new swagger file or update an existing one, place
-the swagger file in `swagger-static` and run the script. It will generate the types file and place it in the
-appropriately-named sub-folder inside the `client` directory
+Type generation is done using the `generate_types.sh` script. To add a new openapi file or update an existing one, place
+the openapi file in `openapi` and run the script from the root of the project. It will generate the types files for all openapi specs and place them in the
+appropriately-named sub-folder inside the `generatedtypes` directory.
 
-### Swagger file formatting
+### OpenAPI file formatting
 
-For consistency, Swagger files should be formatted with `prettier`
+For consistency, openapi files should be formatted with `prettier`
 
 This can be installed globally using npm:
 
