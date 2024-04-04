@@ -1,9 +1,6 @@
 package aggregation
 
 import (
-	"context"
-
-	"github.com/1inch/1inch-sdk-go/aggregation/models"
 	"github.com/1inch/1inch-sdk-go/common"
 
 	"github.com/1inch/1inch-sdk-go/internal/http_executor"

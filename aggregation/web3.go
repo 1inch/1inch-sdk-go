@@ -36,3 +36,27 @@ func (c Client) BuildSwapTransaction(d *models.SwapResponse, nonce uint64, gasTi
 		GasFeeCap: gasFeeCap,
 	}), nil
 }
+
+func (c Client) BuildSwapTransactionLegacy(d *models.SwapResponse, nonce uint64, gasPrice *big.Int) (*types.Transaction, error) {
+	to := gethCommon.HexToAddress(d.Tx.To)
+
+	value := new(big.Int)
+	value, ok := value.SetString(d.Tx.Value, 10)
+	if !ok {
+		return nil, errors.New("failed to convert d.Tx.Value to big.Int")
+	}
+
+	data, err := hex.DecodeString(d.Tx.Data[2:])
+	if err != nil {
+		return nil, err
+	}
+
+	return types.NewTx(&types.LegacyTx{
+		Nonce:    nonce,
+		GasPrice: gasPrice,
+		Gas:      uint64(d.Tx.Gas),
+		To:       &to,
+		Value:    value,
+		Data:     data,
+	}), nil
+}
