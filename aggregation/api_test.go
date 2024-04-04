@@ -8,7 +8,7 @@ import (
 
 	"github.com/1inch/1inch-sdk-go/aggregation/models"
 	"github.com/1inch/1inch-sdk-go/common"
-	"github.com/1inch/1inch-sdk-go/internal/helpers/consts/chains"
+	"github.com/1inch/1inch-sdk-go/constants"
 )
 
 type MockHttpExecutor struct {
@@ -82,7 +82,7 @@ func TestGetQuote(t *testing.T) {
 	api := api{httpExecutor: mockExecutor}
 
 	params := models.GetQuoteParams{
-		ChainId: chains.Ethereum,
+		ChainId: constants.EthereumChainId,
 		AggregationControllerGetQuoteParams: models.AggregationControllerGetQuoteParams{
 			Src:               "0x6b175474e89094c44da98b954eedeac495271d0f",
 			Dst:               "0xc02aaa39b223fe8d0a0e5c4f27ead9083c756cc2",

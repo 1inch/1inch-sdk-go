@@ -1,20 +1,18 @@
 package constants
 
 const (
-	Arbitrum  = 42161
-	Aurora    = 1313161554
-	Avalanche = 43114
-	Base      = 8453
-	Bsc       = 56
-	Ethereum  = 1
-	Fantom    = 250
-	Gnosis    = 100
-	Klaytn    = 8217
-	Optimism  = 10
-	Polygon   = 137
-	ZkSyncEra = 324
+	ArbitrumChainId  = 42161
+	AuroraChainId    = 1313161554
+	AvalancheChainId = 43114
+	BaseChainId      = 8453
+	BscChainId       = 56
+	EthereumChainId  = 1
+	FantomChainId    = 250
+	GnosisChainId    = 100
+	KlaytnChainId    = 8217
+	OptimismChainId  = 10
+	PolygonChainId   = 137
+	ZkSyncEraChainId = 324
 )
 
-// TODO Can I move this somewhere else to avoid conflicting with autocomplete?
-
-var ValidChainIds = []int{Arbitrum, Aurora, Avalanche, Base, Bsc, Ethereum, Fantom, Gnosis, Klaytn, Optimism, Polygon, ZkSyncEra}
+var ValidChainIds = []int{ArbitrumChainId, AuroraChainId, AvalancheChainId, BaseChainId, BscChainId, EthereumChainId, FantomChainId, GnosisChainId, KlaytnChainId, OptimismChainId, PolygonChainId, ZkSyncEraChainId}

@@ -66,7 +66,7 @@ func TestApproveAllowanceParams_Validate(t *testing.T) {
 		{
 			description: "Valid parameters",
 			params: ApproveAllowanceParams{
-				ChainId: constants.Ethereum,
+				ChainId: constants.EthereumChainId,
 				ApproveControllerGetAllowanceParams: ApproveControllerGetAllowanceParams{
 					TokenAddress:  "0x1234567890abcdef1234567890abcdef12345678",
 					WalletAddress: "0x1234567890abcdef1234567890abcdef12345678",
@@ -110,7 +110,7 @@ func TestApproveSpenderParams_Validate(t *testing.T) {
 		{
 			description: "Valid parameters",
 			params: ApproveSpenderParams{
-				ChainId: constants.Ethereum,
+				ChainId: constants.EthereumChainId,
 			},
 		},
 		{
@@ -148,7 +148,7 @@ func TestApproveTransactionParams_Validate(t *testing.T) {
 		{
 			description: "Valid parameters",
 			params: ApproveTransactionParams{
-				ChainId: constants.Ethereum,
+				ChainId: constants.EthereumChainId,
 				ApproveControllerGetCallDataParams: ApproveControllerGetCallDataParams{
 					TokenAddress: "0x1234567890abcdef1234567890abcdef12345678",
 				},
@@ -190,7 +190,7 @@ func TestGetLiquiditySourcesParams_Validate(t *testing.T) {
 		{
 			description: "Valid parameters",
 			params: GetLiquiditySourcesParams{
-				ChainId: constants.Ethereum,
+				ChainId: constants.EthereumChainId,
 			},
 		},
 		{
@@ -228,7 +228,7 @@ func TestGetQuoteParams_Validate(t *testing.T) {
 		{
 			description: "Valid parameters",
 			params: GetQuoteParams{
-				ChainId: constants.Ethereum,
+				ChainId: constants.EthereumChainId,
 				AggregationControllerGetQuoteParams: AggregationControllerGetQuoteParams{
 					Src:    "0x1234567890abcdef1234567890abcdef12345678",
 					Dst:    "0x1234567890abcdef1234567890abcdef12345679",
@@ -333,7 +333,7 @@ func TestGetTokensParams_Validate(t *testing.T) {
 		{
 			description: "Valid parameters",
 			params: GetTokensParams{
-				ChainId: constants.Ethereum,
+				ChainId: constants.EthereumChainId,
 			},
 		},
 		{

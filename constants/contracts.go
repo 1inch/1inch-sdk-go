@@ -25,29 +25,29 @@ const SeriesNonceManagerPolygon = "0xa5eb255EF45dFb48B5d133d08833DEF69871691D"
 
 func GetSeriesNonceManagerFromChainId(chainId int) (string, error) {
 	switch chainId {
-	case Arbitrum:
+	case ArbitrumChainId:
 		return SeriesNonceManagerArbitrum, nil
-	case Aurora:
+	case AuroraChainId:
 		return SeriesNonceManagerAurora, nil
-	case Avalanche:
+	case AvalancheChainId:
 		return SeriesNonceManagerAvalanche, nil
-	case Base:
+	case BaseChainId:
 		return SeriesNonceManagerBase, nil
-	case Bsc:
+	case BscChainId:
 		return SeriesNonceManagerBsc, nil
-	case Ethereum:
+	case EthereumChainId:
 		return SeriesNonceManagerEthereum, nil
-	case Fantom:
+	case FantomChainId:
 		return SeriesNonceManagerFantom, nil
-	case Gnosis:
+	case GnosisChainId:
 		return SeriesNonceManagerGnosis, nil
-	case Klaytn:
+	case KlaytnChainId:
 		return SeriesNonceManagerKlaytn, nil
-	case Optimism:
+	case OptimismChainId:
 		return SeriesNonceManagerOptimism, nil
-	case Polygon:
+	case PolygonChainId:
 		return SeriesNonceManagerPolygon, nil
-	case ZkSyncEra:
+	case ZkSyncEraChainId:
 		return "", fmt.Errorf("zksync contract unknown") // TODO get this contract
 	default:
 		return "", fmt.Errorf("unrecognized chain id: %d", chainId)

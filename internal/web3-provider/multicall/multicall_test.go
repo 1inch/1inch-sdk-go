@@ -64,7 +64,7 @@ func TestMulticallEthereumSuccess(t *testing.T) {
 
 	resp, err := MultiCall(context.Background(), MulticallParams{
 		Client:   client,
-		ChainId:  constants.Ethereum,
+		ChainId:  constants.EthereumChainId,
 		Calldata: callData,
 	})
 	require.NoError(t, err)
@@ -95,7 +95,7 @@ func TestMulticallPolygonSuccess(t *testing.T) {
 
 	resp, err := MultiCall(context.Background(), MulticallParams{
 		Client:   client,
-		ChainId:  constants.Polygon,
+		ChainId:  constants.PolygonChainId,
 		Calldata: callData,
 	})
 	require.NoError(t, err)

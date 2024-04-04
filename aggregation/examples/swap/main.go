@@ -2,16 +2,21 @@ package main
 
 import (
 	"context"
+	"encoding/hex"
 	"fmt"
+	"math/big"
 	"os"
 	"time"
 
+	gethCommon "github.com/ethereum/go-ethereum/common"
+
 	"github.com/1inch/1inch-sdk-go/aggregation"
 	"github.com/1inch/1inch-sdk-go/aggregation/models"
+	"github.com/1inch/1inch-sdk-go/constants"
 )
 
 /*
-This example demonstrates how to swap tokens on the Polygon network using the 1inch SDK.
+This example demonstrates how to swap tokens on the PolygonChainId network using the 1inch SDK.
 The only thing you need to provide is your wallet address, wallet key, and dev portal token.
 This can be done through your environment, or you can directly set them in the variables below
 */
@@ -23,7 +28,7 @@ var (
 )
 
 func main() {
-	config, err := aggregation.NewDefaultConfiguration(nodeUrl, privateKey, 137, "https://api.1inch.dev", devPortalToken)
+	config, err := aggregation.NewDefaultConfiguration(nodeUrl, privateKey, constants.EthereumChainId, "https://api.1inch.dev", devPortalToken)
 	if err != nil {
 		return
 	}
@@ -42,26 +47,21 @@ func main() {
 		fmt.Printf("Failed to get swap data: %v\n", err)
 		return
 	}
+	//
 
-	nonce, err := client.Wallet.Nonce(ctx)
-	if err != nil {
-		fmt.Printf("Failed to get nonce: %v\n", err)
+	to := gethCommon.HexToAddress(swapData.Tx.To)
+
+	value, ok := new(big.Int).SetString(swapData.Tx.Value, 10)
+	if !ok {
 		return
 	}
 
-	gasTip, err := client.Wallet.GetGasTipCap(ctx)
+	data, err := hex.DecodeString(swapData.Tx.Data[2:])
 	if err != nil {
-		fmt.Printf("Failed to get gas tip: %v\n", err)
 		return
 	}
 
-	gasFee, err := client.Wallet.GetGasFeeCap(ctx)
-	if err != nil {
-		fmt.Printf("Failed to get gas fee: %v\n", err)
-		return
-	}
-
-	tx, err := client.BuildSwapTransaction(swapData, nonce, gasTip, gasFee)
+	tx, err := client.Wallet.BuildTransaction(ctx, &to, value, uint64(swapData.Tx.Gas), data)
 	if err != nil {
 		fmt.Printf("Failed to build transaction: %v\n", err)
 		return

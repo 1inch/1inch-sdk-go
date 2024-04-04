@@ -179,8 +179,8 @@ func TestChainIdRequired(t *testing.T) {
 			expectError: true,
 		},
 		{
-			description: "Valid chain id - Ethereum",
-			value:       constants.Ethereum,
+			description: "Valid chain id - EthereumChainId",
+			value:       constants.EthereumChainId,
 		},
 	}
 
@@ -207,12 +207,12 @@ func TestChainId(t *testing.T) {
 			value:       0,
 		},
 		{
-			description: "Valid chain id - Ethereum",
-			value:       constants.Ethereum,
+			description: "Valid chain id - EthereumChainId",
+			value:       constants.EthereumChainId,
 		},
 		{
-			description: "Valid chain id - Polygon",
-			value:       constants.Polygon,
+			description: "Valid chain id - PolygonChainId",
+			value:       constants.PolygonChainId,
 		},
 		{
 			description: "Invalid chain id",

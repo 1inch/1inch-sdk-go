@@ -4,7 +4,7 @@ import (
 	"github.com/1inch/1inch-sdk-go/common"
 
 	"github.com/1inch/1inch-sdk-go/internal/http_executor"
-	"github.com/1inch/1inch-sdk-go/internal/web3_provider"
+	"github.com/1inch/1inch-sdk-go/internal/web3-provider"
 )
 
 type Configuration struct {

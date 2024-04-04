@@ -14,10 +14,12 @@ type Wallet interface {
 	Balance(ctx context.Context) (*big.Int, error)
 
 	GetGasTipCap(ctx context.Context) (*big.Int, error)
-	GetGasFeeCap(ctx context.Context) (*big.Int, error)
+	GetGasPrice(ctx context.Context) (*big.Int, error)
 
 	Sign(tx *types.Transaction) (*types.Transaction, error)
 	BroadcastTransaction(ctx context.Context, tx *types.Transaction) error
+	BuildTransaction(ctx context.Context, to *gethCommon.Address, value *big.Int, gas uint64, data []byte) (*types.Transaction, error)
+	TransactionReceipt(ctx context.Context, txHash gethCommon.Hash) (*types.Receipt, error)
 
 	TokenPermit(cd ContractPermitData) (string, error)
 	//TokenApprove()
@@ -25,8 +27,6 @@ type Wallet interface {
 	// view functions
 	//TokenBalance()
 	//TokenAllowance()
-
-	TransactionReceipt(ctx context.Context, txHash gethCommon.Hash) (*types.Receipt, error)
 
 }
 
