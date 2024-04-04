@@ -17,13 +17,13 @@ This can be done through your environment, or you can directly set them in the v
 */
 
 var (
-	publicAddress  = os.Getenv("WALLET_ADDRESS")
 	privateKey     = os.Getenv("WALLET_KEY")
+	nodeUrl        = os.Getenv("NODE_URL")
 	devPortalToken = os.Getenv("DEV_PORTAL_TOKEN")
 )
 
 func main() {
-	config, err := aggregation.DefaultConfiguration("https://polygon-pokt.nodies.app", privateKey, 137, "https://api.1inch.dev", devPortalToken)
+	config, err := aggregation.NewDefaultConfiguration(nodeUrl, privateKey, 137, "https://api.1inch.dev", devPortalToken)
 	if err != nil {
 		return
 	}
@@ -35,7 +35,7 @@ func main() {
 		Src:      "0x3c499c542cEF5E3811e1192ce70d8cC03d5c3359",
 		Dst:      "0x0d500B1d8E8eF31E21C99d1Db9A6444d3ADf1270",
 		Amount:   "1000",
-		From:     publicAddress,
+		From:     client.Wallet.Address().Hex(),
 		Slippage: 1,
 	})
 	if err != nil {
@@ -79,7 +79,7 @@ func main() {
 		return
 	}
 
-	// TODO factor this out into a helper function?
+	// Waiting for transaction, just an example of it
 	fmt.Printf("Transaction has been broadcast. View it on Polygonscan here: %v\n", fmt.Sprintf("https://polygonscan.com/tx/%v", signedTx.Hash().Hex()))
 	for {
 		receipt, err := client.Wallet.TransactionReceipt(ctx, signedTx.Hash())
