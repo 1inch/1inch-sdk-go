@@ -53,6 +53,7 @@ func (w Wallet) GetGasFeeCap(ctx context.Context) (*big.Int, error) {
 	return w.ethClient.SuggestGasPrice(ctx)
 }
 
+
 func (w Wallet) TransactionReceipt(ctx context.Context, txHash common.Hash) (*types.Receipt, error) {
 	return w.ethClient.TransactionReceipt(ctx, txHash)
 }

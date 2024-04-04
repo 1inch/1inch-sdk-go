@@ -1,6 +1,9 @@
 package aggregation
 
 import (
+	"context"
+
+	"github.com/1inch/1inch-sdk-go/aggregation/models"
 	"github.com/1inch/1inch-sdk-go/common"
 
 	"github.com/1inch/1inch-sdk-go/internal/http_executor"
@@ -46,18 +49,18 @@ func NewClient(cfg *Configuration) (*Client, error) {
 	return &c, nil
 }
 
-func DefaultConfiguration(nodeUrl string, privateKey string, chainId uint64, apiUrl string, apiKey string) (*Configuration, error) {
+func NewDefaultConfiguration(nodeUrl string, privateKey string, chainId uint64, apiUrl string, apiKey string) (*Configuration, error) {
 	executor, err := http_executor.DefaultHttpClient(apiUrl, apiKey)
 	if err != nil {
 		return nil, err
 	}
 
 	a := api{
-		httpExecutor: executor,
 		chainId:      chainId,
+		httpExecutor: executor,
 	}
 
-	walletCfg, err := DefaultWalletConfiguration(nodeUrl, privateKey, chainId)
+	walletCfg, err := NewDefaultWalletConfiguration(nodeUrl, privateKey, chainId)
 	if err != nil {
 		return nil, err
 	}
@@ -67,7 +70,7 @@ func DefaultConfiguration(nodeUrl string, privateKey string, chainId uint64, api
 	}, nil
 }
 
-func DefaultWalletConfiguration(nodeUrl string, privateKey string, chainId uint64) (*WalletConfiguration, error) {
+func NewDefaultWalletConfiguration(nodeUrl string, privateKey string, chainId uint64) (*WalletConfiguration, error) {
 	w, err := web3_provider.DefaultWalletProvider(privateKey, nodeUrl, chainId)
 	if err != nil {
 		return nil, err
