@@ -21,7 +21,7 @@ package main
 //		DevPortalApiKey: os.Getenv("DEV_PORTAL_TOKEN"),
 //		Web3HttpProviders: []models.Web3Provider{
 //			{
-//				ChainId: chains.Polygon,
+//				chainId: chains.Polygon,
 //				Url:     os.Getenv("WEB_3_HTTP_PROVIDER_URL_WITH_KEY_POLYGON"),
 //			},
 //		},
@@ -35,7 +35,7 @@ package main
 //
 //	// Build the config for the orders request
 //	limitOrdersParams := models.GetAllOrdersParams{
-//		ChainId: 137,
+//		chainId: 137,
 //		LimitOrderV3SubscribedApiControllerGetAllLimitOrdersParams: models.LimitOrderV3SubscribedApiControllerGetAllLimitOrdersParams{
 //			Page:   1,
 //			Limit:  2,

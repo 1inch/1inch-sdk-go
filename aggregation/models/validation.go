@@ -10,7 +10,7 @@ import (
 //func (params *SwapTokensParams) Validate() error {
 //	var validationErrors []error
 //	validationErrors = validate.Parameter(int(params.ApprovalType), "approvalType", validate.CheckApprovalType, validationErrors)
-//	validationErrors = validate.Parameter(params.ChainId, "chainId", validate.CheckChainIdRequired, validationErrors)
+//	validationErrors = validate.Parameter(params.chainId, "chainId", validate.CheckChainIdRequired, validationErrors)
 //	validationErrors = validate.Parameter(params.Address, "publicAddress", validate.CheckEthereumAddressRequired, validationErrors)
 //	validationErrors = validate.Parameter(params.WalletKey, "walletKey", validate.CheckPrivateKeyRequired, validationErrors)
 //	validationErrors = validate.Parameter(params.Src, "src", validate.CheckEthereumAddressRequired, validationErrors)
@@ -105,7 +105,7 @@ func (params *GetQuoteParams) Validate() error {
 
 func (params *AggregationControllerGetSwapParams) Validate() error {
 	var validationErrors []error
-	//validationErrors = validate.Parameter(params.ChainId, "chainId", validate.CheckChainIdRequired, validationErrors)
+	//validationErrors = validate.Parameter(params.chainId, "chainId", validate.CheckChainIdRequired, validationErrors)
 	validationErrors = validate.Parameter(params.Src, "src", validate.CheckEthereumAddressRequired, validationErrors)
 	validationErrors = validate.Parameter(params.Dst, "dst", validate.CheckEthereumAddressRequired, validationErrors)
 	validationErrors = validate.Parameter(params.Amount, "amount", validate.CheckBigIntRequired, validationErrors)

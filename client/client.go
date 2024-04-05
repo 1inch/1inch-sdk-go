@@ -58,7 +58,7 @@ package client
 //		if err != nil {
 //			return nil, fmt.Errorf("failed to create eth client: %v", err)
 //		}
-//		ethClientMap[provider.ChainId] = ethClient
+//		ethClientMap[provider.chainId] = ethClient
 //	}
 //
 //	apiBaseUrl, err := url.Parse("https://api.1inch.dev")

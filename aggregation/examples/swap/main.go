@@ -2,13 +2,9 @@ package main
 
 import (
 	"context"
-	"encoding/hex"
 	"fmt"
-	"math/big"
 	"os"
 	"time"
-
-	gethCommon "github.com/ethereum/go-ethereum/common"
 
 	"github.com/1inch/1inch-sdk-go/aggregation"
 	"github.com/1inch/1inch-sdk-go/aggregation/models"
@@ -47,21 +43,8 @@ func main() {
 		fmt.Printf("Failed to get swap data: %v\n", err)
 		return
 	}
-	//
 
-	to := gethCommon.HexToAddress(swapData.Tx.To)
-
-	value, ok := new(big.Int).SetString(swapData.Tx.Value, 10)
-	if !ok {
-		return
-	}
-
-	data, err := hex.DecodeString(swapData.Tx.Data[2:])
-	if err != nil {
-		return
-	}
-
-	tx, err := client.Wallet.BuildTransaction(ctx, &to, value, uint64(swapData.Tx.Gas), data)
+	tx, err := client.TxBuilder.New().SetData(swapData.Tx.GetCallData()).SetTo(swapData.Tx.GetToAddress()).SetGas(uint64(swapData.Tx.Gas)).SetValue(swapData.Tx.GetValue()).Build(ctx)
 	if err != nil {
 		fmt.Printf("Failed to build transaction: %v\n", err)
 		return

@@ -24,7 +24,7 @@ package main
 //		DevPortalApiKey: os.Getenv("DEV_PORTAL_TOKEN"),
 //		Web3HttpProviders: []models.Web3Provider{
 //			{
-//				ChainId: chains.Polygon,
+//				chainId: chains.Polygon,
 //				Url:     web3providers.Polygon,
 //			},
 //		},
@@ -38,7 +38,7 @@ package main
 //
 //	// Build the config for the swap request
 //	swapParams := models.GetSwapParams{
-//		ChainId:      chains.Polygon,
+//		chainId:      chains.Polygon,
 //		SkipWarnings: false,
 //		AggregationControllerGetSwapParams: models.AggregationControllerGetSwapParams{
 //			Src:             tokens.PolygonFrax,

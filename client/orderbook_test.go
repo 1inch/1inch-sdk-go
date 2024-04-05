@@ -41,7 +41,7 @@ package client
 //			description: "Error - MakerAsset is native token",
 //			owner:       addresses.Vitalik,
 //			params: models.CreateOrderParams{
-//				ChainId:      chains.Ethereum,
+//				chainId:      chains.Ethereum,
 //				PrivateKey:   os.Getenv("WALLET_KEY"),
 //				Maker:        addresses.Vitalik,
 //				MakerAsset:   tokens.NativeToken,
@@ -103,7 +103,7 @@ package client
 //		{
 //			description: "Success",
 //			params: models.GetOrdersByCreatorAddressParams{
-//				ChainId:        chains.Ethereum,
+//				chainId:        chains.Ethereum,
 //				CreatorAddress: addresses.Vitalik,
 //			},
 //			expectedOutput: defaultSignature,
@@ -159,7 +159,7 @@ package client
 //		{
 //			description: "Success",
 //			params: models.GetAllOrdersParams{
-//				ChainId: chains.Ethereum,
+//				chainId: chains.Ethereum,
 //				LimitOrderV3SubscribedApiControllerGetAllLimitOrdersParams: models.LimitOrderV3SubscribedApiControllerGetAllLimitOrdersParams{},
 //			},
 //			expectedOutput: defaultSignature,
@@ -213,7 +213,7 @@ package client
 //		{
 //			description: "Success",
 //			params: models.GetCountParams{
-//				ChainId: chains.Ethereum,
+//				chainId: chains.Ethereum,
 //				LimitOrderV3SubscribedApiControllerGetAllOrdersCountParams: models.LimitOrderV3SubscribedApiControllerGetAllOrdersCountParams{},
 //			},
 //			expectedOutput: defaultCount,
@@ -267,7 +267,7 @@ package client
 //			description:    "Success",
 //			expectedOutput: 48608667,
 //			params: models.GetEventParams{
-//				ChainId:   chains.Ethereum,
+//				chainId:   chains.Ethereum,
 //				OrderHash: "123",
 //			},
 //		},
@@ -321,7 +321,7 @@ package client
 //		{
 //			description: "Success",
 //			params: models.GetEventsParams{
-//				ChainId: chains.Ethereum,
+//				chainId: chains.Ethereum,
 //				LimitOrderV3SubscribedApiControllerGetEventsParams: models.LimitOrderV3SubscribedApiControllerGetEventsParams{
 //					Limit: 1,
 //				},

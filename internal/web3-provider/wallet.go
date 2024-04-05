@@ -27,3 +27,7 @@ func (w Wallet) Balance(ctx context.Context) (*big.Int, error) {
 	}
 	return balance, nil
 }
+
+func (w Wallet) ChainId() int64 {
+	return w.chainId.Int64()
+}

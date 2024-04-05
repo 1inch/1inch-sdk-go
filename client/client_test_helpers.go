@@ -33,7 +33,7 @@ package client
 //			DevPortalApiKey: os.Getenv("DEV_PORTAL_TOKEN"),
 //			Web3HttpProviders: []models.Web3Provider{
 //				{
-//					ChainId: chains.Ethereum,
+//					chainId: chains.Ethereum,
 //					Url:     os.Getenv("WEB_3_HTTP_PROVIDER_URL_WITH_KEY"),
 //				},
 //			},

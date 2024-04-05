@@ -29,7 +29,7 @@ func Test_createPermitSignature(t *testing.T) {
 		ethClient:  &ethclient.Client{},
 		address:    &address,
 		privateKey: privateKey,
-		ChainId:    big.NewInt(int64(137)),
+		chainId:    big.NewInt(int64(137)),
 		erc20ABI:   &erc20ABI,
 	}
 
@@ -96,7 +96,7 @@ func TestTokenPermit(t *testing.T) {
 		ethClient:  &ethclient.Client{},
 		address:    &address,
 		privateKey: privateKey,
-		ChainId:    big.NewInt(int64(137)),
+		chainId:    big.NewInt(int64(137)),
 		erc20ABI:   &erc20ABI,
 	}
 

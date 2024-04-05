@@ -27,7 +27,7 @@ package client
 //
 //// CreateOrder creates an order in the Limit Order Protocol
 //func (s *OrderbookService) CreateOrder(ctx context.Context, params models.CreateOrderParams) (*models.CreateOrderResponse, *http.Response, error) {
-//	u := fmt.Sprintf("/orderbook/v3.0/%d", params.ChainId)
+//	u := fmt.Sprintf("/orderbook/v3.0/%d", params.chainId)
 //
 //	err := params.Validate()
 //	if err != nil {
@@ -44,7 +44,7 @@ package client
 //		params.Taker = addresses.Zero
 //	}
 //
-//	aggregationRouter, err := contracts.Get1inchRouterFromChainId(params.ChainId)
+//	aggregationRouter, err := contracts.Get1inchRouterFromChainId(params.chainId)
 //	if err != nil {
 //		return nil, nil, fmt.Errorf("failed to get 1inch router address: %v", err)
 //	}
@@ -52,7 +52,7 @@ package client
 //	fromTokenAddress := common.HexToAddress(params.MakerAsset)
 //	publicAddress := common.HexToAddress(params.Maker)
 //	aggregationRouterAddress := common.HexToAddress(aggregationRouter)
-//	ethClient, err := s.client.GetEthClient(params.ChainId)
+//	ethClient, err := s.client.GetEthClient(params.chainId)
 //	if err != nil {
 //		return nil, nil, fmt.Errorf("failed to get eth client: %v", err)
 //	}
@@ -72,7 +72,7 @@ package client
 //
 //	var usePermit bool
 //	if params.ApprovalType != onchain.ApprovalAlways {
-//		usePermit = onchain.ShouldUsePermit(ethClient, params.ChainId, params.MakerAsset)
+//		usePermit = onchain.ShouldUsePermit(ethClient, params.chainId, params.MakerAsset)
 //	}
 //
 //	permitParams := "0x"
@@ -81,7 +81,7 @@ package client
 //			EthClient:     ethClient,
 //			MakerAsset:    params.MakerAsset,
 //			PublicAddress: derivedPublicAddress,
-//			ChainId:       params.ChainId,
+//			chainId:       params.chainId,
 //			PrivateKey:    params.PrivateKey,
 //			Deadline:      params.ExpireAfter,
 //		})
@@ -118,7 +118,7 @@ package client
 //			}
 //
 //			erc20Config := onchain.Erc20ApprovalConfig{
-//				ChainId:        params.ChainId,
+//				chainId:        params.chainId,
 //				Key:            params.PrivateKey,
 //				Erc20Address:   fromTokenAddress,
 //				PublicAddress:  publicAddress,
@@ -133,7 +133,7 @@ package client
 //		}
 //	}
 //
-//	seriesNonceManager, err := contracts.GetSeriesNonceManagerFromChainId(params.ChainId)
+//	seriesNonceManager, err := contracts.GetSeriesNonceManagerFromChainId(params.chainId)
 //	if err != nil {
 //		return nil, nil, fmt.Errorf("failed to get series nonce manager address: %v", err)
 //	}
@@ -181,7 +181,7 @@ package client
 //
 //// GetOrdersByCreatorAddress returns all orders created by a given address in the Limit Order Protocol
 //func (s *OrderbookService) GetOrdersByCreatorAddress(ctx context.Context, params models.GetOrdersByCreatorAddressParams) ([]models.OrderResponse, *http.Response, error) {
-//	u := fmt.Sprintf("/orderbook/v3.0/%d/address/%s", params.ChainId, params.CreatorAddress)
+//	u := fmt.Sprintf("/orderbook/v3.0/%d/address/%s", params.chainId, params.CreatorAddress)
 //
 //	err := params.Validate()
 //	if err != nil {
@@ -209,7 +209,7 @@ package client
 //
 //// GetAllOrders returns all orders in the Limit Order Protocol
 //func (s *OrderbookService) GetAllOrders(ctx context.Context, params models.GetAllOrdersParams) ([]models.OrderResponse, *http.Response, error) {
-//	u := fmt.Sprintf("/orderbook/v3.0/%d/all", params.ChainId)
+//	u := fmt.Sprintf("/orderbook/v3.0/%d/all", params.chainId)
 //
 //	err := params.Validate()
 //	if err != nil {
@@ -237,7 +237,7 @@ package client
 //
 //// GetCount returns the number of orders in the Limit Order Protocol
 //func (s *OrderbookService) GetCount(ctx context.Context, params models.GetCountParams) (*models.CountResponse, *http.Response, error) {
-//	u := fmt.Sprintf("/orderbook/v3.0/%d/count", params.ChainId)
+//	u := fmt.Sprintf("/orderbook/v3.0/%d/count", params.chainId)
 //
 //	err := params.Validate()
 //	if err != nil {
@@ -265,7 +265,7 @@ package client
 //
 //// GetEvent returns an event in the Limit Order Protocol by order hash
 //func (s *OrderbookService) GetEvent(ctx context.Context, params models.GetEventParams) (*models.EventResponse, *http.Response, error) {
-//	u := fmt.Sprintf("/orderbook/v3.0/%d/events/%s", params.ChainId, params.OrderHash)
+//	u := fmt.Sprintf("/orderbook/v3.0/%d/events/%s", params.chainId, params.OrderHash)
 //
 //	err := params.Validate()
 //	if err != nil {
@@ -288,7 +288,7 @@ package client
 //
 //// GetEvents returns all events in the Limit Order Protocol
 //func (s *OrderbookService) GetEvents(ctx context.Context, params models.GetEventsParams) ([]models.EventResponse, *http.Response, error) {
-//	u := fmt.Sprintf("/orderbook/v3.0/%d/events", params.ChainId)
+//	u := fmt.Sprintf("/orderbook/v3.0/%d/events", params.chainId)
 //
 //	err := params.Validate()
 //	if err != nil {
@@ -318,7 +318,7 @@ package client
 //
 //// GetActiveOrdersWithPermit returns all orders in the Limit Order Protocol that are active and have a valid permit
 //func (s *OrderbookService) GetActiveOrdersWithPermit(ctx context.Context, params models.GetActiveOrdersWithPermitParams) ([]models.OrderResponse, *http.Response, error) {
-//	u := fmt.Sprintf("/orderbook/v3.0/%d/has-active-orders-with-permit/%s/%s", params.ChainId, params.Token, params.Wallet)
+//	u := fmt.Sprintf("/orderbook/v3.0/%d/has-active-orders-with-permit/%s/%s", params.chainId, params.Token, params.Wallet)
 //
 //	err := params.Validate()
 //	if err != nil {

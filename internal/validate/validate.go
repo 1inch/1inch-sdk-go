@@ -80,7 +80,7 @@ func CheckBigInt(parameter interface{}, variableName string) error {
 func CheckChainIdRequired(parameter interface{}, variableName string) error {
 	value, ok := parameter.(int)
 	if !ok {
-		return fmt.Errorf("for parameter '%v' to be validated as '%v', it must be an int", variableName, "ChainId")
+		return fmt.Errorf("for parameter '%v' to be validated as '%v', it must be an int", variableName, "chainId")
 	}
 
 	if value == 0 {
@@ -93,7 +93,7 @@ func CheckChainIdRequired(parameter interface{}, variableName string) error {
 func CheckChainId(parameter interface{}, variableName string) error {
 	value, ok := parameter.(int)
 	if !ok {
-		return fmt.Errorf("for parameter '%v' to be validated as '%v', it must be an int", variableName, "ChainId")
+		return fmt.Errorf("for parameter '%v' to be validated as '%v', it must be an int", variableName, "chainId")
 	}
 	if value == 0 {
 		return nil

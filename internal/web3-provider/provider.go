@@ -18,7 +18,7 @@ type Wallet struct {
 	ethClient  *ethclient.Client
 	address    *common.Address
 	privateKey *ecdsa.PrivateKey
-	ChainId    *big.Int
+	chainId    *big.Int
 	erc20ABI   *abi.ABI
 }
 
@@ -43,7 +43,7 @@ func DefaultWalletProvider(pk string, nodeURL string, ChainId uint64) (*Wallet, 
 		ethClient:  ethClient,
 		address:    &address,
 		privateKey: privateKey,
-		ChainId:    big.NewInt(int64(ChainId)),
+		chainId:    big.NewInt(int64(ChainId)),
 		erc20ABI:   &erc20ABI,
 	}, nil
 }

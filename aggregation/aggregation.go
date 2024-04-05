@@ -2,9 +2,9 @@ package aggregation
 
 import (
 	"github.com/1inch/1inch-sdk-go/common"
-
 	"github.com/1inch/1inch-sdk-go/internal/http_executor"
 	"github.com/1inch/1inch-sdk-go/internal/web3-provider"
+	transaction_builder "github.com/1inch/1inch-sdk-go/internal/web3-provider/transaction-builder"
 )
 
 type Configuration struct {
@@ -21,12 +21,14 @@ type WalletConfiguration struct {
 	PrivateKey string
 	NodeURL    string
 
-	Wallet common.Wallet
+	Wallet    common.Wallet
+	TxBuilder common.TransactionBuilderFactory
 }
 
 type Client struct {
 	api
-	Wallet common.Wallet
+	Wallet    common.Wallet
+	TxBuilder common.TransactionBuilderFactory
 }
 
 type api struct {
@@ -73,7 +75,9 @@ func NewDefaultWalletConfiguration(nodeUrl string, privateKey string, chainId ui
 		return nil, err
 	}
 
+	f := transaction_builder.NewFactory(w)
 	return &WalletConfiguration{
-		Wallet: w,
+		Wallet:    w,
+		TxBuilder: f,
 	}, nil
 }

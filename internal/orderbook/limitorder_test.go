@@ -142,7 +142,7 @@ package orderbook
 //		{
 //			name: "happy path",
 //			orderRequest: models.CreateOrderParams{
-//				ChainId:      chains.Polygon,
+//				chainId:      chains.Polygon,
 //				PrivateKey:   os.Getenv("WALLET_KEY"),
 //				MakerAsset:   "0x8f3Cf7ad23Cd3CaDbD9735AFf958023239c6A063",
 //				TakerAsset:   "0x7ceb23fd6bc0add59e62ac25578270cff1b9f619",
@@ -173,7 +173,7 @@ package orderbook
 //		{
 //			name: "empty maker asset",
 //			orderRequest: models.CreateOrderParams{
-//				ChainId:      chains.Polygon,
+//				chainId:      chains.Polygon,
 //				PrivateKey:   os.Getenv("WALLET_KEY"),
 //				MakerAsset:   "",
 //				TakerAsset:   "0x7ceb23fd6bc0add59e62ac25578270cff1b9f619",
@@ -189,7 +189,7 @@ package orderbook
 //		{
 //			name: "empty taker asset",
 //			orderRequest: models.CreateOrderParams{
-//				ChainId:      chains.Polygon,
+//				chainId:      chains.Polygon,
 //				PrivateKey:   os.Getenv("WALLET_KEY"),
 //				MakerAsset:   "0x8f3Cf7ad23Cd3CaDbD9735AFf958023239c6A063",
 //				TakerAsset:   "",
@@ -205,7 +205,7 @@ package orderbook
 //		{
 //			name: "invalid private key",
 //			orderRequest: models.CreateOrderParams{
-//				ChainId:      chains.Polygon,
+//				chainId:      chains.Polygon,
 //				PrivateKey:   "invalid_private_key", // non-hex or short length key
 //				MakerAsset:   "0x8f3Cf7ad23Cd3CaDbD9735AFf958023239c6A063",
 //				TakerAsset:   "0x7ceb23fd6bc0add59e62ac25578270cff1b9f619",
