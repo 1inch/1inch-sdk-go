@@ -126,7 +126,7 @@ func (w Wallet) GetContractDetailsForPermit(ctx context.Context, token gethCommo
 		FromToken:     token.Hex(),
 		PublicAddress: w.address.Hex(),
 		Spender:       spender.Hex(),
-		ChainId:       int(w.ChainId.Int64()),
+		ChainId:       int(w.ChainId()),
 		Deadline:      deadline,
 		Name:          contractName,
 		Version:       contractVersion,

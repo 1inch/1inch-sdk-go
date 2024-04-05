@@ -3,8 +3,8 @@ package aggregation
 import (
 	"github.com/1inch/1inch-sdk-go/common"
 	"github.com/1inch/1inch-sdk-go/internal/http_executor"
+	"github.com/1inch/1inch-sdk-go/internal/transaction-builder"
 	"github.com/1inch/1inch-sdk-go/internal/web3-provider"
-	transaction_builder "github.com/1inch/1inch-sdk-go/internal/web3-provider/transaction-builder"
 )
 
 type Configuration struct {

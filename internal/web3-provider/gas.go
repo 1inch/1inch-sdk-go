@@ -20,6 +20,6 @@ func (w Wallet) GetGasPrice(ctx context.Context) (*big.Int, error) {
 }
 
 func (w Wallet) IsEIP1559Applicable() bool {
-	c := w.ChainId.Uint64()
+	c := w.ChainId()
 	return !(c == constants.BscChainId || c == constants.AuroraChainId || c == constants.ZkSyncEraChainId || c == constants.FantomChainId)
 }

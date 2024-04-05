@@ -49,7 +49,7 @@ func main() {
 		fmt.Printf("Failed to build transaction: %v\n", err)
 		return
 	}
-
+	tx2, err := client.TxBuilder.New().SetData(swapData.Tx.GetCallData()).SetTo(swapData.Tx.GetToAddress()).SetGas(uint64(swapData.Tx.Gas)).SetValue(swapData.Tx.GetValue()).BuildDynamicTx(ctx)
 	signedTx, err := client.Wallet.Sign(tx)
 	if err != nil {
 		fmt.Printf("Failed to sign transaction: %v\n", err)
