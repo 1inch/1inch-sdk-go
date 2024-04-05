@@ -10,7 +10,7 @@ import (
 	"github.com/ethereum/go-ethereum/accounts/abi"
 	"github.com/ethereum/go-ethereum/common"
 
-	"github.com/1inch/1inch-sdk-go/internal/helpers/consts/chains"
+	"github.com/1inch/1inch-sdk-go/constants"
 )
 
 const multicallMethod = "multicall"
@@ -118,29 +118,29 @@ func Call(ctx context.Context, params CallParams) ([]byte, error) {
 
 func GetEvmHelperContract(ChainId int) (string, error) {
 	switch ChainId {
-	case chains.Ethereum:
+	case constants.EthereumChainId:
 		return multicallContractEthereum, nil
-	case chains.Bsc:
+	case constants.BscChainId:
 		return multicallContractBnb, nil
-	case chains.Polygon:
+	case constants.PolygonChainId:
 		return multicallContractPolygon, nil
-	case chains.Optimism:
+	case constants.OptimismChainId:
 		return multicallContractOptimism, nil
-	case chains.Arbitrum:
+	case constants.ArbitrumChainId:
 		return multicallContractArbitrum, nil
-	case chains.Gnosis:
+	case constants.GnosisChainId:
 		return multicallContractGnosis, nil
-	case chains.Avalanche:
+	case constants.AvalancheChainId:
 		return multicallContractAvalanche, nil
-	case chains.Fantom:
+	case constants.FantomChainId:
 		return multicallContractFantom, nil
-	case chains.Klaytn:
+	case constants.KlaytnChainId:
 		return multicallContractKlaytn, nil
-	case chains.Aurora:
+	case constants.AuroraChainId:
 		return multicallContractAurora, nil
-	case chains.ZkSyncEra:
+	case constants.ZkSyncEraChainId:
 		return multicallContractZkSyncEra, nil
-	case chains.Base:
+	case constants.BaseChainId:
 		return multicallContractBase, nil
 	default:
 		return "", fmt.Errorf("chain %d is not supported", ChainId)
