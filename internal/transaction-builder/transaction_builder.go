@@ -40,6 +40,9 @@ type TransactionBuilder struct {
 }
 
 func (t *TransactionBuilder) SetData(d []byte) common.TransactionBuilder {
+	if d == nil {
+		return t
+	}
 	t.data = d
 	t.dataSet = true
 	return t
@@ -52,6 +55,9 @@ func (t *TransactionBuilder) SetNonce(n uint64) common.TransactionBuilder {
 }
 
 func (t *TransactionBuilder) SetGasPrice(g *big.Int) common.TransactionBuilder {
+	if g == nil {
+		return t
+	}
 	t.gasPrice = g
 	t.gasPriceSet = true
 	return t
@@ -64,24 +70,36 @@ func (t *TransactionBuilder) SetGas(g uint64) common.TransactionBuilder {
 }
 
 func (t *TransactionBuilder) SetValue(v *big.Int) common.TransactionBuilder {
+	if v == nil {
+		return t
+	}
 	t.value = v
 	t.valueSet = true
 	return t
 }
 
 func (t *TransactionBuilder) SetTo(address *gethCommon.Address) common.TransactionBuilder {
+	if address == nil {
+		return t
+	}
 	t.to = address
 	t.toSet = true
 	return t
 }
 
 func (t *TransactionBuilder) SetGasTipCap(g *big.Int) common.TransactionBuilder {
+	if g == nil {
+		return t
+	}
 	t.gasTipCap = g
 	t.gasTipCapSet = true
 	return t
 }
 
 func (t *TransactionBuilder) SetGasFeeCap(g *big.Int) common.TransactionBuilder {
+	if g == nil {
+		return t
+	}
 	t.gasFeeCap = g
 	t.gasFeeCapSet = true
 	return t
