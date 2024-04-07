@@ -87,6 +87,19 @@ func TestTransactionBuilder_Build(t *testing.T) {
 				"GasFeeCap": big.NewInt(23),
 			},
 		},
+		{
+			name:        "Missing to and data",
+			nonce:       testSpecialNonSetValue,
+			gas:         20_000,
+			value:       big.NewInt(200000),
+			gasFee:      nil,
+			gasTip:      nil,
+			to:          nil,
+			expectError: true,
+			expectedValues: map[string]interface{}{
+				"To": nil,
+			},
+		},
 	}
 
 	for _, tc := range tests {
