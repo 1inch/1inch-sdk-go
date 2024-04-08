@@ -13,17 +13,9 @@ type CallData struct {
 	Gas        uint64 `json:"-"`
 }
 
-type MulticallParams struct {
-	Client   Client
-	ChainId  int
-	Calldata []CallData
-}
-
 type CallParams struct {
-	Client          Client
-	Data            []byte
-	ContractAddress string
-	Block           *big.Int
+	Data  []byte
+	Block *big.Int
 }
 
 type request struct {

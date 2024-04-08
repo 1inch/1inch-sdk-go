@@ -49,11 +49,13 @@ const (
 )
 
 func TestMulticallEthereumSuccess(t *testing.T) {
-	var callData []CallData
-
 	client, err := ethclient.Dial(Ethereum)
 	require.NoError(t, err)
 
+	instance, err := NewMulticall(client, constants.EthereumChainId)
+	require.NoError(t, err)
+
+	var callData []CallData
 	parsedABI, err := abi.JSON(strings.NewReader(constants.Erc20ABI)) // Make a generic version of this ABI
 	require.NoError(t, err)
 
@@ -62,11 +64,7 @@ func TestMulticallEthereumSuccess(t *testing.T) {
 	callData = append(callData, BuildCallData(EthereumUsdc, hexutil.Encode(nameRequest), 0))
 	callData = append(callData, BuildCallData(EthereumDai, hexutil.Encode(nameRequest), 0))
 
-	resp, err := MultiCall(context.Background(), MulticallParams{
-		Client:   client,
-		ChainId:  constants.EthereumChainId,
-		Calldata: callData,
-	})
+	resp, err := instance.Execute(context.Background(), callData)
 	require.NoError(t, err)
 
 	var tokenName string
@@ -80,10 +78,13 @@ func TestMulticallEthereumSuccess(t *testing.T) {
 }
 
 func TestMulticallPolygonSuccess(t *testing.T) {
-	var callData []CallData
-
 	client, err := ethclient.Dial(Polygon)
 	require.NoError(t, err)
+
+	instance, err := NewMulticall(client, constants.PolygonChainId)
+	require.NoError(t, err)
+
+	var callData []CallData
 
 	parsedABI, err := abi.JSON(strings.NewReader(constants.Erc20ABI)) // Make a generic version of this ABI
 	require.NoError(t, err)
@@ -93,11 +94,7 @@ func TestMulticallPolygonSuccess(t *testing.T) {
 	callData = append(callData, BuildCallData(PolygonUsdc, hexutil.Encode(symbolRequest), 0))
 	callData = append(callData, BuildCallData(PolygonDai, hexutil.Encode(symbolRequest), 0))
 
-	resp, err := MultiCall(context.Background(), MulticallParams{
-		Client:   client,
-		ChainId:  constants.PolygonChainId,
-		Calldata: callData,
-	})
+	resp, err := instance.Execute(context.Background(), callData)
 	require.NoError(t, err)
 
 	var tokenName string

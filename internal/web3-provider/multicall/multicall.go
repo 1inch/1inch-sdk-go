@@ -9,6 +9,7 @@ import (
 	"github.com/ethereum/go-ethereum"
 	"github.com/ethereum/go-ethereum/accounts/abi"
 	"github.com/ethereum/go-ethereum/common"
+	"github.com/ethereum/go-ethereum/ethclient"
 
 	"github.com/1inch/1inch-sdk-go/constants"
 )
@@ -31,13 +32,62 @@ const (
 )
 
 var (
-	ErrEmptyContractAddr = errors.New("contract address must not be empty")
-	ErrEmptyResponse     = errors.New("empty response")
+	ErrEmptyResponse = errors.New("empty response")
 )
 
 type Client interface {
 	ethereum.ContractCaller
 	ethereum.ChainReader
+}
+
+type Multicall struct {
+	client          *ethclient.Client
+	contractAddress *common.Address
+	contractABI     *abi.ABI
+}
+
+func NewMulticall(client *ethclient.Client, chainId uint64) (*Multicall, error) {
+	var addressRaw string
+
+	switch chainId {
+	case constants.EthereumChainId:
+		addressRaw = multicallContractEthereum
+	case constants.BscChainId:
+		addressRaw = multicallContractBnb
+	case constants.PolygonChainId:
+		addressRaw = multicallContractPolygon
+	case constants.OptimismChainId:
+		addressRaw = multicallContractOptimism
+	case constants.ArbitrumChainId:
+		addressRaw = multicallContractArbitrum
+	case constants.GnosisChainId:
+		addressRaw = multicallContractGnosis
+	case constants.AvalancheChainId:
+		addressRaw = multicallContractAvalanche
+	case constants.FantomChainId:
+		addressRaw = multicallContractFantom
+	case constants.KlaytnChainId:
+		addressRaw = multicallContractKlaytn
+	case constants.AuroraChainId:
+		addressRaw = multicallContractAurora
+	case constants.ZkSyncEraChainId:
+		addressRaw = multicallContractZkSyncEra
+	case constants.BaseChainId:
+		addressRaw = multicallContractBase
+	default:
+		return nil, fmt.Errorf("chain %d is not supported", chainId)
+	}
+
+	helperContractAddress := common.HexToAddress(addressRaw)
+	contractABI, err := abi.JSON(strings.NewReader(Multicallv2abiABI)) // Make a generic version of this ABI
+	if err != nil {
+		return nil, fmt.Errorf("failed to parse abi error: %s", err)
+	}
+	return &Multicall{
+		client:          client,
+		contractAddress: &helperContractAddress,
+		contractABI:     &contractABI,
+	}, nil
 }
 
 func BuildCallData(to, data string, gas uint64, opts ...string) (r CallData) {
@@ -50,21 +100,16 @@ func BuildCallData(to, data string, gas uint64, opts ...string) (r CallData) {
 	return r
 }
 
-func MultiCall(ctx context.Context, params MulticallParams) ([][]byte, error) {
+func (m Multicall) Execute(ctx context.Context, callData []CallData) ([][]byte, error) {
 	var requests []request
-	for _, d := range params.Calldata {
+	for _, d := range callData {
 		requests = append(requests, request{
 			To:   common.HexToAddress(d.To),
 			Data: common.FromHex(d.Data),
 		})
 	}
 
-	multicallContract, err := abi.JSON(strings.NewReader(Multicallv2abiABI)) // Make a generic version of this ABI
-	if err != nil {
-		return nil, fmt.Errorf("failed to parse abi error: %s", err)
-	}
-
-	data, err := multicallContract.Pack(
+	data, err := m.contractABI.Pack(
 		multicallMethod,
 		requests,
 	)
@@ -72,77 +117,24 @@ func MultiCall(ctx context.Context, params MulticallParams) ([][]byte, error) {
 		return nil, fmt.Errorf("failed to pack msg error: %s", err)
 	}
 
-	evmHelperContract, err := GetEvmHelperContract(params.ChainId)
+	nodeMsg := ethereum.CallMsg{
+		To:   m.contractAddress,
+		Data: data,
+	}
+	resp, err := m.client.CallContract(ctx, nodeMsg, nil)
 	if err != nil {
-		return nil, err
+		return nil, fmt.Errorf("failed to call contract: error: %s", err)
 	}
 
-	var multicallResponse response
-	resp, err := Call(ctx, CallParams{
-		Client:          params.Client,
-		Data:            data,
-		ContractAddress: evmHelperContract,
-		Block:           nil, // nil block means latest block
-	})
-	if err != nil {
-		return nil, err
-	}
 	if len(resp) == 0 {
 		return nil, ErrEmptyResponse
 	}
 
-	err = multicallContract.UnpackIntoInterface(&multicallResponse, multicallMethod, resp)
+	var multicallResponse response
+	err = m.contractABI.UnpackIntoInterface(&multicallResponse, multicallMethod, resp)
 	if err != nil {
 		return nil, err
 	}
 
 	return multicallResponse.Results, nil
-}
-
-func Call(ctx context.Context, params CallParams) ([]byte, error) {
-	if params.ContractAddress == "" {
-		return nil, ErrEmptyContractAddr
-	}
-	var toAddress = common.HexToAddress(params.ContractAddress)
-	var nodeMsg = ethereum.CallMsg{
-		To:   &toAddress,
-		Data: params.Data,
-	}
-	resp, err := params.Client.CallContract(ctx, nodeMsg, params.Block)
-	if err != nil {
-		return nil, fmt.Errorf("failed to call contract: error: %s", err)
-	}
-
-	return resp, nil
-}
-
-func GetEvmHelperContract(ChainId int) (string, error) {
-	switch ChainId {
-	case constants.EthereumChainId:
-		return multicallContractEthereum, nil
-	case constants.BscChainId:
-		return multicallContractBnb, nil
-	case constants.PolygonChainId:
-		return multicallContractPolygon, nil
-	case constants.OptimismChainId:
-		return multicallContractOptimism, nil
-	case constants.ArbitrumChainId:
-		return multicallContractArbitrum, nil
-	case constants.GnosisChainId:
-		return multicallContractGnosis, nil
-	case constants.AvalancheChainId:
-		return multicallContractAvalanche, nil
-	case constants.FantomChainId:
-		return multicallContractFantom, nil
-	case constants.KlaytnChainId:
-		return multicallContractKlaytn, nil
-	case constants.AuroraChainId:
-		return multicallContractAurora, nil
-	case constants.ZkSyncEraChainId:
-		return multicallContractZkSyncEra, nil
-	case constants.BaseChainId:
-		return multicallContractBase, nil
-	default:
-		return "", fmt.Errorf("chain %d is not supported", ChainId)
-	}
 }
