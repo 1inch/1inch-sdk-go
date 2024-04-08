@@ -2,3 +2,8 @@
 .vscode/
 /tmp
 /bin
+
+### macOS ###
+*.DS_Store
+.AppleDouble
+.LSOverride
