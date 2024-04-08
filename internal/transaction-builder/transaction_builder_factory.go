@@ -17,9 +17,9 @@ func NewFactory(w common.Wallet) *TransactionBuilderFactory {
 func (f TransactionBuilderFactory) New() common.TransactionBuilder {
 	return &TransactionBuilder{
 		wallet:    f.wallet,
-		nonce:     0,
+		nonce:     nil,
 		gasPrice:  nil,
-		gas:       0,
+		gas:       nil,
 		to:        nil,
 		value:     nil,
 		data:      nil,

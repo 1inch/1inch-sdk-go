@@ -2,9 +2,13 @@ package main
 
 import (
 	"context"
+	"encoding/hex"
 	"fmt"
+	"math/big"
 	"os"
 	"time"
+
+	"github.com/ethereum/go-ethereum/common"
 
 	"github.com/1inch/1inch-sdk-go/aggregation"
 	"github.com/1inch/1inch-sdk-go/aggregation/models"
@@ -44,7 +48,17 @@ func main() {
 		return
 	}
 
-	tx, err := client.TxBuilder.New().SetData(swapData.Tx.GetCallData()).SetTo(swapData.Tx.GetToAddress()).SetGas(uint64(swapData.Tx.Gas)).SetValue(swapData.Tx.GetValue()).Build(ctx)
+	data, err := hex.DecodeString(swapData.Tx.Data[2:])
+	if err != nil {
+		return
+	}
+	value, ok := new(big.Int).SetString(swapData.Tx.Value, 10)
+	if !ok {
+		return
+	}
+	to := common.HexToAddress(swapData.Tx.To)
+
+	tx, err := client.TxBuilder.New().SetData(data).SetTo(&to).SetGas(uint64(swapData.Tx.Gas)).SetValue(value).Build(ctx)
 	if err != nil {
 		fmt.Printf("Failed to build transaction: %v\n", err)
 		return

@@ -12,31 +12,16 @@ import (
 )
 
 type TransactionBuilder struct {
-	wallet common.Wallet
-
-	nonce    uint64
-	nonceSet bool
-
-	gasPrice    *big.Int
-	gasPriceSet bool
-
-	gas    uint64
-	gasSet bool
-
-	to    *gethCommon.Address `rlp:"nil"`
-	toSet bool
-
-	value    *big.Int
-	valueSet bool
-
-	data    []byte
-	dataSet bool
-
-	gasTipCap    *big.Int
-	gasTipCapSet bool
-
-	gasFeeCap    *big.Int
-	gasFeeCapSet bool
+	wallet    common.Wallet
+	nonce     *uint64
+	gasPrice  *big.Int
+	gas       *uint64
+	to        *gethCommon.Address `rlp:"nil"`
+	value     *big.Int
+	valueSet  bool
+	data      []byte
+	gasTipCap *big.Int
+	gasFeeCap *big.Int
 }
 
 func (t *TransactionBuilder) SetData(d []byte) common.TransactionBuilder {
@@ -44,13 +29,11 @@ func (t *TransactionBuilder) SetData(d []byte) common.TransactionBuilder {
 		return t
 	}
 	t.data = d
-	t.dataSet = true
 	return t
 }
 
 func (t *TransactionBuilder) SetNonce(n uint64) common.TransactionBuilder {
-	t.nonce = n
-	t.nonceSet = true
+	t.nonce = &n
 	return t
 }
 
@@ -59,13 +42,11 @@ func (t *TransactionBuilder) SetGasPrice(g *big.Int) common.TransactionBuilder {
 		return t
 	}
 	t.gasPrice = g
-	t.gasPriceSet = true
 	return t
 }
 
 func (t *TransactionBuilder) SetGas(g uint64) common.TransactionBuilder {
-	t.gas = g
-	t.gasSet = true
+	t.gas = &g
 	return t
 }
 
@@ -83,7 +64,6 @@ func (t *TransactionBuilder) SetTo(address *gethCommon.Address) common.Transacti
 		return t
 	}
 	t.to = address
-	t.toSet = true
 	return t
 }
 
@@ -92,7 +72,6 @@ func (t *TransactionBuilder) SetGasTipCap(g *big.Int) common.TransactionBuilder 
 		return t
 	}
 	t.gasTipCap = g
-	t.gasTipCapSet = true
 	return t
 }
 
@@ -101,37 +80,34 @@ func (t *TransactionBuilder) SetGasFeeCap(g *big.Int) common.TransactionBuilder 
 		return t
 	}
 	t.gasFeeCap = g
-	t.gasFeeCapSet = true
 	return t
 }
 
 func (t *TransactionBuilder) BuildLegacyTx(ctx context.Context) (*types.Transaction, error) {
-	if !t.toSet && !t.dataSet {
+	if t.to == nil && t.data == nil {
 		return nil, fmt.Errorf("transaction without data and to params is invalid, specify the params")
 	}
 
-	if !t.nonceSet {
+	if t.nonce == nil {
 		nonce, err := t.wallet.Nonce(ctx)
 		if err != nil {
 			return nil, err
 		}
-		t.nonce = nonce
-		t.nonceSet = true
+		t.nonce = &nonce
 	}
 
-	if !t.gasPriceSet {
+	if t.gasPrice == nil {
 		gasPrice, err := t.wallet.GetGasPrice(ctx)
 		if err != nil {
 			return nil, err
 		}
 		t.gasPrice = gasPrice
-		t.gasPriceSet = true
 	}
 
 	return types.NewTx(&types.LegacyTx{
-		Nonce:    t.nonce,
+		Nonce:    *t.nonce,
 		GasPrice: t.gasPrice,
-		Gas:      t.gas,
+		Gas:      *t.gas,
 		To:       t.to,
 		Value:    t.value,
 		Data:     t.data,
@@ -143,43 +119,40 @@ func (t *TransactionBuilder) BuildDynamicTx(ctx context.Context) (*types.Transac
 		return nil, fmt.Errorf("current chainId is not supported for dynamic tx")
 	}
 
-	if !t.toSet && !t.dataSet {
+	if t.to == nil && t.data == nil {
 		return nil, fmt.Errorf("transaction without data and to params is invalid, specify the params")
 	}
 
-	if !t.nonceSet {
+	if t.nonce == nil {
 		nonce, err := t.wallet.Nonce(ctx)
 		if err != nil {
 			return nil, err
 		}
-		t.nonce = nonce
-		t.nonceSet = true
+		t.nonce = &nonce
 	}
 
-	if !t.gasTipCapSet {
+	if t.gasTipCap == nil {
 		gasTipCap, err := t.wallet.GetGasTipCap(ctx)
 		if err != nil {
 			return nil, err
 		}
 		t.gasTipCap = gasTipCap
-		t.gasTipCapSet = true
 	}
 
-	if !t.gasFeeCapSet {
+	if t.gasFeeCap == nil {
 		gasPrice, err := t.wallet.GetGasPrice(ctx)
 		if err != nil {
 			return nil, err
 		}
 		t.gasFeeCap = gasPrice
-		t.gasFeeCapSet = true
 	}
 
 	return types.NewTx(&types.DynamicFeeTx{
 		ChainID:   big.NewInt(t.wallet.ChainId()),
-		Nonce:     t.nonce,
+		Nonce:     *t.nonce,
 		GasTipCap: t.gasTipCap,
 		GasFeeCap: t.gasFeeCap,
-		Gas:       t.gas,
+		Gas:       *t.gas,
 		To:        t.to,
 		Value:     t.value,
 		Data:      t.data,
