@@ -6,7 +6,7 @@ import (
 	"testing"
 
 	"github.com/ethereum/go-ethereum/accounts/abi"
-	"github.com/ethereum/go-ethereum/common/hexutil"
+	"github.com/ethereum/go-ethereum/common"
 	"github.com/ethereum/go-ethereum/ethclient"
 	"github.com/stretchr/testify/require"
 
@@ -61,8 +61,8 @@ func TestMulticallEthereumSuccess(t *testing.T) {
 
 	nameRequest, err := parsedABI.Pack(nameMethod)
 	require.NoError(t, err)
-	callData = append(callData, BuildCallData(EthereumUsdc, hexutil.Encode(nameRequest), 0))
-	callData = append(callData, BuildCallData(EthereumDai, hexutil.Encode(nameRequest), 0))
+	callData = append(callData, BuildCallData(common.HexToAddress(EthereumUsdc), nameRequest, 0))
+	callData = append(callData, BuildCallData(common.HexToAddress(EthereumDai), nameRequest, 0))
 
 	resp, err := instance.Execute(context.Background(), callData)
 	require.NoError(t, err)
@@ -91,8 +91,8 @@ func TestMulticallPolygonSuccess(t *testing.T) {
 
 	symbolRequest, err := parsedABI.Pack(symbolMethod)
 	require.NoError(t, err)
-	callData = append(callData, BuildCallData(PolygonUsdc, hexutil.Encode(symbolRequest), 0))
-	callData = append(callData, BuildCallData(PolygonDai, hexutil.Encode(symbolRequest), 0))
+	callData = append(callData, BuildCallData(common.HexToAddress(PolygonUsdc), symbolRequest, 0))
+	callData = append(callData, BuildCallData(common.HexToAddress(PolygonDai), symbolRequest, 0))
 
 	resp, err := instance.Execute(context.Background(), callData)
 	require.NoError(t, err)

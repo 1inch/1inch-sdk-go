@@ -4,18 +4,15 @@ import (
 	"context"
 	"fmt"
 	"math/big"
-	"strconv"
 	"strings"
 
-	"github.com/ethereum/go-ethereum"
-	"github.com/ethereum/go-ethereum/accounts/abi"
 	gethCommon "github.com/ethereum/go-ethereum/common"
 	"github.com/ethereum/go-ethereum/common/math"
 	"github.com/ethereum/go-ethereum/crypto"
-	"github.com/ethereum/go-ethereum/ethclient"
 	"github.com/ethereum/go-ethereum/signer/core/apitypes"
 
 	"github.com/1inch/1inch-sdk-go/common"
+	"github.com/1inch/1inch-sdk-go/internal/web3-provider/multicall"
 )
 
 // TokenPermit Will return an erc2612 string struct if possible
@@ -102,22 +99,46 @@ func (w Wallet) createPermitSignature(cd *common.ContractPermitData) (string, er
 }
 
 func (w Wallet) GetContractDetailsForPermit(ctx context.Context, token gethCommon.Address, spender gethCommon.Address, deadline int64) (*common.ContractPermitData, error) {
-	contractName, err := callAndUnpackContractMethod(ctx, token, *w.erc20ABI, w.ethClient, "name")
+	contractNameData, err := w.erc20ABI.Pack("name")
 	if err != nil {
 		return nil, err
 	}
 
-	contractVersion, err := callAndUnpackContractMethod(ctx, token, *w.erc20ABI, w.ethClient, "version")
+	contractVersionData, err := w.erc20ABI.Pack("version")
 	if err != nil {
 		return nil, err
 	}
 
-	contractNonceStr, err := callAndUnpackContractMethod(ctx, token, *w.erc20ABI, w.ethClient, "nonce", []gethCommon.Address{token})
+	contractNonceData, err := w.erc20ABI.Pack("nonce", []gethCommon.Address{token})
 	if err != nil {
 		return nil, err
 	}
 
-	contractNonce, err := strconv.ParseInt(contractNonceStr, 10, 64)
+	callDataArray := []multicall.CallData{
+		multicall.BuildCallData(token, contractNameData, 0),
+		multicall.BuildCallData(token, contractVersionData, 0),
+		multicall.BuildCallData(token, contractNonceData, 0),
+	}
+
+	mResult, err := w.multicall.Execute(ctx, callDataArray)
+	if err != nil {
+		return nil, err
+	}
+
+	var contractName string
+	err = w.erc20ABI.UnpackIntoInterface(&contractName, "name", mResult[0])
+	if err != nil {
+		return nil, err
+	}
+
+	var contractVersion string
+	err = w.erc20ABI.UnpackIntoInterface(&contractVersion, "version", mResult[1])
+	if err != nil {
+		return nil, err
+	}
+
+	var contractNonce int64
+	err = w.erc20ABI.UnpackIntoInterface(&contractNonce, "nonce", mResult[2])
 	if err != nil {
 		return nil, err
 	}
@@ -132,31 +153,6 @@ func (w Wallet) GetContractDetailsForPermit(ctx context.Context, token gethCommo
 		Version:       contractVersion,
 		Nonce:         contractNonce,
 	}, nil
-}
-
-func callAndUnpackContractMethod(ctx context.Context, token gethCommon.Address, parsedABI abi.ABI, client *ethclient.Client, methodName string, methodArgs ...interface{}) (string, error) {
-	data, err := parsedABI.Pack(methodName, methodArgs...)
-	if err != nil {
-		return "", err
-	}
-
-	msg := ethereum.CallMsg{
-		To:   &token,
-		Data: data,
-	}
-
-	result, err := client.CallContract(ctx, msg, nil)
-	if err != nil {
-		return "", err
-	}
-
-	var returnValue string
-	err = parsedABI.UnpackIntoInterface(&returnValue, methodName, result)
-	if err != nil {
-		return "", err
-	}
-
-	return returnValue, nil
 }
 
 func padStringWithZeroes(s string) string {

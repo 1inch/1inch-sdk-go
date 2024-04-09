@@ -9,6 +9,7 @@ import (
 	"github.com/ethereum/go-ethereum"
 	"github.com/ethereum/go-ethereum/accounts/abi"
 	"github.com/ethereum/go-ethereum/common"
+	"github.com/ethereum/go-ethereum/common/hexutil"
 	"github.com/ethereum/go-ethereum/ethclient"
 
 	"github.com/1inch/1inch-sdk-go/constants"
@@ -35,18 +36,13 @@ var (
 	ErrEmptyResponse = errors.New("empty response")
 )
 
-type Client interface {
-	ethereum.ContractCaller
-	ethereum.ChainReader
-}
-
-type Multicall struct {
+type Client struct {
 	client          *ethclient.Client
 	contractAddress *common.Address
 	contractABI     *abi.ABI
 }
 
-func NewMulticall(client *ethclient.Client, chainId uint64) (*Multicall, error) {
+func NewMulticall(client *ethclient.Client, chainId uint64) (*Client, error) {
 	var addressRaw string
 
 	switch chainId {
@@ -83,16 +79,16 @@ func NewMulticall(client *ethclient.Client, chainId uint64) (*Multicall, error) 
 	if err != nil {
 		return nil, fmt.Errorf("failed to parse abi error: %s", err)
 	}
-	return &Multicall{
+	return &Client{
 		client:          client,
 		contractAddress: &helperContractAddress,
 		contractABI:     &contractABI,
 	}, nil
 }
 
-func BuildCallData(to, data string, gas uint64, opts ...string) (r CallData) {
-	r.To = to
-	r.Data = data
+func BuildCallData(to common.Address, data []byte, gas uint64, opts ...string) (r CallData) {
+	r.To = to.Hex()
+	r.Data = hexutil.Encode(data)
 	r.Gas = gas
 	if len(opts) != 0 {
 		r.MethodName = opts[0]
@@ -100,7 +96,7 @@ func BuildCallData(to, data string, gas uint64, opts ...string) (r CallData) {
 	return r
 }
 
-func (m Multicall) Execute(ctx context.Context, callData []CallData) ([][]byte, error) {
+func (m Client) Execute(ctx context.Context, callData []CallData) ([][]byte, error) {
 	var requests []request
 	for _, d := range callData {
 		requests = append(requests, request{

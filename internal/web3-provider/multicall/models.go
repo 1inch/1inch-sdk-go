@@ -13,11 +13,6 @@ type CallData struct {
 	Gas        uint64 `json:"-"`
 }
 
-type CallParams struct {
-	Data  []byte
-	Block *big.Int
-}
-
 type request struct {
 	To   common.Address
 	Data []byte

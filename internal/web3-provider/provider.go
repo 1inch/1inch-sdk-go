@@ -12,9 +12,11 @@ import (
 	"github.com/ethereum/go-ethereum/ethclient"
 
 	"github.com/1inch/1inch-sdk-go/constants"
+	"github.com/1inch/1inch-sdk-go/internal/web3-provider/multicall"
 )
 
 type Wallet struct {
+	multicall  *multicall.Client
 	ethClient  *ethclient.Client
 	address    *common.Address
 	privateKey *ecdsa.PrivateKey
@@ -22,7 +24,7 @@ type Wallet struct {
 	erc20ABI   *abi.ABI
 }
 
-func DefaultWalletProvider(pk string, nodeURL string, ChainId uint64) (*Wallet, error) {
+func DefaultWalletProvider(pk string, nodeURL string, chainId uint64) (*Wallet, error) {
 	erc20ABI, err := abi.JSON(strings.NewReader(constants.Erc20ABI)) // Make a generic version of this ABI
 	if err != nil {
 		return nil, err
@@ -39,11 +41,17 @@ func DefaultWalletProvider(pk string, nodeURL string, ChainId uint64) (*Wallet, 
 	publicKey := privateKey.Public()
 	address := crypto.PubkeyToAddress(*publicKey.(*ecdsa.PublicKey))
 
+	m, err := multicall.NewMulticall(ethClient, chainId)
+	if err != nil {
+		return nil, err
+	}
+
 	return &Wallet{
+		multicall:  m,
 		ethClient:  ethClient,
 		address:    &address,
 		privateKey: privateKey,
-		chainId:    big.NewInt(int64(ChainId)),
+		chainId:    big.NewInt(int64(chainId)),
 		erc20ABI:   &erc20ABI,
 	}, nil
 }
