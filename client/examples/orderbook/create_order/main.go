@@ -6,9 +6,9 @@ package main
 //	"log"
 //	"os"
 //
-//	"github.com/1inch/1inch-sdk-go/internal/helpers/consts/addresses"
-//	"github.com/1inch/1inch-sdk-go/internal/helpers/consts/chains"
-//	"github.com/1inch/1inch-sdk-go/internal/helpers/consts/tokens"
+//	"github.com/1inch/1inch-sdk-go/internal/helpers/constants/addresses"
+//	"github.com/1inch/1inch-sdk-go/internal/helpers/constants/chains"
+//	"github.com/1inch/1inch-sdk-go/internal/helpers/constants/tokens"
 //
 //	"github.com/1inch/1inch-sdk-go/client"
 //	"github.com/1inch/1inch-sdk-go/client/models"
@@ -22,7 +22,7 @@ package main
 //		DevPortalApiKey: os.Getenv("DEV_PORTAL_TOKEN"),
 //		Web3HttpProviders: []models.Web3Provider{
 //			{
-//				ChainId: chains.Polygon,
+//				chainId: chains.Polygon,
 //				Url:     os.Getenv("WEB_3_HTTP_PROVIDER_URL_WITH_KEY_POLYGON"),
 //			},
 //		},
@@ -36,7 +36,7 @@ package main
 //
 //	// Build the config for the orders request
 //	createOrderParams := models.CreateOrderParams{
-//		ChainId:      chains.Polygon,
+//		chainId:      chains.Polygon,
 //		PrivateKey:   os.Getenv("WALLET_KEY"),
 //		Maker:        os.Getenv("WALLET_ADDRESS"),
 //		MakerAsset:   tokens.PolygonFrax,

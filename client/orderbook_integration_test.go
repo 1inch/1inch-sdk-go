@@ -8,9 +8,9 @@ package client
 //	"testing"
 //
 //	helpers2 "github.com/1inch/1inch-sdk-go/internal/helpers"
-//	"github.com/1inch/1inch-sdk-go/internal/helpers/consts/amounts"
-//	"github.com/1inch/1inch-sdk-go/internal/helpers/consts/chains"
-//	"github.com/1inch/1inch-sdk-go/internal/helpers/consts/tokens"
+//	"github.com/1inch/1inch-sdk-go/internal/helpers/constants/amounts"
+//	"github.com/1inch/1inch-sdk-go/internal/helpers/constants/chains"
+//	"github.com/1inch/1inch-sdk-go/internal/helpers/constants/tokens"
 //
 //	"github.com/stretchr/testify/require"
 //
@@ -29,7 +29,7 @@ package client
 //		{
 //			description: "Success",
 //			orderRequest: models.CreateOrderParams{
-//				ChainId:      chains.Polygon,
+//				chainId:      chains.Polygon,
 //				PrivateKey:   os.Getenv("WALLET_KEY_EMPTY"),
 //				Maker:        os.Getenv("WALLET_ADDRESS_EMPTY"),
 //				MakerAsset:   tokens.PolygonFrax,
@@ -43,7 +43,7 @@ package client
 //		{
 //			description: "Failure - No approval with error",
 //			orderRequest: models.CreateOrderParams{
-//				ChainId:                        chains.Polygon,
+//				chainId:                        chains.Polygon,
 //				PrivateKey:                     os.Getenv("WALLET_KEY_EMPTY"),
 //				Maker:                          os.Getenv("WALLET_ADDRESS_EMPTY"),
 //				MakerAsset:                     tokens.PolygonDai,
@@ -62,7 +62,7 @@ package client
 //		DevPortalApiKey: helpers2.GetenvSafe("DEV_PORTAL_TOKEN"),
 //		Web3HttpProviders: []models.Web3Provider{
 //			{
-//				ChainId: chains.Polygon,
+//				chainId: chains.Polygon,
 //				Url:     helpers2.GetenvSafe("WEB_3_HTTP_PROVIDER_URL_WITH_KEY_POLYGON"),
 //			},
 //		},
@@ -99,7 +99,7 @@ package client
 //		{
 //			description: "Get all orders",
 //			params: models.GetAllOrdersParams{
-//				ChainId: chains.Ethereum,
+//				chainId: chains.Ethereum,
 //			},
 //		},
 //	}
@@ -133,7 +133,7 @@ package client
 //		{
 //			description: "Get counts",
 //			params: models.GetCountParams{
-//				ChainId: chains.Ethereum,
+//				chainId: chains.Ethereum,
 //			},
 //		},
 //	}
@@ -167,7 +167,7 @@ package client
 //		{
 //			description: "Get events",
 //			params: models.GetEventsParams{
-//				ChainId: chains.Ethereum,
+//				chainId: chains.Ethereum,
 //				LimitOrderV3SubscribedApiControllerGetEventsParams: models.LimitOrderV3SubscribedApiControllerGetEventsParams{
 //					Limit: 1,
 //				},

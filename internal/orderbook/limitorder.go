@@ -11,7 +11,7 @@ package orderbook
 //	"time"
 //
 //	helpers2 "github.com/1inch/1inch-sdk-go/internal/helpers"
-//	"github.com/1inch/1inch-sdk-go/internal/helpers/consts/contracts"
+//	"github.com/1inch/1inch-sdk-go/internal/helpers/constants/contracts"
 //
 //	"github.com/ethereum/go-ethereum/common"
 //	"github.com/ethereum/go-ethereum/common/math"
@@ -42,7 +42,7 @@ package orderbook
 //		Interactions:  concatenateInteractions(interactions),
 //	}
 //
-//	aggregationRouter, err := contracts.Get1inchRouterFromChainId(orderRequest.ChainId)
+//	aggregationRouter, err := contracts.Get1inchRouterFromChainId(orderRequest.chainId)
 //	if err != nil {
 //		return nil, fmt.Errorf("failed to get 1inch router address: %v", err)
 //	}
@@ -51,7 +51,7 @@ package orderbook
 //	domainData := apitypes.TypedDataDomain{
 //		Name:              contracts.AggregationRouterV5Name,
 //		Version:           contracts.AggregationRouterV5VersionNumber,
-//		ChainId:           math.NewHexOrDecimal256(int64(orderRequest.ChainId)),
+//		chainId:           math.NewHexOrDecimal256(int64(orderRequest.chainId)),
 //		VerifyingContract: aggregationRouter,
 //	}
 //
@@ -93,7 +93,7 @@ package orderbook
 //		Domain: apitypes.TypedDataDomain{
 //			Name:              domainData.Name,
 //			Version:           domainData.Version,
-//			ChainId:           domainData.ChainId,
+//			chainId:           domainData.chainId,
 //			VerifyingContract: domainData.VerifyingContract,
 //		},
 //		Message: orderMessage,

@@ -12,10 +12,10 @@ package client
 //
 //	"github.com/1inch/1inch-sdk-go/client/models"
 //	"github.com/1inch/1inch-sdk-go/helpers"
-//	"github.com/1inch/1inch-sdk-go/helpers/consts/amounts"
-//	"github.com/1inch/1inch-sdk-go/helpers/consts/chains"
-//	"github.com/1inch/1inch-sdk-go/helpers/consts/contracts"
-//	"github.com/1inch/1inch-sdk-go/helpers/consts/tokens"
+//	"github.com/1inch/1inch-sdk-go/helpers/constants/amounts"
+//	"github.com/1inch/1inch-sdk-go/helpers/constants/chains"
+//	"github.com/1inch/1inch-sdk-go/helpers/constants/contracts"
+//	"github.com/1inch/1inch-sdk-go/helpers/constants/tokens"
 //	"github.com/1inch/1inch-sdk-go/internal/onchain"
 //
 //	"github.com/ethereum/go-ethereum/common"
@@ -58,7 +58,7 @@ package client
 //		return fmt.Errorf("wallet key must be provided")
 //	}
 //
-//	ethClient, err := s.client.GetEthClient(params.ChainId)
+//	ethClient, err := s.client.GetEthClient(params.chainId)
 //	if err != nil {
 //		return fmt.Errorf("failed to get eth client: %v", err)
 //	}
@@ -67,7 +67,7 @@ package client
 //
 //	executeSwapConfig := &models.ExecuteSwapConfig{
 //		WalletKey:     params.WalletKey,
-//		ChainId:       params.ChainId,
+//		chainId:       params.chainId,
 //		PublicAddress: params.PublicAddress,
 //		Amount:        params.Amount,
 //		Slippage:      params.Slippage,
@@ -75,7 +75,7 @@ package client
 //
 //	var usePermit bool
 //	if params.ApprovalType != onchain.ApprovalAlways {
-//		usePermit = onchain.ShouldUsePermit(ethClient, params.ChainId, params.Src)
+//		usePermit = onchain.ShouldUsePermit(ethClient, params.chainId, params.Src)
 //	}
 //
 //	if usePermit || params.ApprovalType == onchain.PermitAlways {
@@ -99,7 +99,7 @@ package client
 //			Version:       version,
 //			Name:          name,
 //			PublicAddress: params.PublicAddress,
-//			ChainId:       params.ChainId,
+//			chainId:       params.chainId,
 //			Key:           params.WalletKey,
 //			Nonce:         nonce,
 //			Deadline:      deadline,
@@ -108,7 +108,7 @@ package client
 //			return fmt.Errorf("failed to create permit signature: %v", err)
 //		}
 //
-//		aggregationRouter, err := contracts.Get1inchRouterFromChainId(params.ChainId)
+//		aggregationRouter, err := contracts.Get1inchRouterFromChainId(params.chainId)
 //		if err != nil {
 //			return fmt.Errorf("failed to get 1inch router address: %v", err)
 //		}
@@ -130,7 +130,7 @@ package client
 //	// Execute swap request
 //	// This will return the transaction data used by a wallet to execute the swap
 //	swapResponse, _, err := s.client.SwapApi.GetSwap(ctx, models.GetSwapParams{
-//		ChainId:                            params.ChainId,
+//		chainId:                            params.chainId,
 //		SkipWarnings:                       true, // Always skip the warnings from this endpoint since there will be one done before the transaction execution
 //		AggregationControllerGetSwapParams: params.AggregationControllerGetSwapParams,
 //	})
@@ -144,7 +144,7 @@ package client
 //
 //	// We will use static data for native token details since they are not ERC20s
 //	if params.Src == tokens.NativeToken {
-//		executeSwapConfig.FromToken = getNativeTokenDetails(params.ChainId)
+//		executeSwapConfig.FromToken = getNativeTokenDetails(params.chainId)
 //	} else {
 //		executeSwapConfig.FromToken = swapResponse.FromToken
 //	}
@@ -164,7 +164,7 @@ package client
 //		return fmt.Errorf("wallet key must be set in the client config")
 //	}
 //
-//	ethClient, err := s.client.GetEthClient(config.ChainId)
+//	ethClient, err := s.client.GetEthClient(config.chainId)
 //	if err != nil {
 //		return fmt.Errorf("failed to get eth client: %v", err)
 //	}
@@ -186,7 +186,7 @@ package client
 //
 //func (s *SwapService) executeSwapWithApproval(ctx context.Context, config *models.ExecuteSwapConfig, ethClient *ethclient.Client) error {
 //
-//	aggregationRouter, err := contracts.Get1inchRouterFromChainId(config.ChainId)
+//	aggregationRouter, err := contracts.Get1inchRouterFromChainId(config.chainId)
 //	if err != nil {
 //		return fmt.Errorf("failed to get 1inch router address: %v", err)
 //	}
@@ -207,7 +207,7 @@ package client
 //		}
 //		if allowance.Cmp(amountBig) <= 0 {
 //			erc20Config := onchain.Erc20ApprovalConfig{
-//				ChainId:        config.ChainId,
+//				chainId:        config.chainId,
 //				Key:            config.WalletKey,
 //				Erc20Address:   common.HexToAddress(config.FromToken.Address),
 //				PublicAddress:  common.HexToAddress(config.PublicAddress),
@@ -237,7 +237,7 @@ package client
 //		Description:   "Swap",
 //		PublicAddress: common.HexToAddress(config.PublicAddress),
 //		PrivateKey:    config.WalletKey,
-//		ChainId:       big.NewInt(int64(config.ChainId)),
+//		chainId:       big.NewInt(int64(config.chainId)),
 //		Value:         value,
 //		To:            aggregationRouter,
 //		Data:          hexData,
@@ -258,7 +258,7 @@ package client
 //		return fmt.Errorf("failed to decode swap data: %v", err)
 //	}
 //
-//	aggregationRouter, err := contracts.Get1inchRouterFromChainId(config.ChainId)
+//	aggregationRouter, err := contracts.Get1inchRouterFromChainId(config.chainId)
 //	if err != nil {
 //		return fmt.Errorf("failed to get 1inch router address: %v", err)
 //	}
@@ -267,7 +267,7 @@ package client
 //		Description:   "Swap",
 //		PublicAddress: common.HexToAddress(config.PublicAddress),
 //		PrivateKey:    config.WalletKey,
-//		ChainId:       big.NewInt(int64(config.ChainId)),
+//		chainId:       big.NewInt(int64(config.chainId)),
 //		Value:         big.NewInt(0),
 //		To:            aggregationRouter,
 //		Data:          hexData,

@@ -8,7 +8,7 @@ package client
 //	"net/url"
 //	"os"
 //
-//	"github.com/1inch/1inch-sdk-go/internal/helpers/consts/chains"
+//	"github.com/1inch/1inch-sdk-go/internal/helpers/constants/chains"
 //
 //	"github.com/1inch/1inch-sdk-go/client/models"
 //)
@@ -33,7 +33,7 @@ package client
 //			DevPortalApiKey: os.Getenv("DEV_PORTAL_TOKEN"),
 //			Web3HttpProviders: []models.Web3Provider{
 //				{
-//					ChainId: chains.Ethereum,
+//					chainId: chains.Ethereum,
 //					Url:     os.Getenv("WEB_3_HTTP_PROVIDER_URL_WITH_KEY"),
 //				},
 //			},
