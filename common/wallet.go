@@ -20,6 +20,7 @@ type Wallet interface {
 	BroadcastTransaction(ctx context.Context, tx *types.Transaction) error
 	TransactionReceipt(ctx context.Context, txHash gethCommon.Hash) (*types.Receipt, error)
 
+	GetContractDetailsForPermit(ctx context.Context, token gethCommon.Address, spender gethCommon.Address, deadline int64) (*ContractPermitData, error)
 	TokenPermit(cd ContractPermitData) (string, error)
 
 	IsEIP1559Applicable() bool

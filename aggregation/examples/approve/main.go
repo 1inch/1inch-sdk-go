@@ -58,12 +58,6 @@ func main() {
 	cmp := amountToSwap.Cmp(allowance)
 
 	if cmp > 0 {
-		//spender, err := client.GetApproveSpender(ctx, models.ApproveSpenderParams{ChainId: constants.EthereumChainId})
-		//if err != nil {
-		//	panic(err)
-		//	return
-		//}
-
 		approveData, err := client.GetApproveTransaction(ctx, models.ApproveTransactionParams{
 			ChainId: constants.EthereumChainId,
 			ApproveControllerGetCallDataParams: models.ApproveControllerGetCallDataParams{
