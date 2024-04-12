@@ -24,11 +24,12 @@ func (w Wallet) TokenPermit(cd common.ContractPermitData) (string, error) {
 		return "", err
 	}
 
-	var a *big.Int
+	a := new(big.Int)
 	a, ok := a.SetString(cd.Amount, 10)
 	if !ok {
 		return "", fmt.Errorf("bad amount")
 	}
+
 	return "0x" + padStringWithZeroes(ownerNoPrefix) +
 		padStringWithZeroes(spenderNoPrefix) +
 		padStringWithZeroes(fmt.Sprintf("%x", a)) +
