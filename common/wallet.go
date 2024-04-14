@@ -44,3 +44,24 @@ type ContractPermitData struct {
 	Deadline      int64
 	Amount        string
 }
+
+type ContractPermitDataDaiLike struct {
+	FromToken              string
+	Spender                string
+	Name                   string
+	Version                string
+	Holder                 string
+	ChainId                int
+	Nonce                  int64
+	Expiry                 int64
+	Allowed                bool
+	IsSaltInsteadOfChainId bool
+	IsDomainWithoutVersion bool
+	Salt                   string
+}
+
+//    holder: string;
+//    spender: string;
+//    nonce: number;
+//    expiry: number;
+//    allowed: boolean;

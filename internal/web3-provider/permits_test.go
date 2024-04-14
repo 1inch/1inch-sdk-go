@@ -82,6 +82,73 @@ func Test_createPermitSignature(t *testing.T) {
 	}
 }
 
+func Test_createPermitSignature2(t *testing.T) {
+	erc20ABI, err := abi.JSON(strings.NewReader(constants.Erc20ABI)) // Make a generic version of this ABI
+	require.NoError(t, err)
+
+	privateKey, err := crypto.HexToECDSA("965e092fdfc08940d2bd05c7b5c7e1c51e283e92c7f52bbf1408973ae9a9acb7")
+	require.NoError(t, err)
+
+	publicKey := privateKey.Public()
+	address := crypto.PubkeyToAddress(*publicKey.(*ecdsa.PublicKey))
+
+	w := &Wallet{
+		ethClient:  &ethclient.Client{},
+		address:    &address,
+		privateKey: privateKey,
+		chainId:    big.NewInt(int64(137)),
+		erc20ABI:   &erc20ABI,
+	}
+
+	testcases := []struct {
+		description       string
+		fromToken         string
+		name              string
+		version           string
+		publicAddress     string
+		chainId           int
+		spender           string
+		amount            string
+		nonce             int64
+		deadline          int64
+		expectedSignature string
+	}{
+		{
+			description:       "Create Signature 2",
+			fromToken:         "0x111111111117dc0aa78b770fa6a738034120c302",
+			publicAddress:     "0x2c9b2dbdba8a9c969ac24153f5c1c23cb0e63914",
+			chainId:           56,
+			name:              "1INCH Token",
+			version:           "1",
+			nonce:             0,
+			spender:           "0x11111112542d85b3ef69ae05771c2dccff4faa26",
+			amount:            "1000000000",
+			deadline:          192689033,
+			expectedSignature: "3b448216a78f91e84db06cf54eb1e3758425bd97ffb9d6941ce437ec7a9c2c174c94f1fa492007dea3a3c305353bf3430b1ca506dd630ce1fd3da09bd387b2f31c",
+		},
+	}
+
+	for _, tc := range testcases {
+		t.Run(tc.description, func(t *testing.T) {
+			d := common.ContractPermitData{
+				FromToken:     tc.fromToken,
+				Spender:       tc.spender,
+				Name:          tc.name,
+				Version:       tc.version,
+				PublicAddress: tc.publicAddress,
+				ChainId:       tc.chainId,
+				Nonce:         tc.nonce,
+				Deadline:      tc.deadline,
+				Amount:        tc.amount,
+			}
+
+			result, err := w.createPermitSignature(&d)
+			require.NoError(t, err)
+			require.Equal(t, tc.expectedSignature, result)
+		})
+	}
+}
+
 func TestTokenPermit(t *testing.T) {
 	erc20ABI, err := abi.JSON(strings.NewReader(constants.Erc20ABI)) // Make a generic version of this ABI
 	require.NoError(t, err)
