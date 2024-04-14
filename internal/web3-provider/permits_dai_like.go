@@ -16,18 +16,18 @@ import (
 
 // TokenPermit Will return an erc2612 string struct if possible
 func (w Wallet) TokenPermitDaiLike(cd common.ContractPermitDataDaiLike) (string, error) {
-	//ownerNoPrefix := remove0xPrefix(w.address.Hex())
-	//spenderNoPrefix := remove0xPrefix(cd.Spender)
-	//signature, err := w.createPermitSignatureDaiLike(&cd)
-	//if err != nil {
-	//	return "", err
-	//}
-	return "", nil
-	//return "0x" + padStringWithZeroes(ownerNoPrefix) +
-	//	padStringWithZeroes(spenderNoPrefix) +
-	//	padStringWithZeroes(fmt.Sprintf("%x", a)) +
-	//	padStringWithZeroes(fmt.Sprintf("%x", cd.Expiry)) +
-	//	convertSignatureToVRSString(signature), nil
+	ownerNoPrefix := remove0xPrefix(w.address.Hex())
+	spenderNoPrefix := remove0xPrefix(cd.Spender)
+	signature, err := w.createPermitSignatureDaiLike(&cd)
+	if err != nil {
+		return "", err
+	}
+	return "0x" + padStringWithZeroes(ownerNoPrefix) +
+		padStringWithZeroes(spenderNoPrefix) +
+		padStringWithZeroes(fmt.Sprintf("%x", cd.Nonce)) +
+		padStringWithZeroes(fmt.Sprintf("%x", cd.Expiry)) +
+		padStringWithZeroes(fmt.Sprintf("%x", boolToInt(cd.Allowed))) +
+		convertSignatureToVRSString(signature), nil
 }
 
 func (w Wallet) createPermitSignatureDaiLike(cd *common.ContractPermitDataDaiLike) (string, error) {
@@ -157,4 +157,11 @@ func (w Wallet) GetContractDetailsForPermitDaiLike(ctx context.Context, token ge
 		Version:       contractVersion,
 		Nonce:         contractNonce,
 	}, nil
+}
+
+func boolToInt(b bool) int {
+	if b {
+		return 1
+	}
+	return 0
 }
