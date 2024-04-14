@@ -9,7 +9,7 @@ import (
 )
 
 func (w Wallet) GetGasTipCap(ctx context.Context) (*big.Int, error) {
-	if w.IsEIP1559Applicable() {
+	if !w.IsEIP1559Applicable() {
 		return nil, fmt.Errorf("eip1159 is not supported, use gas price")
 	}
 	return w.ethClient.SuggestGasTipCap(ctx)

@@ -24,37 +24,55 @@ func (w Wallet) TokenPermit(cd common.ContractPermitData) (string, error) {
 		return "", err
 	}
 
-	a := new(big.Int)
-	a, ok := a.SetString(cd.Amount, 10)
-	if !ok {
-		return "", fmt.Errorf("bad amount")
-	}
-
 	return "0x" + padStringWithZeroes(ownerNoPrefix) +
 		padStringWithZeroes(spenderNoPrefix) +
-		padStringWithZeroes(fmt.Sprintf("%x", a)) +
+		padStringWithZeroes(fmt.Sprintf("%x", cd.Amount)) +
 		padStringWithZeroes(fmt.Sprintf("%x", cd.Deadline)) +
 		convertSignatureToVRSString(signature), nil
 }
 
 func (w Wallet) createPermitSignature(cd *common.ContractPermitData) (string, error) {
+	eip712DomainTypes := []apitypes.Type{
+		{Name: "name", Type: "string"},
+	}
+	if !cd.IsDomainWithoutVersion {
+		eip712DomainTypes = append(eip712DomainTypes, apitypes.Type{Name: "version", Type: "string"})
+	}
+	if !cd.IsSaltInsteadOfChainId {
+		eip712DomainTypes = append(eip712DomainTypes, apitypes.Type{Name: "chainId", Type: "uint256"})
+	} else {
+		eip712DomainTypes = append(eip712DomainTypes, apitypes.Type{Name: "salt", Type: "bytes32"})
+	}
+	eip712DomainTypes = append(eip712DomainTypes, apitypes.Type{Name: "verifyingContract", Type: "address"})
+
+	// Permit model fields
+	permitFields := []apitypes.Type{
+		{Name: "owner", Type: "address"},
+		{Name: "spender", Type: "address"},
+		{Name: "value", Type: "uint256"},
+		{Name: "nonce", Type: "uint256"},
+		{Name: "deadline", Type: "uint256"},
+	}
+
 	domainData := apitypes.TypedDataDomain{
 		Name:              cd.Name,
-		Version:           cd.Version,
-		ChainId:           math.NewHexOrDecimal256(int64(cd.ChainId)),
 		VerifyingContract: cd.FromToken,
 	}
 
-	amount, ok := new(big.Int).SetString(cd.Amount, 10)
-	if !ok {
-		return "", fmt.Errorf("failed to convert string (%v) to big.Int", cd.Amount)
+	if cd.IsSaltInsteadOfChainId {
+		domainData.Salt = cd.Salt
+	} else {
+		domainData.ChainId = math.NewHexOrDecimal256(int64(cd.ChainId))
+	}
+	if !cd.IsDomainWithoutVersion {
+		domainData.Version = cd.Version
 	}
 
-	// Order Message
+	//// Order Message
 	orderMessage := apitypes.TypedDataMessage{
 		"owner":    cd.PublicAddress,
 		"spender":  cd.Spender,
-		"value":    amount,
+		"value":    cd.Amount,
 		"nonce":    big.NewInt(cd.Nonce),
 		"deadline": big.NewInt(cd.Deadline),
 	}
@@ -62,19 +80,8 @@ func (w Wallet) createPermitSignature(cd *common.ContractPermitData) (string, er
 	// Typed Data
 	typedData := apitypes.TypedData{
 		Types: map[string][]apitypes.Type{
-			"EIP712Domain": {
-				{Name: "name", Type: "string"},
-				{Name: "version", Type: "string"},
-				{Name: "chainId", Type: "uint256"},
-				{Name: "verifyingContract", Type: "address"},
-			},
-			"Permit": {
-				{Name: "owner", Type: "address"},
-				{Name: "spender", Type: "address"},
-				{Name: "value", Type: "uint256"},
-				{Name: "nonce", Type: "uint256"},
-				{Name: "deadline", Type: "uint256"},
-			},
+			"EIP712Domain": eip712DomainTypes,
+			"Permit":       permitFields,
 		},
 		PrimaryType: "Permit",
 		Domain:      domainData,
@@ -97,7 +104,7 @@ func (w Wallet) createPermitSignature(cd *common.ContractPermitData) (string, er
 	return signatureHex, nil
 }
 
-func (w Wallet) GetContractDetailsForPermit(ctx context.Context, token gethCommon.Address, spender gethCommon.Address, deadline int64) (*common.ContractPermitData, error) {
+func (w Wallet) GetContractDetailsForPermit(ctx context.Context, token gethCommon.Address, spender gethCommon.Address, amount *big.Int, deadline int64) (*common.ContractPermitData, error) {
 	contractNameData, err := w.erc20ABI.Pack("name")
 	if err != nil {
 		return nil, err
@@ -108,7 +115,7 @@ func (w Wallet) GetContractDetailsForPermit(ctx context.Context, token gethCommo
 		return nil, err
 	}
 
-	contractNonceData, err := w.erc20ABI.Pack("nonce", []gethCommon.Address{token})
+	contractNonceData, err := w.erc20ABI.Pack("nonces", token)
 	if err != nil {
 		return nil, err
 	}
@@ -131,13 +138,17 @@ func (w Wallet) GetContractDetailsForPermit(ctx context.Context, token gethCommo
 	}
 
 	var contractVersion string
-	err = w.erc20ABI.UnpackIntoInterface(&contractVersion, "version", mResult[1])
-	if err != nil {
-		return nil, err
+	if len(mResult[1]) == 0 {
+		contractVersion = "1"
+	} else {
+		err = w.erc20ABI.UnpackIntoInterface(&contractVersion, "version", mResult[1])
+		if err != nil {
+			return nil, err
+		}
 	}
 
-	var contractNonce int64
-	err = w.erc20ABI.UnpackIntoInterface(&contractNonce, "nonce", mResult[2])
+	var contractNonce *big.Int
+	err = w.erc20ABI.UnpackIntoInterface(&contractNonce, "nonces", mResult[2])
 	if err != nil {
 		return nil, err
 	}
@@ -150,7 +161,8 @@ func (w Wallet) GetContractDetailsForPermit(ctx context.Context, token gethCommo
 		Deadline:      deadline,
 		Name:          contractName,
 		Version:       contractVersion,
-		Nonce:         contractNonce,
+		Nonce:         contractNonce.Int64(),
+		Amount:        amount,
 	}, nil
 }
 

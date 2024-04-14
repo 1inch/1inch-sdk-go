@@ -157,6 +157,11 @@ type MyWallet struct {
 	chainID *big.Int
 }
 
+func (w *MyWallet) GetContractDetailsForPermit(ctx context.Context, token gethCommon.Address, spender gethCommon.Address, amount *big.Int, deadline int64) (*common.ContractPermitData, error) {
+	//TODO implement me
+	panic("implement me")
+}
+
 func NewMyWallet(address gethCommon.Address, chainID *big.Int) *MyWallet {
 	return &MyWallet{
 		address: address,

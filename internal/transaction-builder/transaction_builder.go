@@ -18,7 +18,6 @@ type TransactionBuilder struct {
 	gas       *uint64
 	to        *gethCommon.Address `rlp:"nil"`
 	value     *big.Int
-	valueSet  bool
 	data      []byte
 	gasTipCap *big.Int
 	gasFeeCap *big.Int
@@ -55,7 +54,6 @@ func (t *TransactionBuilder) SetValue(v *big.Int) common.TransactionBuilder {
 		return t
 	}
 	t.value = v
-	t.valueSet = true
 	return t
 }
 

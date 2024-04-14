@@ -43,6 +43,7 @@ func NewClient(cfg *Configuration) (*Client, error) {
 
 	if cfg.WalletConfiguration != nil {
 		c.Wallet = cfg.WalletConfiguration.Wallet
+		c.TxBuilder = cfg.WalletConfiguration.TxBuilder
 	}
 
 	return &c, nil

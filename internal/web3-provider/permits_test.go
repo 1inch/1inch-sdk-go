@@ -7,8 +7,11 @@ import (
 	"testing"
 
 	"github.com/ethereum/go-ethereum/accounts/abi"
+	gethCommon "github.com/ethereum/go-ethereum/common"
+	"github.com/ethereum/go-ethereum/core/types"
 	"github.com/ethereum/go-ethereum/crypto"
 	"github.com/ethereum/go-ethereum/ethclient"
+	"github.com/ethereum/go-ethereum/rlp"
 	"github.com/stretchr/testify/require"
 
 	"github.com/1inch/1inch-sdk-go/common"
@@ -32,6 +35,8 @@ func Test_createPermitSignature(t *testing.T) {
 		chainId:    big.NewInt(int64(137)),
 		erc20ABI:   &erc20ABI,
 	}
+	a := new(big.Int)
+	a, _ = a.SetString("115792089237316195423570985008687907853269984665640564039457584007913129639935", 10)
 
 	testcases := []struct {
 		description       string
@@ -41,7 +46,7 @@ func Test_createPermitSignature(t *testing.T) {
 		publicAddress     string
 		chainId           int
 		spender           string
-		amount            string
+		amount            *big.Int
 		nonce             int64
 		deadline          int64
 		expectedSignature string
@@ -55,7 +60,7 @@ func Test_createPermitSignature(t *testing.T) {
 			version:           "1",
 			nonce:             0,
 			spender:           "0x1111111254eeb25477b68fb85ed929f73a960582",
-			amount:            "115792089237316195423570985008687907853269984665640564039457584007913129639935",
+			amount:            a,
 			deadline:          1704250835,
 			expectedSignature: "0d95c0246c1356df4653606e586e97447a516c937b5dd758fa0e56f2f8dd1f952b222c24a337e89dfbe20a8e112a7c6d004a3170598b9d4941aa38126920c9ed1b",
 		},
@@ -108,7 +113,7 @@ func Test_createPermitSignature2(t *testing.T) {
 		publicAddress     string
 		chainId           int
 		spender           string
-		amount            string
+		amount            *big.Int
 		nonce             int64
 		deadline          int64
 		expectedSignature string
@@ -122,7 +127,7 @@ func Test_createPermitSignature2(t *testing.T) {
 			version:           "1",
 			nonce:             0,
 			spender:           "0x11111112542d85b3ef69ae05771c2dccff4faa26",
-			amount:            "1000000000",
+			amount:            big.NewInt(1000000000),
 			deadline:          192689033,
 			expectedSignature: "3b448216a78f91e84db06cf54eb1e3758425bd97ffb9d6941ce437ec7a9c2c174c94f1fa492007dea3a3c305353bf3430b1ca506dd630ce1fd3da09bd387b2f31c",
 		},
@@ -177,7 +182,7 @@ func TestTokenPermit(t *testing.T) {
 		publicAddress string
 		chainId       int
 		spender       string
-		amount        string
+		amount        *big.Int
 		//expectedSignatureString        string
 		nonce    int64
 		deadline int64
@@ -191,7 +196,7 @@ func TestTokenPermit(t *testing.T) {
 			version:       "1",
 			nonce:         0,
 			spender:       "0x11111112542d85b3ef69ae05771c2dccff4faa26",
-			amount:        "1000000000",
+			amount:        big.NewInt(1000000000),
 			deadline:      192689033,
 			//expectedSignatureString: "0x3b448216a78f91e84db06cf54eb1e3758425bd97ffb9d6941ce437ec7a9c2c174c94f1fa492007dea3a3c305353bf3430b1ca506dd630ce1fd3da09bd387b2f31c",
 			expectedPermitString: "0x0000000000000000000000002c9b2DBdbA8A9c969Ac24153f5C1c23CB0e6391400000000000000000000000011111112542d85b3ef69ae05771c2dccff4faa26000000000000000000000000000000000000000000000000000000003b9aca00000000000000000000000000000000000000000000000000000000000b7c3389000000000000000000000000000000000000000000000000000000000000001c3b448216a78f91e84db06cf54eb1e3758425bd97ffb9d6941ce437ec7a9c2c174c94f1fa492007dea3a3c305353bf3430b1ca506dd630ce1fd3da09bd387b2f3",
@@ -309,4 +314,13 @@ func Test_remove0xPrefix(t *testing.T) {
 			require.Equal(t, tc.expected, result)
 		})
 	}
+}
+
+func Test_remove0xPrefix2(t *testing.T) {
+	data := "02f902988189028506fc23ac00851a524b859e83046800941111111254eeb25477b68fb85ed929f73a96058280b902283c15fd91000000000000000000000000b36087d1a878451ea78042dd178fd44f8c81421900000000000000000000000045c32fa6df82ead1e2ef74d17b76547eddfaff89000000000000000000000000000000000000000000000000016345785d8a000000000000000000000000000000000000000000000000000000001cbdab1f1c3600000000000000000000000000000000000000000000000000000000000000c00000000000000000000000000000000000000000000000000000000000000120000000000000000000000000000000000000000000000000000000000000000280000000000000003b6d0340e7c714dd3dd70ee04eb69a856655765454e77c8800000000000000003b8b87c0def834ae4a1198bfec84544fb374ec7f1314a7c500000000000000000000000000000000000000000000000000000000000000e0000000000000000000000000b36087d1a878451ea78042dd178fd44f8c8142190000000000000000000000001111111254eeb25477b68fb85ed929f73a960582000000000000000000000000000000000000000000000000016345785d8a000000000000000000000000000000000000000000000000000000000000661ed0e6000000000000000000000000000000000000000000000000000000000000001c2434cfd00c9509570fb0bca7827effa573cdbe95143c0bdfe2490ed8486d17d0649792346cacc5d2cdd6bc62dd9ecbd20bf2f95e7301138f071d1511c7f53bf161126f0fc001a0cd7e1e3ae05e3c7f0cd3e4afb4078ec33542a56a54d62e950fc5d635b2d87994a0353445eca7e55d8211c34a0e447a466d7c5c4af0cc9728fa3565bc247a68c110"
+	var tx types.Transaction
+	tr, err := &tx, rlp.DecodeBytes(gethCommon.Hex2Bytes(data), &tx)
+	require.NoError(t, err)
+	require.NotEmpty(t, tr)
+
 }

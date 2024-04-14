@@ -9,7 +9,8 @@ import (
 )
 
 func (w Wallet) Sign(tx *types.Transaction) (*types.Transaction, error) {
-	signedTx, err := types.SignTx(tx, types.LatestSignerForChainID(w.chainId), w.privateKey)
+	signer := types.LatestSignerForChainID(w.chainId)
+	signedTx, err := types.SignTx(tx, signer, w.privateKey)
 	if err != nil {
 		return nil, err
 	}

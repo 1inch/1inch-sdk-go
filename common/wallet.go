@@ -20,7 +20,7 @@ type Wallet interface {
 	BroadcastTransaction(ctx context.Context, tx *types.Transaction) error
 	TransactionReceipt(ctx context.Context, txHash gethCommon.Hash) (*types.Receipt, error)
 
-	GetContractDetailsForPermit(ctx context.Context, token gethCommon.Address, spender gethCommon.Address, deadline int64) (*ContractPermitData, error)
+	GetContractDetailsForPermit(ctx context.Context, token gethCommon.Address, spender gethCommon.Address, amount *big.Int, deadline int64) (*ContractPermitData, error)
 	TokenPermit(cd ContractPermitData) (string, error)
 
 	IsEIP1559Applicable() bool
@@ -34,15 +34,18 @@ type Wallet interface {
 }
 
 type ContractPermitData struct {
-	FromToken     string
-	Spender       string
-	Name          string
-	Version       string
-	PublicAddress string
-	ChainId       int
-	Nonce         int64
-	Deadline      int64
-	Amount        string
+	FromToken              string
+	Spender                string
+	Name                   string
+	Version                string
+	PublicAddress          string
+	ChainId                int
+	Nonce                  int64
+	Deadline               int64
+	Amount                 *big.Int
+	IsSaltInsteadOfChainId bool
+	IsDomainWithoutVersion bool
+	Salt                   string
 }
 
 type ContractPermitDataDaiLike struct {

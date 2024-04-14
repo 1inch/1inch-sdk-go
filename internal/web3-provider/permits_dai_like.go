@@ -113,7 +113,7 @@ func (w Wallet) GetContractDetailsForPermitDaiLike(ctx context.Context, token ge
 		return nil, err
 	}
 
-	contractNonceData, err := w.erc20ABI.Pack("nonce", []gethCommon.Address{token})
+	contractNonceData, err := w.erc20ABI.Pack("nonces", token)
 	if err != nil {
 		return nil, err
 	}
@@ -142,7 +142,7 @@ func (w Wallet) GetContractDetailsForPermitDaiLike(ctx context.Context, token ge
 	}
 
 	var contractNonce int64
-	err = w.erc20ABI.UnpackIntoInterface(&contractNonce, "nonce", mResult[2])
+	err = w.erc20ABI.UnpackIntoInterface(&contractNonce, "nonces", mResult[2])
 	if err != nil {
 		return nil, err
 	}
