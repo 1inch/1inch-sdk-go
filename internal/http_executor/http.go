@@ -112,7 +112,7 @@ func (c *Client) handleErrorResponse(resp *http.Response) error {
 		return fmt.Errorf("failed to format error response body: %v", err)
 	}
 
-	return fmt.Errorf("%v\n", string(errFormatted))
+	return fmt.Errorf("%s", errFormatted)
 }
 
 // addQueryParameters adds the parameters in the struct params as URL query parameters to s.
