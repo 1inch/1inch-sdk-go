@@ -101,15 +101,18 @@ func (c *Client) handleErrorResponse(resp *http.Response) error {
 		return fmt.Errorf("reading error response body failed: %v", err)
 	}
 
-	var apiError struct {
-		Message string `json:"message"`
-	}
-	if err := json.Unmarshal(body, &apiError); err != nil {
-		// Fallback to raw body text if the body cannot be parsed as JSON
-		return fmt.Errorf("HTTP %d: %s", resp.StatusCode, body)
+	var errorMessageMap map[string]interface{}
+	err = json.Unmarshal(body, &errorMessageMap)
+	if err != nil {
+		return fmt.Errorf("failed to unmarshal error response body: %v", err)
 	}
 
-	return fmt.Errorf("HTTP %d: %s", resp.StatusCode, apiError.Message)
+	errFormatted, err := json.MarshalIndent(errorMessageMap, "", "    ")
+	if err != nil {
+		return fmt.Errorf("failed to format error response body: %v", err)
+	}
+
+	return fmt.Errorf("%v\n", string(errFormatted))
 }
 
 // addQueryParameters adds the parameters in the struct params as URL query parameters to s.
