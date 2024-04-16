@@ -115,7 +115,7 @@ func (w Wallet) GetContractDetailsForPermit(ctx context.Context, token gethCommo
 		return nil, err
 	}
 
-	contractNonceData, err := w.erc20ABI.Pack("nonces", token)
+	contractNonceData, err := w.erc20ABI.Pack("nonces", w.Address())
 	if err != nil {
 		return nil, err
 	}

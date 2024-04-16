@@ -102,7 +102,7 @@ func (w Wallet) createPermitSignatureDaiLike(cd *common.ContractPermitDataDaiLik
 	return signatureHex, nil
 }
 
-func (w Wallet) GetContractDetailsForPermitDaiLike(ctx context.Context, token gethCommon.Address, spender gethCommon.Address, deadline int64) (*common.ContractPermitData, error) {
+func (w Wallet) GetContractDetailsForPermitDaiLike(ctx context.Context, token gethCommon.Address, spender gethCommon.Address, deadline int64) (*common.ContractPermitDataDaiLike, error) {
 	contractNameData, err := w.erc20ABI.Pack("name")
 	if err != nil {
 		return nil, err
@@ -113,7 +113,7 @@ func (w Wallet) GetContractDetailsForPermitDaiLike(ctx context.Context, token ge
 		return nil, err
 	}
 
-	contractNonceData, err := w.erc20ABI.Pack("nonces", token)
+	contractNonceData, err := w.erc20ABI.Pack("nonces", w.Address())
 	if err != nil {
 		return nil, err
 	}
@@ -141,21 +141,22 @@ func (w Wallet) GetContractDetailsForPermitDaiLike(ctx context.Context, token ge
 		return nil, err
 	}
 
-	var contractNonce int64
+	contractNonce := new(big.Int)
 	err = w.erc20ABI.UnpackIntoInterface(&contractNonce, "nonces", mResult[2])
 	if err != nil {
 		return nil, err
 	}
 
-	return &common.ContractPermitData{
-		FromToken:     token.Hex(),
-		PublicAddress: w.address.Hex(),
-		Spender:       spender.Hex(),
-		ChainId:       int(w.ChainId()),
-		Deadline:      deadline,
-		Name:          contractName,
-		Version:       contractVersion,
-		Nonce:         contractNonce,
+	return &common.ContractPermitDataDaiLike{
+		FromToken: token.Hex(),
+		Holder:    w.address.Hex(),
+		Spender:   spender.Hex(),
+		ChainId:   int(w.ChainId()),
+		Expiry:    deadline,
+		Name:      contractName,
+		Version:   contractVersion,
+		Nonce:     contractNonce.Int64(),
+		Allowed:   true,
 	}, nil
 }
 

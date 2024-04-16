@@ -21,7 +21,9 @@ type Wallet interface {
 	TransactionReceipt(ctx context.Context, txHash gethCommon.Hash) (*types.Receipt, error)
 
 	GetContractDetailsForPermit(ctx context.Context, token gethCommon.Address, spender gethCommon.Address, amount *big.Int, deadline int64) (*ContractPermitData, error)
+	GetContractDetailsForPermitDaiLike(ctx context.Context, token gethCommon.Address, spender gethCommon.Address, deadline int64) (*ContractPermitDataDaiLike, error)
 	TokenPermit(cd ContractPermitData) (string, error)
+	TokenPermitDaiLike(cd ContractPermitDataDaiLike) (string, error)
 
 	IsEIP1559Applicable() bool
 	ChainId() int64
