@@ -202,6 +202,14 @@ func (w *MyWallet) TransactionReceipt(ctx context.Context, txHash gethCommon.Has
 	return nil, nil
 }
 
+func (w *MyWallet) GetContractDetailsForPermitDaiLike(ctx context.Context, token gethCommon.Address, spender gethCommon.Address, deadline int64) (*common.ContractPermitDataDaiLike, error) {
+	return nil, nil
+}
+
+func (w *MyWallet) TokenPermitDaiLike(cd common.ContractPermitDataDaiLike) (string, error) {
+	return "", nil
+}
+
 func (w *MyWallet) TokenPermit(cd common.ContractPermitData) (string, error) {
 	return "", nil
 }
