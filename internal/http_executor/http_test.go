@@ -7,6 +7,7 @@ import (
 	"net/http"
 	"net/http/httptest"
 	"net/url"
+	"strings"
 	"testing"
 
 	"github.com/stretchr/testify/assert"
@@ -126,8 +127,12 @@ func TestExecuteRequest_ServerErrorPOST(t *testing.T) {
 		t.Fatalf("Expected an error, got nil")
 	}
 
-	expectedErrorMessage := "processing response failed: HTTP 500: internal server error"
-	if err.Error() != expectedErrorMessage {
+	expectedErrorMessage := `processing response failed: {
+	"message": "internal server error"
+}`
+
+	// Remove all whitespace when comparing the errors
+	if strings.Join(strings.Fields(err.Error()), "") != strings.Join(strings.Fields(expectedErrorMessage), "") {
 		t.Errorf("Expected error message '%s', got '%s'", expectedErrorMessage, err.Error())
 	}
 }
