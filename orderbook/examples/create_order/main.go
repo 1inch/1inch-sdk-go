@@ -8,8 +8,10 @@ import (
 	"os"
 	"time"
 
+	getCommon "github.com/ethereum/go-ethereum/common"
 	"github.com/ethereum/go-ethereum/crypto"
 
+	"github.com/1inch/1inch-sdk-go/constants"
 	"github.com/1inch/1inch-sdk-go/orderbook"
 	"github.com/1inch/1inch-sdk-go/orderbook/models"
 )
@@ -44,14 +46,20 @@ func main() {
 	}
 	client, err := orderbook.NewClient(config)
 
+	seriesNonceManager, err := constants.GetSeriesNonceManagerFromChainId(chainId)
+	if err != nil {
+		log.Fatal(fmt.Errorf("failed to get series nonce manager address: %v", err))
+	}
+	seriesNonceManagerAddress := getCommon.HexToAddress(seriesNonceManager)
+
 	ecdsaPrivateKey, err := crypto.HexToECDSA(privateKey)
 	if err != nil {
 		log.Fatalf(fmt.Sprintf("error converting private key to ECDSA: %v", err))
 	}
 	publicKey := ecdsaPrivateKey.Public()
-	publicAddress := crypto.PubkeyToAddress(*publicKey.(*ecdsa.PublicKey))
+	address := crypto.PubkeyToAddress(*publicKey.(*ecdsa.PublicKey))
 
-	seriesNonce, err := orderbook.GetSeriesNonce(ctx, client.Wallet, publicAddress)
+	seriesNonce, err := client.Wallet.GetSeriesNonce(ctx, seriesNonceManagerAddress, address)
 	if err != nil {
 		log.Fatal(fmt.Errorf("failed to get series nonce: %v", err))
 	}
@@ -61,7 +69,7 @@ func main() {
 		SeriesNonce:                    seriesNonce,
 		PrivateKey:                     privateKey,
 		ExpireAfter:                    time.Now().Add(time.Minute * 10).Unix(), // TODO update the field name to have "unix" suffix
-		Maker:                          publicAddress.Hex(),
+		Maker:                          address.Hex(),
 		MakerAsset:                     wmatic,
 		TakerAsset:                     usdc,
 		MakingAmount:                   ten16,
