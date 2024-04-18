@@ -185,6 +185,8 @@ func TestTokenPermit(t *testing.T) {
 		deadline               int64
 		IsSaltInsteadOfChainId bool
 		IsDomainWithoutVersion bool
+		PermitTypeHash         string
+		DomainSeparator        string
 	}{
 		{
 			description:          "Create Permit 1inch BSC",
@@ -250,7 +252,24 @@ func TestTokenPermit(t *testing.T) {
 			spender:              "0x1111111254EEB25477B68fb85Ed929f73A960582",
 			amount:               big.NewInt(100000),
 			deadline:             1713457338,
+			DomainSeparator:      "0x06c37168a7db5138defc7866392bb87a741f9b3d104deb5094588ce041cae335",
+			PermitTypeHash:       "0x6e71edae12b1b97f4d1f60370fef10105fa2faae0126114a169c64845d6126c9",
 			expectedPermitString: "0x0000000000000000000000002c9b2DBdbA8A9c969Ac24153f5C1c23CB0e639140000000000000000000000001111111254EEB25477B68fb85Ed929f73A96058200000000000000000000000000000000000000000000000000000000000186a000000000000000000000000000000000000000000000000000000000662148ba000000000000000000000000000000000000000000000000000000000000001be1e089fc6e42874b2d369a080af21ddc227181943d680f401da42d2c50ca8d646785db86ee82618b6c5b93eaa0954f12b30b086063001e7f66161157aaae652f",
+		},
+		{
+			description:          "Create Permit USDC Polygon",
+			fromToken:            "0x2791bca1f2de4661ed88a30c99a7a9449aa84174",
+			publicAddress:        "0x2c9b2dbdba8a9c969ac24153f5c1c23cb0e63914",
+			chainId:              137,
+			name:                 "USD Coin (PoS)",
+			version:              "1",
+			nonce:                0,
+			spender:              "0x11111112542d85b3ef69ae05771c2dccff4faa26",
+			amount:               big.NewInt(1000000000),
+			deadline:             192689033,
+			PermitTypeHash:       "0x6e71edae12b1b97f4d1f60370fef10105fa2faae0126114a169c64845d6126c9",
+			DomainSeparator:      "0x294369e003769a2d4d625e8a9ebebffa09ff70dd7c708497d8b56d2c2d199a19",
+			expectedPermitString: "0xbeb4f4af4426615fb564382d170f708045e03690246b2d1e248359eed9450f0a7fd5af843025cea84ef8c8482d8214e7c886750b258d736f190b1ef5fc1358c71c",
 		},
 	}
 
@@ -267,9 +286,15 @@ func TestTokenPermit(t *testing.T) {
 				Deadline:               tc.deadline,
 				Amount:                 tc.amount,
 				IsDomainWithoutVersion: tc.IsDomainWithoutVersion,
-				IsSaltInsteadOfChainId: tc.IsSaltInsteadOfChainId,
+				//IsSaltInsteadOfChainId: tc.IsSaltInsteadOfChainId,
+			}
+			if tc.PermitTypeHash != "" {
+				d.PermitTypeHash = tc.PermitTypeHash
 			}
 
+			if tc.DomainSeparator != "" {
+				d.DomainSeparator = tc.DomainSeparator
+			}
 			permit, err := w.TokenPermit(d)
 			require.NoError(t, err)
 			// temp, need to work for good example

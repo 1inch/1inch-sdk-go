@@ -45,9 +45,10 @@ type ContractPermitData struct {
 	Nonce                  int64
 	Deadline               int64
 	Amount                 *big.Int
-	IsSaltInsteadOfChainId bool
 	IsDomainWithoutVersion bool
 	Salt                   string
+	PermitTypeHash         string
+	DomainSeparator        string
 }
 
 type ContractPermitDataDaiLike struct {
