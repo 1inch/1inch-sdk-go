@@ -70,13 +70,3 @@ func GetSeriesNonceManagerFromChainId(chainId int) (string, error) {
 		return "", fmt.Errorf("unrecognized chain id: %d", chainId)
 	}
 }
-
-// Contains checks if the slice contains the given value.
-func Contains[T comparable](value T, sliceB []T) bool {
-	for _, v := range sliceB {
-		if v == value {
-			return true
-		}
-	}
-	return false
-}
