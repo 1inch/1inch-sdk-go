@@ -16,16 +16,21 @@ import (
 )
 
 type Wallet struct {
-	multicall  *multicall.Client
-	ethClient  *ethclient.Client
-	address    *common.Address
-	privateKey *ecdsa.PrivateKey
-	chainId    *big.Int
-	erc20ABI   *abi.ABI
+	multicall             *multicall.Client
+	ethClient             *ethclient.Client
+	address               *common.Address
+	privateKey            *ecdsa.PrivateKey
+	chainId               *big.Int
+	erc20ABI              *abi.ABI
+	seriesNonceManagerABI *abi.ABI
 }
 
 func DefaultWalletProvider(pk string, nodeURL string, chainId uint64) (*Wallet, error) {
 	erc20ABI, err := abi.JSON(strings.NewReader(constants.Erc20ABI)) // Make a generic version of this ABI
+	if err != nil {
+		return nil, err
+	}
+	seriesNonceManagerABI, err := abi.JSON(strings.NewReader(constants.SeriesNonceManagerABI)) // Make a generic version of this ABI
 	if err != nil {
 		return nil, err
 	}
@@ -47,11 +52,12 @@ func DefaultWalletProvider(pk string, nodeURL string, chainId uint64) (*Wallet, 
 	}
 
 	return &Wallet{
-		multicall:  m,
-		ethClient:  ethClient,
-		address:    &address,
-		privateKey: privateKey,
-		chainId:    big.NewInt(int64(chainId)),
-		erc20ABI:   &erc20ABI,
+		multicall:             m,
+		ethClient:             ethClient,
+		address:               &address,
+		privateKey:            privateKey,
+		chainId:               big.NewInt(int64(chainId)),
+		erc20ABI:              &erc20ABI,
+		seriesNonceManagerABI: &seriesNonceManagerABI,
 	}, nil
 }
