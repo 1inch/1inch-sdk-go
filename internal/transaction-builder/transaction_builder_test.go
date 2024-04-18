@@ -214,6 +214,10 @@ func (w *MyWallet) TokenPermit(cd common.ContractPermitData) (string, error) {
 	return "", nil
 }
 
+func (w *MyWallet) GetSeriesNonce(ctx context.Context, token gethCommon.Address, publicAddress gethCommon.Address) (*big.Int, error) {
+	return big.NewInt(0), nil
+}
+
 func (w *MyWallet) IsEIP1559Applicable() bool {
 	return true
 }

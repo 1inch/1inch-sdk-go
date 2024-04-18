@@ -41,13 +41,3 @@ func IsSubset[T comparable](sliceA, sliceB []T) bool {
 	}
 	return true
 }
-
-// Contains checks if the slice contains the given value.
-func Contains[T comparable](value T, sliceB []T) bool {
-	for _, v := range sliceB {
-		if v == value {
-			return true
-		}
-	}
-	return false
-}
