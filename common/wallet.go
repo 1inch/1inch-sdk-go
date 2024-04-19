@@ -27,8 +27,6 @@ type Wallet interface {
 	TokenPermit(cd ContractPermitData) (string, error)
 	TokenPermitDaiLike(cd ContractPermitDataDaiLike) (string, error)
 
-	GetSeriesNonce(ctx context.Context, token gethCommon.Address, publicAddress gethCommon.Address) (*big.Int, error) // TODO this should not be built into the wallet
-
 	IsEIP1559Applicable() bool
 	ChainId() int64
 	//TokenApprove()
