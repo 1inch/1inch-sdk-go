@@ -35,10 +35,10 @@ func (params *CreateOrderParams) Validate() error {
 	validationErrors = validate.Parameter(params.TakingAmount, "takingAmount", validate.CheckBigIntRequired, validationErrors)
 	validationErrors = validate.Parameter(params.MakingAmount, "makingAmount", validate.CheckBigIntRequired, validationErrors)
 	validationErrors = validate.Parameter(params.Taker, "taker", validate.CheckEthereumAddress, validationErrors)
-	if strings.ToLower(params.MakerAsset) == strings.ToLower(params.TakerAsset) && (strings.ToLower(params.MakerAsset) != "" && strings.ToLower(params.TakerAsset) != "") {
+	if strings.EqualFold(params.MakerAsset, params.TakerAsset) && (params.MakerAsset != "" && params.TakerAsset != "") {
 		validationErrors = append(validationErrors, validate.NewParameterCustomError("maker asset and taker asset cannot be the same"))
 	}
-	if strings.ToLower(params.MakerAsset) == NativeToken || strings.ToLower(params.TakerAsset) == NativeToken {
+	if strings.EqualFold(params.MakerAsset, NativeToken) || strings.EqualFold(params.TakerAsset, NativeToken) {
 		validationErrors = append(validationErrors, validate.NewParameterCustomError("native gas token is not supported as maker or taker asset"))
 	}
 
