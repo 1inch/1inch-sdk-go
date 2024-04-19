@@ -169,6 +169,10 @@ func NewMyWallet(address gethCommon.Address, chainID *big.Int) *MyWallet {
 	}
 }
 
+func (w *MyWallet) Call(ctx context.Context, contractAddress gethCommon.Address, callData []byte) ([]byte, error) {
+	return nil, nil
+}
+
 func (w *MyWallet) Nonce(ctx context.Context) (uint64, error) {
 	return 44, nil
 }
@@ -212,10 +216,6 @@ func (w *MyWallet) TokenPermitDaiLike(cd common.ContractPermitDataDaiLike) (stri
 
 func (w *MyWallet) TokenPermit(cd common.ContractPermitData) (string, error) {
 	return "", nil
-}
-
-func (w *MyWallet) GetSeriesNonce(ctx context.Context, token gethCommon.Address, publicAddress gethCommon.Address) (*big.Int, error) {
-	return big.NewInt(0), nil
 }
 
 func (w *MyWallet) IsEIP1559Applicable() bool {

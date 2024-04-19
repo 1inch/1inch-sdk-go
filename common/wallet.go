@@ -9,6 +9,8 @@ import (
 )
 
 type Wallet interface {
+	Call(ctx context.Context, contractAddress gethCommon.Address, callData []byte) ([]byte, error)
+
 	Nonce(ctx context.Context) (uint64, error)
 	Address() gethCommon.Address
 	Balance(ctx context.Context) (*big.Int, error)
@@ -24,8 +26,6 @@ type Wallet interface {
 	GetContractDetailsForPermitDaiLike(ctx context.Context, token gethCommon.Address, spender gethCommon.Address, deadline int64) (*ContractPermitDataDaiLike, error)
 	TokenPermit(cd ContractPermitData) (string, error)
 	TokenPermitDaiLike(cd ContractPermitDataDaiLike) (string, error)
-
-	GetSeriesNonce(ctx context.Context, token gethCommon.Address, publicAddress gethCommon.Address) (*big.Int, error) // TODO this should not be built into the wallet
 
 	IsEIP1559Applicable() bool
 	ChainId() int64
