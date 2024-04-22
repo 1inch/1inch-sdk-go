@@ -8,6 +8,7 @@ import (
 	"github.com/stretchr/testify/require"
 
 	"github.com/1inch/1inch-sdk-go/constants"
+	"github.com/1inch/1inch-sdk-go/internal/slice_utils"
 )
 
 func TestIsEthereumAddressRequired(t *testing.T) {
@@ -1042,7 +1043,7 @@ func TestContains(t *testing.T) {
 
 	for _, tc := range testCases {
 		t.Run(tc.description, func(t *testing.T) {
-			result := Contains(tc.value, tc.slice)
+			result := slice_utils.Contains(tc.value, tc.slice)
 			assert.Equal(t, tc.expected, result, fmt.Sprintf("%v: expected %v, got %v", tc.description, tc.expected, result))
 		})
 	}

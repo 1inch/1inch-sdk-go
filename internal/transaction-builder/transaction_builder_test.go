@@ -169,6 +169,10 @@ func NewMyWallet(address gethCommon.Address, chainID *big.Int) *MyWallet {
 	}
 }
 
+func (w *MyWallet) Call(ctx context.Context, contractAddress gethCommon.Address, callData []byte) ([]byte, error) {
+	return nil, nil
+}
+
 func (w *MyWallet) Nonce(ctx context.Context) (uint64, error) {
 	return 44, nil
 }

@@ -9,6 +9,8 @@ import (
 )
 
 type Wallet interface {
+	Call(ctx context.Context, contractAddress gethCommon.Address, callData []byte) ([]byte, error)
+
 	Nonce(ctx context.Context) (uint64, error)
 	Address() gethCommon.Address
 	Balance(ctx context.Context) (*big.Int, error)

@@ -8,6 +8,7 @@ import (
 	"time"
 
 	"github.com/1inch/1inch-sdk-go/constants"
+	"github.com/1inch/1inch-sdk-go/internal/slice_utils"
 )
 
 func CheckEthereumAddressRequired(parameter interface{}, variableName string) error {
@@ -99,7 +100,7 @@ func CheckChainId(parameter interface{}, variableName string) error {
 		return nil
 	}
 
-	if !Contains(value, constants.ValidChainIds) {
+	if !slice_utils.Contains(value, constants.ValidChainIds) {
 		return NewParameterValidationError(variableName, fmt.Sprintf("is invalid, valid chain ids are: %v", constants.ValidChainIds))
 	}
 	return nil
@@ -145,7 +146,7 @@ func CheckApprovalType(parameter interface{}, variableName string) error {
 		return nil
 	}
 
-	if !Contains(value, []int{0, 1, 2}) {
+	if !slice_utils.Contains(value, []int{0, 1, 2}) {
 		return NewParameterValidationError(variableName, "invalid approval type")
 	}
 	return nil
@@ -253,7 +254,7 @@ func CheckSortBy(parameter interface{}, variableName string) error {
 	}
 
 	validSortBy := []string{"createDateTime", "takerRate", "makerRate", "makerAmount", "takerAmount"}
-	if !Contains(value, validSortBy) {
+	if !slice_utils.Contains(value, validSortBy) {
 		return NewParameterValidationError(variableName, fmt.Sprintf("can only contain %v", validSortBy))
 	}
 	return nil
