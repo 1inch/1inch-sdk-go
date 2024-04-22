@@ -39,6 +39,7 @@ func Get1inchRouterFromChainId(chainId int) (string, error) {
 		return "", fmt.Errorf("unrecognized chain id: %d", chainId)
 	}
 }
+
 func GetSeriesNonceManagerFromChainId(chainId int) (string, error) {
 	switch chainId {
 	case ArbitrumChainId:

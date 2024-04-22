@@ -22,7 +22,7 @@ This can be done through your environment, or you can directly set them in the v
 
 var (
 	privateKey     = os.Getenv("WALLET_KEY")
-	nodeUrl        = "https://polygon-bor-rpc.publicnode.com"
+	nodeUrl        = os.Getenv("NODE_URL")
 	devPortalToken = os.Getenv("DEV_PORTAL_TOKEN")
 )
 
@@ -51,7 +51,7 @@ func main() {
 	publicKey := ecdsaPrivateKey.Public()
 	publicAddress := crypto.PubkeyToAddress(*publicKey.(*ecdsa.PublicKey))
 
-	seriesNonce, err := orderbook.GetSeriesNonce(ctx, client.Wallet, publicAddress)
+	seriesNonce, err := client.GetSeriesNonce(ctx, publicAddress)
 	if err != nil {
 		log.Fatal(fmt.Errorf("failed to get series nonce: %v", err))
 	}
