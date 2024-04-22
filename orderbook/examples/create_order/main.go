@@ -51,7 +51,7 @@ func main() {
 	publicKey := ecdsaPrivateKey.Public()
 	publicAddress := crypto.PubkeyToAddress(*publicKey.(*ecdsa.PublicKey))
 
-	seriesNonce, err := orderbook.GetSeriesNonce(ctx, client.Wallet, publicAddress)
+	seriesNonce, err := client.GetSeriesNonce(ctx, publicAddress)
 	if err != nil {
 		log.Fatal(fmt.Errorf("failed to get series nonce: %v", err))
 	}
@@ -60,7 +60,7 @@ func main() {
 		ChainId:                        chainId,
 		SeriesNonce:                    seriesNonce,
 		PrivateKey:                     privateKey,
-		ExpireAfter:                    time.Now().Add(time.Minute * 10).Unix(), // TODO update the field name to have "unix" suffix
+		ExpireAfter:                    time.Now().Add(time.Hour * 10).Unix(), // TODO update the field name to have "unix" suffix
 		Maker:                          publicAddress.Hex(),
 		MakerAsset:                     wmatic,
 		TakerAsset:                     usdc,

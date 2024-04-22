@@ -10,13 +10,12 @@ import (
 	"github.com/ethereum/go-ethereum/accounts/abi"
 	gethCommon "github.com/ethereum/go-ethereum/common"
 
-	"github.com/1inch/1inch-sdk-go/common"
 	"github.com/1inch/1inch-sdk-go/constants"
 )
 
-func GetSeriesNonce(ctx context.Context, wallet common.Wallet, publicAddress gethCommon.Address) (*big.Int, error) {
+func (c *Client) GetSeriesNonce(ctx context.Context, publicAddress gethCommon.Address) (*big.Int, error) {
 
-	seriesNonceManager, err := constants.GetSeriesNonceManagerFromChainId(int(wallet.ChainId()))
+	seriesNonceManager, err := constants.GetSeriesNonceManagerFromChainId(int(c.Wallet.ChainId()))
 	if err != nil {
 		log.Fatal(fmt.Errorf("failed to get series nonce manager address: %v", err))
 	}
@@ -33,7 +32,7 @@ func GetSeriesNonce(ctx context.Context, wallet common.Wallet, publicAddress get
 		return nil, err
 	}
 
-	result, err := wallet.Call(ctx, gethCommon.HexToAddress(seriesNonceManager), seriesNonceData)
+	result, err := c.Wallet.Call(ctx, gethCommon.HexToAddress(seriesNonceManager), seriesNonceData)
 	if err != nil {
 		return nil, err
 	}
