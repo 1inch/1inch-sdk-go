@@ -60,7 +60,7 @@ func main() {
 		ChainId:                        chainId,
 		SeriesNonce:                    seriesNonce,
 		PrivateKey:                     privateKey,
-		ExpireAfter:                    time.Now().Add(time.Hour * 10).Unix(), // TODO update the field name to have "unix" suffix
+		ExpireAfter:                    time.Now().Add(time.Minute * 10).Unix(), // TODO update the field name to have "unix" suffix
 		Maker:                          publicAddress.Hex(),
 		MakerAsset:                     wmatic,
 		TakerAsset:                     usdc,
