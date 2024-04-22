@@ -38,11 +38,8 @@ func (w Wallet) createPermitSignatureDaiLike(cd *common.ContractPermitDataDaiLik
 	if !cd.IsDomainWithoutVersion {
 		eip712DomainTypes = append(eip712DomainTypes, apitypes.Type{Name: "version", Type: "string"})
 	}
-	if !cd.IsSaltInsteadOfChainId {
-		eip712DomainTypes = append(eip712DomainTypes, apitypes.Type{Name: "chainId", Type: "uint256"})
-	} else {
-		eip712DomainTypes = append(eip712DomainTypes, apitypes.Type{Name: "salt", Type: "bytes32"})
-	}
+	eip712DomainTypes = append(eip712DomainTypes, apitypes.Type{Name: "chainId", Type: "uint256"})
+
 	eip712DomainTypes = append(eip712DomainTypes, apitypes.Type{Name: "verifyingContract", Type: "address"})
 
 	// Permit model fields
@@ -59,11 +56,8 @@ func (w Wallet) createPermitSignatureDaiLike(cd *common.ContractPermitDataDaiLik
 		VerifyingContract: cd.FromToken,
 	}
 
-	if cd.IsSaltInsteadOfChainId {
-		domainData.Salt = cd.Salt
-	} else {
-		domainData.ChainId = math.NewHexOrDecimal256(int64(cd.ChainId))
-	}
+	domainData.ChainId = math.NewHexOrDecimal256(int64(cd.ChainId))
+
 	if !cd.IsDomainWithoutVersion {
 		domainData.Version = cd.Version
 	}

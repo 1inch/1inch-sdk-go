@@ -45,9 +45,7 @@ type ContractPermitData struct {
 	Nonce                  int64
 	Deadline               int64
 	Amount                 *big.Int
-	IsSaltInsteadOfChainId bool
 	IsDomainWithoutVersion bool
-	Salt                   string
 }
 
 type ContractPermitDataDaiLike struct {
@@ -60,13 +58,5 @@ type ContractPermitDataDaiLike struct {
 	Nonce                  int64
 	Expiry                 int64
 	Allowed                bool
-	IsSaltInsteadOfChainId bool
 	IsDomainWithoutVersion bool
-	Salt                   string
 }
-
-//    holder: string;
-//    spender: string;
-//    nonce: number;
-//    expiry: number;
-//    allowed: boolean;

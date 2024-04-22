@@ -183,7 +183,6 @@ func TestTokenPermit(t *testing.T) {
 		//expectedSignatureString        string
 		nonce                  int64
 		deadline               int64
-		IsSaltInsteadOfChainId bool
 		IsDomainWithoutVersion bool
 	}{
 		{
@@ -267,7 +266,6 @@ func TestTokenPermit(t *testing.T) {
 				Deadline:               tc.deadline,
 				Amount:                 tc.amount,
 				IsDomainWithoutVersion: tc.IsDomainWithoutVersion,
-				IsSaltInsteadOfChainId: tc.IsSaltInsteadOfChainId,
 			}
 
 			permit, err := w.TokenPermit(d)
