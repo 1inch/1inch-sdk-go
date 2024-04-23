@@ -43,11 +43,9 @@ func main() {
 
 	amountToSwap := big.NewInt(1e18)
 
-	allowanceData, err := client.GetApproveAllowance(ctx, aggregation.ApproveAllowanceParams{
-		ApproveControllerGetAllowanceParams: aggregation.ApproveControllerGetAllowanceParams{
-			TokenAddress:  PolygonDai,
-			WalletAddress: client.Wallet.Address().Hex(),
-		},
+	allowanceData, err := client.GetApproveAllowance(ctx, aggregation.ApproveControllerGetAllowanceParams{
+		TokenAddress:  PolygonDai,
+		WalletAddress: client.Wallet.Address().Hex(),
 	})
 
 	allowance := new(big.Int)
@@ -56,11 +54,9 @@ func main() {
 	cmp := amountToSwap.Cmp(allowance)
 
 	if cmp > 0 {
-		approveData, err := client.GetApproveTransaction(ctx, aggregation.ApproveTransactionParams{
-			ApproveControllerGetCallDataParams: aggregation.ApproveControllerGetCallDataParams{
-				TokenAddress: PolygonDai,
-				Amount:       amountToSwap.String(),
-			},
+		approveData, err := client.GetApproveTransaction(ctx, aggregation.ApproveControllerGetCallDataParams{
+			TokenAddress: PolygonDai,
+			Amount:       amountToSwap.String(),
 		})
 		if err != nil {
 			panic(err)

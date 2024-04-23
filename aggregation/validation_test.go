@@ -5,7 +5,6 @@ import (
 
 	"github.com/stretchr/testify/require"
 
-	"github.com/1inch/1inch-sdk-go/constants"
 	"github.com/1inch/1inch-sdk-go/internal/validate"
 )
 
@@ -60,64 +59,22 @@ func TestSwapTokensParams_Validate(t *testing.T) {
 func TestApproveAllowanceParams_Validate(t *testing.T) {
 	testCases := []struct {
 		description  string
-		params       ApproveAllowanceParams
+		params       ApproveControllerGetAllowanceParams
 		expectErrors []string
 	}{
 		{
 			description: "Valid parameters",
-			params: ApproveAllowanceParams{
-				ChainId: constants.EthereumChainId,
-				ApproveControllerGetAllowanceParams: ApproveControllerGetAllowanceParams{
-					TokenAddress:  "0x1234567890abcdef1234567890abcdef12345678",
-					WalletAddress: "0x1234567890abcdef1234567890abcdef12345678",
-				},
+			params: ApproveControllerGetAllowanceParams{
+				TokenAddress:  "0x1234567890abcdef1234567890abcdef12345678",
+				WalletAddress: "0x1234567890abcdef1234567890abcdef12345678",
 			},
 		},
 		{
 			description: "Missing required parameters",
-			params:      ApproveAllowanceParams{},
+			params:      ApproveControllerGetAllowanceParams{},
 			expectErrors: []string{
-				"'chainId' is required",
 				"'tokenAddress' is required",
 				"'walletAddress' is required",
-			},
-		},
-	}
-
-	for _, tc := range testCases {
-		t.Run(tc.description, func(t *testing.T) {
-			err := tc.params.Validate()
-
-			if len(tc.expectErrors) > 0 {
-				require.Error(t, err)
-				for _, expectedError := range tc.expectErrors {
-					require.Contains(t, err.Error(), expectedError, "Error message should contain the expected text")
-				}
-				require.Equal(t, len(tc.expectErrors), validate.GetValidatorErrorsCount(err), "The number of errors returned should match the length of the expected errors: %s\n", err)
-			} else {
-				require.NoError(t, err)
-			}
-		})
-	}
-}
-
-func TestApproveSpenderParams_Validate(t *testing.T) {
-	testCases := []struct {
-		description  string
-		params       ApproveSpenderParams
-		expectErrors []string
-	}{
-		{
-			description: "Valid parameters",
-			params: ApproveSpenderParams{
-				ChainId: constants.EthereumChainId,
-			},
-		},
-		{
-			description: "Missing required parameters",
-			params:      ApproveSpenderParams{},
-			expectErrors: []string{
-				"'chainId' is required",
 			},
 		},
 	}
@@ -142,62 +99,20 @@ func TestApproveSpenderParams_Validate(t *testing.T) {
 func TestApproveTransactionParams_Validate(t *testing.T) {
 	testCases := []struct {
 		description  string
-		params       ApproveTransactionParams
+		params       ApproveControllerGetCallDataParams
 		expectErrors []string
 	}{
 		{
 			description: "Valid parameters",
-			params: ApproveTransactionParams{
-				ChainId: constants.EthereumChainId,
-				ApproveControllerGetCallDataParams: ApproveControllerGetCallDataParams{
-					TokenAddress: "0x1234567890abcdef1234567890abcdef12345678",
-				},
+			params: ApproveControllerGetCallDataParams{
+				TokenAddress: "0x1234567890abcdef1234567890abcdef12345678",
 			},
 		},
 		{
 			description: "Missing required parameters",
-			params:      ApproveTransactionParams{},
+			params:      ApproveControllerGetCallDataParams{},
 			expectErrors: []string{
-				"'chainId' is required",
 				"'tokenAddress' is required",
-			},
-		},
-	}
-
-	for _, tc := range testCases {
-		t.Run(tc.description, func(t *testing.T) {
-			err := tc.params.Validate()
-
-			if len(tc.expectErrors) > 0 {
-				require.Error(t, err)
-				for _, expectedError := range tc.expectErrors {
-					require.Contains(t, err.Error(), expectedError, "Error message should contain the expected text")
-				}
-				require.Equal(t, len(tc.expectErrors), validate.GetValidatorErrorsCount(err), "The number of errors returned should match the length of the expected errors: %s\n", err)
-			} else {
-				require.NoError(t, err)
-			}
-		})
-	}
-}
-
-func TestGetLiquiditySourcesParams_Validate(t *testing.T) {
-	testCases := []struct {
-		description  string
-		params       GetLiquiditySourcesParams
-		expectErrors []string
-	}{
-		{
-			description: "Valid parameters",
-			params: GetLiquiditySourcesParams{
-				ChainId: constants.EthereumChainId,
-			},
-		},
-		{
-			description: "Missing required parameters",
-			params:      GetLiquiditySourcesParams{},
-			expectErrors: []string{
-				"'chainId' is required",
 			},
 		},
 	}
@@ -222,25 +137,21 @@ func TestGetLiquiditySourcesParams_Validate(t *testing.T) {
 func TestGetQuoteParams_Validate(t *testing.T) {
 	testCases := []struct {
 		description  string
-		params       GetQuoteParams
+		params       AggregationControllerGetQuoteParams
 		expectErrors []string
 	}{
 		{
 			description: "Valid parameters",
-			params: GetQuoteParams{
-				ChainId: constants.EthereumChainId,
-				AggregationControllerGetQuoteParams: AggregationControllerGetQuoteParams{
-					Src:    "0x1234567890abcdef1234567890abcdef12345678",
-					Dst:    "0x1234567890abcdef1234567890abcdef12345679",
-					Amount: "10000",
-				},
+			params: AggregationControllerGetQuoteParams{
+				Src:    "0x1234567890abcdef1234567890abcdef12345678",
+				Dst:    "0x1234567890abcdef1234567890abcdef12345679",
+				Amount: "10000",
 			},
 		},
 		{
 			description: "Missing required parameters",
-			params:      GetQuoteParams{},
+			params:      AggregationControllerGetQuoteParams{},
 			expectErrors: []string{
-				"'chainId' is required",
 				"'src' is required",
 				"'dst' is required",
 				"'amount' is required",
@@ -303,44 +214,6 @@ func TestGetSwapDataParams_Validate(t *testing.T) {
 			},
 			expectErrors: []string{
 				"src and dst tokens must be different",
-			},
-		},
-	}
-
-	for _, tc := range testCases {
-		t.Run(tc.description, func(t *testing.T) {
-			err := tc.params.Validate()
-
-			if len(tc.expectErrors) > 0 {
-				require.Error(t, err)
-				for _, expectedError := range tc.expectErrors {
-					require.Contains(t, err.Error(), expectedError, "Error message should contain the expected text")
-				}
-				require.Equal(t, len(tc.expectErrors), validate.GetValidatorErrorsCount(err), "The number of errors returned should match the length of the expected errors: %s\n", err)
-			} else {
-				require.NoError(t, err)
-			}
-		})
-	}
-}
-
-func TestGetTokensParams_Validate(t *testing.T) {
-	testCases := []struct {
-		description  string
-		params       GetTokensParams
-		expectErrors []string
-	}{
-		{
-			description: "Valid parameters",
-			params: GetTokensParams{
-				ChainId: constants.EthereumChainId,
-			},
-		},
-		{
-			description: "Missing required parameters",
-			params:      GetTokensParams{},
-			expectErrors: []string{
-				"'chainId' is required",
 			},
 		},
 	}

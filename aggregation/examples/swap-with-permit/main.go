@@ -41,11 +41,9 @@ func main() {
 
 	amountToSwap := big.NewInt(1e17)
 
-	allowanceData, err := client.GetApproveAllowance(ctx, aggregation.ApproveAllowanceParams{
-		ApproveControllerGetAllowanceParams: aggregation.ApproveControllerGetAllowanceParams{
-			TokenAddress:  PolygonFRAX,
-			WalletAddress: client.Wallet.Address().Hex(),
-		},
+	allowanceData, err := client.GetApproveAllowance(ctx, aggregation.ApproveControllerGetAllowanceParams{
+		TokenAddress:  PolygonFRAX,
+		WalletAddress: client.Wallet.Address().Hex(),
 	})
 
 	allowance := new(big.Int)
