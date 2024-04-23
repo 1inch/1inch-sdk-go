@@ -6,32 +6,6 @@ import (
 	"github.com/1inch/1inch-sdk-go/internal/validate"
 )
 
-//
-//func (params *SwapTokensParams) Validate() error {
-//	var validationErrors []error
-//	validationErrors = validate.Parameter(int(params.ApprovalType), "approvalType", validate.CheckApprovalType, validationErrors)
-//	validationErrors = validate.Parameter(params.chainId, "chainId", validate.CheckChainIdRequired, validationErrors)
-//	validationErrors = validate.Parameter(params.Address, "publicAddress", validate.CheckEthereumAddressRequired, validationErrors)
-//	validationErrors = validate.Parameter(params.WalletKey, "walletKey", validate.CheckPrivateKeyRequired, validationErrors)
-//	validationErrors = validate.Parameter(params.Src, "src", validate.CheckEthereumAddressRequired, validationErrors)
-//	validationErrors = validate.Parameter(params.Dst, "dst", validate.CheckEthereumAddressRequired, validationErrors)
-//	validationErrors = validate.Parameter(params.Amount, "amount", validate.CheckBigIntRequired, validationErrors)
-//	validationErrors = validate.Parameter(params.From, "from", validate.CheckEthereumAddressRequired, validationErrors)
-//	validationErrors = validate.Parameter(params.Slippage, "slippage", validate.CheckSlippageRequired, validationErrors)
-//	validationErrors = validate.Parameter(params.Protocols, "protocols", validate.CheckProtocols, validationErrors)
-//	validationErrors = validate.Parameter(params.Fee, "fee", validate.CheckFee, validationErrors)
-//	validationErrors = validate.Parameter(params.GasPrice, "gasPrice", validate.CheckBigInt, validationErrors)
-//	validationErrors = validate.Parameter(params.ComplexityLevel, "complexityLevel", validate.CheckFloat32NonNegativeWhole, validationErrors)
-//	validationErrors = validate.Parameter(params.Parts, "parts", validate.CheckFloat32NonNegativeWhole, validationErrors)
-//	validationErrors = validate.Parameter(params.MainRouteParts, "mainRouteParts", validate.CheckFloat32NonNegativeWhole, validationErrors)
-//	validationErrors = validate.Parameter(params.GasLimit, "gasLimit", validate.CheckFloat32NonNegativeWhole, validationErrors)
-//	validationErrors = validate.Parameter(params.ConnectorTokens, "connectorTokens", validate.CheckConnectorTokens, validationErrors)
-//	validationErrors = validate.Parameter(params.Permit, "permit", validate.CheckPermitHash, validationErrors)
-//	validationErrors = validate.Parameter(params.Receiver, "receiver", validate.CheckEthereumAddress, validationErrors)
-//	validationErrors = validate.Parameter(params.Referrer, "referrer", validate.CheckEthereumAddress, validationErrors)
-//	return validate.ConsolidateValidationErorrs(validationErrors)
-//}
-
 type ApproveAllowanceParams struct {
 	ChainId int
 	ApproveControllerGetAllowanceParams
@@ -105,7 +79,6 @@ func (params *GetQuoteParams) Validate() error {
 
 func (params *AggregationControllerGetSwapParams) Validate() error {
 	var validationErrors []error
-	//validationErrors = validate.Parameter(params.chainId, "chainId", validate.CheckChainIdRequired, validationErrors)
 	validationErrors = validate.Parameter(params.Src, "src", validate.CheckEthereumAddressRequired, validationErrors)
 	validationErrors = validate.Parameter(params.Dst, "dst", validate.CheckEthereumAddressRequired, validationErrors)
 	validationErrors = validate.Parameter(params.Amount, "amount", validate.CheckBigIntRequired, validationErrors)
@@ -137,28 +110,6 @@ func (params *GetTokensParams) Validate() error {
 	validationErrors = validate.Parameter(params.ChainId, "chainId", validate.CheckChainIdRequired, validationErrors)
 	return validate.ConsolidateValidationErorrs(validationErrors)
 }
-
-//func (params *AggregationControllerGetSwapParams) Validate() error {
-//	if params.Src == "" {
-//		return errors.New("src is required")
-//	}
-//	if params.Dst == "" {
-//		return errors.New("dst is required")
-//	}
-//	if params.Amount == "" {
-//		return errors.New("amount is required")
-//	}
-//	if params.From == "" {
-//		return errors.New("from is required")
-//	}
-//	if params.Src == params.Dst {
-//		return errors.New("src and dst tokens must be different")
-//	}
-//	if params.Slippage == 0 {
-//		return errors.New("slippage is required")
-//	}
-//	return nil
-//}
 
 func (params *ApproveControllerGetCallDataParams) Validate() error {
 	if params.TokenAddress == "" {

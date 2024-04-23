@@ -14,9 +14,14 @@ type SwapResponseExtended struct {
 
 type NormalizedTransactionData struct {
 	Data     []byte
-	From     gethCommon.Address
 	Gas      uint64
 	GasPrice *big.Int
 	To       gethCommon.Address
 	Value    *big.Int
+}
+
+type ApproveCallDataResponseExtended struct {
+	ApproveCallDataResponse
+
+	TxNormalized NormalizedTransactionData
 }

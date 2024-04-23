@@ -58,7 +58,7 @@ func (api *api) GetApproveSpender(ctx context.Context, params ApproveSpenderPara
 }
 
 // GetApproveTransaction returns the transaction data for approving the 1inch router to spend a token on behalf of a wallet
-func (api *api) GetApproveTransaction(ctx context.Context, params ApproveTransactionParams) (*ApproveCallDataResponse, error) {
+func (api *api) GetApproveTransaction(ctx context.Context, params ApproveTransactionParams) (*ApproveCallDataResponseExtended, error) {
 	u := fmt.Sprintf("/swap/v5.2/%d/approve/transaction", api.chainId)
 
 	err := params.Validate()
@@ -78,7 +78,7 @@ func (api *api) GetApproveTransaction(ctx context.Context, params ApproveTransac
 	if err != nil {
 		return nil, err
 	}
-	return &approveCallData, nil
+	return normalizeApproveCallDataResponse(approveCallData)
 }
 
 // GetLiquiditySources returns all liquidity sources tracked by the 1inch Aggregation Protocol for a given chain

@@ -14,6 +14,8 @@ const AggregationRouterV5VersionNumber = "5"
 const AggregationRouterV6Name = "1inch Aggregation Router"
 const AggregationRouterV6VersionNumber = "6"
 
+const ERC20_APPROVE_GAS = 45_000
+
 // Series Nonce Manager contract addresses are taken from limit-order-protocol/deployments
 
 const SeriesNonceManagerArbitrum = "0xD7936052D1e096d48C81Ef3918F9Fd6384108480"
