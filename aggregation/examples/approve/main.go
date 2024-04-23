@@ -54,7 +54,7 @@ func main() {
 	cmp := amountToSwap.Cmp(allowance)
 
 	if cmp > 0 {
-		approveData, err := client.GetApproveTransaction(ctx, aggregation.GetCallDataParams{
+		approveData, err := client.GetApproveTransaction(ctx, aggregation.GetApproveParams{
 			TokenAddress: PolygonDai,
 			Amount:       amountToSwap.String(),
 		})

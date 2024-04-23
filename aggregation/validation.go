@@ -13,7 +13,7 @@ func (params *GetAllowanceParams) Validate() error {
 	return validate.ConsolidateValidationErorrs(validationErrors)
 }
 
-func (params *GetCallDataParams) Validate() error {
+func (params *GetApproveParams) Validate() error {
 	var validationErrors []error
 	validationErrors = validate.Parameter(params.TokenAddress, "tokenAddress", validate.CheckEthereumAddressRequired, validationErrors)
 	validationErrors = validate.Parameter(params.Amount, "amount", validate.CheckBigInt, validationErrors)

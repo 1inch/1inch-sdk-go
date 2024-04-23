@@ -449,7 +449,7 @@
     },
     "/v5.2/1/approve/transaction": {
       "get": {
-        "operationId": "getCallData",
+        "operationId": "getApprove",
         "summary": "Generate approve calldata to allow 1inch Router to perform a swap",
         "parameters": [
           {

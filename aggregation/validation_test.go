@@ -99,18 +99,18 @@ func TestApproveAllowanceParams_Validate(t *testing.T) {
 func TestApproveTransactionParams_Validate(t *testing.T) {
 	testCases := []struct {
 		description  string
-		params       GetCallDataParams
+		params       GetApproveParams
 		expectErrors []string
 	}{
 		{
 			description: "Valid parameters",
-			params: GetCallDataParams{
+			params: GetApproveParams{
 				TokenAddress: "0x1234567890abcdef1234567890abcdef12345678",
 			},
 		},
 		{
 			description: "Missing required parameters",
-			params:      GetCallDataParams{},
+			params:      GetApproveParams{},
 			expectErrors: []string{
 				"'tokenAddress' is required",
 			},

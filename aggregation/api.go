@@ -93,7 +93,7 @@ func (api *api) GetApproveSpender(ctx context.Context) (*SpenderResponse, error)
 }
 
 // GetApproveTransaction returns the transaction data for approving the 1inch router to spend a token on behalf of a wallet
-func (api *api) GetApproveTransaction(ctx context.Context, params GetCallDataParams) (*ApproveCallDataResponseExtended, error) {
+func (api *api) GetApproveTransaction(ctx context.Context, params GetApproveParams) (*ApproveCallDataResponseExtended, error) {
 	u := fmt.Sprintf("/swap/v5.2/%d/approve/transaction", api.chainId)
 
 	err := params.Validate()

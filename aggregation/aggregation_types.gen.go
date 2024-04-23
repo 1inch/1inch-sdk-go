@@ -199,8 +199,8 @@ type GetAllowanceParams struct {
 	WalletAddress string `url:"walletAddress" json:"walletAddress"`
 }
 
-// GetCallDataParams defines parameters for GetCallData.
-type GetCallDataParams struct {
+// GetApproveParams defines parameters for GetApprove.
+type GetApproveParams struct {
 	// TokenAddress Token address you want to swap
 	TokenAddress string `url:"tokenAddress" json:"tokenAddress"`
 
