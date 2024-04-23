@@ -2,16 +2,11 @@ package main
 
 import (
 	"context"
-	"encoding/hex"
 	"fmt"
-	"math/big"
 	"os"
 	"time"
 
-	"github.com/ethereum/go-ethereum/common"
-
 	"github.com/1inch/1inch-sdk-go/aggregation"
-	"github.com/1inch/1inch-sdk-go/aggregation/models"
 	"github.com/1inch/1inch-sdk-go/constants"
 )
 
@@ -36,7 +31,7 @@ func main() {
 
 	ctx := context.Background()
 
-	swapData, err := client.GetSwap(ctx, models.AggregationControllerGetSwapParams{
+	swapData, err := client.GetSwap(ctx, aggregation.AggregationControllerGetSwapParams{
 		Src:      "0x3c499c542cEF5E3811e1192ce70d8cC03d5c3359",
 		Dst:      "0x0d500B1d8E8eF31E21C99d1Db9A6444d3ADf1270",
 		Amount:   "1000",
@@ -48,17 +43,7 @@ func main() {
 		return
 	}
 
-	data, err := hex.DecodeString(swapData.Tx.Data[2:])
-	if err != nil {
-		return
-	}
-	value, ok := new(big.Int).SetString(swapData.Tx.Value, 10)
-	if !ok {
-		return
-	}
-	to := common.HexToAddress(swapData.Tx.To)
-
-	tx, err := client.TxBuilder.New().SetData(data).SetTo(&to).SetGas(uint64(swapData.Tx.Gas)).SetValue(value).Build(ctx)
+	tx, err := client.TxBuilder.New().SetData(swapData.TxNormalized.Data).SetTo(&swapData.TxNormalized.To).SetGas(swapData.TxNormalized.Gas).SetValue(swapData.TxNormalized.Value).Build(ctx)
 	if err != nil {
 		fmt.Printf("Failed to build transaction: %v\n", err)
 		return

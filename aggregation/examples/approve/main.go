@@ -9,7 +9,6 @@ import (
 	"github.com/ethereum/go-ethereum/common"
 
 	"github.com/1inch/1inch-sdk-go/aggregation"
-	"github.com/1inch/1inch-sdk-go/aggregation/models"
 	"github.com/1inch/1inch-sdk-go/constants"
 )
 
@@ -44,9 +43,9 @@ func main() {
 
 	amountToSwap := big.NewInt(1e18)
 
-	allowanceData, err := client.GetApproveAllowance(ctx, models.ApproveAllowanceParams{
+	allowanceData, err := client.GetApproveAllowance(ctx, aggregation.ApproveAllowanceParams{
 		ChainId: constants.EthereumChainId,
-		ApproveControllerGetAllowanceParams: models.ApproveControllerGetAllowanceParams{
+		ApproveControllerGetAllowanceParams: aggregation.ApproveControllerGetAllowanceParams{
 			TokenAddress:  PolygonDai,
 			WalletAddress: client.Wallet.Address().Hex(),
 		},
@@ -58,9 +57,9 @@ func main() {
 	cmp := amountToSwap.Cmp(allowance)
 
 	if cmp > 0 {
-		approveData, err := client.GetApproveTransaction(ctx, models.ApproveTransactionParams{
+		approveData, err := client.GetApproveTransaction(ctx, aggregation.ApproveTransactionParams{
 			ChainId: constants.EthereumChainId,
-			ApproveControllerGetCallDataParams: models.ApproveControllerGetCallDataParams{
+			ApproveControllerGetCallDataParams: aggregation.ApproveControllerGetCallDataParams{
 				TokenAddress: PolygonDai,
 				Amount:       amountToSwap.String(),
 			},
