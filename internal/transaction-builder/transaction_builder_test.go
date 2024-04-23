@@ -157,11 +157,20 @@ type MyWallet struct {
 	chainID *big.Int
 }
 
+func (w *MyWallet) GetContractDetailsForPermit(ctx context.Context, token gethCommon.Address, spender gethCommon.Address, amount *big.Int, deadline int64) (*common.ContractPermitData, error) {
+	//TODO implement me
+	panic("implement me")
+}
+
 func NewMyWallet(address gethCommon.Address, chainID *big.Int) *MyWallet {
 	return &MyWallet{
 		address: address,
 		chainID: chainID,
 	}
+}
+
+func (w *MyWallet) Call(ctx context.Context, contractAddress gethCommon.Address, callData []byte) ([]byte, error) {
+	return nil, nil
 }
 
 func (w *MyWallet) Nonce(ctx context.Context) (uint64, error) {
@@ -195,6 +204,14 @@ func (w *MyWallet) BroadcastTransaction(ctx context.Context, tx *types.Transacti
 
 func (w *MyWallet) TransactionReceipt(ctx context.Context, txHash gethCommon.Hash) (*types.Receipt, error) {
 	return nil, nil
+}
+
+func (w *MyWallet) GetContractDetailsForPermitDaiLike(ctx context.Context, token gethCommon.Address, spender gethCommon.Address, deadline int64) (*common.ContractPermitDataDaiLike, error) {
+	return nil, nil
+}
+
+func (w *MyWallet) TokenPermitDaiLike(cd common.ContractPermitDataDaiLike) (string, error) {
+	return "", nil
 }
 
 func (w *MyWallet) TokenPermit(cd common.ContractPermitData) (string, error) {

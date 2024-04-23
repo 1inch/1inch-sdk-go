@@ -4,7 +4,6 @@ import (
 	"context"
 	"fmt"
 	"math/big"
-	"strings"
 
 	gethCommon "github.com/ethereum/go-ethereum/common"
 	"github.com/ethereum/go-ethereum/common/math"
@@ -16,22 +15,23 @@ import (
 )
 
 // TokenPermit Will return an erc2612 string struct if possible
-func (w Wallet) TokenPermit(cd common.ContractPermitData) (string, error) {
+func (w Wallet) TokenPermitDaiLike(cd common.ContractPermitDataDaiLike) (string, error) {
 	ownerNoPrefix := remove0xPrefix(w.address.Hex())
 	spenderNoPrefix := remove0xPrefix(cd.Spender)
-	signature, err := w.createPermitSignature(&cd)
+	signature, err := w.createPermitSignatureDaiLike(&cd)
 	if err != nil {
 		return "", err
 	}
-
 	return "0x" + padStringWithZeroes(ownerNoPrefix) +
 		padStringWithZeroes(spenderNoPrefix) +
-		padStringWithZeroes(fmt.Sprintf("%x", cd.Amount)) +
-		padStringWithZeroes(fmt.Sprintf("%x", cd.Deadline)) +
+		padStringWithZeroes(fmt.Sprintf("%x", cd.Nonce)) +
+		padStringWithZeroes(fmt.Sprintf("%x", cd.Expiry)) +
+		padStringWithZeroes(fmt.Sprintf("%x", boolToInt(cd.Allowed))) +
 		convertSignatureToVRSString(signature), nil
 }
 
-func (w Wallet) createPermitSignature(cd *common.ContractPermitData) (string, error) {
+func (w Wallet) createPermitSignatureDaiLike(cd *common.ContractPermitDataDaiLike) (string, error) {
+	// Dynamically build the EIP712Domain types
 	eip712DomainTypes := []apitypes.Type{
 		{Name: "name", Type: "string"},
 	}
@@ -44,11 +44,11 @@ func (w Wallet) createPermitSignature(cd *common.ContractPermitData) (string, er
 
 	// Permit model fields
 	permitFields := []apitypes.Type{
-		{Name: "owner", Type: "address"},
+		{Name: "holder", Type: "address"},
 		{Name: "spender", Type: "address"},
-		{Name: "value", Type: "uint256"},
 		{Name: "nonce", Type: "uint256"},
-		{Name: "deadline", Type: "uint256"},
+		{Name: "expiry", Type: "uint256"},
+		{Name: "allowed", Type: "bool"},
 	}
 
 	domainData := apitypes.TypedDataDomain{
@@ -62,16 +62,14 @@ func (w Wallet) createPermitSignature(cd *common.ContractPermitData) (string, er
 		domainData.Version = cd.Version
 	}
 
-	//// Order Message
 	orderMessage := apitypes.TypedDataMessage{
-		"owner":    cd.PublicAddress,
-		"spender":  cd.Spender,
-		"value":    cd.Amount,
-		"nonce":    big.NewInt(cd.Nonce),
-		"deadline": big.NewInt(cd.Deadline),
+		"holder":  cd.Holder,
+		"spender": cd.Spender,
+		"allowed": cd.Allowed,
+		"nonce":   big.NewInt(cd.Nonce),
+		"expiry":  big.NewInt(cd.Expiry),
 	}
 
-	// Typed Data
 	typedData := apitypes.TypedData{
 		Types: map[string][]apitypes.Type{
 			"EIP712Domain": eip712DomainTypes,
@@ -98,7 +96,7 @@ func (w Wallet) createPermitSignature(cd *common.ContractPermitData) (string, er
 	return signatureHex, nil
 }
 
-func (w Wallet) GetContractDetailsForPermit(ctx context.Context, token gethCommon.Address, spender gethCommon.Address, amount *big.Int, deadline int64) (*common.ContractPermitData, error) {
+func (w Wallet) GetContractDetailsForPermitDaiLike(ctx context.Context, token gethCommon.Address, spender gethCommon.Address, deadline int64) (*common.ContractPermitDataDaiLike, error) {
 	contractNameData, err := w.erc20ABI.Pack("name")
 	if err != nil {
 		return nil, err
@@ -132,53 +130,33 @@ func (w Wallet) GetContractDetailsForPermit(ctx context.Context, token gethCommo
 	}
 
 	var contractVersion string
-	if len(mResult[1]) == 0 {
-		contractVersion = "1"
-	} else {
-		err = w.erc20ABI.UnpackIntoInterface(&contractVersion, "version", mResult[1])
-		if err != nil {
-			return nil, err
-		}
+	err = w.erc20ABI.UnpackIntoInterface(&contractVersion, "version", mResult[1])
+	if err != nil {
+		return nil, err
 	}
 
-	var contractNonce *big.Int
+	contractNonce := new(big.Int)
 	err = w.erc20ABI.UnpackIntoInterface(&contractNonce, "nonces", mResult[2])
 	if err != nil {
 		return nil, err
 	}
 
-	return &common.ContractPermitData{
-		FromToken:     token.Hex(),
-		PublicAddress: w.address.Hex(),
-		Spender:       spender.Hex(),
-		ChainId:       int(w.ChainId()),
-		Deadline:      deadline,
-		Name:          contractName,
-		Version:       contractVersion,
-		Nonce:         contractNonce.Int64(),
-		Amount:        amount,
+	return &common.ContractPermitDataDaiLike{
+		FromToken: token.Hex(),
+		Holder:    w.address.Hex(),
+		Spender:   spender.Hex(),
+		ChainId:   int(w.ChainId()),
+		Expiry:    deadline,
+		Name:      contractName,
+		Version:   contractVersion,
+		Nonce:     contractNonce.Int64(),
+		Allowed:   true,
 	}, nil
 }
 
-func padStringWithZeroes(s string) string {
-	if len(s) >= 64 {
-		return s
+func boolToInt(b bool) int {
+	if b {
+		return 1
 	}
-	return strings.Repeat("0", 64-len(s)) + s
-}
-
-func remove0xPrefix(s string) string {
-	if strings.HasPrefix(s, "0x") {
-		return s[2:]
-	}
-	return s
-}
-
-// ConvertSignatureToVRSString converts a createPermitSignature from rsv to padded vrs format
-func convertSignatureToVRSString(signature string) string {
-	// explicit breakdown
-	//r := createPermitSignature[:66]
-	//s := createPermitSignature[66:128]
-	//v := createPermitSignature[128:]
-	return padStringWithZeroes(signature[128:]) + signature[:128]
+	return 0
 }

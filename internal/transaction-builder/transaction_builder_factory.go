@@ -8,8 +8,8 @@ type TransactionBuilderFactory struct {
 	wallet common.Wallet
 }
 
-func NewFactory(w common.Wallet) *TransactionBuilderFactory {
-	return &TransactionBuilderFactory{
+func NewFactory(w common.Wallet) TransactionBuilderFactory {
+	return TransactionBuilderFactory{
 		wallet: w,
 	}
 }
