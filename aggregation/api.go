@@ -7,8 +7,48 @@ import (
 	"github.com/1inch/1inch-sdk-go/common"
 )
 
+// GetLiquiditySources returns all liquidity sources tracked by the 1inch Aggregation Protocol for a given chain
+func (api *api) GetLiquiditySources(ctx context.Context) (*ProtocolsResponse, error) {
+	u := fmt.Sprintf("/swap/v5.2/%d/liquidity-sources", api.chainId)
+
+	payload := common.RequestPayload{
+		Method: "GET",
+		Params: nil,
+		U:      u,
+		Body:   nil,
+	}
+
+	var liquiditySources ProtocolsResponse
+	err := api.httpExecutor.ExecuteRequest(ctx, payload, &liquiditySources)
+	if err != nil {
+		return nil, err
+	}
+
+	return &liquiditySources, nil
+}
+
+// GetTokens returns all tokens officially tracked by the 1inch Aggregation Protocol for a given chain
+func (api *api) GetTokens(ctx context.Context) (*TokensResponse, error) {
+	u := fmt.Sprintf("/swap/v5.2/%d/tokens", api.chainId)
+
+	payload := common.RequestPayload{
+		Method: "GET",
+		Params: nil,
+		U:      u,
+		Body:   nil,
+	}
+
+	var tokens TokensResponse
+	err := api.httpExecutor.ExecuteRequest(ctx, payload, &tokens)
+	if err != nil {
+		return nil, err
+	}
+
+	return &tokens, nil
+}
+
 // GetApproveAllowance returns the allowance the 1inch router has to spend a token on behalf of a wallet
-func (api *api) GetApproveAllowance(ctx context.Context, params ApproveAllowanceParams) (*AllowanceResponse, error) {
+func (api *api) GetApproveAllowance(ctx context.Context, params ApproveControllerGetAllowanceParams) (*AllowanceResponse, error) {
 	u := fmt.Sprintf("/swap/v5.2/%d/approve/allowance", api.chainId)
 
 	err := params.Validate()
@@ -18,7 +58,7 @@ func (api *api) GetApproveAllowance(ctx context.Context, params ApproveAllowance
 
 	payload := common.RequestPayload{
 		Method: "GET",
-		Params: params.ApproveControllerGetAllowanceParams,
+		Params: params,
 		U:      u,
 		Body:   nil,
 	}
@@ -33,13 +73,8 @@ func (api *api) GetApproveAllowance(ctx context.Context, params ApproveAllowance
 }
 
 // GetApproveSpender returns the address of the 1inch router contract
-func (api *api) GetApproveSpender(ctx context.Context, params ApproveSpenderParams) (*SpenderResponse, error) {
+func (api *api) GetApproveSpender(ctx context.Context) (*SpenderResponse, error) {
 	u := fmt.Sprintf("/swap/v5.2/%d/approve/spender", api.chainId)
-
-	err := params.Validate()
-	if err != nil {
-		return nil, err
-	}
 
 	payload := common.RequestPayload{
 		Method: "GET",
@@ -49,7 +84,7 @@ func (api *api) GetApproveSpender(ctx context.Context, params ApproveSpenderPara
 	}
 
 	var spender SpenderResponse
-	err = api.httpExecutor.ExecuteRequest(ctx, payload, &spender)
+	err := api.httpExecutor.ExecuteRequest(ctx, payload, &spender)
 	if err != nil {
 		return nil, err
 	}
@@ -58,7 +93,7 @@ func (api *api) GetApproveSpender(ctx context.Context, params ApproveSpenderPara
 }
 
 // GetApproveTransaction returns the transaction data for approving the 1inch router to spend a token on behalf of a wallet
-func (api *api) GetApproveTransaction(ctx context.Context, params ApproveTransactionParams) (*ApproveCallDataResponseExtended, error) {
+func (api *api) GetApproveTransaction(ctx context.Context, params ApproveControllerGetCallDataParams) (*ApproveCallDataResponseExtended, error) {
 	u := fmt.Sprintf("/swap/v5.2/%d/approve/transaction", api.chainId)
 
 	err := params.Validate()
@@ -68,7 +103,7 @@ func (api *api) GetApproveTransaction(ctx context.Context, params ApproveTransac
 
 	payload := common.RequestPayload{
 		Method: "GET",
-		Params: params.ApproveControllerGetCallDataParams,
+		Params: params,
 		U:      u,
 		Body:   nil,
 	}
@@ -81,33 +116,8 @@ func (api *api) GetApproveTransaction(ctx context.Context, params ApproveTransac
 	return normalizeApproveCallDataResponse(approveCallData)
 }
 
-// GetLiquiditySources returns all liquidity sources tracked by the 1inch Aggregation Protocol for a given chain
-func (api *api) GetLiquiditySources(ctx context.Context, params GetLiquiditySourcesParams) (*ProtocolsResponse, error) {
-	u := fmt.Sprintf("/swap/v5.2/%d/liquidity-sources", api.chainId)
-
-	err := params.Validate()
-	if err != nil {
-		return nil, err
-	}
-
-	payload := common.RequestPayload{
-		Method: "GET",
-		Params: nil,
-		U:      u,
-		Body:   nil,
-	}
-
-	var liquiditySources ProtocolsResponse
-	err = api.httpExecutor.ExecuteRequest(ctx, payload, &liquiditySources)
-	if err != nil {
-		return nil, err
-	}
-
-	return &liquiditySources, nil
-}
-
 // GetQuote returns the quote for a potential swap through the Aggregation Protocol
-func (api *api) GetQuote(ctx context.Context, params GetQuoteParams) (*QuoteResponse, error) {
+func (api *api) GetQuote(ctx context.Context, params AggregationControllerGetQuoteParams) (*QuoteResponse, error) {
 	u := fmt.Sprintf("/swap/v5.2/%d/quote", api.chainId)
 
 	err := params.Validate()
@@ -117,7 +127,7 @@ func (api *api) GetQuote(ctx context.Context, params GetQuoteParams) (*QuoteResp
 
 	payload := common.RequestPayload{
 		Method: "GET",
-		Params: params.AggregationControllerGetQuoteParams,
+		Params: params,
 		U:      u,
 	}
 
@@ -152,29 +162,4 @@ func (api *api) GetSwap(ctx context.Context, params AggregationControllerGetSwap
 		return nil, err
 	}
 	return normalizeSwapResponse(swapResponse)
-}
-
-// GetTokens returns all tokens officially tracked by the 1inch Aggregation Protocol for a given chain
-func (api *api) GetTokens(ctx context.Context, params GetTokensParams) (*TokensResponse, error) {
-	u := fmt.Sprintf("/swap/v5.2/%d/tokens", api.chainId)
-
-	err := params.Validate()
-	if err != nil {
-		return nil, err
-	}
-
-	payload := common.RequestPayload{
-		Method: "GET",
-		Params: nil,
-		U:      u,
-		Body:   nil,
-	}
-
-	var tokens TokensResponse
-	err = api.httpExecutor.ExecuteRequest(ctx, payload, &tokens)
-	if err != nil {
-		return nil, err
-	}
-
-	return &tokens, nil
 }

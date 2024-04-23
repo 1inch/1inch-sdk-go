@@ -2,7 +2,6 @@ package main
 
 import (
 	"context"
-	"encoding/hex"
 	"fmt"
 	"math/big"
 	"os"
@@ -32,7 +31,7 @@ const (
 )
 
 func main() {
-	config, err := aggregation.NewDefaultConfiguration(nodeUrl, privateKey, constants.PolygonChainId, "https://api.1inch.dev", devPortalToken)
+	config, err := aggregation.NewConfiguration(nodeUrl, privateKey, constants.PolygonChainId, "https://api.1inch.dev", devPortalToken)
 	if err != nil {
 		return
 	}
@@ -43,7 +42,6 @@ func main() {
 	amountToSwap := big.NewInt(1e17)
 
 	allowanceData, err := client.GetApproveAllowance(ctx, aggregation.ApproveAllowanceParams{
-		ChainId: constants.PolygonChainId,
 		ApproveControllerGetAllowanceParams: aggregation.ApproveControllerGetAllowanceParams{
 			TokenAddress:  PolygonFRAX,
 			WalletAddress: client.Wallet.Address().Hex(),
@@ -58,7 +56,7 @@ func main() {
 	var permit string
 
 	if cmp > 0 {
-		spender, err := client.GetApproveSpender(ctx, aggregation.ApproveSpenderParams{ChainId: constants.EthereumChainId})
+		spender, err := client.GetApproveSpender(ctx)
 		if err != nil {
 			panic(err)
 		}
@@ -92,19 +90,9 @@ func main() {
 		return
 	}
 
-	data, err := hex.DecodeString(swapData.Tx.Data[2:])
-	if err != nil {
-		return
-	}
-	value, ok := new(big.Int).SetString(swapData.Tx.Value, 10)
-	if !ok {
-		return
-	}
-	to := common.HexToAddress(swapData.Tx.To)
-
 	builder := client.TxBuilder.New()
 
-	tx, err := builder.SetData(data).SetTo(&to).SetGas(uint64(swapData.Tx.Gas)).SetValue(value).Build(ctx)
+	tx, err := builder.SetData(swapData.TxNormalized.Data).SetTo(&swapData.TxNormalized.To).SetGas(swapData.TxNormalized.Gas).SetValue(swapData.TxNormalized.Value).Build(ctx)
 	if err != nil {
 		fmt.Printf("Failed to build transaction: %v\n", err)
 		return

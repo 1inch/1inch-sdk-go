@@ -8,16 +8,18 @@ import (
 )
 
 type Configuration struct {
-	WalletConfiguration *WalletConfiguration
-	ChainId             uint64
+	WalletConfiguration *ConfigurationWallet
+	APIConfiguration    *ConfigurationAPI
+}
 
+type ConfigurationAPI struct {
 	ApiKey string
 	ApiURL string
 
 	API api
 }
 
-type WalletConfiguration struct {
+type ConfigurationWallet struct {
 	PrivateKey string
 	NodeURL    string
 
@@ -25,7 +27,22 @@ type WalletConfiguration struct {
 	TxBuilder common.TransactionBuilderFactory
 }
 
-func NewDefaultConfiguration(nodeUrl string, privateKey string, chainId uint64, apiUrl string, apiKey string) (*Configuration, error) {
+func NewConfiguration(nodeUrl string, privateKey string, chainId uint64, apiUrl string, apiKey string) (*Configuration, error) {
+	apiCfg, err := NewConfigurationAPI(chainId, apiUrl, apiKey)
+	if err != nil {
+		return nil, err
+	}
+	walletCfg, err := NewConfigurationWallet(nodeUrl, privateKey, chainId)
+	if err != nil {
+		return nil, err
+	}
+	return &Configuration{
+		WalletConfiguration: walletCfg,
+		APIConfiguration:    apiCfg,
+	}, nil
+}
+
+func NewConfigurationAPI(chainId uint64, apiUrl string, apiKey string) (*ConfigurationAPI, error) {
 	executor, err := http_executor.DefaultHttpClient(apiUrl, apiKey)
 	if err != nil {
 		return nil, err
@@ -36,24 +53,22 @@ func NewDefaultConfiguration(nodeUrl string, privateKey string, chainId uint64, 
 		httpExecutor: executor,
 	}
 
-	walletCfg, err := NewDefaultWalletConfiguration(nodeUrl, privateKey, chainId)
-	if err != nil {
-		return nil, err
-	}
-	return &Configuration{
-		WalletConfiguration: walletCfg,
-		API:                 a,
+	return &ConfigurationAPI{
+		ApiURL: apiUrl,
+		ApiKey: apiKey,
+
+		API: a,
 	}, nil
 }
 
-func NewDefaultWalletConfiguration(nodeUrl string, privateKey string, chainId uint64) (*WalletConfiguration, error) {
+func NewConfigurationWallet(nodeUrl string, privateKey string, chainId uint64) (*ConfigurationWallet, error) {
 	w, err := web3_provider.DefaultWalletProvider(privateKey, nodeUrl, chainId)
 	if err != nil {
 		return nil, err
 	}
 
 	f := transaction_builder.NewFactory(w)
-	return &WalletConfiguration{
+	return &ConfigurationWallet{
 		Wallet:    w,
 		TxBuilder: f,
 	}, nil

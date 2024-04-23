@@ -30,7 +30,7 @@ const (
 )
 
 func main() {
-	config, err := aggregation.NewDefaultConfiguration(nodeUrl, privateKey, constants.EthereumChainId, "https://api.1inch.dev", devPortalToken)
+	config, err := aggregation.NewConfiguration(nodeUrl, privateKey, constants.EthereumChainId, "https://api.1inch.dev", devPortalToken)
 	if err != nil {
 		return
 	}
@@ -44,7 +44,6 @@ func main() {
 	amountToSwap := big.NewInt(1e18)
 
 	allowanceData, err := client.GetApproveAllowance(ctx, aggregation.ApproveAllowanceParams{
-		ChainId: constants.EthereumChainId,
 		ApproveControllerGetAllowanceParams: aggregation.ApproveControllerGetAllowanceParams{
 			TokenAddress:  PolygonDai,
 			WalletAddress: client.Wallet.Address().Hex(),
@@ -58,7 +57,6 @@ func main() {
 
 	if cmp > 0 {
 		approveData, err := client.GetApproveTransaction(ctx, aggregation.ApproveTransactionParams{
-			ChainId: constants.EthereumChainId,
 			ApproveControllerGetCallDataParams: aggregation.ApproveControllerGetCallDataParams{
 				TokenAddress: PolygonDai,
 				Amount:       amountToSwap.String(),

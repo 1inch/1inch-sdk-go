@@ -6,60 +6,22 @@ import (
 	"github.com/1inch/1inch-sdk-go/internal/validate"
 )
 
-type ApproveAllowanceParams struct {
-	ChainId int
-	ApproveControllerGetAllowanceParams
-}
-
-func (params *ApproveAllowanceParams) Validate() error {
+func (params *ApproveControllerGetAllowanceParams) Validate() error {
 	var validationErrors []error
-	validationErrors = validate.Parameter(params.ChainId, "chainId", validate.CheckChainIdRequired, validationErrors)
 	validationErrors = validate.Parameter(params.TokenAddress, "tokenAddress", validate.CheckEthereumAddressRequired, validationErrors)
 	validationErrors = validate.Parameter(params.WalletAddress, "walletAddress", validate.CheckEthereumAddressRequired, validationErrors)
 	return validate.ConsolidateValidationErorrs(validationErrors)
 }
 
-type ApproveSpenderParams struct {
-	ChainId int
-}
-
-func (params *ApproveSpenderParams) Validate() error {
+func (params *ApproveControllerGetCallDataParams) Validate() error {
 	var validationErrors []error
-	validationErrors = validate.Parameter(params.ChainId, "chainId", validate.CheckChainIdRequired, validationErrors)
-	return validate.ConsolidateValidationErorrs(validationErrors)
-}
-
-type ApproveTransactionParams struct {
-	ChainId int
-	ApproveControllerGetCallDataParams
-}
-
-func (params *ApproveTransactionParams) Validate() error {
-	var validationErrors []error
-	validationErrors = validate.Parameter(params.ChainId, "chainId", validate.CheckChainIdRequired, validationErrors)
 	validationErrors = validate.Parameter(params.TokenAddress, "tokenAddress", validate.CheckEthereumAddressRequired, validationErrors)
 	validationErrors = validate.Parameter(params.Amount, "amount", validate.CheckBigInt, validationErrors)
 	return validate.ConsolidateValidationErorrs(validationErrors)
 }
 
-type GetLiquiditySourcesParams struct {
-	ChainId int
-}
-
-func (params *GetLiquiditySourcesParams) Validate() error {
+func (params *AggregationControllerGetQuoteParams) Validate() error {
 	var validationErrors []error
-	validationErrors = validate.Parameter(params.ChainId, "chainId", validate.CheckChainIdRequired, validationErrors)
-	return validate.ConsolidateValidationErorrs(validationErrors)
-}
-
-type GetQuoteParams struct {
-	ChainId int
-	AggregationControllerGetQuoteParams
-}
-
-func (params *GetQuoteParams) Validate() error {
-	var validationErrors []error
-	validationErrors = validate.Parameter(params.ChainId, "chainId", validate.CheckChainIdRequired, validationErrors)
 	validationErrors = validate.Parameter(params.Src, "src", validate.CheckEthereumAddressRequired, validationErrors)
 	validationErrors = validate.Parameter(params.Dst, "dst", validate.CheckEthereumAddressRequired, validationErrors)
 	validationErrors = validate.Parameter(params.Amount, "amount", validate.CheckBigIntRequired, validationErrors)
@@ -99,31 +61,4 @@ func (params *AggregationControllerGetSwapParams) Validate() error {
 		validationErrors = append(validationErrors, errors.New("src and dst tokens must be different"))
 	}
 	return validate.ConsolidateValidationErorrs(validationErrors)
-}
-
-type GetTokensParams struct {
-	ChainId int
-}
-
-func (params *GetTokensParams) Validate() error {
-	var validationErrors []error
-	validationErrors = validate.Parameter(params.ChainId, "chainId", validate.CheckChainIdRequired, validationErrors)
-	return validate.ConsolidateValidationErorrs(validationErrors)
-}
-
-func (params *ApproveControllerGetCallDataParams) Validate() error {
-	if params.TokenAddress == "" {
-		return errors.New("tokenAddress is required")
-	}
-	return nil
-}
-
-func (params *ApproveControllerGetAllowanceParams) Validate() error {
-	if params.TokenAddress == "" {
-		return errors.New("tokenAddress is required")
-	}
-	if params.WalletAddress == "" {
-		return errors.New("walletAddress is required")
-	}
-	return nil
 }

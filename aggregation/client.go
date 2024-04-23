@@ -10,6 +10,10 @@ type Client struct {
 	TxBuilder common.TransactionBuilderFactory
 }
 
+type ClientOnlyAPI struct {
+	api
+}
+
 type api struct {
 	chainId      uint64
 	httpExecutor common.HttpExecutor
@@ -17,12 +21,20 @@ type api struct {
 
 func NewClient(cfg *Configuration) (*Client, error) {
 	c := Client{
-		api: cfg.API,
+		api: cfg.APIConfiguration.API,
 	}
 
 	if cfg.WalletConfiguration != nil {
 		c.Wallet = cfg.WalletConfiguration.Wallet
 		c.TxBuilder = cfg.WalletConfiguration.TxBuilder
+	}
+
+	return &c, nil
+}
+
+func NewClientOnlyAPI(cfg *ConfigurationAPI) (*ClientOnlyAPI, error) {
+	c := ClientOnlyAPI{
+		api: cfg.API,
 	}
 
 	return &c, nil
