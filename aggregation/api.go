@@ -48,7 +48,7 @@ func (api *api) GetTokens(ctx context.Context) (*TokensResponse, error) {
 }
 
 // GetApproveAllowance returns the allowance the 1inch router has to spend a token on behalf of a wallet
-func (api *api) GetApproveAllowance(ctx context.Context, params ApproveControllerGetAllowanceParams) (*AllowanceResponse, error) {
+func (api *api) GetApproveAllowance(ctx context.Context, params GetAllowanceParams) (*AllowanceResponse, error) {
 	u := fmt.Sprintf("/swap/v5.2/%d/approve/allowance", api.chainId)
 
 	err := params.Validate()
@@ -93,7 +93,7 @@ func (api *api) GetApproveSpender(ctx context.Context) (*SpenderResponse, error)
 }
 
 // GetApproveTransaction returns the transaction data for approving the 1inch router to spend a token on behalf of a wallet
-func (api *api) GetApproveTransaction(ctx context.Context, params ApproveControllerGetCallDataParams) (*ApproveCallDataResponseExtended, error) {
+func (api *api) GetApproveTransaction(ctx context.Context, params GetCallDataParams) (*ApproveCallDataResponseExtended, error) {
 	u := fmt.Sprintf("/swap/v5.2/%d/approve/transaction", api.chainId)
 
 	err := params.Validate()
@@ -117,7 +117,7 @@ func (api *api) GetApproveTransaction(ctx context.Context, params ApproveControl
 }
 
 // GetQuote returns the quote for a potential swap through the Aggregation Protocol
-func (api *api) GetQuote(ctx context.Context, params AggregationControllerGetQuoteParams) (*QuoteResponse, error) {
+func (api *api) GetQuote(ctx context.Context, params GetQuoteParams) (*QuoteResponse, error) {
 	u := fmt.Sprintf("/swap/v5.2/%d/quote", api.chainId)
 
 	err := params.Validate()
@@ -141,7 +141,7 @@ func (api *api) GetQuote(ctx context.Context, params AggregationControllerGetQuo
 }
 
 // GetSwap returns a swap quote with transaction data that can be used to execute a swap through the Aggregation Protocol
-func (api *api) GetSwap(ctx context.Context, params AggregationControllerGetSwapParams) (*SwapResponseExtended, error) {
+func (api *api) GetSwap(ctx context.Context, params GetSwapParams) (*SwapResponseExtended, error) {
 	u := fmt.Sprintf("/swap/v5.2/%d/swap", api.chainId)
 
 	err := params.Validate()

@@ -41,7 +41,7 @@ func main() {
 
 	amountToSwap := big.NewInt(1e17)
 
-	allowanceData, err := client.GetApproveAllowance(ctx, aggregation.ApproveControllerGetAllowanceParams{
+	allowanceData, err := client.GetApproveAllowance(ctx, aggregation.GetAllowanceParams{
 		TokenAddress:  PolygonFRAX,
 		WalletAddress: client.Wallet.Address().Hex(),
 	})
@@ -72,7 +72,7 @@ func main() {
 		}
 	}
 
-	swapParams := aggregation.AggregationControllerGetSwapParams{
+	swapParams := aggregation.GetSwapParams{
 		Src:      PolygonFRAX,
 		Dst:      PolygonWeth,
 		Amount:   amountToSwap.String(),

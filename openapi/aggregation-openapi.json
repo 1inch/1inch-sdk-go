@@ -3,7 +3,7 @@
   "paths": {
     "/v5.2/1/quote": {
       "get": {
-        "operationId": "AggregationController_getQuote",
+        "operationId": "getQuote",
         "summary": "Find the best quote to swap with 1inch Router",
         "parameters": [
           {
@@ -173,12 +173,14 @@
             }
           }
         },
-        "tags": ["Swap"]
+        "tags": [
+          "Swap"
+        ]
       }
     },
     "/v5.2/1/swap": {
       "get": {
-        "operationId": "AggregationController_getSwap",
+        "operationId": "getSwap",
         "summary": "Generate calldata to swap on 1inch Router",
         "parameters": [
           {
@@ -418,12 +420,14 @@
             }
           }
         },
-        "tags": ["Swap"]
+        "tags": [
+          "Swap"
+        ]
       }
     },
     "/v5.2/1/approve/spender": {
       "get": {
-        "operationId": "ApproveController_getSpender",
+        "operationId": "getSpender",
         "summary": "Address of the 1inch Router that is trusted to spend funds for the swap",
         "parameters": [],
         "responses": {
@@ -438,12 +442,14 @@
             }
           }
         },
-        "tags": ["Approve"]
+        "tags": [
+          "Approve"
+        ]
       }
     },
     "/v5.2/1/approve/transaction": {
       "get": {
-        "operationId": "ApproveController_getCallData",
+        "operationId": "getCallData",
         "summary": "Generate approve calldata to allow 1inch Router to perform a swap",
         "parameters": [
           {
@@ -480,12 +486,14 @@
             }
           }
         },
-        "tags": ["Approve"]
+        "tags": [
+          "Approve"
+        ]
       }
     },
     "/v5.2/1/approve/allowance": {
       "get": {
-        "operationId": "ApproveController_getAllowance",
+        "operationId": "getAllowance",
         "summary": "Get the number of tokens that the 1inch Router is allowed to swap",
         "parameters": [
           {
@@ -520,12 +528,14 @@
             }
           }
         },
-        "tags": ["Approve"]
+        "tags": [
+          "Approve"
+        ]
       }
     },
     "/v5.2/1/liquidity-sources": {
       "get": {
-        "operationId": "ProtocolsController_getProtocolsImages",
+        "operationId": "getLiquiditySources",
         "summary": "List of liquidity sources that are available for routing in the 1inch Aggregation Protocol",
         "parameters": [],
         "responses": {
@@ -540,12 +550,14 @@
             }
           }
         },
-        "tags": ["Info"]
+        "tags": [
+          "Info"
+        ]
       }
     },
     "/v5.2/1/tokens": {
       "get": {
-        "operationId": "TokensController_getTokens",
+        "operationId": "getTokens",
         "summary": "List of tokens that are available for swap in the 1inch Aggregation protocol",
         "parameters": [],
         "responses": {
@@ -560,7 +572,9 @@
             }
           }
         },
-        "tags": ["Info"]
+        "tags": [
+          "Info"
+        ]
       }
     }
   },
@@ -585,7 +599,9 @@
             "x-go-type-skip-optional-pointer": true
           }
         },
-        "required": ["tokens"]
+        "required": [
+          "tokens"
+        ]
       },
       "TokenInfo": {
         "type": "object",
@@ -630,7 +646,9 @@
             "x-go-type-skip-optional-pointer": true
           },
           "tags": {
-            "example": ["tokens"],
+            "example": [
+              "tokens"
+            ],
             "type": "array",
             "items": {
               "type": "string"
@@ -638,7 +656,13 @@
             "x-go-type-skip-optional-pointer": true
           }
         },
-        "required": ["address", "symbol", "name", "decimals", "logoURI"]
+        "required": [
+          "address",
+          "symbol",
+          "name",
+          "decimals",
+          "logoURI"
+        ]
       },
       "QuoteResponse": {
         "type": "object",
@@ -686,7 +710,9 @@
             "x-go-type-skip-optional-pointer": true
           }
         },
-        "required": ["toAmount"]
+        "required": [
+          "toAmount"
+        ]
       },
       "HttpExceptionMeta": {
         "type": "object",
@@ -700,7 +726,10 @@
             "x-go-type-skip-optional-pointer": true
           }
         },
-        "required": ["type", "value"]
+        "required": [
+          "type",
+          "value"
+        ]
       },
       "QuoteRequestError": {
         "type": "object",
@@ -720,7 +749,10 @@
           "statusCode": {
             "type": "number",
             "description": "HTTP code",
-            "enum": [400, 500],
+            "enum": [
+              400,
+              500
+            ],
             "example": 400,
             "x-go-type-skip-optional-pointer": true
           },
@@ -739,7 +771,13 @@
             "x-go-type-skip-optional-pointer": true
           }
         },
-        "required": ["error", "description", "statusCode", "requestId", "meta"]
+        "required": [
+          "error",
+          "description",
+          "statusCode",
+          "requestId",
+          "meta"
+        ]
       },
       "TransactionData": {
         "type": "object",
@@ -775,7 +813,14 @@
             "x-go-type-skip-optional-pointer": true
           }
         },
-        "required": ["from", "to", "data", "value", "gasPrice", "gas"]
+        "required": [
+          "from",
+          "to",
+          "data",
+          "value",
+          "gasPrice",
+          "gas"
+        ]
       },
       "SwapResponse": {
         "type": "object",
@@ -825,7 +870,10 @@
             ]
           }
         },
-        "required": ["toAmount", "tx"]
+        "required": [
+          "toAmount",
+          "tx"
+        ]
       },
       "SwapRequestError": {
         "type": "object",
@@ -845,7 +893,10 @@
           "statusCode": {
             "type": "number",
             "description": "HTTP code",
-            "enum": [400, 500],
+            "enum": [
+              400,
+              500
+            ],
             "example": 400,
             "x-go-type-skip-optional-pointer": true
           },
@@ -864,7 +915,13 @@
             "x-go-type-skip-optional-pointer": true
           }
         },
-        "required": ["error", "description", "statusCode", "requestId", "meta"]
+        "required": [
+          "error",
+          "description",
+          "statusCode",
+          "requestId",
+          "meta"
+        ]
       },
       "SpenderResponse": {
         "type": "object",
@@ -876,7 +933,9 @@
             "x-go-type-skip-optional-pointer": true
           }
         },
-        "required": ["address"]
+        "required": [
+          "address"
+        ]
       },
       "ApproveCallDataResponse": {
         "type": "object",
@@ -906,7 +965,12 @@
             "x-go-type-skip-optional-pointer": true
           }
         },
-        "required": ["data", "gasPrice", "to", "value"]
+        "required": [
+          "data",
+          "gasPrice",
+          "to",
+          "value"
+        ]
       },
       "AllowanceResponse": {
         "type": "object",
@@ -918,7 +982,9 @@
             "x-go-type-skip-optional-pointer": true
           }
         },
-        "required": ["allowance"]
+        "required": [
+          "allowance"
+        ]
       },
       "ProtocolImage": {
         "type": "object",
@@ -944,7 +1010,12 @@
             "x-go-type-skip-optional-pointer": true
           }
         },
-        "required": ["id", "title", "img", "img_color"]
+        "required": [
+          "id",
+          "title",
+          "img",
+          "img_color"
+        ]
       },
       "ProtocolsResponse": {
         "type": "object",
@@ -958,7 +1029,9 @@
             "x-go-type-skip-optional-pointer": true
           }
         },
-        "required": ["protocols"]
+        "required": [
+          "protocols"
+        ]
       },
       "SelectedProtocol": {
         "type": "object",
@@ -988,7 +1061,12 @@
             "x-go-type-skip-optional-pointer": true
           }
         },
-        "required": ["name", "part", "fromTokenAddress", "toTokenAddress"]
+        "required": [
+          "name",
+          "part",
+          "fromTokenAddress",
+          "toTokenAddress"
+        ]
       }
     }
   }

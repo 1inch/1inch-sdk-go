@@ -35,7 +35,7 @@ func main() {
 	}
 	ctx := context.Background()
 
-	quote, err := client.GetQuote(ctx, aggregation.AggregationControllerGetQuoteParams{
+	quote, err := client.GetQuote(ctx, aggregation.GetQuoteParams{
 		Src:    PolygonDai,
 		Dst:    PolygonWeth,
 		Amount: "10000000000000000",

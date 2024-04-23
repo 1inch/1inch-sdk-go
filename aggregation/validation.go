@@ -6,21 +6,21 @@ import (
 	"github.com/1inch/1inch-sdk-go/internal/validate"
 )
 
-func (params *ApproveControllerGetAllowanceParams) Validate() error {
+func (params *GetAllowanceParams) Validate() error {
 	var validationErrors []error
 	validationErrors = validate.Parameter(params.TokenAddress, "tokenAddress", validate.CheckEthereumAddressRequired, validationErrors)
 	validationErrors = validate.Parameter(params.WalletAddress, "walletAddress", validate.CheckEthereumAddressRequired, validationErrors)
 	return validate.ConsolidateValidationErorrs(validationErrors)
 }
 
-func (params *ApproveControllerGetCallDataParams) Validate() error {
+func (params *GetCallDataParams) Validate() error {
 	var validationErrors []error
 	validationErrors = validate.Parameter(params.TokenAddress, "tokenAddress", validate.CheckEthereumAddressRequired, validationErrors)
 	validationErrors = validate.Parameter(params.Amount, "amount", validate.CheckBigInt, validationErrors)
 	return validate.ConsolidateValidationErorrs(validationErrors)
 }
 
-func (params *AggregationControllerGetQuoteParams) Validate() error {
+func (params *GetQuoteParams) Validate() error {
 	var validationErrors []error
 	validationErrors = validate.Parameter(params.Src, "src", validate.CheckEthereumAddressRequired, validationErrors)
 	validationErrors = validate.Parameter(params.Dst, "dst", validate.CheckEthereumAddressRequired, validationErrors)
@@ -39,7 +39,7 @@ func (params *AggregationControllerGetQuoteParams) Validate() error {
 	return validate.ConsolidateValidationErorrs(validationErrors)
 }
 
-func (params *AggregationControllerGetSwapParams) Validate() error {
+func (params *GetSwapParams) Validate() error {
 	var validationErrors []error
 	validationErrors = validate.Parameter(params.Src, "src", validate.CheckEthereumAddressRequired, validationErrors)
 	validationErrors = validate.Parameter(params.Dst, "dst", validate.CheckEthereumAddressRequired, validationErrors)

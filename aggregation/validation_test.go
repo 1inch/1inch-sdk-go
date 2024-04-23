@@ -13,12 +13,12 @@ const ethereumUsdc = "0xa0b86991c6218b36c1d19d4a2e9eb0ce3606eb48"
 func TestSwapTokensParams_Validate(t *testing.T) {
 	testCases := []struct {
 		description  string
-		params       AggregationControllerGetSwapParams
+		params       GetSwapParams
 		expectErrors []string
 	}{
 		{
 			description: "Valid parameters",
-			params: AggregationControllerGetSwapParams{
+			params: GetSwapParams{
 				Src:      "0x1234567890abcdef1234567890abcdef12345678",
 				Dst:      "0x1234567890abcdef1234567890abcdef12345679",
 				Amount:   "10000",
@@ -28,7 +28,7 @@ func TestSwapTokensParams_Validate(t *testing.T) {
 		},
 		{
 			description: "Missing required parameters",
-			params:      AggregationControllerGetSwapParams{},
+			params:      GetSwapParams{},
 			expectErrors: []string{
 				"'src' is required",
 				"'dst' is required",
@@ -59,19 +59,19 @@ func TestSwapTokensParams_Validate(t *testing.T) {
 func TestApproveAllowanceParams_Validate(t *testing.T) {
 	testCases := []struct {
 		description  string
-		params       ApproveControllerGetAllowanceParams
+		params       GetAllowanceParams
 		expectErrors []string
 	}{
 		{
 			description: "Valid parameters",
-			params: ApproveControllerGetAllowanceParams{
+			params: GetAllowanceParams{
 				TokenAddress:  "0x1234567890abcdef1234567890abcdef12345678",
 				WalletAddress: "0x1234567890abcdef1234567890abcdef12345678",
 			},
 		},
 		{
 			description: "Missing required parameters",
-			params:      ApproveControllerGetAllowanceParams{},
+			params:      GetAllowanceParams{},
 			expectErrors: []string{
 				"'tokenAddress' is required",
 				"'walletAddress' is required",
@@ -99,18 +99,18 @@ func TestApproveAllowanceParams_Validate(t *testing.T) {
 func TestApproveTransactionParams_Validate(t *testing.T) {
 	testCases := []struct {
 		description  string
-		params       ApproveControllerGetCallDataParams
+		params       GetCallDataParams
 		expectErrors []string
 	}{
 		{
 			description: "Valid parameters",
-			params: ApproveControllerGetCallDataParams{
+			params: GetCallDataParams{
 				TokenAddress: "0x1234567890abcdef1234567890abcdef12345678",
 			},
 		},
 		{
 			description: "Missing required parameters",
-			params:      ApproveControllerGetCallDataParams{},
+			params:      GetCallDataParams{},
 			expectErrors: []string{
 				"'tokenAddress' is required",
 			},
@@ -137,12 +137,12 @@ func TestApproveTransactionParams_Validate(t *testing.T) {
 func TestGetQuoteParams_Validate(t *testing.T) {
 	testCases := []struct {
 		description  string
-		params       AggregationControllerGetQuoteParams
+		params       GetQuoteParams
 		expectErrors []string
 	}{
 		{
 			description: "Valid parameters",
-			params: AggregationControllerGetQuoteParams{
+			params: GetQuoteParams{
 				Src:    "0x1234567890abcdef1234567890abcdef12345678",
 				Dst:    "0x1234567890abcdef1234567890abcdef12345679",
 				Amount: "10000",
@@ -150,7 +150,7 @@ func TestGetQuoteParams_Validate(t *testing.T) {
 		},
 		{
 			description: "Missing required parameters",
-			params:      AggregationControllerGetQuoteParams{},
+			params:      GetQuoteParams{},
 			expectErrors: []string{
 				"'src' is required",
 				"'dst' is required",
@@ -179,12 +179,12 @@ func TestGetQuoteParams_Validate(t *testing.T) {
 func TestGetSwapDataParams_Validate(t *testing.T) {
 	testCases := []struct {
 		description  string
-		params       AggregationControllerGetSwapParams
+		params       GetSwapParams
 		expectErrors []string
 	}{
 		{
 			description: "Valid parameters",
-			params: AggregationControllerGetSwapParams{
+			params: GetSwapParams{
 				Src:      "0x1234567890abcdef1234567890abcdef12345678",
 				Dst:      "0x1234567890abcdef1234567890abcdef12345679",
 				Amount:   "10000",
@@ -194,7 +194,7 @@ func TestGetSwapDataParams_Validate(t *testing.T) {
 		},
 		{
 			description: "Missing required parameters",
-			params:      AggregationControllerGetSwapParams{},
+			params:      GetSwapParams{},
 			expectErrors: []string{
 				"'src' is required",
 				"'dst' is required",
@@ -205,7 +205,7 @@ func TestGetSwapDataParams_Validate(t *testing.T) {
 		},
 		{
 			description: "Error - src and dst tokens are identical",
-			params: AggregationControllerGetSwapParams{
+			params: GetSwapParams{
 				Src:      ethereumUsdc,
 				Dst:      ethereumUsdc,
 				Amount:   "10000",
