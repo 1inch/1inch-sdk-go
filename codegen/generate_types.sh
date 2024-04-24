@@ -16,6 +16,35 @@ display_help() {
     echo "  -help              Display this help message."
 }
 
+# update_operation_ids uses mappings from mapping.json to update operationId in the openapi files
+update_operation_ids() {
+    local api_openapi_file_name="$1"
+    local mapping_file="mapping.json"  # Define the location of your mapping file
+    local temp_file="${api_openapi_file_name}.tmp"  # Define the temporary file name
+
+    # Ensure the mapping file exists
+    if [ ! -f "$mapping_file" ]; then
+        echo "Mapping file not found: $mapping_file"
+        return 1
+    fi
+
+    # Use jq to update operationId based on the mapping file
+    jq --slurpfile map "$mapping_file" '
+        .paths |= with_entries(
+            .value |= with_entries(
+                if .value.operationId then
+                    .value.operationId = ($map[0][.value.operationId] // .value.operationId)
+                else
+                    .
+                end
+            )
+        )' "$api_openapi_file_name" > "$temp_file"
+
+    # Optionally, provide a message that the file has been updated
+    echo "Updated operationIds in $api_openapi_file_name and saved to $temp_file"
+}
+
+
 # check_and_fix_incorrect_number_arrays checks for a known incorrect formatting for number arrays and fixes them for oapi-codegen
 check_and_fix_incorrect_number_arrays() {
     local api_openapi_file_name="$1"
@@ -74,7 +103,7 @@ add_pointer_skip_field() {
 # Check that the script is being run from within the golang folder specifically
 current_folder_name=$(basename "$PWD")
 
-if [[ ! "$current_folder_name" == "1inch-sdk-go" ]]; then
+if [[ ! "$current_folder_name" == "codegen" ]]; then
     echo "This script can only be run from the directory in which it exists."
     exit 1
 fi
@@ -139,6 +168,8 @@ fi
 
 # Loop over all openapi files in the directory
 for api_openapi_file_name in "$openapi_dir"/*-openapi.json; do
+
+
     # Extract the service name from the filename
     package_name_raw=$(basename "$api_openapi_file_name" -openapi.json)
 
@@ -171,6 +202,14 @@ for api_openapi_file_name in "$openapi_dir"/*-openapi.json; do
 
     # Add x-go-type-skip-optional-pointer to schema objects and parameters if not already present
     add_pointer_skip_field "$api_openapi_file_name"
+
+
+    if [ "$verbose_logging" = "true" ]; then
+      echo "Updating operationId for $api_openapi_file_name using mapping from $mapping_file"
+    fi
+
+    # Call to update operationIds
+    update_operation_ids "$api_openapi_file_name"
 
     mv ${api_openapi_file_name}.tmp $api_openapi_file_name || {
         echo "Error: Failed to overwrite the temporary jq file back to $api_openapi_file_name."

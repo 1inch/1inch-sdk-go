@@ -32,3 +32,8 @@ go-lint:
 	@echo "  >  Running golint "
 	bin/golangci-lint version
 	bin/golangci-lint run --timeout=2m
+
+codegen-types:
+	@echo "Running generate_types.sh from the codegen directory..."
+	@cd codegen && ./generate_types.sh
+	@echo "Script execution completed."
