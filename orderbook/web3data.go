@@ -60,7 +60,17 @@ func (c *Client) GetFillOrderCalldata(getOrderResponse *models.GetOrderByHashRes
 		return nil, err
 	}
 
-	fillOrderData, err := aggregationRouterV6.Pack(function, getOrderResponse.LimitOrderDataNormalized, BytesToBytes32(compressedSignature.R), BytesToBytes32(compressedSignature.VS), getOrderResponse.LimitOrderDataNormalized.TakingAmount, big.NewInt(0))
+	rCompressed, err := BytesToBytes32(compressedSignature.R)
+	if err != nil {
+		return nil, err
+	}
+
+	vsCompressed, err := BytesToBytes32(compressedSignature.VS)
+	if err != nil {
+		return nil, err
+	}
+
+	fillOrderData, err := aggregationRouterV6.Pack(function, getOrderResponse.LimitOrderDataNormalized, rCompressed, vsCompressed, getOrderResponse.LimitOrderDataNormalized.TakingAmount, big.NewInt(0))
 	if err != nil {
 		return nil, err
 	}
