@@ -118,8 +118,8 @@ import (
 //		require.NoError(t, err)
 //		require.Equal(t, "DAI", tokenName)
 //	}
+
 func TestBuildCallData(t *testing.T) {
-	// Define test cases
 	tests := []struct {
 		name     string
 		to       common.Address
@@ -155,7 +155,6 @@ func TestBuildCallData(t *testing.T) {
 		},
 	}
 
-	// Execute tests
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
 			actual := BuildCallData(tt.to, tt.data, tt.gas, tt.opts...)
