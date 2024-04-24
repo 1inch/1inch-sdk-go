@@ -1,6 +1,9 @@
 package models
 
-import "time"
+import (
+	"math/big"
+	"time"
+)
 
 type CreateOrderResponse struct {
 	Success bool `json:"success"`
@@ -29,6 +32,42 @@ type OrderResponse struct {
 	TakerRate          string      `json:"takerRate"`
 	IsMakerContract    bool        `json:"isMakerContract"`
 	OrderInvalidReason interface{} `json:"orderInvalidReason"`
+}
+
+type GetOrderByHashResponse struct {
+	ID                   int         `json:"id"`
+	OrderHash            string      `json:"orderHash"`
+	CreateDateTime       time.Time   `json:"createDateTime"`
+	LastChangedDateTime  time.Time   `json:"lastChangedDateTime"`
+	TakerAsset           string      `json:"takerAsset"`
+	MakerAsset           string      `json:"makerAsset"`
+	OrderMaker           string      `json:"orderMaker"`
+	OrderStatus          int         `json:"orderStatus"`
+	Signature            string      `json:"signature"`
+	MakerAmount          string      `json:"makerAmount"`
+	RemainingMakerAmount string      `json:"remainingMakerAmount"`
+	MakerBalance         string      `json:"makerBalance"`
+	MakerAllowance       string      `json:"makerAllowance"`
+	TakerAmount          string      `json:"takerAmount"`
+	Data                 Data        `json:"data"`
+	MakerRate            string      `json:"makerRate"`
+	TakerRate            string      `json:"takerRate"`
+	TakerRateDoubled     float64     `json:"takerRateDoubled"`
+	OrderHashSelector    int         `json:"orderHashSelector"`
+	OrderInvalidReason   interface{} `json:"orderInvalidReason"`
+	IsMakerContract      bool        `json:"isMakerContract"`
+}
+
+type Data struct {
+	Salt         string `json:"salt"`
+	Maker        string `json:"maker"`
+	Receiver     string `json:"receiver"`
+	Extension    string `json:"extension,omitempty"`
+	MakerAsset   string `json:"makerAsset"`
+	TakerAsset   string `json:"takerAsset"`
+	MakerTraits  string `json:"makerTraits"`
+	MakingAmount string `json:"makingAmount"`
+	TakingAmount string `json:"takingAmount"`
 }
 
 type CountResponse struct {
@@ -60,4 +99,21 @@ type BuildMakerTraitsParams struct {
 	Expiry             int64
 	Nonce              int64
 	Series             int64
+}
+
+type GetOrderByHashResponseExtended struct {
+	GetOrderByHashResponse
+
+	LimitOrderDataNormalized NormalizedLimitOrderData
+}
+
+type NormalizedLimitOrderData struct {
+	Salt         *big.Int
+	MakerAsset   *big.Int
+	TakerAsset   *big.Int
+	Maker        *big.Int
+	Receiver     *big.Int
+	MakingAmount *big.Int
+	TakingAmount *big.Int
+	MakerTraits  *big.Int
 }

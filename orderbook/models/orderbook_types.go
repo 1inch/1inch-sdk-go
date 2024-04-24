@@ -64,6 +64,18 @@ func (params *GetOrdersByCreatorAddressParams) Validate() error {
 	return validate.ConsolidateValidationErorrs(validationErrors)
 }
 
+type GetOrderParams struct {
+	ChainId   int
+	OrderHash string
+}
+
+func (params *GetOrderParams) Validate() error {
+	var validationErrors []error
+	validationErrors = validate.Parameter(params.ChainId, "chainId", validate.CheckChainIdRequired, validationErrors)
+	validationErrors = validate.Parameter(params.OrderHash, "orderHash", validate.CheckOrderHashRequired, validationErrors)
+	return validate.ConsolidateValidationErorrs(validationErrors)
+}
+
 type GetAllOrdersParams struct {
 	ChainId int
 	LimitOrderV3SubscribedApiControllerGetAllLimitOrdersParams

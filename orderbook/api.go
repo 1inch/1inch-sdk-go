@@ -98,6 +98,30 @@ func (api *api) GetOrdersByCreatorAddress(ctx context.Context, params models.Get
 	return ordersResponse, nil
 }
 
+// GetOrder returns an order from Limit Order Protocol that matches a specific hash
+func (api *api) GetOrder(ctx context.Context, params models.GetOrderParams) (*models.GetOrderByHashResponseExtended, error) {
+	u := fmt.Sprintf("/orderbook/v4.0/%d/order/%s", api.chainId, params.OrderHash)
+
+	err := params.Validate()
+	if err != nil {
+		return nil, err
+	}
+
+	payload := common.RequestPayload{
+		Method: "GET",
+		Params: params,
+		U:      u,
+	}
+
+	var getOrderByHashResponse *models.GetOrderByHashResponse
+	err = api.httpExecutor.ExecuteRequest(ctx, payload, &getOrderByHashResponse)
+	if err != nil {
+		return nil, err
+	}
+
+	return normalizeGetOrderByHashResponse(getOrderByHashResponse)
+}
+
 // GetAllOrders returns all orders in the Limit Order Protocol
 func (api *api) GetAllOrders(ctx context.Context, params models.GetAllOrdersParams) ([]models.OrderResponse, error) {
 	u := fmt.Sprintf("/orderbook/v3.0/%d/all", api.chainId)

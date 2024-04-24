@@ -11,6 +11,7 @@ import (
 	gethCommon "github.com/ethereum/go-ethereum/common"
 
 	"github.com/1inch/1inch-sdk-go/constants"
+	"github.com/1inch/1inch-sdk-go/orderbook/models"
 )
 
 func (c *Client) GetSeriesNonce(ctx context.Context, publicAddress gethCommon.Address) (*big.Int, error) {
@@ -44,4 +45,25 @@ func (c *Client) GetSeriesNonce(ctx context.Context, publicAddress gethCommon.Ad
 	}
 
 	return nonce, nil
+}
+
+func (c *Client) GetFillOrderCalldata(getOrderResponse *models.GetOrderByHashResponseExtended) ([]byte, error) {
+	function := "fillOrder"
+
+	aggregationRouterV6, err := abi.JSON(strings.NewReader(constants.AggregationRouterV6ABI))
+	if err != nil {
+		return nil, err
+	}
+
+	compressedSignature, err := CompressSignature(getOrderResponse.Signature[2:])
+	if err != nil {
+		return nil, err
+	}
+
+	fillOrderData, err := aggregationRouterV6.Pack(function, getOrderResponse.LimitOrderDataNormalized, BytesToBytes32(compressedSignature.R), BytesToBytes32(compressedSignature.VS), getOrderResponse.LimitOrderDataNormalized.TakingAmount, big.NewInt(0))
+	if err != nil {
+		return nil, err
+	}
+
+	return fillOrderData, nil
 }

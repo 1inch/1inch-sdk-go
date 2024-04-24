@@ -10,3 +10,6 @@ var SeriesNonceManagerABI string
 
 //go:embed abi/aggregationRouterV5.abi.json
 var AggregationRouterV5ABI string
+
+//go:embed abi/aggregationRouterV6.abi.json
+var AggregationRouterV6ABI string
