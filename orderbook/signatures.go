@@ -29,14 +29,9 @@ func CompressSignature(signature string) (*CompactSignature, error) {
 	copy(s, signatureBytes[32:64])
 	v := signatureBytes[64]
 
-	// Adjust v according to Ethereum's usual 27-28 scheme if necessary
-	if v < 27 {
-		v += 27
-	}
-
-	// Encode v into s (last byte, first bit)
+	// Encode v into s (first bit)
 	if v == 28 {
-		s[31] |= 0x80 // Set the first bit if v is 28
+		s[0] |= 0x80 // Set the first bit if v is 28
 	}
 
 	return &CompactSignature{

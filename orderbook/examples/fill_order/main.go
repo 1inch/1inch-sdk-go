@@ -14,6 +14,12 @@ import (
 	"github.com/1inch/1inch-sdk-go/orderbook/models"
 )
 
+/*
+This example demonstrates how to fill an order on the Polygon network using the 1inch SDK.
+You need to provide your wallet address, wallet key, dev portal token, and the order hash + chain ID of the order you would like to fill.
+This can be done through your environment, or you can directly set them in the variables below
+*/
+
 var (
 	privateKey     = os.Getenv("WALLET_KEY")
 	nodeUrl        = os.Getenv("NODE_URL")
@@ -21,13 +27,11 @@ var (
 )
 
 const (
-	limitOrderHash = "0xdd17bfaf789cc17ac14cdc279f1b686830082e1e3e220b5fcebff5ba26854717"
+	limitOrderHash = "0x66a02d8afe24325452aa218dd076d903383433d6332ea5371fbc39b35a850b96"
 	chainId        = 137
 )
 
 func main() {
-	// use the swap example program as a template for building the limit order fill flow
-
 	ctx := context.Background()
 
 	config, err := orderbook.NewDefaultConfiguration(nodeUrl, privateKey, uint64(chainId), "https://api.1inch.dev", devPortalToken)
@@ -43,13 +47,13 @@ func main() {
 
 	fillOrderData, err := client.GetFillOrderCalldata(getOrderRresponse)
 
+	fmt.Printf("fillOrderData: %x\n", fillOrderData)
+
 	aggregationRouter, err := constants.Get1inchRouterFromChainId(chainId)
 	if err != nil {
 		log.Fatalf("Failed to get 1inch router address: %v", err)
 	}
 	aggregationRouterAddress := gethCommon.HexToAddress(aggregationRouter)
-
-	fmt.Printf("fillOrderData: %x\n", fillOrderData)
 
 	tx, err := client.TxBuilder.New().SetData(fillOrderData).SetTo(&aggregationRouterAddress).SetGas(150000).Build(ctx)
 	if err != nil {

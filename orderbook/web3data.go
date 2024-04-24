@@ -77,3 +77,17 @@ func (c *Client) GetFillOrderCalldata(getOrderResponse *models.GetOrderByHashRes
 
 	return fillOrderData, nil
 }
+
+// BytesToBytes32 converts a byte slice to a [32]byte, padding with zeros if necessary,
+// and truncating if it's too long.
+func BytesToBytes32(b []byte) (*[32]byte, error) {
+	var arr [32]byte
+	if len(b) > 32 {
+		// If b is longer than 32 bytes, error out to avoid losing data
+		return nil, fmt.Errorf("input is longer than 32 bytes")
+	} else {
+		// If b is shorter than 32 bytes, copy it as is and leave the rest zeroed
+		copy(arr[:], b)
+	}
+	return &arr, nil
+}

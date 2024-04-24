@@ -8,8 +8,10 @@ import (
 	"os"
 	"time"
 
+	gethCommon "github.com/ethereum/go-ethereum/common"
 	"github.com/ethereum/go-ethereum/crypto"
 
+	"github.com/1inch/1inch-sdk-go/constants"
 	"github.com/1inch/1inch-sdk-go/orderbook"
 	"github.com/1inch/1inch-sdk-go/orderbook/models"
 )
@@ -60,7 +62,7 @@ func main() {
 		ChainId:                        chainId,
 		SeriesNonce:                    seriesNonce,
 		PrivateKey:                     privateKey,
-		ExpireAfter:                    time.Now().Add(time.Minute * 10).Unix(), // TODO update the field name to have "unix" suffix
+		ExpireAfter:                    time.Now().Add(time.Hour * 10).Unix(), // TODO update the field name to have "unix" suffix
 		Maker:                          publicAddress.Hex(),
 		MakerAsset:                     wmatic,
 		TakerAsset:                     usdc,
@@ -86,4 +88,60 @@ func main() {
 	})
 
 	fmt.Printf("Order created! \nOrder hash: %v\n", getOrderResponse[0].OrderHash)
+
+	// Sleep to accommodate free-tier API keys
+	time.Sleep(time.Second)
+
+	getOrderRresponse, err := client.GetOrder(ctx, models.GetOrderParams{
+		ChainId:   chainId,
+		OrderHash: getOrderResponse[0].OrderHash,
+	})
+
+	fmt.Printf("Order retrieved! \nOrder sig: %v\n", getOrderRresponse.Signature)
+
+	fillOrderData, err := client.GetFillOrderCalldata(getOrderRresponse)
+
+	fmt.Printf("fillOrderData: %x\n", fillOrderData)
+
+	aggregationRouter, err := constants.Get1inchRouterFromChainId(chainId)
+	if err != nil {
+		log.Fatalf("Failed to get 1inch router address: %v", err)
+	}
+	aggregationRouterAddress := gethCommon.HexToAddress(aggregationRouter)
+
+	tx, err := client.TxBuilder.New().SetData(fillOrderData).SetTo(&aggregationRouterAddress).SetGas(150000).Build(ctx)
+	if err != nil {
+		fmt.Printf("Failed to build transaction: %v\n", err)
+		return
+	}
+	signedTx, err := client.Wallet.Sign(tx)
+	if err != nil {
+		fmt.Printf("Failed to sign transaction: %v\n", err)
+		return
+	}
+
+	err = client.Wallet.BroadcastTransaction(ctx, signedTx)
+	if err != nil {
+		fmt.Printf("Failed to broadcast transaction: %v\n", err)
+		return
+	}
+
+	// Waiting for transaction, just an example of it
+	fmt.Printf("Transaction has been broadcast. View it on Polygonscan here: %v\n", fmt.Sprintf("https://polygonscan.com/tx/%v", signedTx.Hash().Hex()))
+	for {
+		receipt, err := client.Wallet.TransactionReceipt(ctx, signedTx.Hash())
+		if receipt != nil {
+			fmt.Println("Transaction complete!")
+			return
+		}
+		if err != nil {
+			fmt.Println("Waiting for transaction to be mined")
+		}
+		select {
+		case <-time.After(1000 * time.Millisecond): // check again after a delay
+		case <-ctx.Done():
+			fmt.Println("Context cancelled")
+			return
+		}
+	}
 }
