@@ -202,6 +202,10 @@ func (w *MyWallet) BroadcastTransaction(ctx context.Context, tx *types.Transacti
 	return nil
 }
 
+func (w *MyWallet) EstimateGas(ctx context.Context, contractAddress gethCommon.Address, callData []byte) (uint64, error) {
+	return 0, nil
+}
+
 func (w *MyWallet) TransactionReceipt(ctx context.Context, txHash gethCommon.Hash) (*types.Receipt, error) {
 	return nil, nil
 }

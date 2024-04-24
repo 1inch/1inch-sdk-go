@@ -1,0 +1,9 @@
+{
+  "AggregationController_getQuote": "getQuote",
+  "AggregationController_getSwap": "getSwap",
+  "ApproveController_getSpender": "getSpender",
+  "ApproveController_getCallData": "getApprove",
+  "ApproveController_getAllowance": "getAllowance",
+  "ProtocolsController_getProtocolsImages": "getLiquiditySources",
+  "TokensController_getTokens": "getTokens"
+}

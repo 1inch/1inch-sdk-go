@@ -9,7 +9,6 @@ import (
 	"github.com/ethereum/go-ethereum/common"
 
 	"github.com/1inch/1inch-sdk-go/aggregation"
-	"github.com/1inch/1inch-sdk-go/aggregation/models"
 	"github.com/1inch/1inch-sdk-go/constants"
 )
 
@@ -31,7 +30,7 @@ const (
 )
 
 func main() {
-	config, err := aggregation.NewDefaultConfiguration(nodeUrl, privateKey, constants.EthereumChainId, "https://api.1inch.dev", devPortalToken)
+	config, err := aggregation.NewConfiguration(nodeUrl, privateKey, constants.EthereumChainId, "https://api.1inch.dev", devPortalToken)
 	if err != nil {
 		return
 	}
@@ -44,12 +43,9 @@ func main() {
 
 	amountToSwap := big.NewInt(1e18)
 
-	allowanceData, err := client.GetApproveAllowance(ctx, models.ApproveAllowanceParams{
-		ChainId: constants.EthereumChainId,
-		ApproveControllerGetAllowanceParams: models.ApproveControllerGetAllowanceParams{
-			TokenAddress:  PolygonDai,
-			WalletAddress: client.Wallet.Address().Hex(),
-		},
+	allowanceData, err := client.GetApproveAllowance(ctx, aggregation.GetAllowanceParams{
+		TokenAddress:  PolygonDai,
+		WalletAddress: client.Wallet.Address().Hex(),
 	})
 
 	allowance := new(big.Int)
@@ -58,12 +54,9 @@ func main() {
 	cmp := amountToSwap.Cmp(allowance)
 
 	if cmp > 0 {
-		approveData, err := client.GetApproveTransaction(ctx, models.ApproveTransactionParams{
-			ChainId: constants.EthereumChainId,
-			ApproveControllerGetCallDataParams: models.ApproveControllerGetCallDataParams{
-				TokenAddress: PolygonDai,
-				Amount:       amountToSwap.String(),
-			},
+		approveData, err := client.GetApproveTransaction(ctx, aggregation.GetApproveParams{
+			TokenAddress: PolygonDai,
+			Amount:       amountToSwap.String(),
 		})
 		if err != nil {
 			panic(err)
