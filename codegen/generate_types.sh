@@ -228,4 +228,10 @@ for api_openapi_file_name in "$openapi_dir"/*-openapi.json; do
         echo "Error: Failed to replace tags in $output_file."
         exit 1
     }
+
+    new_dir="../$package_name"  # Adjust relative path according to your project structure
+        mkdir -p "$new_dir" && mv "$output_file" "$new_dir/" || {
+            echo "Error: Failed to move generated types to $new_dir."
+            exit 1
+        }
 done
