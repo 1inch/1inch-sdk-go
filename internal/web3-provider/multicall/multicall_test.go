@@ -1,7 +1,15 @@
 package multicall
 
+import (
+	"testing"
+
+	"github.com/ethereum/go-ethereum/common"
+	"github.com/stretchr/testify/assert"
+)
+
 // make it no network tests with normal mocks
-//import (
+// import (
+//
 //	"context"
 //	"strings"
 //	"testing"
@@ -12,9 +20,11 @@ package multicall
 //	"github.com/stretchr/testify/require"
 //
 //	"github.com/1inch/1inch-sdk-go/constants"
-//)
 //
-//const (
+// )
+//
+// const (
+//
 //	nameMethod   = "name"
 //	symbolMethod = "symbol"
 //
@@ -47,64 +57,109 @@ package multicall
 //	ArbitrumUsdc = "0xaf88d065e77c8cc2239327c5edb3a432268e5831"
 //	ArbitrumDai  = "0xda10009cbd5d07dd0cecc66161fc93d7c9000da1"
 //	ArbitrumFrax = "0x17fc002b466eec40dae837fc4be5c67993ddbd6f"
-//)
 //
+// )
 //
-//func TestMulticallEthereumSuccess(t *testing.T) {
-//	client, err := ethclient.Dial(Ethereum)
-//	require.NoError(t, err)
+//	func TestMulticallEthereumSuccess(t *testing.T) {
+//		client, err := ethclient.Dial(Ethereum)
+//		require.NoError(t, err)
 //
-//	instance, err := NewMulticall(client, constants.EthereumChainId)
-//	require.NoError(t, err)
+//		instance, err := NewMulticall(client, constants.EthereumChainId)
+//		require.NoError(t, err)
 //
-//	var callData []CallData
-//	parsedABI, err := abi.JSON(strings.NewReader(constants.Erc20ABI)) // Make a generic version of this ABI
-//	require.NoError(t, err)
+//		var callData []CallData
+//		parsedABI, err := abi.JSON(strings.NewReader(constants.Erc20ABI)) // Make a generic version of this ABI
+//		require.NoError(t, err)
 //
-//	nameRequest, err := parsedABI.Pack(nameMethod)
-//	require.NoError(t, err)
-//	callData = append(callData, BuildCallData(common.HexToAddress(EthereumUsdc), nameRequest, 0))
-//	callData = append(callData, BuildCallData(common.HexToAddress(EthereumDai), nameRequest, 0))
+//		nameRequest, err := parsedABI.Pack(nameMethod)
+//		require.NoError(t, err)
+//		callData = append(callData, BuildCallData(common.HexToAddress(EthereumUsdc), nameRequest, 0))
+//		callData = append(callData, BuildCallData(common.HexToAddress(EthereumDai), nameRequest, 0))
 //
-//	resp, err := instance.Execute(context.Background(), callData)
-//	require.NoError(t, err)
+//		resp, err := instance.Execute(context.Background(), callData)
+//		require.NoError(t, err)
 //
-//	var tokenName string
-//	err = parsedABI.UnpackIntoInterface(&tokenName, nameMethod, resp[0])
-//	require.NoError(t, err)
-//	require.Equal(t, "USD Coin", tokenName)
+//		var tokenName string
+//		err = parsedABI.UnpackIntoInterface(&tokenName, nameMethod, resp[0])
+//		require.NoError(t, err)
+//		require.Equal(t, "USD Coin", tokenName)
 //
-//	err = parsedABI.UnpackIntoInterface(&tokenName, nameMethod, resp[1])
-//	require.NoError(t, err)
-//	require.Equal(t, "Dai Stablecoin", tokenName)
-//}
+//		err = parsedABI.UnpackIntoInterface(&tokenName, nameMethod, resp[1])
+//		require.NoError(t, err)
+//		require.Equal(t, "Dai Stablecoin", tokenName)
+//	}
 //
-//func TestMulticallPolygonSuccess(t *testing.T) {
-//	client, err := ethclient.Dial(Polygon)
-//	require.NoError(t, err)
+//	func TestMulticallPolygonSuccess(t *testing.T) {
+//		client, err := ethclient.Dial(Polygon)
+//		require.NoError(t, err)
 //
-//	instance, err := NewMulticall(client, constants.PolygonChainId)
-//	require.NoError(t, err)
+//		instance, err := NewMulticall(client, constants.PolygonChainId)
+//		require.NoError(t, err)
 //
-//	var callData []CallData
+//		var callData []CallData
 //
-//	parsedABI, err := abi.JSON(strings.NewReader(constants.Erc20ABI)) // Make a generic version of this ABI
-//	require.NoError(t, err)
+//		parsedABI, err := abi.JSON(strings.NewReader(constants.Erc20ABI)) // Make a generic version of this ABI
+//		require.NoError(t, err)
 //
-//	symbolRequest, err := parsedABI.Pack(symbolMethod)
-//	require.NoError(t, err)
-//	callData = append(callData, BuildCallData(common.HexToAddress(PolygonUsdc), symbolRequest, 0))
-//	callData = append(callData, BuildCallData(common.HexToAddress(PolygonDai), symbolRequest, 0))
+//		symbolRequest, err := parsedABI.Pack(symbolMethod)
+//		require.NoError(t, err)
+//		callData = append(callData, BuildCallData(common.HexToAddress(PolygonUsdc), symbolRequest, 0))
+//		callData = append(callData, BuildCallData(common.HexToAddress(PolygonDai), symbolRequest, 0))
 //
-//	resp, err := instance.Execute(context.Background(), callData)
-//	require.NoError(t, err)
+//		resp, err := instance.Execute(context.Background(), callData)
+//		require.NoError(t, err)
 //
-//	var tokenName string
-//	err = parsedABI.UnpackIntoInterface(&tokenName, symbolMethod, resp[0])
-//	require.NoError(t, err)
-//	require.Equal(t, "USDC", tokenName)
+//		var tokenName string
+//		err = parsedABI.UnpackIntoInterface(&tokenName, symbolMethod, resp[0])
+//		require.NoError(t, err)
+//		require.Equal(t, "USDC", tokenName)
 //
-//	err = parsedABI.UnpackIntoInterface(&tokenName, symbolMethod, resp[1])
-//	require.NoError(t, err)
-//	require.Equal(t, "DAI", tokenName)
-//}
+//		err = parsedABI.UnpackIntoInterface(&tokenName, symbolMethod, resp[1])
+//		require.NoError(t, err)
+//		require.Equal(t, "DAI", tokenName)
+//	}
+func TestBuildCallData(t *testing.T) {
+	// Define test cases
+	tests := []struct {
+		name     string
+		to       common.Address
+		data     []byte
+		gas      uint64
+		opts     []string
+		expected CallData
+	}{
+		{
+			name: "basic data",
+			to:   common.HexToAddress("0xAb1234cdE56789f0Ab1234cdE56789f0ab1234cD"),
+			data: []byte{0xde, 0xad, 0xbe, 0xef},
+			gas:  21000,
+			opts: nil,
+			expected: CallData{
+				To:   "0xAb1234cdE56789F0AB1234cDe56789F0AB1234CD",
+				Data: "0xdeadbeef",
+				Gas:  21000,
+			},
+		},
+		{
+			name: "with method name",
+			to:   common.HexToAddress("0xAb1234cdE56789f0Ab1234cdE56789f0ab1234cD"),
+			data: []byte{0xca, 0xfe, 0xba, 0xbe},
+			gas:  30000,
+			opts: []string{"transfer"},
+			expected: CallData{
+				To:         "0xAb1234cdE56789F0AB1234cDe56789F0AB1234CD",
+				Data:       "0xcafebabe",
+				Gas:        30000,
+				MethodName: "transfer",
+			},
+		},
+	}
+
+	// Execute tests
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			actual := BuildCallData(tt.to, tt.data, tt.gas, tt.opts...)
+			assert.Equal(t, tt.expected, actual)
+		})
+	}
+}
