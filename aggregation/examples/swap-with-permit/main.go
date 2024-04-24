@@ -2,7 +2,6 @@ package main
 
 import (
 	"context"
-	"encoding/hex"
 	"fmt"
 	"math/big"
 	"os"
@@ -11,7 +10,6 @@ import (
 	"github.com/ethereum/go-ethereum/common"
 
 	"github.com/1inch/1inch-sdk-go/aggregation"
-	"github.com/1inch/1inch-sdk-go/aggregation/models"
 	"github.com/1inch/1inch-sdk-go/constants"
 )
 
@@ -33,7 +31,7 @@ const (
 )
 
 func main() {
-	config, err := aggregation.NewDefaultConfiguration(nodeUrl, privateKey, constants.PolygonChainId, "https://api.1inch.dev", devPortalToken)
+	config, err := aggregation.NewConfiguration(nodeUrl, privateKey, constants.PolygonChainId, "https://api.1inch.dev", devPortalToken)
 	if err != nil {
 		return
 	}
@@ -43,12 +41,9 @@ func main() {
 
 	amountToSwap := big.NewInt(1e17)
 
-	allowanceData, err := client.GetApproveAllowance(ctx, models.ApproveAllowanceParams{
-		ChainId: constants.PolygonChainId,
-		ApproveControllerGetAllowanceParams: models.ApproveControllerGetAllowanceParams{
-			TokenAddress:  PolygonFRAX,
-			WalletAddress: client.Wallet.Address().Hex(),
-		},
+	allowanceData, err := client.GetApproveAllowance(ctx, aggregation.GetAllowanceParams{
+		TokenAddress:  PolygonFRAX,
+		WalletAddress: client.Wallet.Address().Hex(),
 	})
 
 	allowance := new(big.Int)
@@ -59,7 +54,7 @@ func main() {
 	var permit string
 
 	if cmp > 0 {
-		spender, err := client.GetApproveSpender(ctx, models.ApproveSpenderParams{ChainId: constants.EthereumChainId})
+		spender, err := client.GetApproveSpender(ctx)
 		if err != nil {
 			panic(err)
 		}
@@ -77,7 +72,7 @@ func main() {
 		}
 	}
 
-	swapParams := models.AggregationControllerGetSwapParams{
+	swapParams := aggregation.GetSwapParams{
 		Src:      PolygonFRAX,
 		Dst:      PolygonWeth,
 		Amount:   amountToSwap.String(),
@@ -93,19 +88,9 @@ func main() {
 		return
 	}
 
-	data, err := hex.DecodeString(swapData.Tx.Data[2:])
-	if err != nil {
-		return
-	}
-	value, ok := new(big.Int).SetString(swapData.Tx.Value, 10)
-	if !ok {
-		return
-	}
-	to := common.HexToAddress(swapData.Tx.To)
-
 	builder := client.TxBuilder.New()
 
-	tx, err := builder.SetData(data).SetTo(&to).SetGas(uint64(swapData.Tx.Gas)).SetValue(value).Build(ctx)
+	tx, err := builder.SetData(swapData.TxNormalized.Data).SetTo(&swapData.TxNormalized.To).SetGas(swapData.TxNormalized.Gas).SetValue(swapData.TxNormalized.Value).Build(ctx)
 	if err != nil {
 		fmt.Printf("Failed to build transaction: %v\n", err)
 		return
