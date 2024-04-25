@@ -6,9 +6,11 @@ import (
 	"reflect"
 	"testing"
 
+	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
 
 	"github.com/1inch/1inch-sdk-go/common"
+	"github.com/1inch/1inch-sdk-go/constants"
 )
 
 type MockHttpExecutor struct {
@@ -79,7 +81,7 @@ func TestGetQuote(t *testing.T) {
 	mockExecutor := &MockHttpExecutor{
 		ResponseObj: mockedResp,
 	}
-	api := api{httpExecutor: mockExecutor}
+	api := api{httpExecutor: mockExecutor, chainId: constants.EthereumChainId}
 
 	params := GetQuoteParams{
 		Src:               "0x6b175474e89094c44da98b954eedeac495271d0f",
@@ -157,7 +159,7 @@ func TestGetSwap(t *testing.T) {
 
 	api := api{
 		httpExecutor: mockExecutor,
-		chainId:      1,
+		chainId:      constants.EthereumChainId,
 	}
 
 	params := GetSwapParams{
@@ -201,7 +203,7 @@ func TestGetApproveTransaction(t *testing.T) {
 
 	api := api{
 		httpExecutor: mockExecutor,
-		chainId:      1,
+		chainId:      constants.EthereumChainId,
 	}
 
 	params := GetApproveParams{
@@ -239,7 +241,7 @@ func TestGetApproveSpender(t *testing.T) {
 
 	api := api{
 		httpExecutor: mockExecutor,
-		chainId:      1,
+		chainId:      constants.EthereumChainId,
 	}
 
 	spender, err := api.GetApproveSpender(ctx)
@@ -247,4 +249,100 @@ func TestGetApproveSpender(t *testing.T) {
 	require.True(t, mockExecutor.Called, "ExecuteRequest should be called")
 	require.NotNil(t, spender, "Spender response should not be nil")
 	require.Equal(t, mockedResp.Address, spender.Address, "The returned address should match the expected address")
+}
+
+func TestGetApproveAllowance(t *testing.T) {
+	ctx := context.Background()
+
+	mockedResp := AllowanceResponse{
+		Allowance: "1000000000000000000",
+	}
+
+	mockExecutor := &MockHttpExecutor{
+		ResponseObj: mockedResp,
+	}
+
+	api := &api{
+		httpExecutor: mockExecutor,
+		chainId:      constants.EthereumChainId,
+	}
+
+	params := GetAllowanceParams{
+		TokenAddress:  "0x5a98fcbea516cf06857215779fd812ca3bef1b32",
+		WalletAddress: "0x083fc10ce7e97cafbae0fe332a9c4384c5f54e45",
+	}
+
+	allowance, err := api.GetApproveAllowance(ctx, params)
+	assert.NoError(t, err)
+	assert.NotNil(t, allowance)
+	assert.Equal(t, mockedResp.Allowance, allowance.Allowance)
+}
+
+func TestGetTokens(t *testing.T) {
+	ctx := context.Background()
+
+	mockedResp := TokensResponse{
+		Tokens: map[string]TokenInfo{
+			"0x5a98fcbea516cf06857215779fd812ca3bef1b32": {
+				Address:  "0x5a98fcbea516cf06857215779fd812ca3bef1b32",
+				Symbol:   "LDO",
+				Name:     "Lido DAO Token",
+				Decimals: 18,
+				LogoURI:  "https://tokens.1inch.io/0x5a98fcbea516cf06857215779fd812ca3bef1b32.png",
+				Tags: []string{
+					"tokens",
+				},
+			},
+			"0xc02aaa39b223fe8d0a0e5c4f27ead9083c756cc2": {
+				Address:  "0xc02aaa39b223fe8d0a0e5c4f27ead9083c756cc2",
+				Symbol:   "WETH",
+				Name:     "Wrapped Ether",
+				Decimals: 18,
+				LogoURI:  "https://tokens.1inch.io/0xc02aaa39b223fe8d0a0e5c4f27ead9083c756cc2.png",
+				Tags: []string{
+					"PEG:ETH",
+					"tokens",
+				},
+			},
+		},
+	}
+
+	mockExecutor := &MockHttpExecutor{
+		ResponseObj: mockedResp,
+	}
+
+	api := &api{
+		httpExecutor: mockExecutor,
+		chainId:      constants.EthereumChainId,
+	}
+
+	tokensResponse, err := api.GetTokens(ctx)
+	assert.NoError(t, err)
+	assert.NotNil(t, tokensResponse)
+	assert.Equal(t, mockedResp.Tokens, tokensResponse.Tokens, "The returned tokens should match the expected tokens")
+}
+
+func TestGetLiquiditySources(t *testing.T) {
+	ctx := context.Background()
+
+	mockedResp := ProtocolsResponse{
+		Protocols: []ProtocolImage{
+			{Id: "UNISWAP_V1", Img: "https://cdn.1inch.io/liquidity-sources-logo/uniswap.png", ImgColor: "https://cdn.1inch.io/liquidity-sources-logo/uniswap_color.png", Title: "Uniswap V1"},
+			{Id: "UNISWAP_V2", Img: "https://cdn.1inch.io/liquidity-sources-logo/uniswap.png", ImgColor: "https://cdn.1inch.io/liquidity-sources-logo/uniswap_color.png", Title: "Uniswap V2"},
+		},
+	}
+
+	mockExecutor := &MockHttpExecutor{
+		ResponseObj: mockedResp,
+	}
+	api := &api{
+		httpExecutor: mockExecutor,
+		chainId:      constants.EthereumChainId,
+	}
+
+	liquiditySources, err := api.GetLiquiditySources(ctx)
+	assert.NoError(t, err)
+	assert.NotNil(t, liquiditySources)
+	assert.Equal(t, mockedResp.Protocols, liquiditySources.Protocols, "The returned protocols should match the expected protocols")
+
 }
