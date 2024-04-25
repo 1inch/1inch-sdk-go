@@ -225,3 +225,26 @@ func TestGetApproveTransaction(t *testing.T) {
 	require.NoError(t, err)
 
 }
+
+func TestGetApproveSpender(t *testing.T) {
+	ctx := context.Background()
+
+	mockedResp := SpenderResponse{
+		Address: "0x1111111254eeb25477b68fb85ed929f73a960582",
+	}
+
+	mockExecutor := &MockHttpExecutor{
+		ResponseObj: mockedResp,
+	}
+
+	api := api{
+		httpExecutor: mockExecutor,
+		chainId:      1,
+	}
+
+	spender, err := api.GetApproveSpender(ctx)
+	require.NoError(t, err)
+	require.True(t, mockExecutor.Called, "ExecuteRequest should be called")
+	require.NotNil(t, spender, "Spender response should not be nil")
+	require.Equal(t, mockedResp.Address, spender.Address, "The returned address should match the expected address")
+}
