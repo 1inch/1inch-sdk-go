@@ -3,6 +3,7 @@ package main
 import (
 	"context"
 	"crypto/ecdsa"
+	"encoding/json"
 	"fmt"
 	"log"
 	"os"
@@ -57,7 +58,6 @@ func main() {
 	}
 
 	createOrderResponse, err := client.CreateOrder(ctx, models.CreateOrderParams{
-		ChainId:                        chainId,
 		SeriesNonce:                    seriesNonce,
 		PrivateKey:                     privateKey,
 		ExpireAfter:                    time.Now().Add(time.Minute * 10).Unix(), // TODO update the field name to have "unix" suffix
@@ -81,9 +81,13 @@ func main() {
 	time.Sleep(time.Second)
 
 	getOrderResponse, err := client.GetOrdersByCreatorAddress(ctx, models.GetOrdersByCreatorAddressParams{
-		ChainId:        chainId,
 		CreatorAddress: publicAddress.Hex(),
 	})
 
-	fmt.Printf("Order created! \nOrder hash: %v\n", getOrderResponse[0].OrderHash)
+	orderIndented, err := json.MarshalIndent(getOrderResponse[0], "", "  ")
+	if err != nil {
+		log.Fatal(fmt.Errorf("Failed to marshal response: %v\n", err))
+	}
+
+	fmt.Printf("Order created: %s\n", orderIndented)
 }

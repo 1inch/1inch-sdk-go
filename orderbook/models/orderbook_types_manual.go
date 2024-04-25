@@ -5,33 +5,85 @@ import (
 	"time"
 )
 
+type CreateOrderParams struct {
+	SeriesNonce                    *big.Int
+	PrivateKey                     string
+	ExpireAfter                    int64
+	Maker                          string
+	MakerAsset                     string
+	TakerAsset                     string
+	TakingAmount                   string
+	MakingAmount                   string
+	Taker                          string
+	SkipWarnings                   bool
+	EnableOnchainApprovalsIfNeeded bool
+}
+
+type GetOrdersByCreatorAddressParams struct {
+	CreatorAddress string
+	LimitOrderV3SubscribedApiControllerGetAllLimitOrdersParams
+}
+
+type GetOrderParams struct {
+	OrderHash string
+}
+
+type GetAllOrdersParams struct {
+	LimitOrderV3SubscribedApiControllerGetAllLimitOrdersParams
+}
+
+type GetCountParams struct {
+	LimitOrderV3SubscribedApiControllerGetAllOrdersCountParams
+}
+
+type GetEventParams struct {
+	OrderHash string
+}
+
+type GetEventsParams struct {
+	LimitOrderV3SubscribedApiControllerGetEventsParams
+}
+
+type GetActiveOrdersWithPermitParams struct {
+	Wallet string
+	Token  string
+}
+
+type Order struct {
+	OrderHash string    `json:"orderHash"`
+	Signature string    `json:"signature"`
+	Data      OrderData `json:"data"`
+}
+
+type OrderData struct {
+	MakerAsset    string `json:"makerAsset"`
+	TakerAsset    string `json:"takerAsset"`
+	MakingAmount  string `json:"makingAmount"`
+	TakingAmount  string `json:"takingAmount"`
+	Salt          string `json:"salt"`
+	Maker         string `json:"maker"`
+	AllowedSender string `json:"allowedSender"`
+	Receiver      string `json:"receiver"`
+	MakerTraits   string `json:"makerTraits"`
+	Extension     string `json:"extension"`
+}
+
 type CreateOrderResponse struct {
 	Success bool `json:"success"`
 }
 
 type OrderResponse struct {
-	Signature            string    `json:"signature"`
-	OrderHash            string    `json:"orderHash"`
-	CreateDateTime       time.Time `json:"createDateTime"`
-	RemainingMakerAmount string    `json:"remainingMakerAmount"`
-	MakerBalance         string    `json:"makerBalance"`
-	MakerAllowance       string    `json:"makerAllowance"`
-	Data                 struct {
-		MakerAsset    string `json:"makerAsset"`
-		TakerAsset    string `json:"takerAsset"`
-		Salt          string `json:"salt"`
-		Receiver      string `json:"receiver"`
-		AllowedSender string `json:"allowedSender"`
-		MakingAmount  string `json:"makingAmount"`
-		TakingAmount  string `json:"takingAmount"`
-		Maker         string `json:"maker"`
-		Interactions  string `json:"interactions"`
-		Offsets       string `json:"offsets"`
-	} `json:"data"`
-	MakerRate          string      `json:"makerRate"`
-	TakerRate          string      `json:"takerRate"`
-	IsMakerContract    bool        `json:"isMakerContract"`
-	OrderInvalidReason interface{} `json:"orderInvalidReason"`
+	Signature            string      `json:"signature"`
+	OrderHash            string      `json:"orderHash"`
+	CreateDateTime       time.Time   `json:"createDateTime"`
+	RemainingMakerAmount string      `json:"remainingMakerAmount"`
+	MakerBalance         string      `json:"makerBalance"`
+	MakerAllowance       string      `json:"makerAllowance"`
+	Data                 OrderData   `json:"data"`
+	MakerRate            string      `json:"makerRate"`
+	TakerRate            string      `json:"takerRate"`
+	IsMakerContract      bool        `json:"isMakerContract"`
+	OrderInvalidReason   interface{} `json:"orderInvalidReason"`
 }
 
 type GetOrderByHashResponse struct {
@@ -49,25 +101,13 @@ type GetOrderByHashResponse struct {
 	MakerBalance         string      `json:"makerBalance"`
 	MakerAllowance       string      `json:"makerAllowance"`
 	TakerAmount          string      `json:"takerAmount"`
-	Data                 Data        `json:"data"`
+	Data                 OrderData   `json:"data"`
 	MakerRate            string      `json:"makerRate"`
 	TakerRate            string      `json:"takerRate"`
 	TakerRateDoubled     float64     `json:"takerRateDoubled"`
 	OrderHashSelector    int         `json:"orderHashSelector"`
 	OrderInvalidReason   interface{} `json:"orderInvalidReason"`
 	IsMakerContract      bool        `json:"isMakerContract"`
-}
-
-type Data struct {
-	Salt         string `json:"salt"`
-	Maker        string `json:"maker"`
-	Receiver     string `json:"receiver"`
-	Extension    string `json:"extension,omitempty"`
-	MakerAsset   string `json:"makerAsset"`
-	TakerAsset   string `json:"takerAsset"`
-	MakerTraits  string `json:"makerTraits"`
-	MakingAmount string `json:"makingAmount"`
-	TakingAmount string `json:"takingAmount"`
 }
 
 type CountResponse struct {
@@ -88,19 +128,6 @@ type EventResponse struct {
 	CreateDateTime       time.Time `json:"createDateTime"`
 }
 
-type BuildMakerTraitsParams struct {
-	AllowedSender      string
-	ShouldCheckEpoch   bool
-	UsePermit2         bool
-	UnwrapWeth         bool
-	HasExtension       bool
-	HasPreInteraction  bool
-	HasPostInteraction bool
-	Expiry             int64
-	Nonce              int64
-	Series             int64
-}
-
 type GetOrderByHashResponseExtended struct {
 	GetOrderByHashResponse
 
@@ -116,4 +143,17 @@ type NormalizedLimitOrderData struct {
 	MakingAmount *big.Int
 	TakingAmount *big.Int
 	MakerTraits  *big.Int
+}
+
+type BuildMakerTraitsParams struct {
+	AllowedSender      string
+	ShouldCheckEpoch   bool
+	UsePermit2         bool
+	UnwrapWeth         bool
+	HasExtension       bool
+	HasPreInteraction  bool
+	HasPostInteraction bool
+	Expiry             int64
+	Nonce              int64
+	Series             int64
 }

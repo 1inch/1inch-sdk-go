@@ -18,7 +18,6 @@ func TestCreateOrderParams_Validate(t *testing.T) {
 		{
 			description: "Valid parameters",
 			params: CreateOrderParams{
-				ChainId:      1,
 				PrivateKey:   "a0b1c2d3e4f5a6b7c8d9e0f1a2b3c4d5e6f7a8b9c0d1e2f3a4b5c6d7e8f9a0b1",
 				Maker:        "0x1234567890abcdef1234567890abcdef12345678",
 				MakerAsset:   "0x1234567890abcdef1234567890abcdef12345678",
@@ -31,7 +30,6 @@ func TestCreateOrderParams_Validate(t *testing.T) {
 			description: "Missing required parameters",
 			params:      CreateOrderParams{},
 			expectErrors: []string{
-				"'chainId' is required",
 				"'privateKey' is required",
 				"'maker' is required",
 				"'makerAsset' is required",
@@ -43,7 +41,6 @@ func TestCreateOrderParams_Validate(t *testing.T) {
 		{
 			description: "Error - MakerAsset is native token",
 			params: CreateOrderParams{
-				ChainId:      1,
 				PrivateKey:   "a0b1c2d3e4f5a6b7c8d9e0f1a2b3c4d5e6f7a8b9c0d1e2f3a4b5c6d7e8f9a0b1",
 				Maker:        "0x1234567890abcdef1234567890abcdef12345678",
 				MakerAsset:   "0xEeeeeEeeeEeEeeEeEeEeeEEEeeeeEeeeeeeeEEeE",
@@ -58,7 +55,6 @@ func TestCreateOrderParams_Validate(t *testing.T) {
 		{
 			description: "Error - TakerAsset is native token",
 			params: CreateOrderParams{
-				ChainId:      1,
 				PrivateKey:   "a0b1c2d3e4f5a6b7c8d9e0f1a2b3c4d5e6f7a8b9c0d1e2f3a4b5c6d7e8f9a0b1",
 				Maker:        "0x1234567890abcdef1234567890abcdef12345678",
 				MakerAsset:   "0xa0b86991c6218b36c1d19d4a2e9eb0ce3606eb48",
@@ -98,7 +94,6 @@ func TestGetOrdersByCreatorAddressParams_Validate(t *testing.T) {
 		{
 			description: "Valid parameters",
 			params: GetOrdersByCreatorAddressParams{
-				ChainId:        1,
 				CreatorAddress: "0x1234567890abcdef1234567890abcdef12345678",
 				LimitOrderV3SubscribedApiControllerGetAllLimitOrdersParams: LimitOrderV3SubscribedApiControllerGetAllLimitOrdersParams{
 					Page:       1,
@@ -114,7 +109,6 @@ func TestGetOrdersByCreatorAddressParams_Validate(t *testing.T) {
 			description: "Missing required parameters",
 			params:      GetOrdersByCreatorAddressParams{},
 			expectErrors: []string{
-				"'chainId' is required",
 				"'creatorAddress' is required",
 			},
 		},
@@ -148,7 +142,6 @@ func TestGetAllOrdersParams_Validate(t *testing.T) {
 		{
 			description: "Valid parameters",
 			params: GetAllOrdersParams{
-				ChainId: 1,
 				LimitOrderV3SubscribedApiControllerGetAllLimitOrdersParams: LimitOrderV3SubscribedApiControllerGetAllLimitOrdersParams{
 					Page:       1,
 					Limit:      1,
@@ -157,13 +150,6 @@ func TestGetAllOrdersParams_Validate(t *testing.T) {
 					TakerAsset: "0x1234567890abcdef1234567890abcdef12345678",
 					MakerAsset: "0x1234567890abcdef1234567890abcdef12345678",
 				},
-			},
-		},
-		{
-			description: "Missing required parameters",
-			params:      GetAllOrdersParams{},
-			expectErrors: []string{
-				"'chainId' is required",
 			},
 		},
 	}
@@ -196,17 +182,9 @@ func TestGetCountParams_Validate(t *testing.T) {
 		{
 			description: "Valid parameters",
 			params: GetCountParams{
-				ChainId: 1,
 				LimitOrderV3SubscribedApiControllerGetAllOrdersCountParams: LimitOrderV3SubscribedApiControllerGetAllOrdersCountParams{
 					Statuses: []string{"1"},
 				},
-			},
-		},
-		{
-			description: "Missing required parameters",
-			params:      GetCountParams{},
-			expectErrors: []string{
-				"'chainId' is required",
 			},
 		},
 	}
@@ -239,7 +217,6 @@ func TestGetEventParams_Validate(t *testing.T) {
 		{
 			description: "Valid parameters",
 			params: GetEventParams{
-				ChainId:   1,
 				OrderHash: "0x1234567890abcdef1234567890abcdef1234567890abcdef1234567890abcdef12",
 			},
 		},
@@ -247,7 +224,6 @@ func TestGetEventParams_Validate(t *testing.T) {
 			description: "Missing required parameters",
 			params:      GetEventParams{},
 			expectErrors: []string{
-				"'chainId' is required",
 				"'orderHash' is required",
 			},
 		},
@@ -279,24 +255,8 @@ func TestGetEventsParams_Validate(t *testing.T) {
 		expectErrors []string
 	}{
 		{
-			description: "Valid parameters",
-			params: GetEventsParams{
-				ChainId: 1,
-			},
-		},
-		{
-			description: "Invalid chain id",
-			params: GetEventsParams{
-				ChainId: -1,
-			},
-			expectErrors: []string{
-				"'chainId': is invalid",
-			},
-		},
-		{
 			description: "Invalid limit parameter",
 			params: GetEventsParams{
-				ChainId: 1,
 				LimitOrderV3SubscribedApiControllerGetEventsParams: LimitOrderV3SubscribedApiControllerGetEventsParams{
 					Limit: -1,
 				}},
@@ -334,16 +294,14 @@ func TestGetActiveOrdersWithPermitParams_Validate(t *testing.T) {
 		{
 			description: "Valid parameters",
 			params: GetActiveOrdersWithPermitParams{
-				ChainId: 1,
-				Wallet:  "a0b1c2d3e4f5a6b7c8d9e0f1a2b3c4d5e6f7a8b9c0d1e2f3a4b5c6d7e8f9a0b1",
-				Token:   "0x1234567890abcdef1234567890abcdef12345678",
+				Wallet: "a0b1c2d3e4f5a6b7c8d9e0f1a2b3c4d5e6f7a8b9c0d1e2f3a4b5c6d7e8f9a0b1",
+				Token:  "0x1234567890abcdef1234567890abcdef12345678",
 			},
 		},
 		{
 			description: "Missing required parameters",
 			params:      GetActiveOrdersWithPermitParams{},
 			expectErrors: []string{
-				"'chainId' is required",
 				"'wallet' is required",
 				"'token' is required",
 			},

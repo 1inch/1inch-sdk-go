@@ -62,7 +62,7 @@ func BuildMakerTraits(params models.BuildMakerTraitsParams) string {
 	return "0x" + paddedPredicate
 }
 
-func CreateLimitOrderMessage(orderRequest models.CreateOrderParams, makerTraits string) (*models.Order, error) {
+func CreateLimitOrderMessage(orderRequest models.CreateOrderParams, makerTraits string, chainId int) (*models.Order, error) {
 
 	orderData := models.OrderData{
 		MakerAsset:    orderRequest.MakerAsset,
@@ -77,7 +77,7 @@ func CreateLimitOrderMessage(orderRequest models.CreateOrderParams, makerTraits 
 		Extension:     "0x",
 	}
 
-	aggregationRouter, err := constants.Get1inchRouterFromChainId(orderRequest.ChainId)
+	aggregationRouter, err := constants.Get1inchRouterFromChainId(chainId)
 	if err != nil {
 		return nil, fmt.Errorf("failed to get 1inch router address: %v", err)
 	}
@@ -86,7 +86,7 @@ func CreateLimitOrderMessage(orderRequest models.CreateOrderParams, makerTraits 
 	domainData := apitypes.TypedDataDomain{
 		Name:              constants.AggregationRouterV6Name,
 		Version:           constants.AggregationRouterV6VersionNumber,
-		ChainId:           math.NewHexOrDecimal256(int64(orderRequest.ChainId)),
+		ChainId:           math.NewHexOrDecimal256(int64(chainId)),
 		VerifyingContract: aggregationRouter,
 	}
 

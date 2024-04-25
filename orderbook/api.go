@@ -46,7 +46,7 @@ func (api *api) CreateOrder(ctx context.Context, params models.CreateOrderParams
 	}
 	makerTraits := orderbook.BuildMakerTraits(buildMakerTraitsParams)
 
-	order, err := orderbook.CreateLimitOrderMessage(params, makerTraits)
+	order, err := orderbook.CreateLimitOrderMessage(params, makerTraits, int(api.chainId))
 	if err != nil {
 		return nil, err
 	}

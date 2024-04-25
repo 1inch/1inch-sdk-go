@@ -59,7 +59,6 @@ func main() {
 	}
 
 	createOrderResponse, err := client.CreateOrder(ctx, models.CreateOrderParams{
-		ChainId:                        chainId,
 		SeriesNonce:                    seriesNonce,
 		PrivateKey:                     privateKey,
 		ExpireAfter:                    time.Now().Add(time.Hour * 10).Unix(), // TODO update the field name to have "unix" suffix
@@ -83,7 +82,6 @@ func main() {
 	time.Sleep(time.Second)
 
 	getOrderResponse, err := client.GetOrdersByCreatorAddress(ctx, models.GetOrdersByCreatorAddressParams{
-		ChainId:        chainId,
 		CreatorAddress: publicAddress.Hex(),
 	})
 
@@ -93,15 +91,10 @@ func main() {
 	time.Sleep(time.Second)
 
 	getOrderRresponse, err := client.GetOrder(ctx, models.GetOrderParams{
-		ChainId:   chainId,
 		OrderHash: getOrderResponse[0].OrderHash,
 	})
 
-	fmt.Printf("Order retrieved! \nOrder sig: %v\n", getOrderRresponse.Signature)
-
 	fillOrderData, err := client.GetFillOrderCalldata(getOrderRresponse)
-
-	fmt.Printf("fillOrderData: %x\n", fillOrderData)
 
 	aggregationRouter, err := constants.Get1inchRouterFromChainId(chainId)
 	if err != nil {

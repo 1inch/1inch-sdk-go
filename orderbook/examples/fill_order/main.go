@@ -27,7 +27,7 @@ var (
 )
 
 const (
-	limitOrderHash = "0x66a02d8afe24325452aa218dd076d903383433d6332ea5371fbc39b35a850b96"
+	limitOrderHash = "0x9fd4d0cccb92ae45ee8c86d579334695d525654d8bca2f63f1f85da339093932"
 	chainId        = 137
 )
 
@@ -41,7 +41,6 @@ func main() {
 	client, err := orderbook.NewClient(config)
 
 	getOrderRresponse, err := client.GetOrder(ctx, models.GetOrderParams{
-		ChainId:   chainId,
 		OrderHash: limitOrderHash,
 	})
 
