@@ -7,6 +7,8 @@ import (
 
 	"github.com/ethereum/go-ethereum/common"
 	"github.com/stretchr/testify/assert"
+
+	"github.com/1inch/1inch-sdk-go/constants"
 )
 
 func TestNormalizeSwapResponse(t *testing.T) {
@@ -85,10 +87,93 @@ func TestNormalizeSwapResponse(t *testing.T) {
 		},
 	}
 
-	// Execute tests
 	for _, tc := range testCases {
 		t.Run(tc.name, func(t *testing.T) {
 			got, err := normalizeSwapResponse(tc.input)
+			if tc.wantErr {
+				assert.Error(t, err)
+			} else {
+				assert.NoError(t, err)
+				assert.Equal(t, tc.want, got)
+			}
+		})
+	}
+}
+
+func TestNormalizeApproveCallDataResponse(t *testing.T) {
+	d := "0x095ea7b30000000000000000000000001111111254eeb25477b68fb85ed929f73a9605820000000000000000000000000000000000000000000000000000000556cd83c2"
+	ldoApproveData, err := hex.DecodeString(d[2:])
+	assert.NoError(t, err)
+
+	testCases := []struct {
+		name    string
+		input   ApproveCallDataResponse
+		want    *ApproveCallDataResponseExtended
+		wantErr bool
+	}{
+		{
+			name: "LDO Approve to 22931145666",
+			input: ApproveCallDataResponse{
+				Data:     d,
+				GasPrice: "16955435273",
+				To:       "0x5a98fcbea516cf06857215779fd812ca3bef1b32",
+				Value:    "0",
+			},
+			want: &ApproveCallDataResponseExtended{
+				ApproveCallDataResponse: ApproveCallDataResponse{
+					Data:     d,
+					GasPrice: "16955435273",
+					To:       "0x5a98fcbea516cf06857215779fd812ca3bef1b32",
+					Value:    "0",
+				},
+				TxNormalized: NormalizedTransactionData{
+					Data:     ldoApproveData,
+					Gas:      constants.ERC20_APPROVE_GAS,
+					GasPrice: big.NewInt(16955435273),
+					To:       common.HexToAddress("0x5a98fcbea516cf06857215779fd812ca3bef1b32"),
+					Value:    big.NewInt(0),
+				},
+			},
+			wantErr: false,
+		},
+		{
+			name: "Invalid 'To' Address",
+			input: ApproveCallDataResponse{
+				Data:     "0x095ea7b3",
+				GasPrice: "100000000000",
+				To:       "0xInvalidAddress",
+				Value:    "0",
+			},
+			want:    nil,
+			wantErr: true,
+		},
+		{
+			name: "Invalid 'GasPrice'",
+			input: ApproveCallDataResponse{
+				Data:     "0x095ea7b3",
+				GasPrice: "NotANumber",
+				To:       "0x5a98fcbea516cf06857215779fd812ca3bef1b32",
+				Value:    "0",
+			},
+			want:    nil,
+			wantErr: true,
+		},
+		{
+			name: "Invalid 'Data'",
+			input: ApproveCallDataResponse{
+				Data:     "0xZZZ",
+				GasPrice: "100000000000",
+				To:       "0x5a98fcbea516cf06857215779fd812ca3bef1b32",
+				Value:    "0",
+			},
+			want:    nil,
+			wantErr: true,
+		},
+	}
+
+	for _, tc := range testCases {
+		t.Run(tc.name, func(t *testing.T) {
+			got, err := normalizeApproveCallDataResponse(tc.input)
 			if tc.wantErr {
 				assert.Error(t, err)
 			} else {
