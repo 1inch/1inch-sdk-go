@@ -26,12 +26,17 @@ lint: go-lint
 
 go-lint-install:
 	@echo "  >  Installing golint"
-	curl -sSfL https://raw.githubusercontent.com/golangci/golangci-lint/master/install.sh | sh -s v1.54.1
+	@curl -sSfL https://raw.githubusercontent.com/golangci/golangci-lint/master/install.sh | sh -s -- -b ./bin v1.54.1
 
 go-lint:
-	@echo "  >  Running golint "
-	bin/golangci-lint version
-	bin/golangci-lint run --timeout=2m
+	@echo "  >  Checking if golint is installed..."
+	@if [ ! -x "./bin/golangci-lint" ]; then \
+		echo "golangci-lint not found, installing..."; \
+		$(MAKE) go-lint-install; \
+	fi
+	@echo "  >  Running golint"
+	@./bin/golangci-lint version
+	@./bin/golangci-lint run --timeout=2m
 
 codegen-types:
 	@echo "Running generate_types.sh from the codegen directory..."
