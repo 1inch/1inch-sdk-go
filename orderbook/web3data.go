@@ -11,6 +11,7 @@ import (
 	gethCommon "github.com/ethereum/go-ethereum/common"
 
 	"github.com/1inch/1inch-sdk-go/constants"
+	"github.com/1inch/1inch-sdk-go/orderbook/internal"
 	"github.com/1inch/1inch-sdk-go/orderbook/models"
 )
 
@@ -55,17 +56,17 @@ func (c *Client) GetFillOrderCalldata(getOrderResponse *models.GetOrderByHashRes
 		return nil, err
 	}
 
-	compressedSignature, err := CompressSignature(getOrderResponse.Signature[2:])
+	compressedSignature, err := internal.CompressSignature(getOrderResponse.Signature[2:])
 	if err != nil {
 		return nil, err
 	}
 
-	rCompressed, err := BytesToBytes32(compressedSignature.R)
+	rCompressed, err := bytesToBytes32(compressedSignature.R)
 	if err != nil {
 		return nil, err
 	}
 
-	vsCompressed, err := BytesToBytes32(compressedSignature.VS)
+	vsCompressed, err := bytesToBytes32(compressedSignature.VS)
 	if err != nil {
 		return nil, err
 	}
@@ -78,9 +79,9 @@ func (c *Client) GetFillOrderCalldata(getOrderResponse *models.GetOrderByHashRes
 	return fillOrderData, nil
 }
 
-// BytesToBytes32 converts a byte slice to a [32]byte, padding with zeros if necessary,
+// bytesToBytes32 converts a byte slice to a [32]byte, padding with zeros if necessary,
 // and truncating if it's too long.
-func BytesToBytes32(b []byte) (*[32]byte, error) {
+func bytesToBytes32(b []byte) (*[32]byte, error) {
 	var arr [32]byte
 	if len(b) > 32 {
 		// If b is longer than 32 bytes, error out to avoid losing data

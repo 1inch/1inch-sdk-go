@@ -7,7 +7,7 @@ import (
 	"time"
 
 	"github.com/1inch/1inch-sdk-go/common"
-	"github.com/1inch/1inch-sdk-go/internal/orderbook"
+	"github.com/1inch/1inch-sdk-go/orderbook/internal"
 	"github.com/1inch/1inch-sdk-go/orderbook/models"
 )
 
@@ -44,9 +44,9 @@ func (api *api) CreateOrder(ctx context.Context, params models.CreateOrderParams
 		Nonce:              params.SeriesNonce.Int64(),
 		Series:             0, // TODO: Series 0 always?
 	}
-	makerTraits := orderbook.BuildMakerTraits(buildMakerTraitsParams)
+	makerTraits := internal.BuildMakerTraits(buildMakerTraitsParams)
 
-	order, err := orderbook.CreateLimitOrderMessage(params, makerTraits, int(api.chainId))
+	order, err := internal.CreateLimitOrderMessage(params, makerTraits, int(api.chainId))
 	if err != nil {
 		return nil, err
 	}
@@ -119,7 +119,7 @@ func (api *api) GetOrder(ctx context.Context, params models.GetOrderParams) (*mo
 		return nil, err
 	}
 
-	return normalizeGetOrderByHashResponse(getOrderByHashResponse)
+	return internal.NormalizeGetOrderByHashResponse(getOrderByHashResponse)
 }
 
 // GetAllOrders returns all orders in the Limit Order Protocol

@@ -1,4 +1,4 @@
-package orderbook
+package internal
 
 import (
 	"fmt"
@@ -10,7 +10,7 @@ import (
 	"github.com/1inch/1inch-sdk-go/orderbook/models"
 )
 
-func normalizeGetOrderByHashResponse(resp *models.GetOrderByHashResponse) (*models.GetOrderByHashResponseExtended, error) {
+func NormalizeGetOrderByHashResponse(resp *models.GetOrderByHashResponse) (*models.GetOrderByHashResponseExtended, error) {
 	saltBigInt, ok := new(big.Int).SetString(resp.Data.Salt, 10)
 	if !ok {
 		return nil, fmt.Errorf("invalid salt value")

@@ -1,4 +1,4 @@
-package orderbook
+package internal
 
 import (
 	"fmt"
