@@ -393,6 +393,43 @@ func CheckConnectorTokens(parameter interface{}, variableName string) error {
 	return nil
 }
 
+func CheckAddressesList(parameter interface{}, variableName string) error {
+	value, ok := parameter.(string)
+	if !ok {
+		return fmt.Errorf("for parameter '%v' to be validated as '%v', it must be a string", variableName, "AddressesList")
+	}
+
+	if value == "" {
+		return nil
+	}
+
+	pattern := `^0x[a-fA-F0-9]{40}(,0x[a-fA-F0-9]{40})*$`
+	re := regexp.MustCompile(pattern)
+
+	ok = re.MatchString(value)
+	if !ok {
+		return NewParameterValidationError(variableName, "must be formatted as a single-string list exactly in the format '0x123,0x456,0x789' "+
+			"without any spaces between each protocol name. Additionally, there cannot be a trailing comma at the end of the list.")
+	}
+
+	if ok {
+		// Split the string by commas to get individual addresses
+		addresses := strings.Split(value, ",")
+
+		// Use a map to check for duplicates
+		addressesMap := make(map[string]bool)
+
+		for _, address := range addresses {
+			if _, exists := addressesMap[address]; exists {
+				return NewParameterValidationError(variableName, "Duplicate address found in list")
+			}
+			addressesMap[address] = true
+		}
+	}
+
+	return nil
+}
+
 func CheckPermitHash(parameter interface{}, variableName string) error {
 	value, ok := parameter.(string)
 	if !ok {
@@ -421,5 +458,14 @@ func CheckExpireAfter(parameter interface{}, variableName string) error {
 	if value < time.Now().Unix() {
 		return NewParameterValidationError(variableName, "must be a future timestamp")
 	}
+	return nil
+}
+
+func CheckBoolean(parameter interface{}, variableName string) error {
+	_, ok := parameter.(bool)
+	if !ok {
+		return fmt.Errorf("for parameter '%v' to be validated as '%v', it must be a string", variableName, "Boolean")
+	}
+
 	return nil
 }

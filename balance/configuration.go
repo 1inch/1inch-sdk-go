@@ -7,8 +7,7 @@ import (
 type Configuration struct {
 	ApiKey string
 	ApiURL string
-
-	API api
+	API    api
 }
 
 func NewConfiguration(chainId uint64, apiUrl string, apiKey string) (*Configuration, error) {
