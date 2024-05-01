@@ -1,4 +1,4 @@
-package internal
+package orderbook
 
 import (
 	"fmt"
@@ -10,7 +10,6 @@ import (
 	"github.com/ethereum/go-ethereum/signer/core/apitypes"
 
 	"github.com/1inch/1inch-sdk-go/constants"
-	"github.com/1inch/1inch-sdk-go/orderbook/models"
 )
 
 const (
@@ -23,7 +22,7 @@ const (
 	needPostinteractionFlag = 251
 )
 
-func BuildMakerTraits(params models.BuildMakerTraitsParams) string {
+func BuildMakerTraits(params BuildMakerTraitsParams) string {
 	// Convert allowedSender from hex string to big.Int
 	allowedSenderInt := new(big.Int)
 	allowedSenderInt.SetString(params.AllowedSender, 16)
@@ -62,9 +61,9 @@ func BuildMakerTraits(params models.BuildMakerTraitsParams) string {
 	return "0x" + paddedPredicate
 }
 
-func CreateLimitOrderMessage(orderRequest models.CreateOrderParams, makerTraits string, chainId int) (*models.Order, error) {
+func CreateLimitOrderMessage(orderRequest CreateOrderParams, chainId int) (*Order, error) {
 
-	orderData := models.OrderData{
+	orderData := OrderData{
 		MakerAsset:    orderRequest.MakerAsset,
 		TakerAsset:    orderRequest.TakerAsset,
 		MakingAmount:  orderRequest.MakingAmount,
@@ -73,7 +72,7 @@ func CreateLimitOrderMessage(orderRequest models.CreateOrderParams, makerTraits 
 		Maker:         orderRequest.Maker,
 		AllowedSender: "0x0000000000000000000000000000000000000000",
 		Receiver:      orderRequest.Taker,
-		MakerTraits:   makerTraits,
+		MakerTraits:   orderRequest.MakerTraits,
 		Extension:     "0x",
 	}
 
@@ -162,7 +161,7 @@ func CreateLimitOrderMessage(orderRequest models.CreateOrderParams, makerTraits 
 	// convert signature to hex string
 	signatureHex := fmt.Sprintf("0x%x", signature)
 
-	return &models.Order{
+	return &Order{
 		OrderHash: challengeHashHex,
 		Signature: signatureHex,
 		Data:      orderData,

@@ -1,4 +1,4 @@
-package models
+package orderbook
 
 import (
 	"fmt"

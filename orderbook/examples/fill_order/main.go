@@ -11,7 +11,6 @@ import (
 
 	"github.com/1inch/1inch-sdk-go/constants"
 	"github.com/1inch/1inch-sdk-go/orderbook"
-	"github.com/1inch/1inch-sdk-go/orderbook/models"
 )
 
 /*
@@ -27,7 +26,7 @@ var (
 )
 
 const (
-	limitOrderHash = "0x9fd4d0cccb92ae45ee8c86d579334695d525654d8bca2f63f1f85da339093932"
+	limitOrderHash = "0xd561427155320cd5bb06416d3281102f80fdf013ae0e8b92b252f318b0d51722"
 	chainId        = 137
 )
 
@@ -40,7 +39,7 @@ func main() {
 	}
 	client, err := orderbook.NewClient(config)
 
-	getOrderRresponse, err := client.GetOrder(ctx, models.GetOrderParams{
+	getOrderRresponse, err := client.GetOrder(ctx, orderbook.GetOrderParams{
 		OrderHash: limitOrderHash,
 	})
 

@@ -1,4 +1,4 @@
-package internal
+package orderbook
 
 import (
 	"fmt"
@@ -6,11 +6,9 @@ import (
 	"strings"
 
 	"github.com/ethereum/go-ethereum/common"
-
-	"github.com/1inch/1inch-sdk-go/orderbook/models"
 )
 
-func NormalizeGetOrderByHashResponse(resp *models.GetOrderByHashResponse) (*models.GetOrderByHashResponseExtended, error) {
+func NormalizeGetOrderByHashResponse(resp *GetOrderByHashResponse) (*GetOrderByHashResponseExtended, error) {
 	saltBigInt, ok := new(big.Int).SetString(resp.Data.Salt, 10)
 	if !ok {
 		return nil, fmt.Errorf("invalid salt value")
@@ -34,9 +32,9 @@ func NormalizeGetOrderByHashResponse(resp *models.GetOrderByHashResponse) (*mode
 		return nil, fmt.Errorf("invalid maker traits value")
 	}
 
-	return &models.GetOrderByHashResponseExtended{
+	return &GetOrderByHashResponseExtended{
 		GetOrderByHashResponse: *resp,
-		LimitOrderDataNormalized: models.NormalizedLimitOrderData{
+		LimitOrderDataNormalized: NormalizedLimitOrderData{
 			Salt:         saltBigInt,
 			MakerAsset:   makerAssetBigInt,
 			TakerAsset:   takerAssetBigInt,

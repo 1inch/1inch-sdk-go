@@ -13,7 +13,6 @@ import (
 
 	"github.com/1inch/1inch-sdk-go/constants"
 	"github.com/1inch/1inch-sdk-go/orderbook"
-	"github.com/1inch/1inch-sdk-go/orderbook/models"
 )
 
 /*
@@ -53,13 +52,30 @@ func main() {
 	publicKey := ecdsaPrivateKey.Public()
 	publicAddress := crypto.PubkeyToAddress(*publicKey.(*ecdsa.PublicKey))
 
+	expireAfter := time.Now().Add(time.Hour).Unix()
+
 	seriesNonce, err := client.GetSeriesNonce(ctx, publicAddress)
 	if err != nil {
 		log.Fatal(fmt.Errorf("failed to get series nonce: %v", err))
 	}
 
-	createOrderResponse, err := client.CreateOrder(ctx, models.CreateOrderParams{
+	buildMakerTraitsParams := orderbook.BuildMakerTraitsParams{
+		AllowedSender:      zeroAddress,
+		ShouldCheckEpoch:   false,
+		UsePermit2:         false,
+		UnwrapWeth:         false,
+		HasExtension:       false,
+		HasPreInteraction:  false,
+		HasPostInteraction: false,
+		Expiry:             expireAfter,
+		Nonce:              seriesNonce.Int64(),
+		Series:             0, // TODO: Series 0 always?
+	}
+	makerTraits := orderbook.BuildMakerTraits(buildMakerTraitsParams)
+
+	createOrderResponse, err := client.CreateOrder(ctx, orderbook.CreateOrderParams{
 		SeriesNonce:                    seriesNonce,
+		MakerTraits:                    makerTraits,
 		PrivateKey:                     privateKey,
 		ExpireAfter:                    time.Now().Add(time.Hour * 10).Unix(), // TODO update the field name to have "unix" suffix
 		Maker:                          publicAddress.Hex(),
@@ -81,7 +97,7 @@ func main() {
 	// Sleep to accommodate free-tier API keys
 	time.Sleep(time.Second)
 
-	getOrderResponse, err := client.GetOrdersByCreatorAddress(ctx, models.GetOrdersByCreatorAddressParams{
+	getOrderResponse, err := client.GetOrdersByCreatorAddress(ctx, orderbook.GetOrdersByCreatorAddressParams{
 		CreatorAddress: publicAddress.Hex(),
 	})
 
@@ -90,7 +106,7 @@ func main() {
 	// Sleep to accommodate free-tier API keys
 	time.Sleep(time.Second)
 
-	getOrderRresponse, err := client.GetOrder(ctx, models.GetOrderParams{
+	getOrderRresponse, err := client.GetOrder(ctx, orderbook.GetOrderParams{
 		OrderHash: getOrderResponse[0].OrderHash,
 	})
 
