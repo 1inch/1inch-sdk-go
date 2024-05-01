@@ -5,9 +5,7 @@ import (
 	"fmt"
 	"log"
 	"math/big"
-	"strings"
 
-	"github.com/ethereum/go-ethereum/accounts/abi"
 	gethCommon "github.com/ethereum/go-ethereum/common"
 
 	"github.com/1inch/1inch-sdk-go/constants"
@@ -22,12 +20,7 @@ func (c *Client) GetSeriesNonce(ctx context.Context, publicAddress gethCommon.Ad
 
 	function := "nonce"
 
-	seriesNonceManagerABI, err := abi.JSON(strings.NewReader(constants.SeriesNonceManagerABI)) // Make a generic version of this ABI
-	if err != nil {
-		return nil, err
-	}
-
-	seriesNonceData, err := seriesNonceManagerABI.Pack(function, big.NewInt(0), publicAddress)
+	seriesNonceData, err := c.SeriesNonceManager.Pack(function, big.NewInt(0), publicAddress)
 	if err != nil {
 		return nil, err
 	}
@@ -38,7 +31,7 @@ func (c *Client) GetSeriesNonce(ctx context.Context, publicAddress gethCommon.Ad
 	}
 
 	var nonce *big.Int
-	err = seriesNonceManagerABI.UnpackIntoInterface(&nonce, function, result)
+	err = c.SeriesNonceManager.UnpackIntoInterface(&nonce, function, result)
 	if err != nil {
 		return nil, err
 	}
@@ -48,11 +41,6 @@ func (c *Client) GetSeriesNonce(ctx context.Context, publicAddress gethCommon.Ad
 
 func (c *Client) GetFillOrderCalldata(getOrderResponse *GetOrderByHashResponseExtended) ([]byte, error) {
 	function := "fillOrder"
-
-	aggregationRouterV6, err := abi.JSON(strings.NewReader(constants.AggregationRouterV6ABI))
-	if err != nil {
-		return nil, err
-	}
 
 	compressedSignature, err := CompressSignature(getOrderResponse.Signature[2:])
 	if err != nil {
@@ -69,7 +57,7 @@ func (c *Client) GetFillOrderCalldata(getOrderResponse *GetOrderByHashResponseEx
 		return nil, err
 	}
 
-	fillOrderData, err := aggregationRouterV6.Pack(function, getOrderResponse.LimitOrderDataNormalized, rCompressed, vsCompressed, getOrderResponse.LimitOrderDataNormalized.TakingAmount, big.NewInt(0))
+	fillOrderData, err := c.AggregationRouterV6.Pack(function, getOrderResponse.LimitOrderDataNormalized, rCompressed, vsCompressed, getOrderResponse.LimitOrderDataNormalized.TakingAmount, big.NewInt(0))
 	if err != nil {
 		return nil, err
 	}

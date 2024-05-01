@@ -19,11 +19,6 @@ func (api *api) CreateOrder(ctx context.Context, params CreateOrderParams) (*Cre
 		return nil, err
 	}
 
-	// To post an order that is open to anyone, the taker address must be the zero address
-	if params.Taker == "" {
-		params.Taker = zeroAddress
-	}
-
 	order, err := CreateLimitOrderMessage(params, int(api.chainId))
 	if err != nil {
 		return nil, err

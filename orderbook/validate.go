@@ -17,7 +17,7 @@ func (params *CreateOrderParams) Validate() error {
 	validationErrors = validate.Parameter(params.TakerAsset, "takerAsset", validate.CheckEthereumAddressRequired, validationErrors)
 	validationErrors = validate.Parameter(params.TakingAmount, "takingAmount", validate.CheckBigIntRequired, validationErrors)
 	validationErrors = validate.Parameter(params.MakingAmount, "makingAmount", validate.CheckBigIntRequired, validationErrors)
-	validationErrors = validate.Parameter(params.Taker, "taker", validate.CheckEthereumAddress, validationErrors)
+	validationErrors = validate.Parameter(params.Taker, "taker", validate.CheckEthereumAddressRequired, validationErrors)
 	if strings.EqualFold(params.MakerAsset, params.TakerAsset) && (params.MakerAsset != "" && params.TakerAsset != "") {
 		validationErrors = append(validationErrors, validate.NewParameterCustomError("maker asset and taker asset cannot be the same"))
 	}

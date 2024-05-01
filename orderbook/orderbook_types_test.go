@@ -24,6 +24,7 @@ func TestCreateOrderParams_Validate(t *testing.T) {
 				TakerAsset:   "0x1234567890abcdef1234567890abcdef12345679",
 				TakingAmount: "1000000000000000000",
 				MakingAmount: "2000000000000000000",
+				Taker:        "0x1234567890abcdef1234567890abcdef12345678",
 			},
 		},
 		{
@@ -36,6 +37,7 @@ func TestCreateOrderParams_Validate(t *testing.T) {
 				"'takerAsset' is required",
 				"'takingAmount' is required",
 				"'makingAmount' is required",
+				"'taker' is required",
 			},
 		},
 		{
@@ -47,6 +49,7 @@ func TestCreateOrderParams_Validate(t *testing.T) {
 				TakerAsset:   "0xa0b86991c6218b36c1d19d4a2e9eb0ce3606eb48",
 				TakingAmount: "1000000000000000000",
 				MakingAmount: "2000000000000000000",
+				Taker:        "0x1234567890abcdef1234567890abcdef12345678",
 			},
 			expectErrors: []string{
 				"native gas token is not supported as maker or taker asset",
@@ -61,6 +64,7 @@ func TestCreateOrderParams_Validate(t *testing.T) {
 				TakerAsset:   "0xEeeeeEeeeEeEeeEeEeEeeEEEeeeeEeeeeeeeEEeE",
 				TakingAmount: "1000000000000000000",
 				MakingAmount: "2000000000000000000",
+				Taker:        "0x1234567890abcdef1234567890abcdef12345678",
 			},
 			expectErrors: []string{
 				"native gas token is not supported as maker or taker asset",

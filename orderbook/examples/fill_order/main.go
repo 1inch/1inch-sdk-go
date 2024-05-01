@@ -26,7 +26,7 @@ var (
 )
 
 const (
-	limitOrderHash = "0xd561427155320cd5bb06416d3281102f80fdf013ae0e8b92b252f318b0d51722"
+	limitOrderHash = "0x23200db82fd0739ce2eab24ca12f2cbbc60fad500e7b646fff82ca2a8b55b971"
 	chainId        = 137
 )
 

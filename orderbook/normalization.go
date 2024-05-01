@@ -3,9 +3,9 @@ package orderbook
 import (
 	"fmt"
 	"math/big"
-	"strings"
 
 	"github.com/ethereum/go-ethereum/common"
+	"github.com/ethereum/go-ethereum/common/hexutil"
 )
 
 func NormalizeGetOrderByHashResponse(resp *GetOrderByHashResponse) (*GetOrderByHashResponseExtended, error) {
@@ -27,7 +27,7 @@ func NormalizeGetOrderByHashResponse(resp *GetOrderByHashResponse) (*GetOrderByH
 	makerBigInt := AddressStringToBigInt(resp.Data.Maker)
 	receiverBigInt := AddressStringToBigInt(resp.Data.Receiver)
 
-	makerTraits, err := HexStringToBigInt(resp.Data.MakerTraits)
+	makerTraits, err := hexutil.DecodeBig(resp.Data.MakerTraits)
 	if err != nil {
 		return nil, fmt.Errorf("invalid maker traits value")
 	}
@@ -51,14 +51,4 @@ func AddressStringToBigInt(addressString string) *big.Int {
 	address := common.HexToAddress(addressString)
 	addressBytes := new(big.Int).SetBytes(address.Bytes())
 	return addressBytes
-}
-
-func HexStringToBigInt(hexStr string) (*big.Int, error) {
-	normStr := strings.TrimPrefix(hexStr, "0x")
-	n := new(big.Int)
-	_, ok := n.SetString(normStr, 16)
-	if !ok {
-		return nil, fmt.Errorf("invalid hexadecimal string: %s", hexStr)
-	}
-	return n, nil
 }
