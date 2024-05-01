@@ -8,8 +8,6 @@ import (
 	"github.com/1inch/1inch-sdk-go/common"
 )
 
-const zeroAddress = "0x0000000000000000000000000000000000000000"
-
 // CreateOrder creates an order in the Limit Order Protocol
 func (api *api) CreateOrder(ctx context.Context, params CreateOrderParams) (*CreateOrderResponse, error) {
 	u := fmt.Sprintf("/orderbook/v4.0/%d", api.chainId)
