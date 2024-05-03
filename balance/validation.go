@@ -9,3 +9,9 @@ func (params *AggregatedBalancesAndAllowancesParams) Validate() error {
 	validationErrors = validate.Parameter(params.Spender, "spender", validate.CheckEthereumAddressRequired, validationErrors)
 	return validate.ConsolidateValidationErorrs(validationErrors)
 }
+
+func (params *BalancesByWalletAddressParams) Validate() error {
+	var validationErrors []error
+	validationErrors = validate.Parameter(params.WalletAddress, "walletAddress", validate.CheckEthereumAddressRequired, validationErrors)
+	return validate.ConsolidateValidationErorrs(validationErrors)
+}

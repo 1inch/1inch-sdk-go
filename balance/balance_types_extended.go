@@ -11,3 +11,8 @@ type AggregatedBalancesAndAllowancesParams struct {
 	// EVM address of token spender (based on erc20 spec)
 	Spender string
 }
+
+// BalancesByWalletAddressParams is used instead of codegen struct to right now as params for API handle
+type BalancesByWalletAddressParams struct {
+	WalletAddress string `url:"wallets" json:"walletAddress"`
+}
