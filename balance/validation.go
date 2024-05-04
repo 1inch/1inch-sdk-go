@@ -15,3 +15,17 @@ func (params *BalancesByWalletAddressParams) Validate() error {
 	validationErrors = validate.Parameter(params.WalletAddress, "walletAddress", validate.CheckEthereumAddressRequired, validationErrors)
 	return validate.ConsolidateValidationErorrs(validationErrors)
 }
+
+func (params *BalancesOfCustomTokensByWalletAddressParams) Validate() error {
+	var validationErrors []error
+	validationErrors = validate.Parameter(params.WalletAddress, "walletAddress", validate.CheckEthereumAddressRequired, validationErrors)
+	validationErrors = validate.Parameter(params.Tokens, "tokens", validate.CheckAddressesList, validationErrors)
+	return validate.ConsolidateValidationErorrs(validationErrors)
+}
+
+func (params *BalancesOfCustomTokensByWalletAddressesListParams) Validate() error {
+	var validationErrors []error
+	validationErrors = validate.Parameter(params.WalletAddresses, "wallets", validate.CheckAddressesList, validationErrors)
+	validationErrors = validate.Parameter(params.Tokens, "tokens", validate.CheckAddressesList, validationErrors)
+	return validate.ConsolidateValidationErorrs(validationErrors)
+}
