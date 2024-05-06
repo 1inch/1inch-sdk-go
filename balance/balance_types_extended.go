@@ -1,14 +1,37 @@
 package balance
 
-// AggregatedBalancesAndAllowancesParams is used instead of codegen struct to right now as params for API handle
-type AggregatedBalancesAndAllowancesParams struct {
-	// List of EVM addresses
+// BalancesAndAllowancesByWalletAddressListParams is used instead of codegen struct to right now as params for API handle
+type BalancesAndAllowancesByWalletAddressListParams struct {
+	Wallet  string `json:"-"`
+	Spender string `json:"-"`
+}
+
+// BalancesByWalletAddressListParams is used instead of codegen struct to right now as params for API handle
+type BalancesAndAllowancesByWalletAddressListResponse map[string]TokenDetails
+
+// TokenDetails holds balance and allowance for an Ethereum address (token)
+type TokenDetails struct {
+	Balance   string `json:"balance"`
+	Allowance string `json:"allowance"`
+}
+
+// BalancesAndAllowancesOfCustomTokensByWalletAddressListParams is used instead of codegen struct to right now as params for API handle
+type BalancesAndAllowancesOfCustomTokensByWalletAddressListParams struct {
+	Wallet  string   `json:"-"`
+	Spender string   `json:"-"`
+	Tokens  []string `json:"tokens"`
+}
+
+// BalancesAndAllowancesOfCustomTokensByWalletAddressListResponse is used instead of codegen struct to right now as params for API handle
+type BalancesAndAllowancesOfCustomTokensByWalletAddressListResponse map[string]TokenDetails
+
+// BalancesAndAllowancesParams is used instead of codegen struct to right now as params for API handle
+type BalancesAndAllowancesParams struct {
 	Wallets []string `url:"wallets" json:"wallets"`
 
 	// Will filter tokens with 0 balance from response
 	FilterEmpty bool `url:"filterEmpty" json:"filterEmpty"`
 
-	// EVM address of token spender (based on erc20 spec)
 	Spender string
 }
 
