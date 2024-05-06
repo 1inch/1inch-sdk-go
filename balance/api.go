@@ -145,7 +145,7 @@ func (api *api) GetBalancesOfCustomTokensByWalletAddressesList(ctx context.Conte
 }
 
 // GetBalancesAndAllowancesOfCustomTokensByWalletAddressList Get balances and allowances of custom tokens by spender for walletAddress
-func (api *api) GetBalancesAndAllowancesOfCustomTokensByWalletAddressList(ctx context.Context, params BalancesAndAllowancesOfCustomTokensByWalletAddressListParams) (*BalancesAndAllowancesOfCustomTokensByWalletAddressListResponse, error) {
+func (api *api) GetBalancesAndAllowancesOfCustomTokensByWalletAddressList(ctx context.Context, params BalancesAndAllowancesOfCustomTokensByWalletAddressParams) (*BalancesAndAllowancesOfCustomTokensByWalletAddressResponse, error) {
 	u := fmt.Sprintf("/balance/v1.2/%d/allowancesAndBalances/%s/%s", api.chainId, params.Spender, params.Wallet)
 
 	err := params.Validate()
@@ -165,7 +165,62 @@ func (api *api) GetBalancesAndAllowancesOfCustomTokensByWalletAddressList(ctx co
 		Body:   body,
 	}
 
-	var response BalancesAndAllowancesOfCustomTokensByWalletAddressListResponse
+	var response BalancesAndAllowancesOfCustomTokensByWalletAddressResponse
+	err = api.httpExecutor.ExecuteRequest(ctx, payload, &response)
+	if err != nil {
+		return nil, err
+	}
+
+	return &response, nil
+}
+
+// GetBalancesByWalletAddress Get allowances of tokens by spender for walletAddress
+func (api *api) GetAllowancesByWalletAddress(ctx context.Context, params AllowancesByWalletAddressParams) (*AllowancesByWalletAddressResponse, error) {
+	u := fmt.Sprintf("/balance/v1.2/%d/allowances/%s/%s", api.chainId, params.Spender, params.Wallet)
+
+	err := params.Validate()
+	if err != nil {
+		return nil, err
+	}
+
+	payload := common.RequestPayload{
+		Method: "GET",
+		Params: nil,
+		U:      u,
+		Body:   nil,
+	}
+
+	var response AllowancesByWalletAddressResponse
+	err = api.httpExecutor.ExecuteRequest(ctx, payload, &response)
+	if err != nil {
+		return nil, err
+	}
+
+	return &response, nil
+}
+
+// GetAllowancesOfCustomTokensByWalletAddress Get allowances of custom tokens by spender for walletAddress
+func (api *api) GetAllowancesOfCustomTokensByWalletAddress(ctx context.Context, params AllowancesOfCustomTokensByWalletAddressParams) (*AllowancesOfCustomTokensByWalletAddressResponse, error) {
+	u := fmt.Sprintf("/balance/v1.2/%d/allowances/%s/%s", api.chainId, params.Spender, params.Wallet)
+
+	err := params.Validate()
+	if err != nil {
+		return nil, err
+	}
+
+	body, err := json.Marshal(params)
+	if err != nil {
+		return nil, err
+	}
+
+	payload := common.RequestPayload{
+		Method: "POST",
+		Params: nil,
+		U:      u,
+		Body:   body,
+	}
+
+	var response AllowancesOfCustomTokensByWalletAddressResponse
 	err = api.httpExecutor.ExecuteRequest(ctx, payload, &response)
 	if err != nil {
 		return nil, err

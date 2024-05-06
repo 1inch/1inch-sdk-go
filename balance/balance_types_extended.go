@@ -15,15 +15,15 @@ type TokenDetails struct {
 	Allowance string `json:"allowance"`
 }
 
-// BalancesAndAllowancesOfCustomTokensByWalletAddressListParams is used instead of codegen struct to right now as params for API handle
-type BalancesAndAllowancesOfCustomTokensByWalletAddressListParams struct {
+// BalancesAndAllowancesOfCustomTokensByWalletAddressParams is used instead of codegen struct to right now as params for API handle
+type BalancesAndAllowancesOfCustomTokensByWalletAddressParams struct {
 	Wallet  string   `json:"-"`
 	Spender string   `json:"-"`
 	Tokens  []string `json:"tokens"`
 }
 
-// BalancesAndAllowancesOfCustomTokensByWalletAddressListResponse is used instead of codegen struct to right now as params for API handle
-type BalancesAndAllowancesOfCustomTokensByWalletAddressListResponse map[string]TokenDetails
+// BalancesAndAllowancesOfCustomTokensByWalletAddressResponse is used instead of codegen struct to right now as params for API handle
+type BalancesAndAllowancesOfCustomTokensByWalletAddressResponse map[string]TokenDetails
 
 // BalancesAndAllowancesParams is used instead of codegen struct to right now as params for API handle
 type BalancesAndAllowancesParams struct {
@@ -60,3 +60,22 @@ type BalancesOfCustomTokensByWalletAddressesListParams struct {
 
 // BalancesByWalletAddressParams is used instead of codegen struct to right now as params for API handle
 type BalancesOfCustomTokensByWalletAddressesListResponse map[string]string
+
+// AllowancesByWalletAddressParams is used instead of codegen struct to right now as params for API handle
+type AllowancesByWalletAddressParams struct {
+	Wallet  string `json:"-"`
+	Spender string `json:"-"`
+}
+
+// AllowancesByWalletAddressResponse is used instead of codegen struct to right now as params for API handle
+type AllowancesByWalletAddressResponse map[string]string
+
+// AllowancesByWalletAddressParams is used instead of codegen struct to right now as params for API handle
+type AllowancesOfCustomTokensByWalletAddressParams struct {
+	Wallet  string   `json:"-"`
+	Spender string   `json:"-"`
+	Tokens  []string `url:"tokens" json:"tokens"`
+}
+
+// AllowancesByWalletAddressResponse is used instead of codegen struct to right now as params for API handle
+type AllowancesOfCustomTokensByWalletAddressResponse map[string]string
