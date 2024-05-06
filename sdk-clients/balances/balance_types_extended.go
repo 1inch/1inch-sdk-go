@@ -59,10 +59,7 @@ type BalancesOfCustomTokensByWalletAddressesListParams struct {
 }
 
 // BalancesByWalletAddressParams is used instead of codegen struct to right now as params for API handle
-type BalancesOfCustomTokensByWalletAddressesListResponse struct {
-	Wallets []string `json:"wallets"`
-	Tokens  []string `json:"tokens"`
-}
+type BalancesOfCustomTokensByWalletAddressesListResponse map[string]map[string]string
 
 // AllowancesByWalletAddressParams is used instead of codegen struct to right now as params for API handle
 type AllowancesByWalletAddressParams struct {
