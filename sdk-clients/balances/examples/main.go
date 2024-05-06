@@ -40,4 +40,10 @@ func main() {
 	}
 
 	fmt.Println(balancesAndAllowances)
+
+	b, err := client.GetBalancesByWalletAddress(ctx, balances.BalancesByWalletAddressParams{WalletAddress: "0x1C17622cfa9B6fD2043A76DfC39A5B5a109aa708"})
+	if err != nil {
+		return
+	}
+	fmt.Println(b)
 }
