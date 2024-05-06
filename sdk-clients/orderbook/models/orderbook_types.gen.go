@@ -68,10 +68,10 @@ type LimitOrderV3Request struct {
 
 // LimitOrderV3SubscribedApiControllerGetLimitOrderParams defines parameters for LimitOrderV3SubscribedApiControllerGetLimitOrder.
 type LimitOrderV3SubscribedApiControllerGetLimitOrderParams struct {
-	// Page Pagination step, default: 1 (page = offset / limit)
+	// Page Pagination step, examples: 1 (page = offset / limit)
 	Page float32 `url:"page,omitempty" json:"page,omitempty"`
 
-	// Limit Number of limit orders to receive (default: 100, max: 500)
+	// Limit Number of limit orders to receive (examples: 100, max: 500)
 	Limit float32 `url:"limit,omitempty" json:"limit,omitempty"`
 
 	// Statuses JSON an array of statuses by which limit orders will be filtered: 1 - valid limit orders, 2 - temporary invalid limit orders, 3 - invalid limit orders
@@ -90,10 +90,10 @@ type LimitOrderV3SubscribedApiControllerGetLimitOrderParamsSortBy string
 
 // LimitOrderV3SubscribedApiControllerGetAllLimitOrdersParams defines parameters for LimitOrderV3SubscribedApiControllerGetAllLimitOrders.
 type LimitOrderV3SubscribedApiControllerGetAllLimitOrdersParams struct {
-	// Page Pagination step, default: 1 (page = offset / limit)
+	// Page Pagination step, examples: 1 (page = offset / limit)
 	Page float32 `url:"page,omitempty" json:"page,omitempty"`
 
-	// Limit Number of limit orders to receive (default: 100, max: 500)
+	// Limit Number of limit orders to receive (examples: 100, max: 500)
 	Limit float32 `url:"limit,omitempty" json:"limit,omitempty"`
 
 	// Statuses JSON an array of statuses by which limit orders will be filtered: 1 - valid limit orders, 2 - temporary invalid limit orders, 3 - invalid limit orders

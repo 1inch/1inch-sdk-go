@@ -23,7 +23,7 @@ func (w Wallet) Address() common.Address {
 func (w Wallet) Balance(ctx context.Context) (*big.Int, error) {
 	balance, err := w.ethClient.BalanceAt(ctx, *w.address, nil)
 	if err != nil {
-		return nil, fmt.Errorf("failed to retrieve balance: %v", err)
+		return nil, fmt.Errorf("failed to retrieve balances: %v", err)
 	}
 	return balance, nil
 }

@@ -270,7 +270,7 @@ func TestTokenPermit(t *testing.T) {
 
 			permit, err := w.TokenPermit(d)
 			require.NoError(t, err)
-			// temp, need to work for good example
+			// temp, need to work for good examples
 			// finish it soon
 			require.Equal(t, tc.expectedPermitString, permit)
 		})

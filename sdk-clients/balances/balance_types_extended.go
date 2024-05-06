@@ -1,4 +1,4 @@
-package balance
+package balances
 
 // BalancesAndAllowancesByWalletAddressListParams is used instead of codegen struct to right now as params for API handle
 type BalancesAndAllowancesByWalletAddressListParams struct {
@@ -9,9 +9,9 @@ type BalancesAndAllowancesByWalletAddressListParams struct {
 // BalancesByWalletAddressListParams is used instead of codegen struct to right now as params for API handle
 type BalancesAndAllowancesByWalletAddressListResponse map[string]TokenDetails
 
-// TokenDetails holds balance and allowance for an Ethereum address (token)
+// TokenDetails holds balances and allowance for an Ethereum address (token)
 type TokenDetails struct {
-	Balance   string `json:"balance"`
+	Balance   string `json:"balances"`
 	Allowance string `json:"allowance"`
 }
 
@@ -29,7 +29,7 @@ type BalancesAndAllowancesOfCustomTokensByWalletAddressResponse map[string]Token
 type BalancesAndAllowancesParams struct {
 	Wallets []string `url:"wallets" json:"wallets"`
 
-	// Will filter tokens with 0 balance from response
+	// Will filter tokens with 0 balances from response
 	FilterEmpty bool `url:"filterEmpty" json:"filterEmpty"`
 
 	Spender string

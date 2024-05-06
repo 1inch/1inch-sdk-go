@@ -1,4 +1,4 @@
-package balance
+package balances
 
 import (
 	"github.com/1inch/1inch-sdk-go/common"

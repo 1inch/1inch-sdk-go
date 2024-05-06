@@ -5,12 +5,13 @@ import (
 	"fmt"
 	"os"
 
-	"github.com/1inch/1inch-sdk-go/aggregation"
 	"github.com/1inch/1inch-sdk-go/constants"
+	"github.com/1inch/1inch-sdk-go/sdk-clients/aggregation"
+	"github.com/1inch/1inch-sdk-go/sdk-clients/balances"
 )
 
 /*
-This example demonstrates how to swap tokens on the PolygonChainId network using the 1inch SDK.
+This examples demonstrates how to swap tokens on the PolygonChainId network using the 1inch SDK.
 The only thing you need to provide is your wallet address, wallet key, and dev portal token.
 This can be done through your environment, or you can directly set them in the variables below
 */
@@ -25,25 +26,24 @@ const (
 )
 
 func main() {
-	config, err := aggregation.NewConfigurationAPI(constants.PolygonChainId, "https://api.1inch.dev", devPortalToken)
+	config, err := balances.NewConfiguration(constants.PolygonChainId, "https://api.1inch.dev", devPortalToken)
 	if err != nil {
 		return
 	}
-	client, err := aggregation.NewClientOnlyAPI(config)
+	client, err := balances.NewClient(config)
 	if err != nil {
 		return
 	}
 	ctx := context.Background()
 
-	quote, err := client.GetQuote(ctx, aggregation.GetQuoteParams{
-		Src:    PolygonDai,
-		Dst:    PolygonWeth,
-		Amount: "10000000000000000",
+	balancesAndAllowances, err := client.GetBalancesAndAllowances(ctx, balances.BalancesAndAllowancesParams{
+		Wallets:     nil,
+		FilterEmpty: false,
+		Spender:     "",
 	})
-
 	if err != nil {
 		return
 	}
 
-	fmt.Printf("Quote Amount: %+v\n", quote.ToAmount)
+	fmt.Println(balancesAndAllowances)
 }

@@ -1,4 +1,4 @@
-package balance
+package balances
 
 import (
 	"context"
@@ -10,7 +10,7 @@ import (
 
 // GetBalancesAndAllowancesByWalletAddressList Get balances and allowances of tokens by spender for walletAddress
 func (api *api) GetBalancesAndAllowancesByWalletAddressList(ctx context.Context, params BalancesAndAllowancesByWalletAddressListParams) (*BalancesAndAllowancesByWalletAddressListResponse, error) {
-	u := fmt.Sprintf("/balance/v1.2/%d/allowancesAndBalances/%s/%s", api.chainId, params.Spender, params.Wallet)
+	u := fmt.Sprintf("/balances/v1.2/%d/allowancesAndBalances/%s/%s", api.chainId, params.Spender, params.Wallet)
 
 	err := params.Validate()
 	if err != nil {
@@ -35,7 +35,7 @@ func (api *api) GetBalancesAndAllowancesByWalletAddressList(ctx context.Context,
 
 // GetBalancesAndAllowances Get balances and allowances by spender for list of EVM addresses
 func (api *api) GetBalancesAndAllowances(ctx context.Context, params BalancesAndAllowancesParams) (*BalancesAndAllowancesResponse, error) {
-	u := fmt.Sprintf("/balance/v1.2/%d/aggregatedBalancesAndAllowances/%s", api.chainId, params.Spender)
+	u := fmt.Sprintf("/balances/v1.2/%d/aggregatedBalancesAndAllowances/%s", api.chainId, params.Spender)
 
 	err := params.Validate()
 	if err != nil {
@@ -58,9 +58,9 @@ func (api *api) GetBalancesAndAllowances(ctx context.Context, params BalancesAnd
 	return &response, nil
 }
 
-// GetBalancesByWalletAddress Get balances of tokens for walletAddress for default token list (1inch tokens list)
+// GetBalancesByWalletAddress Get balances of tokens for walletAddress for examples token list (1inch tokens list)
 func (api *api) GetBalancesByWalletAddress(ctx context.Context, params BalancesByWalletAddressParams) (*BalancesByWalletAddressResponse, error) {
-	u := fmt.Sprintf("/balance/v1.2/%d/balances/%s", api.chainId, params.WalletAddress)
+	u := fmt.Sprintf("/balances/v1.2/%d/balances/%s", api.chainId, params.WalletAddress)
 
 	err := params.Validate()
 	if err != nil {
@@ -84,9 +84,9 @@ func (api *api) GetBalancesByWalletAddress(ctx context.Context, params BalancesB
 }
 
 // GetBalancesOfCustomTokensByWalletAddress Get balances of custom tokens for walletAddress
-// Takes wallet address and provided tokens and provides balance of each token
+// Takes wallet address and provided tokens and provides balances of each token
 func (api *api) GetBalancesOfCustomTokensByWalletAddress(ctx context.Context, params BalancesOfCustomTokensByWalletAddressParams) (*BalancesOfCustomTokensByWalletAddressResponse, error) {
-	u := fmt.Sprintf("/balance/v1.2/%d/balances/%s", api.chainId, params.WalletAddress)
+	u := fmt.Sprintf("/balances/v1.2/%d/balances/%s", api.chainId, params.WalletAddress)
 
 	err := params.Validate()
 	if err != nil {
@@ -116,7 +116,7 @@ func (api *api) GetBalancesOfCustomTokensByWalletAddress(ctx context.Context, pa
 
 // GetBalancesOfCustomTokensByWalletAddress Get balances of custom tokens for list of wallets addresses
 func (api *api) GetBalancesOfCustomTokensByWalletAddressesList(ctx context.Context, params BalancesOfCustomTokensByWalletAddressesListParams) (*BalancesOfCustomTokensByWalletAddressesListResponse, error) {
-	u := fmt.Sprintf("/balance/v1.2/%d/balances/multiple/walletsAndTokens", api.chainId)
+	u := fmt.Sprintf("/balances/v1.2/%d/balances/multiple/walletsAndTokens", api.chainId)
 
 	err := params.Validate()
 	if err != nil {
@@ -146,7 +146,7 @@ func (api *api) GetBalancesOfCustomTokensByWalletAddressesList(ctx context.Conte
 
 // GetBalancesAndAllowancesOfCustomTokensByWalletAddressList Get balances and allowances of custom tokens by spender for walletAddress
 func (api *api) GetBalancesAndAllowancesOfCustomTokensByWalletAddressList(ctx context.Context, params BalancesAndAllowancesOfCustomTokensByWalletAddressParams) (*BalancesAndAllowancesOfCustomTokensByWalletAddressResponse, error) {
-	u := fmt.Sprintf("/balance/v1.2/%d/allowancesAndBalances/%s/%s", api.chainId, params.Spender, params.Wallet)
+	u := fmt.Sprintf("/balances/v1.2/%d/allowancesAndBalances/%s/%s", api.chainId, params.Spender, params.Wallet)
 
 	err := params.Validate()
 	if err != nil {
@@ -176,7 +176,7 @@ func (api *api) GetBalancesAndAllowancesOfCustomTokensByWalletAddressList(ctx co
 
 // GetBalancesByWalletAddress Get allowances of tokens by spender for walletAddress
 func (api *api) GetAllowancesByWalletAddress(ctx context.Context, params AllowancesByWalletAddressParams) (*AllowancesByWalletAddressResponse, error) {
-	u := fmt.Sprintf("/balance/v1.2/%d/allowances/%s/%s", api.chainId, params.Spender, params.Wallet)
+	u := fmt.Sprintf("/balances/v1.2/%d/allowances/%s/%s", api.chainId, params.Spender, params.Wallet)
 
 	err := params.Validate()
 	if err != nil {
@@ -201,7 +201,7 @@ func (api *api) GetAllowancesByWalletAddress(ctx context.Context, params Allowan
 
 // GetAllowancesOfCustomTokensByWalletAddress Get allowances of custom tokens by spender for walletAddress
 func (api *api) GetAllowancesOfCustomTokensByWalletAddress(ctx context.Context, params AllowancesOfCustomTokensByWalletAddressParams) (*AllowancesOfCustomTokensByWalletAddressResponse, error) {
-	u := fmt.Sprintf("/balance/v1.2/%d/allowances/%s/%s", api.chainId, params.Spender, params.Wallet)
+	u := fmt.Sprintf("/balances/v1.2/%d/allowances/%s/%s", api.chainId, params.Spender, params.Wallet)
 
 	err := params.Validate()
 	if err != nil {
