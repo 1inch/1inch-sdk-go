@@ -89,7 +89,7 @@ func (api *api) GetBalancesByWalletAddress(ctx context.Context, params BalancesB
 // GetBalancesOfCustomTokensByWalletAddress Get balances of custom tokens for walletAddress
 // Takes wallet address and provided tokens and provides balances of each token
 func (api *api) GetBalancesOfCustomTokensByWalletAddress(ctx context.Context, params BalancesOfCustomTokensByWalletAddressParams) (*BalancesOfCustomTokensByWalletAddressResponse, error) {
-	u := fmt.Sprintf("/balance/v1.2/%d/balances/%s", api.chainId, params.WalletAddress)
+	u := fmt.Sprintf("/balance/v1.2/%d/balances/%s", api.chainId, params.Wallets)
 
 	err := params.Validate()
 	if err != nil {
