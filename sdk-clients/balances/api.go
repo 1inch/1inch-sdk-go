@@ -34,7 +34,7 @@ func (api *api) GetBalancesAndAllowancesByWalletAddressList(ctx context.Context,
 }
 
 // GetBalancesAndAllowances Get balances and allowances by spender for list of EVM addresses
-func (api *api) GetBalancesAndAllowances(ctx context.Context, params BalancesAndAllowancesParams) (*BalancesAndAllowancesResponse, error) {
+func (api *api) GetBalancesAndAllowances(ctx context.Context, params BalancesAndAllowancesParams) (*AggregatedBalancesAndAllowancesResponse, error) {
 	u := fmt.Sprintf("/balances/v1.2/%d/aggregatedBalancesAndAllowances/%s", api.chainId, params.Spender)
 
 	err := params.Validate()
@@ -49,7 +49,7 @@ func (api *api) GetBalancesAndAllowances(ctx context.Context, params BalancesAnd
 		Body:   nil,
 	}
 
-	var response BalancesAndAllowancesResponse
+	var response AggregatedBalancesAndAllowancesResponse
 	err = api.httpExecutor.ExecuteRequest(ctx, payload, &response)
 	if err != nil {
 		return nil, err

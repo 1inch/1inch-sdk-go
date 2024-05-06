@@ -446,53 +446,70 @@
   "components": {
     "schemas": {
       "AggregatedBalancesAndAllowancesResponse": {
-        "type": "object",
-        "properties": {
-          "decimals": {
-            "type": "number"
-          },
-          "symbol": {
-            "type": "string"
-          },
-          "tags": {
-            "type": "array",
-            "items": {
-              "type": "string"
+        "type": "array",
+        "items": {
+          "type": "object",
+          "properties": {
+            "decimals": {
+              "type": "integer",
+              "description": "Number of decimal places for the token"
+            },
+            "symbol": {
+              "type": "string",
+              "description": "Symbol of the token"
+            },
+            "tags": {
+              "type": "array",
+              "items": {
+                "type": "string"
+              },
+              "description": "Additional tags for the token"
+            },
+            "address": {
+              "type": "string",
+              "format": "address",
+              "description": "Token contract address"
+            },
+            "name": {
+              "type": "string",
+              "description": "Name of the token"
+            },
+            "logoURI": {
+              "type": "string",
+              "format": "uri",
+              "description": "URL to the token logo image"
+            },
+            "isCustom": {
+              "type": "boolean",
+              "description": "Indicates if the token is custom or not"
+            },
+            "wallets": {
+              "type": "object",
+              "description": "Token balances and allowances for specific wallets",
+              "additionalProperties": {
+                "type": "object",
+                "properties": {
+                  "balance": {
+                    "type": "string",
+                    "description": "Balance of the token for the wallet"
+                  },
+                  "allowance": {
+                    "type": "string",
+                    "description": "Allowance of the token for the wallet"
+                  }
+                }
+              }
+            },
+            "type": {
+              "type": "string",
+              "description": "Type of token (e.g., 'ethereum', 'token')"
+            },
+            "tracked": {
+              "type": "boolean",
+              "description": "Indicates if the token is tracked or not"
             }
-          },
-          "address": {
-            "type": "string"
-          },
-          "name": {
-            "type": "string"
-          },
-          "logoURI": {
-            "type": "string"
-          },
-          "isCustom": {
-            "type": "boolean"
-          },
-          "wallets": {
-            "type": "object"
-          },
-          "type": {
-            "type": "string"
-          },
-          "tracked": {
-            "type": "boolean"
           }
-        },
-        "required": [
-          "decimals",
-          "symbol",
-          "tags",
-          "address",
-          "name",
-          "logoURI",
-          "isCustom",
-          "wallets",
-          "type"
-        ]
+        }
       },
       "CustomTokensRequest": {
         "type": "object",
