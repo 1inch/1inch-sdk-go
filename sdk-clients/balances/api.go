@@ -4,6 +4,7 @@ import (
 	"context"
 	"encoding/json"
 	"fmt"
+	"strings"
 
 	"github.com/1inch/1inch-sdk-go/common"
 )
@@ -35,7 +36,7 @@ func (api *api) GetBalancesAndAllowancesByWalletAddressList(ctx context.Context,
 
 // GetBalancesAndAllowances Get balances and allowances by spender for list of EVM addresses
 func (api *api) GetBalancesAndAllowances(ctx context.Context, params BalancesAndAllowancesParams) (*AggregatedBalancesAndAllowancesResponse, error) {
-	u := fmt.Sprintf("/balances/v1.2/%d/aggregatedBalancesAndAllowances/%s", api.chainId, params.Spender)
+	u := fmt.Sprintf("/balance/v1.2/%d/aggregatedBalancesAndAllowances/%s", api.chainId, params.Spender)
 
 	err := params.Validate()
 	if err != nil {
@@ -44,9 +45,11 @@ func (api *api) GetBalancesAndAllowances(ctx context.Context, params BalancesAnd
 
 	payload := common.RequestPayload{
 		Method: "GET",
-		Params: nil,
-		U:      u,
-		Body:   nil,
+		Params: struct {
+			Wallets string `url:"wallets"`
+		}{Wallets: strings.Join(params.Wallets, ",")},
+		U:    u,
+		Body: nil,
 	}
 
 	var response AggregatedBalancesAndAllowancesResponse

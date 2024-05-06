@@ -19,11 +19,6 @@ var (
 	devPortalToken = os.Getenv("DEV_PORTAL_TOKEN")
 )
 
-const (
-	PolygonDai  = "0x8f3Cf7ad23Cd3CaDbD9735AFf958023239c6A063"
-	PolygonWeth = "0x7ceB23fD6bC0adD59E62ac25578270cFf1b9f619"
-)
-
 func main() {
 	config, err := balances.NewConfiguration(constants.PolygonChainId, "https://api.1inch.dev", devPortalToken)
 	if err != nil {
@@ -36,9 +31,9 @@ func main() {
 	ctx := context.Background()
 
 	balancesAndAllowances, err := client.GetBalancesAndAllowances(ctx, balances.BalancesAndAllowancesParams{
-		Wallets:     nil,
-		FilterEmpty: false,
-		Spender:     "",
+		Wallets:     []string{"0x1C17622cfa9B6fD2043A76DfC39A5B5a109aa708", "0x28C6c06298d514Db089934071355E5743bf21d60"},
+		FilterEmpty: true,
+		Spender:     "0x58b6a8a3302369daec383334672404ee733ab239",
 	})
 	if err != nil {
 		return
