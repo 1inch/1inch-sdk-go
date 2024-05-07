@@ -43,7 +43,7 @@ func CheckEthereumAddress(parameter interface{}, variableName string) error {
 func CheckEthereumAddressListRequired(parameter interface{}, variableName string) error {
 	addresses, ok := parameter.([]string)
 	if !ok {
-		return fmt.Errorf("for parameter '%v' to be validated as '%v', it must be a list of strings", variableName, "EthereumAddress")
+		return fmt.Errorf("for parameter '%v' to be validated as '%v', it must be a list of strings", variableName, "EthereumAddressList")
 	}
 	if len(addresses) == 0 {
 		return NewParameterMissingError(variableName)
