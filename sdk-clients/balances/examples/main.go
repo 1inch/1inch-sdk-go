@@ -74,15 +74,15 @@ func main() {
 	//}
 	//fmt.Println(b3)
 
-	//b4, err := client.GetAllowancesOfCustomTokensByWalletAddress(ctx, balances.AllowancesOfCustomTokensByWalletAddressParams{
-	//	Wallet:  "0x1C17622cfa9B6fD2043A76DfC39A5B5a109aa708",
-	//	Spender: "0x0d8775f648430679a709e98d2b0cb6250d2887ef",
-	//	Tokens:  []string{"0x0d8775f648430679a709e98d2b0cb6250d2887ef", "0x58b6a8a3302369daec383334672404ee733ab239"},
-	//})
-	//if err != nil {
-	//	return
-	//}
-	//fmt.Println(b4)
+	b4, err := client.GetAllowancesOfCustomTokensByWalletAddress(ctx, balances.AllowancesOfCustomTokensByWalletAddressParams{
+		Wallet:  "0x1C17622cfa9B6fD2043A76DfC39A5B5a109aa708",
+		Spender: "0x0d8775f648430679a709e98d2b0cb6250d2887ef",
+		Tokens:  []string{"0x0d8775f648430679a709e98d2b0cb6250d2887ef", "0x58b6a8a3302369daec383334672404ee733ab239"},
+	})
+	if err != nil {
+		return
+	}
+	fmt.Println(b4)
 
 	//b5, err := client.GetBalancesAndAllowancesByWalletAddressList(ctx, balances.BalancesAndAllowancesByWalletAddressListParams{
 	//	Wallet:  "0x083fc10cE7e97CaFBaE0fE332a9c4384c5f54E45",
@@ -93,13 +93,13 @@ func main() {
 	//}
 	//fmt.Println(b5)
 
-	b6, err := client.GetBalancesAndAllowancesOfCustomTokensByWalletAddressList(ctx, balances.BalancesAndAllowancesOfCustomTokensByWalletAddressParams{
-		Wallet:  "0x1C17622cfa9B6fD2043A76DfC39A5B5a109aa708",
-		Spender: "0x0d8775f648430679a709e98d2b0cb6250d2887ef",
-		Tokens:  []string{"0x0d8775f648430679a709e98d2b0cb6250d2887ef", "0x58b6a8a3302369daec383334672404ee733ab239"},
-	})
-	if err != nil {
-		return
-	}
-	fmt.Println(b6)
+	//b6, err := client.GetBalancesAndAllowancesOfCustomTokensByWalletAddressList(ctx, balances.BalancesAndAllowancesOfCustomTokensByWalletAddressParams{
+	//	Wallet:  "0x1C17622cfa9B6fD2043A76DfC39A5B5a109aa708",
+	//	Spender: "0x0d8775f648430679a709e98d2b0cb6250d2887ef",
+	//	Tokens:  []string{"0x0d8775f648430679a709e98d2b0cb6250d2887ef", "0x58b6a8a3302369daec383334672404ee733ab239"},
+	//})
+	//if err != nil {
+	//	return
+	//}
+	//fmt.Println(b6)
 }

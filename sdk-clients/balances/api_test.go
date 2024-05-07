@@ -331,7 +331,13 @@ func TestGetBalancesAndAllowancesOfCustomTokensByWalletAddressList(t *testing.T)
 func TestGetAllowancesByWalletAddress(t *testing.T) {
 	ctx := context.Background()
 
-	mockedResp := AllowancesByWalletAddressResponse{}
+	mockedResp := AllowancesByWalletAddressResponse{
+		"0xfc1e690f61efd961294b3e1ce3313fbd8aa4f85d": "0",
+		"0xeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeee": "115792089237316195423570985008687907853269984665640564039457584007913129639935",
+		"0x06af07097c9eeb7fd685c692751d5c66db49c215": "0",
+		"0xf5dce57282a584d2746faf1593d3121fcac444dc": "0",
+		"0x4ddc2d193948926d02f9b1fe9e1daa0718270ed5": "0",
+	}
 
 	mockExecutor := &MockHttpExecutor{
 		ResponseObj: mockedResp,
@@ -342,7 +348,10 @@ func TestGetAllowancesByWalletAddress(t *testing.T) {
 		chainId:      constants.EthereumChainId,
 	}
 
-	params := AllowancesByWalletAddressParams{}
+	params := AllowancesByWalletAddressParams{
+		Wallet:  "0x1C17622cfa9B6fD2043A76DfC39A5B5a109aa708",
+		Spender: "0x0d8775f648430679a709e98d2b0cb6250d2887ef",
+	}
 
 	balances, err := api.GetAllowancesByWalletAddress(ctx, params)
 	require.NoError(t, err)
@@ -360,7 +369,11 @@ func TestGetAllowancesByWalletAddress(t *testing.T) {
 func TestGetAllowancesOfCustomTokensByWalletAddress(t *testing.T) {
 	ctx := context.Background()
 
-	mockedResp := AllowancesOfCustomTokensByWalletAddressResponse{}
+	mockedResp := AllowancesOfCustomTokensByWalletAddressResponse{
+		"0x0d8775f648430679a709e98d2b0cb6250d2887ef": "0",
+		"0x58b6a8a3302369daec383334672404ee733ab239": "0",
+		"0xeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeee": "115792089237316195423570985008687907853269984665640564039457584007913129639935",
+	}
 
 	mockExecutor := &MockHttpExecutor{
 		ResponseObj: mockedResp,
@@ -371,7 +384,11 @@ func TestGetAllowancesOfCustomTokensByWalletAddress(t *testing.T) {
 		chainId:      constants.EthereumChainId,
 	}
 
-	params := AllowancesOfCustomTokensByWalletAddressParams{}
+	params := AllowancesOfCustomTokensByWalletAddressParams{
+		Wallet:  "0x1C17622cfa9B6fD2043A76DfC39A5B5a109aa708",
+		Spender: "0x0d8775f648430679a709e98d2b0cb6250d2887ef",
+		Tokens:  []string{"0x0d8775f648430679a709e98d2b0cb6250d2887ef", "0x58b6a8a3302369daec383334672404ee733ab239"},
+	}
 
 	balances, err := api.GetAllowancesOfCustomTokensByWalletAddress(ctx, params)
 	require.NoError(t, err)
