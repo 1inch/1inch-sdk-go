@@ -15,7 +15,7 @@ import (
 )
 
 /*
-This examples demonstrates how to create an order on the Polygon network using the 1inch SDK.
+This example demonstrates how to create an order on the Polygon network using the 1inch SDK.
 The only thing you need to provide is your wallet address, wallet key, and dev portal token.
 This can be done through your environment, or you can directly set them in the variables below
 */
