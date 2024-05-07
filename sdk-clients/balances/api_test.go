@@ -248,7 +248,16 @@ func TestGetBalancesOfCustomTokensByWalletAddress(t *testing.T) {
 func TestGetBalancesOfCustomTokensByWalletAddressesList(t *testing.T) {
 	ctx := context.Background()
 
-	mockedResp := BalancesOfCustomTokensByWalletAddressesListResponse{}
+	mockedResp := BalancesOfCustomTokensByWalletAddressesListResponse{
+		"0x1C17622cfa9B6fD2043A76DfC39A5B5a109aa708": {
+			"0x0d8775f648430679a709e98d2b0cb6250d2887ef": "1959358841794366748822851",
+			"0x58b6a8a3302369daec383334672404ee733ab239": "49288784831205560933732",
+		},
+		"0x28C6c06298d514Db089934071355E5743bf21d60": {
+			"0x0d8775f648430679a709e98d2b0cb6250d2887ef": "1161733852779267731316060",
+			"0x58b6a8a3302369daec383334672404ee733ab239": "63737723801972894816455",
+		},
+	}
 
 	mockExecutor := &MockHttpExecutor{
 		ResponseObj: mockedResp,
@@ -259,7 +268,10 @@ func TestGetBalancesOfCustomTokensByWalletAddressesList(t *testing.T) {
 		chainId:      constants.EthereumChainId,
 	}
 
-	params := BalancesOfCustomTokensByWalletAddressesListParams{}
+	params := BalancesOfCustomTokensByWalletAddressesListParams{
+		Wallets: []string{"0x1C17622cfa9B6fD2043A76DfC39A5B5a109aa708", "0x28C6c06298d514Db089934071355E5743bf21d60"},
+		Tokens:  []string{"0x0d8775f648430679a709e98d2b0cb6250d2887ef", "0x58b6a8a3302369daec383334672404ee733ab239"},
+	}
 
 	balances, err := api.GetBalancesOfCustomTokensByWalletAddressesList(ctx, params)
 	require.NoError(t, err)
@@ -277,7 +289,16 @@ func TestGetBalancesOfCustomTokensByWalletAddressesList(t *testing.T) {
 func TestGetBalancesAndAllowancesOfCustomTokensByWalletAddressList(t *testing.T) {
 	ctx := context.Background()
 
-	mockedResp := BalancesAndAllowancesOfCustomTokensByWalletAddressResponse{}
+	mockedResp := BalancesAndAllowancesOfCustomTokensByWalletAddressResponse{
+		"0x0d8775f648430679a709e98d2b0cb6250d2887ef": {
+			Balance:   "1959358841794366748822851",
+			Allowance: "0",
+		},
+		"0x58b6a8a3302369daec383334672404ee733ab239": {
+			Balance:   "49288784831205560933732",
+			Allowance: "0",
+		},
+	}
 
 	mockExecutor := &MockHttpExecutor{
 		ResponseObj: mockedResp,
@@ -288,7 +309,11 @@ func TestGetBalancesAndAllowancesOfCustomTokensByWalletAddressList(t *testing.T)
 		chainId:      constants.EthereumChainId,
 	}
 
-	params := BalancesAndAllowancesOfCustomTokensByWalletAddressParams{}
+	params := BalancesAndAllowancesOfCustomTokensByWalletAddressParams{
+		Wallet:  "0x1C17622cfa9B6fD2043A76DfC39A5B5a109aa708",
+		Spender: "0x0d8775f648430679a709e98d2b0cb6250d2887ef",
+		Tokens:  []string{"0x0d8775f648430679a709e98d2b0cb6250d2887ef", "0x58b6a8a3302369daec383334672404ee733ab239"},
+	}
 
 	balances, err := api.GetBalancesAndAllowancesOfCustomTokensByWalletAddressList(ctx, params)
 	require.NoError(t, err)
