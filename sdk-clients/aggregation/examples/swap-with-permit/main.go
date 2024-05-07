@@ -107,7 +107,7 @@ func main() {
 		return
 	}
 
-	// Waiting for transaction, just an examples of it
+	// Waiting for transaction, just an example of it
 	fmt.Printf("Transaction has been broadcast. View it on Polygonscan here: %v\n", fmt.Sprintf("https://polygonscan.com/tx/%v", signedTx.Hash().Hex()))
 	for {
 		receipt, err := client.Wallet.TransactionReceipt(ctx, signedTx.Hash())
