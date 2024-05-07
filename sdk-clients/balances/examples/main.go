@@ -30,17 +30,17 @@ func main() {
 	}
 	ctx := context.Background()
 
-	//b1, err := client.GetBalancesOfCustomTokensByWalletAddress(ctx, balances.BalancesOfCustomTokensByWalletAddressParams{
-	//	Wallets: "0x1C17622cfa9B6fD2043A76DfC39A5B5a109aa708",
-	//	Tokens:  []string{"0x0d8775f648430679a709e98d2b0cb6250d2887ef", "0x58b6a8a3302369daec383334672404ee733ab239"},
-	//})
-	//if err != nil {
-	//	return
-	//}
-	//fmt.Println(b1)
+	b1, err := client.GetBalancesOfCustomTokensByWalletAddress(ctx, balances.BalancesOfCustomTokensByWalletAddressParams{
+		Wallet: "0x1C17622cfa9B6fD2043A76DfC39A5B5a109aa708",
+		Tokens: []string{"0x0d8775f648430679a709e98d2b0cb6250d2887ef", "0x58b6a8a3302369daec383334672404ee733ab239"},
+	})
+	if err != nil {
+		return
+	}
+	fmt.Println(b1)
 
 	//b2, err := client.GetBalancesOfCustomTokensByWalletAddressesList(ctx, balances.BalancesOfCustomTokensByWalletAddressesListParams{
-	//	Wallets: []string{"0x1C17622cfa9B6fD2043A76DfC39A5B5a109aa708", "0x28C6c06298d514Db089934071355E5743bf21d60"},
+	//	Wallet: []string{"0x1C17622cfa9B6fD2043A76DfC39A5B5a109aa708", "0x28C6c06298d514Db089934071355E5743bf21d60"},
 	//	Tokens:  []string{"0x0d8775f648430679a709e98d2b0cb6250d2887ef", "0x58b6a8a3302369daec383334672404ee733ab239"},
 	//})
 	//if err != nil {
@@ -48,23 +48,22 @@ func main() {
 	//}
 	//fmt.Println(b2)
 
-	balancesAndAllowances, err := client.GetBalancesAndAllowances(ctx, balances.BalancesAndAllowancesParams{
-		Wallets:     []string{"0x1C17622cfa9B6fD2043A76DfC39A5B5a109aa708", "0x28C6c06298d514Db089934071355E5743bf21d60"},
-		FilterEmpty: true,
-		Spender:     "0x58b6a8a3302369daec383334672404ee733ab239",
-	})
-	if err != nil {
-		return
-	}
+	//balancesAndAllowances, err := client.GetBalancesAndAllowances(ctx, balances.BalancesAndAllowancesParams{
+	//	Wallet:     []string{"0x1C17622cfa9B6fD2043A76DfC39A5B5a109aa708", "0x28C6c06298d514Db089934071355E5743bf21d60"},
+	//	FilterEmpty: true,
+	//	Spender:     "0x58b6a8a3302369daec383334672404ee733ab239",
+	//})
+	//if err != nil {
+	//	return
+	//}
 
-	fmt.Println(balancesAndAllowances)
+	//fmt.Println(balancesAndAllowances)
 	//
 	//b, err := client.GetBalancesByWalletAddress(ctx, balances.BalancesByWalletAddressParams{WalletAddress: "0x1C17622cfa9B6fD2043A76DfC39A5B5a109aa708"})
 	//if err != nil {
 	//	return
 	//}
 	//fmt.Println(b)
-	//
 
 	//b3, err := client.GetAllowancesByWalletAddress(ctx, balances.AllowancesByWalletAddressParams{
 	//	Wallet:  "0x1C17622cfa9B6fD2043A76DfC39A5B5a109aa708",

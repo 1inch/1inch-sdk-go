@@ -176,3 +176,187 @@ func TestGetBalancesAndAllowances(t *testing.T) {
 	}
 	require.NoError(t, err)
 }
+
+func TestGetBalancesByWalletAddress(t *testing.T) {
+	ctx := context.Background()
+
+	mockedResp := BalancesByWalletAddressResponse{
+		"0xd15ecdcf5ea68e3995b2d0527a0ae0a3258302f8": "0",
+		"0xd26114cd6ee289accf82350c8d8487fedb8a0c07": "1870790329879940053913181",
+		"0xd46ba6d942050d489dbd938a2c909a5d5039a161": "0",
+	}
+
+	mockExecutor := &MockHttpExecutor{
+		ResponseObj: mockedResp,
+	}
+
+	api := api{
+		httpExecutor: mockExecutor,
+		chainId:      constants.EthereumChainId,
+	}
+
+	params := BalancesByWalletAddressParams{WalletAddress: "0x1C17622cfa9B6fD2043A76DfC39A5B5a109aa708"}
+
+	balances, err := api.GetBalancesByWalletAddress(ctx, params)
+	require.NoError(t, err)
+	require.NotNil(t, balances)
+
+	if !mockExecutor.Called {
+		t.Errorf("Expected ExecuteRequest to be called")
+	}
+	if !reflect.DeepEqual(balances, &mockedResp) {
+		t.Errorf("Expected swap to be %+v, got %+v", balances, mockedResp)
+	}
+	require.NoError(t, err)
+}
+
+func TestGetBalancesOfCustomTokensByWalletAddress(t *testing.T) {
+	ctx := context.Background()
+
+	mockedResp := BalancesOfCustomTokensByWalletAddressResponse{
+		"0x0d8775f648430679a709e98d2b0cb6250d2887ef": "1959358841794366748822851",
+		"0x58b6a8a3302369daec383334672404ee733ab239": "49288784831205560933732",
+	}
+
+	mockExecutor := &MockHttpExecutor{
+		ResponseObj: mockedResp,
+	}
+
+	api := api{
+		httpExecutor: mockExecutor,
+		chainId:      constants.EthereumChainId,
+	}
+
+	params := BalancesOfCustomTokensByWalletAddressParams{
+		Wallet: "0x1C17622cfa9B6fD2043A76DfC39A5B5a109aa708",
+		Tokens: []string{"0x0d8775f648430679a709e98d2b0cb6250d2887ef", "0x58b6a8a3302369daec383334672404ee733ab239"},
+	}
+
+	balances, err := api.GetBalancesOfCustomTokensByWalletAddress(ctx, params)
+	require.NoError(t, err)
+	require.NotNil(t, balances)
+
+	if !mockExecutor.Called {
+		t.Errorf("Expected ExecuteRequest to be called")
+	}
+	if !reflect.DeepEqual(balances, &mockedResp) {
+		t.Errorf("Expected swap to be %+v, got %+v", balances, mockedResp)
+	}
+	require.NoError(t, err)
+}
+
+func TestGetBalancesOfCustomTokensByWalletAddressesList(t *testing.T) {
+	ctx := context.Background()
+
+	mockedResp := BalancesOfCustomTokensByWalletAddressesListResponse{}
+
+	mockExecutor := &MockHttpExecutor{
+		ResponseObj: mockedResp,
+	}
+
+	api := api{
+		httpExecutor: mockExecutor,
+		chainId:      constants.EthereumChainId,
+	}
+
+	params := BalancesOfCustomTokensByWalletAddressesListParams{}
+
+	balances, err := api.GetBalancesOfCustomTokensByWalletAddressesList(ctx, params)
+	require.NoError(t, err)
+	require.NotNil(t, balances)
+
+	if !mockExecutor.Called {
+		t.Errorf("Expected ExecuteRequest to be called")
+	}
+	if !reflect.DeepEqual(balances, &mockedResp) {
+		t.Errorf("Expected swap to be %+v, got %+v", balances, mockedResp)
+	}
+	require.NoError(t, err)
+}
+
+func TestGetBalancesAndAllowancesOfCustomTokensByWalletAddressList(t *testing.T) {
+	ctx := context.Background()
+
+	mockedResp := BalancesAndAllowancesOfCustomTokensByWalletAddressResponse{}
+
+	mockExecutor := &MockHttpExecutor{
+		ResponseObj: mockedResp,
+	}
+
+	api := api{
+		httpExecutor: mockExecutor,
+		chainId:      constants.EthereumChainId,
+	}
+
+	params := BalancesAndAllowancesOfCustomTokensByWalletAddressParams{}
+
+	balances, err := api.GetBalancesAndAllowancesOfCustomTokensByWalletAddressList(ctx, params)
+	require.NoError(t, err)
+	require.NotNil(t, balances)
+
+	if !mockExecutor.Called {
+		t.Errorf("Expected ExecuteRequest to be called")
+	}
+	if !reflect.DeepEqual(balances, &mockedResp) {
+		t.Errorf("Expected swap to be %+v, got %+v", balances, mockedResp)
+	}
+	require.NoError(t, err)
+}
+
+func TestGetAllowancesByWalletAddress(t *testing.T) {
+	ctx := context.Background()
+
+	mockedResp := AllowancesByWalletAddressResponse{}
+
+	mockExecutor := &MockHttpExecutor{
+		ResponseObj: mockedResp,
+	}
+
+	api := api{
+		httpExecutor: mockExecutor,
+		chainId:      constants.EthereumChainId,
+	}
+
+	params := AllowancesByWalletAddressParams{}
+
+	balances, err := api.GetAllowancesByWalletAddress(ctx, params)
+	require.NoError(t, err)
+	require.NotNil(t, balances)
+
+	if !mockExecutor.Called {
+		t.Errorf("Expected ExecuteRequest to be called")
+	}
+	if !reflect.DeepEqual(balances, &mockedResp) {
+		t.Errorf("Expected swap to be %+v, got %+v", balances, mockedResp)
+	}
+	require.NoError(t, err)
+}
+
+func TestGetAllowancesOfCustomTokensByWalletAddress(t *testing.T) {
+	ctx := context.Background()
+
+	mockedResp := AllowancesOfCustomTokensByWalletAddressResponse{}
+
+	mockExecutor := &MockHttpExecutor{
+		ResponseObj: mockedResp,
+	}
+
+	api := api{
+		httpExecutor: mockExecutor,
+		chainId:      constants.EthereumChainId,
+	}
+
+	params := AllowancesOfCustomTokensByWalletAddressParams{}
+
+	balances, err := api.GetAllowancesOfCustomTokensByWalletAddress(ctx, params)
+	require.NoError(t, err)
+	require.NotNil(t, balances)
+
+	if !mockExecutor.Called {
+		t.Errorf("Expected ExecuteRequest to be called")
+	}
+	if !reflect.DeepEqual(balances, &mockedResp) {
+		t.Errorf("Expected swap to be %+v, got %+v", balances, mockedResp)
+	}
+	require.NoError(t, err)
+}
