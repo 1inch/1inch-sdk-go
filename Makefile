@@ -7,7 +7,7 @@ GOBASE := $(shell pwd)
 GOBIN := $(GOBASE)/bin
 GOPKG := $(.)
 # A valid GOPATH is required to use the `go get` command.
-# If $GOPATH is not specified, $HOME/go will be used by examples
+# If $GOPATH is not specified, $HOME/go will be used by example
 GOPATH := $(if $(GOPATH),$(GOPATH),~/go)
 
 get:
