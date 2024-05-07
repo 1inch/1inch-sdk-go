@@ -8,7 +8,7 @@ import (
 
 	"github.com/1inch/1inch-sdk-go/common"
 	"github.com/1inch/1inch-sdk-go/internal/orderbook"
-	"github.com/1inch/1inch-sdk-go/orderbook/models"
+	"github.com/1inch/1inch-sdk-go/sdk-clients/orderbook/models"
 )
 
 const zeroAddress = "0x0000000000000000000000000000000000000000"

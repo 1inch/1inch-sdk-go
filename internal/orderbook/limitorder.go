@@ -10,7 +10,7 @@ import (
 	"github.com/ethereum/go-ethereum/signer/core/apitypes"
 
 	"github.com/1inch/1inch-sdk-go/constants"
-	"github.com/1inch/1inch-sdk-go/orderbook/models"
+	"github.com/1inch/1inch-sdk-go/sdk-clients/orderbook/models"
 )
 
 const (

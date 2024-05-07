@@ -40,6 +40,28 @@ func CheckEthereumAddress(parameter interface{}, variableName string) error {
 	return nil
 }
 
+func CheckEthereumAddressListRequired(parameter interface{}, variableName string) error {
+	addresses, ok := parameter.([]string)
+	if !ok {
+		return fmt.Errorf("for parameter '%v' to be validated as '%v', it must be a list of strings", variableName, "EthereumAddressList")
+	}
+	if len(addresses) == 0 {
+		return NewParameterMissingError(variableName)
+	}
+
+	for _, address := range addresses {
+		if address == "" {
+			return NewParameterMissingError(variableName)
+		}
+		re := regexp.MustCompile(`^0x[a-fA-F0-9]{40}$`)
+		if !re.MatchString(address) {
+			return NewParameterValidationError(variableName, "not a valid Ethereum address")
+		}
+	}
+
+	return nil
+}
+
 var bigIntMax, _ = BigIntFromString("115792089237316195423570985008687907853269984665640564039457584007913129639935")
 var bigIntZero = big.NewInt(0)
 
@@ -421,5 +443,14 @@ func CheckExpireAfter(parameter interface{}, variableName string) error {
 	if value < time.Now().Unix() {
 		return NewParameterValidationError(variableName, "must be a future timestamp")
 	}
+	return nil
+}
+
+func CheckBoolean(parameter interface{}, variableName string) error {
+	_, ok := parameter.(bool)
+	if !ok {
+		return fmt.Errorf("for parameter '%v' to be validated as '%v', it must be a string", variableName, "Boolean")
+	}
+
 	return nil
 }

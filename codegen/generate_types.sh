@@ -229,7 +229,7 @@ for api_openapi_file_name in "$openapi_dir"/*-openapi.json; do
         exit 1
     }
 
-    new_dir="../$package_name"  # Adjust relative path according to your project structure
+    new_dir="../sdk-clients/$package_name"  # Adjust relative path according to your project structure
         mkdir -p "$new_dir" && mv "$output_file" "$new_dir/" || {
             echo "Error: Failed to move generated types to $new_dir."
             exit 1
