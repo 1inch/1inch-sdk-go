@@ -37,7 +37,7 @@ type BalancesAndAllowancesParams struct {
 
 // BalancesByWalletAddressParams is used instead of codegen struct to right now as params for API handle
 type BalancesByWalletAddressParams struct {
-	WalletAddress string `url:"wallets" json:"walletAddress"`
+	Wallet string `url:"wallets" json:"walletAddress"`
 }
 
 // BalancesByWalletAddressParams is used instead of codegen struct to right now as params for API handle

@@ -14,7 +14,7 @@ func (params *BalancesAndAllowancesParams) Validate() error {
 
 func (params *BalancesByWalletAddressParams) Validate() error {
 	var validationErrors []error
-	validationErrors = validate.Parameter(params.WalletAddress, "walletAddress", validate.CheckEthereumAddressRequired, validationErrors)
+	validationErrors = validate.Parameter(params.Wallet, "walletAddress", validate.CheckEthereumAddressRequired, validationErrors)
 	return validate.ConsolidateValidationErorrs(validationErrors)
 }
 

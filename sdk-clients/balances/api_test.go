@@ -195,7 +195,7 @@ func TestGetBalancesByWalletAddress(t *testing.T) {
 		chainId:      constants.EthereumChainId,
 	}
 
-	params := BalancesByWalletAddressParams{WalletAddress: "0x1C17622cfa9B6fD2043A76DfC39A5B5a109aa708"}
+	params := BalancesByWalletAddressParams{Wallet: "0x1C17622cfa9B6fD2043A76DfC39A5B5a109aa708"}
 
 	balances, err := api.GetBalancesByWalletAddress(ctx, params)
 	require.NoError(t, err)

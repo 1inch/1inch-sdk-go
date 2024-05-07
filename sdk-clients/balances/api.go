@@ -63,7 +63,7 @@ func (api *api) GetBalancesAndAllowances(ctx context.Context, params BalancesAnd
 
 // GetBalancesByWalletAddress Get balances of tokens for walletAddress for examples token list (1inch tokens list)
 func (api *api) GetBalancesByWalletAddress(ctx context.Context, params BalancesByWalletAddressParams) (*BalancesByWalletAddressResponse, error) {
-	u := fmt.Sprintf("/balance/v1.2/%d/balances/%s", api.chainId, params.WalletAddress)
+	u := fmt.Sprintf("/balance/v1.2/%d/balances/%s", api.chainId, params.Wallet)
 
 	err := params.Validate()
 	if err != nil {
