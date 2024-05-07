@@ -11,7 +11,7 @@ type BalancesAndAllowancesByWalletAddressListResponse map[string]TokenDetails
 
 // TokenDetails holds balances and allowance for an Ethereum address (token)
 type TokenDetails struct {
-	Balance   string `json:"balances"`
+	Balance   string `json:"balance"`
 	Allowance string `json:"allowance"`
 }
 

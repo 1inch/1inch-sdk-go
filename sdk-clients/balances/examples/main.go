@@ -10,7 +10,7 @@ import (
 )
 
 /*
-This example demonstrates how to swap tokens on the PolygonChainId network using the 1inch SDK.
+This example demonstrates how to swap tokens on the EthereumChainId network using the 1inch SDK.
 The only thing you need to provide is your wallet address, wallet key, and dev portal token.
 This can be done through your environment, or you can directly set them in the variables below
 */
@@ -30,14 +30,14 @@ func main() {
 	}
 	ctx := context.Background()
 
-	b1, err := client.GetBalancesOfCustomTokensByWalletAddress(ctx, balances.BalancesOfCustomTokensByWalletAddressParams{
-		Wallets: "0x1C17622cfa9B6fD2043A76DfC39A5B5a109aa708",
-		Tokens:  []string{"0x0d8775f648430679a709e98d2b0cb6250d2887ef", "0x58b6a8a3302369daec383334672404ee733ab239"},
-	})
-	if err != nil {
-		return
-	}
-	fmt.Println(b1)
+	//b1, err := client.GetBalancesOfCustomTokensByWalletAddress(ctx, balances.BalancesOfCustomTokensByWalletAddressParams{
+	//	Wallets: "0x1C17622cfa9B6fD2043A76DfC39A5B5a109aa708",
+	//	Tokens:  []string{"0x0d8775f648430679a709e98d2b0cb6250d2887ef", "0x58b6a8a3302369daec383334672404ee733ab239"},
+	//})
+	//if err != nil {
+	//	return
+	//}
+	//fmt.Println(b1)
 
 	//b2, err := client.GetBalancesOfCustomTokensByWalletAddressesList(ctx, balances.BalancesOfCustomTokensByWalletAddressesListParams{
 	//	Wallets: []string{"0x1C17622cfa9B6fD2043A76DfC39A5B5a109aa708", "0x28C6c06298d514Db089934071355E5743bf21d60"},
@@ -85,14 +85,14 @@ func main() {
 	//}
 	//fmt.Println(b4)
 
-	//b5, err := client.GetBalancesAndAllowancesByWalletAddressList(ctx, balances.BalancesAndAllowancesByWalletAddressListParams{
-	//	Wallet:  "0x1C17622cfa9B6fD2043A76DfC39A5B5a109aa708",
-	//	Spender: "0x0d8775f648430679a709e98d2b0cb6250d2887ef",
-	//})
-	//if err != nil {
-	//	return
-	//}
-	//fmt.Println(b5)
+	b5, err := client.GetBalancesAndAllowancesByWalletAddressList(ctx, balances.BalancesAndAllowancesByWalletAddressListParams{
+		Wallet:  "0x083fc10cE7e97CaFBaE0fE332a9c4384c5f54E45",
+		Spender: "0x111111125421ca6dc452d289314280a0f8842a65",
+	})
+	if err != nil {
+		return
+	}
+	fmt.Println(b5)
 
 	//b6, err := client.GetBalancesAndAllowancesOfCustomTokensByWalletAddressList(ctx, balances.BalancesAndAllowancesOfCustomTokensByWalletAddressParams{
 	//	Wallet:  "0x1C17622cfa9B6fD2043A76DfC39A5B5a109aa708",
