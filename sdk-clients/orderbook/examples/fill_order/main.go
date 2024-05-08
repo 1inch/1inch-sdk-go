@@ -10,7 +10,7 @@ import (
 	gethCommon "github.com/ethereum/go-ethereum/common"
 
 	"github.com/1inch/1inch-sdk-go/constants"
-	"github.com/1inch/1inch-sdk-go/orderbook"
+	"github.com/1inch/1inch-sdk-go/sdk-clients/orderbook"
 )
 
 /*
@@ -26,7 +26,7 @@ var (
 )
 
 const (
-	limitOrderHash = "0x197e6ad98e2c5fbcbc07d63827bc35f1b5a2bcc57554817e3fa96793ed4425bf"
+	limitOrderHash = "0x073797847405119e8de253d97b281853748e690065b4ae04e5eda9d282f1015b"
 	chainId        = 137
 )
 

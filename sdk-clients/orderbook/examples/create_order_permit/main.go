@@ -15,7 +15,7 @@ import (
 	"github.com/ethereum/go-ethereum/crypto"
 
 	"github.com/1inch/1inch-sdk-go/constants"
-	"github.com/1inch/1inch-sdk-go/orderbook"
+	"github.com/1inch/1inch-sdk-go/sdk-clients/orderbook"
 )
 
 /*
