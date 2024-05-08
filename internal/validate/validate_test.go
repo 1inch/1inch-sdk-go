@@ -40,6 +40,44 @@ func TestIsEthereumAddressRequired(t *testing.T) {
 	}
 }
 
+func TestCheckEthereumAddressListRequired(t *testing.T) {
+	testcases := []struct {
+		description string
+		addresses   []string
+		expectError bool
+	}{
+		{
+			description: "Invalid address - empty",
+			addresses:   []string{},
+			expectError: true,
+		},
+		{
+			description: "Valid addresses 1",
+			addresses:   []string{"0x1234567890abcdef1234567890abcdef12345678"},
+		},
+		{
+			description: "Valid addresses 2",
+			addresses:   []string{"0x1234567890abcdef1234567890abcdef12345678", "0x7ceB23fD6bC0adD59E62ac25578270cFf1b9f619"},
+		},
+		{
+			description: "Invalid addresses ",
+			addresses:   []string{"0x1234567890abcdef1234567890abcdef145678", "0x7ceB23fD6bC0adD59E62ac25578270cFf1b9f619"},
+			expectError: true,
+		},
+	}
+
+	for _, tc := range testcases {
+		t.Run(tc.description, func(t *testing.T) {
+			err := CheckEthereumAddressListRequired(tc.addresses, "testValue")
+			if tc.expectError {
+				require.Error(t, err, fmt.Sprintf("%s should have caused an error", tc.description))
+			} else {
+				require.NoError(t, err, fmt.Sprintf("%s should not have caused an error", tc.description))
+			}
+		})
+	}
+}
+
 func TestIsEthereumAddress(t *testing.T) {
 	testcases := []struct {
 		description string
@@ -969,6 +1007,58 @@ func TestIsBigInt(t *testing.T) {
 		t.Run(tc.description, func(t *testing.T) {
 			_, err := BigIntFromString(tc.input)
 			require.NoError(t, err)
+		})
+	}
+}
+
+func TestCheckBoolean(t *testing.T) {
+	testCases := []struct {
+		description string
+		input       interface{}
+		expectError bool
+	}{
+		{
+			description: "True",
+			input:       true,
+		},
+		{
+			description: "False",
+			input:       false,
+		},
+		{
+			description: "Must fail",
+			input:       nil,
+			expectError: true,
+		},
+		{
+			description: "Must fail 2",
+			input: struct {
+				A string
+			}{
+				A: "a",
+			},
+			expectError: true,
+		},
+		{
+			description: "Must fail 3",
+			input:       []string{"1", "2"},
+			expectError: true,
+		},
+		{
+			description: "Must fail 4",
+			input:       12,
+			expectError: true,
+		},
+	}
+
+	for _, tc := range testCases {
+		t.Run(tc.description, func(t *testing.T) {
+			err := CheckBoolean(tc.input, "testValue")
+			if tc.expectError {
+				require.Error(t, err)
+			} else {
+				require.NoError(t, err)
+			}
 		})
 	}
 }

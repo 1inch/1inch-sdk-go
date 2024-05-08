@@ -5,8 +5,8 @@ import (
 	"fmt"
 	"os"
 
-	"github.com/1inch/1inch-sdk-go/aggregation"
 	"github.com/1inch/1inch-sdk-go/constants"
+	"github.com/1inch/1inch-sdk-go/sdk-clients/aggregation"
 )
 
 /*
