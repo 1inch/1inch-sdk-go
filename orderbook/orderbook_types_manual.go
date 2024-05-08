@@ -8,6 +8,7 @@ import (
 type CreateOrderParams struct {
 	SeriesNonce                    *big.Int
 	MakerTraits                    string
+	Extension                      string
 	PrivateKey                     string
 	ExpireAfter                    int64
 	Maker                          string

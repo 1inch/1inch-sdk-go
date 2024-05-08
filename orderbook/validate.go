@@ -25,6 +25,8 @@ func (params *CreateOrderParams) Validate() error {
 		validationErrors = append(validationErrors, validate.NewParameterCustomError("native gas token is not supported as maker or taker asset"))
 	}
 
+	//TODO if an extension is present, then MakerTraits must also be marked for an extension in the order
+
 	return validate.ConsolidateValidationErorrs(validationErrors)
 }
 

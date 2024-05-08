@@ -39,8 +39,16 @@ func (c *Client) GetSeriesNonce(ctx context.Context, publicAddress gethCommon.Ad
 	return nonce, nil
 }
 
+const makerTraitsPermitOnly = "7440945280133576583328096164017418065923851860621198004784596428783616"
+
 func (c *Client) GetFillOrderCalldata(getOrderResponse *GetOrderByHashResponseExtended) ([]byte, error) {
-	function := "fillOrder"
+
+	var function string
+	if getOrderResponse.Data.Extension == "0x" {
+		function = "fillOrder"
+	} else {
+		function = "fillOrderArgs"
+	}
 
 	compressedSignature, err := CompressSignature(getOrderResponse.Signature[2:])
 	if err != nil {
@@ -57,9 +65,31 @@ func (c *Client) GetFillOrderCalldata(getOrderResponse *GetOrderByHashResponseEx
 		return nil, err
 	}
 
-	fillOrderData, err := c.AggregationRouterV6.Pack(function, getOrderResponse.LimitOrderDataNormalized, rCompressed, vsCompressed, getOrderResponse.LimitOrderDataNormalized.TakingAmount, big.NewInt(0))
-	if err != nil {
-		return nil, err
+	//takerTraitsBigInt, ok := new(big.Int).SetString("0", 16)
+	//if !ok {
+	//	return nil, fmt.Errorf("invalid taking amount value")
+	//}
+
+	var fillOrderData []byte
+
+	switch function {
+	case "fillOrder":
+		fillOrderData, err = c.AggregationRouterV6.Pack(function, getOrderResponse.LimitOrderDataNormalized, rCompressed, vsCompressed, getOrderResponse.LimitOrderDataNormalized.TakingAmount, big.NewInt(0))
+		if err != nil {
+			return nil, err
+		}
+	case "fillOrderArgs":
+		takerTraitsBigInt, ok := new(big.Int).SetString(makerTraitsPermitOnly, 10)
+		if !ok {
+			return nil, fmt.Errorf("invalid taking amount value")
+		}
+
+		extensionData := gethCommon.FromHex(getOrderResponse.Data.Extension)
+
+		fillOrderData, err = c.AggregationRouterV6.Pack(function, getOrderResponse.LimitOrderDataNormalized, rCompressed, vsCompressed, getOrderResponse.LimitOrderDataNormalized.TakingAmount, takerTraitsBigInt, extensionData)
+		if err != nil {
+			return nil, err
+		}
 	}
 
 	return fillOrderData, nil

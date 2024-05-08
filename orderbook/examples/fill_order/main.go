@@ -26,7 +26,7 @@ var (
 )
 
 const (
-	limitOrderHash = "0x23200db82fd0739ce2eab24ca12f2cbbc60fad500e7b646fff82ca2a8b55b971"
+	limitOrderHash = "0x197e6ad98e2c5fbcbc07d63827bc35f1b5a2bcc57554817e3fa96793ed4425bf"
 	chainId        = 137
 )
 
@@ -44,8 +44,9 @@ func main() {
 	})
 
 	fillOrderData, err := client.GetFillOrderCalldata(getOrderRresponse)
-
-	fmt.Printf("fillOrderData: %x\n", fillOrderData)
+	if err != nil {
+		log.Fatalf("Failed to get fill order calldata: %v", err)
+	}
 
 	aggregationRouter, err := constants.Get1inchRouterFromChainId(chainId)
 	if err != nil {

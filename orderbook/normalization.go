@@ -11,7 +11,10 @@ import (
 func NormalizeGetOrderByHashResponse(resp *GetOrderByHashResponse) (*GetOrderByHashResponseExtended, error) {
 	saltBigInt, ok := new(big.Int).SetString(resp.Data.Salt, 10)
 	if !ok {
-		return nil, fmt.Errorf("invalid salt value")
+		saltBigInt, ok = new(big.Int).SetString(resp.Data.Salt[2:], 16)
+		if !ok {
+			return nil, fmt.Errorf("invalid salt value")
+		}
 	}
 	makingAmountBigInt, ok := new(big.Int).SetString(resp.Data.MakingAmount, 10)
 	if !ok {

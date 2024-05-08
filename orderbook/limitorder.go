@@ -1,8 +1,10 @@
 package orderbook
 
 import (
+	"encoding/hex"
 	"fmt"
 	"math/big"
+	"strings"
 	"time"
 
 	"github.com/ethereum/go-ethereum/common/math"
@@ -68,12 +70,12 @@ func CreateLimitOrderMessage(orderRequest CreateOrderParams, chainId int) (*Orde
 		TakerAsset:    orderRequest.TakerAsset,
 		MakingAmount:  orderRequest.MakingAmount,
 		TakingAmount:  orderRequest.TakingAmount,
-		Salt:          GenerateSalt(),
+		Salt:          GenerateSalt(orderRequest.Extension),
 		Maker:         orderRequest.Maker,
 		AllowedSender: "0x0000000000000000000000000000000000000000",
 		Receiver:      orderRequest.Taker,
 		MakerTraits:   orderRequest.MakerTraits,
-		Extension:     "0x",
+		Extension:     orderRequest.Extension,
 	}
 
 	aggregationRouter, err := constants.Get1inchRouterFromChainId(chainId)
@@ -168,6 +170,103 @@ func CreateLimitOrderMessage(orderRequest CreateOrderParams, chainId int) (*Orde
 	}, err
 }
 
-var GenerateSalt = func() string {
-	return fmt.Sprintf("%d", time.Now().UnixNano()/int64(time.Millisecond))
+func GenerateSalt(extension string) string {
+	if extension == "0x" {
+		return fmt.Sprintf("%d", time.Now().UnixNano()/int64(time.Millisecond))
+	}
+
+	byteConverted, err := stringToHexBytes(extension)
+	if err != nil {
+		panic(err)
+	}
+
+	keccakHash := crypto.Keccak256Hash(byteConverted)
+	salt := new(big.Int).SetBytes(keccakHash.Bytes())
+	// We need to keccak256 the extension and then bitwise & it with uint_160_max
+	var uint160Max = new(big.Int).Sub(new(big.Int).Lsh(big.NewInt(1), 160), big.NewInt(1))
+	salt.And(salt, uint160Max)
+	return fmt.Sprintf("0x%x", salt)
+}
+
+func stringToHexBytes(hexStr string) ([]byte, error) {
+	// Strip the "0x" prefix if it exists
+	cleanedStr := strings.TrimPrefix(hexStr, "0x")
+
+	// Ensure the string has an even length by padding with a zero if it's odd
+	if len(cleanedStr)%2 != 0 {
+		cleanedStr = "0" + cleanedStr
+	}
+
+	// Decode the string into bytes
+	bytes, err := hex.DecodeString(cleanedStr)
+	if err != nil {
+		return nil, err
+	}
+
+	return bytes, nil
+}
+
+func GetInteractions(makerAsset string, permit string) ([]string, error) {
+
+	makerAssetData := `0x`
+	takerAssetData := `0x`
+	getMakingAmount := `0x`
+	getTakingAmount := `0x`
+	predicate := `0x`
+	preInteraction := `0x`
+	postInteraction := `0x`
+
+	// The maker token must be prepended to permit data for limit orders
+	if permit != "0x" {
+		permit = makerAsset + permit
+	}
+
+	return []string{makerAssetData, takerAssetData, getMakingAmount, getTakingAmount, predicate, permit, preInteraction, postInteraction}, nil
+}
+
+func GetOffsets(interactions []string) *big.Int {
+	var lengthMap []int
+	for _, interaction := range interactions {
+		if interaction[:2] == "0x" {
+			lengthMap = append(lengthMap, len(interaction)/2-1)
+		} else {
+			lengthMap = append(lengthMap, len(interaction)/2)
+		}
+	}
+
+	cumulativeSum := 0
+	bytesAccumulator := big.NewInt(0)
+	var index uint64
+
+	for _, length := range lengthMap {
+		cumulativeSum += length
+		shiftVal := big.NewInt(int64(cumulativeSum))
+		shiftVal.Lsh(shiftVal, uint(32*index))           // Shift left
+		bytesAccumulator.Add(bytesAccumulator, shiftVal) // Add to accumulator
+		index++
+	}
+
+	return bytesAccumulator
+}
+
+func BuildExtension(interactionsConcatednated string, offsets *big.Int) string {
+	if interactionsConcatednated == "0x" {
+		return "0x"
+	}
+	offsetsBytes := offsets.Bytes()
+	paddedOffsetHex := fmt.Sprintf("%064x", offsetsBytes)
+	return "0x" + paddedOffsetHex + strings.TrimPrefix(interactionsConcatednated, "0x")
+}
+
+func ConcatenateInteractions(interactions []string) string {
+	var builder strings.Builder
+
+	for _, interaction := range interactions {
+		// Remove "0x" prefix if present
+		interaction = strings.TrimPrefix(interaction, "0x")
+		builder.WriteString(interaction)
+	}
+
+	// Add "0x" prefix to the final result
+	return fmt.Sprintf("%s", builder.String())
 }
