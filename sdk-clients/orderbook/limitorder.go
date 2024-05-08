@@ -270,3 +270,7 @@ func ConcatenateInteractions(interactions []string) string {
 	// Add "0x" prefix to the final result
 	return fmt.Sprintf("%s", builder.String())
 }
+
+func Trim0x(input string) string {
+	return strings.TrimPrefix(input, "0x")
+}
