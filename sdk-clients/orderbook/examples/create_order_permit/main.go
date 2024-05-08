@@ -6,11 +6,15 @@ import (
 	"encoding/json"
 	"fmt"
 	"log"
+	"math/big"
 	"os"
+	"strconv"
 	"time"
 
+	"github.com/ethereum/go-ethereum/common"
 	"github.com/ethereum/go-ethereum/crypto"
 
+	"github.com/1inch/1inch-sdk-go/constants"
 	"github.com/1inch/1inch-sdk-go/sdk-clients/orderbook"
 )
 
@@ -27,8 +31,8 @@ var (
 )
 
 const (
-	wmatic      = "0x0d500B1d8E8eF31E21C99d1Db9A6444d3ADf1270"
-	usdc        = "0x3c499c542cEF5E3811e1192ce70d8cC03d5c3359"
+	PolygonFRAX = "0x45c32fa6df82ead1e2ef74d17b76547eddfaff89"
+	PolygonUsdc = "0x3c499c542cEF5E3811e1192ce70d8cC03d5c3359"
 	ten16       = "10000000000000000"
 	ten6        = "1000000"
 	zeroAddress = "0x0000000000000000000000000000000000000000"
@@ -58,33 +62,64 @@ func main() {
 		log.Fatal(fmt.Errorf("failed to get series nonce: %v", err))
 	}
 
-	buildMakerTraitsParams := orderbook.BuildMakerTraitsParams{
+	router, err := constants.Get1inchRouterFromChainId(chainId)
+	if err != nil {
+		log.Fatal(fmt.Errorf("failed to get 1inch router address: %v", err))
+	}
+
+	makingAmount := ten16
+	makingAmountInt, err := strconv.ParseInt(makingAmount, 10, 64)
+	if err != nil {
+		fmt.Println("Error converting string to int:", err)
+		return
+	}
+
+	permitData, err := client.Wallet.GetContractDetailsForPermit(ctx, common.HexToAddress(PolygonFRAX), common.HexToAddress(router), big.NewInt(makingAmountInt), expireAfter)
+	if err != nil {
+		panic(err)
+	}
+
+	permit, err := client.Wallet.TokenPermit(*permitData)
+	if err != nil {
+		log.Fatal(fmt.Errorf("Failed to get permit: %v\n", err))
+	}
+
+	interactions, err := orderbook.GetInteractions(PolygonFRAX, orderbook.Trim0x(permit))
+	if err != nil {
+		log.Fatal(fmt.Errorf("Failed to get interactions: %v\n", err))
+	}
+
+	interactionsConcatenated := orderbook.ConcatenateInteractions(interactions)
+	interactionsOffsets := orderbook.GetOffsets(interactions)
+	extension := orderbook.BuildExtension(interactionsConcatenated, interactionsOffsets)
+
+	makerTraits := orderbook.BuildMakerTraits(orderbook.BuildMakerTraitsParams{
 		AllowedSender:      zeroAddress,
 		ShouldCheckEpoch:   false,
 		UsePermit2:         false,
 		UnwrapWeth:         false,
-		HasExtension:       false,
+		HasExtension:       true,
 		HasPreInteraction:  false,
 		HasPostInteraction: false,
 		Expiry:             expireAfter,
 		Nonce:              seriesNonce.Int64(),
 		Series:             0, // TODO: Series 0 always?
-	}
-	makerTraits := orderbook.BuildMakerTraits(buildMakerTraitsParams)
+	})
 
 	createOrderResponse, err := client.CreateOrder(ctx, orderbook.CreateOrderParams{
 		SeriesNonce:                    seriesNonce,
+		MakerTraits:                    makerTraits,
+		Extension:                      extension,
 		PrivateKey:                     privateKey,
 		ExpireAfter:                    expireAfter, // TODO update the field name to have "unix" suffix
 		Maker:                          publicAddress.Hex(),
-		MakerAsset:                     wmatic,
-		TakerAsset:                     usdc,
-		MakingAmount:                   ten16,
+		MakerAsset:                     PolygonFRAX,
+		TakerAsset:                     PolygonUsdc,
+		MakingAmount:                   makingAmount,
 		TakingAmount:                   ten6,
 		Taker:                          zeroAddress,
 		SkipWarnings:                   false,
 		EnableOnchainApprovalsIfNeeded: false,
-		MakerTraits:                    makerTraits,
 	})
 	if err != nil {
 		log.Fatal(fmt.Errorf("Failed to create order: %v\n", err))

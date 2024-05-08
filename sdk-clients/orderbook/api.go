@@ -4,49 +4,27 @@ import (
 	"context"
 	"encoding/json"
 	"fmt"
-	"time"
 
 	"github.com/1inch/1inch-sdk-go/common"
-	"github.com/1inch/1inch-sdk-go/internal/orderbook"
-	"github.com/1inch/1inch-sdk-go/sdk-clients/orderbook/models"
 )
 
-const zeroAddress = "0x0000000000000000000000000000000000000000"
+// Empty Extensions for Orderbook API are represented as 0x instead of a blank string
+const emptyExtension = "0x"
 
 // CreateOrder creates an order in the Limit Order Protocol
-func (api *api) CreateOrder(ctx context.Context, params models.CreateOrderParams) (*models.CreateOrderResponse, error) {
+func (api *api) CreateOrder(ctx context.Context, params CreateOrderParams) (*CreateOrderResponse, error) {
 	u := fmt.Sprintf("/orderbook/v4.0/%d", api.chainId)
+
+	if params.Extension == "" {
+		params.Extension = emptyExtension
+	}
 
 	err := params.Validate()
 	if err != nil {
 		return nil, err
 	}
 
-	// Orders only last one minute if not specified in the request
-	if params.ExpireAfter == 0 {
-		params.ExpireAfter = time.Now().Add(time.Hour).Unix()
-	}
-
-	// To post an order that is open to anyone, the taker address must be the zero address
-	if params.Taker == "" {
-		params.Taker = zeroAddress
-	}
-
-	buildMakerTraitsParams := models.BuildMakerTraitsParams{
-		AllowedSender:      params.Taker,
-		ShouldCheckEpoch:   false,
-		UsePermit2:         false,
-		UnwrapWeth:         false,
-		HasExtension:       false,
-		HasPreInteraction:  false,
-		HasPostInteraction: false,
-		Expiry:             params.ExpireAfter,
-		Nonce:              params.SeriesNonce.Int64(),
-		Series:             0, // TODO: Series 0 always?
-	}
-	makerTraits := orderbook.BuildMakerTraits(buildMakerTraitsParams)
-
-	order, err := orderbook.CreateLimitOrderMessage(params, makerTraits)
+	order, err := CreateLimitOrderMessage(params, int(api.chainId))
 	if err != nil {
 		return nil, err
 	}
@@ -63,7 +41,7 @@ func (api *api) CreateOrder(ctx context.Context, params models.CreateOrderParams
 		Body:   body,
 	}
 
-	var createOrderResponse models.CreateOrderResponse
+	var createOrderResponse CreateOrderResponse
 	err = api.httpExecutor.ExecuteRequest(ctx, payload, &createOrderResponse)
 	if err != nil {
 		return nil, err
@@ -75,7 +53,7 @@ func (api *api) CreateOrder(ctx context.Context, params models.CreateOrderParams
 // TODO Reusing the same request/response objects due to bad openapi spec
 
 // GetOrdersByCreatorAddress returns all orders created by a given address in the Limit Order Protocol
-func (api *api) GetOrdersByCreatorAddress(ctx context.Context, params models.GetOrdersByCreatorAddressParams) ([]models.OrderResponse, error) {
+func (api *api) GetOrdersByCreatorAddress(ctx context.Context, params GetOrdersByCreatorAddressParams) ([]OrderResponse, error) {
 	u := fmt.Sprintf("/orderbook/v4.0/%d/address/%s", api.chainId, params.CreatorAddress)
 
 	err := params.Validate()
@@ -89,7 +67,7 @@ func (api *api) GetOrdersByCreatorAddress(ctx context.Context, params models.Get
 		U:      u,
 	}
 
-	var ordersResponse []models.OrderResponse
+	var ordersResponse []OrderResponse
 	err = api.httpExecutor.ExecuteRequest(ctx, payload, &ordersResponse)
 	if err != nil {
 		return nil, err
@@ -98,8 +76,32 @@ func (api *api) GetOrdersByCreatorAddress(ctx context.Context, params models.Get
 	return ordersResponse, nil
 }
 
+// GetOrder returns an order from Limit Order Protocol that matches a specific hash
+func (api *api) GetOrder(ctx context.Context, params GetOrderParams) (*GetOrderByHashResponseExtended, error) {
+	u := fmt.Sprintf("/orderbook/v4.0/%d/order/%s", api.chainId, params.OrderHash)
+
+	err := params.Validate()
+	if err != nil {
+		return nil, err
+	}
+
+	payload := common.RequestPayload{
+		Method: "GET",
+		Params: params,
+		U:      u,
+	}
+
+	var getOrderByHashResponse *GetOrderByHashResponse
+	err = api.httpExecutor.ExecuteRequest(ctx, payload, &getOrderByHashResponse)
+	if err != nil {
+		return nil, err
+	}
+
+	return NormalizeGetOrderByHashResponse(getOrderByHashResponse)
+}
+
 // GetAllOrders returns all orders in the Limit Order Protocol
-func (api *api) GetAllOrders(ctx context.Context, params models.GetAllOrdersParams) ([]models.OrderResponse, error) {
+func (api *api) GetAllOrders(ctx context.Context, params GetAllOrdersParams) ([]OrderResponse, error) {
 	u := fmt.Sprintf("/orderbook/v3.0/%d/all", api.chainId)
 
 	err := params.Validate()
@@ -113,7 +115,7 @@ func (api *api) GetAllOrders(ctx context.Context, params models.GetAllOrdersPara
 		U:      u,
 	}
 
-	var allOrdersResponse []models.OrderResponse
+	var allOrdersResponse []OrderResponse
 	err = api.httpExecutor.ExecuteRequest(ctx, payload, &allOrdersResponse)
 	if err != nil {
 		return nil, err
@@ -123,7 +125,7 @@ func (api *api) GetAllOrders(ctx context.Context, params models.GetAllOrdersPara
 }
 
 // GetCount returns the number of orders in the Limit Order Protocol
-func (api *api) GetCount(ctx context.Context, params models.GetCountParams) (*models.CountResponse, error) {
+func (api *api) GetCount(ctx context.Context, params GetCountParams) (*CountResponse, error) {
 	u := fmt.Sprintf("/orderbook/v3.0/%d/count", api.chainId)
 
 	err := params.Validate()
@@ -137,7 +139,7 @@ func (api *api) GetCount(ctx context.Context, params models.GetCountParams) (*mo
 		U:      u,
 	}
 
-	var count models.CountResponse
+	var count CountResponse
 	err = api.httpExecutor.ExecuteRequest(ctx, payload, &count)
 	if err != nil {
 		return nil, err
@@ -147,7 +149,7 @@ func (api *api) GetCount(ctx context.Context, params models.GetCountParams) (*mo
 }
 
 // GetEvent returns an event in the Limit Order Protocol by order hash
-func (api *api) GetEvent(ctx context.Context, params models.GetEventParams) (*models.EventResponse, error) {
+func (api *api) GetEvent(ctx context.Context, params GetEventParams) (*EventResponse, error) {
 	u := fmt.Sprintf("/orderbook/v3.0/%d/events/%s", api.chainId, params.OrderHash)
 
 	err := params.Validate()
@@ -161,7 +163,7 @@ func (api *api) GetEvent(ctx context.Context, params models.GetEventParams) (*mo
 		U:      u,
 	}
 
-	var event models.EventResponse
+	var event EventResponse
 	err = api.httpExecutor.ExecuteRequest(ctx, payload, &event)
 	if err != nil {
 		return nil, err
@@ -171,7 +173,7 @@ func (api *api) GetEvent(ctx context.Context, params models.GetEventParams) (*mo
 }
 
 // GetEvents returns all events in the Limit Order Protocol
-func (api *api) GetEvents(ctx context.Context, params models.GetEventsParams) ([]models.EventResponse, error) {
+func (api *api) GetEvents(ctx context.Context, params GetEventsParams) ([]EventResponse, error) {
 	u := fmt.Sprintf("/orderbook/v3.0/%d/events", api.chainId)
 
 	err := params.Validate()
@@ -185,7 +187,7 @@ func (api *api) GetEvents(ctx context.Context, params models.GetEventsParams) ([
 		U:      u,
 	}
 
-	var events []models.EventResponse
+	var events []EventResponse
 	err = api.httpExecutor.ExecuteRequest(ctx, payload, &events)
 	if err != nil {
 		return nil, err
@@ -197,7 +199,7 @@ func (api *api) GetEvents(ctx context.Context, params models.GetEventsParams) ([
 // TODO untested endpoint
 
 // GetActiveOrdersWithPermit returns all orders in the Limit Order Protocol that are active and have a valid permit
-func (api *api) GetActiveOrdersWithPermit(ctx context.Context, params models.GetActiveOrdersWithPermitParams) ([]models.OrderResponse, error) {
+func (api *api) GetActiveOrdersWithPermit(ctx context.Context, params GetActiveOrdersWithPermitParams) ([]OrderResponse, error) {
 	u := fmt.Sprintf("/orderbook/v3.0/%d/has-active-orders-with-permit/%s/%s", api.chainId, params.Token, params.Wallet)
 
 	err := params.Validate()
@@ -211,7 +213,7 @@ func (api *api) GetActiveOrdersWithPermit(ctx context.Context, params models.Get
 		U:      u,
 	}
 
-	var orders []models.OrderResponse
+	var orders []OrderResponse
 	err = api.httpExecutor.ExecuteRequest(ctx, payload, &orders)
 	if err != nil {
 		return nil, err
