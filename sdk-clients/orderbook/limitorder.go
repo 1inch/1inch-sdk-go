@@ -14,55 +14,6 @@ import (
 	"github.com/1inch/1inch-sdk-go/constants"
 )
 
-const (
-	unwrapWethFlag          = 247
-	allowMultipleFillsFlag  = 254
-	needEpochCheckFlag      = 250
-	usePermit2Flag          = 248
-	hasExtensionFlag        = 249
-	needPreinteractionFlag  = 252
-	needPostinteractionFlag = 251
-)
-
-func BuildMakerTraits(params BuildMakerTraitsParams) string {
-	// Convert allowedSender from hex string to big.Int
-	allowedSenderInt := new(big.Int)
-	allowedSenderInt.SetString(params.AllowedSender, 16)
-
-	// Initialize tempPredicate as big.Int
-	tempPredicate := new(big.Int)
-	tempPredicate.Lsh(big.NewInt(params.Series), 160)
-	tempPredicate.Or(tempPredicate, new(big.Int).Lsh(big.NewInt(params.Nonce), 120))
-	tempPredicate.Or(tempPredicate, new(big.Int).Lsh(big.NewInt(params.Expiry), 80))
-	tempPredicate.Or(tempPredicate, new(big.Int).And(allowedSenderInt, new(big.Int).Sub(new(big.Int).Lsh(big.NewInt(1), 80), big.NewInt(1))))
-
-	if params.UnwrapWeth {
-		tempPredicate.Or(tempPredicate, big.NewInt(1).Lsh(big.NewInt(1), unwrapWethFlag))
-	}
-	// This flag must be set
-	tempPredicate.Or(tempPredicate, big.NewInt(1).Lsh(big.NewInt(1), allowMultipleFillsFlag))
-
-	if params.ShouldCheckEpoch {
-		tempPredicate.Or(tempPredicate, big.NewInt(1).Lsh(big.NewInt(1), needEpochCheckFlag))
-	}
-	if params.UsePermit2 {
-		tempPredicate.Or(tempPredicate, big.NewInt(1).Lsh(big.NewInt(1), usePermit2Flag))
-	}
-	if params.HasExtension {
-		tempPredicate.Or(tempPredicate, big.NewInt(1).Lsh(big.NewInt(1), hasExtensionFlag))
-	}
-	if params.HasPreInteraction {
-		tempPredicate.Or(tempPredicate, big.NewInt(1).Lsh(big.NewInt(1), needPreinteractionFlag))
-	}
-	if params.HasPostInteraction {
-		tempPredicate.Or(tempPredicate, big.NewInt(1).Lsh(big.NewInt(1), needPostinteractionFlag))
-	}
-
-	// Pad the predicate to 32 bytes with 0's on the left and convert to hex string
-	paddedPredicate := fmt.Sprintf("%032x", tempPredicate)
-	return "0x" + paddedPredicate
-}
-
 func CreateLimitOrderMessage(orderRequest CreateOrderParams, chainId int) (*Order, error) {
 
 	orderData := OrderData{
@@ -74,7 +25,7 @@ func CreateLimitOrderMessage(orderRequest CreateOrderParams, chainId int) (*Orde
 		Maker:         orderRequest.Maker,
 		AllowedSender: "0x0000000000000000000000000000000000000000",
 		Receiver:      orderRequest.Taker,
-		MakerTraits:   orderRequest.MakerTraits,
+		MakerTraits:   orderRequest.MakerTraits.Encode(),
 		Extension:     orderRequest.Extension,
 	}
 

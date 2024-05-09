@@ -41,7 +41,7 @@ func (c *Client) GetSeriesNonce(ctx context.Context, publicAddress gethCommon.Ad
 
 const makerTraitsPermitOnly = "7440945280133576583328096164017418065923851860621198004784596428783616"
 
-func (c *Client) GetFillOrderCalldata(getOrderResponse *GetOrderByHashResponseExtended) ([]byte, error) {
+func (c *Client) GetFillOrderCalldata(getOrderResponse *GetOrderByHashResponseExtended, takerTraits *TakerTraits) ([]byte, error) {
 
 	var function string
 	if getOrderResponse.Data.Extension == "0x" {
@@ -79,14 +79,10 @@ func (c *Client) GetFillOrderCalldata(getOrderResponse *GetOrderByHashResponseEx
 			return nil, err
 		}
 	case "fillOrderArgs":
-		takerTraitsBigInt, ok := new(big.Int).SetString(makerTraitsPermitOnly, 10)
-		if !ok {
-			return nil, fmt.Errorf("invalid taking amount value")
-		}
 
-		extensionData := gethCommon.FromHex(getOrderResponse.Data.Extension)
+		TakerTraitsEnc := takerTraits.Encode()
 
-		fillOrderData, err = c.AggregationRouterV6.Pack(function, getOrderResponse.LimitOrderDataNormalized, rCompressed, vsCompressed, getOrderResponse.LimitOrderDataNormalized.TakingAmount, takerTraitsBigInt, extensionData)
+		fillOrderData, err = c.AggregationRouterV6.Pack(function, getOrderResponse.LimitOrderDataNormalized, rCompressed, vsCompressed, getOrderResponse.LimitOrderDataNormalized.TakingAmount, TakerTraitsEnc.TraitFlags, TakerTraitsEnc.Args)
 		if err != nil {
 			return nil, err
 		}

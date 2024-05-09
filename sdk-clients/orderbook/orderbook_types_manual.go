@@ -3,11 +3,13 @@ package orderbook
 import (
 	"math/big"
 	"time"
+
+	"github.com/ethereum/go-ethereum/common"
 )
 
 type CreateOrderParams struct {
 	SeriesNonce                    *big.Int
-	MakerTraits                    string
+	MakerTraits                    *MakerTraits
 	Extension                      string
 	PrivateKey                     string
 	ExpireAfter                    int64
@@ -147,15 +149,30 @@ type NormalizedLimitOrderData struct {
 	MakerTraits  *big.Int
 }
 
-type BuildMakerTraitsParams struct {
+type MakerTraitsParams struct {
 	AllowedSender      string
+	Expiry             int64
+	Nonce              int64
+	Series             int64
 	ShouldCheckEpoch   bool
 	UsePermit2         bool
 	UnwrapWeth         bool
 	HasExtension       bool
 	HasPreInteraction  bool
 	HasPostInteraction bool
-	Expiry             int64
-	Nonce              int64
-	Series             int64
+}
+
+type TakerTraitsParams struct {
+	Receiver        *common.Address
+	Extension       string
+	MakerAmount     bool
+	UnwrapWETH      bool
+	SkipOrderPermit bool
+	UsePermit2      bool
+	ArgsHasReceiver bool
+}
+
+type TakerTraitsCalldata struct {
+	Trait *big.Int
+	Args  string
 }
