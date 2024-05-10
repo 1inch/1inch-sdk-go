@@ -6,11 +6,11 @@ import (
 )
 
 var (
-	// TODO currently unused masks carried over from the Typescript Limit Order SDK
-	allowedSenderMask = NewBitMask(big.NewInt(0), big.NewInt(80))
-	expirationMask    = NewBitMask(big.NewInt(80), big.NewInt(120))
-	nonceOrEpochMask  = NewBitMask(big.NewInt(120), big.NewInt(160))
-	seriesMask        = NewBitMask(big.NewInt(160), big.NewInt(200))
+// TODO currently unused masks carried over from the Typescript Limit Order SDK
+// allowedSenderMask = NewBitMask(big.NewInt(0), big.NewInt(80))
+// expirationMask    = NewBitMask(big.NewInt(80), big.NewInt(120))
+// nonceOrEpochMask  = NewBitMask(big.NewInt(120), big.NewInt(160))
+// seriesMask        = NewBitMask(big.NewInt(160), big.NewInt(200))
 )
 
 const (

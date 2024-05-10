@@ -39,8 +39,6 @@ func (c *Client) GetSeriesNonce(ctx context.Context, publicAddress gethCommon.Ad
 	return nonce, nil
 }
 
-const makerTraitsPermitOnly = "7440945280133576583328096164017418065923851860621198004784596428783616"
-
 func (c *Client) GetFillOrderCalldata(getOrderResponse *GetOrderByHashResponseExtended, takerTraits *TakerTraits) ([]byte, error) {
 
 	var function string

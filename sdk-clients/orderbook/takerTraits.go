@@ -9,9 +9,10 @@ import (
 )
 
 var (
-	thresholdMask             = NewBitMask(big.NewInt(0), big.NewInt(185))
-	argsInteractionLengthMask = NewBitMask(big.NewInt(220), big.NewInt(224))
-	argsExtensionLengthMask   = NewBitMask(big.NewInt(224), big.NewInt(248))
+	// TODO currently unused masks carried over from the Typescript Limit Order SDK
+	//thresholdMask             = NewBitMask(big.NewInt(0), big.NewInt(185))
+	//argsInteractionLengthMask = NewBitMask(big.NewInt(220), big.NewInt(224))
+	argsExtensionLengthMask = NewBitMask(big.NewInt(224), big.NewInt(248))
 )
 
 const (
@@ -58,12 +59,9 @@ func (t *TakerTraits) Encode() *TakerTraitsEncoded {
 		encodedCalldata.Or(encodedCalldata, tmp.Lsh(big.NewInt(1), ArgsHasReceiverFlag))
 	}
 
-	var extensionBytesLen *big.Int
 	if t.Extension != "0x" {
-		extensionBytesLen = big.NewInt(int64(len(t.Extension))/2 - 1)
+		extensionBytesLen := big.NewInt(int64(len(t.Extension))/2 - 1)
 		argsExtensionLengthMask.SetBits(encodedCalldata, extensionBytesLen)
-	} else {
-		extensionBytesLen = big.NewInt(0)
 	}
 
 	traits := fmt.Sprintf("%032x", encodedCalldata)
