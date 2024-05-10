@@ -21,12 +21,12 @@ func CreateLimitOrderMessage(orderRequest CreateOrderParams, chainId int) (*Orde
 		TakerAsset:    orderRequest.TakerAsset,
 		MakingAmount:  orderRequest.MakingAmount,
 		TakingAmount:  orderRequest.TakingAmount,
-		Salt:          GenerateSalt(orderRequest.Extension),
+		Salt:          GenerateSalt(orderRequest.Extension.Encode()),
 		Maker:         orderRequest.Maker,
 		AllowedSender: "0x0000000000000000000000000000000000000000",
 		Receiver:      orderRequest.Taker,
 		MakerTraits:   orderRequest.MakerTraits.Encode(),
-		Extension:     orderRequest.Extension,
+		Extension:     orderRequest.Extension.Encode(),
 	}
 
 	aggregationRouter, err := constants.Get1inchRouterFromChainId(chainId)
@@ -155,73 +155,4 @@ func stringToHexBytes(hexStr string) ([]byte, error) {
 	}
 
 	return bytes, nil
-}
-
-func GetInteractions(makerAsset string, permit string) ([]string, error) {
-
-	makerAssetData := `0x`
-	takerAssetData := `0x`
-	getMakingAmount := `0x`
-	getTakingAmount := `0x`
-	predicate := `0x`
-	preInteraction := `0x`
-	postInteraction := `0x`
-
-	// The maker token must be prepended to permit data for limit orders
-	if permit != "0x" {
-		permit = makerAsset + permit
-	}
-
-	return []string{makerAssetData, takerAssetData, getMakingAmount, getTakingAmount, predicate, permit, preInteraction, postInteraction}, nil
-}
-
-func GetOffsets(interactions []string) *big.Int {
-	var lengthMap []int
-	for _, interaction := range interactions {
-		if interaction[:2] == "0x" {
-			lengthMap = append(lengthMap, len(interaction)/2-1)
-		} else {
-			lengthMap = append(lengthMap, len(interaction)/2)
-		}
-	}
-
-	cumulativeSum := 0
-	bytesAccumulator := big.NewInt(0)
-	var index uint64
-
-	for _, length := range lengthMap {
-		cumulativeSum += length
-		shiftVal := big.NewInt(int64(cumulativeSum))
-		shiftVal.Lsh(shiftVal, uint(32*index))           // Shift left
-		bytesAccumulator.Add(bytesAccumulator, shiftVal) // Add to accumulator
-		index++
-	}
-
-	return bytesAccumulator
-}
-
-func BuildExtension(interactionsConcatednated string, offsets *big.Int) string {
-	if interactionsConcatednated == "0x" {
-		return "0x"
-	}
-	offsetsBytes := offsets.Bytes()
-	paddedOffsetHex := fmt.Sprintf("%064x", offsetsBytes)
-	return "0x" + paddedOffsetHex + strings.TrimPrefix(interactionsConcatednated, "0x")
-}
-
-func ConcatenateInteractions(interactions []string) string {
-	var builder strings.Builder
-
-	for _, interaction := range interactions {
-		// Remove "0x" prefix if present
-		interaction = strings.TrimPrefix(interaction, "0x")
-		builder.WriteString(interaction)
-	}
-
-	// Add "0x" prefix to the final result
-	return builder.String()
-}
-
-func Trim0x(input string) string {
-	return strings.TrimPrefix(input, "0x")
 }

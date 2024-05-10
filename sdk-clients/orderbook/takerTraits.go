@@ -60,7 +60,7 @@ func (t *TakerTraits) Encode() *TakerTraitsEncoded {
 
 	var extensionBytesLen *big.Int
 	if t.Extension != "0x" {
-		extensionBytesLen = big.NewInt(int64(len(Trim0x(t.Extension)) / 2))
+		extensionBytesLen = big.NewInt(int64(len(t.Extension))/2 - 1)
 		argsExtensionLengthMask.SetBits(encodedCalldata, extensionBytesLen)
 	} else {
 		extensionBytesLen = big.NewInt(0)

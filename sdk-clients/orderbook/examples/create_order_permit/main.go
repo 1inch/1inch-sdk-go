@@ -16,7 +16,6 @@ import (
 
 	"github.com/1inch/1inch-sdk-go/constants"
 	"github.com/1inch/1inch-sdk-go/sdk-clients/orderbook"
-	"github.com/1inch/1inch-sdk-go/tmp/indentPrint"
 )
 
 /*
@@ -79,22 +78,20 @@ func main() {
 	if err != nil {
 		panic(err)
 	}
-
 	permit, err := client.Wallet.TokenPermit(*permitData)
 	if err != nil {
 		log.Fatal(fmt.Errorf("Failed to get permit: %v\n", err))
 	}
 
-	interactions, err := orderbook.GetInteractions(PolygonFRAX, orderbook.Trim0x(permit))
+	extension, err := orderbook.NewExtension(orderbook.ExtensionParams{
+		MakerAsset: PolygonFRAX,
+		Permit:     permit,
+	})
 	if err != nil {
-		log.Fatal(fmt.Errorf("Failed to get interactions: %v\n", err))
+		log.Fatalf("Failed to create extension: %v\n", err)
 	}
 
-	interactionsConcatenated := orderbook.ConcatenateInteractions(interactions)
-	interactionsOffsets := orderbook.GetOffsets(interactions)
-	extension := orderbook.BuildExtension(interactionsConcatenated, interactionsOffsets)
-
-	makerTraitParams := orderbook.MakerTraitsParams{
+	makerTraits := orderbook.NewMakerTraits(orderbook.MakerTraitsParams{
 		AllowedSender:      zeroAddress,
 		ShouldCheckEpoch:   false,
 		UsePermit2:         false,
@@ -105,10 +102,7 @@ func main() {
 		Expiry:             expireAfter,
 		Nonce:              seriesNonce.Int64(),
 		Series:             0, // TODO: Series 0 always?
-	}
-	indentPrint.IndentPrint(makerTraitParams)
-	makerTraits := orderbook.NewMakerTraits(makerTraitParams)
-	fmt.Println(makerTraits)
+	})
 
 	createOrderResponse, err := client.CreateOrder(ctx, orderbook.CreateOrderParams{
 		SeriesNonce:                    seriesNonce,

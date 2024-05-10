@@ -15,10 +15,6 @@ const emptyExtension = "0x"
 func (api *api) CreateOrder(ctx context.Context, params CreateOrderParams) (*CreateOrderResponse, error) {
 	u := fmt.Sprintf("/orderbook/v4.0/%d", api.chainId)
 
-	if params.Extension == "" {
-		params.Extension = emptyExtension
-	}
-
 	err := params.Validate()
 	if err != nil {
 		return nil, err

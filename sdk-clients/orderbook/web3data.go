@@ -47,6 +47,10 @@ func (c *Client) GetFillOrderCalldata(getOrderResponse *GetOrderByHashResponseEx
 	if getOrderResponse.Data.Extension == "0x" {
 		function = "fillOrder"
 	} else {
+		if takerTraits == nil {
+			return nil, fmt.Errorf("this order has extension data, but no taker traits were provided")
+		}
+
 		function = "fillOrderArgs"
 	}
 
@@ -65,11 +69,6 @@ func (c *Client) GetFillOrderCalldata(getOrderResponse *GetOrderByHashResponseEx
 		return nil, err
 	}
 
-	//takerTraitsBigInt, ok := new(big.Int).SetString("0", 16)
-	//if !ok {
-	//	return nil, fmt.Errorf("invalid taking amount value")
-	//}
-
 	var fillOrderData []byte
 
 	switch function {
@@ -79,10 +78,8 @@ func (c *Client) GetFillOrderCalldata(getOrderResponse *GetOrderByHashResponseEx
 			return nil, err
 		}
 	case "fillOrderArgs":
-
-		TakerTraitsEnc := takerTraits.Encode()
-
-		fillOrderData, err = c.AggregationRouterV6.Pack(function, getOrderResponse.LimitOrderDataNormalized, rCompressed, vsCompressed, getOrderResponse.LimitOrderDataNormalized.TakingAmount, TakerTraitsEnc.TraitFlags, TakerTraitsEnc.Args)
+		takerTraitsEncoded := takerTraits.Encode()
+		fillOrderData, err = c.AggregationRouterV6.Pack(function, getOrderResponse.LimitOrderDataNormalized, rCompressed, vsCompressed, getOrderResponse.LimitOrderDataNormalized.TakingAmount, takerTraitsEncoded.TraitFlags, takerTraitsEncoded.Args)
 		if err != nil {
 			return nil, err
 		}
