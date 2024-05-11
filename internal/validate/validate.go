@@ -454,3 +454,16 @@ func CheckBoolean(parameter interface{}, variableName string) error {
 
 	return nil
 }
+
+func CheckFiatCurrency(parameter interface{}, variableName string) error {
+	value, ok := parameter.(string)
+	if !ok {
+		return fmt.Errorf("for parameter '%v' to be validated as '%v', it must be a boolean", variableName, "Boolean")
+	}
+
+	if len(value) != 3 {
+		return NewParameterValidationError(variableName, "must have len = 3 (like USD, EUR, etc)")
+	}
+
+	return nil
+}
