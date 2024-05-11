@@ -10,5 +10,6 @@
   "ChainController_whitelist": "getWhitelistedTokensPrices",
   "ChainController_getCustomCurrencies": "getCustomCurrenciesList",
   "ChainController_byAddressesPost": "getPricesForRequestedTokensLong",
-  "ChainController_byAddresses": "getPricesForRequestedTokens"
+  "ChainController_byAddresses": "getPricesForRequestedTokens",
+  "ApiController_v1_5": "getGasPrices"
 }

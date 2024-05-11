@@ -1,0 +1,80 @@
+{
+  "openapi": "3.0.0",
+  "paths": {
+    "/v1.5/1": {
+      "get": {
+        "operationId": "getGasPrices",
+        "parameters": [],
+        "responses": {
+          "200": {
+            "description": "GasPrice",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Eip1559GasPriceResponse"
+                }
+              }
+            }
+          }
+        },
+        "tags": [
+          "Gas Price"
+        ]
+      }
+    }
+  },
+  "info": {
+    "title": "1inch Gas Price API",
+    "description": "<h2>Ethereum Network</h2> Using 1inch Gas Price API, you can get optimize gas price from network.\n",
+    "version": "1.4",
+    "contact": {}
+  },
+  "tags": [],
+  "servers": [],
+  "components": {
+    "schemas": {
+      "Eip1559GasValueResponse": {
+        "type": "object",
+        "properties": {
+          "maxPriorityFeePerGas": {
+            "type": "string"
+          },
+          "maxFeePerGas": {
+            "type": "string"
+          }
+        },
+        "required": [
+          "maxPriorityFeePerGas",
+          "maxFeePerGas"
+        ]
+      },
+      "Eip1559GasPriceResponse": {
+        "type": "object",
+        "properties": {
+          "baseFee": {
+            "type": "string"
+          },
+          "low": {
+            "$ref": "#/components/schemas/Eip1559GasValueResponse"
+          },
+          "medium": {
+            "$ref": "#/components/schemas/Eip1559GasValueResponse"
+          },
+          "high": {
+            "$ref": "#/components/schemas/Eip1559GasValueResponse"
+          },
+          "instant": {
+            "$ref": "#/components/schemas/Eip1559GasValueResponse"
+          }
+        },
+        "required": [
+          "baseFee",
+          "low",
+          "medium",
+          "high",
+          "instant"
+        ]
+      }
+    }
+  }
+}
