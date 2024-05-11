@@ -13,6 +13,6 @@ func (params *GetWhitelistedTokensPricesParams) Validate() error {
 func (params *GetPricesRequestDto) Validate() error {
 	var validationErrors []error
 	validationErrors = validate.Parameter(params.Tokens, "Tokens", validate.CheckEthereumAddressListRequired, validationErrors)
-	validationErrors = validate.Parameter(params.Currency, "currency", validate.CheckFiatCurrency, validationErrors)
+	validationErrors = validate.Parameter(string(params.Currency), "currency", validate.CheckFiatCurrency, validationErrors)
 	return validate.ConsolidateValidationErorrs(validationErrors)
 }

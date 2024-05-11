@@ -21,14 +21,8 @@ var (
 )
 
 const (
-	mainWalletAddress      = "0x1C17622cfa9B6fD2043A76DfC39A5B5a109aa708"
-	secondaryWalletAddress = "0x28C6c06298d514Db089934071355E5743bf21d60"
-
 	tokenAddress1 = "0x0d8775f648430679a709e98d2b0cb6250d2887ef"
 	tokenAddress2 = "0x58b6a8a3302369daec383334672404ee733ab239"
-
-	spender     = "0x58b6a8a3302369daec383334672404ee733ab239"
-	spenderInch = "0x111111125421ca6dc452d289314280a0f8842a65"
 )
 
 func main() {
@@ -51,5 +45,17 @@ func main() {
 	}
 
 	fmt.Println("GetWhitelistedTokensPricesParams:", whitelistedTokensPrices)
+	time.Sleep(time.Second)
+
+	requestedTokensPrices, err := client.GetPricesForRequestedTokens(ctx, spotprices.GetPricesRequestDto{
+		Currency: spotprices.GetPricesRequestDtoCurrency(spotprices.USD),
+		Tokens:   []string{tokenAddress1, tokenAddress2},
+	})
+	if err != nil {
+		fmt.Println("failed to GetPricesForRequestedTokens: %w", err)
+		return
+	}
+
+	fmt.Println("GetPricesForRequestedTokens:", requestedTokensPrices)
 	time.Sleep(time.Second)
 }

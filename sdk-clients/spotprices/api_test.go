@@ -74,3 +74,38 @@ func TestGetPricesForWhitelistedTokens(t *testing.T) {
 	}
 	require.NoError(t, err)
 }
+
+func TestGetPricesForRequestedTokens(t *testing.T) {
+	ctx := context.Background()
+
+	mockedResp := PricesForRequestedTokensResponse{
+		"0x0d8775f648430679a709e98d2b0cb6250d2887ef": "1000000000000000000",
+		"0x58b6a8a3302369daec383334672404ee733ab239": "1000000000000000000",
+	}
+
+	mockExecutor := &MockHttpExecutor{
+		ResponseObj: mockedResp,
+	}
+
+	api := api{
+		httpExecutor: mockExecutor,
+		chainId:      constants.EthereumChainId,
+	}
+
+	params := GetPricesRequestDto{
+		Currency: GetPricesRequestDtoCurrency(USD),
+		Tokens:   []string{"0x0d8775f648430679a709e98d2b0cb6250d2887ef", "0x58b6a8a3302369daec383334672404ee733ab239"},
+	}
+
+	prices, err := api.GetPricesForRequestedTokens(ctx, params)
+	require.NoError(t, err)
+	require.NotNil(t, prices)
+
+	if !mockExecutor.Called {
+		t.Errorf("Expected ExecuteRequest to be called")
+	}
+	if !reflect.DeepEqual(prices, &mockedResp) {
+		t.Errorf("Expected swap to be %+v, got %+v", prices, mockedResp)
+	}
+	require.NoError(t, err)
+}
