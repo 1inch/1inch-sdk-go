@@ -6,7 +6,7 @@ import (
 
 func (params *GetWhitelistedTokensPricesParams) Validate() error {
 	var validationErrors []error
-	validationErrors = validate.Parameter(params.Currency, "currency", validate.CheckFiatCurrency, validationErrors)
+	validationErrors = validate.Parameter(string(params.Currency), "currency", validate.CheckFiatCurrency, validationErrors)
 	return validate.ConsolidateValidationErorrs(validationErrors)
 }
 

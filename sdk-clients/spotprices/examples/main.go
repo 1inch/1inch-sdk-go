@@ -7,7 +7,7 @@ import (
 	"time"
 
 	"github.com/1inch/1inch-sdk-go/constants"
-	"github.com/1inch/1inch-sdk-go/sdk-clients/balances"
+	"github.com/1inch/1inch-sdk-go/sdk-clients/spotprices"
 )
 
 /*
@@ -32,108 +32,24 @@ const (
 )
 
 func main() {
-	config, err := balances.NewConfiguration(constants.EthereumChainId, "https://api.1inch.dev", devPortalToken)
+	config, err := spotprices.NewConfiguration(constants.EthereumChainId, "https://api.1inch.dev", devPortalToken)
 	if err != nil {
 		return
 	}
-	client, err := balances.NewClient(config)
+	client, err := spotprices.NewClient(config)
 	if err != nil {
 		return
 	}
 	ctx := context.Background()
 
-	balancesOfCustomTokensByWalletAddressResponse, err := client.GetBalancesOfCustomTokensByWalletAddress(ctx, balances.BalancesOfCustomTokensByWalletAddressParams{
-		Wallet: mainWalletAddress,
-		Tokens: []string{tokenAddress1, tokenAddress2},
+	whitelistedTokensPrices, err := client.GetPricesForWhitelistedTokens(ctx, spotprices.GetWhitelistedTokensPricesParams{
+		Currency: spotprices.GetWhitelistedTokensPricesParamsCurrency(spotprices.USD),
 	})
 	if err != nil {
-		fmt.Println("failed to GetBalancesOfCustomTokensByWalletAddress: %w", err)
+		fmt.Println("failed to GetWhitelistedTokensPricesParams: %w", err)
 		return
 	}
 
-	fmt.Println("GetBalancesOfCustomTokensByWalletAddress:", balancesOfCustomTokensByWalletAddressResponse)
+	fmt.Println("GetWhitelistedTokensPricesParams:", whitelistedTokensPrices)
 	time.Sleep(time.Second)
-
-	balancesOfCustomTokensByWalletAddressesListResponse, err := client.GetBalancesOfCustomTokensByWalletAddressesList(ctx, balances.BalancesOfCustomTokensByWalletAddressesListParams{
-		Wallets: []string{mainWalletAddress, secondaryWalletAddress},
-		Tokens:  []string{tokenAddress1, tokenAddress2},
-	})
-	if err != nil {
-		fmt.Println("failed to GetBalancesOfCustomTokensByWalletAddressesList: %w", err)
-		return
-	}
-
-	fmt.Println("GetBalancesOfCustomTokensByWalletAddressesList:", balancesOfCustomTokensByWalletAddressesListResponse)
-	time.Sleep(time.Second)
-
-	aggregatedBalancesAndAllowancesResponse, err := client.GetBalancesAndAllowances(ctx, balances.BalancesAndAllowancesParams{
-		Wallets:     []string{mainWalletAddress, secondaryWalletAddress},
-		FilterEmpty: true,
-		Spender:     spender,
-	})
-	if err != nil {
-		fmt.Println("failed to GetBalancesAndAllowances: %w", err)
-		return
-	}
-
-	fmt.Println("aggregatedBalancesAndAllowancesResponse:", aggregatedBalancesAndAllowancesResponse)
-	time.Sleep(time.Second)
-
-	balancesByWalletAddressResponse, err := client.GetBalancesByWalletAddress(ctx, balances.BalancesByWalletAddressParams{Wallet: mainWalletAddress})
-	if err != nil {
-		fmt.Println("failed to GetBalancesByWalletAddress: %w", err)
-		return
-	}
-
-	fmt.Println("GetBalancesByWalletAddress:", balancesByWalletAddressResponse)
-	time.Sleep(time.Second)
-
-	allowancesByWalletAddressResponse, err := client.GetAllowancesByWalletAddress(ctx, balances.AllowancesByWalletAddressParams{
-		Wallet:  mainWalletAddress,
-		Spender: spender,
-	})
-	if err != nil {
-		fmt.Println("failed to GetAllowancesByWalletAddress: %w", err)
-		return
-	}
-
-	fmt.Println("GetAllowancesByWalletAddress:", allowancesByWalletAddressResponse)
-	time.Sleep(time.Second)
-
-	allowancesOfCustomTokensByWalletAddressResponse, err := client.GetAllowancesOfCustomTokensByWalletAddress(ctx, balances.AllowancesOfCustomTokensByWalletAddressParams{
-		Wallet:  mainWalletAddress,
-		Spender: spender,
-		Tokens:  []string{tokenAddress1, tokenAddress2},
-	})
-	if err != nil {
-		fmt.Println("failed to GetAllowancesOfCustomTokensByWalletAddress: %w", err)
-		return
-	}
-
-	fmt.Println("GetAllowancesOfCustomTokensByWalletAddress:", allowancesOfCustomTokensByWalletAddressResponse)
-	time.Sleep(time.Second)
-
-	balancesAndAllowancesByWalletAddressListResponse, err := client.GetBalancesAndAllowancesByWalletAddressList(ctx, balances.BalancesAndAllowancesByWalletAddressListParams{
-		Wallet:  secondaryWalletAddress,
-		Spender: spenderInch,
-	})
-	if err != nil {
-		fmt.Println("failed to GetBalancesAndAllowancesByWalletAddressList: %w", err)
-		return
-	}
-
-	fmt.Println("GetBalancesAndAllowancesByWalletAddressList:", balancesAndAllowancesByWalletAddressListResponse)
-	time.Sleep(time.Second)
-
-	balancesAndAllowancesOfCustomTokensByWalletAddressResponse, err := client.GetBalancesAndAllowancesOfCustomTokensByWalletAddressList(ctx, balances.BalancesAndAllowancesOfCustomTokensByWalletAddressParams{
-		Wallet:  mainWalletAddress,
-		Spender: spender,
-		Tokens:  []string{tokenAddress1, tokenAddress2},
-	})
-	if err != nil {
-		fmt.Println("failed to GetBalancesAndAllowancesOfCustomTokensByWalletAddressList: %w", err)
-		return
-	}
-
-	fmt.Println("GetBalancesAndAllowancesOfCustomTokensByWalletAddressList:", balancesAndAllowancesOfCustomTokensByWalletAddressResponse)
 }

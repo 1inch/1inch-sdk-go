@@ -42,7 +42,12 @@ func boolPtr(b bool) *bool    { return &b }
 func TestGetPricesForWhitelistedTokens(t *testing.T) {
 	ctx := context.Background()
 
-	mockedResp := PricesForWhitelistedTokensResponse{}
+	mockedResp := PricesForWhitelistedTokensResponse{
+		"0xc02aaa39b223fe8d0a0e5c4f27ead9083c756cc2": "1000000000000000000",
+		"0xeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeee": "1000000000000000000",
+		"0xc3d688b66703497daa19211eedff47f25384cdc3": "344516328099167",
+		"0x320623b8e4ff03373931769a31fc52a4e78b5d70": "2136128317246",
+	}
 
 	mockExecutor := &MockHttpExecutor{
 		ResponseObj: mockedResp,
@@ -53,7 +58,9 @@ func TestGetPricesForWhitelistedTokens(t *testing.T) {
 		chainId:      constants.EthereumChainId,
 	}
 
-	params := GetWhitelistedTokensPricesParams{}
+	params := GetWhitelistedTokensPricesParams{
+		Currency: GetWhitelistedTokensPricesParamsCurrency(USD),
+	}
 
 	prices, err := api.GetPricesForWhitelistedTokens(ctx, params)
 	require.NoError(t, err)

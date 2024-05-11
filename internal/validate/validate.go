@@ -449,7 +449,7 @@ func CheckExpireAfter(parameter interface{}, variableName string) error {
 func CheckBoolean(parameter interface{}, variableName string) error {
 	_, ok := parameter.(bool)
 	if !ok {
-		return fmt.Errorf("for parameter '%v' to be validated as '%v', it must be a string", variableName, "Boolean")
+		return fmt.Errorf("for parameter '%v' to be validated as '%v', it must be a boolean", variableName, "Boolean")
 	}
 
 	return nil
@@ -458,7 +458,7 @@ func CheckBoolean(parameter interface{}, variableName string) error {
 func CheckFiatCurrency(parameter interface{}, variableName string) error {
 	value, ok := parameter.(string)
 	if !ok {
-		return fmt.Errorf("for parameter '%v' to be validated as '%v', it must be a boolean", variableName, "Boolean")
+		return fmt.Errorf("for parameter '%v' to be validated as '%v', it must be a string", variableName, "String")
 	}
 
 	if len(value) != 3 {
