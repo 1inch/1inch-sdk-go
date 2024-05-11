@@ -3,7 +3,7 @@
   "paths": {
     "/v1.1/1": {
       "get": {
-        "operationId": "ChainController_whitelist",
+        "operationId": "getWhitelistedTokensPrices",
         "summary": "Prices for whitelisted tokens",
         "description": "Prices for whitelisted tokens",
         "parameters": [
@@ -86,7 +86,7 @@
         ]
       },
       "post": {
-        "operationId": "ChainController_byAddressesPost",
+        "operationId": "getPricesForRequestedTokens",
         "summary": "Prices for requested tokens",
         "description": "Returns prices for requested tokens",
         "parameters": [],
@@ -162,7 +162,7 @@
     },
     "/v1.1/1/currencies": {
       "get": {
-        "operationId": "ChainController_getCustomCurrencies",
+        "operationId": "getCustomCurrenciesList",
         "summary": "List of custom currencies",
         "description": "Custom currencies",
         "parameters": [],
@@ -185,7 +185,7 @@
     },
     "/v1.1/1/{addresses}": {
       "get": {
-        "operationId": "ChainController_byAddresses",
+        "operationId": "getPricesForRequestedTokens",
         "summary": "Prices for requested tokens",
         "description": "Returns prices for requested tokens",
         "parameters": [

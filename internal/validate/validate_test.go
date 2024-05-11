@@ -1063,6 +1063,58 @@ func TestCheckBoolean(t *testing.T) {
 	}
 }
 
+func TestCheckFiatCurrency(t *testing.T) {
+	testCases := []struct {
+		description string
+		input       interface{}
+		expectError bool
+	}{
+		{
+			description: "True",
+			input:       "USD",
+		},
+		{
+			description: "True",
+			input:       "EUR",
+		},
+		{
+			description: "Must fail",
+			input:       nil,
+			expectError: true,
+		},
+		{
+			description: "Must fail 2",
+			input: struct {
+				A string
+			}{
+				A: "a",
+			},
+			expectError: true,
+		},
+		{
+			description: "Must fail 3",
+			input:       "ANDA",
+			expectError: true,
+		},
+		{
+			description: "Must fail 4",
+			input:       12,
+			expectError: true,
+		},
+	}
+
+	for _, tc := range testCases {
+		t.Run(tc.description, func(t *testing.T) {
+			err := CheckFiatCurrency(tc.input, "testValue")
+			if tc.expectError {
+				require.Error(t, err)
+			} else {
+				require.NoError(t, err)
+			}
+		})
+	}
+}
+
 func TestIsSubset(t *testing.T) {
 	testCases := []struct {
 		description string
