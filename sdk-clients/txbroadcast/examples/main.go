@@ -32,7 +32,7 @@ func main() {
 	ctx := context.Background()
 
 	broadcastPublicResponse, err := client.BroadcastPublicTransaction(ctx, txbroadcast.BroadcastRequest{
-		RawTransaction: "",
+		RawTransaction: "<YOOR RAW TX here>",
 	})
 	if err != nil {
 		fmt.Println("failed to BroadcastPublicTransaction: %w", err)
@@ -40,5 +40,16 @@ func main() {
 	}
 
 	fmt.Println("BroadcastPublicTransaction:", broadcastPublicResponse)
+	time.Sleep(time.Second)
+
+	broadcastPrivateResponse, err := client.BroadcastPrivateTransaction(ctx, txbroadcast.BroadcastRequest{
+		RawTransaction: "<YOOR RAW TX here that you want to send to private mempool>",
+	})
+	if err != nil {
+		fmt.Println("failed to BroadcastPrivateTransaction: %w", err)
+		return
+	}
+
+	fmt.Println("BroadcastPrivateTransaction:", broadcastPrivateResponse)
 	time.Sleep(time.Second)
 }
