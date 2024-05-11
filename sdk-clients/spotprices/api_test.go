@@ -35,10 +35,6 @@ func (m *MockHttpExecutor) ExecuteRequest(ctx context.Context, payload common.Re
 	return nil
 }
 
-func strPtr(s string) *string { return &s }
-func intPtr(i int) *int       { return &i }
-func boolPtr(b bool) *bool    { return &b }
-
 func TestGetPricesForWhitelistedTokens(t *testing.T) {
 	ctx := context.Background()
 
