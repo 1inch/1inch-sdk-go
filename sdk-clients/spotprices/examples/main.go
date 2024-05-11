@@ -75,4 +75,13 @@ func main() {
 
 	fmt.Println("GetPricesForRequestedTokensLarge:", requestedTokensPricesLarge)
 	time.Sleep(time.Second)
+
+	customCurrencies, err := client.GetCustomCurrenciesList(ctx)
+	if err != nil {
+		fmt.Println("failed to GetCustomCurrenciesList: %w", err)
+		return
+	}
+
+	fmt.Println("GetCustomCurrenciesList:", customCurrencies)
+	time.Sleep(time.Second)
 }

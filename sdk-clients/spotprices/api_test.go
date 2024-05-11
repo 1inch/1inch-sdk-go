@@ -124,3 +124,35 @@ func TestGetPricesForRequestedTokensLarge(t *testing.T) {
 	}
 	require.NoError(t, err)
 }
+
+func TestGetCustomCurrenciesList(t *testing.T) {
+	ctx := context.Background()
+
+	mockedResp := CurrenciesResponseDto{
+		Codes: []string{
+			"USD",
+			"EUR",
+		},
+	}
+
+	mockExecutor := &MockHttpExecutor{
+		ResponseObj: mockedResp,
+	}
+
+	api := api{
+		httpExecutor: mockExecutor,
+		chainId:      constants.EthereumChainId,
+	}
+
+	prices, err := api.GetCustomCurrenciesList(ctx)
+	require.NoError(t, err)
+	require.NotNil(t, prices)
+
+	if !mockExecutor.Called {
+		t.Errorf("Expected ExecuteRequest to be called")
+	}
+	if !reflect.DeepEqual(prices, &mockedResp) {
+		t.Errorf("Expected swap to be %+v, got %+v", prices, mockedResp)
+	}
+	require.NoError(t, err)
+}
