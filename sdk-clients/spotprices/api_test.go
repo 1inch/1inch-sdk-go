@@ -75,12 +75,17 @@ func TestGetPricesForWhitelistedTokens(t *testing.T) {
 	require.NoError(t, err)
 }
 
-func TestGetPricesForRequestedTokens(t *testing.T) {
+func TestGetPricesForRequestedTokensLarge(t *testing.T) {
 	ctx := context.Background()
 
 	mockedResp := PricesForRequestedTokensResponse{
 		"0x0d8775f648430679a709e98d2b0cb6250d2887ef": "1000000000000000000",
 		"0x58b6a8a3302369daec383334672404ee733ab239": "1000000000000000000",
+		"0x320623b8e4ff03373931769a31fc52a4e78b5d70": "1000000000000000000",
+		"0x71ab77b7dbb4fa7e017bc15090b2163221420282": "1000000000000000000",
+		"0x256d1fce1b1221e8398f65f9b36033ce50b2d497": "1000000000000000000",
+		"0x85f17cf997934a597031b2e18a9ab6ebd4b9f6a4": "1000000000000000000",
+		"0x55c08ca52497e2f1534b59e2917bf524d4765257": "1000000000000000000",
 	}
 
 	mockExecutor := &MockHttpExecutor{
@@ -92,12 +97,22 @@ func TestGetPricesForRequestedTokens(t *testing.T) {
 		chainId:      constants.EthereumChainId,
 	}
 
+	const (
+		tokenAddress1 = "0x0d8775f648430679a709e98d2b0cb6250d2887ef"
+		tokenAddress2 = "0x58b6a8a3302369daec383334672404ee733ab239"
+		tokenAddress3 = "0x320623b8e4ff03373931769a31fc52a4e78b5d70"
+		tokenAddress4 = "0x71ab77b7dbb4fa7e017bc15090b2163221420282"
+		tokenAddress5 = "0x256d1fce1b1221e8398f65f9b36033ce50b2d497"
+		tokenAddress6 = "0x85f17cf997934a597031b2e18a9ab6ebd4b9f6a4"
+		tokenAddress7 = "0x55c08ca52497e2f1534b59e2917bf524d4765257"
+	)
+
 	params := GetPricesRequestDto{
 		Currency: GetPricesRequestDtoCurrency(USD),
-		Tokens:   []string{"0x0d8775f648430679a709e98d2b0cb6250d2887ef", "0x58b6a8a3302369daec383334672404ee733ab239"},
+		Tokens:   []string{tokenAddress1, tokenAddress2, tokenAddress3, tokenAddress4, tokenAddress5, tokenAddress6, tokenAddress7},
 	}
 
-	prices, err := api.GetPricesForRequestedTokens(ctx, params)
+	prices, err := api.GetPricesForRequestedTokensLarge(ctx, params)
 	require.NoError(t, err)
 	require.NotNil(t, prices)
 

@@ -23,6 +23,11 @@ var (
 const (
 	tokenAddress1 = "0x0d8775f648430679a709e98d2b0cb6250d2887ef"
 	tokenAddress2 = "0x58b6a8a3302369daec383334672404ee733ab239"
+	tokenAddress3 = "0x320623b8e4ff03373931769a31fc52a4e78b5d70"
+	tokenAddress4 = "0x71ab77b7dbb4fa7e017bc15090b2163221420282"
+	tokenAddress5 = "0x256d1fce1b1221e8398f65f9b36033ce50b2d497"
+	tokenAddress6 = "0x85f17cf997934a597031b2e18a9ab6ebd4b9f6a4"
+	tokenAddress7 = "0x55c08ca52497e2f1534b59e2917bf524d4765257"
 )
 
 func main() {
@@ -57,5 +62,17 @@ func main() {
 	}
 
 	fmt.Println("GetPricesForRequestedTokens:", requestedTokensPrices)
+	time.Sleep(time.Second)
+
+	requestedTokensPricesLarge, err := client.GetPricesForRequestedTokensLarge(ctx, spotprices.GetPricesRequestDto{
+		Currency: spotprices.GetPricesRequestDtoCurrency(spotprices.USD),
+		Tokens:   []string{tokenAddress1, tokenAddress2, tokenAddress3, tokenAddress4, tokenAddress5, tokenAddress6, tokenAddress7},
+	})
+	if err != nil {
+		fmt.Println("failed to GetPricesForRequestedTokensLarge: %w", err)
+		return
+	}
+
+	fmt.Println("GetPricesForRequestedTokensLarge:", requestedTokensPricesLarge)
 	time.Sleep(time.Second)
 }
