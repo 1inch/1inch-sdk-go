@@ -11,5 +11,6 @@
   "ChainController_getCustomCurrencies": "getCustomCurrenciesList",
   "ChainController_byAddressesPost": "getPricesForRequestedTokensLong",
   "ChainController_byAddresses": "getPricesForRequestedTokens",
-  "ApiController_v1_5": "getGasPrices"
+  "ApiController_v1_5": "getGasPrices",
+  "DevPortalController_getNfts": "getNftsByAddress"
 }
