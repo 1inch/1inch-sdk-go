@@ -2,7 +2,6 @@ package nft
 
 import (
 	"context"
-	"fmt"
 	"strconv"
 	"strings"
 
@@ -11,7 +10,7 @@ import (
 
 // GetSupportedChains Returns supported chains
 func (api *api) GetSupportedChains(ctx context.Context) (*SupportedChainsResponse, error) {
-	u := fmt.Sprintf("/nft/v1/supportedchains")
+	u := "/nft/v1/supportedchains"
 
 	payload := common.RequestPayload{
 		Method: "GET",
@@ -31,7 +30,7 @@ func (api *api) GetSupportedChains(ctx context.Context) (*SupportedChainsRespons
 
 // GetNFTsByAddress Get users NFTs by EVM address with supported chains
 func (api *api) GetNFTsByAddress(ctx context.Context, params GetNftsByAddressParams) (*GetNFTsByAddressResponse, error) {
-	u := fmt.Sprintf("/nft/v1/byaddress")
+	u := "/nft/v1/byaddress"
 
 	err := params.Validate()
 	if err != nil {
