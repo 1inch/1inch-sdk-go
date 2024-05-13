@@ -1,0 +1,390 @@
+{
+  "openapi": "3.0.0",
+  "paths": {
+    "/v2.0/history/{address}/events": {
+      "get": {
+        "operationId": "getHistoryEventsByAddress",
+        "summary": "Returns history events for address",
+        "parameters": [
+          {
+            "name": "address",
+            "required": true,
+            "in": "path",
+            "description": "Account address",
+            "example": "0x266E77cE9034a023056ea2845CB6A20517F6FDB7",
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "limit",
+            "required": false,
+            "in": "query",
+            "description": "Amount of events to return, default is 100, max is 10000",
+            "example": 100,
+            "schema": {
+              "type": "integer"
+            }
+          },
+          {
+            "name": "tokenAddress",
+            "required": false,
+            "in": "query",
+            "description": "Token address used at event",
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "chainId",
+            "required": false,
+            "in": "query",
+            "example": 1,
+            "description": "chainId",
+            "schema": {
+              "type": "integer"
+            }
+          },
+          {
+            "name": "toTimestampMs",
+            "required": false,
+            "in": "query",
+            "description": "To time at milliseconds",
+            "example": 1695283931212,
+            "schema": {
+              "type": "integer"
+            }
+          },
+          {
+            "name": "fromTimestampMs",
+            "required": false,
+            "in": "query",
+            "description": "From time at milliseconds",
+            "example": 1694754179096,
+            "schema": {
+              "type": "integer"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/components/schemas/HistoryResponseDto"
+                  }
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Bad Request."
+          },
+          "401": {
+            "description": "Unauthorized."
+          },
+          "500": {
+            "description": "Internal server error."
+          }
+        },
+        "tags": [
+          "history"
+        ]
+      }
+    }
+  },
+  "info": {
+    "title": "Transaction history",
+    "description": "History of transactions for the user",
+    "version": "2.0",
+    "contact": {}
+  },
+  "tags": [],
+  "servers": [
+    {
+      "url": "https://history-green.1inch.io",
+      "description": "green"
+    },
+    {
+      "url": "https://history-blue.1inch.io",
+      "description": "blue"
+    },
+    {
+      "url": "http://localhost:3000",
+      "description": "localhost"
+    }
+  ],
+  "components": {
+    "schemas": {
+      "TokenActionDto": {
+        "type": "object",
+        "properties": {
+          "address": {
+            "type": "string",
+            "example": "0xc944e90c64b2c07662a292be6244bdf05cda44a7"
+          },
+          "standard": {
+            "type": "string",
+            "example": "ERC20"
+          },
+          "fromAddress": {
+            "type": "string",
+            "example": "0x266e77ce9034a023056ea2845cb6a20517f6fdb7"
+          },
+          "toAddress": {
+            "type": "string",
+            "example": "0x03f7724180aa6b939894b5ca4314783b0b36b329"
+          },
+          "tokenId": {
+            "type": "object",
+            "example": "0x03f7724180aa6b939894b5ca4314783b0b36b329"
+          },
+          "amount": {
+            "type": "object",
+            "example": "291000000000"
+          },
+          "direction": {
+            "type": "string",
+            "example": "Out",
+            "enum": [
+              "In",
+              "Out",
+              "Self",
+              "On"
+            ]
+          }
+        },
+        "required": [
+          "address",
+          "standard",
+          "fromAddress",
+          "toAddress",
+          "direction"
+        ]
+      },
+      "TransactionDetailsMetaDto": {
+        "type": "object",
+        "properties": {
+          "is1inchFusionSwap": {
+            "type": "object",
+            "example": true
+          },
+          "orderFillPercentage": {
+            "type": "object",
+            "example": 2
+          },
+          "ensDomainName": {
+            "type": "object",
+            "example": "usd.eth"
+          },
+          "fromChainId": {
+            "type": "object",
+            "example": "56"
+          },
+          "toChainId": {
+            "type": "object",
+            "example": "1"
+          },
+          "safeAddress": {
+            "type": "object",
+            "example": "0x34391448368ae60aa7dc12dc309c4ef674a06d7f"
+          },
+          "protocol": {
+            "type": "object",
+            "example": "Gnosis"
+          }
+        }
+      },
+      "TransactionDetailsDto": {
+        "type": "object",
+        "properties": {
+          "orderInBlock": {
+            "type": "number",
+            "example": 2
+          },
+          "txHash": {
+            "type": "string",
+            "example": "0xdd87fbd093714d493ba53c000e4222b500e622500eeceaae9d4c4c5111ffbbfc"
+          },
+          "chainId": {
+            "type": "integer",
+            "enum": [
+              1,
+              45,
+              137,
+              10,
+              56,
+              42161,
+              43114,
+              100,
+              250,
+              1313161554,
+              8217,
+              324,
+              8453
+            ],
+            "example": 1
+          },
+          "blockNumber": {
+            "type": "number",
+            "example": "18182982"
+          },
+          "blockTimeSec": {
+            "type": "number",
+            "example": "1695283931"
+          },
+          "status": {
+            "type": "string",
+            "example": "Completed"
+          },
+          "type": {
+            "type": "string",
+            "example": "Transfer",
+            "enum": [
+              "Approve",
+              "Wrap",
+              "Unwrap",
+              "Transfer",
+              "SwapExactInput",
+              "SwapExactOutput",
+              "LimitOrderFill",
+              "LimitOrderCancel",
+              "LimitOrderCancelAll",
+              "Multicall",
+              "AddLiquidity",
+              "RemoveLiquidity",
+              "Borrow",
+              "Repay",
+              "Stake",
+              "Unstake",
+              "Vote",
+              "DelegateVotePower",
+              "UnDelegateVotePower",
+              "DiscardVote",
+              "DeployPool",
+              "Claim",
+              "AbiDecoded",
+              "TraceDecoded",
+              "Action",
+              "Bridge",
+              "BuyNft",
+              "BidNft",
+              "OfferSellNft",
+              "Burn",
+              "WrappedTx",
+              "RegisterENSDomain",
+              "Revoke",
+              "CreateSafe",
+              "AddOwner"
+            ]
+          },
+          "tokenActions": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/TokenActionDto"
+            }
+          },
+          "fromAddress": {
+            "type": "string",
+            "example": "0x266e77ce9034a023056ea2845cb6a20517f6fdb7"
+          },
+          "toAddress": {
+            "type": "string",
+            "example": "0xc944e90c64b2c07662a292be6244bdf05cda44a7"
+          },
+          "nonce": {
+            "type": "number",
+            "example": 5
+          },
+          "feeInWei": {
+            "type": "string",
+            "example": "378906276289230"
+          },
+          "meta": {
+            "$ref": "#/components/schemas/TransactionDetailsMetaDto"
+          }
+        },
+        "required": [
+          "orderInBlock",
+          "txHash",
+          "chainId",
+          "blockNumber",
+          "blockTimeSec",
+          "status",
+          "type",
+          "tokenActions",
+          "fromAddress",
+          "toAddress",
+          "nonce",
+          "feeInWei"
+        ]
+      },
+      "HistoryEventDto": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "string",
+            "example": 7279741913753607
+          },
+          "address": {
+            "type": "string",
+            "example": "0x266E77cE9034a023056ea2845CB6A20517F6FDB7"
+          },
+          "type": {
+            "type": "string",
+            "enum": [
+              "Transaction",
+              "LimitOrder",
+              "FusionSwap"
+            ],
+            "example": "Transaction"
+          },
+          "rating": {
+            "type": "string",
+            "enum": [
+              "Reliable",
+              "Scam"
+            ],
+            "example": "Reliable"
+          },
+          "timeMs": {
+            "type": "number",
+            "example": 1694754179096
+          },
+          "details": {
+            "$ref": "#/components/schemas/TransactionDetailsDto"
+          }
+        },
+        "required": [
+          "id",
+          "address",
+          "type",
+          "rating",
+          "timeMs",
+          "details"
+        ]
+      },
+      "HistoryResponseDto": {
+        "type": "object",
+        "properties": {
+          "items": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/HistoryEventDto"
+            }
+          },
+          "cache_counter": {
+            "type": "number"
+          }
+        },
+        "required": [
+          "items",
+          "cache_counter"
+        ]
+      }
+    }
+  }
+}
