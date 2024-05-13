@@ -78,22 +78,20 @@ func main() {
 	if err != nil {
 		panic(err)
 	}
-
 	permit, err := client.Wallet.TokenPermit(*permitData)
 	if err != nil {
 		log.Fatal(fmt.Errorf("Failed to get permit: %v\n", err))
 	}
 
-	interactions, err := orderbook.GetInteractions(PolygonFRAX, orderbook.Trim0x(permit))
+	extension, err := orderbook.NewExtension(orderbook.ExtensionParams{
+		MakerAsset: PolygonFRAX,
+		Permit:     permit,
+	})
 	if err != nil {
-		log.Fatal(fmt.Errorf("Failed to get interactions: %v\n", err))
+		log.Fatalf("Failed to create extension: %v\n", err)
 	}
 
-	interactionsConcatenated := orderbook.ConcatenateInteractions(interactions)
-	interactionsOffsets := orderbook.GetOffsets(interactions)
-	extension := orderbook.BuildExtension(interactionsConcatenated, interactionsOffsets)
-
-	makerTraits := orderbook.BuildMakerTraits(orderbook.BuildMakerTraitsParams{
+	makerTraits := orderbook.NewMakerTraits(orderbook.MakerTraitsParams{
 		AllowedSender:      zeroAddress,
 		ShouldCheckEpoch:   false,
 		UsePermit2:         false,

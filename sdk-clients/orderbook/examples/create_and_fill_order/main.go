@@ -59,7 +59,7 @@ func main() {
 		log.Fatal(fmt.Errorf("failed to get series nonce: %v", err))
 	}
 
-	buildMakerTraitsParams := orderbook.BuildMakerTraitsParams{
+	makerTraits := orderbook.NewMakerTraits(orderbook.MakerTraitsParams{
 		AllowedSender:      zeroAddress,
 		ShouldCheckEpoch:   false,
 		UsePermit2:         false,
@@ -70,8 +70,7 @@ func main() {
 		Expiry:             expireAfter,
 		Nonce:              seriesNonce.Int64(),
 		Series:             0, // TODO: Series 0 always?
-	}
-	makerTraits := orderbook.BuildMakerTraits(buildMakerTraitsParams)
+	})
 
 	createOrderResponse, err := client.CreateOrder(ctx, orderbook.CreateOrderParams{
 		SeriesNonce:                    seriesNonce,
@@ -110,7 +109,7 @@ func main() {
 		OrderHash: getOrderResponse[0].OrderHash,
 	})
 
-	fillOrderData, err := client.GetFillOrderCalldata(getOrderRresponse)
+	fillOrderData, err := client.GetFillOrderCalldata(getOrderRresponse, nil)
 
 	aggregationRouter, err := constants.Get1inchRouterFromChainId(chainId)
 	if err != nil {

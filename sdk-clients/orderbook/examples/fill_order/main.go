@@ -26,7 +26,7 @@ var (
 )
 
 const (
-	limitOrderHash = "0x073797847405119e8de253d97b281853748e690065b4ae04e5eda9d282f1015b"
+	limitOrderHash = "0xddf0907b11b3dba4591372e201117f09f9cdc7ccfff175397bc57eeb7043a59f"
 	chainId        = 137
 )
 
@@ -39,11 +39,15 @@ func main() {
 	}
 	client, err := orderbook.NewClient(config)
 
-	getOrderRresponse, err := client.GetOrder(ctx, orderbook.GetOrderParams{
+	getOrderResponse, err := client.GetOrder(ctx, orderbook.GetOrderParams{
 		OrderHash: limitOrderHash,
 	})
 
-	fillOrderData, err := client.GetFillOrderCalldata(getOrderRresponse)
+	takerTraits := orderbook.NewTakerTraits(orderbook.TakerTraitsParams{
+		Extension: getOrderResponse.Data.Extension,
+	})
+
+	fillOrderData, err := client.GetFillOrderCalldata(getOrderResponse, takerTraits)
 	if err != nil {
 		log.Fatalf("Failed to get fill order calldata: %v", err)
 	}
