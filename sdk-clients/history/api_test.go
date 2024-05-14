@@ -9,6 +9,7 @@ import (
 	"github.com/stretchr/testify/require"
 
 	"github.com/1inch/1inch-sdk-go/common"
+	"github.com/1inch/1inch-sdk-go/constants"
 )
 
 type MockHttpExecutor struct {
@@ -37,7 +38,42 @@ func (m *MockHttpExecutor) ExecuteRequest(ctx context.Context, payload common.Re
 func TestGetHistoryEventsByAddress(t *testing.T) {
 	ctx := context.Background()
 
-	mockedResp := HistoryResponseDto{}
+	mockedResp := EventsByAddressResponse{
+		Items: []Item{
+			{
+				TimeMs:  1696151195140,
+				Address: "0x266e77ce9034a023056ea2845cb6a20517f6fdb7",
+				Type:    0,
+				Rating:  "reliable",
+				Details: Details{
+					TxHash:       "0x00b61f593833012bde2bcb6b209a79fe9de47cc28f102509145fbbca4e1c6566",
+					ChainID:      1,
+					BlockNumber:  18254685,
+					BlockTimeSec: 1696151195,
+					Status:       "completed",
+					Type:         "Send",
+					TokenActions: []TokenAction{
+						{
+							Address:     "0xeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeee",
+							Standard:    "Native",
+							FromAddress: "0x266e77ce9034a023056ea2845cb6a20517f6fdb7",
+							ToAddress:   "0xae0ee0a63a2ce6baeeffe56e7714fb4efe48d419",
+							Amount:      "4935656027779822",
+							Direction:   "Out",
+						},
+					},
+					FromAddress:  "0x266e77ce9034a023056ea2845cb6a20517f6fdb7",
+					ToAddress:    "0xae0ee0a63a2ce6baeeffe56e7714fb4efe48d419",
+					OrderInBlock: 140,
+					Nonce:        9,
+					FeeInWei:     "750577247363861",
+				},
+				ID:                      "306262793328640",
+				EventOrderInTransaction: 0,
+			},
+		},
+		CacheCounter: 1,
+	}
 
 	mockExecutor := &MockHttpExecutor{
 		ResponseObj: mockedResp,
@@ -47,7 +83,10 @@ func TestGetHistoryEventsByAddress(t *testing.T) {
 		httpExecutor: mockExecutor,
 	}
 
-	params := EventsByAddressParams{}
+	params := EventsByAddressParams{
+		Address: "0x266E77cE9034a023056ea2845CB6A20517F6FDB7",
+		ChainId: constants.EthereumChainId,
+	}
 
 	prices, err := api.GetHistoryEventsByAddress(ctx, params)
 	require.NoError(t, err)

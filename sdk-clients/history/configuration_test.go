@@ -7,7 +7,7 @@ import (
 )
 
 func TestNewConfigurationAPI(t *testing.T) {
-	configAPI, err := NewConfiguration(1, "https://api.example.com", "apikey123")
+	configAPI, err := NewConfiguration("https://api.example.com", "apikey123")
 
 	assert.NoError(t, err)
 	assert.NotNil(t, configAPI)
