@@ -7,7 +7,7 @@ import (
 	"time"
 
 	"github.com/1inch/1inch-sdk-go/constants"
-	"github.com/1inch/1inch-sdk-go/sdk-clients/history"
+	"github.com/1inch/1inch-sdk-go/sdk-clients/traces"
 )
 
 /*
@@ -21,25 +21,55 @@ var (
 )
 
 func main() {
-	config, err := history.NewConfiguration("https://api.1inch.dev", devPortalToken)
+	config, err := traces.NewConfiguration(constants.EthereumChainId, "https://api.1inch.dev", devPortalToken)
 	if err != nil {
 		return
 	}
-	client, err := history.NewClient(config)
+	client, err := traces.NewClient(config)
 	if err != nil {
 		return
 	}
 	ctx := context.Background()
 
-	historyEvents, err := client.GetHistoryEventsByAddress(ctx, history.EventsByAddressParams{
-		Address: "0x266E77cE9034a023056ea2845CB6A20517F6FDB7",
-		ChainId: constants.EthereumChainId,
-	})
+	interval, err := client.GetSyncedInterval(ctx)
 	if err != nil {
-		fmt.Println("failed to GetHistoryEventsByAddress: %w", err)
+		fmt.Println("failed to GetSyncedInterval: %w", err)
 		return
 	}
 
-	fmt.Println("GetHistoryEventsByAddress:", historyEvents)
+	fmt.Println("GetSyncedInterval:", interval)
+	time.Sleep(time.Second)
+
+	blockTrace, err := client.GetBlockTraceByNumber(ctx, traces.GetBlockTraceByNumberParam(17378177))
+	if err != nil {
+		fmt.Println("failed to GetBlockTraceByNumber: %w", err)
+		return
+	}
+
+	fmt.Println("GetBlockTraceByNumber:", blockTrace)
+	time.Sleep(time.Second)
+
+	txTrace, err := client.GetTxTraceByNumberAndHash(ctx, traces.GetTxTraceByNumberAndHashParams{
+		BlockNumber:     17378177,
+		TransactionHash: "0x16897e492b2e023d8f07be9e925f2c15a91000ef11a01fc71e70f75050f1e03c",
+	})
+	if err != nil {
+		fmt.Println("failed to GetTxTraceByNumberAndHash: %w", err)
+		return
+	}
+
+	fmt.Println("GetTxTraceByNumberAndHash:", txTrace)
+	time.Sleep(time.Second)
+
+	txTraceOffset, err := client.GetTxTraceByNumberAndOffset(ctx, traces.GetTxTraceByNumberAndOffsetParams{
+		BlockNumber: 17378177,
+		Offset:      1,
+	})
+	if err != nil {
+		fmt.Println("failed to GetTxTraceByNumberAndOffset: %w", err)
+		return
+	}
+
+	fmt.Println("GetTxTraceByNumberAndOffset:", txTraceOffset)
 	time.Sleep(time.Second)
 }
