@@ -4,7 +4,7 @@ import (
 	"github.com/1inch/1inch-sdk-go/internal/validate"
 )
 
-func (params *HistoryEventsByAddressParams) Validate() error {
+func (params *EventsByAddressParams) Validate() error {
 	var validationErrors []error
 	validationErrors = validate.Parameter(params.TokenAddress, "TokenAddress", validate.CheckEthereumAddress, validationErrors)
 	validationErrors = validate.Parameter(params.Address, "Address", validate.CheckEthereumAddressRequired, validationErrors)

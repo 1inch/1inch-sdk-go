@@ -31,7 +31,7 @@ func main() {
 	}
 	ctx := context.Background()
 
-	historyEvents, err := client.GetHistoryEventsByAddress(ctx, history.HistoryEventsByAddressParams{
+	historyEvents, err := client.GetHistoryEventsByAddress(ctx, history.EventsByAddressParams{
 		Address: "0x266E77cE9034a023056ea2845CB6A20517F6FDB7",
 		ChainId: constants.EthereumChainId,
 	})

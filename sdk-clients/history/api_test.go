@@ -47,7 +47,7 @@ func TestGetHistoryEventsByAddress(t *testing.T) {
 		httpExecutor: mockExecutor,
 	}
 
-	params := HistoryEventsByAddressParams{}
+	params := EventsByAddressParams{}
 
 	prices, err := api.GetHistoryEventsByAddress(ctx, params)
 	require.NoError(t, err)

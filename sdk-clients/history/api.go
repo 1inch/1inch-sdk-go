@@ -8,7 +8,7 @@ import (
 )
 
 // GetHistoryEventsByAddress Returns history events for address
-func (api *api) GetHistoryEventsByAddress(ctx context.Context, params HistoryEventsByAddressParams) (*HistoryResponseDto, error) {
+func (api *api) GetHistoryEventsByAddress(ctx context.Context, params EventsByAddressParams) (*EventsByAddressResponse, error) {
 	u := fmt.Sprintf("history/v2.0/history/%s/events", params.Address)
 
 	err := params.Validate()
@@ -23,7 +23,7 @@ func (api *api) GetHistoryEventsByAddress(ctx context.Context, params HistoryEve
 		Body:   nil,
 	}
 
-	var response HistoryResponseDto
+	var response EventsByAddressResponse
 	err = api.httpExecutor.ExecuteRequest(ctx, payload, &response)
 	if err != nil {
 		return nil, err

@@ -3,7 +3,7 @@
   "paths": {
     "/v2.0/history/{address}/events": {
       "get": {
-        "operationId": "getHistoryEventsByAddress",
+        "operationId": "V2RestApiController_getHistoryEventsByAddress",
         "summary": "Returns history events for address",
         "parameters": [
           {
