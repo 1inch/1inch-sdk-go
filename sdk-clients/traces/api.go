@@ -48,7 +48,7 @@ func (api *api) GetBlockTraceByNumber(ctx context.Context, param GetBlockTraceBy
 }
 
 // GetTxTraceByNumberAndHash Get transaction trace by block number and transaction hash
-func (api *api) GetTxTraceByNumberAndHash(ctx context.Context, param GetTxTraceByNumberAndHashParams) (*PlainTransactionTraceWithTypeDto, error) {
+func (api *api) GetTxTraceByNumberAndHash(ctx context.Context, param GetTxTraceByNumberAndHashParams) (*TransactionTraceResponse, error) {
 	u := fmt.Sprintf("traces/v1.0/chain/%d/block-trace/%d/tx-hash/%s", api.chainId, param.BlockNumber, param.TransactionHash)
 
 	payload := common.RequestPayload{
@@ -58,7 +58,7 @@ func (api *api) GetTxTraceByNumberAndHash(ctx context.Context, param GetTxTraceB
 		Body:   nil,
 	}
 
-	var response PlainTransactionTraceWithTypeDto
+	var response TransactionTraceResponse
 	err := api.httpExecutor.ExecuteRequest(ctx, payload, &response)
 	if err != nil {
 		return nil, err
@@ -68,7 +68,7 @@ func (api *api) GetTxTraceByNumberAndHash(ctx context.Context, param GetTxTraceB
 }
 
 // GetTxTraceByNumberAndOffset Get transaction trace by block number and offset of transaction in block
-func (api *api) GetTxTraceByNumberAndOffset(ctx context.Context, param GetTxTraceByNumberAndOffsetParams) (*PlainTransactionTraceWithTypeDto, error) {
+func (api *api) GetTxTraceByNumberAndOffset(ctx context.Context, param GetTxTraceByNumberAndOffsetParams) (*TransactionTraceResponse, error) {
 	u := fmt.Sprintf("traces/v1.0/chain/%d/block-trace/%d/offset/%d", api.chainId, param.BlockNumber, param.Offset)
 
 	payload := common.RequestPayload{
@@ -78,7 +78,7 @@ func (api *api) GetTxTraceByNumberAndOffset(ctx context.Context, param GetTxTrac
 		Body:   nil,
 	}
 
-	var response PlainTransactionTraceWithTypeDto
+	var response TransactionTraceResponse
 	err := api.httpExecutor.ExecuteRequest(ctx, payload, &response)
 	if err != nil {
 		return nil, err

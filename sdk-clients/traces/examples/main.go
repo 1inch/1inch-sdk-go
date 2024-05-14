@@ -40,7 +40,7 @@ func main() {
 	fmt.Println("GetSyncedInterval:", interval)
 	time.Sleep(time.Second)
 
-	blockTrace, err := client.GetBlockTraceByNumber(ctx, traces.GetBlockTraceByNumberParam(17378177))
+	blockTrace, err := client.GetBlockTraceByNumber(ctx, traces.GetBlockTraceByNumberParam(17378176))
 	if err != nil {
 		fmt.Println("failed to GetBlockTraceByNumber: %w", err)
 		return

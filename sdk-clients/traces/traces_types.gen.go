@@ -32,23 +32,6 @@ const (
 	CoreBuiltinCallTraceDtoTypeTRANSFERETHER CoreBuiltinCallTraceDtoType = "TRANSFER_ETHER"
 )
 
-// Defines values for CoreBuiltinTransactionRootSuccessTraceDtoChainId.
-const (
-	N1             CoreBuiltinTransactionRootSuccessTraceDtoChainId = 1
-	N10            CoreBuiltinTransactionRootSuccessTraceDtoChainId = 10
-	N100           CoreBuiltinTransactionRootSuccessTraceDtoChainId = 100
-	N1313161554e09 CoreBuiltinTransactionRootSuccessTraceDtoChainId = 1.313161554e+09
-	N137           CoreBuiltinTransactionRootSuccessTraceDtoChainId = 137
-	N250           CoreBuiltinTransactionRootSuccessTraceDtoChainId = 250
-	N324           CoreBuiltinTransactionRootSuccessTraceDtoChainId = 324
-	N42161         CoreBuiltinTransactionRootSuccessTraceDtoChainId = 42161
-	N43114         CoreBuiltinTransactionRootSuccessTraceDtoChainId = 43114
-	N45            CoreBuiltinTransactionRootSuccessTraceDtoChainId = 45
-	N56            CoreBuiltinTransactionRootSuccessTraceDtoChainId = 56
-	N8217          CoreBuiltinTransactionRootSuccessTraceDtoChainId = 8217
-	N8453          CoreBuiltinTransactionRootSuccessTraceDtoChainId = 8453
-)
-
 // Defines values for CoreBuiltinTransactionRootSuccessTraceDtoType.
 const (
 	CoreBuiltinTransactionRootSuccessTraceDtoTypeCALL          CoreBuiltinTransactionRootSuccessTraceDtoType = "CALL"
@@ -124,8 +107,8 @@ const (
 // CoreBuiltinBlockTracesDto defines model for CoreBuiltinBlockTracesDto.
 type CoreBuiltinBlockTracesDto struct {
 	BlockHash      string                                      `json:"blockHash"`
+	BlockNumber    *float32                                    `json:"blockNumber,omitempty"`
 	BlockTimestamp string                                      `json:"blockTimestamp"`
-	Number         float32                                     `json:"number"`
 	Traces         []CoreBuiltinTransactionRootSuccessTraceDto `json:"traces"`
 	Type           CoreBuiltinBlockTracesDtoType               `json:"type"`
 	Version        string                                      `json:"version"`
@@ -140,7 +123,7 @@ type CoreBuiltinCallTraceDto struct {
 	Error            string                      `json:"error"`
 	From             string                      `json:"from"`
 	Gas              string                      `json:"gas"`
-	GasUsed          string                      `json:"gasUsed"`
+	GasUsed          float32                     `json:"gasUsed"`
 	Input            string                      `json:"input"`
 	IsParentHasError bool                        `json:"isParentHasError"`
 	Output           string                      `json:"output"`
@@ -161,29 +144,25 @@ type CoreBuiltinTraceLogDto struct {
 
 // CoreBuiltinTransactionRootSuccessTraceDto defines model for CoreBuiltinTransactionRootSuccessTraceDto.
 type CoreBuiltinTransactionRootSuccessTraceDto struct {
-	Calls                []CoreBuiltinCallTraceDto                        `json:"calls"`
-	ChainId              CoreBuiltinTransactionRootSuccessTraceDtoChainId `json:"chainId"`
-	Error                string                                           `json:"error"`
-	Events               []CoreBuiltinTraceLogDto                         `json:"events"`
-	From                 string                                           `json:"from"`
-	Gas                  string                                           `json:"gas"`
-	GasHex               string                                           `json:"gasHex"`
-	GasPrice             string                                           `json:"gasPrice"`
-	GasUsed              string                                           `json:"gasUsed"`
-	Input                string                                           `json:"input"`
-	MaxFeePerGas         string                                           `json:"maxFeePerGas"`
-	MaxPriorityFeePerGas string                                           `json:"maxPriorityFeePerGas"`
-	Nonce                string                                           `json:"nonce"`
-	Output               string                                           `json:"output"`
-	RevertReason         string                                           `json:"revertReason"`
-	To                   string                                           `json:"to"`
-	TxHash               string                                           `json:"txHash"`
-	Type                 CoreBuiltinTransactionRootSuccessTraceDtoType    `json:"type"`
-	Value                string                                           `json:"value"`
+	Calls                []CoreBuiltinCallTraceDto                     `json:"calls"`
+	Error                string                                        `json:"error"`
+	Events               []CoreBuiltinTraceLogDto                      `json:"events"`
+	From                 string                                        `json:"from"`
+	Gas                  string                                        `json:"gas"`
+	GasHex               string                                        `json:"gasHex"`
+	GasPrice             string                                        `json:"gasPrice"`
+	GasUsed              float32                                       `json:"gasUsed"`
+	Input                string                                        `json:"input"`
+	MaxFeePerGas         string                                        `json:"maxFeePerGas"`
+	MaxPriorityFeePerGas string                                        `json:"maxPriorityFeePerGas"`
+	Nonce                string                                        `json:"nonce"`
+	Output               string                                        `json:"output"`
+	RevertReason         string                                        `json:"revertReason"`
+	To                   string                                        `json:"to"`
+	TxHash               string                                        `json:"txHash"`
+	Type                 CoreBuiltinTransactionRootSuccessTraceDtoType `json:"type"`
+	Value                string                                        `json:"value"`
 }
-
-// CoreBuiltinTransactionRootSuccessTraceDtoChainId defines model for CoreBuiltinTransactionRootSuccessTraceDto.ChainId.
-type CoreBuiltinTransactionRootSuccessTraceDtoChainId float32
 
 // CoreBuiltinTransactionRootSuccessTraceDtoType defines model for CoreBuiltinTransactionRootSuccessTraceDto.Type.
 type CoreBuiltinTransactionRootSuccessTraceDtoType string
