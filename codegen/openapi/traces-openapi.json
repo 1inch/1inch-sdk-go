@@ -1,0 +1,1025 @@
+{
+  "openapi": "3.0.0",
+  "paths": {
+    "/v1.0/chain/{chain}/synced-interval": {
+      "get": {
+        "operationId": "SyncedIntervalRestApiController_readSyncedInterval",
+        "summary": "Get synced interval",
+        "parameters": [
+          {
+            "name": "chain",
+            "required": true,
+            "in": "path",
+            "example": "1",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ReadSyncedIntervalResponseDto"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Bad Request."
+          },
+          "401": {
+            "description": "Unauthorized."
+          },
+          "500": {
+            "description": "Internal server error."
+          }
+        },
+        "tags": [
+          "Synced Interval"
+        ]
+      }
+    },
+    "/v1.0/chain/{chain}/block-trace/{blockNumber}": {
+      "get": {
+        "operationId": "BlockTraceRestApiController_blockTraceByNumber",
+        "summary": "Get block trace by number",
+        "parameters": [
+          {
+            "name": "chain",
+            "required": true,
+            "in": "path",
+            "example": "1",
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "blockNumber",
+            "required": true,
+            "in": "path",
+            "example": "15000000",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "anyOf": [
+                    {
+                      "$ref": "#/components/schemas/CoreBuiltinBlockTracesDto"
+                    },
+                    {
+                      "$ref": "#/components/schemas/CoreCustomBlockTraceDto"
+                    }
+                  ]
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Bad Request."
+          },
+          "401": {
+            "description": "Unauthorized."
+          },
+          "500": {
+            "description": "Internal server error."
+          }
+        },
+        "tags": [
+          "Trace"
+        ]
+      }
+    },
+    "/v1.0/chain/{chain}/block-trace/{blockNumber}/tx-hash/{txHash}": {
+      "get": {
+        "operationId": "BlockTraceRestApiController_transactionTraceByBlockNumberAndTxHash",
+        "summary": "Get transaction trace by block number and transaction hash",
+        "parameters": [
+          {
+            "name": "chain",
+            "required": true,
+            "in": "path",
+            "example": "1",
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "blockNumber",
+            "required": true,
+            "in": "path",
+            "example": "17378177",
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "txHash",
+            "required": true,
+            "in": "path",
+            "example": "0x16897e492b2e023d8f07be9e925f2c15a91000ef11a01fc71e70f75050f1e03c",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/PlainTransactionTraceWithTypeDto"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Bad Request."
+          },
+          "401": {
+            "description": "Unauthorized."
+          },
+          "500": {
+            "description": "Internal server error."
+          }
+        },
+        "tags": [
+          "Trace"
+        ]
+      }
+    },
+    "/v1.0/chain/{chain}/block-trace/{blockNumber}/offset/{offset}": {
+      "get": {
+        "operationId": "BlockTraceRestApiController_transactionTraceByBlockNumberAndOffset",
+        "summary": "Get transaction trace by block number and offset of transaction in block",
+        "parameters": [
+          {
+            "name": "chain",
+            "required": true,
+            "in": "path",
+            "example": "1",
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "blockNumber",
+            "required": true,
+            "in": "path",
+            "example": "17378177",
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "offset",
+            "required": true,
+            "in": "path",
+            "example": "1",
+            "schema": {
+              "type": "number"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/PlainTransactionTraceWithTypeDto"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Bad Request."
+          },
+          "401": {
+            "description": "Unauthorized."
+          },
+          "500": {
+            "description": "Internal server error."
+          }
+        },
+        "tags": [
+          "Trace"
+        ]
+      }
+    }
+  },
+  "info": {
+    "title": "Transaction Traces Indexer",
+    "description": "Indexer for transaction traces based on debug_traceBlockByNumber and debug_traceTransaction JSON-RPC methods",
+    "version": "1.0",
+    "contact": {}
+  },
+  "tags": [],
+  "servers": [
+    {
+      "url": "https://transaction-traces-indexer.1inch.io",
+      "description": "prod"
+    }
+  ],
+  "components": {
+    "schemas": {
+      "ReadSyncedIntervalResponseDto": {
+        "type": "object",
+        "properties": {
+          "from": {
+            "type": "number",
+            "example": 1
+          },
+          "to": {
+            "type": "number",
+            "example": 14913951
+          }
+        },
+        "required": [
+          "from",
+          "to"
+        ]
+      },
+      "CoreBuiltinCallTraceDto": {
+        "type": "object",
+        "properties": {
+          "isParentHasError": {
+            "type": "boolean",
+            "example": true
+          },
+          "type": {
+            "type": "string",
+            "enum": [
+              "SELFDESTRUCT",
+              "CREATE",
+              "CREATE2",
+              "CALL",
+              "CALLCODE",
+              "DELEGATECALL",
+              "STATICCALL",
+              "TRANSFER_ETHER",
+              "INVALID",
+              "STOP"
+            ],
+            "example": "CALL"
+          },
+          "from": {
+            "type": "string",
+            "example": "0x71dad91e069861350c2ba882fd86762a5efe8792"
+          },
+          "to": {
+            "type": "string",
+            "example": "0x71dad91e069861350c2ba882fd86762a5efe8792"
+          },
+          "value": {
+            "type": "string",
+            "example": "0x5f68e8131ecf80000"
+          },
+          "gas": {
+            "type": "string",
+            "example": "0x3e48f"
+          },
+          "gasUsed": {
+            "type": "string",
+            "example": "0x5da9"
+          },
+          "input": {
+            "type": "string",
+            "example": "0xd0e30db0"
+          },
+          "output": {
+            "type": "string",
+            "example": "0x0000000000000000000000000000000000000000000000000000000000000001"
+          },
+          "error": {
+            "type": "string",
+            "example": "error"
+          },
+          "calls": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/CoreBuiltinCallTraceDto"
+            }
+          }
+        },
+        "required": [
+          "isParentHasError",
+          "type",
+          "from",
+          "to",
+          "value",
+          "gas",
+          "gasUsed",
+          "input",
+          "output",
+          "error",
+          "calls"
+        ]
+      },
+      "CoreBuiltinTraceLogDto": {
+        "type": "object",
+        "properties": {
+          "data": {
+            "type": "string",
+            "example": "0xffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffff"
+          },
+          "topics": {
+            "example": [
+              "0x8c5be1e5ebec7d5bd14f71427d1e84f3dd0314c0f7b2291e5b200ac8c7c3b925",
+              "0x00000000000000000000000059eb67ecbb7e68ee94114b2f77d91074404504be",
+              "0x000000000000000000000000a5e0829caced8ffdd4de3c43696c57f7d7a678ff"
+            ],
+            "type": "array",
+            "items": {
+              "type": "array"
+            }
+          },
+          "contract": {
+            "type": "string",
+            "example": "0x0000000000000000000000000000000000001010"
+          }
+        },
+        "required": [
+          "data",
+          "topics",
+          "contract"
+        ]
+      },
+      "CoreBuiltinTransactionRootSuccessTraceDto": {
+        "type": "object",
+        "properties": {
+          "chainId": {
+            "type": "number",
+            "example": 1,
+            "enum": [
+              1,
+              45,
+              137,
+              10,
+              56,
+              42161,
+              43114,
+              100,
+              250,
+              1313161554,
+              8217,
+              324,
+              8453
+            ]
+          },
+          "type": {
+            "type": "string",
+            "enum": [
+              "SELFDESTRUCT",
+              "CREATE",
+              "CREATE2",
+              "CALL",
+              "CALLCODE",
+              "DELEGATECALL",
+              "STATICCALL",
+              "TRANSFER_ETHER",
+              "INVALID",
+              "STOP"
+            ],
+            "example": "CALL"
+          },
+          "from": {
+            "type": "string",
+            "example": "0x71dad91e069861350c2ba882fd86762a5efe8792"
+          },
+          "to": {
+            "type": "string",
+            "example": "0x71dad91e069861350c2ba882fd86762a5efe8792"
+          },
+          "value": {
+            "type": "string",
+            "example": "0x5f68e8131ecf80000"
+          },
+          "gas": {
+            "type": "string",
+            "example": "0x3e48f"
+          },
+          "gasUsed": {
+            "type": "string",
+            "example": "0x5da9"
+          },
+          "input": {
+            "type": "string",
+            "example": "0xd0e30db0"
+          },
+          "output": {
+            "type": "string",
+            "example": "0x0000000000000000000000000000000000000000000000000000000000000001"
+          },
+          "calls": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/CoreBuiltinCallTraceDto"
+            }
+          },
+          "txHash": {
+            "type": "string",
+            "example": "0xbf424a717932e4868644f69e8f297ce51d5f4596089635312b2ad9c610cc0018"
+          },
+          "nonce": {
+            "type": "string",
+            "example": "0x1"
+          },
+          "error": {
+            "type": "string",
+            "example": "error"
+          },
+          "revertReason": {
+            "type": "string",
+            "example": "error"
+          },
+          "gasPrice": {
+            "type": "string",
+            "example": "0x123"
+          },
+          "maxFeePerGas": {
+            "type": "string",
+            "example": "0x345"
+          },
+          "maxPriorityFeePerGas": {
+            "type": "string",
+            "example": "0x123"
+          },
+          "gasHex": {
+            "type": "string",
+            "example": "0x35b60"
+          },
+          "events": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/CoreBuiltinTraceLogDto"
+            }
+          }
+        },
+        "required": [
+          "chainId",
+          "type",
+          "from",
+          "to",
+          "value",
+          "gas",
+          "gasUsed",
+          "input",
+          "output",
+          "calls",
+          "txHash",
+          "nonce",
+          "error",
+          "revertReason",
+          "gasPrice",
+          "maxFeePerGas",
+          "maxPriorityFeePerGas",
+          "gasHex",
+          "events"
+        ]
+      },
+      "CoreBuiltinBlockTracesDto": {
+        "type": "object",
+        "properties": {
+          "type": {
+            "type": "string",
+            "example": "BUILTIN",
+            "enum": [
+              "CUSTOM",
+              "CUSTOM_WITHOUT_STORE",
+              "BUILTIN",
+              "CUSTOM_GO",
+              "OLD_ARBITRUM_RAW_TRACE"
+            ]
+          },
+          "version": {
+            "type": "string",
+            "example": "v1.2.3"
+          },
+          "number": {
+            "type": "number",
+            "example": "16123123"
+          },
+          "blockHash": {
+            "type": "string",
+            "example": "0xb80490b1bed7a31536b888de977f92b5c03707bf8c69ab3d066a2eef3dc2e26c"
+          },
+          "blockTimestamp": {
+            "type": "string",
+            "example": "0x64bf5cde"
+          },
+          "traces": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/CoreBuiltinTransactionRootSuccessTraceDto"
+            }
+          }
+        },
+        "required": [
+          "type",
+          "version",
+          "number",
+          "blockHash",
+          "blockTimestamp",
+          "traces"
+        ]
+      },
+      "CoreCustomBlockTraceDto": {
+        "type": "object",
+        "properties": {
+          "type": {
+            "type": "string",
+            "example": "CUSTOM",
+            "enum": [
+              "CUSTOM",
+              "CUSTOM_WITHOUT_STORE",
+              "BUILTIN",
+              "CUSTOM_GO",
+              "OLD_ARBITRUM_RAW_TRACE"
+            ]
+          },
+          "version": {
+            "type": "string",
+            "example": "v1.2.3"
+          },
+          "number": {
+            "type": "number",
+            "example": 17123123
+          },
+          "blockHash": {
+            "type": "string",
+            "example": "0xb80490b1bed7a31536b888de977f92b5c03707bf8c69ab3d066a2eef3dc2e26c"
+          },
+          "blockTimestamp": {
+            "type": "string",
+            "example": "0x64bf5cde"
+          },
+          "traces": {
+            "type": "array",
+            "items": {
+              "oneOf": [
+                {
+                  "$ref": "#/components/schemas/CoreCustomErrorTransactionTraceDto"
+                },
+                {
+                  "$ref": "#/components/schemas/CoreCustomRootTxEventCallstackTraceFullDto"
+                }
+              ]
+            }
+          }
+        },
+        "required": [
+          "type",
+          "version",
+          "number",
+          "blockHash",
+          "blockTimestamp",
+          "traces"
+        ]
+      },
+      "CoreCustomErrorTransactionTraceDto": {
+        "type": "object",
+        "properties": {
+          "error": {
+            "type": "string",
+            "example": "error"
+          },
+          "txHash": {
+            "type": "string",
+            "example": "0xbf424a717932e4868644f69e8f297ce51d5f4596089635312b2ad9c610cc0018"
+          },
+          "nonce": {
+            "type": "string",
+            "example": "0x1"
+          },
+          "gasPrice": {
+            "type": "string",
+            "example": "0x3e48f"
+          },
+          "maxFeePerGas": {
+            "type": "string",
+            "example": "0x3e48f"
+          },
+          "maxPriorityFeePerGas": {
+            "type": "string",
+            "example": "0x3e48f"
+          },
+          "gasHex": {
+            "type": "string",
+            "example": "0x3e48f"
+          }
+        },
+        "required": [
+          "error",
+          "txHash",
+          "nonce",
+          "gasPrice",
+          "maxFeePerGas",
+          "maxPriorityFeePerGas",
+          "gasHex"
+        ]
+      },
+      "CoreCustomTraceLogDto": {
+        "type": "object",
+        "properties": {
+          "data": {
+            "type": "string",
+            "example": "0xffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffff"
+          },
+          "topics": {
+            "type": "array",
+            "items": {
+              "type": "array"
+            }
+          },
+          "contract": {
+            "type": "string",
+            "example": "0xa0b86991c6218b36c1d19d4a2e9eb0ce3606eb48"
+          }
+        },
+        "required": [
+          "data",
+          "topics",
+          "contract"
+        ]
+      },
+      "CustomStorageDto": {
+        "type": "object",
+        "properties": {
+          "type": {
+            "type": "string",
+            "example": "load"
+          },
+          "key": {
+            "type": "string",
+            "example": "8"
+          },
+          "value": {
+            "type": "string",
+            "example": "63780c770000000000008255bfdbaa0269330000000000000b9057fb86bca9b0"
+          }
+        },
+        "required": [
+          "type",
+          "key",
+          "value"
+        ]
+      },
+      "CoreCustomTxEventCallstackTraceDto": {
+        "type": "object",
+        "properties": {
+          "type": {
+            "type": "string",
+            "example": "TRANSFER_ETHER"
+          },
+          "from": {
+            "type": "string",
+            "example": "0x71dad91e069861350c2ba882fd86762a5efe8792"
+          },
+          "to": {
+            "type": "string",
+            "example": "0x71dad91e069861350c2ba882fd86762a5efe8792"
+          },
+          "value": {
+            "type": "string",
+            "example": "0x5f68e8131ecf80000"
+          },
+          "gasLimit": {
+            "type": "number",
+            "example": 123
+          },
+          "gasUsed": {
+            "type": "number",
+            "example": 123
+          },
+          "input": {
+            "type": "string",
+            "example": "0xd0e30db0"
+          },
+          "output": {
+            "type": "string",
+            "example": "0x0000000000000000000000000000000000000000000000000000000000000001"
+          },
+          "time": {
+            "type": "string",
+            "example": "781ns"
+          },
+          "calls": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/CoreCustomTxEventCallstackTraceDto"
+            }
+          },
+          "logs": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/CoreCustomTraceLogDto"
+            }
+          },
+          "status": {
+            "type": "string",
+            "enum": [
+              "REVERTED",
+              "INVALID_OPCODE",
+              "RETURNED",
+              "STOPPED",
+              "ERROR",
+              "NO_CONTRACT",
+              "OUT_OF_GAS",
+              "SELFDESTRUCTED",
+              "ERROR_UNWIND"
+            ],
+            "example": "RETURNED"
+          },
+          "success": {
+            "type": "number",
+            "example": "1"
+          },
+          "res": {
+            "type": "string",
+            "example": "0x0000000000000000000000000000000000000000000000000000000000000001"
+          },
+          "depth": {
+            "type": "number",
+            "example": "1"
+          },
+          "destructAddress": {
+            "type": "string",
+            "example": "0x71dad91e069861350c2ba882fd86762a5efe8792"
+          },
+          "errorDetails": {
+            "type": "string",
+            "example": "error"
+          },
+          "storage": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/CustomStorageDto"
+            }
+          },
+          "prevGasLimit": {
+            "type": "number",
+            "example": "123"
+          },
+          "gas": {
+            "type": "string",
+            "example": "0x3e48f"
+          },
+          "gasCost": {
+            "type": "number",
+            "example": "0x3e48f"
+          },
+          "address": {
+            "type": "string",
+            "example": "0x71dad91e069861350c2ba882fd86762a5efe8792"
+          }
+        },
+        "required": [
+          "type",
+          "from",
+          "to",
+          "value",
+          "gasLimit",
+          "gasUsed",
+          "input",
+          "output",
+          "time",
+          "calls",
+          "logs",
+          "status",
+          "success",
+          "res",
+          "depth",
+          "destructAddress",
+          "errorDetails",
+          "storage",
+          "prevGasLimit",
+          "gas",
+          "gasCost",
+          "address"
+        ]
+      },
+      "CoreCustomRootTxEventCallstackTraceFullDto": {
+        "type": "object",
+        "properties": {
+          "type": {
+            "type": "string",
+            "example": "CALL",
+            "enum": [
+              "SELFDESTRUCT",
+              "CREATE",
+              "CREATE2",
+              "CALL",
+              "CALLCODE",
+              "DELEGATECALL",
+              "STATICCALL",
+              "TRANSFER_ETHER",
+              "INVALID",
+              "STOP"
+            ]
+          },
+          "from": {
+            "type": "string",
+            "example": "0x71dad91e069861350c2ba882fd86762a5efe8792"
+          },
+          "to": {
+            "type": "string",
+            "example": "0x71dad91e069861350c2ba882fd86762a5efe8792"
+          },
+          "value": {
+            "type": "string",
+            "example": "0x5f68e8131ecf80000"
+          },
+          "gasLimit": {
+            "type": "number",
+            "example": "123"
+          },
+          "gasUsed": {
+            "type": "number",
+            "example": 123
+          },
+          "input": {
+            "type": "string",
+            "example": "0xd0e30db0"
+          },
+          "output": {
+            "type": "string",
+            "example": "0x0000000000000000000000000000000000000000000000000000000000000001"
+          },
+          "time": {
+            "type": "string",
+            "example": "781ns"
+          },
+          "calls": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/CoreCustomTxEventCallstackTraceDto"
+            }
+          },
+          "logs": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/CoreCustomTraceLogDto"
+            }
+          },
+          "status": {
+            "type": "string",
+            "enum": [
+              "REVERTED",
+              "INVALID_OPCODE",
+              "RETURNED",
+              "STOPPED",
+              "ERROR",
+              "NO_CONTRACT",
+              "OUT_OF_GAS",
+              "SELFDESTRUCTED",
+              "ERROR_UNWIND"
+            ],
+            "example": "REVERTED"
+          },
+          "success": {
+            "type": "number",
+            "example": "1"
+          },
+          "address": {
+            "type": "string",
+            "example": "0x71dad91e069861350c2ba882fd86762a5efe8792"
+          },
+          "res": {
+            "type": "string",
+            "example": "0x0000000000000000000000000000000000000000000000000000000000000001"
+          },
+          "depth": {
+            "type": "number",
+            "example": "3"
+          },
+          "destructAddress": {
+            "type": "string",
+            "example": "0x71dad91e069861350c2ba882fd86762a5efe8792"
+          },
+          "errorDetails": {
+            "type": "string",
+            "example": "error"
+          },
+          "storage": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/CustomStorageDto"
+            }
+          },
+          "txHash": {
+            "type": "string",
+            "example": "0xbf424a717932e4868644f69e8f297ce51d5f4596089635312b2ad9c610cc0018"
+          },
+          "nonce": {
+            "type": "string",
+            "example": "0x1"
+          },
+          "gasPrice": {
+            "type": "string",
+            "example": "0x3f5476a00"
+          },
+          "maxFeePerGas": {
+            "type": "string",
+            "example": "0x3e48f"
+          },
+          "maxPriorityFeePerGas": {
+            "type": "string",
+            "example": "0x3e48f"
+          },
+          "intrinsicGas": {
+            "type": "number",
+            "example": "0x3e48f"
+          },
+          "gasRefund": {
+            "type": "number",
+            "example": 123
+          },
+          "gasActual": {
+            "type": "number",
+            "example": 123
+          },
+          "gasHex": {
+            "type": "string",
+            "example": "0x123123123"
+          }
+        },
+        "required": [
+          "type",
+          "from",
+          "to",
+          "value",
+          "gasLimit",
+          "gasUsed",
+          "input",
+          "output",
+          "time",
+          "calls",
+          "logs",
+          "status",
+          "success",
+          "address",
+          "res",
+          "depth",
+          "destructAddress",
+          "errorDetails",
+          "storage",
+          "txHash",
+          "nonce",
+          "gasPrice",
+          "maxFeePerGas",
+          "maxPriorityFeePerGas",
+          "intrinsicGas",
+          "gasRefund",
+          "gasActual",
+          "gasHex"
+        ]
+      },
+      "PlainTransactionTraceWithTypeDto": {
+        "type": "object",
+        "properties": {
+          "transactionTrace": {
+            "type": "array",
+            "items": {
+              "oneOf": [
+                {
+                  "$ref": "#/components/schemas/CoreBuiltinTransactionRootSuccessTraceDto"
+                },
+                {
+                  "$ref": "#/components/schemas/CoreCustomErrorTransactionTraceDto"
+                },
+                {
+                  "$ref": "#/components/schemas/CoreCustomRootTxEventCallstackTraceFullDto"
+                }
+              ]
+            }
+          },
+          "type": {
+            "type": "string",
+            "enum": [
+              "CUSTOM",
+              "CUSTOM_WITHOUT_STORE",
+              "BUILTIN",
+              "CUSTOM_GO",
+              "OLD_ARBITRUM_RAW_TRACE"
+            ]
+          }
+        },
+        "required": [
+          "transactionTrace",
+          "type"
+        ]
+      }
+    }
+  }
+}
