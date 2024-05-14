@@ -3,6 +3,7 @@ package main
 import (
 	"context"
 	"fmt"
+	"log"
 	"os"
 	"time"
 
@@ -21,13 +22,16 @@ var (
 )
 
 func main() {
-	config, err := history.NewConfiguration("https://api.1inch.dev", devPortalToken)
+	config, err := history.NewConfiguration(history.ConfigurationParams{
+		ApiUrl: "https://api.1inch.dev",
+		ApiKey: devPortalToken,
+	})
 	if err != nil {
-		return
+		log.Fatal("failed to create configuration: %w", err)
 	}
 	client, err := history.NewClient(config)
 	if err != nil {
-		return
+		log.Fatalf("failed to create client: %v", err)
 	}
 	ctx := context.Background()
 
@@ -36,8 +40,7 @@ func main() {
 		ChainId: constants.EthereumChainId,
 	})
 	if err != nil {
-		fmt.Println("failed to GetHistoryEventsByAddress: %w", err)
-		return
+		log.Fatalf("failed to GetHistoryEventsByAddress: %v", err)
 	}
 
 	fmt.Println("GetHistoryEventsByAddress:", historyEvents)

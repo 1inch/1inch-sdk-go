@@ -3,6 +3,7 @@ package main
 import (
 	"context"
 	"fmt"
+	"log"
 	"os"
 	"time"
 
@@ -21,13 +22,17 @@ var (
 )
 
 func main() {
-	config, err := txbroadcast.NewConfiguration(constants.EthereumChainId, "https://api.1inch.dev", devPortalToken)
+	config, err := txbroadcast.NewConfiguration(txbroadcast.ConfigurationParams{
+		ChainId: constants.EthereumChainId,
+		ApiUrl:  "https://api.1inch.dev",
+		ApiKey:  devPortalToken,
+	})
 	if err != nil {
-		return
+		log.Fatalf("failed to create configuration: %v", err)
 	}
 	client, err := txbroadcast.NewClient(config)
 	if err != nil {
-		return
+		log.Fatalf("failed to create client: %v", err)
 	}
 	ctx := context.Background()
 
@@ -35,8 +40,7 @@ func main() {
 		RawTransaction: "<YOOR RAW TX here>",
 	})
 	if err != nil {
-		fmt.Println("failed to BroadcastPublicTransaction: %w", err)
-		return
+		log.Fatalf("failed to BroadcastPublicTransaction: %v", err)
 	}
 
 	fmt.Println("BroadcastPublicTransaction:", broadcastPublicResponse)
@@ -46,8 +50,7 @@ func main() {
 		RawTransaction: "<YOOR RAW TX here that you want to send to private mempool>",
 	})
 	if err != nil {
-		fmt.Println("failed to BroadcastPrivateTransaction: %w", err)
-		return
+		log.Fatalf("failed to BroadcastPrivateTransaction: %v", err)
 	}
 
 	fmt.Println("BroadcastPrivateTransaction:", broadcastPrivateResponse)

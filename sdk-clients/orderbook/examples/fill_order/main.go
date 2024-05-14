@@ -26,14 +26,20 @@ var (
 )
 
 const (
-	limitOrderHash = "0xddf0907b11b3dba4591372e201117f09f9cdc7ccfff175397bc57eeb7043a59f"
+	limitOrderHash = "0x6e6b51a256ea0e5b7cb59918b3af368bd12a1bfcdd61522e878638c3a8dcf288"
 	chainId        = 137
 )
 
 func main() {
 	ctx := context.Background()
 
-	config, err := orderbook.NewDefaultConfiguration(nodeUrl, privateKey, uint64(chainId), "https://api.1inch.dev", devPortalToken)
+	config, err := orderbook.NewConfiguration(orderbook.ConfigurationParams{
+		NodeUrl:    nodeUrl,
+		PrivateKey: privateKey,
+		ChainId:    chainId,
+		ApiUrl:     "https://api.1inch.dev",
+		ApiKey:     devPortalToken,
+	})
 	if err != nil {
 		log.Fatal(err)
 	}

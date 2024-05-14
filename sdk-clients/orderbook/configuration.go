@@ -1,4 +1,4 @@
-package aggregation
+package orderbook
 
 import (
 	"github.com/1inch/1inch-sdk-go/common"
@@ -8,7 +8,7 @@ import (
 )
 
 type Configuration struct {
-	WalletConfiguration *ConfigurationWallet
+	WalletConfiguration *WalletConfiguration
 	APIConfiguration    *ConfigurationAPI
 }
 
@@ -19,7 +19,7 @@ type ConfigurationAPI struct {
 	API api
 }
 
-type ConfigurationWallet struct {
+type WalletConfiguration struct {
 	PrivateKey string
 	NodeURL    string
 
@@ -69,14 +69,14 @@ func NewConfigurationAPI(chainId uint64, apiUrl string, apiKey string) (*Configu
 	}, nil
 }
 
-func NewConfigurationWallet(nodeUrl string, privateKey string, chainId uint64) (*ConfigurationWallet, error) {
+func NewConfigurationWallet(nodeUrl string, privateKey string, chainId uint64) (*WalletConfiguration, error) {
 	w, err := web3_provider.DefaultWalletProvider(privateKey, nodeUrl, chainId)
 	if err != nil {
 		return nil, err
 	}
 
 	f := transaction_builder.NewFactory(w)
-	return &ConfigurationWallet{
+	return &WalletConfiguration{
 		Wallet:    w,
 		TxBuilder: f,
 	}, nil

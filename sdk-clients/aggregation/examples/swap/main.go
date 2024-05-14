@@ -3,6 +3,7 @@ package main
 import (
 	"context"
 	"fmt"
+	"log"
 	"os"
 	"time"
 
@@ -23,12 +24,20 @@ var (
 )
 
 func main() {
-	config, err := aggregation.NewConfiguration(nodeUrl, privateKey, constants.EthereumChainId, "https://api.1inch.dev", devPortalToken)
+	config, err := aggregation.NewConfiguration(aggregation.ConfigurationParams{
+		NodeUrl:    nodeUrl,
+		PrivateKey: privateKey,
+		ChainId:    constants.EthereumChainId,
+		ApiUrl:     "https://api.1inch.dev",
+		ApiKey:     devPortalToken,
+	})
 	if err != nil {
-		return
+		log.Fatalf("Failed to create configuration: %v\n", err)
 	}
 	client, err := aggregation.NewClient(config)
-
+	if err != nil {
+		log.Fatalf("Failed to create client: %v\n", err)
+	}
 	ctx := context.Background()
 
 	swapData, err := client.GetSwap(ctx, aggregation.GetSwapParams{
@@ -39,25 +48,21 @@ func main() {
 		Slippage: 1,
 	})
 	if err != nil {
-		fmt.Printf("Failed to get swap data: %v\n", err)
-		return
+		log.Fatalf("Failed to get swap data: %v\n", err)
 	}
 
 	tx, err := client.TxBuilder.New().SetData(swapData.TxNormalized.Data).SetTo(&swapData.TxNormalized.To).SetGas(swapData.TxNormalized.Gas).SetValue(swapData.TxNormalized.Value).Build(ctx)
 	if err != nil {
-		fmt.Printf("Failed to build transaction: %v\n", err)
-		return
+		log.Fatalf("Failed to build transaction: %v\n", err)
 	}
 	signedTx, err := client.Wallet.Sign(tx)
 	if err != nil {
-		fmt.Printf("Failed to sign transaction: %v\n", err)
-		return
+		log.Fatalf("Failed to sign transaction: %v\n", err)
 	}
 
 	err = client.Wallet.BroadcastTransaction(ctx, signedTx)
 	if err != nil {
-		fmt.Printf("Failed to broadcast transaction: %v\n", err)
-		return
+		log.Fatalf("Failed to broadcast transaction: %v\n", err)
 	}
 
 	// Waiting for transaction, just an examples of it

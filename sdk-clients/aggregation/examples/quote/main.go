@@ -4,6 +4,7 @@ import (
 	"context"
 	"encoding/json"
 	"fmt"
+	"log"
 	"os"
 
 	"github.com/1inch/1inch-sdk-go/constants"
@@ -23,12 +24,20 @@ var (
 )
 
 func main() {
-	config, err := aggregation.NewConfiguration(nodeUrl, privateKey, constants.PolygonChainId, "https://api.1inch.dev", devPortalToken)
+	config, err := aggregation.NewConfiguration(aggregation.ConfigurationParams{
+		NodeUrl:    nodeUrl,
+		PrivateKey: privateKey,
+		ChainId:    constants.PolygonChainId,
+		ApiUrl:     "https://api.1inch.dev",
+		ApiKey:     devPortalToken,
+	})
 	if err != nil {
-		return
+		log.Fatalf("Failed to create configuration: %v\n", err)
 	}
 	client, err := aggregation.NewClient(config)
-
+	if err != nil {
+		log.Fatalf("Failed to create client: %v\n", err)
+	}
 	ctx := context.Background()
 
 	swapData, err := client.GetSwap(ctx, aggregation.GetSwapParams{
@@ -39,14 +48,12 @@ func main() {
 		Slippage: 1,
 	})
 	if err != nil {
-		fmt.Printf("Failed to get swap data: %v\n", err)
-		return
+		log.Fatalf("Failed to get swap data: %v\n", err)
 	}
 
 	output, err := json.MarshalIndent(swapData, "", "  ")
 	if err != nil {
-		fmt.Printf("Failed to marshal swap data: %v\n", err)
-		return
+		log.Fatalf("Failed to marshal swap data: %v\n", err)
 	}
 	fmt.Printf("%s\n", string(output))
 }

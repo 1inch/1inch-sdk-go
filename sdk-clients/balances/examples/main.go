@@ -3,6 +3,7 @@ package main
 import (
 	"context"
 	"fmt"
+	"log"
 	"os"
 	"time"
 
@@ -32,13 +33,17 @@ const (
 )
 
 func main() {
-	config, err := balances.NewConfiguration(constants.EthereumChainId, "https://api.1inch.dev", devPortalToken)
+	config, err := balances.NewConfiguration(balances.ConfigurationParams{
+		ChainId: constants.EthereumChainId,
+		ApiUrl:  "https://api.1inch.dev",
+		ApiKey:  devPortalToken,
+	})
 	if err != nil {
-		return
+		log.Fatalf("Failed to create configuration: %v\n", err)
 	}
 	client, err := balances.NewClient(config)
 	if err != nil {
-		return
+		log.Fatalf("Failed to create client: %v\n", err)
 	}
 	ctx := context.Background()
 
@@ -47,8 +52,7 @@ func main() {
 		Tokens: []string{tokenAddress1, tokenAddress2},
 	})
 	if err != nil {
-		fmt.Println("failed to GetBalancesOfCustomTokensByWalletAddress: %w", err)
-		return
+		log.Fatalf("failed to GetBalancesOfCustomTokensByWalletAddress: %v\n", err)
 	}
 
 	fmt.Println("GetBalancesOfCustomTokensByWalletAddress:", balancesOfCustomTokensByWalletAddressResponse)
@@ -59,8 +63,7 @@ func main() {
 		Tokens:  []string{tokenAddress1, tokenAddress2},
 	})
 	if err != nil {
-		fmt.Println("failed to GetBalancesOfCustomTokensByWalletAddressesList: %w", err)
-		return
+		log.Fatalf("failed to GetBalancesOfCustomTokensByWalletAddressesList: %v\n", err)
 	}
 
 	fmt.Println("GetBalancesOfCustomTokensByWalletAddressesList:", balancesOfCustomTokensByWalletAddressesListResponse)
@@ -72,8 +75,7 @@ func main() {
 		Spender:     spender,
 	})
 	if err != nil {
-		fmt.Println("failed to GetBalancesAndAllowances: %w", err)
-		return
+		log.Fatalf("failed to GetBalancesAndAllowances: %v\n", err)
 	}
 
 	fmt.Println("aggregatedBalancesAndAllowancesResponse:", aggregatedBalancesAndAllowancesResponse)
@@ -81,8 +83,7 @@ func main() {
 
 	balancesByWalletAddressResponse, err := client.GetBalancesByWalletAddress(ctx, balances.BalancesByWalletAddressParams{Wallet: mainWalletAddress})
 	if err != nil {
-		fmt.Println("failed to GetBalancesByWalletAddress: %w", err)
-		return
+		log.Fatalf("failed to GetBalancesByWalletAddress: %v\n", err)
 	}
 
 	fmt.Println("GetBalancesByWalletAddress:", balancesByWalletAddressResponse)
@@ -93,8 +94,7 @@ func main() {
 		Spender: spender,
 	})
 	if err != nil {
-		fmt.Println("failed to GetAllowancesByWalletAddress: %w", err)
-		return
+		log.Fatalf("failed to GetAllowancesByWalletAddress: %v\n", err)
 	}
 
 	fmt.Println("GetAllowancesByWalletAddress:", allowancesByWalletAddressResponse)
@@ -106,8 +106,7 @@ func main() {
 		Tokens:  []string{tokenAddress1, tokenAddress2},
 	})
 	if err != nil {
-		fmt.Println("failed to GetAllowancesOfCustomTokensByWalletAddress: %w", err)
-		return
+		log.Fatalf("failed to GetAllowancesOfCustomTokensByWalletAddress: %v\n", err)
 	}
 
 	fmt.Println("GetAllowancesOfCustomTokensByWalletAddress:", allowancesOfCustomTokensByWalletAddressResponse)
@@ -118,8 +117,7 @@ func main() {
 		Spender: spenderInch,
 	})
 	if err != nil {
-		fmt.Println("failed to GetBalancesAndAllowancesByWalletAddressList: %w", err)
-		return
+		log.Fatalf("failed to GetBalancesAndAllowancesByWalletAddressList: %v\n", err)
 	}
 
 	fmt.Println("GetBalancesAndAllowancesByWalletAddressList:", balancesAndAllowancesByWalletAddressListResponse)
@@ -131,8 +129,7 @@ func main() {
 		Tokens:  []string{tokenAddress1, tokenAddress2},
 	})
 	if err != nil {
-		fmt.Println("failed to GetBalancesAndAllowancesOfCustomTokensByWalletAddressList: %w", err)
-		return
+		log.Fatalf("failed to GetBalancesAndAllowancesOfCustomTokensByWalletAddressList: %v\n", err)
 	}
 
 	fmt.Println("GetBalancesAndAllowancesOfCustomTokensByWalletAddressList:", balancesAndAllowancesOfCustomTokensByWalletAddressResponse)
