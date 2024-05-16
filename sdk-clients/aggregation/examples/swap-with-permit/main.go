@@ -3,6 +3,7 @@ package main
 import (
 	"context"
 	"fmt"
+	"log"
 	"math/big"
 	"os"
 	"time"
@@ -31,12 +32,20 @@ const (
 )
 
 func main() {
-	config, err := aggregation.NewConfiguration(nodeUrl, privateKey, constants.PolygonChainId, "https://api.1inch.dev", devPortalToken)
+	config, err := aggregation.NewConfiguration(aggregation.ConfigurationParams{
+		NodeUrl:    nodeUrl,
+		PrivateKey: privateKey,
+		ChainId:    constants.PolygonChainId,
+		ApiUrl:     "https://api.1inch.dev",
+		ApiKey:     devPortalToken,
+	})
 	if err != nil {
-		return
+		log.Fatalf("Failed to create configuration: %v\n", err)
 	}
 	client, err := aggregation.NewClient(config)
-
+	if err != nil {
+		log.Fatalf("Failed to create client: %v\n", err)
+	}
 	ctx := context.Background()
 
 	amountToSwap := big.NewInt(1e17)
@@ -45,6 +54,9 @@ func main() {
 		TokenAddress:  PolygonFRAX,
 		WalletAddress: client.Wallet.Address().Hex(),
 	})
+	if err != nil {
+		log.Fatalf("Failed to get allowance: %v\n", err)
+	}
 
 	allowance := new(big.Int)
 	allowance.SetString(allowanceData.Allowance, 10)
@@ -63,12 +75,12 @@ func main() {
 
 		permitData, err := client.Wallet.GetContractDetailsForPermit(ctx, common.HexToAddress(PolygonFRAX), common.HexToAddress(spender.Address), amountToSwap, twoDaysLater.Unix())
 		if err != nil {
-			panic(err)
+			log.Fatalf("Failed to get permit data: %v\n", err)
 		}
 
 		permit, err = client.Wallet.TokenPermit(*permitData)
 		if err != nil {
-			panic(err)
+			log.Fatalf("Failed to sign permit: %v\n", err)
 		}
 	}
 
@@ -84,27 +96,23 @@ func main() {
 	}
 	swapData, err := client.GetSwap(ctx, swapParams)
 	if err != nil {
-		fmt.Printf("Failed to get swap data: %v\n", err)
-		return
+		log.Fatalf("Failed to get swap data: %v\n", err)
 	}
 
 	builder := client.TxBuilder.New()
 
 	tx, err := builder.SetData(swapData.TxNormalized.Data).SetTo(&swapData.TxNormalized.To).SetGas(swapData.TxNormalized.Gas).SetValue(swapData.TxNormalized.Value).Build(ctx)
 	if err != nil {
-		fmt.Printf("Failed to build transaction: %v\n", err)
-		return
+		log.Fatalf("Failed to build transaction: %v\n", err)
 	}
 	signedTx, err := client.Wallet.Sign(tx)
 	if err != nil {
-		fmt.Printf("Failed to sign transaction: %v\n", err)
-		return
+		log.Fatalf("Failed to sign transaction: %v\n", err)
 	}
 
 	err = client.Wallet.BroadcastTransaction(ctx, signedTx)
 	if err != nil {
-		fmt.Printf("Failed to broadcast transaction: %v\n", err)
-		return
+		log.Fatalf("Failed to broadcast transaction: %v\n", err)
 	}
 
 	// Waiting for transaction, just an example of it

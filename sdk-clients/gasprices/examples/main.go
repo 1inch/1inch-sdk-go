@@ -3,6 +3,7 @@ package main
 import (
 	"context"
 	"fmt"
+	"log"
 	"os"
 	"time"
 
@@ -21,31 +22,38 @@ var (
 )
 
 func main() {
-	config, err := gasprices.NewConfiguration(constants.EthereumChainId, "https://api.1inch.dev", devPortalToken)
+	config, err := gasprices.NewConfiguration(gasprices.ConfigurationParams{
+		ChainId: constants.EthereumChainId,
+		ApiUrl:  "https://api.1inch.dev",
+		ApiKey:  devPortalToken,
+	})
 	if err != nil {
-		return
+		log.Fatal("failed to create configuration: %w", err)
 	}
 
-	configLegacyChain, err := gasprices.NewConfiguration(constants.AuroraChainId, "https://api.1inch.dev", devPortalToken)
+	configLegacyChain, err := gasprices.NewConfiguration(gasprices.ConfigurationParams{
+		ChainId: constants.AuroraChainId,
+		ApiUrl:  "https://api.1inch.dev",
+		ApiKey:  devPortalToken,
+	})
 	if err != nil {
-		return
+		log.Fatal("failed to create configuration for legacy chain: %w", err)
 	}
 
 	client, err := gasprices.NewClient(config)
 	if err != nil {
-		return
+		log.Fatalf("failed to create client: %v", err)
 	}
 
 	clientLegacyChain, err := gasprices.NewClient(configLegacyChain)
 	if err != nil {
-		return
+		log.Fatalf("failed to create legacy client: %v", err)
 	}
 	ctx := context.Background()
 
 	gasPriceEIP15559, err := client.GetGasPriceEIP1559(ctx)
 	if err != nil {
-		fmt.Println("failed to GetGasPriceEIP1559: %w", err)
-		return
+		log.Fatalf("failed to GetGasPriceEIP1559: %v", err)
 	}
 
 	fmt.Println("GetGasPriceEIP1559:", gasPriceEIP15559)
@@ -53,8 +61,7 @@ func main() {
 
 	gasPriceLegacy, err := clientLegacyChain.GetGasPriceLegacy(ctx)
 	if err != nil {
-		fmt.Println("failed to GetGasPriceLegacy: %w", err)
-		return
+		log.Fatalf("failed to GetGasPriceLegacy: %v", err)
 	}
 
 	fmt.Println("GetGasPriceLegacy:", gasPriceLegacy)

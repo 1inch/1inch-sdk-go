@@ -1,7 +1,7 @@
 package spotprices
 
 import (
-	"github.com/1inch/1inch-sdk-go/internal/http-executor"
+	http_executor "github.com/1inch/1inch-sdk-go/internal/http-executor"
 )
 
 type Configuration struct {
@@ -10,20 +10,26 @@ type Configuration struct {
 	API    api
 }
 
-func NewConfiguration(chainId uint64, apiUrl string, apiKey string) (*Configuration, error) {
-	executor, err := http_executor.DefaultHttpClient(apiUrl, apiKey)
+type ConfigurationParams struct {
+	ChainId uint64
+	ApiUrl  string
+	ApiKey  string
+}
+
+func NewConfiguration(params ConfigurationParams) (*Configuration, error) {
+	executor, err := http_executor.DefaultHttpClient(params.ApiUrl, params.ApiKey)
 	if err != nil {
 		return nil, err
 	}
 
 	a := api{
-		chainId:      chainId,
+		chainId:      params.ChainId,
 		httpExecutor: executor,
 	}
 
 	return &Configuration{
-		ApiURL: apiUrl,
-		ApiKey: apiKey,
+		ApiURL: params.ApiUrl,
+		ApiKey: params.ApiKey,
 		API:    a,
 	}, nil
 }
