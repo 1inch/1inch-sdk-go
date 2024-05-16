@@ -9,7 +9,7 @@ import (
 
 // SearchTokenAllChains Get Tokens that match the provided search criteria across all chains
 func (api *api) SearchTokenAllChains(ctx context.Context, params SearchControllerSearchAllChainsParams) ([]ProviderTokenDtoFixed, error) {
-	u := fmt.Sprintf("/token/v1.2/search")
+	u := "/token/v1.2/search"
 
 	err := params.Validate()
 	if err != nil {
