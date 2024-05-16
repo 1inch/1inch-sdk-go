@@ -31,14 +31,14 @@ func main() {
 	}
 	ctx := context.Background()
 
-	interval, err := client.GetSyncedInterval(ctx)
-	if err != nil {
-		fmt.Println("failed to GetSyncedInterval: %w", err)
-		return
-	}
-
-	fmt.Println("GetSyncedInterval:", interval)
-	time.Sleep(time.Second)
+	//interval, err := client.GetSyncedInterval(ctx)
+	//if err != nil {
+	//	fmt.Println("failed to GetSyncedInterval: %w", err)
+	//	return
+	//}
+	//
+	//fmt.Println("GetSyncedInterval:", interval)
+	//time.Sleep(time.Second)
 
 	blockTrace, err := client.GetBlockTraceByNumber(ctx, traces.GetBlockTraceByNumberParam(17378176))
 	if err != nil {
