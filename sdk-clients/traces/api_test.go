@@ -71,7 +71,6 @@ func TestGetBlockTraceByNumber(t *testing.T) {
 	mockedResp := CoreBuiltinBlockTracesDto{
 		BlockHash:      "",
 		BlockTimestamp: "",
-		Number:         0,
 		Traces:         nil,
 		Type:           "",
 		Version:        "",
