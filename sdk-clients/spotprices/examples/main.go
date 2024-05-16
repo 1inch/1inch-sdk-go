@@ -3,6 +3,7 @@ package main
 import (
 	"context"
 	"fmt"
+	"log"
 	"os"
 	"time"
 
@@ -31,13 +32,17 @@ const (
 )
 
 func main() {
-	config, err := spotprices.NewConfiguration(constants.EthereumChainId, "https://api.1inch.dev", devPortalToken)
+	config, err := spotprices.NewConfiguration(spotprices.ConfigurationParams{
+		ChainId: constants.EthereumChainId,
+		ApiUrl:  "https://api.1inch.dev",
+		ApiKey:  devPortalToken,
+	})
 	if err != nil {
-		return
+		log.Fatalf("failed to create configuration: %v", err)
 	}
 	client, err := spotprices.NewClient(config)
 	if err != nil {
-		return
+		log.Fatalf("failed to create client: %v", err)
 	}
 	ctx := context.Background()
 
@@ -45,8 +50,7 @@ func main() {
 		Currency: spotprices.GetWhitelistedTokensPricesParamsCurrency(spotprices.USD),
 	})
 	if err != nil {
-		fmt.Println("failed to GetWhitelistedTokensPricesParams: %w", err)
-		return
+		log.Fatalf("failed to GetWhitelistedTokensPrices: %v", err)
 	}
 
 	fmt.Println("GetWhitelistedTokensPricesParams:", whitelistedTokensPrices)
@@ -57,8 +61,7 @@ func main() {
 		Tokens:   []string{tokenAddress1, tokenAddress2},
 	})
 	if err != nil {
-		fmt.Println("failed to GetPricesForRequestedTokens: %w", err)
-		return
+		log.Fatalf("failed to GetPricesForRequestedTokens: %v", err)
 	}
 
 	fmt.Println("GetPricesForRequestedTokens:", requestedTokensPrices)
@@ -69,8 +72,7 @@ func main() {
 		Tokens:   []string{tokenAddress1, tokenAddress2, tokenAddress3, tokenAddress4, tokenAddress5, tokenAddress6, tokenAddress7},
 	})
 	if err != nil {
-		fmt.Println("failed to GetPricesForRequestedTokensLarge: %w", err)
-		return
+		log.Fatalf("failed to GetPricesForRequestedTokensLarge: %v", err)
 	}
 
 	fmt.Println("GetPricesForRequestedTokensLarge:", requestedTokensPricesLarge)
@@ -78,8 +80,7 @@ func main() {
 
 	customCurrencies, err := client.GetCustomCurrenciesList(ctx)
 	if err != nil {
-		fmt.Println("failed to GetCustomCurrenciesList: %w", err)
-		return
+		log.Fatalf("failed to GetCustomCurrenciesList: %v", err)
 	}
 
 	fmt.Println("GetCustomCurrenciesList:", customCurrencies)

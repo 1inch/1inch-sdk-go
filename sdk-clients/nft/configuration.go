@@ -1,7 +1,7 @@
 package nft
 
 import (
-	"github.com/1inch/1inch-sdk-go/internal/http-executor"
+	http_executor "github.com/1inch/1inch-sdk-go/internal/http-executor"
 )
 
 type Configuration struct {
@@ -10,8 +10,13 @@ type Configuration struct {
 	API    api
 }
 
-func NewConfiguration(apiUrl string, apiKey string) (*Configuration, error) {
-	executor, err := http_executor.DefaultHttpClient(apiUrl, apiKey)
+type ConfigurationParams struct {
+	ApiUrl string
+	ApiKey string
+}
+
+func NewConfiguration(params ConfigurationParams) (*Configuration, error) {
+	executor, err := http_executor.DefaultHttpClient(params.ApiUrl, params.ApiKey)
 	if err != nil {
 		return nil, err
 	}
@@ -21,8 +26,8 @@ func NewConfiguration(apiUrl string, apiKey string) (*Configuration, error) {
 	}
 
 	return &Configuration{
-		ApiURL: apiUrl,
-		ApiKey: apiKey,
+		ApiURL: params.ApiUrl,
+		ApiKey: params.ApiKey,
 		API:    a,
 	}, nil
 }

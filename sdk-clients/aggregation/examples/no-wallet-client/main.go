@@ -3,6 +3,7 @@ package main
 import (
 	"context"
 	"fmt"
+	"log"
 	"os"
 
 	"github.com/1inch/1inch-sdk-go/constants"
@@ -27,11 +28,11 @@ const (
 func main() {
 	config, err := aggregation.NewConfigurationAPI(constants.PolygonChainId, "https://api.1inch.dev", devPortalToken)
 	if err != nil {
-		return
+		log.Fatalf("Failed to create configuration: %v\n", err)
 	}
 	client, err := aggregation.NewClientOnlyAPI(config)
 	if err != nil {
-		return
+		log.Fatalf("Failed to create client: %v\n", err)
 	}
 	ctx := context.Background()
 
@@ -42,7 +43,7 @@ func main() {
 	})
 
 	if err != nil {
-		return
+		log.Fatalf("Failed to get quote: %v\n", err)
 	}
 
 	fmt.Printf("Quote Amount: %+v\n", quote.ToAmount)

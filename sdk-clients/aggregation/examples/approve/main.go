@@ -3,6 +3,7 @@ package main
 import (
 	"context"
 	"encoding/hex"
+	"log"
 	"math/big"
 	"os"
 
@@ -29,15 +30,21 @@ const (
 	PolygonWeth = "0x7ceB23fD6bC0adD59E62ac25578270cFf1b9f619"
 )
 
+// nodeUrl, privateKey, constants.EthereumChainId, "https://api.1inch.dev", devPortalToken
 func main() {
-	config, err := aggregation.NewConfiguration(nodeUrl, privateKey, constants.EthereumChainId, "https://api.1inch.dev", devPortalToken)
+	config, err := aggregation.NewConfiguration(aggregation.ConfigurationParams{
+		NodeUrl:    nodeUrl,
+		PrivateKey: privateKey,
+		ChainId:    constants.EthereumChainId,
+		ApiUrl:     "https://api.1inch.dev",
+		ApiKey:     devPortalToken,
+	})
 	if err != nil {
-		return
+		log.Fatalf("Failed to create configuration: %v\n", err)
 	}
 	client, err := aggregation.NewClient(config)
 	if err != nil {
-		panic(err)
-		return
+		log.Fatalf("Failed to create client: %v\n", err)
 	}
 	ctx := context.Background()
 
@@ -59,29 +66,28 @@ func main() {
 			Amount:       amountToSwap.String(),
 		})
 		if err != nil {
-			panic(err)
-			return
+			log.Fatalf("Failed to get approve data: %v\n", err)
 		}
 		data, err := hex.DecodeString(approveData.Data[2:])
 		if err != nil {
-			return
+			log.Fatalf("Failed to decode approve data: %v\n", err)
 		}
 
 		to := common.HexToAddress(approveData.Data)
 
 		tx, err := client.TxBuilder.New().SetData(data).SetTo(&to).Build(ctx)
 		if err != nil {
-			return
+			log.Fatalf("Failed to build approve transaction: %v\n", err)
 		}
 
 		signedTx, err := client.Wallet.Sign(tx)
 		if err != nil {
-			return
+			log.Fatalf("Failed to sign approve transaction: %v\n", err)
 		}
 
 		err = client.Wallet.BroadcastTransaction(ctx, signedTx)
 		if err != nil {
-			return
+			log.Fatalf("Failed to broadcast approve transaction: %v\n", err)
 		}
 	}
 
