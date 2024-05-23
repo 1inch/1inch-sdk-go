@@ -1,0 +1,16 @@
+{
+  "AggregationController_getQuote": "getQuote",
+  "AggregationController_getSwap": "getSwap",
+  "ApproveController_getSpender": "getSpender",
+  "ApproveController_getCallData": "getApprove",
+  "ApproveController_getAllowance": "getAllowance",
+  "ProtocolsController_getProtocolsImages": "getLiquiditySources",
+  "TokensController_getTokens": "getTokens",
+  "ChainV1_2Controller_getAggregatedBalancesAndAllowancesV1_2": "getAggregatedBalancesAndAllowances",
+  "ChainController_whitelist": "getWhitelistedTokensPrices",
+  "ChainController_getCustomCurrencies": "getCustomCurrenciesList",
+  "ChainController_byAddressesPost": "getPricesForRequestedTokensLong",
+  "ChainController_byAddresses": "getPricesForRequestedTokens",
+  "ApiController_v1_5": "getGasPrices",
+  "DevPortalController_getNfts": "getNftsByAddress"
+}

@@ -1,0 +1,658 @@
+{
+  "openapi": "3.0.0",
+  "paths": {
+    "/v1.2/search": {
+      "get": {
+        "operationId": "SearchController_searchAllChains",
+        "summary": "Search tokens by name or symbol",
+        "description": "Search tokens by name or symbol",
+        "parameters": [
+          {
+            "name": "query",
+            "required": false,
+            "in": "query",
+            "description": "Text to search for in token address, token symbol, or description",
+            "example": "1inch",
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "ignore_listed",
+            "required": false,
+            "in": "query",
+            "description": "Whether to ignore listed tokens",
+            "example": false,
+            "schema": {
+              "type": "boolean"
+            }
+          },
+          {
+            "name": "only_positive_rating",
+            "required": true,
+            "in": "query",
+            "schema": {
+              "type": "boolean"
+            }
+          },
+          {
+            "name": "limit",
+            "required": false,
+            "in": "query",
+            "description": "Maximum number of tokens to return",
+            "example": 10,
+            "schema": {
+              "type": "number"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Search results",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/components/schemas/TokenDto"
+                  }
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Invalid chain ID"
+          }
+        },
+        "tags": [
+          "tokens"
+        ]
+      }
+    },
+    "/v1.2/{chain_id}/search": {
+      "get": {
+        "operationId": "SearchController_searchSingleChain",
+        "summary": "Search token",
+        "description": "Search token by query in name, symbol and description",
+        "parameters": [
+          {
+            "name": "chain_id",
+            "required": true,
+            "in": "path",
+            "schema": {
+              "type": "number"
+            }
+          },
+          {
+            "name": "query",
+            "required": false,
+            "in": "query",
+            "description": "Text to search for in token address, token symbol, or description",
+            "example": "1inch",
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "ignore_listed",
+            "required": false,
+            "in": "query",
+            "description": "Whether to ignore listed tokens",
+            "example": false,
+            "schema": {
+              "type": "boolean"
+            }
+          },
+          {
+            "name": "only_positive_rating",
+            "required": true,
+            "in": "query",
+            "schema": {
+              "type": "boolean"
+            }
+          },
+          {
+            "name": "limit",
+            "required": false,
+            "in": "query",
+            "description": "Maximum number of tokens to return",
+            "example": 10,
+            "schema": {
+              "type": "number"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Search results",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/components/schemas/TokenDto"
+                  }
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Invalid chain ID"
+          }
+        },
+        "tags": [
+          "tokens"
+        ]
+      }
+    },
+    "/v1.2/{chain_id}": {
+      "get": {
+        "operationId": "TokenListController_tokens",
+        "summary": "1inch whitelisted tokens",
+        "description": "Get 1inch whitelisted tokens info",
+        "parameters": [
+          {
+            "name": "chain_id",
+            "required": true,
+            "in": "path",
+            "schema": {
+              "type": "number"
+            }
+          },
+          {
+            "name": "provider",
+            "required": false,
+            "in": "query",
+            "description": "Provider code. Default value is 1inch",
+            "example": "1inch",
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "country",
+            "required": false,
+            "in": "query",
+            "description": "Country code",
+            "example": "US",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Token info map",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "0x111111111117dc0aa78b770fa6a738034120c302": {
+                      "$ref": "#/components/schemas/ProviderTokenDto"
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Invalid chain ID",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/BadRequestErrorDto"
+                }
+              }
+            }
+          }
+        },
+        "tags": [
+          "tokens"
+        ]
+      }
+    },
+    "/v1.2/{chain_id}/token-list": {
+      "get": {
+        "operationId": "TokenListController_tokensList",
+        "summary": "1inch whitelisted tokens in list format",
+        "description": "Get 1inch whitelisted tokens in list",
+        "parameters": [
+          {
+            "name": "chain_id",
+            "required": true,
+            "in": "path",
+            "schema": {
+              "type": "number"
+            }
+          },
+          {
+            "name": "provider",
+            "required": false,
+            "in": "query",
+            "description": "Provider code. Default value is \"1inch\"",
+            "example": "1inch",
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "country",
+            "required": false,
+            "in": "query",
+            "description": "Country code",
+            "example": "US",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Token list",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/TokenListResponseDto"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Invalid chain ID",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/BadRequestErrorDto"
+                }
+              }
+            }
+          }
+        },
+        "tags": [
+          "tokens"
+        ]
+      }
+    },
+    "/v1.2/{chain_id}/custom": {
+      "get": {
+        "operationId": "CustomTokensController_getTokensInfo",
+        "summary": "Get many tokens",
+        "description": "Get tokens info",
+        "parameters": [
+          {
+            "name": "chain_id",
+            "required": true,
+            "in": "path",
+            "schema": {
+              "type": "number"
+            }
+          },
+          {
+            "name": "addresses",
+            "required": true,
+            "in": "query",
+            "schema": {
+              "type": "array",
+              "items": {
+                "type": "string"
+              }
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Tokens info map",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "0x111111111117dc0aa78b770fa6a738034120c302": {
+                      "$ref": "#/components/schemas/TokenInfoDto"
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Invalid chain ID or address",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/BadRequestErrorDto"
+                }
+              }
+            }
+          }
+        },
+        "tags": [
+          "tokens"
+        ]
+      }
+    },
+    "/v1.2/{chain_id}/custom/{address}": {
+      "get": {
+        "operationId": "CustomTokensController_getTokenInfo",
+        "summary": "Get single token",
+        "description": "Get token info",
+        "parameters": [
+          {
+            "name": "chain_id",
+            "required": true,
+            "in": "path",
+            "schema": {
+              "type": "number"
+            }
+          },
+          {
+            "name": "address",
+            "required": true,
+            "in": "path",
+            "example": "0x111111111117dc0aa78b770fa6a738034120c302",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Token info",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "$ref": "#/components/schemas/TokenDto"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Invalid chain ID or address",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/BadRequestErrorDto"
+                }
+              }
+            }
+          }
+        },
+        "tags": [
+          "tokens"
+        ]
+      }
+    }
+  },
+  "info": {
+    "title": "1inch Tokens API",
+    "description": "",
+    "version": "4.3.80",
+    "contact": {}
+  },
+  "tags": [
+    {
+      "name": "tokens",
+      "description": ""
+    }
+  ],
+  "servers": [],
+  "components": {
+    "schemas": {
+      "TagDto": {
+        "type": "object",
+        "properties": {
+          "provider": {
+            "type": "string"
+          },
+          "value": {
+            "type": "string"
+          }
+        },
+        "required": [
+          "provider",
+          "value"
+        ]
+      },
+      "TokenDto": {
+        "type": "object",
+        "properties": {
+          "chainId": {
+            "type": "number"
+          },
+          "symbol": {
+            "type": "string"
+          },
+          "name": {
+            "type": "string"
+          },
+          "address": {
+            "type": "string"
+          },
+          "decimals": {
+            "type": "number"
+          },
+          "logoURI": {
+            "type": "string"
+          },
+          "rating": {
+            "type": "number"
+          },
+          "eip2612": {
+            "type": "boolean"
+          },
+          "isFoT": {
+            "type": "boolean"
+          },
+          "tags": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/TagDto"
+            }
+          },
+          "providers": {
+            "type": "array",
+            "items": {
+              "type": "string"
+            }
+          }
+        },
+        "required": [
+          "chainId",
+          "symbol",
+          "name",
+          "address",
+          "decimals",
+          "rating",
+          "tags",
+          "providers"
+        ]
+      },
+      "ProviderTokenDto": {
+        "type": "object",
+        "properties": {
+          "chainId": {
+            "type": "number"
+          },
+          "symbol": {
+            "type": "string"
+          },
+          "name": {
+            "type": "string"
+          },
+          "address": {
+            "type": "string"
+          },
+          "decimals": {
+            "type": "number"
+          },
+          "logoURI": {
+            "type": "string"
+          },
+          "providers": {
+            "type": "array",
+            "items": {
+              "type": "string"
+            }
+          },
+          "eip2612": {
+            "type": "boolean"
+          },
+          "isFoT": {
+            "type": "boolean"
+          },
+          "displayedSymbol": {
+            "type": "string"
+          },
+          "tags": {
+            "type": "array",
+            "items": {
+              "type": "string"
+            }
+          }
+        },
+        "required": [
+          "chainId",
+          "symbol",
+          "name",
+          "address",
+          "decimals",
+          "providers",
+          "tags"
+        ]
+      },
+      "BadRequestErrorDto": {
+        "type": "object",
+        "properties": {
+          "statusCode": {
+            "type": "number",
+            "example": 400
+          },
+          "message": {
+            "type": "string"
+          },
+          "error": {
+            "type": "string"
+          }
+        },
+        "required": [
+          "statusCode",
+          "message",
+          "error"
+        ]
+      },
+      "TokenInfoDto": {
+        "type": "object",
+        "properties": {
+          "address": {
+            "type": "string"
+          },
+          "chainId": {
+            "type": "number"
+          },
+          "decimals": {
+            "type": "number"
+          },
+          "extensions": {
+            "type": "object"
+          },
+          "logoURI": {
+            "type": "string"
+          },
+          "name": {
+            "type": "string"
+          },
+          "symbol": {
+            "type": "string"
+          },
+          "tags": {
+            "type": "array",
+            "items": {
+              "type": "string"
+            }
+          }
+        },
+        "required": [
+          "address",
+          "chainId",
+          "decimals",
+          "logoURI",
+          "name",
+          "symbol",
+          "tags"
+        ]
+      },
+      "VersionDto": {
+        "type": "object",
+        "properties": {
+          "major": {
+            "type": "number"
+          },
+          "minor": {
+            "type": "number"
+          },
+          "patch": {
+            "type": "number"
+          }
+        },
+        "required": [
+          "major",
+          "minor",
+          "patch"
+        ]
+      },
+      "TokenListResponseDto": {
+        "type": "object",
+        "properties": {
+          "keywords": {
+            "type": "array",
+            "items": {
+              "type": "string"
+            }
+          },
+          "logoURI": {
+            "type": "string"
+          },
+          "name": {
+            "type": "string"
+          },
+          "tags": {
+            "type": "object",
+            "additionalProperties": {
+              "$ref": "#/components/schemas/TagDto"
+            }
+          },
+          "tags_order": {
+            "type": "array",
+            "items": {
+              "type": "string"
+            }
+          },
+          "timestamp": {
+            "type": "string"
+          },
+          "tokens": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/TokenInfoDto"
+            }
+          },
+          "version": {
+            "$ref": "#/components/schemas/VersionDto"
+          }
+        },
+        "required": [
+          "keywords",
+          "logoURI",
+          "name",
+          "tags",
+          "tags_order",
+          "timestamp",
+          "tokens",
+          "version"
+        ]
+      }
+    }
+  }
+}

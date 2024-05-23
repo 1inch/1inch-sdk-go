@@ -7,8 +7,8 @@ import (
 	"strings"
 	"time"
 
-	"github.com/1inch/1inch-sdk-go/helpers"
-	"github.com/1inch/1inch-sdk-go/helpers/consts/chains"
+	"github.com/1inch/1inch-sdk-go/constants"
+	"github.com/1inch/1inch-sdk-go/internal/slice_utils"
 )
 
 func CheckEthereumAddressRequired(parameter interface{}, variableName string) error {
@@ -40,7 +40,29 @@ func CheckEthereumAddress(parameter interface{}, variableName string) error {
 	return nil
 }
 
-var bigIntMax, _ = helpers.BigIntFromString("115792089237316195423570985008687907853269984665640564039457584007913129639935")
+func CheckEthereumAddressListRequired(parameter interface{}, variableName string) error {
+	addresses, ok := parameter.([]string)
+	if !ok {
+		return fmt.Errorf("for parameter '%v' to be validated as '%v', it must be a list of strings", variableName, "EthereumAddressList")
+	}
+	if len(addresses) == 0 {
+		return NewParameterMissingError(variableName)
+	}
+
+	for _, address := range addresses {
+		if address == "" {
+			return NewParameterMissingError(variableName)
+		}
+		re := regexp.MustCompile(`^0x[a-fA-F0-9]{40}$`)
+		if !re.MatchString(address) {
+			return NewParameterValidationError(variableName, "not a valid Ethereum address")
+		}
+	}
+
+	return nil
+}
+
+var bigIntMax, _ = BigIntFromString("115792089237316195423570985008687907853269984665640564039457584007913129639935")
 var bigIntZero = big.NewInt(0)
 
 func CheckBigIntRequired(parameter interface{}, variableName string) error {
@@ -65,7 +87,7 @@ func CheckBigInt(parameter interface{}, variableName string) error {
 		return nil
 	}
 
-	parsedValue, err := helpers.BigIntFromString(value)
+	parsedValue, err := BigIntFromString(value)
 	if err != nil {
 		return NewParameterValidationError(variableName, "not a valid value")
 	}
@@ -100,8 +122,8 @@ func CheckChainId(parameter interface{}, variableName string) error {
 		return nil
 	}
 
-	if !helpers.Contains(value, chains.ValidChainIds) {
-		return NewParameterValidationError(variableName, fmt.Sprintf("is invalid, valid chain ids are: %v", chains.ValidChainIds))
+	if !slice_utils.Contains(value, constants.ValidChainIds) {
+		return NewParameterValidationError(variableName, fmt.Sprintf("is invalid, valid chain ids are: %v", constants.ValidChainIds))
 	}
 	return nil
 }
@@ -146,7 +168,7 @@ func CheckApprovalType(parameter interface{}, variableName string) error {
 		return nil
 	}
 
-	if !helpers.Contains(value, []int{0, 1, 2}) {
+	if !slice_utils.Contains(value, []int{0, 1, 2}) {
 		return NewParameterValidationError(variableName, "invalid approval type")
 	}
 	return nil
@@ -217,11 +239,11 @@ func CheckStatusesInts(parameter interface{}, variableName string) error {
 		return nil
 	}
 
-	if helpers.HasDuplicates(value) {
+	if HasDuplicates(value) {
 		return NewParameterValidationError(variableName, "must not contain duplicates")
 	}
 	validStatuses := []float32{1, 2, 3}
-	if !helpers.IsSubset(value, validStatuses) {
+	if !IsSubset(value, validStatuses) {
 		return NewParameterValidationError(variableName, fmt.Sprintf("can only contain %v", validStatuses))
 	}
 	return nil
@@ -233,11 +255,11 @@ func CheckStatusesStrings(parameter interface{}, variableName string) error {
 		return fmt.Errorf("for parameter '%v' to be validated as '%v', it must be a []string", variableName, "StatusesStrings")
 	}
 
-	if helpers.HasDuplicates(value) {
+	if HasDuplicates(value) {
 		return NewParameterValidationError(variableName, "must not contain duplicates")
 	}
 	validStatuses := []string{"1", "2", "3"}
-	if !helpers.IsSubset(value, validStatuses) {
+	if !IsSubset(value, validStatuses) {
 		return NewParameterValidationError(variableName, fmt.Sprintf("can only contain %v", validStatuses))
 	}
 	return nil
@@ -254,7 +276,7 @@ func CheckSortBy(parameter interface{}, variableName string) error {
 	}
 
 	validSortBy := []string{"createDateTime", "takerRate", "makerRate", "makerAmount", "takerAmount"}
-	if !helpers.Contains(value, validSortBy) {
+	if !slice_utils.Contains(value, validSortBy) {
 		return NewParameterValidationError(variableName, fmt.Sprintf("can only contain %v", validSortBy))
 	}
 	return nil
@@ -421,5 +443,36 @@ func CheckExpireAfter(parameter interface{}, variableName string) error {
 	if value < time.Now().Unix() {
 		return NewParameterValidationError(variableName, "must be a future timestamp")
 	}
+	return nil
+}
+
+func CheckBoolean(parameter interface{}, variableName string) error {
+	_, ok := parameter.(bool)
+	if !ok {
+		return fmt.Errorf("for parameter '%v' to be validated as '%v', it must be a boolean", variableName, "Boolean")
+	}
+
+	return nil
+}
+
+func CheckString(parameter interface{}, variableName string) error {
+	_, ok := parameter.(string)
+	if !ok {
+		return fmt.Errorf("for parameter '%v' to be validated as '%v', it must be a string", variableName, "String")
+	}
+
+	return nil
+}
+
+func CheckFiatCurrency(parameter interface{}, variableName string) error {
+	value, ok := parameter.(string)
+	if !ok {
+		return fmt.Errorf("for parameter '%v' to be validated as '%v', it must be a string", variableName, "FiatCurrency")
+	}
+
+	if len(value) != 3 {
+		return NewParameterValidationError(variableName, "must have len = 3 (like USD, EUR, etc)")
+	}
+
 	return nil
 }

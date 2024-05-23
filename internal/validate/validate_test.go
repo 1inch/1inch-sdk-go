@@ -4,9 +4,11 @@ import (
 	"fmt"
 	"testing"
 
+	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
 
-	"github.com/1inch/1inch-sdk-go/helpers/consts/chains"
+	"github.com/1inch/1inch-sdk-go/constants"
+	"github.com/1inch/1inch-sdk-go/internal/slice_utils"
 )
 
 func TestIsEthereumAddressRequired(t *testing.T) {
@@ -29,6 +31,44 @@ func TestIsEthereumAddressRequired(t *testing.T) {
 	for _, tc := range testcases {
 		t.Run(tc.description, func(t *testing.T) {
 			err := CheckEthereumAddressRequired(tc.address, "testValue")
+			if tc.expectError {
+				require.Error(t, err, fmt.Sprintf("%s should have caused an error", tc.description))
+			} else {
+				require.NoError(t, err, fmt.Sprintf("%s should not have caused an error", tc.description))
+			}
+		})
+	}
+}
+
+func TestCheckEthereumAddressListRequired(t *testing.T) {
+	testcases := []struct {
+		description string
+		addresses   []string
+		expectError bool
+	}{
+		{
+			description: "Invalid address - empty",
+			addresses:   []string{},
+			expectError: true,
+		},
+		{
+			description: "Valid addresses 1",
+			addresses:   []string{"0x1234567890abcdef1234567890abcdef12345678"},
+		},
+		{
+			description: "Valid addresses 2",
+			addresses:   []string{"0x1234567890abcdef1234567890abcdef12345678", "0x7ceB23fD6bC0adD59E62ac25578270cFf1b9f619"},
+		},
+		{
+			description: "Invalid addresses ",
+			addresses:   []string{"0x1234567890abcdef1234567890abcdef145678", "0x7ceB23fD6bC0adD59E62ac25578270cFf1b9f619"},
+			expectError: true,
+		},
+	}
+
+	for _, tc := range testcases {
+		t.Run(tc.description, func(t *testing.T) {
+			err := CheckEthereumAddressListRequired(tc.addresses, "testValue")
 			if tc.expectError {
 				require.Error(t, err, fmt.Sprintf("%s should have caused an error", tc.description))
 			} else {
@@ -178,8 +218,8 @@ func TestChainIdRequired(t *testing.T) {
 			expectError: true,
 		},
 		{
-			description: "Valid chain id - Ethereum",
-			value:       chains.Ethereum,
+			description: "Valid chain id - EthereumChainId",
+			value:       constants.EthereumChainId,
 		},
 	}
 
@@ -206,12 +246,12 @@ func TestChainId(t *testing.T) {
 			value:       0,
 		},
 		{
-			description: "Valid chain id - Ethereum",
-			value:       chains.Ethereum,
+			description: "Valid chain id - EthereumChainId",
+			value:       constants.EthereumChainId,
 		},
 		{
-			description: "Valid chain id - Polygon",
-			value:       chains.Polygon,
+			description: "Valid chain id - PolygonChainId",
+			value:       constants.PolygonChainId,
 		},
 		{
 			description: "Invalid chain id",
@@ -943,6 +983,262 @@ func TestExpireAfter(t *testing.T) {
 			} else {
 				require.NoError(t, err, fmt.Sprintf("%s should not have caused an error", tc.description))
 			}
+		})
+	}
+}
+
+func TestIsBigInt(t *testing.T) {
+	testCases := []struct {
+		description string
+		input       string
+		expectError bool
+	}{
+		{
+			description: "Max big value",
+			input:       "115792089237316195423570985008687907853269984665640564039457584007913129639935",
+		},
+		{
+			description: "Max big value + 1",
+			input:       "115792089237316195423570985008687907853269984665640564039457584007913129639936",
+		},
+	}
+
+	for _, tc := range testCases {
+		t.Run(tc.description, func(t *testing.T) {
+			_, err := BigIntFromString(tc.input)
+			require.NoError(t, err)
+		})
+	}
+}
+
+func TestCheckBoolean(t *testing.T) {
+	testCases := []struct {
+		description string
+		input       interface{}
+		expectError bool
+	}{
+		{
+			description: "True",
+			input:       true,
+		},
+		{
+			description: "False",
+			input:       false,
+		},
+		{
+			description: "Must fail",
+			input:       nil,
+			expectError: true,
+		},
+		{
+			description: "Must fail 2",
+			input: struct {
+				A string
+			}{
+				A: "a",
+			},
+			expectError: true,
+		},
+		{
+			description: "Must fail 3",
+			input:       []string{"1", "2"},
+			expectError: true,
+		},
+		{
+			description: "Must fail 4",
+			input:       12,
+			expectError: true,
+		},
+	}
+
+	for _, tc := range testCases {
+		t.Run(tc.description, func(t *testing.T) {
+			err := CheckBoolean(tc.input, "testValue")
+			if tc.expectError {
+				require.Error(t, err)
+			} else {
+				require.NoError(t, err)
+			}
+		})
+	}
+}
+
+func TestCheckString(t *testing.T) {
+	testCases := []struct {
+		description string
+		input       interface{}
+		expectError bool
+	}{
+		{
+			description: "True",
+			input:       "a",
+		},
+		{
+			description: "True 2",
+			input:       "12",
+		},
+		{
+			description: "Must fail",
+			input:       nil,
+			expectError: true,
+		},
+		{
+			description: "Must fail 2",
+			input: struct {
+				A string
+			}{
+				A: "a",
+			},
+			expectError: true,
+		},
+		{
+			description: "Must fail 3",
+			input:       []string{"1", "2"},
+			expectError: true,
+		},
+		{
+			description: "Must fail 4",
+			input:       12,
+			expectError: true,
+		},
+	}
+
+	for _, tc := range testCases {
+		t.Run(tc.description, func(t *testing.T) {
+			err := CheckString(tc.input, "testValue")
+			if tc.expectError {
+				require.Error(t, err)
+			} else {
+				require.NoError(t, err)
+			}
+		})
+	}
+}
+
+func TestCheckFiatCurrency(t *testing.T) {
+	testCases := []struct {
+		description string
+		input       interface{}
+		expectError bool
+	}{
+		{
+			description: "True",
+			input:       "USD",
+		},
+		{
+			description: "True",
+			input:       "EUR",
+		},
+		{
+			description: "Must fail",
+			input:       nil,
+			expectError: true,
+		},
+		{
+			description: "Must fail 2",
+			input: struct {
+				A string
+			}{
+				A: "a",
+			},
+			expectError: true,
+		},
+		{
+			description: "Must fail 3",
+			input:       "ANDA",
+			expectError: true,
+		},
+		{
+			description: "Must fail 4",
+			input:       12,
+			expectError: true,
+		},
+	}
+
+	for _, tc := range testCases {
+		t.Run(tc.description, func(t *testing.T) {
+			err := CheckFiatCurrency(tc.input, "testValue")
+			if tc.expectError {
+				require.Error(t, err)
+			} else {
+				require.NoError(t, err)
+			}
+		})
+	}
+}
+
+func TestIsSubset(t *testing.T) {
+	testCases := []struct {
+		description string
+		sliceA      []int
+		sliceB      []int
+		expected    bool
+	}{
+		{
+			description: "sliceA is a subset of sliceB",
+			sliceA:      []int{1, 2},
+			sliceB:      []int{1, 2, 3, 4},
+			expected:    true,
+		},
+		{
+			description: "sliceA is not a subset of sliceB",
+			sliceA:      []int{1, 2, 5},
+			sliceB:      []int{1, 2, 3, 4},
+			expected:    false,
+		},
+		{
+			description: "sliceA is empty",
+			sliceA:      []int{},
+			sliceB:      []int{1, 2, 3, 4},
+			expected:    true,
+		},
+		{
+			description: "both slices are empty",
+			sliceA:      []int{},
+			sliceB:      []int{},
+			expected:    true,
+		},
+	}
+
+	for _, tc := range testCases {
+		t.Run(tc.description, func(t *testing.T) {
+			result := IsSubset(tc.sliceA, tc.sliceB)
+			assert.Equal(t, tc.expected, result, fmt.Sprintf("%v: expected %v, got %v", tc.description, tc.expected, result))
+		})
+	}
+}
+
+func TestContains(t *testing.T) {
+	testCases := []struct {
+		description string
+		value       int
+		slice       []int
+		expected    bool
+	}{
+		{
+			description: "value is present in the slice",
+			value:       1,
+			slice:       []int{1, 2, 3},
+			expected:    true,
+		},
+		{
+			description: "value is not present in the slice",
+			value:       4,
+			slice:       []int{1, 2, 3},
+			expected:    false,
+		},
+		{
+			description: "slice is empty",
+			value:       1,
+			slice:       []int{},
+			expected:    false,
+		},
+	}
+
+	for _, tc := range testCases {
+		t.Run(tc.description, func(t *testing.T) {
+			result := slice_utils.Contains(tc.value, tc.slice)
+			assert.Equal(t, tc.expected, result, fmt.Sprintf("%v: expected %v, got %v", tc.description, tc.expected, result))
 		})
 	}
 }

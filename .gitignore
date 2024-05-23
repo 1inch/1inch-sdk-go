@@ -1,4 +1,9 @@
 .idea/
 .vscode/
-swagger-dynamic/*.json
 /tmp
+/bin
+
+### macOS ###
+*.DS_Store
+.AppleDouble
+.LSOverride

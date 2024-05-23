@@ -1,0 +1,1073 @@
+{
+  "openapi": "3.0.0",
+  "paths": {
+    "/v5.2/1/quote": {
+      "get": {
+        "operationId": "getQuote",
+        "summary": "Find the best quote to swap with 1inch Router",
+        "parameters": [
+          {
+            "name": "src",
+            "required": true,
+            "in": "query",
+            "example": "0xeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeee",
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "dst",
+            "required": true,
+            "in": "query",
+            "example": "0x111111111117dc0aa78b770fa6a738034120c302",
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "amount",
+            "required": true,
+            "in": "query",
+            "example": "10000000000000000",
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "protocols",
+            "required": false,
+            "in": "query",
+            "description": "All supported liquidity sources by default",
+            "schema": {
+              "type": "string",
+              "x-go-type-skip-optional-pointer": true
+            }
+          },
+          {
+            "name": "fee",
+            "required": false,
+            "in": "query",
+            "description": "Partner fee. min: 0; max: 3 Should be the same for /quote and /swap",
+            "schema": {
+              "minimum": 0,
+              "maximum": 3,
+              "type": "number",
+              "x-go-type-skip-optional-pointer": true
+            }
+          },
+          {
+            "name": "gasPrice",
+            "required": false,
+            "in": "query",
+            "description": "Network price per gas in wei. By default fast network gas price",
+            "schema": {
+              "type": "string",
+              "x-go-type-skip-optional-pointer": true
+            }
+          },
+          {
+            "name": "complexityLevel",
+            "required": false,
+            "in": "query",
+            "schema": {
+              "minimum": 0,
+              "maximum": 2,
+              "type": "number",
+              "x-go-type-skip-optional-pointer": true
+            }
+          },
+          {
+            "name": "parts",
+            "required": false,
+            "in": "query",
+            "schema": {
+              "minimum": 0,
+              "maximum": 50,
+              "type": "number",
+              "x-go-type-skip-optional-pointer": true
+            }
+          },
+          {
+            "name": "mainRouteParts",
+            "required": false,
+            "in": "query",
+            "schema": {
+              "minimum": 0,
+              "maximum": 10,
+              "type": "number",
+              "x-go-type-skip-optional-pointer": true
+            }
+          },
+          {
+            "name": "gasLimit",
+            "required": false,
+            "in": "query",
+            "schema": {
+              "minimum": 100000,
+              "maximum": 11500000,
+              "type": "number",
+              "x-go-type-skip-optional-pointer": true
+            }
+          },
+          {
+            "name": "includeTokensInfo",
+            "required": false,
+            "in": "query",
+            "description": "Return fromToken and toToken info in response",
+            "schema": {
+              "type": "boolean",
+              "x-go-type-skip-optional-pointer": true
+            }
+          },
+          {
+            "name": "includeProtocols",
+            "required": false,
+            "in": "query",
+            "description": "Return used swap protocols in response",
+            "schema": {
+              "type": "boolean",
+              "x-go-type-skip-optional-pointer": true
+            }
+          },
+          {
+            "name": "includeGas",
+            "required": false,
+            "in": "query",
+            "description": "Return approximated gas in response",
+            "schema": {
+              "type": "boolean",
+              "x-go-type-skip-optional-pointer": true
+            }
+          },
+          {
+            "name": "connectorTokens",
+            "required": false,
+            "in": "query",
+            "schema": {
+              "minimum": 0,
+              "maximum": 5,
+              "type": "string",
+              "x-go-type-skip-optional-pointer": true
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/QuoteResponse"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/QuoteRequestError"
+                }
+              }
+            }
+          }
+        },
+        "tags": [
+          "Swap"
+        ]
+      }
+    },
+    "/v5.2/1/swap": {
+      "get": {
+        "operationId": "getSwap",
+        "summary": "Generate calldata to swap on 1inch Router",
+        "parameters": [
+          {
+            "name": "src",
+            "required": true,
+            "in": "query",
+            "example": "0xeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeee",
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "dst",
+            "required": true,
+            "in": "query",
+            "example": "0x111111111117dc0aa78b770fa6a738034120c302",
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "amount",
+            "required": true,
+            "in": "query",
+            "example": "10000000000000000",
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "from",
+            "required": true,
+            "in": "query",
+            "description": "The address that calls the 1inch contract",
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "slippage",
+            "required": true,
+            "in": "query",
+            "example": 1,
+            "description": "min: 0; max: 50",
+            "schema": {
+              "minimum": 0,
+              "maximum": 50,
+              "type": "number"
+            }
+          },
+          {
+            "name": "protocols",
+            "required": false,
+            "in": "query",
+            "description": "All supported liquidity sources by default",
+            "schema": {
+              "type": "string",
+              "x-go-type-skip-optional-pointer": true
+            }
+          },
+          {
+            "name": "fee",
+            "required": false,
+            "in": "query",
+            "description": "Partner fee. min: 0; max: 3 Should be the same for /quote and /swap",
+            "schema": {
+              "minimum": 0,
+              "maximum": 3,
+              "type": "number",
+              "x-go-type-skip-optional-pointer": true
+            }
+          },
+          {
+            "name": "gasPrice",
+            "required": false,
+            "in": "query",
+            "description": "Network price per gas in wei. By default fast network gas price",
+            "schema": {
+              "type": "string",
+              "x-go-type-skip-optional-pointer": true
+            }
+          },
+          {
+            "name": "complexityLevel",
+            "required": false,
+            "in": "query",
+            "schema": {
+              "minimum": 0,
+              "maximum": 2,
+              "type": "number",
+              "x-go-type-skip-optional-pointer": true
+            }
+          },
+          {
+            "name": "parts",
+            "required": false,
+            "in": "query",
+            "schema": {
+              "minimum": 0,
+              "maximum": 50,
+              "type": "number",
+              "x-go-type-skip-optional-pointer": true
+            }
+          },
+          {
+            "name": "mainRouteParts",
+            "required": false,
+            "in": "query",
+            "schema": {
+              "minimum": 0,
+              "maximum": 10,
+              "type": "number",
+              "x-go-type-skip-optional-pointer": true
+            }
+          },
+          {
+            "name": "gasLimit",
+            "required": false,
+            "in": "query",
+            "schema": {
+              "minimum": 100000,
+              "maximum": 11500000,
+              "type": "number",
+              "x-go-type-skip-optional-pointer": true
+            }
+          },
+          {
+            "name": "includeTokensInfo",
+            "required": false,
+            "in": "query",
+            "description": "Return fromToken and toToken info in response",
+            "schema": {
+              "type": "boolean",
+              "x-go-type-skip-optional-pointer": true
+            }
+          },
+          {
+            "name": "includeProtocols",
+            "required": false,
+            "in": "query",
+            "description": "Return used swap protocols in response",
+            "schema": {
+              "type": "boolean",
+              "x-go-type-skip-optional-pointer": true
+            }
+          },
+          {
+            "name": "includeGas",
+            "required": false,
+            "in": "query",
+            "description": "Return approximated gas in response",
+            "schema": {
+              "type": "boolean",
+              "x-go-type-skip-optional-pointer": true
+            }
+          },
+          {
+            "name": "connectorTokens",
+            "required": false,
+            "in": "query",
+            "schema": {
+              "minimum": 0,
+              "maximum": 5,
+              "type": "string",
+              "x-go-type-skip-optional-pointer": true
+            }
+          },
+          {
+            "name": "permit",
+            "required": false,
+            "in": "query",
+            "description": "https://eips.ethereum.org/EIPS/eip-2612",
+            "schema": {
+              "type": "string",
+              "x-go-type-skip-optional-pointer": true
+            }
+          },
+          {
+            "name": "receiver",
+            "required": false,
+            "in": "query",
+            "description": "This address will receive funds after the swap. By default same address as \"from\" param",
+            "schema": {
+              "type": "string",
+              "x-go-type-skip-optional-pointer": true
+            }
+          },
+          {
+            "name": "referrer",
+            "required": false,
+            "in": "query",
+            "schema": {
+              "type": "string",
+              "x-go-type-skip-optional-pointer": true
+            }
+          },
+          {
+            "name": "allowPartialFill",
+            "required": false,
+            "in": "query",
+            "description": "By default set to false",
+            "schema": {
+              "type": "boolean",
+              "x-go-type-skip-optional-pointer": true
+            }
+          },
+          {
+            "name": "disableEstimate",
+            "required": false,
+            "in": "query",
+            "description": "Enable this flag to disable onchain simulation",
+            "schema": {
+              "type": "boolean",
+              "x-go-type-skip-optional-pointer": true
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/SwapResponse"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/SwapRequestError"
+                }
+              }
+            }
+          }
+        },
+        "tags": [
+          "Swap"
+        ]
+      }
+    },
+    "/v5.2/1/approve/spender": {
+      "get": {
+        "operationId": "getSpender",
+        "summary": "Address of the 1inch Router that is trusted to spend funds for the swap",
+        "parameters": [],
+        "responses": {
+          "200": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/SpenderResponse"
+                }
+              }
+            }
+          }
+        },
+        "tags": [
+          "Approve"
+        ]
+      }
+    },
+    "/v5.2/1/approve/transaction": {
+      "get": {
+        "operationId": "getApprove",
+        "summary": "Generate approve calldata to allow 1inch Router to perform a swap",
+        "parameters": [
+          {
+            "name": "tokenAddress",
+            "required": true,
+            "in": "query",
+            "example": "0x111111111117dc0aa78b770fa6a738034120c302",
+            "description": "Token address you want to swap",
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "amount",
+            "required": false,
+            "in": "query",
+            "example": "100000000000",
+            "description": "The number of tokens that the 1inch Router is allowed to swap.If not specified, it will be allowed to spend an infinite amount of tokens.",
+            "schema": {
+              "type": "string",
+              "x-go-type-skip-optional-pointer": true
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Transaction body to allow the exchange with the 1inch Router",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ApproveCallDataResponse"
+                }
+              }
+            }
+          }
+        },
+        "tags": [
+          "Approve"
+        ]
+      }
+    },
+    "/v5.2/1/approve/allowance": {
+      "get": {
+        "operationId": "getAllowance",
+        "summary": "Get the number of tokens that the 1inch Router is allowed to swap",
+        "parameters": [
+          {
+            "name": "tokenAddress",
+            "required": true,
+            "in": "query",
+            "example": "0x111111111117dc0aa78b770fa6a738034120c302",
+            "description": "Token address you want to swap",
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "walletAddress",
+            "required": true,
+            "in": "query",
+            "description": "Wallet address for which you want to check",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/AllowanceResponse"
+                }
+              }
+            }
+          }
+        },
+        "tags": [
+          "Approve"
+        ]
+      }
+    },
+    "/v5.2/1/liquidity-sources": {
+      "get": {
+        "operationId": "getLiquiditySources",
+        "summary": "List of liquidity sources that are available for routing in the 1inch Aggregation Protocol",
+        "parameters": [],
+        "responses": {
+          "200": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProtocolsResponse"
+                }
+              }
+            }
+          }
+        },
+        "tags": [
+          "Info"
+        ]
+      }
+    },
+    "/v5.2/1/tokens": {
+      "get": {
+        "operationId": "getTokens",
+        "summary": "List of tokens that are available for swap in the 1inch Aggregation protocol",
+        "parameters": [],
+        "responses": {
+          "200": {
+            "description": "All supported tokens (can also use your own)",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/TokensResponse"
+                }
+              }
+            }
+          }
+        },
+        "tags": [
+          "Info"
+        ]
+      }
+    }
+  },
+  "info": {
+    "title": "1inch Swap API",
+    "description": "\n<h2>Ethereum Network</h2>\nUsing 1inch Swap API, you can find the best route to exchange assets and make the exchange.\n<br><br>\nStep by step:\n1. Lookup addresses of tokens you want to swap, for example ‘0xxx’ , ‘0xxxx’ for DAI -> 1INCH\n2. Check for allowance of 1inch router contract to spend source asset (/approve/allowance)\n3. If necessary, give approval for 1inch router to spend source token (/approve/transaction)\n4. Monitor the best exchange route using (/quote)\n5. When you ready use to perform swap (/swap)",
+    "version": "5.2",
+    "contact": {}
+  },
+  "tags": [],
+  "servers": [],
+  "components": {
+    "schemas": {
+      "TokensResponse": {
+        "type": "object",
+        "properties": {
+          "tokens": {
+            "type": "object",
+            "additionalProperties": {
+              "$ref": "#/components/schemas/TokenInfo"
+            },
+            "x-go-type-skip-optional-pointer": true
+          }
+        },
+        "required": [
+          "tokens"
+        ]
+      },
+      "TokenInfo": {
+        "type": "object",
+        "properties": {
+          "address": {
+            "type": "string",
+            "example": "0x111111111117dc0aa78b770fa6a738034120c302",
+            "x-go-type-skip-optional-pointer": true
+          },
+          "symbol": {
+            "type": "string",
+            "example": "1INCH",
+            "x-go-type-skip-optional-pointer": true
+          },
+          "name": {
+            "type": "string",
+            "example": "1INCH Token",
+            "x-go-type-skip-optional-pointer": true
+          },
+          "decimals": {
+            "type": "number",
+            "example": 18,
+            "x-go-type-skip-optional-pointer": true
+          },
+          "logoURI": {
+            "type": "string",
+            "example": "https://tokens.1inch.io/0x111111111117dc0aa78b770fa6a738034120c302.png",
+            "x-go-type-skip-optional-pointer": true
+          },
+          "domainVersion": {
+            "type": "string",
+            "x-go-type-skip-optional-pointer": true
+          },
+          "eip2612": {
+            "type": "boolean",
+            "example": true,
+            "x-go-type-skip-optional-pointer": true
+          },
+          "isFoT": {
+            "type": "boolean",
+            "example": false,
+            "x-go-type-skip-optional-pointer": true
+          },
+          "tags": {
+            "example": [
+              "tokens"
+            ],
+            "type": "array",
+            "items": {
+              "type": "string"
+            },
+            "x-go-type-skip-optional-pointer": true
+          }
+        },
+        "required": [
+          "address",
+          "symbol",
+          "name",
+          "decimals",
+          "logoURI"
+        ]
+      },
+      "QuoteResponse": {
+        "type": "object",
+        "properties": {
+          "fromToken": {
+            "description": "Source token info",
+            "allOf": [
+              {
+                "$ref": "#/components/schemas/TokenInfo"
+              }
+            ]
+          },
+          "toToken": {
+            "description": "Destination token info",
+            "allOf": [
+              {
+                "$ref": "#/components/schemas/TokenInfo"
+              }
+            ]
+          },
+          "toAmount": {
+            "type": "string",
+            "description": "Expected amount of destination token",
+            "example": "62131879850006790961",
+            "x-go-type-skip-optional-pointer": true
+          },
+          "protocols": {
+            "type": "array",
+            "description": "Selected protocols in a path",
+            "items": {
+              "type": "array",
+              "items": {
+                "type": "array",
+                "items": {
+                  "$ref": "#/components/schemas/SelectedProtocol"
+                }
+              }
+            },
+            "x-go-type-skip-optional-pointer": true
+          },
+          "gas": {
+            "type": "number",
+            "description": "Estimated gas",
+            "example": 100000,
+            "x-go-type-skip-optional-pointer": true
+          }
+        },
+        "required": [
+          "toAmount"
+        ]
+      },
+      "HttpExceptionMeta": {
+        "type": "object",
+        "properties": {
+          "type": {
+            "type": "string",
+            "x-go-type-skip-optional-pointer": true
+          },
+          "value": {
+            "type": "string",
+            "x-go-type-skip-optional-pointer": true
+          }
+        },
+        "required": [
+          "type",
+          "value"
+        ]
+      },
+      "QuoteRequestError": {
+        "type": "object",
+        "properties": {
+          "error": {
+            "type": "string",
+            "description": "Error code description",
+            "example": "Bad Request",
+            "x-go-type-skip-optional-pointer": true
+          },
+          "description": {
+            "type": "string",
+            "description": "Error description",
+            "example": "insufficient liquidity",
+            "x-go-type-skip-optional-pointer": true
+          },
+          "statusCode": {
+            "type": "number",
+            "description": "HTTP code",
+            "enum": [
+              400,
+              500
+            ],
+            "example": 400,
+            "x-go-type-skip-optional-pointer": true
+          },
+          "requestId": {
+            "type": "string",
+            "description": "Request id",
+            "example": "2a92c18a-5c20-4f0d-a0da-e8b5b3602ad6",
+            "x-go-type-skip-optional-pointer": true
+          },
+          "meta": {
+            "description": "Meta information",
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/HttpExceptionMeta"
+            },
+            "x-go-type-skip-optional-pointer": true
+          }
+        },
+        "required": [
+          "error",
+          "description",
+          "statusCode",
+          "requestId",
+          "meta"
+        ]
+      },
+      "TransactionData": {
+        "type": "object",
+        "properties": {
+          "from": {
+            "type": "string",
+            "example": "0x1111111111111111111111111111111111111111",
+            "x-go-type-skip-optional-pointer": true
+          },
+          "to": {
+            "type": "string",
+            "example": "0x1111111254eeb25477b68fb85ed929f73a960582",
+            "x-go-type-skip-optional-pointer": true
+          },
+          "data": {
+            "type": "string",
+            "example": "0x0502b1c50000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000002386f26fc10000000000000000000000000000000000000000000000000003556e53186804ca3e0000000000000000000000000000000000000000000000000000000000000080000000000000000000000000000000000000000000000000000000000000000180000000000000003b6d034026aad2da94c59524ac0d93f6d6cbf9071d7086f2",
+            "x-go-type-skip-optional-pointer": true
+          },
+          "value": {
+            "type": "string",
+            "example": "10000000000000000",
+            "x-go-type-skip-optional-pointer": true
+          },
+          "gasPrice": {
+            "type": "string",
+            "example": "6994090150",
+            "x-go-type-skip-optional-pointer": true
+          },
+          "gas": {
+            "type": "number",
+            "example": 121363,
+            "x-go-type-skip-optional-pointer": true
+          }
+        },
+        "required": [
+          "from",
+          "to",
+          "data",
+          "value",
+          "gasPrice",
+          "gas"
+        ]
+      },
+      "SwapResponse": {
+        "type": "object",
+        "properties": {
+          "fromToken": {
+            "description": "Source token info",
+            "allOf": [
+              {
+                "$ref": "#/components/schemas/TokenInfo"
+              }
+            ]
+          },
+          "toToken": {
+            "description": "Destination token info",
+            "allOf": [
+              {
+                "$ref": "#/components/schemas/TokenInfo"
+              }
+            ]
+          },
+          "toAmount": {
+            "type": "string",
+            "description": "Expected amount of destination token",
+            "example": "62131879850006790961",
+            "x-go-type-skip-optional-pointer": true
+          },
+          "protocols": {
+            "type": "array",
+            "description": "Selected protocols in a path",
+            "items": {
+              "type": "array",
+              "items": {
+                "type": "array",
+                "items": {
+                  "$ref": "#/components/schemas/SelectedProtocol"
+                }
+              }
+            },
+            "x-go-type-skip-optional-pointer": true
+          },
+          "tx": {
+            "description": "Transaction object",
+            "allOf": [
+              {
+                "$ref": "#/components/schemas/TransactionData"
+              }
+            ]
+          }
+        },
+        "required": [
+          "toAmount",
+          "tx"
+        ]
+      },
+      "SwapRequestError": {
+        "type": "object",
+        "properties": {
+          "error": {
+            "type": "string",
+            "description": "Error code description",
+            "example": "Bad Request",
+            "x-go-type-skip-optional-pointer": true
+          },
+          "description": {
+            "type": "string",
+            "description": "Error description",
+            "example": "cannot estimate",
+            "x-go-type-skip-optional-pointer": true
+          },
+          "statusCode": {
+            "type": "number",
+            "description": "HTTP code",
+            "enum": [
+              400,
+              500
+            ],
+            "example": 400,
+            "x-go-type-skip-optional-pointer": true
+          },
+          "requestId": {
+            "type": "string",
+            "description": "Request id",
+            "example": "2a92c18a-5c20-4f0d-a0da-e8b5b3602ad6",
+            "x-go-type-skip-optional-pointer": true
+          },
+          "meta": {
+            "description": "Meta information",
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/HttpExceptionMeta"
+            },
+            "x-go-type-skip-optional-pointer": true
+          }
+        },
+        "required": [
+          "error",
+          "description",
+          "statusCode",
+          "requestId",
+          "meta"
+        ]
+      },
+      "SpenderResponse": {
+        "type": "object",
+        "properties": {
+          "address": {
+            "type": "string",
+            "description": "Address of the 1inch Router that is trusted to spend funds for the swap",
+            "example": "0x1111111254eeb25477b68fb85ed929f73a960582",
+            "x-go-type-skip-optional-pointer": true
+          }
+        },
+        "required": [
+          "address"
+        ]
+      },
+      "ApproveCallDataResponse": {
+        "type": "object",
+        "properties": {
+          "data": {
+            "type": "string",
+            "description": "The encoded data to call the approve method on the swapped token contract",
+            "example": "0x095ea7b30000000000000000000000001111111254eeb25477b68fb85ed929f73a960582ffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffff",
+            "x-go-type-skip-optional-pointer": true
+          },
+          "gasPrice": {
+            "type": "string",
+            "description": "Network high gas price in wei",
+            "example": "1000000000",
+            "x-go-type-skip-optional-pointer": true
+          },
+          "to": {
+            "type": "string",
+            "description": "Token address that will be allowed to exchange through 1inch Router",
+            "example": "0x111111111117dc0aa78b770fa6a738034120c302",
+            "x-go-type-skip-optional-pointer": true
+          },
+          "value": {
+            "type": "string",
+            "description": "Native token value in wei (for approve is always 0)",
+            "example": "0",
+            "x-go-type-skip-optional-pointer": true
+          }
+        },
+        "required": [
+          "data",
+          "gasPrice",
+          "to",
+          "value"
+        ]
+      },
+      "AllowanceResponse": {
+        "type": "object",
+        "properties": {
+          "allowance": {
+            "type": "string",
+            "description": "Allowance amount",
+            "example": "115792089237316195423570985008687907853269984665640564039457584007913129639935",
+            "x-go-type-skip-optional-pointer": true
+          }
+        },
+        "required": [
+          "allowance"
+        ]
+      },
+      "ProtocolImage": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "string",
+            "description": "Protocol id",
+            "x-go-type-skip-optional-pointer": true
+          },
+          "title": {
+            "type": "string",
+            "description": "Protocol title",
+            "x-go-type-skip-optional-pointer": true
+          },
+          "img": {
+            "type": "string",
+            "description": "Protocol logo image",
+            "x-go-type-skip-optional-pointer": true
+          },
+          "img_color": {
+            "type": "string",
+            "description": "Protocol logo image in color",
+            "x-go-type-skip-optional-pointer": true
+          }
+        },
+        "required": [
+          "id",
+          "title",
+          "img",
+          "img_color"
+        ]
+      },
+      "ProtocolsResponse": {
+        "type": "object",
+        "properties": {
+          "protocols": {
+            "description": "List of protocols that are available for routing in the 1inch Aggregation Protocol",
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/ProtocolImage"
+            },
+            "x-go-type-skip-optional-pointer": true
+          }
+        },
+        "required": [
+          "protocols"
+        ]
+      },
+      "SelectedProtocol": {
+        "type": "object",
+        "properties": {
+          "name": {
+            "type": "string",
+            "description": "Protocol id",
+            "example": "UNISWAP_V3",
+            "x-go-type-skip-optional-pointer": true
+          },
+          "part": {
+            "type": "number",
+            "description": "Protocol share",
+            "example": 100,
+            "x-go-type-skip-optional-pointer": true
+          },
+          "fromTokenAddress": {
+            "type": "string",
+            "description": "Source token to swap on protocol",
+            "example": "0xeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeee",
+            "x-go-type-skip-optional-pointer": true
+          },
+          "toTokenAddress": {
+            "type": "string",
+            "description": "Destination token to swap on protocol",
+            "example": "0x111111111117dc0aa78b770fa6a738034120c302",
+            "x-go-type-skip-optional-pointer": true
+          }
+        },
+        "required": [
+          "name",
+          "part",
+          "fromTokenAddress",
+          "toTokenAddress"
+        ]
+      }
+    }
+  }
+}

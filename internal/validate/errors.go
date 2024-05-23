@@ -19,7 +19,7 @@ func NewParameterCustomError(errorMessage string) error {
 }
 
 func ConsolidateValidationErorrs(validationErrors []error) error {
-	if validationErrors == nil || len(validationErrors) == 0 {
+	if len(validationErrors) == 0 {
 		return nil
 	}
 	builder := strings.Builder{}
