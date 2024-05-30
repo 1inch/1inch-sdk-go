@@ -12,7 +12,8 @@
             "in": "path",
             "example": "1",
             "schema": {
-              "type": "string"
+              "type": "string",
+              "x-go-type-skip-optional-pointer": true
             }
           }
         ],
@@ -53,7 +54,8 @@
             "in": "path",
             "example": "1",
             "schema": {
-              "type": "string"
+              "type": "string",
+              "x-go-type-skip-optional-pointer": true
             }
           },
           {
@@ -62,7 +64,8 @@
             "in": "path",
             "example": "15000000",
             "schema": {
-              "type": "string"
+              "type": "string",
+              "x-go-type-skip-optional-pointer": true
             }
           }
         ],
@@ -110,7 +113,8 @@
             "in": "path",
             "example": "1",
             "schema": {
-              "type": "string"
+              "type": "string",
+              "x-go-type-skip-optional-pointer": true
             }
           },
           {
@@ -119,7 +123,8 @@
             "in": "path",
             "example": "17378177",
             "schema": {
-              "type": "string"
+              "type": "string",
+              "x-go-type-skip-optional-pointer": true
             }
           },
           {
@@ -128,7 +133,8 @@
             "in": "path",
             "example": "0x16897e492b2e023d8f07be9e925f2c15a91000ef11a01fc71e70f75050f1e03c",
             "schema": {
-              "type": "string"
+              "type": "string",
+              "x-go-type-skip-optional-pointer": true
             }
           }
         ],
@@ -169,7 +175,8 @@
             "in": "path",
             "example": "1",
             "schema": {
-              "type": "string"
+              "type": "string",
+              "x-go-type-skip-optional-pointer": true
             }
           },
           {
@@ -178,7 +185,8 @@
             "in": "path",
             "example": "17378177",
             "schema": {
-              "type": "string"
+              "type": "string",
+              "x-go-type-skip-optional-pointer": true
             }
           },
           {
@@ -187,7 +195,8 @@
             "in": "path",
             "example": "1",
             "schema": {
-              "type": "number"
+              "type": "number",
+              "x-go-type-skip-optional-pointer": true
             }
           }
         ],
@@ -238,11 +247,13 @@
         "properties": {
           "from": {
             "type": "number",
-            "example": 1
+            "example": 1,
+            "x-go-type-skip-optional-pointer": true
           },
           "to": {
             "type": "number",
-            "example": 14913951
+            "example": 14913951,
+            "x-go-type-skip-optional-pointer": true
           }
         },
         "required": [
@@ -255,7 +266,8 @@
         "properties": {
           "isParentHasError": {
             "type": "boolean",
-            "example": true
+            "example": true,
+            "x-go-type-skip-optional-pointer": true
           },
           "type": {
             "type": "string",
@@ -271,45 +283,55 @@
               "INVALID",
               "STOP"
             ],
-            "example": "CALL"
+            "example": "CALL",
+            "x-go-type-skip-optional-pointer": true
           },
           "from": {
             "type": "string",
-            "example": "0x71dad91e069861350c2ba882fd86762a5efe8792"
+            "example": "0x71dad91e069861350c2ba882fd86762a5efe8792",
+            "x-go-type-skip-optional-pointer": true
           },
           "to": {
             "type": "string",
-            "example": "0x71dad91e069861350c2ba882fd86762a5efe8792"
+            "example": "0x71dad91e069861350c2ba882fd86762a5efe8792",
+            "x-go-type-skip-optional-pointer": true
           },
           "value": {
             "type": "string",
-            "example": "0x5f68e8131ecf80000"
+            "example": "0x5f68e8131ecf80000",
+            "x-go-type-skip-optional-pointer": true
           },
           "gas": {
             "type": "string",
-            "example": "0x3e48f"
+            "example": "0x3e48f",
+            "x-go-type-skip-optional-pointer": true
           },
           "gasUsed": {
             "type": "number",
-            "example": "0x5da9"
+            "example": "0x5da9",
+            "x-go-type-skip-optional-pointer": true
           },
           "input": {
             "type": "string",
-            "example": "0xd0e30db0"
+            "example": "0xd0e30db0",
+            "x-go-type-skip-optional-pointer": true
           },
           "output": {
             "type": "string",
-            "example": "0x0000000000000000000000000000000000000000000000000000000000000001"
+            "example": "0x0000000000000000000000000000000000000000000000000000000000000001",
+            "x-go-type-skip-optional-pointer": true
           },
           "error": {
             "type": "string",
-            "example": "error"
+            "example": "error",
+            "x-go-type-skip-optional-pointer": true
           },
           "calls": {
             "type": "array",
             "items": {
               "$ref": "#/components/schemas/CoreBuiltinCallTraceDto"
-            }
+            },
+            "x-go-type-skip-optional-pointer": true
           }
         },
         "required": [
@@ -331,7 +353,8 @@
         "properties": {
           "data": {
             "type": "string",
-            "example": "0xffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffff"
+            "example": "0xffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffff",
+            "x-go-type-skip-optional-pointer": true
           },
           "topics": {
             "example": [
@@ -342,11 +365,13 @@
             "type": "array",
             "items": {
               "type": "array"
-            }
+            },
+            "x-go-type-skip-optional-pointer": true
           },
           "contract": {
             "type": "string",
-            "example": "0x0000000000000000000000000000000000001010"
+            "example": "0x0000000000000000000000000000000000001010",
+            "x-go-type-skip-optional-pointer": true
           }
         },
         "required": [
@@ -372,79 +397,97 @@
               "INVALID",
               "STOP"
             ],
-            "example": "CALL"
+            "example": "CALL",
+            "x-go-type-skip-optional-pointer": true
           },
           "from": {
             "type": "string",
-            "example": "0x71dad91e069861350c2ba882fd86762a5efe8792"
+            "example": "0x71dad91e069861350c2ba882fd86762a5efe8792",
+            "x-go-type-skip-optional-pointer": true
           },
           "to": {
             "type": "string",
-            "example": "0x71dad91e069861350c2ba882fd86762a5efe8792"
+            "example": "0x71dad91e069861350c2ba882fd86762a5efe8792",
+            "x-go-type-skip-optional-pointer": true
           },
           "value": {
             "type": "string",
-            "example": "0x5f68e8131ecf80000"
+            "example": "0x5f68e8131ecf80000",
+            "x-go-type-skip-optional-pointer": true
           },
           "gas": {
             "type": "string",
-            "example": "0x3e48f"
+            "example": "0x3e48f",
+            "x-go-type-skip-optional-pointer": true
           },
           "gasUsed": {
             "type": "number",
-            "example": "0x5da9"
+            "example": "0x5da9",
+            "x-go-type-skip-optional-pointer": true
           },
           "input": {
             "type": "string",
-            "example": "0xd0e30db0"
+            "example": "0xd0e30db0",
+            "x-go-type-skip-optional-pointer": true
           },
           "output": {
             "type": "string",
-            "example": "0x0000000000000000000000000000000000000000000000000000000000000001"
+            "example": "0x0000000000000000000000000000000000000000000000000000000000000001",
+            "x-go-type-skip-optional-pointer": true
           },
           "calls": {
             "type": "array",
             "items": {
               "$ref": "#/components/schemas/CoreBuiltinCallTraceDto"
-            }
+            },
+            "x-go-type-skip-optional-pointer": true
           },
           "txHash": {
             "type": "string",
-            "example": "0xbf424a717932e4868644f69e8f297ce51d5f4596089635312b2ad9c610cc0018"
+            "example": "0xbf424a717932e4868644f69e8f297ce51d5f4596089635312b2ad9c610cc0018",
+            "x-go-type-skip-optional-pointer": true
           },
           "nonce": {
             "type": "string",
-            "example": "0x1"
+            "example": "0x1",
+            "x-go-type-skip-optional-pointer": true
           },
           "error": {
             "type": "string",
-            "example": "error"
+            "example": "error",
+            "x-go-type-skip-optional-pointer": true
           },
           "revertReason": {
             "type": "string",
-            "example": "error"
+            "example": "error",
+            "x-go-type-skip-optional-pointer": true
           },
           "gasPrice": {
             "type": "string",
-            "example": "0x123"
+            "example": "0x123",
+            "x-go-type-skip-optional-pointer": true
           },
           "maxFeePerGas": {
             "type": "string",
-            "example": "0x345"
+            "example": "0x345",
+            "x-go-type-skip-optional-pointer": true
           },
           "maxPriorityFeePerGas": {
             "type": "string",
-            "example": "0x123"
+            "example": "0x123",
+            "x-go-type-skip-optional-pointer": true
           },
           "gasHex": {
             "type": "string",
-            "example": "0x35b60"
+            "example": "0x35b60",
+            "x-go-type-skip-optional-pointer": true
           },
           "events": {
             "type": "array",
             "items": {
               "$ref": "#/components/schemas/CoreBuiltinTraceLogDto"
-            }
+            },
+            "x-go-type-skip-optional-pointer": true
           }
         },
         "required": [
@@ -481,29 +524,35 @@
               "BUILTIN",
               "CUSTOM_GO",
               "OLD_ARBITRUM_RAW_TRACE"
-            ]
+            ],
+            "x-go-type-skip-optional-pointer": true
           },
           "version": {
             "type": "string",
-            "example": "v1.2.3"
+            "example": "v1.2.3",
+            "x-go-type-skip-optional-pointer": true
           },
           "blockNumber": {
             "type": "number",
-            "example": "16123123"
+            "example": "16123123",
+            "x-go-type-skip-optional-pointer": true
           },
           "blockHash": {
             "type": "string",
-            "example": "0xb80490b1bed7a31536b888de977f92b5c03707bf8c69ab3d066a2eef3dc2e26c"
+            "example": "0xb80490b1bed7a31536b888de977f92b5c03707bf8c69ab3d066a2eef3dc2e26c",
+            "x-go-type-skip-optional-pointer": true
           },
           "blockTimestamp": {
             "type": "string",
-            "example": "0x64bf5cde"
+            "example": "0x64bf5cde",
+            "x-go-type-skip-optional-pointer": true
           },
           "traces": {
             "type": "array",
             "items": {
               "$ref": "#/components/schemas/CoreBuiltinTransactionRootSuccessTraceDto"
-            }
+            },
+            "x-go-type-skip-optional-pointer": true
           }
         },
         "required": [
@@ -527,23 +576,28 @@
               "BUILTIN",
               "CUSTOM_GO",
               "OLD_ARBITRUM_RAW_TRACE"
-            ]
+            ],
+            "x-go-type-skip-optional-pointer": true
           },
           "version": {
             "type": "string",
-            "example": "v1.2.3"
+            "example": "v1.2.3",
+            "x-go-type-skip-optional-pointer": true
           },
           "number": {
             "type": "number",
-            "example": 17123123
+            "example": 17123123,
+            "x-go-type-skip-optional-pointer": true
           },
           "blockHash": {
             "type": "string",
-            "example": "0xb80490b1bed7a31536b888de977f92b5c03707bf8c69ab3d066a2eef3dc2e26c"
+            "example": "0xb80490b1bed7a31536b888de977f92b5c03707bf8c69ab3d066a2eef3dc2e26c",
+            "x-go-type-skip-optional-pointer": true
           },
           "blockTimestamp": {
             "type": "string",
-            "example": "0x64bf5cde"
+            "example": "0x64bf5cde",
+            "x-go-type-skip-optional-pointer": true
           },
           "traces": {
             "type": "array",
@@ -556,7 +610,8 @@
                   "$ref": "#/components/schemas/CoreCustomRootTxEventCallstackTraceFullDto"
                 }
               ]
-            }
+            },
+            "x-go-type-skip-optional-pointer": true
           }
         },
         "required": [
@@ -573,31 +628,38 @@
         "properties": {
           "error": {
             "type": "string",
-            "example": "error"
+            "example": "error",
+            "x-go-type-skip-optional-pointer": true
           },
           "txHash": {
             "type": "string",
-            "example": "0xbf424a717932e4868644f69e8f297ce51d5f4596089635312b2ad9c610cc0018"
+            "example": "0xbf424a717932e4868644f69e8f297ce51d5f4596089635312b2ad9c610cc0018",
+            "x-go-type-skip-optional-pointer": true
           },
           "nonce": {
             "type": "string",
-            "example": "0x1"
+            "example": "0x1",
+            "x-go-type-skip-optional-pointer": true
           },
           "gasPrice": {
             "type": "string",
-            "example": "0x3e48f"
+            "example": "0x3e48f",
+            "x-go-type-skip-optional-pointer": true
           },
           "maxFeePerGas": {
             "type": "string",
-            "example": "0x3e48f"
+            "example": "0x3e48f",
+            "x-go-type-skip-optional-pointer": true
           },
           "maxPriorityFeePerGas": {
             "type": "string",
-            "example": "0x3e48f"
+            "example": "0x3e48f",
+            "x-go-type-skip-optional-pointer": true
           },
           "gasHex": {
             "type": "string",
-            "example": "0x3e48f"
+            "example": "0x3e48f",
+            "x-go-type-skip-optional-pointer": true
           }
         },
         "required": [
@@ -615,17 +677,20 @@
         "properties": {
           "data": {
             "type": "string",
-            "example": "0xffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffff"
+            "example": "0xffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffff",
+            "x-go-type-skip-optional-pointer": true
           },
           "topics": {
             "type": "array",
             "items": {
               "type": "array"
-            }
+            },
+            "x-go-type-skip-optional-pointer": true
           },
           "contract": {
             "type": "string",
-            "example": "0xa0b86991c6218b36c1d19d4a2e9eb0ce3606eb48"
+            "example": "0xa0b86991c6218b36c1d19d4a2e9eb0ce3606eb48",
+            "x-go-type-skip-optional-pointer": true
           }
         },
         "required": [
@@ -639,15 +704,18 @@
         "properties": {
           "type": {
             "type": "string",
-            "example": "load"
+            "example": "load",
+            "x-go-type-skip-optional-pointer": true
           },
           "key": {
             "type": "string",
-            "example": "8"
+            "example": "8",
+            "x-go-type-skip-optional-pointer": true
           },
           "value": {
             "type": "string",
-            "example": "63780c770000000000008255bfdbaa0269330000000000000b9057fb86bca9b0"
+            "example": "63780c770000000000008255bfdbaa0269330000000000000b9057fb86bca9b0",
+            "x-go-type-skip-optional-pointer": true
           }
         },
         "required": [
@@ -661,51 +729,62 @@
         "properties": {
           "type": {
             "type": "string",
-            "example": "TRANSFER_ETHER"
+            "example": "TRANSFER_ETHER",
+            "x-go-type-skip-optional-pointer": true
           },
           "from": {
             "type": "string",
-            "example": "0x71dad91e069861350c2ba882fd86762a5efe8792"
+            "example": "0x71dad91e069861350c2ba882fd86762a5efe8792",
+            "x-go-type-skip-optional-pointer": true
           },
           "to": {
             "type": "string",
-            "example": "0x71dad91e069861350c2ba882fd86762a5efe8792"
+            "example": "0x71dad91e069861350c2ba882fd86762a5efe8792",
+            "x-go-type-skip-optional-pointer": true
           },
           "value": {
             "type": "string",
-            "example": "0x5f68e8131ecf80000"
+            "example": "0x5f68e8131ecf80000",
+            "x-go-type-skip-optional-pointer": true
           },
           "gasLimit": {
             "type": "number",
-            "example": 123
+            "example": 123,
+            "x-go-type-skip-optional-pointer": true
           },
           "gasUsed": {
             "type": "number",
-            "example": 123
+            "example": 123,
+            "x-go-type-skip-optional-pointer": true
           },
           "input": {
             "type": "string",
-            "example": "0xd0e30db0"
+            "example": "0xd0e30db0",
+            "x-go-type-skip-optional-pointer": true
           },
           "output": {
             "type": "string",
-            "example": "0x0000000000000000000000000000000000000000000000000000000000000001"
+            "example": "0x0000000000000000000000000000000000000000000000000000000000000001",
+            "x-go-type-skip-optional-pointer": true
           },
           "time": {
             "type": "string",
-            "example": "781ns"
+            "example": "781ns",
+            "x-go-type-skip-optional-pointer": true
           },
           "calls": {
             "type": "array",
             "items": {
               "$ref": "#/components/schemas/CoreCustomTxEventCallstackTraceDto"
-            }
+            },
+            "x-go-type-skip-optional-pointer": true
           },
           "logs": {
             "type": "array",
             "items": {
               "$ref": "#/components/schemas/CoreCustomTraceLogDto"
-            }
+            },
+            "x-go-type-skip-optional-pointer": true
           },
           "status": {
             "type": "string",
@@ -720,49 +799,60 @@
               "SELFDESTRUCTED",
               "ERROR_UNWIND"
             ],
-            "example": "RETURNED"
+            "example": "RETURNED",
+            "x-go-type-skip-optional-pointer": true
           },
           "success": {
             "type": "number",
-            "example": "1"
+            "example": "1",
+            "x-go-type-skip-optional-pointer": true
           },
           "res": {
             "type": "string",
-            "example": "0x0000000000000000000000000000000000000000000000000000000000000001"
+            "example": "0x0000000000000000000000000000000000000000000000000000000000000001",
+            "x-go-type-skip-optional-pointer": true
           },
           "depth": {
             "type": "number",
-            "example": "1"
+            "example": "1",
+            "x-go-type-skip-optional-pointer": true
           },
           "destructAddress": {
             "type": "string",
-            "example": "0x71dad91e069861350c2ba882fd86762a5efe8792"
+            "example": "0x71dad91e069861350c2ba882fd86762a5efe8792",
+            "x-go-type-skip-optional-pointer": true
           },
           "errorDetails": {
             "type": "string",
-            "example": "error"
+            "example": "error",
+            "x-go-type-skip-optional-pointer": true
           },
           "storage": {
             "type": "array",
             "items": {
               "$ref": "#/components/schemas/CustomStorageDto"
-            }
+            },
+            "x-go-type-skip-optional-pointer": true
           },
           "prevGasLimit": {
             "type": "number",
-            "example": "123"
+            "example": "123",
+            "x-go-type-skip-optional-pointer": true
           },
           "gas": {
             "type": "string",
-            "example": "0x3e48f"
+            "example": "0x3e48f",
+            "x-go-type-skip-optional-pointer": true
           },
           "gasCost": {
             "type": "number",
-            "example": "0x3e48f"
+            "example": "0x3e48f",
+            "x-go-type-skip-optional-pointer": true
           },
           "address": {
             "type": "string",
-            "example": "0x71dad91e069861350c2ba882fd86762a5efe8792"
+            "example": "0x71dad91e069861350c2ba882fd86762a5efe8792",
+            "x-go-type-skip-optional-pointer": true
           }
         },
         "required": [
@@ -807,51 +897,62 @@
               "TRANSFER_ETHER",
               "INVALID",
               "STOP"
-            ]
+            ],
+            "x-go-type-skip-optional-pointer": true
           },
           "from": {
             "type": "string",
-            "example": "0x71dad91e069861350c2ba882fd86762a5efe8792"
+            "example": "0x71dad91e069861350c2ba882fd86762a5efe8792",
+            "x-go-type-skip-optional-pointer": true
           },
           "to": {
             "type": "string",
-            "example": "0x71dad91e069861350c2ba882fd86762a5efe8792"
+            "example": "0x71dad91e069861350c2ba882fd86762a5efe8792",
+            "x-go-type-skip-optional-pointer": true
           },
           "value": {
             "type": "string",
-            "example": "0x5f68e8131ecf80000"
+            "example": "0x5f68e8131ecf80000",
+            "x-go-type-skip-optional-pointer": true
           },
           "gasLimit": {
             "type": "number",
-            "example": "123"
+            "example": "123",
+            "x-go-type-skip-optional-pointer": true
           },
           "gasUsed": {
             "type": "number",
-            "example": 123
+            "example": 123,
+            "x-go-type-skip-optional-pointer": true
           },
           "input": {
             "type": "string",
-            "example": "0xd0e30db0"
+            "example": "0xd0e30db0",
+            "x-go-type-skip-optional-pointer": true
           },
           "output": {
             "type": "string",
-            "example": "0x0000000000000000000000000000000000000000000000000000000000000001"
+            "example": "0x0000000000000000000000000000000000000000000000000000000000000001",
+            "x-go-type-skip-optional-pointer": true
           },
           "time": {
             "type": "string",
-            "example": "781ns"
+            "example": "781ns",
+            "x-go-type-skip-optional-pointer": true
           },
           "calls": {
             "type": "array",
             "items": {
               "$ref": "#/components/schemas/CoreCustomTxEventCallstackTraceDto"
-            }
+            },
+            "x-go-type-skip-optional-pointer": true
           },
           "logs": {
             "type": "array",
             "items": {
               "$ref": "#/components/schemas/CoreCustomTraceLogDto"
-            }
+            },
+            "x-go-type-skip-optional-pointer": true
           },
           "status": {
             "type": "string",
@@ -866,73 +967,90 @@
               "SELFDESTRUCTED",
               "ERROR_UNWIND"
             ],
-            "example": "REVERTED"
+            "example": "REVERTED",
+            "x-go-type-skip-optional-pointer": true
           },
           "success": {
             "type": "number",
-            "example": "1"
+            "example": "1",
+            "x-go-type-skip-optional-pointer": true
           },
           "address": {
             "type": "string",
-            "example": "0x71dad91e069861350c2ba882fd86762a5efe8792"
+            "example": "0x71dad91e069861350c2ba882fd86762a5efe8792",
+            "x-go-type-skip-optional-pointer": true
           },
           "res": {
             "type": "string",
-            "example": "0x0000000000000000000000000000000000000000000000000000000000000001"
+            "example": "0x0000000000000000000000000000000000000000000000000000000000000001",
+            "x-go-type-skip-optional-pointer": true
           },
           "depth": {
             "type": "number",
-            "example": "3"
+            "example": "3",
+            "x-go-type-skip-optional-pointer": true
           },
           "destructAddress": {
             "type": "string",
-            "example": "0x71dad91e069861350c2ba882fd86762a5efe8792"
+            "example": "0x71dad91e069861350c2ba882fd86762a5efe8792",
+            "x-go-type-skip-optional-pointer": true
           },
           "errorDetails": {
             "type": "string",
-            "example": "error"
+            "example": "error",
+            "x-go-type-skip-optional-pointer": true
           },
           "storage": {
             "type": "array",
             "items": {
               "$ref": "#/components/schemas/CustomStorageDto"
-            }
+            },
+            "x-go-type-skip-optional-pointer": true
           },
           "txHash": {
             "type": "string",
-            "example": "0xbf424a717932e4868644f69e8f297ce51d5f4596089635312b2ad9c610cc0018"
+            "example": "0xbf424a717932e4868644f69e8f297ce51d5f4596089635312b2ad9c610cc0018",
+            "x-go-type-skip-optional-pointer": true
           },
           "nonce": {
             "type": "string",
-            "example": "0x1"
+            "example": "0x1",
+            "x-go-type-skip-optional-pointer": true
           },
           "gasPrice": {
             "type": "string",
-            "example": "0x3f5476a00"
+            "example": "0x3f5476a00",
+            "x-go-type-skip-optional-pointer": true
           },
           "maxFeePerGas": {
             "type": "string",
-            "example": "0x3e48f"
+            "example": "0x3e48f",
+            "x-go-type-skip-optional-pointer": true
           },
           "maxPriorityFeePerGas": {
             "type": "string",
-            "example": "0x3e48f"
+            "example": "0x3e48f",
+            "x-go-type-skip-optional-pointer": true
           },
           "intrinsicGas": {
             "type": "number",
-            "example": "0x3e48f"
+            "example": "0x3e48f",
+            "x-go-type-skip-optional-pointer": true
           },
           "gasRefund": {
             "type": "number",
-            "example": 123
+            "example": 123,
+            "x-go-type-skip-optional-pointer": true
           },
           "gasActual": {
             "type": "number",
-            "example": 123
+            "example": 123,
+            "x-go-type-skip-optional-pointer": true
           },
           "gasHex": {
             "type": "string",
-            "example": "0x123123123"
+            "example": "0x123123123",
+            "x-go-type-skip-optional-pointer": true
           }
         },
         "required": [
@@ -983,7 +1101,8 @@
                   "$ref": "#/components/schemas/CoreCustomRootTxEventCallstackTraceFullDto"
                 }
               ]
-            }
+            },
+            "x-go-type-skip-optional-pointer": true
           },
           "type": {
             "type": "string",
@@ -993,7 +1112,8 @@
               "BUILTIN",
               "CUSTOM_GO",
               "OLD_ARBITRUM_RAW_TRACE"
-            ]
+            ],
+            "x-go-type-skip-optional-pointer": true
           }
         },
         "required": [

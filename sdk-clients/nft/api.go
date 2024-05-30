@@ -48,8 +48,8 @@ func (api *api) GetNFTsByAddress(ctx context.Context, params GetNftsByAddressPar
 		Params: struct {
 			ChainIds string `url:"chainIds" json:"chainIds"`
 			Address  string `url:"address" json:"address"`
-			Limit    *int   `url:"limit,omitempty" json:"limit,omitempty"`
-			Offset   *int   `url:"offset,omitempty" json:"offset,omitempty"`
+			Limit    int    `url:"limit,omitempty" json:"limit,omitempty"`
+			Offset   int    `url:"offset,omitempty" json:"offset,omitempty"`
 		}{
 			ChainIds: strings.Join(stringChainIds, ","),
 			Address:  params.Address,

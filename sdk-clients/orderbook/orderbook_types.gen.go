@@ -56,7 +56,6 @@ type LimitOrderV3Data struct {
 
 // LimitOrderV3Request defines model for LimitOrderV3Request.
 type LimitOrderV3Request struct {
-	// Data Limit order data
 	Data LimitOrderV3Data `json:"data"`
 
 	// OrderHash Hash of the limit order typed data

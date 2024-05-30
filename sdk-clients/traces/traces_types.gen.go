@@ -107,7 +107,7 @@ const (
 // CoreBuiltinBlockTracesDto defines model for CoreBuiltinBlockTracesDto.
 type CoreBuiltinBlockTracesDto struct {
 	BlockHash      string                                      `json:"blockHash"`
-	BlockNumber    *float32                                    `json:"blockNumber,omitempty"`
+	BlockNumber    float32                                     `json:"blockNumber,omitempty"`
 	BlockTimestamp string                                      `json:"blockTimestamp"`
 	Traces         []CoreBuiltinTransactionRootSuccessTraceDto `json:"traces"`
 	Type           CoreBuiltinBlockTracesDtoType               `json:"type"`

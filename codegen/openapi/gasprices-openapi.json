@@ -37,10 +37,12 @@
         "type": "object",
         "properties": {
           "maxPriorityFeePerGas": {
-            "type": "string"
+            "type": "string",
+            "x-go-type-skip-optional-pointer": true
           },
           "maxFeePerGas": {
-            "type": "string"
+            "type": "string",
+            "x-go-type-skip-optional-pointer": true
           }
         },
         "required": [
@@ -52,19 +54,24 @@
         "type": "object",
         "properties": {
           "baseFee": {
-            "type": "string"
+            "type": "string",
+            "x-go-type-skip-optional-pointer": true
           },
           "low": {
-            "$ref": "#/components/schemas/Eip1559GasValueResponse"
+            "$ref": "#/components/schemas/Eip1559GasValueResponse",
+            "x-go-type-skip-optional-pointer": true
           },
           "medium": {
-            "$ref": "#/components/schemas/Eip1559GasValueResponse"
+            "$ref": "#/components/schemas/Eip1559GasValueResponse",
+            "x-go-type-skip-optional-pointer": true
           },
           "high": {
-            "$ref": "#/components/schemas/Eip1559GasValueResponse"
+            "$ref": "#/components/schemas/Eip1559GasValueResponse",
+            "x-go-type-skip-optional-pointer": true
           },
           "instant": {
-            "$ref": "#/components/schemas/Eip1559GasValueResponse"
+            "$ref": "#/components/schemas/Eip1559GasValueResponse",
+            "x-go-type-skip-optional-pointer": true
           }
         },
         "required": [

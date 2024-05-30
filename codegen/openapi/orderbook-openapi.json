@@ -12,7 +12,8 @@
           "content": {
             "application/json": {
               "schema": {
-                "$ref": "#/components/schemas/LimitOrderV3Request"
+                "$ref": "#/components/schemas/LimitOrderV3Request",
+                "x-go-type-skip-optional-pointer": true
               }
             }
           }
@@ -45,7 +46,8 @@
             "description": "Address of limit orders creator",
             "example": "0x0000000000000000000000000000000000000000",
             "schema": {
-              "type": "string"
+              "type": "string",
+              "x-go-type-skip-optional-pointer": true
             }
           },
           {
@@ -237,7 +239,8 @@
               "type": "array",
               "items": {
                 "type": "string"
-              }
+              },
+              "x-go-type-skip-optional-pointer": true
             }
           }
         ],
@@ -260,7 +263,8 @@
             "required": true,
             "in": "path",
             "schema": {
-              "type": "string"
+              "type": "string",
+              "x-go-type-skip-optional-pointer": true
             }
           }
         ],
@@ -283,7 +287,8 @@
             "required": true,
             "in": "query",
             "schema": {
-              "type": "number"
+              "type": "number",
+              "x-go-type-skip-optional-pointer": true
             }
           }
         ],
@@ -306,7 +311,8 @@
             "required": true,
             "in": "path",
             "schema": {
-              "type": "string"
+              "type": "string",
+              "x-go-type-skip-optional-pointer": true
             }
           },
           {
@@ -314,7 +320,8 @@
             "required": true,
             "in": "path",
             "schema": {
-              "type": "string"
+              "type": "string",
+              "x-go-type-skip-optional-pointer": true
             }
           }
         ],
@@ -420,12 +427,8 @@
             "x-go-type-skip-optional-pointer": true
           },
           "data": {
-            "description": "Limit order data",
-            "allOf": [
-              {
-                "$ref": "#/components/schemas/LimitOrderV3Data"
-              }
-            ]
+            "$ref": "#/components/schemas/LimitOrderV3Data",
+            "x-go-type-skip-optional-pointer": true
           }
         },
         "required": [
