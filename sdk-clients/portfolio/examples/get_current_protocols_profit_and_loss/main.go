@@ -36,7 +36,7 @@ func main() {
 		Timerange: &timerange,
 	})
 	if err != nil {
-		log.Fatalf("failed to GetSupportedChains: %v", err)
+		log.Fatalf("failed to get response: %v", err)
 	}
 
 	responseIndented, err := json.MarshalIndent(response, "", "  ")
@@ -44,5 +44,5 @@ func main() {
 		log.Fatalf("failed to MarshalIndent: %v", err)
 	}
 
-	fmt.Printf("GetProtocolsProfitAndLoss: %s\n", responseIndented)
+	fmt.Printf("Response: %s\n", responseIndented)
 }

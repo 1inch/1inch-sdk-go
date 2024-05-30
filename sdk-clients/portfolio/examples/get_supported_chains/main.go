@@ -38,5 +38,5 @@ func main() {
 		log.Fatalf("failed to MarshalIndent: %v", err)
 	}
 
-	fmt.Printf("GetProtocolsDetails: %s\n", responseIndented)
+	fmt.Printf("Response: %s\n", responseIndented)
 }

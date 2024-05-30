@@ -28,18 +28,18 @@ func main() {
 	}
 	ctx := context.Background()
 
-	tokensCurrentValueResponse, err := client.GetTokensCurrentValue(ctx, portfolio.GetCurrentValuePortfolioV4OverviewErc20CurrentValueGetParams{
+	response, err := client.GetTokensCurrentValue(ctx, portfolio.GetCurrentValuePortfolioV4OverviewErc20CurrentValueGetParams{
 		Addresses: []string{"0xd8dA6BF26964aF9D7eEd9e03E53415D37aA96045"},
 		ChainId:   1,
 	})
 	if err != nil {
-		log.Fatalf("failed to GetSupportedChains: %v", err)
+		log.Fatalf("failed to get response: %v", err)
 	}
 
-	portfolioValueIndented, err := json.MarshalIndent(tokensCurrentValueResponse, "", "  ")
+	responseIndented, err := json.MarshalIndent(response, "", "  ")
 	if err != nil {
 		log.Fatalf("failed to MarshalIndent: %v", err)
 	}
 
-	fmt.Printf("GetProtocolsDetails: %s\n", portfolioValueIndented)
+	fmt.Printf("Response: %s\n", responseIndented)
 }

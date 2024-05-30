@@ -28,15 +28,15 @@ func main() {
 	}
 	ctx := context.Background()
 
-	isServiceAvailableResponse, err := client.IsServiceAvailable(ctx)
+	response, err := client.IsServiceAvailable(ctx)
 	if err != nil {
-		log.Fatalf("failed to IsServiceAvailable: %v", err)
+		log.Fatalf("failed to get response: %v", err)
 	}
 
-	tokensProfitLossResponseIndented, err := json.MarshalIndent(isServiceAvailableResponse, "", "  ")
+	responseIndented, err := json.MarshalIndent(response, "", "  ")
 	if err != nil {
 		log.Fatalf("failed to MarshalIndent: %v", err)
 	}
 
-	fmt.Printf("GetProtocolsDetails: %s\n", tokensProfitLossResponseIndented)
+	fmt.Printf("Response: %s\n", responseIndented)
 }
