@@ -1,5 +1,7 @@
 package portfolio
 
+//TODO These response bodies are largely a guess due to the lack of documentation
+
 type GetPortfolioValueResponse struct {
 	Result []struct {
 		ProtocolName   string `json:"protocol_name"`
