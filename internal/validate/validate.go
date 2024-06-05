@@ -484,7 +484,7 @@ func CheckTimerange(parameter interface{}, variableName string) error {
 	}
 
 	validTimerangeValues := []string{"1day", "1week", "1month", "1year", "3years"}
-	if !slice_utils.Contains(value, []string{"1day", "1week", "1month", "1year", "3years"}) {
+	if !slice_utils.Contains(value, validTimerangeValues) {
 		return NewParameterValidationError(variableName, fmt.Sprintf("is invalid, valid chain ids are: %v", validTimerangeValues))
 	}
 	return nil
