@@ -14,7 +14,8 @@
             "description": "Text to search for in token address, token symbol, or description",
             "example": "1inch",
             "schema": {
-              "type": "string"
+              "type": "string",
+              "x-go-type-skip-optional-pointer": true
             }
           },
           {
@@ -24,7 +25,8 @@
             "description": "Whether to ignore listed tokens",
             "example": false,
             "schema": {
-              "type": "boolean"
+              "type": "boolean",
+              "x-go-type-skip-optional-pointer": true
             }
           },
           {
@@ -32,7 +34,8 @@
             "required": true,
             "in": "query",
             "schema": {
-              "type": "boolean"
+              "type": "boolean",
+              "x-go-type-skip-optional-pointer": true
             }
           },
           {
@@ -42,7 +45,8 @@
             "description": "Maximum number of tokens to return",
             "example": 10,
             "schema": {
-              "type": "number"
+              "type": "number",
+              "x-go-type-skip-optional-pointer": true
             }
           }
         ],
@@ -80,7 +84,8 @@
             "required": true,
             "in": "path",
             "schema": {
-              "type": "number"
+              "type": "number",
+              "x-go-type-skip-optional-pointer": true
             }
           },
           {
@@ -90,7 +95,8 @@
             "description": "Text to search for in token address, token symbol, or description",
             "example": "1inch",
             "schema": {
-              "type": "string"
+              "type": "string",
+              "x-go-type-skip-optional-pointer": true
             }
           },
           {
@@ -100,7 +106,8 @@
             "description": "Whether to ignore listed tokens",
             "example": false,
             "schema": {
-              "type": "boolean"
+              "type": "boolean",
+              "x-go-type-skip-optional-pointer": true
             }
           },
           {
@@ -108,7 +115,8 @@
             "required": true,
             "in": "query",
             "schema": {
-              "type": "boolean"
+              "type": "boolean",
+              "x-go-type-skip-optional-pointer": true
             }
           },
           {
@@ -118,7 +126,8 @@
             "description": "Maximum number of tokens to return",
             "example": 10,
             "schema": {
-              "type": "number"
+              "type": "number",
+              "x-go-type-skip-optional-pointer": true
             }
           }
         ],
@@ -156,7 +165,8 @@
             "required": true,
             "in": "path",
             "schema": {
-              "type": "number"
+              "type": "number",
+              "x-go-type-skip-optional-pointer": true
             }
           },
           {
@@ -166,7 +176,8 @@
             "description": "Provider code. Default value is 1inch",
             "example": "1inch",
             "schema": {
-              "type": "string"
+              "type": "string",
+              "x-go-type-skip-optional-pointer": true
             }
           },
           {
@@ -176,7 +187,8 @@
             "description": "Country code",
             "example": "US",
             "schema": {
-              "type": "string"
+              "type": "string",
+              "x-go-type-skip-optional-pointer": true
             }
           }
         ],
@@ -223,7 +235,8 @@
             "required": true,
             "in": "path",
             "schema": {
-              "type": "number"
+              "type": "number",
+              "x-go-type-skip-optional-pointer": true
             }
           },
           {
@@ -233,7 +246,8 @@
             "description": "Provider code. Default value is \"1inch\"",
             "example": "1inch",
             "schema": {
-              "type": "string"
+              "type": "string",
+              "x-go-type-skip-optional-pointer": true
             }
           },
           {
@@ -243,7 +257,8 @@
             "description": "Country code",
             "example": "US",
             "schema": {
-              "type": "string"
+              "type": "string",
+              "x-go-type-skip-optional-pointer": true
             }
           }
         ],
@@ -285,7 +300,8 @@
             "required": true,
             "in": "path",
             "schema": {
-              "type": "number"
+              "type": "number",
+              "x-go-type-skip-optional-pointer": true
             }
           },
           {
@@ -296,7 +312,8 @@
               "type": "array",
               "items": {
                 "type": "string"
-              }
+              },
+              "x-go-type-skip-optional-pointer": true
             }
           }
         ],
@@ -343,7 +360,8 @@
             "required": true,
             "in": "path",
             "schema": {
-              "type": "number"
+              "type": "number",
+              "x-go-type-skip-optional-pointer": true
             }
           },
           {
@@ -352,7 +370,8 @@
             "in": "path",
             "example": "0x111111111117dc0aa78b770fa6a738034120c302",
             "schema": {
-              "type": "string"
+              "type": "string",
+              "x-go-type-skip-optional-pointer": true
             }
           }
         ],
@@ -404,10 +423,12 @@
         "type": "object",
         "properties": {
           "provider": {
-            "type": "string"
+            "type": "string",
+            "x-go-type-skip-optional-pointer": true
           },
           "value": {
-            "type": "string"
+            "type": "string",
+            "x-go-type-skip-optional-pointer": true
           }
         },
         "required": [
@@ -419,43 +440,54 @@
         "type": "object",
         "properties": {
           "chainId": {
-            "type": "number"
+            "type": "number",
+            "x-go-type-skip-optional-pointer": true
           },
           "symbol": {
-            "type": "string"
+            "type": "string",
+            "x-go-type-skip-optional-pointer": true
           },
           "name": {
-            "type": "string"
+            "type": "string",
+            "x-go-type-skip-optional-pointer": true
           },
           "address": {
-            "type": "string"
+            "type": "string",
+            "x-go-type-skip-optional-pointer": true
           },
           "decimals": {
-            "type": "number"
+            "type": "number",
+            "x-go-type-skip-optional-pointer": true
           },
           "logoURI": {
-            "type": "string"
+            "type": "string",
+            "x-go-type-skip-optional-pointer": true
           },
           "rating": {
-            "type": "number"
+            "type": "number",
+            "x-go-type-skip-optional-pointer": true
           },
           "eip2612": {
-            "type": "boolean"
+            "type": "boolean",
+            "x-go-type-skip-optional-pointer": true
           },
           "isFoT": {
-            "type": "boolean"
+            "type": "boolean",
+            "x-go-type-skip-optional-pointer": true
           },
           "tags": {
             "type": "array",
             "items": {
               "$ref": "#/components/schemas/TagDto"
-            }
+            },
+            "x-go-type-skip-optional-pointer": true
           },
           "providers": {
             "type": "array",
             "items": {
               "type": "string"
-            }
+            },
+            "x-go-type-skip-optional-pointer": true
           }
         },
         "required": [
@@ -473,43 +505,54 @@
         "type": "object",
         "properties": {
           "chainId": {
-            "type": "number"
+            "type": "number",
+            "x-go-type-skip-optional-pointer": true
           },
           "symbol": {
-            "type": "string"
+            "type": "string",
+            "x-go-type-skip-optional-pointer": true
           },
           "name": {
-            "type": "string"
+            "type": "string",
+            "x-go-type-skip-optional-pointer": true
           },
           "address": {
-            "type": "string"
+            "type": "string",
+            "x-go-type-skip-optional-pointer": true
           },
           "decimals": {
-            "type": "number"
+            "type": "number",
+            "x-go-type-skip-optional-pointer": true
           },
           "logoURI": {
-            "type": "string"
+            "type": "string",
+            "x-go-type-skip-optional-pointer": true
           },
           "providers": {
             "type": "array",
             "items": {
               "type": "string"
-            }
+            },
+            "x-go-type-skip-optional-pointer": true
           },
           "eip2612": {
-            "type": "boolean"
+            "type": "boolean",
+            "x-go-type-skip-optional-pointer": true
           },
           "isFoT": {
-            "type": "boolean"
+            "type": "boolean",
+            "x-go-type-skip-optional-pointer": true
           },
           "displayedSymbol": {
-            "type": "string"
+            "type": "string",
+            "x-go-type-skip-optional-pointer": true
           },
           "tags": {
             "type": "array",
             "items": {
               "type": "string"
-            }
+            },
+            "x-go-type-skip-optional-pointer": true
           }
         },
         "required": [
@@ -527,13 +570,16 @@
         "properties": {
           "statusCode": {
             "type": "number",
-            "example": 400
+            "example": 400,
+            "x-go-type-skip-optional-pointer": true
           },
           "message": {
-            "type": "string"
+            "type": "string",
+            "x-go-type-skip-optional-pointer": true
           },
           "error": {
-            "type": "string"
+            "type": "string",
+            "x-go-type-skip-optional-pointer": true
           }
         },
         "required": [
@@ -546,31 +592,39 @@
         "type": "object",
         "properties": {
           "address": {
-            "type": "string"
+            "type": "string",
+            "x-go-type-skip-optional-pointer": true
           },
           "chainId": {
-            "type": "number"
+            "type": "number",
+            "x-go-type-skip-optional-pointer": true
           },
           "decimals": {
-            "type": "number"
+            "type": "number",
+            "x-go-type-skip-optional-pointer": true
           },
           "extensions": {
-            "type": "object"
+            "type": "object",
+            "x-go-type-skip-optional-pointer": true
           },
           "logoURI": {
-            "type": "string"
+            "type": "string",
+            "x-go-type-skip-optional-pointer": true
           },
           "name": {
-            "type": "string"
+            "type": "string",
+            "x-go-type-skip-optional-pointer": true
           },
           "symbol": {
-            "type": "string"
+            "type": "string",
+            "x-go-type-skip-optional-pointer": true
           },
           "tags": {
             "type": "array",
             "items": {
               "type": "string"
-            }
+            },
+            "x-go-type-skip-optional-pointer": true
           }
         },
         "required": [
@@ -587,13 +641,16 @@
         "type": "object",
         "properties": {
           "major": {
-            "type": "number"
+            "type": "number",
+            "x-go-type-skip-optional-pointer": true
           },
           "minor": {
-            "type": "number"
+            "type": "number",
+            "x-go-type-skip-optional-pointer": true
           },
           "patch": {
-            "type": "number"
+            "type": "number",
+            "x-go-type-skip-optional-pointer": true
           }
         },
         "required": [
@@ -609,37 +666,45 @@
             "type": "array",
             "items": {
               "type": "string"
-            }
+            },
+            "x-go-type-skip-optional-pointer": true
           },
           "logoURI": {
-            "type": "string"
+            "type": "string",
+            "x-go-type-skip-optional-pointer": true
           },
           "name": {
-            "type": "string"
+            "type": "string",
+            "x-go-type-skip-optional-pointer": true
           },
           "tags": {
             "type": "object",
             "additionalProperties": {
               "$ref": "#/components/schemas/TagDto"
-            }
+            },
+            "x-go-type-skip-optional-pointer": true
           },
           "tags_order": {
             "type": "array",
             "items": {
               "type": "string"
-            }
+            },
+            "x-go-type-skip-optional-pointer": true
           },
           "timestamp": {
-            "type": "string"
+            "type": "string",
+            "x-go-type-skip-optional-pointer": true
           },
           "tokens": {
             "type": "array",
             "items": {
               "$ref": "#/components/schemas/TokenInfoDto"
-            }
+            },
+            "x-go-type-skip-optional-pointer": true
           },
           "version": {
-            "$ref": "#/components/schemas/VersionDto"
+            "$ref": "#/components/schemas/VersionDto",
+            "x-go-type-skip-optional-pointer": true
           }
         },
         "required": [

@@ -105,12 +105,12 @@ type HistoryResponseDto struct {
 // TokenActionDto defines model for TokenActionDto.
 type TokenActionDto struct {
 	Address     string                  `json:"address"`
-	Amount      *map[string]interface{} `json:"amount,omitempty"`
+	Amount      map[string]interface{}  `json:"amount,omitempty"`
 	Direction   TokenActionDtoDirection `json:"direction"`
 	FromAddress string                  `json:"fromAddress"`
 	Standard    string                  `json:"standard"`
 	ToAddress   string                  `json:"toAddress"`
-	TokenId     *map[string]interface{} `json:"tokenId,omitempty"`
+	TokenId     map[string]interface{}  `json:"tokenId,omitempty"`
 }
 
 // TokenActionDtoDirection defines model for TokenActionDto.Direction.
@@ -141,29 +141,29 @@ type TransactionDetailsDtoType string
 
 // TransactionDetailsMetaDto defines model for TransactionDetailsMetaDto.
 type TransactionDetailsMetaDto struct {
-	EnsDomainName       *map[string]interface{} `json:"ensDomainName,omitempty"`
-	FromChainId         *map[string]interface{} `json:"fromChainId,omitempty"`
-	Is1inchFusionSwap   *map[string]interface{} `json:"is1inchFusionSwap,omitempty"`
-	OrderFillPercentage *map[string]interface{} `json:"orderFillPercentage,omitempty"`
-	Protocol            *map[string]interface{} `json:"protocol,omitempty"`
-	SafeAddress         *map[string]interface{} `json:"safeAddress,omitempty"`
-	ToChainId           *map[string]interface{} `json:"toChainId,omitempty"`
+	EnsDomainName       map[string]interface{} `json:"ensDomainName,omitempty"`
+	FromChainId         map[string]interface{} `json:"fromChainId,omitempty"`
+	Is1inchFusionSwap   map[string]interface{} `json:"is1inchFusionSwap,omitempty"`
+	OrderFillPercentage map[string]interface{} `json:"orderFillPercentage,omitempty"`
+	Protocol            map[string]interface{} `json:"protocol,omitempty"`
+	SafeAddress         map[string]interface{} `json:"safeAddress,omitempty"`
+	ToChainId           map[string]interface{} `json:"toChainId,omitempty"`
 }
 
 // V2RestApiControllerGetHistoryEventsByAddressParams defines parameters for V2RestApiControllerGetHistoryEventsByAddress.
 type V2RestApiControllerGetHistoryEventsByAddressParams struct {
 	// Limit Amount of events to return, default is 100, max is 10000
-	Limit *int `url:"limit,omitempty" json:"limit,omitempty"`
+	Limit int `url:"limit,omitempty" json:"limit,omitempty"`
 
 	// TokenAddress Token address used at event
-	TokenAddress *string `url:"tokenAddress,omitempty" json:"tokenAddress,omitempty"`
+	TokenAddress string `url:"tokenAddress,omitempty" json:"tokenAddress,omitempty"`
 
 	// ChainId chainId
-	ChainId *int `url:"chainId,omitempty" json:"chainId,omitempty"`
+	ChainId int `url:"chainId,omitempty" json:"chainId,omitempty"`
 
 	// ToTimestampMs To time at milliseconds
-	ToTimestampMs *int `url:"toTimestampMs,omitempty" json:"toTimestampMs,omitempty"`
+	ToTimestampMs int `url:"toTimestampMs,omitempty" json:"toTimestampMs,omitempty"`
 
 	// FromTimestampMs From time at milliseconds
-	FromTimestampMs *int `url:"fromTimestampMs,omitempty" json:"fromTimestampMs,omitempty"`
+	FromTimestampMs int `url:"fromTimestampMs,omitempty" json:"fromTimestampMs,omitempty"`
 }

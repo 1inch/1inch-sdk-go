@@ -96,10 +96,10 @@ func TestGetPricesForWhitelistedTokens(t *testing.T) {
 	}
 
 	params := SearchControllerSearchAllChainsParams{
-		Query:              getPtr("UNI"),
-		IgnoreListed:       nil,
+		Query:              "UNI",
+		IgnoreListed:       false,
 		OnlyPositiveRating: false,
-		Limit:              getPtr(float32(1)),
+		Limit:              float32(1),
 	}
 
 	tokens, err := api.SearchTokenAllChains(ctx, params)

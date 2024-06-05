@@ -12,7 +12,8 @@
           "content": {
             "application/json": {
               "schema": {
-                "$ref": "#/components/schemas/BroadcastRequest"
+                "$ref": "#/components/schemas/BroadcastRequest",
+                "x-go-type-skip-optional-pointer": true
               }
             }
           }
@@ -49,7 +50,8 @@
           "content": {
             "application/json": {
               "schema": {
-                "$ref": "#/components/schemas/BroadcastRequest"
+                "$ref": "#/components/schemas/BroadcastRequest",
+                "x-go-type-skip-optional-pointer": true
               }
             }
           }
@@ -91,7 +93,8 @@
           "rawTransaction": {
             "type": "string",
             "description": "The raw transaction data",
-            "example": "0xf86..."
+            "example": "0xf86...",
+            "x-go-type-skip-optional-pointer": true
           }
         },
         "required": [
@@ -104,7 +107,8 @@
           "transactionHash": {
             "type": "string",
             "description": "The transaction hash",
-            "example": "0x123..."
+            "example": "0x123...",
+            "x-go-type-skip-optional-pointer": true
           }
         },
         "required": [

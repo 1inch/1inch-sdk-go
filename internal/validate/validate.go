@@ -476,3 +476,16 @@ func CheckFiatCurrency(parameter interface{}, variableName string) error {
 
 	return nil
 }
+
+func CheckTimerange(parameter interface{}, variableName string) error {
+	value, ok := parameter.(string)
+	if !ok {
+		return fmt.Errorf("for parameter '%v' to be validated as '%v', it must be a string", variableName, "Timerange")
+	}
+
+	validTimerangeValues := []string{"1day", "1week", "1month", "1year", "3years"}
+	if !slice_utils.Contains(value, validTimerangeValues) {
+		return NewParameterValidationError(variableName, fmt.Sprintf("is invalid, valid chain ids are: %v", validTimerangeValues))
+	}
+	return nil
+}
