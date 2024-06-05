@@ -11,7 +11,8 @@
             "required": true,
             "in": "path",
             "schema": {
-              "type": "string"
+              "type": "string",
+              "x-go-type-skip-optional-pointer": true
             }
           },
           {
@@ -22,7 +23,8 @@
               "type": "array",
               "items": {
                 "type": "string"
-              }
+              },
+              "x-go-type-skip-optional-pointer": true
             }
           },
           {
@@ -30,7 +32,8 @@
             "required": true,
             "in": "query",
             "schema": {
-              "type": "boolean"
+              "type": "boolean",
+              "x-go-type-skip-optional-pointer": true
             }
           }
         ],
@@ -64,7 +67,8 @@
             "required": true,
             "in": "path",
             "schema": {
-              "type": "string"
+              "type": "string",
+              "x-go-type-skip-optional-pointer": true
             }
           }
         ],
@@ -104,7 +108,8 @@
             "required": true,
             "in": "path",
             "schema": {
-              "type": "string"
+              "type": "string",
+              "x-go-type-skip-optional-pointer": true
             }
           }
         ],
@@ -113,7 +118,8 @@
           "content": {
             "application/json": {
               "schema": {
-                "$ref": "#/components/schemas/CustomTokensRequest"
+                "$ref": "#/components/schemas/CustomTokensRequest",
+                "x-go-type-skip-optional-pointer": true
               }
             }
           }
@@ -155,7 +161,8 @@
           "content": {
             "application/json": {
               "schema": {
-                "$ref": "#/components/schemas/CustomTokensAndWalletsRequest"
+                "$ref": "#/components/schemas/CustomTokensAndWalletsRequest",
+                "x-go-type-skip-optional-pointer": true
               }
             }
           }
@@ -210,7 +217,8 @@
             "required": true,
             "in": "path",
             "schema": {
-              "type": "string"
+              "type": "string",
+              "x-go-type-skip-optional-pointer": true
             }
           },
           {
@@ -218,7 +226,8 @@
             "required": true,
             "in": "path",
             "schema": {
-              "type": "string"
+              "type": "string",
+              "x-go-type-skip-optional-pointer": true
             }
           }
         ],
@@ -271,7 +280,8 @@
             "required": true,
             "in": "path",
             "schema": {
-              "type": "string"
+              "type": "string",
+              "x-go-type-skip-optional-pointer": true
             }
           },
           {
@@ -279,7 +289,8 @@
             "required": true,
             "in": "path",
             "schema": {
-              "type": "string"
+              "type": "string",
+              "x-go-type-skip-optional-pointer": true
             }
           }
         ],
@@ -288,7 +299,8 @@
           "content": {
             "application/json": {
               "schema": {
-                "$ref": "#/components/schemas/CustomTokensRequest"
+                "$ref": "#/components/schemas/CustomTokensRequest",
+                "x-go-type-skip-optional-pointer": true
               }
             }
           }
@@ -344,7 +356,8 @@
             "required": true,
             "in": "path",
             "schema": {
-              "type": "string"
+              "type": "string",
+              "x-go-type-skip-optional-pointer": true
             }
           },
           {
@@ -352,7 +365,8 @@
             "required": true,
             "in": "path",
             "schema": {
-              "type": "string"
+              "type": "string",
+              "x-go-type-skip-optional-pointer": true
             }
           }
         ],
@@ -388,7 +402,8 @@
             "required": true,
             "in": "path",
             "schema": {
-              "type": "string"
+              "type": "string",
+              "x-go-type-skip-optional-pointer": true
             }
           },
           {
@@ -396,7 +411,8 @@
             "required": true,
             "in": "path",
             "schema": {
-              "type": "string"
+              "type": "string",
+              "x-go-type-skip-optional-pointer": true
             }
           }
         ],
@@ -405,7 +421,8 @@
           "content": {
             "application/json": {
               "schema": {
-                "$ref": "#/components/schemas/CustomTokensRequest"
+                "$ref": "#/components/schemas/CustomTokensRequest",
+                "x-go-type-skip-optional-pointer": true
               }
             }
           }
@@ -522,7 +539,8 @@
             "type": "array",
             "items": {
               "type": "string"
-            }
+            },
+            "x-go-type-skip-optional-pointer": true
           }
         },
         "required": [
@@ -540,7 +558,8 @@
             "type": "array",
             "items": {
               "type": "string"
-            }
+            },
+            "x-go-type-skip-optional-pointer": true
           },
           "wallets": {
             "description": "List of wallets",
@@ -550,7 +569,8 @@
             "type": "array",
             "items": {
               "type": "string"
-            }
+            },
+            "x-go-type-skip-optional-pointer": true
           }
         },
         "required": [

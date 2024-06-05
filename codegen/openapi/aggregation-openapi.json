@@ -12,7 +12,8 @@
             "in": "query",
             "example": "0xeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeee",
             "schema": {
-              "type": "string"
+              "type": "string",
+              "x-go-type-skip-optional-pointer": true
             }
           },
           {
@@ -21,7 +22,8 @@
             "in": "query",
             "example": "0x111111111117dc0aa78b770fa6a738034120c302",
             "schema": {
-              "type": "string"
+              "type": "string",
+              "x-go-type-skip-optional-pointer": true
             }
           },
           {
@@ -30,7 +32,8 @@
             "in": "query",
             "example": "10000000000000000",
             "schema": {
-              "type": "string"
+              "type": "string",
+              "x-go-type-skip-optional-pointer": true
             }
           },
           {
@@ -189,7 +192,8 @@
             "in": "query",
             "example": "0xeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeee",
             "schema": {
-              "type": "string"
+              "type": "string",
+              "x-go-type-skip-optional-pointer": true
             }
           },
           {
@@ -198,7 +202,8 @@
             "in": "query",
             "example": "0x111111111117dc0aa78b770fa6a738034120c302",
             "schema": {
-              "type": "string"
+              "type": "string",
+              "x-go-type-skip-optional-pointer": true
             }
           },
           {
@@ -207,7 +212,8 @@
             "in": "query",
             "example": "10000000000000000",
             "schema": {
-              "type": "string"
+              "type": "string",
+              "x-go-type-skip-optional-pointer": true
             }
           },
           {
@@ -216,7 +222,8 @@
             "in": "query",
             "description": "The address that calls the 1inch contract",
             "schema": {
-              "type": "string"
+              "type": "string",
+              "x-go-type-skip-optional-pointer": true
             }
           },
           {
@@ -228,7 +235,8 @@
             "schema": {
               "minimum": 0,
               "maximum": 50,
-              "type": "number"
+              "type": "number",
+              "x-go-type-skip-optional-pointer": true
             }
           },
           {
@@ -459,7 +467,8 @@
             "example": "0x111111111117dc0aa78b770fa6a738034120c302",
             "description": "Token address you want to swap",
             "schema": {
-              "type": "string"
+              "type": "string",
+              "x-go-type-skip-optional-pointer": true
             }
           },
           {
@@ -503,7 +512,8 @@
             "example": "0x111111111117dc0aa78b770fa6a738034120c302",
             "description": "Token address you want to swap",
             "schema": {
-              "type": "string"
+              "type": "string",
+              "x-go-type-skip-optional-pointer": true
             }
           },
           {
@@ -512,7 +522,8 @@
             "in": "query",
             "description": "Wallet address for which you want to check",
             "schema": {
-              "type": "string"
+              "type": "string",
+              "x-go-type-skip-optional-pointer": true
             }
           }
         ],
@@ -668,20 +679,12 @@
         "type": "object",
         "properties": {
           "fromToken": {
-            "description": "Source token info",
-            "allOf": [
-              {
-                "$ref": "#/components/schemas/TokenInfo"
-              }
-            ]
+            "$ref": "#/components/schemas/TokenInfo",
+            "x-go-type-skip-optional-pointer": true
           },
           "toToken": {
-            "description": "Destination token info",
-            "allOf": [
-              {
-                "$ref": "#/components/schemas/TokenInfo"
-              }
-            ]
+            "$ref": "#/components/schemas/TokenInfo",
+            "x-go-type-skip-optional-pointer": true
           },
           "toAmount": {
             "type": "string",
@@ -826,20 +829,12 @@
         "type": "object",
         "properties": {
           "fromToken": {
-            "description": "Source token info",
-            "allOf": [
-              {
-                "$ref": "#/components/schemas/TokenInfo"
-              }
-            ]
+            "$ref": "#/components/schemas/TokenInfo",
+            "x-go-type-skip-optional-pointer": true
           },
           "toToken": {
-            "description": "Destination token info",
-            "allOf": [
-              {
-                "$ref": "#/components/schemas/TokenInfo"
-              }
-            ]
+            "$ref": "#/components/schemas/TokenInfo",
+            "x-go-type-skip-optional-pointer": true
           },
           "toAmount": {
             "type": "string",
@@ -862,12 +857,8 @@
             "x-go-type-skip-optional-pointer": true
           },
           "tx": {
-            "description": "Transaction object",
-            "allOf": [
-              {
-                "$ref": "#/components/schemas/TransactionData"
-              }
-            ]
+            "$ref": "#/components/schemas/TransactionData",
+            "x-go-type-skip-optional-pointer": true
           }
         },
         "required": [

@@ -95,7 +95,8 @@
           "content": {
             "application/json": {
               "schema": {
-                "$ref": "#/components/schemas/GetPricesRequestDto"
+                "$ref": "#/components/schemas/GetPricesRequestDto",
+                "x-go-type-skip-optional-pointer": true
               }
             }
           }
@@ -198,7 +199,8 @@
               "type": "array",
               "items": {
                 "type": "string"
-              }
+              },
+              "x-go-type-skip-optional-pointer": true
             }
           },
           {

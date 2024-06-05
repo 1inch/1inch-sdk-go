@@ -30,11 +30,9 @@ func main() {
 	}
 	ctx := context.Background()
 
-	searchQuery := "UNI"
-	limit := float32(2)
 	tokens, err := client.SearchTokenSingleChain(ctx, tokens.SearchControllerSearchSingleChainParams{
-		Query: &searchQuery,
-		Limit: &limit,
+		Query: "UNI",
+		Limit: 2,
 	})
 	if err != nil {
 		log.Fatalf("failed to search token: %v", err)

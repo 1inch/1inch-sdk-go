@@ -16,6 +16,99 @@ display_help() {
     echo "  -help              Display this help message."
 }
 
+remove_null_schemas() {
+  local api_openapi_file_name="$1"
+  local temp_file="${api_openapi_file_name}.tmp"
+  jq 'walk(if type == "object" and has("anyOf")
+          then .anyOf |= map(select(.type != "null"))
+          else . end)' ${api_openapi_file_name} > ${temp_file}
+
+  if [ $? -ne 0 ]; then
+    echo "Error: Failed to remove null schemas with jq on $api_openapi_file_name."
+    exit 1
+  fi
+
+  mv "${temp_file}" "${api_openapi_file_name}"
+}
+
+change_any_of_int_to_int() {
+  local api_openapi_file_name="$1"
+  local temp_file="${api_openapi_file_name}.tmp"
+
+  jq '
+    def modify_schema:
+      if type == "object" and .schema.anyOf then
+        .schema |= (.anyOf[0] + { description: .description, title: .title })
+      else
+        .
+      end;
+
+    .paths |= map_values(
+      . as $path |
+      . | map_values(
+        if .parameters then
+          .parameters |= map(modify_schema)
+        else . end
+      )
+    )
+  ' ${api_openapi_file_name} > ${temp_file}
+
+  if [ $? -ne 0 ]; then
+    echo "Error: Failed to change any of int schemas to int with jq on $api_openapi_file_name."
+    exit 1
+  fi
+
+  mv "${temp_file}" "${api_openapi_file_name}"
+}
+
+change_any_of_ref_to_ref() {
+  local api_openapi_file_name="$1"
+  local temp_file="${api_openapi_file_name}.tmp"
+
+  jq '
+    def simplify_allOf:
+      if type == "object" and .allOf then
+        .allOf |= map(
+          if type == "object" and has("$ref") then . else empty end
+        ) |
+        . |= if .allOf | length == 1 then .allOf[0] else . end |
+        del(.allOf)
+      else
+        .
+      end;
+
+    # Apply the simplification to the paths
+    .paths |= map_values(
+      . as $path |
+      . | map_values(
+        if .parameters then
+          .parameters |= map(
+            if .schema then .schema |= simplify_allOf else . end
+          )
+        else . end |
+        if .requestBody? then
+          .requestBody.content."application/json".schema |= simplify_allOf
+        else . end
+      )
+    ) |
+
+    # Apply the simplification to the components schemas
+    .components.schemas |= map_values(
+      . |= simplify_allOf |
+      if .properties then
+        .properties |= map_values(simplify_allOf)
+      else . end
+    )
+  ' ${api_openapi_file_name} > ${temp_file}
+
+  if [ $? -ne 0 ]; then
+    echo "Error: Failed to change any of ref schemas to ref with jq on $api_openapi_file_name."
+    exit 1
+  fi
+
+  mv "${temp_file}" "${api_openapi_file_name}"
+}
+
 # update_operation_ids uses mappings from mapping.json to update operationId in the openapi files
 update_operation_ids() {
     local api_openapi_file_name="$1"
@@ -40,8 +133,14 @@ update_operation_ids() {
             )
         )' "$api_openapi_file_name" > "$temp_file"
 
+    if [ $? -ne 0 ]; then
+      echo "Error: Failed to update operation ids with jq on $api_openapi_file_name."
+      exit 1
+    fi
+
     # Optionally, provide a message that the file has been updated
-    echo "Updated operationIds in $api_openapi_file_name and saved to $temp_file"
+    echo "Updated operationIds in $api_openapi_file_name"
+    mv "${temp_file}" "${api_openapi_file_name}"
 }
 
 
@@ -63,6 +162,7 @@ check_and_fix_incorrect_number_arrays() {
 # This is required to prevent the SDK from adding pointers to optional fields
 add_pointer_skip_field() {
   local api_openapi_file_name="$1"
+    local temp_file="${api_openapi_file_name}.tmp"  # Define the temporary file name
 
   jq '
            # Function to add x-go-type-skip-optional-pointer to schema objects if not already present
@@ -94,10 +194,14 @@ add_pointer_skip_field() {
                .properties |= map_values(add_skip_pointer)
              else . end
            )
-         ' $api_openapi_file_name > ${api_openapi_file_name}.tmp || {
-          echo "Error: Failed to run jq on $api_openapi_file_name."
-          exit 1
-      }
+         ' ${api_openapi_file_name} > ${temp_file}
+
+  if [ $? -ne 0 ]; then
+    echo "Error: Failed to add pointer skip fields with jq on $api_openapi_file_name."
+    exit 1
+  fi
+
+  mv "${temp_file}" "${api_openapi_file_name}"
 }
 
 # Check that the script is being run from within the golang folder specifically
@@ -196,13 +300,8 @@ for api_openapi_file_name in "$openapi_dir"/*-openapi.json; do
         echo "Error: Failed to create directory $output_dir/$package_name."
         exit 1
     }
-
     # Check for all known incorrect schema types and fix them if they exist
     check_and_fix_incorrect_number_arrays "$api_openapi_file_name"
-
-    # Add x-go-type-skip-optional-pointer to schema objects and parameters if not already present
-    add_pointer_skip_field "$api_openapi_file_name"
-
 
     if [ "$verbose_logging" = "true" ]; then
       echo "Updating operationId for $api_openapi_file_name using mapping from $mapping_file"
@@ -211,10 +310,18 @@ for api_openapi_file_name in "$openapi_dir"/*-openapi.json; do
     # Call to update operationIds
     update_operation_ids "$api_openapi_file_name"
 
-    mv ${api_openapi_file_name}.tmp $api_openapi_file_name || {
-        echo "Error: Failed to overwrite the temporary jq file back to $api_openapi_file_name."
-        exit 1
-    }
+    # Remove null schemas
+    remove_null_schemas "$api_openapi_file_name"
+
+    # simplify ints
+    change_any_of_int_to_int "$api_openapi_file_name"
+
+    # simplify ref
+    change_any_of_ref_to_ref "$api_openapi_file_name"
+
+    # Should always be the final schema step!
+    # Add x-go-type-skip-optional-pointer to schema objects and parameters if not already present
+    add_pointer_skip_field "$api_openapi_file_name"
 
     # Generate the oapi output into the new directory
     output_file="$output_dir/$package_name/${types_file_name}"

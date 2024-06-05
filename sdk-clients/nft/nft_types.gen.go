@@ -34,58 +34,56 @@ const (
 // Asset defines model for Asset.
 type Asset struct {
 	AnimationOriginalUrl string        `json:"animation_original_url"`
-	AnimationUrl         *string       `json:"animation_url,omitempty"`
+	AnimationUrl         string        `json:"animation_url,omitempty"`
 	AssetContract        AssetContract `json:"asset_contract"`
 
 	// BackgroundColor The background color to be displayed with the item
-	BackgroundColor *map[string]interface{} `json:"background_color,omitempty"`
+	BackgroundColor map[string]interface{} `json:"background_color,omitempty"`
 
 	// ChainId chain id of NFT
-	ChainId      *int                    `json:"chainId,omitempty"`
-	Collection   *Collection             `json:"collection,omitempty"`
-	Creator      *map[string]interface{} `json:"creator,omitempty"`
-	Decimals     *map[string]interface{} `json:"decimals,omitempty"`
-	Description  string                  `json:"description"`
-	ExternalLink string                  `json:"external_link"`
+	ChainId      int                    `json:"chainId,omitempty"`
+	Collection   *Collection            `json:"collection,omitempty"`
+	Creator      map[string]interface{} `json:"creator,omitempty"`
+	Decimals     map[string]interface{} `json:"decimals,omitempty"`
+	Description  string                 `json:"description"`
+	ExternalLink string                 `json:"external_link"`
 
 	// Id The token ID of the NFT
 	Id                float32 `json:"id"`
-	ImageOriginalUrl  *string `json:"image_original_url,omitempty"`
-	ImagePreviewUrl   *string `json:"image_preview_url,omitempty"`
-	ImageThumbnailUrl *string `json:"image_thumbnail_url,omitempty"`
-	ImageUrl          *string `json:"image_url,omitempty"`
-	IsNsfw            *bool   `json:"is_nsfw,omitempty"`
+	ImageOriginalUrl  string  `json:"image_original_url,omitempty"`
+	ImagePreviewUrl   string  `json:"image_preview_url,omitempty"`
+	ImageThumbnailUrl string  `json:"image_thumbnail_url,omitempty"`
+	ImageUrl          string  `json:"image_url,omitempty"`
+	IsNsfw            bool    `json:"is_nsfw,omitempty"`
 
 	// LastSale When this item was last sold (null if there was no last sale)
-	LastSale    *map[string]interface{} `json:"last_sale,omitempty"`
-	ListingDate *map[string]interface{} `json:"listing_date,omitempty"`
+	LastSale    map[string]interface{} `json:"last_sale,omitempty"`
+	ListingDate map[string]interface{} `json:"listing_date,omitempty"`
 
 	// Name Name of the item
-	Name      string   `json:"name"`
-	NumSales  *float32 `json:"num_sales,omitempty"`
-	Owner     *string  `json:"owner,omitempty"`
-	Permalink *string  `json:"permalink,omitempty"`
+	Name      string  `json:"name"`
+	NumSales  float32 `json:"num_sales,omitempty"`
+	Owner     string  `json:"owner,omitempty"`
+	Permalink string  `json:"permalink,omitempty"`
 
 	// Priority priority of NFT if "zero" it should display first
 	Priority float32 `json:"priority"`
 
 	// Provider provider of NFT
-	Provider AssetProvider `json:"provider"`
-
-	// RarityData Contains rarity data for the asset. See Rarity Data below.
-	RarityData        *RarityData             `json:"rarity_data,omitempty"`
-	SeaportSellOrders *map[string]interface{} `json:"seaport_sell_orders,omitempty"`
-	SupportsWyvern    *bool                   `json:"supports_wyvern,omitempty"`
+	Provider          AssetProvider          `json:"provider"`
+	RarityData        *RarityData            `json:"rarity_data,omitempty"`
+	SeaportSellOrders map[string]interface{} `json:"seaport_sell_orders,omitempty"`
+	SupportsWyvern    bool                   `json:"supports_wyvern,omitempty"`
 
 	// TokenId The token ID of the NFT
-	TokenId       *string                 `json:"token_id,omitempty"`
-	TokenMetadata *string                 `json:"token_metadata,omitempty"`
-	TopBid        *map[string]interface{} `json:"top_bid,omitempty"`
+	TokenId       string                 `json:"token_id,omitempty"`
+	TokenMetadata string                 `json:"token_metadata,omitempty"`
+	TopBid        map[string]interface{} `json:"top_bid,omitempty"`
 
 	// Traits A list of traits associated with the item (see traits section)
-	Traits                  []string                `json:"traits"`
-	TransferFee             *map[string]interface{} `json:"transfer_fee,omitempty"`
-	TransferFeePaymentToken *map[string]interface{} `json:"transfer_fee_payment_token,omitempty"`
+	Traits                  []string               `json:"traits"`
+	TransferFee             map[string]interface{} `json:"transfer_fee,omitempty"`
+	TransferFeePaymentToken map[string]interface{} `json:"transfer_fee_payment_token,omitempty"`
 }
 
 // AssetProvider provider of NFT
@@ -187,10 +185,10 @@ type GetNftsByAddressParams struct {
 	Address string `url:"address" json:"address"`
 
 	// Limit The maximum number of api to return
-	Limit *int `url:"limit,omitempty" json:"limit,omitempty"`
+	Limit int `url:"limit,omitempty" json:"limit,omitempty"`
 
 	// Offset The offset number of api to return
-	Offset *int `url:"offset,omitempty" json:"offset,omitempty"`
+	Offset int `url:"offset,omitempty" json:"offset,omitempty"`
 }
 
 // GetNftsByAddressParamsChainIds defines parameters for GetNftsByAddress.

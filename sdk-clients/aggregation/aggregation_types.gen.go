@@ -86,7 +86,6 @@ type QuoteRequestErrorStatusCode float32
 
 // QuoteResponse defines model for QuoteResponse.
 type QuoteResponse struct {
-	// FromToken Source token info
 	FromToken *TokenInfo `json:"fromToken,omitempty"`
 
 	// Gas Estimated gas
@@ -96,10 +95,8 @@ type QuoteResponse struct {
 	Protocols [][][]SelectedProtocol `json:"protocols,omitempty"`
 
 	// ToAmount Expected amount of destination token
-	ToAmount string `json:"toAmount"`
-
-	// ToToken Destination token info
-	ToToken *TokenInfo `json:"toToken,omitempty"`
+	ToAmount string     `json:"toAmount"`
+	ToToken  *TokenInfo `json:"toToken,omitempty"`
 }
 
 // SelectedProtocol defines model for SelectedProtocol.
@@ -146,20 +143,15 @@ type SwapRequestErrorStatusCode float32
 
 // SwapResponse defines model for SwapResponse.
 type SwapResponse struct {
-	// FromToken Source token info
 	FromToken *TokenInfo `json:"fromToken,omitempty"`
 
 	// Protocols Selected protocols in a path
 	Protocols [][][]SelectedProtocol `json:"protocols,omitempty"`
 
 	// ToAmount Expected amount of destination token
-	ToAmount string `json:"toAmount"`
-
-	// ToToken Destination token info
-	ToToken *TokenInfo `json:"toToken,omitempty"`
-
-	// Tx Transaction object
-	Tx TransactionData `json:"tx"`
+	ToAmount string          `json:"toAmount"`
+	ToToken  *TokenInfo      `json:"toToken,omitempty"`
+	Tx       TransactionData `json:"tx"`
 }
 
 // TokenInfo defines model for TokenInfo.

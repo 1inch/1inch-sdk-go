@@ -15,10 +15,10 @@ type ProviderTokenDto struct {
 	Address         string   `json:"address"`
 	ChainId         float32  `json:"chainId"`
 	Decimals        float32  `json:"decimals"`
-	DisplayedSymbol *string  `json:"displayedSymbol,omitempty"`
-	Eip2612         *bool    `json:"eip2612,omitempty"`
-	IsFoT           *bool    `json:"isFoT,omitempty"`
-	LogoURI         *string  `json:"logoURI,omitempty"`
+	DisplayedSymbol string   `json:"displayedSymbol,omitempty"`
+	Eip2612         bool     `json:"eip2612,omitempty"`
+	IsFoT           bool     `json:"isFoT,omitempty"`
+	LogoURI         string   `json:"logoURI,omitempty"`
 	Name            string   `json:"name"`
 	Providers       []string `json:"providers"`
 	Symbol          string   `json:"symbol"`
@@ -36,9 +36,9 @@ type TokenDto struct {
 	Address   string   `json:"address"`
 	ChainId   float32  `json:"chainId"`
 	Decimals  float32  `json:"decimals"`
-	Eip2612   *bool    `json:"eip2612,omitempty"`
-	IsFoT     *bool    `json:"isFoT,omitempty"`
-	LogoURI   *string  `json:"logoURI,omitempty"`
+	Eip2612   bool     `json:"eip2612,omitempty"`
+	IsFoT     bool     `json:"isFoT,omitempty"`
+	LogoURI   string   `json:"logoURI,omitempty"`
 	Name      string   `json:"name"`
 	Providers []string `json:"providers"`
 	Rating    float32  `json:"rating"`
@@ -48,14 +48,14 @@ type TokenDto struct {
 
 // TokenInfoDto defines model for TokenInfoDto.
 type TokenInfoDto struct {
-	Address    string                  `json:"address"`
-	ChainId    float32                 `json:"chainId"`
-	Decimals   float32                 `json:"decimals"`
-	Extensions *map[string]interface{} `json:"extensions,omitempty"`
-	LogoURI    string                  `json:"logoURI"`
-	Name       string                  `json:"name"`
-	Symbol     string                  `json:"symbol"`
-	Tags       []string                `json:"tags"`
+	Address    string                 `json:"address"`
+	ChainId    float32                `json:"chainId"`
+	Decimals   float32                `json:"decimals"`
+	Extensions map[string]interface{} `json:"extensions,omitempty"`
+	LogoURI    string                 `json:"logoURI"`
+	Name       string                 `json:"name"`
+	Symbol     string                 `json:"symbol"`
+	Tags       []string               `json:"tags"`
 }
 
 // TokenListResponseDto defines model for TokenListResponseDto.
@@ -80,23 +80,23 @@ type VersionDto struct {
 // SearchControllerSearchAllChainsParams defines parameters for SearchControllerSearchAllChains.
 type SearchControllerSearchAllChainsParams struct {
 	// Query Text to search for in token address, token symbol, or description
-	Query *string `url:"query,omitempty" json:"query,omitempty"`
+	Query string `url:"query,omitempty" json:"query,omitempty"`
 
 	// IgnoreListed Whether to ignore listed tokens
-	IgnoreListed       *bool `url:"ignore_listed,omitempty" json:"ignore_listed,omitempty"`
-	OnlyPositiveRating bool  `url:"only_positive_rating" json:"only_positive_rating"`
+	IgnoreListed       bool `url:"ignore_listed,omitempty" json:"ignore_listed,omitempty"`
+	OnlyPositiveRating bool `url:"only_positive_rating" json:"only_positive_rating"`
 
 	// Limit Maximum number of tokens to return
-	Limit *float32 `url:"limit,omitempty" json:"limit,omitempty"`
+	Limit float32 `url:"limit,omitempty" json:"limit,omitempty"`
 }
 
 // TokenListControllerTokensParams defines parameters for TokenListControllerTokens.
 type TokenListControllerTokensParams struct {
 	// Provider Provider code. Default value is 1inch
-	Provider *string `url:"provider,omitempty" json:"provider,omitempty"`
+	Provider string `url:"provider,omitempty" json:"provider,omitempty"`
 
 	// Country Country code
-	Country *string `url:"country,omitempty" json:"country,omitempty"`
+	Country string `url:"country,omitempty" json:"country,omitempty"`
 }
 
 // CustomTokensControllerGetTokensInfoParams defines parameters for CustomTokensControllerGetTokensInfo.
@@ -107,21 +107,21 @@ type CustomTokensControllerGetTokensInfoParams struct {
 // SearchControllerSearchSingleChainParams defines parameters for SearchControllerSearchSingleChain.
 type SearchControllerSearchSingleChainParams struct {
 	// Query Text to search for in token address, token symbol, or description
-	Query *string `url:"query,omitempty" json:"query,omitempty"`
+	Query string `url:"query,omitempty" json:"query,omitempty"`
 
 	// IgnoreListed Whether to ignore listed tokens
-	IgnoreListed       *bool `url:"ignore_listed,omitempty" json:"ignore_listed,omitempty"`
-	OnlyPositiveRating bool  `url:"only_positive_rating" json:"only_positive_rating"`
+	IgnoreListed       bool `url:"ignore_listed,omitempty" json:"ignore_listed,omitempty"`
+	OnlyPositiveRating bool `url:"only_positive_rating" json:"only_positive_rating"`
 
 	// Limit Maximum number of tokens to return
-	Limit *float32 `url:"limit,omitempty" json:"limit,omitempty"`
+	Limit float32 `url:"limit,omitempty" json:"limit,omitempty"`
 }
 
 // TokenListControllerTokensListParams defines parameters for TokenListControllerTokensList.
 type TokenListControllerTokensListParams struct {
 	// Provider Provider code. Default value is "1inch"
-	Provider *string `url:"provider,omitempty" json:"provider,omitempty"`
+	Provider string `url:"provider,omitempty" json:"provider,omitempty"`
 
 	// Country Country code
-	Country *string `url:"country,omitempty" json:"country,omitempty"`
+	Country string `url:"country,omitempty" json:"country,omitempty"`
 }
