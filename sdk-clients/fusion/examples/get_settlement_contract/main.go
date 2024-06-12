@@ -12,21 +12,13 @@ import (
 
 var (
 	devPortalToken = os.Getenv("DEV_PORTAL_TOKEN")
-	publicAddress  = os.Getenv("WALLET_ADDRESS")
-)
-
-const (
-	usdc    = "0x3c499c542cEF5E3811e1192ce70d8cC03d5c3359"
-	wmatic  = "0x0d500B1d8E8eF31E21C99d1Db9A6444d3ADf1270"
-	amount  = 100000000
-	chainId = 137
 )
 
 func main() {
 	config, err := fusion.NewConfiguration(fusion.ConfigurationParams{
 		ApiUrl:  "https://api.1inch.dev",
 		ApiKey:  devPortalToken,
-		ChainId: chainId,
+		ChainId: 1,
 	})
 	if err != nil {
 		log.Fatalf("failed to create configuration: %v", err)
@@ -37,12 +29,7 @@ func main() {
 	}
 	ctx := context.Background()
 
-	response, err := client.GetQuote(ctx, fusion.QuoterControllerGetQuoteParams{
-		FromTokenAddress: usdc,
-		ToTokenAddress:   wmatic,
-		Amount:           amount,
-		WalletAddress:    publicAddress,
-	})
+	response, err := client.GetSettlementContract(ctx)
 	if err != nil {
 		log.Fatalf("failed to request: %v", err)
 	}

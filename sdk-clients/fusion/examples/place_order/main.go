@@ -16,10 +16,11 @@ var (
 )
 
 const (
-	usdc    = "0x3c499c542cEF5E3811e1192ce70d8cC03d5c3359"
-	wmatic  = "0x0d500B1d8E8eF31E21C99d1Db9A6444d3ADf1270"
-	amount  = 100000000
-	chainId = 137
+	usdc         = "0x3c499c542cEF5E3811e1192ce70d8cC03d5c3359"
+	wmatic       = "0x0d500B1d8E8eF31E21C99d1Db9A6444d3ADf1270"
+	amount       = 100000000
+	amountString = "100000000"
+	chainId      = 137
 )
 
 func main() {
@@ -42,6 +43,7 @@ func main() {
 		ToTokenAddress:   wmatic,
 		Amount:           amount,
 		WalletAddress:    publicAddress,
+		EnableEstimate:   true,
 	})
 	if err != nil {
 		log.Fatalf("failed to request: %v", err)
@@ -52,4 +54,17 @@ func main() {
 		log.Fatalf("Failed to marshal response: %v\n", err)
 	}
 	fmt.Printf("Response: %s\n", string(output))
+
+	order, err := client.PlaceOrder(ctx, *response, fusion.OrderParams{
+		FromTokenAddress: usdc,
+		ToTokenAddress:   wmatic,
+		Amount:           amountString,
+		WalletAddress:    publicAddress,
+	})
+
+	orderMarshaled, err := json.MarshalIndent(order, "", "  ")
+	if err != nil {
+		log.Fatalf("Failed to marshal response: %v\n", err)
+	}
+	fmt.Printf("Response: %s\n", string(orderMarshaled))
 }

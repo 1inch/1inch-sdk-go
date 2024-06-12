@@ -24,6 +24,21 @@ const (
 	unwrapWethFlag          = 247
 )
 
+type MakerTraitsParams struct {
+	AllowedSender      string
+	Expiry             int64
+	Nonce              int64
+	Series             int64
+	ShouldCheckEpoch   bool
+	UsePermit2         bool
+	UnwrapWeth         bool
+	HasExtension       bool
+	HasPreInteraction  bool
+	HasPostInteraction bool
+	AllowPartialFills  bool
+	AllowMultipleFills bool
+}
+
 type MakerTraits struct {
 	AllowedSender string
 	Expiry        int64
@@ -37,6 +52,9 @@ type MakerTraits struct {
 	HasExtension        bool
 	ShouldUsePermit2    bool
 	ShouldUnwrapWeth    bool
+
+	AllowPartialFills  bool
+	AllowMultipleFills bool
 }
 
 func NewMakerTraits(params MakerTraitsParams) *MakerTraits {
@@ -53,6 +71,10 @@ func NewMakerTraits(params MakerTraitsParams) *MakerTraits {
 		ShouldUsePermit2:    params.UsePermit2,
 		ShouldUnwrapWeth:    params.UnwrapWeth,
 	}
+}
+
+func (m *MakerTraits) IsBitInvalidatorMode() bool {
+	return !m.AllowPartialFills || !m.AllowMultipleFills
 }
 
 func (m *MakerTraits) Encode() string {
