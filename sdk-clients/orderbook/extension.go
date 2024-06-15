@@ -1,6 +1,7 @@
 package orderbook
 
 import (
+	"encoding/json"
 	"fmt"
 	"math/big"
 	"strings"
@@ -57,7 +58,14 @@ func (i *Extension) Encode() string {
 	if interactionsConcatednated == "" {
 		return "0x"
 	}
-	offsetsBytes := i.getOffsets().Bytes()
+
+	extensionIndented, err := json.MarshalIndent(i, "", "  ")
+	if err != nil {
+		panic("Error marshaling extension")
+	}
+	fmt.Printf("Extension indented: %s\n", string(extensionIndented))
+
+	offsetsBytes := i.getOffsets()
 	paddedOffsetHex := fmt.Sprintf("%064x", offsetsBytes)
 	return "0x" + paddedOffsetHex + interactionsConcatednated
 }
