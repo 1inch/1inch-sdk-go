@@ -17,7 +17,7 @@ func (w Wallet) GenerateApproveCallData(addressTo string, amount uint64) (string
 		return "", fmt.Errorf("failed to pack ABI data: %v", err)
 	}
 
-	return common.Bytes2Hex(callData), nil
+	return "0x" + common.Bytes2Hex(callData), nil
 }
 
 func (w Wallet) TokenAllowance(ctx context.Context, tokenAddress string, spenderAddress string) (*big.Int, error) {

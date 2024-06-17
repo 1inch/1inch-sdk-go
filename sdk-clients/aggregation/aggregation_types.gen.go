@@ -167,6 +167,11 @@ type TokenInfo struct {
 	Tags          []string `json:"tags,omitempty"`
 }
 
+// TokensResponse defines model for TokensResponse.
+type TokensResponse struct {
+	Tokens map[string]TokenInfo `json:"tokens"`
+}
+
 // TransactionData defines model for TransactionData.
 type TransactionData struct {
 	Data     string  `json:"data"`

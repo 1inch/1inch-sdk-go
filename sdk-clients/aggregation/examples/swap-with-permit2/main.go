@@ -2,11 +2,10 @@ package main
 
 import (
 	"context"
-	"fmt"
+	"encoding/hex"
 	"log"
 	"math/big"
 	"os"
-	"time"
 
 	"github.com/ethereum/go-ethereum/common"
 
@@ -65,26 +64,34 @@ func main() {
 	allowance := new(big.Int)
 	allowance.SetString(allowanceData.Allowance, 10)
 
-	cmp := amountToSwap.Cmp(allowance)
-
-	var permit string
+	//cmp := amountToSwap.Cmp(allowance)
+	//
+	//var permit string
 
 	perimit2allowance, err := client.Wallet.TokenAllowance(ctx, PolygonFRAX, UniswapPermit2Polygon)
 	if err != nil {
 		log.Fatalf("Failed to get allowance: %v\n", err)
 	}
 
-	cmp2 := allowance.Cmp(perimit2allowance)
+	cmp2 := amountToSwap.Cmp(perimit2allowance)
 	if cmp2 > 0 {
-		approveData, err := client.Wallet.GenerateApproveCallData(UniswapPermit2Polygon, amountToSwap.Uint64())
+		approveDataString, err := client.Wallet.GenerateApproveCallData(UniswapPermit2Polygon, amountToSwap.Uint64())
 		if err != nil {
 			log.Fatalf("Failed to generate call data: %v\n", err)
 		}
+
+		approveData, err := hex.DecodeString(approveDataString[2:])
+		if err != nil {
+			log.Fatalf("Failed to decode approveDataString: %v\n", err)
+		}
+
+		toAddressFrax := common.HexToAddress(PolygonFRAX)
+
 		builder := client.TxBuilder.New()
 
-		tx, err := builder.SetData(approveData).SetTo(&swapData.TxNormalized.To).SetGas(swapData.TxNormalized.Gas).SetValue(swapData.TxNormalized.Value).Build(ctx)
+		tx, err := builder.SetData(approveData).SetTo(&toAddressFrax).SetGas(21_000 * 5).Build(ctx)
 		if err != nil {
-			log.Fatalf("Failed to build transaction: %v\n", err)
+			log.Fatalf("Failed to build approval  transaction: %v\n", err)
 		}
 		signedTx, err := client.Wallet.Sign(tx)
 		if err != nil {
@@ -96,72 +103,73 @@ func main() {
 			log.Fatalf("Failed to broadcast transaction: %v\n", err)
 		}
 	}
-	if cmp > 0 {
-		spender, err := client.GetApproveSpender(ctx)
-		if err != nil {
-			panic(err)
-		}
-		now := time.Now()
-		twoDaysLater := now.Add(time.Hour * 24 * 2)
 
-		permitData, err := client.Wallet.GetContractDetailsForPermit(ctx, common.HexToAddress(UniswapPermit2Polygon), common.HexToAddress(spender.Address), amountToSwap, twoDaysLater.Unix())
-		if err != nil {
-			log.Fatalf("Failed to get permit data: %v\n", err)
-		}
-
-		permit, err = client.Wallet.TokenPermit(*permitData)
-		if err != nil {
-			log.Fatalf("Failed to sign permit: %v\n", err)
-		}
-	}
-
-	swapParams := aggregation.GetSwapParams{
-		Src:      PolygonFRAX,
-		Dst:      PolygonWeth,
-		Amount:   amountToSwap.String(),
-		From:     client.Wallet.Address().Hex(),
-		Slippage: 1,
-	}
-	if permit != "" {
-		swapParams.Permit = permit
-	}
-	swapData, err := client.GetSwap(ctx, swapParams)
-	if err != nil {
-		log.Fatalf("Failed to get swap data: %v\n", err)
-	}
-
-	builder := client.TxBuilder.New()
-
-	tx, err := builder.SetData(swapData.TxNormalized.Data).SetTo(&swapData.TxNormalized.To).SetGas(swapData.TxNormalized.Gas).SetValue(swapData.TxNormalized.Value).Build(ctx)
-	if err != nil {
-		log.Fatalf("Failed to build transaction: %v\n", err)
-	}
-	signedTx, err := client.Wallet.Sign(tx)
-	if err != nil {
-		log.Fatalf("Failed to sign transaction: %v\n", err)
-	}
-
-	err = client.Wallet.BroadcastTransaction(ctx, signedTx)
-	if err != nil {
-		log.Fatalf("Failed to broadcast transaction: %v\n", err)
-	}
-
-	// Waiting for transaction, just an example of it
-	fmt.Printf("Transaction has been broadcast. View it on Polygonscan here: %v\n", fmt.Sprintf("https://polygonscan.com/tx/%v", signedTx.Hash().Hex()))
-	for {
-		receipt, err := client.Wallet.TransactionReceipt(ctx, signedTx.Hash())
-		if receipt != nil {
-			fmt.Println("Transaction complete!")
-			return
-		}
-		if err != nil {
-			fmt.Println("Waiting for transaction to be mined")
-		}
-		select {
-		case <-time.After(1000 * time.Millisecond): // check again after a delay
-		case <-ctx.Done():
-			fmt.Println("Context cancelled")
-			return
-		}
-	}
+	//if cmp > 0 {
+	//	spender, err := client.GetApproveSpender(ctx)
+	//	if err != nil {
+	//		panic(err)
+	//	}
+	//	now := time.Now()
+	//	twoDaysLater := now.Add(time.Hour * 24 * 2)
+	//
+	//	permitData, err := client.Wallet.GetContractDetailsForPermit(ctx, common.HexToAddress(UniswapPermit2Polygon), common.HexToAddress(spender.Address), amountToSwap, twoDaysLater.Unix())
+	//	if err != nil {
+	//		log.Fatalf("Failed to get permit data: %v\n", err)
+	//	}
+	//
+	//	permit, err = client.Wallet.TokenPermit(*permitData)
+	//	if err != nil {
+	//		log.Fatalf("Failed to sign permit: %v\n", err)
+	//	}
+	//}
+	//
+	//swapParams := aggregation.GetSwapParams{
+	//	Src:      PolygonFRAX,
+	//	Dst:      PolygonWeth,
+	//	Amount:   amountToSwap.String(),
+	//	From:     client.Wallet.Address().Hex(),
+	//	Slippage: 1,
+	//}
+	//if permit != "" {
+	//	swapParams.Permit = permit
+	//}
+	//swapData, err := client.GetSwap(ctx, swapParams)
+	//if err != nil {
+	//	log.Fatalf("Failed to get swap data: %v\n", err)
+	//}
+	//
+	//builder := client.TxBuilder.New()
+	//
+	//tx, err := builder.SetData(swapData.TxNormalized.Data).SetTo(&swapData.TxNormalized.To).SetGas(swapData.TxNormalized.Gas).SetValue(swapData.TxNormalized.Value).Build(ctx)
+	//if err != nil {
+	//	log.Fatalf("Failed to build transaction: %v\n", err)
+	//}
+	//signedTx, err := client.Wallet.Sign(tx)
+	//if err != nil {
+	//	log.Fatalf("Failed to sign transaction: %v\n", err)
+	//}
+	//
+	//err = client.Wallet.BroadcastTransaction(ctx, signedTx)
+	//if err != nil {
+	//	log.Fatalf("Failed to broadcast transaction: %v\n", err)
+	//}
+	//
+	//// Waiting for transaction, just an example of it
+	//fmt.Printf("Transaction has been broadcast. View it on Polygonscan here: %v\n", fmt.Sprintf("https://polygonscan.com/tx/%v", signedTx.Hash().Hex()))
+	//for {
+	//	receipt, err := client.Wallet.TransactionReceipt(ctx, signedTx.Hash())
+	//	if receipt != nil {
+	//		fmt.Println("Transaction complete!")
+	//		return
+	//	}
+	//	if err != nil {
+	//		fmt.Println("Waiting for transaction to be mined")
+	//	}
+	//	select {
+	//	case <-time.After(1000 * time.Millisecond): // check again after a delay
+	//	case <-ctx.Done():
+	//		fmt.Println("Context cancelled")
+	//		return
+	//	}
+	//}
 }

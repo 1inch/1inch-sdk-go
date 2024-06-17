@@ -33,12 +33,6 @@ type Wallet interface {
 
 	IsEIP1559Applicable() bool
 	ChainId() int64
-	//TokenApprove()
-
-	// view functions
-	//TokenBalance()
-	//TokenAllowance()
-
 }
 
 type ContractPermitData struct {
