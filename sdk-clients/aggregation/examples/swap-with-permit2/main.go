@@ -31,6 +31,10 @@ const (
 	PolygonWeth = "0x7ceB23fD6bC0adD59E62ac25578270cFf1b9f619"
 )
 
+const (
+	UniswapPermit2Polygon = "0x000000000022D473030F116dDEE9F6B43aC78BA3"
+)
+
 func main() {
 	config, err := aggregation.NewConfiguration(aggregation.ConfigurationParams{
 		NodeUrl:    nodeUrl,
@@ -65,6 +69,33 @@ func main() {
 
 	var permit string
 
+	perimit2allowance, err := client.Wallet.TokenAllowance(ctx, PolygonFRAX, UniswapPermit2Polygon)
+	if err != nil {
+		log.Fatalf("Failed to get allowance: %v\n", err)
+	}
+
+	cmp2 := allowance.Cmp(perimit2allowance)
+	if cmp2 > 0 {
+		approveData, err := client.Wallet.GenerateApproveCallData(UniswapPermit2Polygon, amountToSwap.Uint64())
+		if err != nil {
+			log.Fatalf("Failed to generate call data: %v\n", err)
+		}
+		builder := client.TxBuilder.New()
+
+		tx, err := builder.SetData(approveData).SetTo(&swapData.TxNormalized.To).SetGas(swapData.TxNormalized.Gas).SetValue(swapData.TxNormalized.Value).Build(ctx)
+		if err != nil {
+			log.Fatalf("Failed to build transaction: %v\n", err)
+		}
+		signedTx, err := client.Wallet.Sign(tx)
+		if err != nil {
+			log.Fatalf("Failed to sign transaction: %v\n", err)
+		}
+
+		err = client.Wallet.BroadcastTransaction(ctx, signedTx)
+		if err != nil {
+			log.Fatalf("Failed to broadcast transaction: %v\n", err)
+		}
+	}
 	if cmp > 0 {
 		spender, err := client.GetApproveSpender(ctx)
 		if err != nil {
@@ -73,7 +104,7 @@ func main() {
 		now := time.Now()
 		twoDaysLater := now.Add(time.Hour * 24 * 2)
 
-		permitData, err := client.Wallet.GetContractDetailsForPermit(ctx, common.HexToAddress(PolygonFRAX), common.HexToAddress(spender.Address), amountToSwap, twoDaysLater.Unix())
+		permitData, err := client.Wallet.GetContractDetailsForPermit(ctx, common.HexToAddress(UniswapPermit2Polygon), common.HexToAddress(spender.Address), amountToSwap, twoDaysLater.Unix())
 		if err != nil {
 			log.Fatalf("Failed to get permit data: %v\n", err)
 		}

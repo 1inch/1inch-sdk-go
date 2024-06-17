@@ -29,6 +29,8 @@ type Wallet interface {
 
 	GenerateApproveCallData(addressTo string, amount uint64) (string, error)
 
+	TokenAllowance(ctx context.Context, tokenAddress string, spenderAddress string) (*big.Int, error)
+
 	IsEIP1559Applicable() bool
 	ChainId() int64
 	//TokenApprove()
