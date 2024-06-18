@@ -149,19 +149,6 @@ type NormalizedLimitOrderData struct {
 	MakerTraits  *big.Int
 }
 
-type MakerTraitsParams struct {
-	AllowedSender      string
-	Expiry             int64
-	Nonce              int64
-	Series             int64
-	ShouldCheckEpoch   bool
-	UsePermit2         bool
-	UnwrapWeth         bool
-	HasExtension       bool
-	HasPreInteraction  bool
-	HasPostInteraction bool
-}
-
 type TakerTraitsParams struct {
 	Receiver        *common.Address
 	Extension       string

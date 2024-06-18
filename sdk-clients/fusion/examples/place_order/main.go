@@ -13,13 +13,15 @@ import (
 var (
 	devPortalToken = os.Getenv("DEV_PORTAL_TOKEN")
 	publicAddress  = os.Getenv("WALLET_ADDRESS")
+	privateKey     = os.Getenv("WALLET_KEY")
 )
 
 const (
-	usdc    = "0x3c499c542cEF5E3811e1192ce70d8cC03d5c3359"
-	wmatic  = "0x0d500B1d8E8eF31E21C99d1Db9A6444d3ADf1270"
-	amount  = 100000000
-	chainId = 137
+	usdc         = "0x3c499c542cEF5E3811e1192ce70d8cC03d5c3359"
+	wmatic       = "0x0d500B1d8E8eF31E21C99d1Db9A6444d3ADf1270"
+	amount       = 1000000000000000000
+	amountString = "1000000000000000000"
+	chainId      = 137
 )
 
 func main() {
@@ -38,10 +40,11 @@ func main() {
 	ctx := context.Background()
 
 	response, err := client.GetQuote(ctx, fusion.QuoterControllerGetQuoteParams{
-		FromTokenAddress: usdc,
-		ToTokenAddress:   wmatic,
+		FromTokenAddress: wmatic,
+		ToTokenAddress:   usdc,
 		Amount:           amount,
 		WalletAddress:    publicAddress,
+		EnableEstimate:   true,
 	})
 	if err != nil {
 		log.Fatalf("failed to request: %v", err)
@@ -52,4 +55,19 @@ func main() {
 		log.Fatalf("Failed to marshal response: %v\n", err)
 	}
 	fmt.Printf("Response: %s\n", string(output))
+
+	fmt.Println("Placing order")
+	_, err = client.PlaceOrder(ctx, *response, fusion.OrderParams{
+		FromTokenAddress: wmatic,
+		ToTokenAddress:   usdc,
+		Amount:           amountString,
+		WalletAddress:    publicAddress,
+		Receiver:         "0x0000000000000000000000000000000000000000",
+	}, fusion.PlaceOrderParams{
+		Maker:      publicAddress,
+		PrivateKey: privateKey,
+	})
+	if err != nil {
+		log.Fatalf("failed to request: %v", err)
+	}
 }
