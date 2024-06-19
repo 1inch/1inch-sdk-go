@@ -3,9 +3,11 @@ package main
 import (
 	"context"
 	"encoding/hex"
+	"fmt"
 	"log"
 	"math/big"
 	"os"
+	"time"
 
 	"github.com/ethereum/go-ethereum/common"
 
@@ -53,16 +55,16 @@ func main() {
 
 	amountToSwap := big.NewInt(1e17)
 
-	allowanceData, err := client.GetApproveAllowance(ctx, aggregation.GetAllowanceParams{
-		TokenAddress:  PolygonFRAX,
-		WalletAddress: client.Wallet.Address().Hex(),
-	})
-	if err != nil {
-		log.Fatalf("Failed to get allowance: %v\n", err)
-	}
-
-	allowance := new(big.Int)
-	allowance.SetString(allowanceData.Allowance, 10)
+	//allowanceData, err := client.GetApproveAllowance(ctx, aggregation.GetAllowanceParams{
+	//	TokenAddress:  PolygonFRAX,
+	//	WalletAddress: client.Wallet.Address().Hex(),
+	//})
+	//if err != nil {
+	//	log.Fatalf("Failed to get allowance: %v\n", err)
+	//}
+	//
+	//allowance := new(big.Int)
+	//allowance.SetString(allowanceData.Allowance, 10)
 
 	//cmp := amountToSwap.Cmp(allowance)
 	//
@@ -72,6 +74,8 @@ func main() {
 	if err != nil {
 		log.Fatalf("Failed to get allowance: %v\n", err)
 	}
+
+	var permit string
 
 	cmp2 := amountToSwap.Cmp(perimit2allowance)
 	if cmp2 > 0 {
@@ -102,74 +106,92 @@ func main() {
 		if err != nil {
 			log.Fatalf("Failed to broadcast transaction: %v\n", err)
 		}
+
+		spender, err := client.GetApproveSpender(ctx)
+		if err != nil {
+			panic(err)
+		}
+		now := time.Now()
+		twoDaysLater := now.Add(time.Hour * 24 * 2)
+
+		permitData, err := client.Wallet.GetContractDetailsForPermit(ctx, common.HexToAddress(UniswapPermit2Polygon), common.HexToAddress(spender.Address), amountToSwap, twoDaysLater.Unix())
+		if err != nil {
+			log.Fatalf("Failed to get permit data: %v\n", err)
+		}
+
+		permit, err = client.Wallet.TokenPermit(*permitData)
+		if err != nil {
+			log.Fatalf("Failed to sign permit: %v\n", err)
+		}
 	}
 
-	//if cmp > 0 {
-	//	spender, err := client.GetApproveSpender(ctx)
-	//	if err != nil {
-	//		panic(err)
-	//	}
-	//	now := time.Now()
-	//	twoDaysLater := now.Add(time.Hour * 24 * 2)
-	//
-	//	permitData, err := client.Wallet.GetContractDetailsForPermit(ctx, common.HexToAddress(UniswapPermit2Polygon), common.HexToAddress(spender.Address), amountToSwap, twoDaysLater.Unix())
-	//	if err != nil {
-	//		log.Fatalf("Failed to get permit data: %v\n", err)
-	//	}
-	//
-	//	permit, err = client.Wallet.TokenPermit(*permitData)
-	//	if err != nil {
-	//		log.Fatalf("Failed to sign permit: %v\n", err)
-	//	}
-	//}
-	//
-	//swapParams := aggregation.GetSwapParams{
-	//	Src:      PolygonFRAX,
-	//	Dst:      PolygonWeth,
-	//	Amount:   amountToSwap.String(),
-	//	From:     client.Wallet.Address().Hex(),
-	//	Slippage: 1,
-	//}
-	//if permit != "" {
-	//	swapParams.Permit = permit
-	//}
-	//swapData, err := client.GetSwap(ctx, swapParams)
-	//if err != nil {
-	//	log.Fatalf("Failed to get swap data: %v\n", err)
-	//}
-	//
-	//builder := client.TxBuilder.New()
-	//
-	//tx, err := builder.SetData(swapData.TxNormalized.Data).SetTo(&swapData.TxNormalized.To).SetGas(swapData.TxNormalized.Gas).SetValue(swapData.TxNormalized.Value).Build(ctx)
-	//if err != nil {
-	//	log.Fatalf("Failed to build transaction: %v\n", err)
-	//}
-	//signedTx, err := client.Wallet.Sign(tx)
-	//if err != nil {
-	//	log.Fatalf("Failed to sign transaction: %v\n", err)
-	//}
-	//
-	//err = client.Wallet.BroadcastTransaction(ctx, signedTx)
-	//if err != nil {
-	//	log.Fatalf("Failed to broadcast transaction: %v\n", err)
-	//}
-	//
-	//// Waiting for transaction, just an example of it
-	//fmt.Printf("Transaction has been broadcast. View it on Polygonscan here: %v\n", fmt.Sprintf("https://polygonscan.com/tx/%v", signedTx.Hash().Hex()))
-	//for {
-	//	receipt, err := client.Wallet.TransactionReceipt(ctx, signedTx.Hash())
-	//	if receipt != nil {
-	//		fmt.Println("Transaction complete!")
-	//		return
-	//	}
-	//	if err != nil {
-	//		fmt.Println("Waiting for transaction to be mined")
-	//	}
-	//	select {
-	//	case <-time.After(1000 * time.Millisecond): // check again after a delay
-	//	case <-ctx.Done():
-	//		fmt.Println("Context cancelled")
-	//		return
-	//	}
-	//}
+	if cmp2 == 0 {
+		spender, err := client.GetApproveSpender(ctx)
+		if err != nil {
+			panic(err)
+		}
+		now := time.Now()
+		twoDaysLater := now.Add(time.Hour * 24 * 2)
+
+		permitData, err := client.Wallet.GetContractDetailsForPermit(ctx, common.HexToAddress(UniswapPermit2Polygon), common.HexToAddress(spender.Address), amountToSwap, twoDaysLater.Unix())
+		if err != nil {
+			log.Fatalf("Failed to get permit data: %v\n", err)
+		}
+
+		permit, err = client.Wallet.TokenPermit(*permitData)
+		if err != nil {
+			log.Fatalf("Failed to sign permit: %v\n", err)
+		}
+	}
+
+	swapParams := aggregation.GetSwapParams{
+		Src:        PolygonFRAX,
+		Dst:        PolygonWeth,
+		Amount:     amountToSwap.String(),
+		From:       client.Wallet.Address().Hex(),
+		Slippage:   1,
+		UsePermit2: true,
+	}
+	if permit != "" {
+		swapParams.Permit = permit
+	}
+	swapData, err := client.GetSwap(ctx, swapParams)
+	if err != nil {
+		log.Fatalf("Failed to get swap data: %v\n", err)
+	}
+
+	builder := client.TxBuilder.New()
+
+	tx, err := builder.SetData(swapData.TxNormalized.Data).SetTo(&swapData.TxNormalized.To).SetGas(swapData.TxNormalized.Gas).SetValue(swapData.TxNormalized.Value).Build(ctx)
+	if err != nil {
+		log.Fatalf("Failed to build transaction: %v\n", err)
+	}
+	signedTx, err := client.Wallet.Sign(tx)
+	if err != nil {
+		log.Fatalf("Failed to sign transaction: %v\n", err)
+	}
+
+	err = client.Wallet.BroadcastTransaction(ctx, signedTx)
+	if err != nil {
+		log.Fatalf("Failed to broadcast transaction: %v\n", err)
+	}
+
+	// Waiting for transaction, just an example of it
+	fmt.Printf("Transaction has been broadcast. View it on Polygonscan here: %v\n", fmt.Sprintf("https://polygonscan.com/tx/%v", signedTx.Hash().Hex()))
+	for {
+		receipt, err := client.Wallet.TransactionReceipt(ctx, signedTx.Hash())
+		if receipt != nil {
+			fmt.Println("Transaction complete!")
+			return
+		}
+		if err != nil {
+			fmt.Println("Waiting for transaction to be mined")
+		}
+		select {
+		case <-time.After(1000 * time.Millisecond): // check again after a delay
+		case <-ctx.Done():
+			fmt.Println("Context cancelled")
+			return
+		}
+	}
 }
