@@ -227,7 +227,8 @@ func (w Wallet) SignPermit2TransferFrom(
 	permit2Address string,
 	witness *Witness,
 ) ([]byte, error) {
-	permitData := getPermitTransferFromData(permit, permit2Address, int(w.chainId.Uint64()), witness)
+	chainId := int(w.chainId.Uint64())
+	permitData := getPermitTransferFromData(permit, permit2Address, chainId, witness)
 
 	encodedData, err := abi.JSON(strings.NewReader(abiString))
 	if err != nil {
