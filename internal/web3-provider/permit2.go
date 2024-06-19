@@ -2,16 +2,34 @@ package web3_provider
 
 import (
 	"bytes"
+	"fmt"
 	"math/big"
 	"reflect"
 	"strings"
 
+	"github.com/ethereum/go-ethereum/accounts/abi"
 	"github.com/ethereum/go-ethereum/common"
 	"github.com/ethereum/go-ethereum/crypto"
 )
 
 const (
 	PERMIT2_DOMAIN_NAME = "Permit2"
+)
+
+const (
+	// Update this with the ABI for your contract
+	abiString = `
+[
+	{
+		"type": "function",
+		"name": "permitTransferFrom",
+		"inputs": [
+			{ "name": "data", "type": "PermitTransferFromData" },
+			{ "name": "witness", "type": "bytes" }
+		]
+	}
+]
+`
 )
 
 var (
@@ -202,4 +220,31 @@ func hashStruct(types map[string][]TypedDataField, values PermitTransferFrom) []
 	}
 
 	return crypto.Keccak256(buffer.Bytes())
+}
+
+func (w Wallet) SignPermit2TransferFrom(
+	permit PermitTransferFrom,
+	permit2Address string,
+	witness *Witness,
+) ([]byte, error) {
+	permitData := getPermitTransferFromData(permit, permit2Address, int(w.chainId.Uint64()), witness)
+
+	encodedData, err := abi.JSON(strings.NewReader(abiString))
+	if err != nil {
+		return nil, fmt.Errorf("failed to parse ABI: %v", err)
+	}
+	_, err = encodedData.Pack("permitTransferFrom", permitData, nil)
+	if err != nil {
+		return nil, fmt.Errorf("failed to pack permit data: %v", err)
+	}
+
+	message := fmt.Sprintf("\x19\x01%s", string(hashPermitTransferFrom(permit, permit2Address, chainId, witness)))
+
+	hash := crypto.Keccak256Hash([]byte(message))
+	signature, err := crypto.Sign(hash.Bytes(), w.privateKey)
+	if err != nil {
+		return nil, fmt.Errorf("failed to sign permit: %v", err)
+	}
+
+	return signature, nil
 }
