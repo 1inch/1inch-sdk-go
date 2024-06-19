@@ -10,6 +10,8 @@ import (
 	"github.com/ethereum/go-ethereum/accounts/abi"
 	"github.com/ethereum/go-ethereum/common"
 	"github.com/ethereum/go-ethereum/crypto"
+	"golang.org/x/text/cases"
+	"golang.org/x/text/language"
 )
 
 const (
@@ -206,7 +208,7 @@ func hashStruct(types map[string][]TypedDataField, values PermitTransferFrom) []
 	value := reflect.ValueOf(values)
 	for _, field := range types[primaryType] {
 		fieldName := field.Name
-		fieldValue := value.FieldByName(strings.Title(fieldName))
+		fieldValue := value.FieldByName(cases.Title(language.English).String(fieldName))
 
 		if field.Type == "address" {
 			buffer.Write(common.HexToAddress(fieldValue.String()).Bytes())
