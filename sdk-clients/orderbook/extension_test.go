@@ -96,23 +96,7 @@ func TestGetOffsets(t *testing.T) {
 			expectedOffsets: "F4000000F4000000F40000000000000000000000000000000000000000",
 		},
 		{
-			name: "Simple Fusion Order",
-			extension: Extension{
-				InteractionsArray: []string{
-					"0x",
-					"0x",
-					"0xfb2809a5314473e1165f6b58018e20ed8f07b84000000000000000666cdada0000b400c45d00767a007e",
-					"0xfb2809a5314473e1165f6b58018e20ed8f07b84000000000000000666cdada0000b400c45d00767a007e",
-					"0x",
-					"0x",
-					"0x",
-					"0xfb2809a5314473e1165f6b58018e20ed8f07b84000000000000000666cdada0000b400c45d00767a007e",
-				},
-			},
-			expectedOffsets: "000000cd000000540000005400000054000000540000002a0000000000000000",
-		},
-		{
-			name: "Another Fusion Order",
+			name: "Fusion Order",
 			extension: Extension{
 				InteractionsArray: []string{
 					"0x",

@@ -8,14 +8,14 @@ import (
 )
 
 const (
-	UINT_24_MAX = (1 << 24) - 1
-	UINT_32_MAX = math.MaxUint32
+	uint24Max = (1 << 24) - 1
+	uint32Max = math.MaxUint32
 )
 
 func NewAuctionDetails(startTime, duration, initialRateBump uint32, points []AuctionPointClassFixed, gasCost GasCostConfigClassFixed) (AuctionDetails, error) {
 
-	if gasCost.GasBumpEstimate > UINT_24_MAX || gasCost.GasPriceEstimate > UINT_32_MAX ||
-		startTime > UINT_32_MAX || duration > UINT_24_MAX || initialRateBump > UINT_24_MAX {
+	if gasCost.GasBumpEstimate > uint24Max || gasCost.GasPriceEstimate > uint32Max ||
+		startTime > uint32Max || duration > uint24Max || initialRateBump > uint24Max {
 		return AuctionDetails{}, errors.New("values exceed their respective limits")
 	}
 

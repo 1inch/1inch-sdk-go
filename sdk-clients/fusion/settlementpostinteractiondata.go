@@ -19,7 +19,7 @@ type SettlementPostInteractionData struct {
 	CustomReceiver     common.Address
 }
 
-var UINT_16_MAX = new(big.Int).Sub(new(big.Int).Lsh(big.NewInt(1), 16), big.NewInt(1))
+var uint16Max = new(big.Int).Sub(new(big.Int).Lsh(big.NewInt(1), 16), big.NewInt(1))
 
 func NewSettlementPostInteractionData(data SettlementSuffixData) SettlementPostInteractionData {
 	if len(data.Whitelist) == 0 {
@@ -54,7 +54,7 @@ func NewSettlementPostInteractionData(data SettlementSuffixData) SettlementPostI
 
 		sumDelay.Add(sumDelay, whitelist[i].Delay)
 
-		if whitelist[i].Delay.Cmp(UINT_16_MAX) >= 0 {
+		if whitelist[i].Delay.Cmp(uint16Max) >= 0 {
 			panic("Too big diff between timestamps")
 		}
 	}

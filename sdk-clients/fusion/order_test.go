@@ -9,6 +9,7 @@ import (
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
 
+	random_number_generation "github.com/1inch/1inch-sdk-go/internal/random-number-generation"
 	"github.com/1inch/1inch-sdk-go/sdk-clients/orderbook"
 )
 
@@ -28,7 +29,6 @@ func TestCreateOrder(t *testing.T) {
 	tests := []struct {
 		name                        string
 		orderParams                 OrderParams
-		fusionOrderParamsData       FusionOrderParamsData
 		additionalParams            AdditionalParams
 		auctionStartTime            uint32
 		nonce                       *big.Int
@@ -40,20 +40,18 @@ func TestCreateOrder(t *testing.T) {
 		data                        string
 	}{
 		{
-			name: "Encode/Decode Interaction",
+			name: "Successful order creation",
 			orderParams: OrderParams{
 				FromTokenAddress: wmatic,
 				ToTokenAddress:   usdc,
 				Amount:           amountString,
 				Receiver:         "0x0000000000000000000000000000000000000000",
-			},
-			fusionOrderParamsData: FusionOrderParamsData{
-				NetworkId: chainId,
-				Preset:    Fast, // TODO currently always choosing the fast preset
-				Receiver:  "0x0000000000000000000000000000000000000000",
+				Preset:           "fast",
 			},
 			additionalParams: AdditionalParams{
+				NetworkId:   chainId,
 				FromAddress: publicAddress,
+				PrivateKey:  privateKey,
 			},
 			auctionStartTime:            1718671900,
 			nonce:                       big.NewInt(887174712009),
@@ -88,9 +86,15 @@ func TestCreateOrder(t *testing.T) {
 			baseSaltValue, err := BigIntFromString(tc.baseSaltValue)
 			require.NoError(t, err)
 
-			originalNonceFunc := randBigIntFunc
-			randBigIntFunc = func(i int64) *big.Int {
-				return tc.nonce
+			originalRandBigIntFunc := random_number_generation.BigIntMaxFunc
+			first := true
+			random_number_generation.BigIntMaxFunc = func(b *big.Int) (*big.Int, error) {
+				if first {
+					first = false
+					return tc.nonce, nil
+				} else {
+					return baseSaltValue, nil
+				}
 			}
 
 			// Monkey patch custom start time value
@@ -105,16 +109,10 @@ func TestCreateOrder(t *testing.T) {
 				return tc.auctionStartTime
 			}
 
-			originalRandBigIntFunc := randBigIntNewFunc
-			randBigIntNewFunc = func(b *big.Int) *big.Int {
-				return baseSaltValue
-			}
-
-			preparedOrder, orderbookOrder, err := CreateOrder(tc.orderParams, quote, tc.fusionOrderParamsData, tc.additionalParams, privateKey)
-			randBigIntFunc = originalNonceFunc
+			preparedOrder, orderbookOrder, err := CreateFusionOrderData(quote, tc.orderParams, tc.additionalParams)
 			timeNow = originalTimeNowFunc
 			CalcAuctionStartTimeFunc = originalCalcAuctionStartTimeFunc
-			randBigIntNewFunc = originalRandBigIntFunc
+			random_number_generation.BigIntMaxFunc = originalRandBigIntFunc
 
 			assert.Equal(t, expectedOrdrebookOrder, *orderbookOrder)
 			assert.Equal(t, expectedPreparedOrder, *preparedOrder)

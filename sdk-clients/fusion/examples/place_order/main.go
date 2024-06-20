@@ -56,18 +56,26 @@ func main() {
 	}
 	fmt.Printf("Response: %s\n", string(output))
 
-	fmt.Println("Placing order")
-	_, err = client.PlaceOrder(ctx, *response, fusion.OrderParams{
+	orderParams := fusion.OrderParams{
 		FromTokenAddress: wmatic,
 		ToTokenAddress:   usdc,
 		Amount:           amountString,
 		WalletAddress:    publicAddress,
 		Receiver:         "0x0000000000000000000000000000000000000000",
-	}, fusion.PlaceOrderParams{
+		Preset:           fusion.Fast,
+	}
+
+	additionalOrderParams := fusion.AdditionalPlaceOrderParams{
 		Maker:      publicAddress,
 		PrivateKey: privateKey,
-	})
+	}
+
+	fmt.Println("Placing order")
+	err = client.PlaceOrder(ctx, *response, orderParams, additionalOrderParams)
 	if err != nil {
 		log.Fatalf("failed to request: %v", err)
 	}
+
+	// A successful Fusion order submission has no response body
+	fmt.Printf("Success!")
 }

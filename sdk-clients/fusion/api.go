@@ -49,6 +49,11 @@ func (api *api) GetSettlementContract(ctx context.Context) (*SettlementAddressOu
 func (api *api) GetQuote(ctx context.Context, params QuoterControllerGetQuoteParams) (*GetQuoteOutputFixed, error) {
 	u := fmt.Sprintf("/fusion/quoter/v2.0/%d/quote/receive", api.chainId)
 
+	err := params.Validate()
+	if err != nil {
+		return nil, err
+	}
+
 	payload := common.RequestPayload{
 		Method: "GET",
 		Params: params,
@@ -57,7 +62,7 @@ func (api *api) GetQuote(ctx context.Context, params QuoterControllerGetQuotePar
 	}
 
 	var response GetQuoteOutputFixed
-	err := api.httpExecutor.ExecuteRequest(ctx, payload, &response)
+	err = api.httpExecutor.ExecuteRequest(ctx, payload, &response)
 	if err != nil {
 		return nil, err
 	}
@@ -91,42 +96,42 @@ func (api *api) GetQuoteWithCustomPreset(ctx context.Context, params QuoterContr
 
 // TODO Evaluate how to properly accept the order data and the extension, signature, and quoteId
 
-func (api *api) PlaceOrder(ctx context.Context, quote GetQuoteOutputFixed, orderParams OrderParams, placeOrderParams PlaceOrderParams) (map[string]interface{}, error) {
+// PlaceOrder accepts a quote and submits it as a fusion order
+func (api *api) PlaceOrder(ctx context.Context, fusionQuote GetQuoteOutputFixed, orderParams OrderParams, additionalOrderParams AdditionalPlaceOrderParams) error {
 	u := fmt.Sprintf("/fusion/relayer/v2.0/%d/order/submit", api.chainId)
 
-	// TODO some kind of input validation
-	fusionOrderParamsData := FusionOrderParamsData{
-		NetworkId: int(api.chainId),
-		Preset:    Fast, // TODO currently always choosing the fast preset
-		Receiver:  orderParams.Receiver,
-		//Nonce:                   nil,
-		//Permit:                  "",
-		//IsPermit2:               false,
-		//AllowPartialFills:       false,
-		//AllowMultipleFills:      false,
-		//DelayAuctionStartTimeBy: nil,
-		//OrderExpirationDelay:    nil,
+	err := orderParams.Validate()
+	if err != nil {
+		return err
+	}
+
+	err = additionalOrderParams.Validate()
+	if err != nil {
+		return err
 	}
 
 	additionalParams := AdditionalParams{
-		FromAddress: placeOrderParams.Maker,
+		NetworkId:   int(api.chainId),
+		FromAddress: additionalOrderParams.Maker,
+		PrivateKey:  additionalOrderParams.PrivateKey,
 	}
 
-	fusionOrder, limitOrder, err := CreateOrder(orderParams, quote, fusionOrderParamsData, additionalParams, placeOrderParams.PrivateKey)
+	// TODO This function can simply return the SignedOrderInput object
+	fusionOrder, limitOrder, err := CreateFusionOrderData(fusionQuote, orderParams, additionalParams)
 	if err != nil {
-		return nil, fmt.Errorf("failed to create order: %v", err)
+		return fmt.Errorf("failed to create order: %v", err)
 	}
 
 	fusionOrderIndented, err := json.MarshalIndent(fusionOrder, "", "  ")
 	if err != nil {
-		return nil, err
+		return err
 	}
 
 	fmt.Printf("Fusion Order: %s\n", string(fusionOrderIndented))
 
 	limitOrderIndented, err := json.MarshalIndent(limitOrder, "", "  ")
 	if err != nil {
-		return nil, err
+		return err
 	}
 	fmt.Printf("Limit Order: %s\n", limitOrderIndented)
 
@@ -142,18 +147,18 @@ func (api *api) PlaceOrder(ctx context.Context, quote GetQuoteOutputFixed, order
 			TakerAsset:   limitOrder.Data.TakerAsset,
 			TakingAmount: limitOrder.Data.TakingAmount,
 		},
-		QuoteId:   quote.QuoteId,
+		QuoteId:   fusionQuote.QuoteId,
 		Signature: limitOrder.Signature,
 	}
 
 	body, err := json.Marshal(signedOrder)
 	if err != nil {
-		return nil, err
+		return err
 	}
 
 	bodyIndented, err := json.MarshalIndent(signedOrder, "", "  ")
 	if err != nil {
-		return nil, err
+		return err
 	}
 
 	fmt.Printf("Body Indented: %s\n", string(bodyIndented))
@@ -165,13 +170,12 @@ func (api *api) PlaceOrder(ctx context.Context, quote GetQuoteOutputFixed, order
 		Body:   body,
 	}
 
-	var response map[string]interface{}
-	err = api.httpExecutor.ExecuteRequest(ctx, payload, &response)
+	err = api.httpExecutor.ExecuteRequest(ctx, payload, nil)
 	if err != nil {
-		return nil, err
+		return err
 	}
 
-	return response, nil
+	return nil
 }
 
 func (api *api) PlaceOrders(ctx context.Context, body []PlaceOrderBody) (*GetQuoteOutput, error) {

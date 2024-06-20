@@ -70,8 +70,6 @@ func main() {
 		UsePermit2:         false,
 		UnwrapWeth:         false,
 		HasExtension:       false,
-		HasPreInteraction:  false,
-		HasPostInteraction: false,
 		Expiry:             expireAfter,
 		Nonce:              seriesNonce.Int64(),
 		Series:             0, // TODO: Series 0 always?

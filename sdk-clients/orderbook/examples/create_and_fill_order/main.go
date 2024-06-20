@@ -72,7 +72,9 @@ func main() {
 		UnwrapWeth:         false,
 		HasExtension:       false,
 		HasPreInteraction:  false,
-		HasPostInteraction: true,
+		HasPostInteraction: false,
+		AllowMultipleFills: true,
+		AllowPartialFills:  true,
 		Expiry:             expireAfter,
 		Nonce:              seriesNonce.Int64(),
 		Series:             0, // TODO: Series 0 always?
@@ -88,7 +90,7 @@ func main() {
 		TakerAsset:                     usdc,
 		MakingAmount:                   ten16,
 		TakingAmount:                   ten6,
-		Taker:                          zeroAddress,
+		Taker:                          zeroAddress, // TODO We should enable the user to pass in a blank string here and ssume 0x000...
 		SkipWarnings:                   false,
 		EnableOnchainApprovalsIfNeeded: false,
 	})

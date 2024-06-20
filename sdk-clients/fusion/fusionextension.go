@@ -7,28 +7,8 @@ import (
 	"strings"
 	"time"
 
-	"github.com/ethereum/go-ethereum/common"
 	"github.com/ethereum/go-ethereum/crypto"
 )
-
-func NewFusionExtension(address common.Address, auctionDetails AuctionDetails, postInteractionData SettlementPostInteractionData, permitInteraction *Interaction) ExtensionBuilder {
-
-	detailsBytes := auctionDetails.Encode()
-
-	builder := ExtensionBuilder{}
-
-	builder.WithMakingAmountData(address, detailsBytes)
-	builder.WithTakingAmountData(address, detailsBytes)
-	builder.WithPostInteraction(
-		NewInteraction(address, postInteractionData.Encode()),
-	)
-
-	if permitInteraction != nil {
-		builder.WithMakerPermit(permitInteraction.Target, permitInteraction.Data)
-	}
-
-	return builder
-}
 
 func stringToHexBytes(hexStr string) ([]byte, error) {
 	// Strip the "0x" prefix if it exists

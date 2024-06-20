@@ -96,8 +96,6 @@ func (m *MakerTraits) Encode() string {
 	encodedCalldata := new(big.Int)
 
 	tmp := new(big.Int)
-
-	encodedCalldata.Or(encodedCalldata, tmp.Lsh(big.NewInt(m.Expiry), 80))
 	// Limit Orders require this flag to always be present
 	if m.AllowMultipleFills {
 		encodedCalldata.Or(encodedCalldata, tmp.Lsh(big.NewInt(1), allowMultipleFillsFlag))
@@ -127,6 +125,7 @@ func (m *MakerTraits) Encode() string {
 	// TODO These values originally used masks to write. Needs more testing to verify the simpler approach works. See https://github.com/1inch/limit-order-sdk/blob/0724227f6dab1649c4a4abcb1df30c2b43126eab/src/limit-order/maker-traits.ts#L74-L84 for how this looks in the Typescript Limit Order SDK
 	encodedCalldata.Or(encodedCalldata, tmp.Lsh(big.NewInt(m.Series), 160))
 	encodedCalldata.Or(encodedCalldata, tmp.Lsh(big.NewInt(m.Nonce), 120))
+	encodedCalldata.Or(encodedCalldata, tmp.Lsh(big.NewInt(m.Expiry), 80))
 
 	// Convert AllowedSender from hex string to big.Int
 	if m.AllowedSender != "" {

@@ -4,6 +4,8 @@ import (
 	"math/big"
 
 	"github.com/ethereum/go-ethereum/common"
+
+	"github.com/1inch/1inch-sdk-go/sdk-clients/orderbook"
 )
 
 type GetQuoteOutputFixed struct {
@@ -41,26 +43,33 @@ type PlaceOrderBody struct {
 	TakingAmount string
 }
 
-type FusionOrderParamsData struct {
-	NetworkId               int
-	Preset                  GetQuoteOutputRecommendedPreset
-	Receiver                string
-	Nonce                   *big.Int
-	Permit                  string
-	IsPermit2               bool
-	AllowPartialFills       bool
-	AllowMultipleFills      bool
-	DelayAuctionStartTimeBy float32
-	OrderExpirationDelay    uint32
+type Order struct {
+	FusionExtension     *Extension
+	Inner               orderbook.OrderData
+	SettlementExtension common.Address
+	OrderInfo           FusionOrderV4
+	AuctionDetails      *AuctionDetails
+	PostInteractionData SettlementPostInteractionData
+	Extra               ExtraData
 }
 
-type FusionOrderParams struct {
-	Preset                  GetQuoteOutputRecommendedPreset
-	Receiver                string
-	Permit                  string
-	Nonce                   *big.Int
+type OrderParams struct {
+	FromTokenAddress        string                          `json:"fromTokenAddress"`
+	ToTokenAddress          string                          `json:"toTokenAddress"`
+	Amount                  string                          `json:"amount"`
+	WalletAddress           string                          `json:"walletAddress"`
+	Permit                  string                          `json:"permit,omitempty"` // without the first 20 bytes of token address
+	Receiver                string                          `json:"receiver,omitempty"`
+	Preset                  GetQuoteOutputRecommendedPreset `json:"preset,omitempty"`
+	Nonce                   *big.Int                        `json:"nonce,omitempty"`
+	Fee                     TakingFeeInfo                   `json:"fee,omitempty"`
+	Source                  string                          `json:"source,omitempty"`
+	IsPermit2               bool                            `json:"isPermit2,omitempty"`
+	CustomPreset            *CustomPreset                   `json:"customPreset,omitempty"`
+	AllowPartialFills       bool                            `json:"allowPartialFills,omitempty"`
+	AllowMultipleFills      bool                            `json:"allowMultipleFills,omitempty"`
 	DelayAuctionStartTimeBy float32
-	IsPermit2               bool
+	OrderExpirationDelay    uint32 // TODO this field is inaccessible in the typescript SDK
 }
 
 type TakingFeeInfo struct {
@@ -78,23 +87,6 @@ type CustomPreset struct {
 type CustomPresetPoint struct {
 	ToTokenAmount string `json:"toTokenAmount"`
 	Delay         int    `json:"delay"`
-}
-
-type OrderParams struct {
-	FromTokenAddress   string                          `json:"fromTokenAddress"`
-	ToTokenAddress     string                          `json:"toTokenAddress"`
-	Amount             string                          `json:"amount"`
-	WalletAddress      string                          `json:"walletAddress"`
-	Permit             string                          `json:"permit,omitempty"`   // without the first 20 bytes of token address
-	Receiver           string                          `json:"receiver,omitempty"` // by default: walletAddress (makerAddress)
-	Preset             GetQuoteOutputRecommendedPreset `json:"preset,omitempty"`   // by default: recommended preset
-	Nonce              *big.Int                        `json:"nonce,omitempty"`
-	Fee                TakingFeeInfo                   `json:"fee,omitempty"`
-	Source             string                          `json:"source,omitempty"`
-	IsPermit2          bool                            `json:"isPermit2,omitempty"`
-	CustomPreset       *CustomPreset                   `json:"customPreset,omitempty"`
-	AllowPartialFills  bool                            `json:"allowPartialFills,omitempty"`  // true by default
-	AllowMultipleFills bool                            `json:"allowMultipleFills,omitempty"` // true by default
 }
 
 type AuctionDetails struct {
@@ -131,13 +123,15 @@ type Preset struct {
 }
 
 type PreparedOrder struct {
-	Order   FusionOrder `json:"order"`
-	Hash    string      `json:"hash"`
-	QuoteId string      `json:"quoteId"`
+	Order   Order  `json:"order"`
+	Hash    string `json:"hash"`
+	QuoteId string `json:"quoteId"`
 }
 
 type AdditionalParams struct {
-	FromAddress string `json:"fromAddress"`
+	NetworkId   int
+	FromAddress string
+	PrivateKey  string
 }
 
 type FusionOrderConstructor struct {
@@ -146,8 +140,8 @@ type FusionOrderConstructor struct {
 }
 
 type Details struct {
-	Auction            AuctionDetails `json:"auction"`
-	Fees               Fees           `json:"fees"`
+	Auction            *AuctionDetails `json:"auction"`
+	Fees               Fees            `json:"fees"`
 	Whitelist          []AuctionWhitelistItem
 	ResolvingStartTime *big.Int
 }
@@ -212,7 +206,7 @@ type ExtraData struct {
 	Source               string
 }
 
-type PlaceOrderParams struct {
+type AdditionalPlaceOrderParams struct {
 	Maker      string
 	PrivateKey string
 }

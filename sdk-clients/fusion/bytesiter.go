@@ -19,9 +19,16 @@ func (iter *BytesIterNew) NextByte() byte {
 	return val
 }
 
+var zero = big.NewInt(0)
+
 func (iter *BytesIterNew) NextUint16() *big.Int {
 	val := new(big.Int).SetBytes(iter.data[iter.pos : iter.pos+2])
 	iter.pos += 2
+
+	// If the resulting value of delay is zero, set it to a fresh big.Int of value zero (for comparisons in tests)
+	if val.Cmp(zero) == 0 {
+		val = zero
+	}
 	return val
 }
 

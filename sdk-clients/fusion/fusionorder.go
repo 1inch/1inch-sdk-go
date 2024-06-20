@@ -11,48 +11,13 @@ import (
 	"github.com/1inch/1inch-sdk-go/sdk-clients/orderbook"
 )
 
-func NewFusionOrderParams(params FusionOrderParamsData) *FusionOrderParams {
-	fusionOrderParams := &FusionOrderParams{}
-
-	if params.Preset == "" {
-		fusionOrderParams.Preset = Fast
-	} else {
-		fusionOrderParams.Preset = params.Preset
-	}
-
-	if params.Receiver == "" {
-		fusionOrderParams.Receiver = "0x0000000000000000000000000000000000000000"
-	} else {
-		fusionOrderParams.Receiver = params.Receiver
-	}
-
-	fusionOrderParams.IsPermit2 = params.IsPermit2
-	fusionOrderParams.Nonce = params.Nonce
-	fusionOrderParams.Permit = params.Permit
-	fusionOrderParams.DelayAuctionStartTimeBy = params.DelayAuctionStartTimeBy
-
-	return fusionOrderParams
-}
-
-type FusionOrder struct {
-	FusionExtension     Extension
-	Inner               orderbook.OrderData
-	SettlementExtension common.Address
-	OrderInfo           FusionOrderV4
-	AuctionDetails      AuctionDetails
-	PostInteractionData SettlementPostInteractionData
-	Extra               ExtraData
-}
-
 var timeNow func() int64 = GetCurrentTime
 
 func GetCurrentTime() int64 {
 	return time.Now().Unix()
 }
 
-func CreateFusionOrder(settlementAddress string, orderInfo FusionOrderV4, details Details, extraParams ExtraParams) (*FusionOrder, *orderbook.MakerTraits, *orderbook.Extension, error) {
-	settlementExtensionContract := settlementAddress
-	auctionDetails := details.Auction
+func CreateSettlementPostInteractionData(details Details, orderInfo FusionOrderV4) (SettlementPostInteractionData, error) {
 	resolverStartTime := details.ResolvingStartTime
 	if details.ResolvingStartTime == nil || details.ResolvingStartTime.Cmp(big.NewInt(0)) == 0 {
 		resolverStartTime = big.NewInt(timeNow())
@@ -65,88 +30,114 @@ func CreateFusionOrder(settlementAddress string, orderInfo FusionOrderV4, detail
 		ResolvingStartTime: resolverStartTime,
 		CustomReceiver:     common.HexToAddress(orderInfo.Receiver),
 	})
-	extra := extraParams // TODO check defaults from SDK
 
-	// TODO ignoring defaults for now
-	//defaultExtraParams := ExtraParams{
-	//	AllowPartialFills:    true,
-	//	AllowMultipleFills:   true,
-	//	unwrapWeth:           false,
-	//	EnablePermit2:        false,
-	//	OrderExpirationDelay: big.NewInt(12),
-	//}
+	return postInteractionData, nil
+}
 
-	deadline := auctionDetails.StartTime + auctionDetails.Duration + extra.OrderExpirationDelay
+type CreateExtensionParams struct {
+	settlementAddress   string
+	postInteractionData SettlementPostInteractionData
+	orderInfo           FusionOrderV4
+	details             Details
+	extraParams         ExtraParams
+}
 
+func CreateExtension(params CreateExtensionParams) (*Extension, error) {
+
+	var permitInteraction *Interaction
+	if params.extraParams.Permit != "" {
+		permitInteraction = &Interaction{
+			Target: common.HexToAddress(params.orderInfo.MakerAsset),
+			Data:   params.extraParams.Permit,
+		}
+	}
+
+	extensionBuilder := ExtensionBuilder{}
+	settlementAddressContract := common.HexToAddress(params.settlementAddress)
+	auctionDetails := params.details.Auction.Encode()
+	extensionBuilder.WithMakingAmountData(settlementAddressContract, auctionDetails)
+	extensionBuilder.WithTakingAmountData(settlementAddressContract, auctionDetails)
+	postInteraction := NewInteraction(settlementAddressContract, params.postInteractionData.Encode())
+	extensionBuilder.WithPostInteraction(postInteraction)
+	if permitInteraction != nil {
+		extensionBuilder.WithMakerPermit(permitInteraction.Target, permitInteraction.Data)
+	}
+	return extensionBuilder.Build(), nil
+}
+
+func CreateMakerTraits(details Details, extraParams ExtraParams) (*orderbook.MakerTraits, error) {
+	deadline := details.Auction.StartTime + details.Auction.Duration + extraParams.OrderExpirationDelay
 	makerTraitParms := orderbook.MakerTraitsParams{
 		Expiry:             int64(deadline),
-		AllowPartialFills:  extra.AllowPartialFills,
-		AllowMultipleFills: extra.AllowMultipleFills,
+		AllowPartialFills:  extraParams.AllowPartialFills,
+		AllowMultipleFills: extraParams.AllowMultipleFills,
 		HasPostInteraction: true,
-		UnwrapWeth:         extra.unwrapWeth,
-		UsePermit2:         extra.EnablePermit2,
+		UnwrapWeth:         extraParams.unwrapWeth,
+		UsePermit2:         extraParams.EnablePermit2,
 		HasExtension:       true,
-		Nonce:              extra.Nonce.Int64(),
+		Nonce:              extraParams.Nonce.Int64(),
 	}
-	if extra.Nonce == nil || extra.Nonce.Cmp(big.NewInt(0)) == 0 {
-		makerTraitParms.Nonce = extra.Nonce.Int64()
+	if extraParams.Nonce == nil || extraParams.Nonce.Cmp(big.NewInt(0)) == 0 {
+		makerTraitParms.Nonce = extraParams.Nonce.Int64()
 	}
-
 	makerTraits := orderbook.NewMakerTraits(makerTraitParms)
-
 	if makerTraits.IsBitInvalidatorMode() {
 		if extraParams.Nonce == nil || extraParams.Nonce == big.NewInt(0) {
-			return nil, nil, nil, errors.New("nonce required, when partial fill or multiple fill disallowed")
+			return nil, errors.New("nonce required, when partial fill or multiple fill disallowed")
 		}
 	}
+	return makerTraits, nil
+}
 
+type CreateOrderDataParams struct {
+	settlementAddress   string
+	postInteractionData SettlementPostInteractionData
+	extension           *Extension
+	orderInfo           FusionOrderV4
+	details             Details
+	extraParams         ExtraParams
+	makerTraits         *orderbook.MakerTraits
+}
+
+func CreateOrder(params CreateOrderDataParams) (*Order, error) {
 	var receiver common.Address
-	if postInteractionData.IntegratorFee.Ratio != nil && postInteractionData.IntegratorFee.Ratio.Cmp(big.NewInt(0)) != 0 {
-		receiver = common.HexToAddress(settlementExtensionContract)
+	if params.postInteractionData.IntegratorFee.Ratio != nil && params.postInteractionData.IntegratorFee.Ratio.Cmp(big.NewInt(0)) != 0 {
+		receiver = common.HexToAddress(params.settlementAddress)
 	} else {
-		receiver = common.HexToAddress(orderInfo.Receiver)
+		receiver = common.HexToAddress(params.orderInfo.Receiver)
 	}
 
-	var permitInteraction *Interaction = nil
-	if extraParams.Permit != "" {
-		permitInteraction = &Interaction{
-			Target: common.HexToAddress(orderInfo.MakerAsset),
-			Data:   extraParams.Permit,
-		}
-	}
-	extension := NewFusionExtension(common.HexToAddress(settlementExtensionContract), auctionDetails, postInteractionData, permitInteraction)
-	builtExtension := extension.Build()
-
-	salt := builtExtension.BuildSalt() // TODO this is not the right salt
-
-	orderData := orderbook.OrderData{
-		MakerAsset:   orderInfo.MakerAsset,
-		TakerAsset:   orderInfo.TakerAsset,
-		MakingAmount: orderInfo.MakingAmount,
-		TakingAmount: orderInfo.TakingAmount,
-		Salt:         fmt.Sprintf("%x", salt),
-		Maker:        orderInfo.Maker,
-		Receiver:     receiver.Hex(),
-		MakerTraits:  makerTraits.Encode(),
-		Extension:    fmt.Sprintf("%x", builtExtension.keccak256()),
+	salt, err := params.extension.GenerateSalt() // TODO this is not the right salt
+	if err != nil {
+		return nil, fmt.Errorf("error generating salt: %v", err)
 	}
 
-	return &FusionOrder{
-		FusionExtension:     builtExtension,
-		Inner:               orderData,
-		SettlementExtension: common.HexToAddress(settlementExtensionContract),
-		OrderInfo:           orderInfo,
-		AuctionDetails:      auctionDetails,
-		PostInteractionData: postInteractionData,
-		Extra: ExtraData{
-			UnwrapWETH:           extraParams.unwrapWeth,
-			Nonce:                extraParams.Nonce,
-			Permit:               extraParams.Permit,
-			AllowPartialFills:    extraParams.AllowPartialFills,
-			AllowMultipleFills:   extraParams.AllowMultipleFills,
-			OrderExpirationDelay: extraParams.OrderExpirationDelay,
-			EnablePermit2:        extraParams.EnablePermit2,
-			Source:               extraParams.Source,
+	return &Order{
+		FusionExtension: params.extension,
+		Inner: orderbook.OrderData{
+			MakerAsset:   params.orderInfo.MakerAsset,
+			TakerAsset:   params.orderInfo.TakerAsset,
+			MakingAmount: params.orderInfo.MakingAmount,
+			TakingAmount: params.orderInfo.TakingAmount,
+			Salt:         fmt.Sprintf("%x", salt),
+			Maker:        params.orderInfo.Maker,
+			Receiver:     receiver.Hex(),
+			MakerTraits:  params.makerTraits.Encode(),
+			Extension:    fmt.Sprintf("%x", params.extension.keccak256()),
 		},
-	}, makerTraits, extension.Build().ConvertToOrderbookExtension(), nil
+		SettlementExtension: common.HexToAddress(params.settlementAddress),
+		OrderInfo:           params.orderInfo,
+		AuctionDetails:      params.details.Auction,
+		PostInteractionData: params.postInteractionData,
+		Extra: ExtraData{
+			UnwrapWETH:           params.extraParams.unwrapWeth,
+			Nonce:                params.extraParams.Nonce,
+			Permit:               params.extraParams.Permit,
+			AllowPartialFills:    params.extraParams.AllowPartialFills,
+			AllowMultipleFills:   params.extraParams.AllowMultipleFills,
+			OrderExpirationDelay: params.extraParams.OrderExpirationDelay,
+			EnablePermit2:        params.extraParams.EnablePermit2,
+			Source:               params.extraParams.Source,
+		},
+	}, nil
 }
