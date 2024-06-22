@@ -15,9 +15,9 @@ import (
 
 var uint40Max = new(big.Int).Sub(new(big.Int).Lsh(big.NewInt(1), 40), big.NewInt(1))
 
-func CreateFusionOrderData(quote GetQuoteOutputFixed, orderParams OrderParams, additionalParams AdditionalParams) (*PreparedOrder, *orderbook.Order, error) {
+func CreateFusionOrderData(quote GetQuoteOutputFixed, orderParams OrderParams, chainId uint64) (*PreparedOrder, *orderbook.Order, error) {
 
-	preset, err := getPreset(quote, orderParams.Preset)
+	preset, err := getPreset(quote.Presets, orderParams.Preset)
 	if err != nil {
 		return nil, nil, fmt.Errorf("error getting preset: %v", err)
 	}
@@ -29,12 +29,8 @@ func CreateFusionOrderData(quote GetQuoteOutputFixed, orderParams OrderParams, a
 
 	fmt.Printf("Auction start time: %v\n", auctionDetails.StartTime)
 
-	allowPartialFills := orderParams.AllowPartialFills
-	allowMultipleFills := orderParams.AllowMultipleFills
-	isNonceRequired := !allowPartialFills || !allowMultipleFills
-
 	var nonce *big.Int
-	if isNonceRequired {
+	if isNonceRequired(orderParams.AllowPartialFills, orderParams.AllowMultipleFills) {
 		if orderParams.Nonce != nil {
 			nonce = orderParams.Nonce
 		} else {
@@ -50,10 +46,10 @@ func CreateFusionOrderData(quote GetQuoteOutputFixed, orderParams OrderParams, a
 	fmt.Printf("Nonce: %v\n", nonce)
 
 	takerAsset := orderParams.ToTokenAddress
-	if takerAsset == nativeToken {
-		takerAssetWrapped, ok := chainToWrapper[NetworkEnum(additionalParams.NetworkId)]
+	if takerAsset == NativeToken {
+		takerAssetWrapped, ok := chainToWrapper[NetworkEnum(chainId)]
 		if !ok {
-			return nil, nil, fmt.Errorf("unable to get address for taker asset's wrapped token. unrecognized network: %v", additionalParams.NetworkId)
+			return nil, nil, fmt.Errorf("unable to get address for taker asset's wrapped token. unrecognized network: %v", chainId)
 		}
 		takerAsset = takerAssetWrapped.Hex()
 	}
@@ -89,8 +85,8 @@ func CreateFusionOrderData(quote GetQuoteOutputFixed, orderParams OrderParams, a
 	extraParams := ExtraParams{
 		Nonce:                nonce,
 		Permit:               "",
-		AllowPartialFills:    allowPartialFills,
-		AllowMultipleFills:   allowMultipleFills,
+		AllowPartialFills:    orderParams.AllowPartialFills,
+		AllowMultipleFills:   orderParams.AllowMultipleFills,
 		OrderExpirationDelay: orderParams.OrderExpirationDelay,
 		Source:               "", // TODO unsure what this is
 	}
@@ -101,7 +97,7 @@ func CreateFusionOrderData(quote GetQuoteOutputFixed, orderParams OrderParams, a
 	}
 
 	orderInfo := FusionOrderV4{
-		Maker:        additionalParams.FromAddress,
+		Maker:        orderParams.WalletAddress,
 		MakerAsset:   orderParams.FromTokenAddress,
 		MakingAmount: orderParams.Amount,
 		Receiver:     orderParams.Receiver,
@@ -149,14 +145,14 @@ func CreateFusionOrderData(quote GetQuoteOutputFixed, orderParams OrderParams, a
 	limitOrder, err := orderbook.CreateLimitOrderMessage(orderbook.CreateOrderParams{
 		MakerTraits:  makerTraits,
 		Extension:    *fusionOrder.FusionExtension.ConvertToOrderbookExtension(),
-		PrivateKey:   additionalParams.PrivateKey,
+		PrivateKey:   orderParams.PrivateKey,
 		Maker:        fusionOrder.OrderInfo.Maker,
 		MakerAsset:   fusionOrder.OrderInfo.MakerAsset,
 		TakerAsset:   fusionOrder.OrderInfo.TakerAsset,
 		TakingAmount: fusionOrder.OrderInfo.TakingAmount,
 		MakingAmount: fusionOrder.OrderInfo.MakingAmount,
 		Taker:        fusionOrder.OrderInfo.Receiver, // TODO unsure if this is right
-	}, additionalParams.NetworkId)
+	}, int(chainId))
 	if err != nil {
 		return nil, nil, fmt.Errorf("error creating limit order message: %v", err)
 	}
@@ -176,21 +172,21 @@ func BigIntFromString(s string) (*big.Int, error) {
 	return bigInt, nil
 }
 
-func getPreset(quote GetQuoteOutputFixed, presetType GetQuoteOutputRecommendedPreset) (*PresetClass, error) {
+func getPreset(presets QuotePresetsClass, presetType GetQuoteOutputRecommendedPreset) (*PresetClass, error) {
 	switch presetType {
 	case Custom:
-		if quote.Presets.Custom == nil {
+		if presets.Custom == nil {
 			return nil, errors.New("custom preset is not available")
 		}
-		return quote.Presets.Custom, nil
+		return presets.Custom, nil
 	case Fast:
-		return &quote.Presets.Fast, nil
+		return &presets.Fast, nil
 	case Medium:
-		return &quote.Presets.Medium, nil
+		return &presets.Medium, nil
 	case Slow:
-		return &quote.Presets.Slow, nil
+		return &presets.Slow, nil
 	}
-	panic("Unknown preset type")
+	return nil, fmt.Errorf("unknown preset type: %v", presetType)
 }
 
 var CalcAuctionStartTimeFunc func(uint32, uint32) uint32 = CalcAuctionStartTime
@@ -228,32 +224,8 @@ func CreateAuctionDetails(preset *PresetClass, additionalWaitPeriod float32) (*A
 	}, nil
 }
 
-const nativeToken = "0xEeeeeEeeeEeEeeEeEeEeeEEEeeeeEeeeeeeeEEeE"
-
-type NetworkEnum int
-
-const (
-	ETHEREUM  NetworkEnum = 1
-	POLYGON   NetworkEnum = 137
-	BINANCE   NetworkEnum = 56
-	ARBITRUM  NetworkEnum = 42161
-	AVALANCHE NetworkEnum = 43114
-	OPTIMISM  NetworkEnum = 10
-	FANTOM    NetworkEnum = 250
-	GNOSIS    NetworkEnum = 100
-	COINBASE  NetworkEnum = 8453
-)
-
-var chainToWrapper = map[NetworkEnum]common.Address{
-	ETHEREUM:  common.HexToAddress("0xc02aaa39b223fe8d0a0e5c4f27ead9083c756cc2"),
-	BINANCE:   common.HexToAddress("0xbb4cdb9cbd36b01bd1cbaebf2de08d9173bc095c"),
-	POLYGON:   common.HexToAddress("0x0d500b1d8e8ef31e21c99d1db9a6444d3adf1270"),
-	ARBITRUM:  common.HexToAddress("0x82af49447d8a07e3bd95bd0d56f35241523fbab1"),
-	AVALANCHE: common.HexToAddress("0xb31f66aa3c1e785363f0875a1b74e27b85fd66c7"),
-	GNOSIS:    common.HexToAddress("0xe91d153e0b41518a2ce8dd3d7944fa863463a97d"),
-	COINBASE:  common.HexToAddress("0x4200000000000000000000000000000000000006"),
-	OPTIMISM:  common.HexToAddress("0x4200000000000000000000000000000000000006"),
-	FANTOM:    common.HexToAddress("0x21be370d5312f44cb42ce377bc9b8a0cef1a4c83"),
+func isNonceRequired(allowPartialFills, allowMultipleFills bool) bool {
+	return !allowPartialFills || !allowMultipleFills
 }
 
 var (

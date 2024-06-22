@@ -21,9 +21,9 @@ type SettlementPostInteractionData struct {
 
 var uint16Max = new(big.Int).Sub(new(big.Int).Lsh(big.NewInt(1), 16), big.NewInt(1))
 
-func NewSettlementPostInteractionData(data SettlementSuffixData) SettlementPostInteractionData {
+func NewSettlementPostInteractionData(data SettlementSuffixData) (*SettlementPostInteractionData, error) {
 	if len(data.Whitelist) == 0 {
-		panic("Whitelist cannot be empty")
+		return nil, errors.New("whitelist cannot be empty")
 	}
 
 	sumDelay := big.NewInt(0)
@@ -55,17 +55,17 @@ func NewSettlementPostInteractionData(data SettlementSuffixData) SettlementPostI
 		sumDelay.Add(sumDelay, whitelist[i].Delay)
 
 		if whitelist[i].Delay.Cmp(uint16Max) >= 0 {
-			panic("Too big diff between timestamps")
+			return nil, fmt.Errorf("delay too big - %d must be less than %d", whitelist[i].Delay, uint16Max)
 		}
 	}
 
-	return SettlementPostInteractionData{
+	return &SettlementPostInteractionData{
 		Whitelist:          whitelist,
 		IntegratorFee:      data.IntegratorFee,
 		BankFee:            data.BankFee,
 		ResolvingStartTime: data.ResolvingStartTime,
 		CustomReceiver:     data.CustomReceiver,
-	}
+	}, nil
 }
 
 func Decode(data string) (SettlementPostInteractionData, error) {

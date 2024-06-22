@@ -41,3 +41,44 @@ func TestAuctionDetails(t *testing.T) {
 		})
 	}
 }
+
+func TestIsNonceRequired(t *testing.T) {
+	tests := []struct {
+		name                string
+		allowPartialFills   bool
+		allowMultipleFills  bool
+		expectedNonceResult bool
+	}{
+		{
+			name:                "Both allowPartialFills and allowMultipleFills are true",
+			allowPartialFills:   true,
+			allowMultipleFills:  true,
+			expectedNonceResult: false,
+		},
+		{
+			name:                "allowPartialFills is false, allowMultipleFills is true",
+			allowPartialFills:   false,
+			allowMultipleFills:  true,
+			expectedNonceResult: true,
+		},
+		{
+			name:                "allowPartialFills is true, allowMultipleFills is false",
+			allowPartialFills:   true,
+			allowMultipleFills:  false,
+			expectedNonceResult: true,
+		},
+		{
+			name:                "Both allowPartialFills and allowMultipleFills are false",
+			allowPartialFills:   false,
+			allowMultipleFills:  false,
+			expectedNonceResult: true,
+		},
+	}
+
+	for _, tc := range tests {
+		t.Run(tc.name, func(t *testing.T) {
+			result := isNonceRequired(tc.allowPartialFills, tc.allowMultipleFills)
+			assert.Equal(t, tc.expectedNonceResult, result)
+		})
+	}
+}

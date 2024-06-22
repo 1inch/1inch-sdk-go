@@ -6,6 +6,7 @@ import (
 
 	"github.com/ethereum/go-ethereum/common"
 	"github.com/stretchr/testify/assert"
+	"github.com/stretchr/testify/require"
 )
 
 func TestSettlementPostInteractionData(t *testing.T) {
@@ -95,7 +96,8 @@ func TestSettlementPostInteractionData(t *testing.T) {
 
 	for _, tc := range tests {
 		t.Run(tc.name, func(t *testing.T) {
-			data := NewSettlementPostInteractionData(tc.data)
+			data, err := NewSettlementPostInteractionData(tc.data)
+			require.NoError(t, err)
 
 			encoded := data.Encode()
 			if tc.expectedBytes != 0 {
@@ -104,7 +106,7 @@ func TestSettlementPostInteractionData(t *testing.T) {
 
 			decoded, err := Decode(encoded)
 			assert.NoError(t, err)
-			assert.Equal(t, data, decoded)
+			assert.Equal(t, *data, decoded)
 		})
 	}
 }

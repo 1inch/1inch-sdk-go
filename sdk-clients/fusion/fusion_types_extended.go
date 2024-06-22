@@ -49,7 +49,7 @@ type Order struct {
 	SettlementExtension common.Address
 	OrderInfo           FusionOrderV4
 	AuctionDetails      *AuctionDetails
-	PostInteractionData SettlementPostInteractionData
+	PostInteractionData *SettlementPostInteractionData
 	Extra               ExtraData
 }
 
@@ -70,6 +70,7 @@ type OrderParams struct {
 	AllowMultipleFills      bool                            `json:"allowMultipleFills,omitempty"`
 	DelayAuctionStartTimeBy float32
 	OrderExpirationDelay    uint32 // TODO this field is inaccessible in the typescript SDK
+	PrivateKey              string
 }
 
 type TakingFeeInfo struct {
@@ -204,9 +205,4 @@ type ExtraData struct {
 	OrderExpirationDelay uint32
 	EnablePermit2        bool
 	Source               string
-}
-
-type AdditionalPlaceOrderParams struct {
-	Maker      string
-	PrivateKey string
 }

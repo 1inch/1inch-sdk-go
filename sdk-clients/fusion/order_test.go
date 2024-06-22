@@ -25,9 +25,10 @@ const (
 	chainId      = 137
 )
 
-func TestCreateOrder(t *testing.T) {
+func TestCreateFusionOrderData(t *testing.T) {
 	tests := []struct {
 		name                        string
+		chainId                     uint64
 		orderParams                 OrderParams
 		additionalParams            AdditionalParams
 		auctionStartTime            uint32
@@ -40,18 +41,16 @@ func TestCreateOrder(t *testing.T) {
 		data                        string
 	}{
 		{
-			name: "Successful order creation",
+			name:    "Successful order creation",
+			chainId: chainId,
 			orderParams: OrderParams{
+				PrivateKey:       privateKey,
+				WalletAddress:    publicAddress,
 				FromTokenAddress: wmatic,
 				ToTokenAddress:   usdc,
 				Amount:           amountString,
 				Receiver:         "0x0000000000000000000000000000000000000000",
 				Preset:           "fast",
-			},
-			additionalParams: AdditionalParams{
-				NetworkId:   chainId,
-				FromAddress: publicAddress,
-				PrivateKey:  privateKey,
 			},
 			auctionStartTime:            1718671900,
 			nonce:                       big.NewInt(887174712009),
@@ -109,7 +108,7 @@ func TestCreateOrder(t *testing.T) {
 				return tc.auctionStartTime
 			}
 
-			preparedOrder, orderbookOrder, err := CreateFusionOrderData(quote, tc.orderParams, tc.additionalParams)
+			preparedOrder, orderbookOrder, err := CreateFusionOrderData(quote, tc.orderParams, tc.chainId)
 			timeNow = originalTimeNowFunc
 			CalcAuctionStartTimeFunc = originalCalcAuctionStartTimeFunc
 			random_number_generation.BigIntMaxFunc = originalRandBigIntFunc
@@ -117,6 +116,277 @@ func TestCreateOrder(t *testing.T) {
 			assert.Equal(t, expectedOrdrebookOrder, *orderbookOrder)
 			assert.Equal(t, expectedPreparedOrder, *preparedOrder)
 
+		})
+	}
+}
+
+func TestGetPreset(t *testing.T) {
+	customPreset := &PresetClass{
+		AllowMultipleFills: true,
+		AllowPartialFills:  true,
+		AuctionDuration:    10.0,
+		AuctionEndAmount:   "1000",
+		AuctionStartAmount: "500",
+		BankFee:            "5",
+		EstP:               0.1,
+		ExclusiveResolver:  map[string]interface{}{"resolver": "value"},
+		GasCost: GasCostConfigClass{
+			GasBumpEstimate:  1.0,
+			GasPriceEstimate: "100",
+		},
+		InitialRateBump: 0.2,
+		Points: []AuctionPointClass{
+			{Coefficient: 1.0, Delay: 2.0},
+		},
+		StartAuctionIn: 1.0,
+		TokenFee:       "1",
+	}
+
+	fastPreset := PresetClass{
+		AllowMultipleFills: false,
+		AllowPartialFills:  false,
+		AuctionDuration:    20.0,
+		AuctionEndAmount:   "2000",
+		AuctionStartAmount: "1000",
+		BankFee:            "10",
+		EstP:               0.2,
+		ExclusiveResolver:  map[string]interface{}{"resolver": "value"},
+		GasCost: GasCostConfigClass{
+			GasBumpEstimate:  2.0,
+			GasPriceEstimate: "200",
+		},
+		InitialRateBump: 0.4,
+		Points: []AuctionPointClass{
+			{Coefficient: 2.0, Delay: 4.0},
+		},
+		StartAuctionIn: 2.0,
+		TokenFee:       "2",
+	}
+
+	mediumPreset := PresetClass{
+		AllowMultipleFills: true,
+		AllowPartialFills:  false,
+		AuctionDuration:    30.0,
+		AuctionEndAmount:   "3000",
+		AuctionStartAmount: "1500",
+		BankFee:            "15",
+		EstP:               0.3,
+		ExclusiveResolver:  map[string]interface{}{"resolver": "value"},
+		GasCost: GasCostConfigClass{
+			GasBumpEstimate:  3.0,
+			GasPriceEstimate: "300",
+		},
+		InitialRateBump: 0.6,
+		Points: []AuctionPointClass{
+			{Coefficient: 3.0, Delay: 6.0},
+		},
+		StartAuctionIn: 3.0,
+		TokenFee:       "3",
+	}
+
+	slowPreset := PresetClass{
+		AllowMultipleFills: false,
+		AllowPartialFills:  true,
+		AuctionDuration:    40.0,
+		AuctionEndAmount:   "4000",
+		AuctionStartAmount: "2000",
+		BankFee:            "20",
+		EstP:               0.4,
+		ExclusiveResolver:  map[string]interface{}{"resolver": "value"},
+		GasCost: GasCostConfigClass{
+			GasBumpEstimate:  4.0,
+			GasPriceEstimate: "400",
+		},
+		InitialRateBump: 0.8,
+		Points: []AuctionPointClass{
+			{Coefficient: 4.0, Delay: 8.0},
+		},
+		StartAuctionIn: 4.0,
+		TokenFee:       "4",
+	}
+
+	presets := QuotePresetsClass{
+		Custom: customPreset,
+		Fast:   fastPreset,
+		Medium: mediumPreset,
+		Slow:   slowPreset,
+	}
+
+	tests := []struct {
+		name       string
+		presetType GetQuoteOutputRecommendedPreset
+		expected   *PresetClass
+		expectErr  bool
+	}{
+		{
+			name:       "Get Custom Preset",
+			presetType: Custom,
+			expected:   customPreset,
+			expectErr:  false,
+		},
+		{
+			name:       "Get Fast Preset",
+			presetType: Fast,
+			expected:   &fastPreset,
+			expectErr:  false,
+		},
+		{
+			name:       "Get Medium Preset",
+			presetType: Medium,
+			expected:   &mediumPreset,
+			expectErr:  false,
+		},
+		{
+			name:       "Get Slow Preset",
+			presetType: Slow,
+			expected:   &slowPreset,
+			expectErr:  false,
+		},
+		{
+			name:       "Unknown Preset Type",
+			presetType: GetQuoteOutputRecommendedPreset("Unknown"),
+			expected:   nil,
+			expectErr:  true,
+		},
+	}
+
+	for _, tc := range tests {
+		t.Run(tc.name, func(t *testing.T) {
+			result, err := getPreset(presets, tc.presetType)
+			if tc.expectErr {
+				require.Error(t, err)
+			} else {
+				require.NoError(t, err)
+				assert.Equal(t, tc.expected, result)
+			}
+		})
+	}
+}
+
+func TestCreateAuctionDetails(t *testing.T) {
+	tests := []struct {
+		name                 string
+		preset               *PresetClass
+		additionalWaitPeriod float32
+		expected             *AuctionDetails
+		expectErr            bool
+	}{
+		{
+			name: "Valid Preset",
+			preset: &PresetClass{
+				AllowMultipleFills: true,
+				AllowPartialFills:  true,
+				AuctionDuration:    60.0,
+				AuctionEndAmount:   "1000",
+				AuctionStartAmount: "500",
+				BankFee:            "5",
+				EstP:               0.1,
+				ExclusiveResolver:  map[string]interface{}{"resolver": "value"},
+				GasCost: GasCostConfigClass{
+					GasBumpEstimate:  1.0,
+					GasPriceEstimate: "100",
+				},
+				InitialRateBump: 2,
+				Points: []AuctionPointClass{
+					{Coefficient: 1.0, Delay: 2.0},
+				},
+				StartAuctionIn: 5.0,
+				TokenFee:       "1",
+			},
+			additionalWaitPeriod: 10.0,
+			expected: &AuctionDetails{
+				StartTime:       CalcAuctionStartTimeFunc(5, 10),
+				Duration:        60,
+				InitialRateBump: 2,
+				Points: []AuctionPointClassFixed{
+					{Coefficient: 1, Delay: 2},
+				},
+				GasCost: GasCostConfigClassFixed{
+					GasBumpEstimate:  1,
+					GasPriceEstimate: 100,
+				},
+			},
+			expectErr: false,
+		},
+		{
+			name: "Invalid Gas Price Estimate",
+			preset: &PresetClass{
+				AllowMultipleFills: true,
+				AllowPartialFills:  true,
+				AuctionDuration:    60.0,
+				AuctionEndAmount:   "1000",
+				AuctionStartAmount: "500",
+				BankFee:            "5",
+				EstP:               0.1,
+				ExclusiveResolver:  map[string]interface{}{"resolver": "value"},
+				GasCost: GasCostConfigClass{
+					GasBumpEstimate:  1.0,
+					GasPriceEstimate: "invalid",
+				},
+				InitialRateBump: 0.2,
+				Points: []AuctionPointClass{
+					{Coefficient: 1.0, Delay: 2.0},
+				},
+				StartAuctionIn: 5.0,
+				TokenFee:       "1",
+			},
+			additionalWaitPeriod: 10.0,
+			expected:             nil,
+			expectErr:            true,
+		},
+	}
+
+	for _, tc := range tests {
+		t.Run(tc.name, func(t *testing.T) {
+			result, err := CreateAuctionDetails(tc.preset, tc.additionalWaitPeriod)
+			if tc.expectErr {
+				require.Error(t, err)
+			} else {
+				require.NoError(t, err)
+				assert.Equal(t, tc.expected, result)
+			}
+		})
+	}
+}
+
+func TestBpsToRatioFormat(t *testing.T) {
+	tests := []struct {
+		name     string
+		input    *big.Int
+		expected *big.Int
+	}{
+		{
+			name:     "Nil input",
+			input:    nil,
+			expected: big.NewInt(0),
+		},
+		{
+			name:     "Zero input",
+			input:    big.NewInt(0),
+			expected: big.NewInt(0),
+		},
+		{
+			name:     "Positive input",
+			input:    big.NewInt(5),
+			expected: big.NewInt(50), // 5 * 100_000 / 10_000
+		},
+		{
+			name:     "Negative input",
+			input:    big.NewInt(-5),
+			expected: big.NewInt(-50), // -5 * 100_000 / 10_000
+		},
+		{
+			name:     "Large input",
+			input:    big.NewInt(100_000),
+			expected: big.NewInt(1_000_000), // 100_000 * 100_000 / 10_000
+		},
+	}
+
+	for _, tc := range tests {
+		t.Run(tc.name, func(t *testing.T) {
+			result := bpsToRatioFormat(tc.input)
+			require.NotNil(t, result)
+			assert.Equal(t, tc.expected, result)
 		})
 	}
 }

@@ -17,26 +17,24 @@ func GetCurrentTime() int64 {
 	return time.Now().Unix()
 }
 
-func CreateSettlementPostInteractionData(details Details, orderInfo FusionOrderV4) (SettlementPostInteractionData, error) {
+func CreateSettlementPostInteractionData(details Details, orderInfo FusionOrderV4) (*SettlementPostInteractionData, error) {
 	resolverStartTime := details.ResolvingStartTime
 	if details.ResolvingStartTime == nil || details.ResolvingStartTime.Cmp(big.NewInt(0)) == 0 {
 		resolverStartTime = big.NewInt(timeNow())
 	}
 	fmt.Printf("Resolver start time: %v\n", resolverStartTime)
-	postInteractionData := NewSettlementPostInteractionData(SettlementSuffixData{
+	return NewSettlementPostInteractionData(SettlementSuffixData{
 		Whitelist:          details.Whitelist,
 		IntegratorFee:      &details.Fees.IntFee,
 		BankFee:            details.Fees.BankFee,
 		ResolvingStartTime: resolverStartTime,
 		CustomReceiver:     common.HexToAddress(orderInfo.Receiver),
 	})
-
-	return postInteractionData, nil
 }
 
 type CreateExtensionParams struct {
 	settlementAddress   string
-	postInteractionData SettlementPostInteractionData
+	postInteractionData *SettlementPostInteractionData
 	orderInfo           FusionOrderV4
 	details             Details
 	extraParams         ExtraParams
@@ -77,12 +75,9 @@ func CreateMakerTraits(details Details, extraParams ExtraParams) (*orderbook.Mak
 		HasExtension:       true,
 		Nonce:              extraParams.Nonce.Int64(),
 	}
-	if extraParams.Nonce == nil || extraParams.Nonce.Cmp(big.NewInt(0)) == 0 {
-		makerTraitParms.Nonce = extraParams.Nonce.Int64()
-	}
 	makerTraits := orderbook.NewMakerTraits(makerTraitParms)
 	if makerTraits.IsBitInvalidatorMode() {
-		if extraParams.Nonce == nil || extraParams.Nonce == big.NewInt(0) {
+		if extraParams.Nonce == nil || extraParams.Nonce.Cmp(big.NewInt(0)) == 0 {
 			return nil, errors.New("nonce required, when partial fill or multiple fill disallowed")
 		}
 	}
@@ -91,7 +86,7 @@ func CreateMakerTraits(details Details, extraParams ExtraParams) (*orderbook.Mak
 
 type CreateOrderDataParams struct {
 	settlementAddress   string
-	postInteractionData SettlementPostInteractionData
+	postInteractionData *SettlementPostInteractionData
 	extension           *Extension
 	orderInfo           FusionOrderV4
 	details             Details

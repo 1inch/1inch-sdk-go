@@ -57,21 +57,17 @@ func main() {
 	fmt.Printf("Response: %s\n", string(output))
 
 	orderParams := fusion.OrderParams{
+		PrivateKey:       privateKey,
+		WalletAddress:    publicAddress,
 		FromTokenAddress: wmatic,
 		ToTokenAddress:   usdc,
 		Amount:           amountString,
-		WalletAddress:    publicAddress,
 		Receiver:         "0x0000000000000000000000000000000000000000",
 		Preset:           fusion.Fast,
 	}
 
-	additionalOrderParams := fusion.AdditionalPlaceOrderParams{
-		Maker:      publicAddress,
-		PrivateKey: privateKey,
-	}
-
 	fmt.Println("Placing order")
-	err = client.PlaceOrder(ctx, *response, orderParams, additionalOrderParams)
+	err = client.PlaceOrder(ctx, *response, orderParams)
 	if err != nil {
 		log.Fatalf("failed to request: %v", err)
 	}
