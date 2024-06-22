@@ -38,11 +38,6 @@ func DecodeInteraction(bytes string) (*Interaction, error) {
 	}, nil
 }
 
-type BytesIter struct {
-	data []byte
-	pos  int
-}
-
 func isHexBytes(s string) bool {
 	_, err := hex.DecodeString(strings.TrimPrefix(s, "0x"))
 	return err == nil

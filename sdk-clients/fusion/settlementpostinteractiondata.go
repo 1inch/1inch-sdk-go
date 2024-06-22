@@ -77,7 +77,7 @@ func Decode(data string) (SettlementPostInteractionData, error) {
 	flags := big.NewInt(int64(bytes[len(bytes)-1]))
 	bytesWithoutFlags := bytes[:len(bytes)-1]
 
-	iter := NewBytesIterNew(bytesWithoutFlags)
+	iter := NewBytesIter(bytesWithoutFlags)
 	var bankFee *big.Int
 	var integratorFee *IntegratorFee
 	var customReceiver common.Address

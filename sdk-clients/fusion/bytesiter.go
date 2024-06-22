@@ -4,16 +4,16 @@ import "math/big"
 
 // Utility structures and functions
 
-type BytesIterNew struct {
+type BytesIter struct {
 	data []byte
 	pos  int
 }
 
-func NewBytesIterNew(data []byte) *BytesIterNew {
-	return &BytesIterNew{data: data}
+func NewBytesIter(data []byte) *BytesIter {
+	return &BytesIter{data: data}
 }
 
-func (iter *BytesIterNew) NextByte() byte {
+func (iter *BytesIter) NextByte() byte {
 	val := iter.data[iter.pos]
 	iter.pos++
 	return val
@@ -21,7 +21,7 @@ func (iter *BytesIterNew) NextByte() byte {
 
 var zero = big.NewInt(0)
 
-func (iter *BytesIterNew) NextUint16() *big.Int {
+func (iter *BytesIter) NextUint16() *big.Int {
 	val := new(big.Int).SetBytes(iter.data[iter.pos : iter.pos+2])
 	iter.pos += 2
 
@@ -32,31 +32,31 @@ func (iter *BytesIterNew) NextUint16() *big.Int {
 	return val
 }
 
-func (iter *BytesIterNew) NextUint32() *big.Int {
+func (iter *BytesIter) NextUint32() *big.Int {
 	val := new(big.Int).SetBytes(iter.data[iter.pos : iter.pos+4])
 	iter.pos += 4
 	return val
 }
 
-func (iter *BytesIterNew) NextUint160() *big.Int {
+func (iter *BytesIter) NextUint160() *big.Int {
 	val := new(big.Int).SetBytes(iter.data[iter.pos : iter.pos+20])
 	iter.pos += 20
 	return val
 }
 
-func (iter *BytesIterNew) NextBytes(n int) []byte {
+func (iter *BytesIter) NextBytes(n int) []byte {
 	val := iter.data[iter.pos : iter.pos+n]
 	iter.pos += n
 	return val
 }
 
-func (iter *BytesIterNew) Rest() *big.Int {
+func (iter *BytesIter) Rest() *big.Int {
 	if iter.pos >= len(iter.data) {
 		return nil
 	}
 	return new(big.Int).SetBytes(iter.data[iter.pos:])
 }
 
-func (iter *BytesIterNew) IsEmpty() bool {
+func (iter *BytesIter) IsEmpty() bool {
 	return iter.pos >= len(iter.data)
 }

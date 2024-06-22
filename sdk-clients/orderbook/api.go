@@ -18,7 +18,7 @@ func (api *api) CreateOrder(ctx context.Context, params CreateOrderParams) (*Cre
 		return nil, err
 	}
 
-	if params.MakerTraits.AllowMultipleFills == false || params.MakerTraits.AllowPartialFills == false {
+	if !params.MakerTraits.AllowMultipleFills || !params.MakerTraits.AllowPartialFills {
 		return nil, errors.New("allowMultipleFills and allowPartialFills must be true")
 	}
 
