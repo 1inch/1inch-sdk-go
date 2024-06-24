@@ -108,6 +108,7 @@ func TestCreateFusionOrderData(t *testing.T) {
 			}
 
 			preparedOrder, orderbookOrder, err := CreateFusionOrderData(quote, tc.orderParams, tc.chainId)
+			require.NoError(t, err)
 			timeNow = originalTimeNowFunc
 			CalcAuctionStartTimeFunc = originalCalcAuctionStartTimeFunc
 			random_number_generation.BigIntMaxFunc = originalRandBigIntFunc
