@@ -27,8 +27,6 @@ func CreateFusionOrderData(quote GetQuoteOutputFixed, orderParams OrderParams, c
 		return nil, nil, fmt.Errorf("error creating auction details: %v", err)
 	}
 
-	fmt.Printf("Auction start time: %v\n", auctionDetails.StartTime)
-
 	var nonce *big.Int
 	if isNonceRequired(orderParams.AllowPartialFills, orderParams.AllowMultipleFills) {
 		if orderParams.Nonce != nil {
@@ -42,8 +40,6 @@ func CreateFusionOrderData(quote GetQuoteOutputFixed, orderParams OrderParams, c
 	} else {
 		nonce = orderParams.Nonce
 	}
-
-	fmt.Printf("Nonce: %v\n", nonce)
 
 	takerAsset := orderParams.ToTokenAddress
 	if takerAsset == NativeToken {

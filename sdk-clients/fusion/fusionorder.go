@@ -22,7 +22,6 @@ func CreateSettlementPostInteractionData(details Details, orderInfo FusionOrderV
 	if details.ResolvingStartTime == nil || details.ResolvingStartTime.Cmp(big.NewInt(0)) == 0 {
 		resolverStartTime = big.NewInt(timeNow())
 	}
-	fmt.Printf("Resolver start time: %v\n", resolverStartTime)
 	return NewSettlementPostInteractionData(SettlementSuffixData{
 		Whitelist:          details.Whitelist,
 		IntegratorFee:      &details.Fees.IntFee,

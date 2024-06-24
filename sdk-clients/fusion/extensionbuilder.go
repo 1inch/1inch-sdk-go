@@ -2,7 +2,6 @@ package fusion
 
 import (
 	"encoding/json"
-	"fmt"
 	"math/big"
 	"strings"
 
@@ -167,8 +166,6 @@ func (e *Extension) GenerateSalt() (*big.Int, error) {
 	if e.isEmpty() {
 		return baseSalt, nil
 	}
-
-	fmt.Printf("Base salt: %v\n", baseSalt)
 
 	uint160Max := new(big.Int).Sub(new(big.Int).Lsh(big.NewInt(1), 160), big.NewInt(1))
 

@@ -104,23 +104,10 @@ func (api *api) PlaceOrder(ctx context.Context, fusionQuote GetQuoteOutputFixed,
 	}
 
 	// TODO This function can simply return the SignedOrderInput object
-	fusionOrder, limitOrder, err := CreateFusionOrderData(fusionQuote, orderParams, api.chainId)
+	_, limitOrder, err := CreateFusionOrderData(fusionQuote, orderParams, api.chainId)
 	if err != nil {
 		return fmt.Errorf("failed to create order: %v", err)
 	}
-
-	fusionOrderIndented, err := json.MarshalIndent(fusionOrder, "", "  ")
-	if err != nil {
-		return err
-	}
-
-	fmt.Printf("Fusion Order: %s\n", string(fusionOrderIndented))
-
-	limitOrderIndented, err := json.MarshalIndent(limitOrder, "", "  ")
-	if err != nil {
-		return err
-	}
-	fmt.Printf("Limit Order: %s\n", limitOrderIndented)
 
 	signedOrder := SignedOrderInput{
 		Extension: limitOrder.Data.Extension,
@@ -142,13 +129,6 @@ func (api *api) PlaceOrder(ctx context.Context, fusionQuote GetQuoteOutputFixed,
 	if err != nil {
 		return err
 	}
-
-	bodyIndented, err := json.MarshalIndent(signedOrder, "", "  ")
-	if err != nil {
-		return err
-	}
-
-	fmt.Printf("Body Indented: %s\n", string(bodyIndented))
 
 	payload := common.RequestPayload{
 		Method: "POST",
