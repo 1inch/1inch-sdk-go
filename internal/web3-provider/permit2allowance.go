@@ -1,12 +1,12 @@
 package web3_provider
 
 import (
-	"log"
+	"errors"
+	"fmt"
 	"math/big"
 
 	"github.com/ethereum/go-ethereum/common"
 	"github.com/ethereum/go-ethereum/common/math"
-	"github.com/ethereum/go-ethereum/crypto"
 	"github.com/ethereum/go-ethereum/signer/core/apitypes"
 )
 
@@ -51,8 +51,11 @@ var PERMIT_TYPES = apitypes.Types{
 	},
 }
 
-func getPermitData(permit PermitSingle, permit2Address common.Address, chainId *big.Int) PermitSingleData {
-	validatePermitDetails(permit.Details)
+func getPermitData(permit PermitSingle, permit2Address common.Address, chainId *big.Int) (PermitSingleData, error) {
+	err := validatePermitDetails(permit.Details)
+	if err != nil {
+		return PermitSingleData{}, err
+	}
 
 	domain := apitypes.TypedDataDomain{
 		Name:              "Permit2",
@@ -68,35 +71,42 @@ func getPermitData(permit PermitSingle, permit2Address common.Address, chainId *
 			"expiration": permit.Details.Expiration,
 			"nonce":      permit.Details.Nonce,
 		},
-		"spender":     permit.Spender.Hex(),
-		"sigDeadline": permit.SigDeadline,
+		"spender":           permit.Spender.Hex(),
+		"sigDeadline":       permit.SigDeadline,
+		"name":              domain.Name,
+		"version":           domain.Version,
+		"chainId":           domain.ChainId,
+		"verifyingContract": domain.VerifyingContract,
 	}
 
 	return PermitSingleData{
 		Domain: domain,
 		Types:  PERMIT_TYPES,
 		Values: values,
-	}
+	}, nil
 }
 
-func validatePermitDetails(details PermitDetails) {
+func validatePermitDetails(details PermitDetails) error {
 	maxUint48 := new(big.Int).Sub(new(big.Int).Lsh(big.NewInt(1), 48), big.NewInt(1))
 	maxUint160 := new(big.Int).Sub(new(big.Int).Lsh(big.NewInt(1), 160), big.NewInt(1))
 
 	if details.Amount.Cmp(maxUint160) > 0 {
-		log.Fatal("AMOUNT_OUT_OF_RANGE")
+		return errors.New("AMOUNT_OUT_OF_RANGE")
 	}
 	if details.Expiration.Cmp(maxUint48) > 0 {
-		log.Fatal("EXPIRATION_OUT_OF_RANGE")
+		return errors.New("EXPIRATION_OUT_OF_RANGE")
 	}
 	if details.Nonce.Cmp(maxUint48) > 0 {
-		log.Fatal("NONCE_OUT_OF_RANGE")
+		return errors.New("NONCE_OUT_OF_RANGE")
 	}
+	return nil
 }
 
 func hashPermitSingle(permit PermitSingle, permit2Address common.Address, chainId *big.Int) (string, error) {
-	permitData := getPermitData(permit, permit2Address, chainId)
-
+	permitData, err := getPermitData(permit, permit2Address, chainId)
+	if err != nil {
+		return "", err
+	}
 	typedData := apitypes.TypedData{
 		Types:       permitData.Types,
 		PrimaryType: "PermitSingle",
@@ -104,26 +114,10 @@ func hashPermitSingle(permit PermitSingle, permit2Address common.Address, chainI
 		Message:     permitData.Values,
 	}
 
-	typedDataHash, err := typedData.HashStruct(typedData.PrimaryType, typedData.Message)
+	challengeHash, _, err := apitypes.TypedDataAndHash(typedData)
 	if err != nil {
-		return "", err
+		return "", fmt.Errorf("error using TypedDataAndHash: %v", err)
 	}
 
-	domainSeparator, err := typedData.HashStruct("EIP712Domain", map[string]interface{}{
-		"name":              typedData.Domain.Name,
-		"version":           typedData.Domain.Version,
-		"chainId":           typedData.Domain.ChainId,
-		"verifyingContract": typedData.Domain.VerifyingContract,
-	})
-	if err != nil {
-		return "", err
-	}
-
-	digest := crypto.Keccak256Hash(
-		[]byte("\x19\x01"),
-		domainSeparator,
-		typedDataHash,
-	)
-
-	return digest.Hex(), nil
+	return fmt.Sprintf("%x", challengeHash), nil
 }

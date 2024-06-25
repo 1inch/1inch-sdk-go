@@ -33,6 +33,7 @@ func TestMaxValuesPass(t *testing.T) {
 	permit2Address := common.HexToAddress("0x0000000000000000000000000000000000000000")
 	chainId := big.NewInt(1) // For example, 1 for Ethereum mainnet
 
-	_, err := hashPermitSingle(permit, permit2Address, chainId)
+	hash, err := hashPermitSingle(permit, permit2Address, chainId)
 	assert.NoError(t, err)
+	assert.Equal(t, "0x7c7685afe45d5d39b6279f05214f9bb9aa275f541f950d0a97d0c18aa43158c8", hash)
 }
