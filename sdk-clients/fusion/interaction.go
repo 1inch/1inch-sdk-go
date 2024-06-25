@@ -13,11 +13,11 @@ type Interaction struct {
 	Data   string
 }
 
-func NewInteraction(target common.Address, data string) Interaction {
+func NewInteraction(target common.Address, data string) *Interaction {
 	if !isHexBytes(data) {
 		panic("Interaction data must be valid hex bytes")
 	}
-	return Interaction{
+	return &Interaction{
 		Target: target,
 		Data:   data,
 	}

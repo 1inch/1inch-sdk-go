@@ -49,17 +49,18 @@ func CreateExtension(params CreateExtensionParams) (*Extension, error) {
 		}
 	}
 
-	extensionBuilder := ExtensionBuilder{}
 	settlementAddressContract := common.HexToAddress(params.settlementAddress)
-	auctionDetails := params.details.Auction.Encode()
-	extensionBuilder.WithMakingAmountData(settlementAddressContract, auctionDetails)
-	extensionBuilder.WithTakingAmountData(settlementAddressContract, auctionDetails)
-	postInteraction := NewInteraction(settlementAddressContract, params.postInteractionData.Encode())
-	extensionBuilder.WithPostInteraction(postInteraction)
-	if permitInteraction != nil {
-		extensionBuilder.WithMakerPermit(permitInteraction.Target, permitInteraction.Data)
+	makingAndTakingAmountData := settlementAddressContract.String() + trim0x(params.details.Auction.Encode())
+	extensionParams := ExtensionParams{
+		MakingAmountData: makingAndTakingAmountData,
+		TakingAmountData: makingAndTakingAmountData,
+		PostInteraction:  NewInteraction(settlementAddressContract, params.postInteractionData.Encode()).Encode(),
 	}
-	return extensionBuilder.Build(), nil
+	if permitInteraction != nil {
+		extensionParams.MakerPermit = permitInteraction.Target.String() + trim0x(permitInteraction.Data)
+	}
+
+	return NewExtension(extensionParams)
 }
 
 func CreateMakerTraits(details Details, extraParams ExtraParams) (*orderbook.MakerTraits, error) {
