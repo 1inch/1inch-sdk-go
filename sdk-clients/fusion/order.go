@@ -130,14 +130,6 @@ func CreateFusionOrderData(quote GetQuoteOutputFixed, orderParams OrderParams, c
 		return nil, nil, fmt.Errorf("error creating fusion order: %v", err)
 	}
 
-	//fusionOrderIndented, err := json.MarshalIndent(fusionOrder, "", "  ")
-	//if err != nil {
-	//	panic("Error marshaling fusion order")
-	//}
-	//fmt.Printf("Fusion Order indented: %s\n", string(fusionOrderIndented))
-
-	// Add a decode makertraits function to avoid the extra return values
-
 	limitOrder, err := orderbook.CreateLimitOrderMessage(orderbook.CreateOrderParams{
 		MakerTraits:  makerTraits,
 		Extension:    *fusionOrder.FusionExtension.ConvertToOrderbookExtension(),

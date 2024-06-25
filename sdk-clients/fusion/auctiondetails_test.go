@@ -37,7 +37,7 @@ func TestAuctionDetails(t *testing.T) {
 			encoded := tc.details.Encode()
 			decoded, err := DecodeAuctionDetails(encoded)
 			require.NoError(t, err)
-			assert.Equal(t, tc.details, decoded)
+			assert.Equal(t, tc.details, *decoded)
 		})
 	}
 }

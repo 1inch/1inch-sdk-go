@@ -2,8 +2,6 @@ package fusion
 
 import "math/big"
 
-// Utility structures and functions
-
 type BytesIter struct {
 	data []byte
 	pos  int

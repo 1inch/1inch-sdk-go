@@ -12,14 +12,14 @@ const (
 	uint32Max = math.MaxUint32
 )
 
-func NewAuctionDetails(startTime, duration, initialRateBump uint32, points []AuctionPointClassFixed, gasCost GasCostConfigClassFixed) (AuctionDetails, error) {
+func NewAuctionDetails(startTime, duration, initialRateBump uint32, points []AuctionPointClassFixed, gasCost GasCostConfigClassFixed) (*AuctionDetails, error) {
 
 	if gasCost.GasBumpEstimate > uint24Max || gasCost.GasPriceEstimate > uint32Max ||
 		startTime > uint32Max || duration > uint24Max || initialRateBump > uint24Max {
-		return AuctionDetails{}, errors.New("values exceed their respective limits")
+		return nil, errors.New("values exceed their respective limits")
 	}
 
-	return AuctionDetails{
+	return &AuctionDetails{
 		StartTime:       startTime,
 		Duration:        duration,
 		InitialRateBump: initialRateBump,
@@ -28,14 +28,14 @@ func NewAuctionDetails(startTime, duration, initialRateBump uint32, points []Auc
 	}, nil
 }
 
-func DecodeAuctionDetails(data string) (AuctionDetails, error) {
+func DecodeAuctionDetails(data string) (*AuctionDetails, error) {
 	bytes, err := hex.DecodeString(data)
 	if err != nil {
-		return AuctionDetails{}, errors.New("invalid hex data")
+		return nil, errors.New("invalid hex data")
 	}
 
 	if len(bytes) < 15 {
-		return AuctionDetails{}, errors.New("data too short")
+		return nil, errors.New("data too short")
 	}
 
 	gasBumpEstimate := binary.BigEndian.Uint32(append([]byte{0x00}, bytes[0:3]...))
