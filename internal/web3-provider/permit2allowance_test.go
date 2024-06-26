@@ -28,7 +28,7 @@ func TestMaxValuesPass(t *testing.T) {
 	_, err := GetTypedDataAllowancePermitSingle(permit, permit2Address, int(chainId.Int64()))
 	assert.NoError(t, err)
 
-	hash, err := hashPermitData(permit, permit2Address, int(chainId.Int64()))
+	hash, err := AllowancePermitSingleTypedDataHash(permit, permit2Address, int(chainId.Int64()))
 	if err != nil {
 		fmt.Println("Error:", err)
 		return

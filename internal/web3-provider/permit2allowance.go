@@ -22,25 +22,6 @@ type AllowancePermitSingle struct {
 	SigDeadline string                 `json:"sigDeadline"`
 }
 
-var PERMIT_TYPES = map[string][]apitypes.Type{
-	"EIP712Domain": {
-		{Name: "name", Type: "string"},
-		{Name: "chainId", Type: "uint256"},
-		{Name: "verifyingContract", Type: "address"},
-	},
-	"PermitSingle": {
-		{Name: "details", Type: "PermitDetails"},
-		{Name: "spender", Type: "address"},
-		{Name: "sigDeadline", Type: "uint256"},
-	},
-	"PermitDetails": {
-		{Name: "token", Type: "address"},
-		{Name: "amount", Type: "uint160"},
-		{Name: "expiration", Type: "uint48"},
-		{Name: "nonce", Type: "uint48"},
-	},
-}
-
 var (
 	MaxAllowanceTransferAmount = new(big.Int).Sub(new(big.Int).Lsh(big.NewInt(1), 160), big.NewInt(1))
 	MaxAllowanceExpiration     = new(big.Int).Sub(new(big.Int).Lsh(big.NewInt(1), 48), big.NewInt(1))
@@ -53,16 +34,6 @@ func GetTypedDataAllowancePermitSingle(permit AllowancePermitSingle, permit2Addr
 	if err != nil {
 		return apitypes.TypedData{}, err
 	}
-	values := apitypes.TypedDataMessage{
-		"details": apitypes.TypedDataMessage{
-			"token":      permit.Details.Token,
-			"amount":     permit.Details.Amount,
-			"expiration": permit.Details.Expiration,
-			"nonce":      permit.Details.Nonce,
-		},
-		"spender":     permit.Spender,
-		"sigDeadline": permit.SigDeadline,
-	}
 
 	return apitypes.TypedData{
 		Domain: apitypes.TypedDataDomain{
@@ -70,8 +41,34 @@ func GetTypedDataAllowancePermitSingle(permit AllowancePermitSingle, permit2Addr
 			ChainId:           math.NewHexOrDecimal256(int64(chainId)),
 			VerifyingContract: permit2Address.Hex(),
 		},
-		Types:       PERMIT_TYPES,
-		Message:     values,
+		Types: map[string][]apitypes.Type{
+			"EIP712Domain": {
+				{Name: "name", Type: "string"},
+				{Name: "chainId", Type: "uint256"},
+				{Name: "verifyingContract", Type: "address"},
+			},
+			"PermitSingle": {
+				{Name: "details", Type: "PermitDetails"},
+				{Name: "spender", Type: "address"},
+				{Name: "sigDeadline", Type: "uint256"},
+			},
+			"PermitDetails": {
+				{Name: "token", Type: "address"},
+				{Name: "amount", Type: "uint160"},
+				{Name: "expiration", Type: "uint48"},
+				{Name: "nonce", Type: "uint48"},
+			},
+		},
+		Message: apitypes.TypedDataMessage{
+			"details": apitypes.TypedDataMessage{
+				"token":      permit.Details.Token,
+				"amount":     permit.Details.Amount,
+				"expiration": permit.Details.Expiration,
+				"nonce":      permit.Details.Nonce,
+			},
+			"spender":     permit.Spender,
+			"sigDeadline": permit.SigDeadline,
+		},
 		PrimaryType: "PermitSingle",
 	}, nil
 }
@@ -112,7 +109,7 @@ func validatePermit(permit AllowancePermitSingle) error {
 	return nil
 }
 
-func hashPermitData(permit AllowancePermitSingle, permit2Address common.Address, chainId int) (string, error) {
+func AllowancePermitSingleTypedDataHash(permit AllowancePermitSingle, permit2Address common.Address, chainId int) (string, error) {
 	typedData, err := GetTypedDataAllowancePermitSingle(permit, permit2Address, chainId)
 	if err != nil {
 		return "", err
