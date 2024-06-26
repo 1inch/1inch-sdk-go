@@ -11,8 +11,8 @@ import (
 
 func TestMaxValuesPass(t *testing.T) {
 
-	permit := PermitSingle{
-		Details: PermitDetails{
+	permit := AllowancePermitSingle{
+		Details: AllowancePermitDetails{
 			Token:      "0x0000000000000000000000000000000000000000",
 			Amount:     "1461501637330902918203684832716283019655932542975",
 			Expiration: "281474976710655",
@@ -25,7 +25,7 @@ func TestMaxValuesPass(t *testing.T) {
 	permit2Address := common.HexToAddress("0x0000000000000000000000000000000000000000")
 	chainId := big.NewInt(1)
 
-	_, err := GetPermitData(permit, permit2Address, int(chainId.Int64()))
+	_, err := GetTypedDataAllowancePermitSingle(permit, permit2Address, int(chainId.Int64()))
 	assert.NoError(t, err)
 
 	hash, err := hashPermitData(permit, permit2Address, int(chainId.Int64()))

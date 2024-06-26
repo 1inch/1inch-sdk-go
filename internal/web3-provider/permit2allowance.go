@@ -1,47 +1,25 @@
 package web3_provider
 
 import (
-	"bytes"
 	"fmt"
 	"math/big"
-	"reflect"
 
 	"github.com/ethereum/go-ethereum/common"
 	"github.com/ethereum/go-ethereum/common/math"
-	"github.com/ethereum/go-ethereum/crypto"
 	"github.com/ethereum/go-ethereum/signer/core/apitypes"
-	"golang.org/x/text/cases"
-	"golang.org/x/text/language"
 )
 
-type TypedDataField struct {
-	Name string `json:"name"`
-	Type string `json:"type"`
-}
-
-type TypedDataDomain struct {
-	Name              string `json:"name"`
-	ChainId           int    `json:"chainId"`
-	VerifyingContract string `json:"verifyingContract"`
-}
-
-type PermitDetails struct {
+type AllowancePermitDetails struct {
 	Token      string `json:"token"`
 	Amount     string `json:"amount"`
 	Expiration string `json:"expiration"`
 	Nonce      string `json:"nonce"`
 }
 
-type PermitSingle struct {
-	Details     PermitDetails `json:"details"`
-	Spender     string        `json:"spender"`
-	SigDeadline string        `json:"sigDeadline"`
-}
-
-type TypedData struct {
-	Domain apitypes.TypedDataDomain   `json:"domain"`
-	Types  map[string][]apitypes.Type `json:"types"`
-	Values apitypes.TypedDataMessage  `json:"values"`
+type AllowancePermitSingle struct {
+	Details     AllowancePermitDetails `json:"details"`
+	Spender     string                 `json:"spender"`
+	SigDeadline string                 `json:"sigDeadline"`
 }
 
 var PERMIT_TYPES = map[string][]apitypes.Type{
@@ -70,21 +48,13 @@ var (
 	MaxSigDeadline             = new(big.Int).Sub(new(big.Int).Lsh(big.NewInt(1), 256), big.NewInt(1))
 )
 
-func GetPermitData(permit PermitSingle, permit2Address common.Address, chainId int) (TypedData, error) {
-	sigDeadline, ok := new(big.Int).SetString(permit.SigDeadline, 10)
-	if !ok {
-		return TypedData{}, fmt.Errorf("invalid sigDeadline")
-	}
-	if sigDeadline.Cmp(MaxSigDeadline) > 0 {
-		return TypedData{}, fmt.Errorf("SIG_DEADLINE_OUT_OF_RANGE")
-	}
-
-	err := validatePermitDetails(permit.Details)
+func GetTypedDataAllowancePermitSingle(permit AllowancePermitSingle, permit2Address common.Address, chainId int) (apitypes.TypedData, error) {
+	err := validatePermit(permit)
 	if err != nil {
-		return TypedData{}, err
+		return apitypes.TypedData{}, err
 	}
-	values := map[string]interface{}{
-		"details": map[string]interface{}{
+	values := apitypes.TypedDataMessage{
+		"details": apitypes.TypedDataMessage{
 			"token":      permit.Details.Token,
 			"amount":     permit.Details.Amount,
 			"expiration": permit.Details.Expiration,
@@ -94,19 +64,20 @@ func GetPermitData(permit PermitSingle, permit2Address common.Address, chainId i
 		"sigDeadline": permit.SigDeadline,
 	}
 
-	return TypedData{
+	return apitypes.TypedData{
 		Domain: apitypes.TypedDataDomain{
 			Name:              "Permit2",
 			ChainId:           math.NewHexOrDecimal256(int64(chainId)),
 			VerifyingContract: permit2Address.Hex(),
 		},
-		Types:  PERMIT_TYPES,
-		Values: values,
+		Types:       PERMIT_TYPES,
+		Message:     values,
+		PrimaryType: "PermitSingle",
 	}, nil
 }
 
-func validatePermitDetails(details PermitDetails) error {
-	nonce, ok := new(big.Int).SetString(details.Nonce, 10)
+func validatePermit(permit AllowancePermitSingle) error {
+	nonce, ok := new(big.Int).SetString(permit.Details.Nonce, 10)
 	if !ok {
 		return fmt.Errorf("invalid nonce")
 	}
@@ -114,7 +85,7 @@ func validatePermitDetails(details PermitDetails) error {
 		return fmt.Errorf("NONCE_OUT_OF_RANGE")
 	}
 
-	amount, ok := new(big.Int).SetString(details.Amount, 10)
+	amount, ok := new(big.Int).SetString(permit.Details.Amount, 10)
 	if !ok {
 		return fmt.Errorf("invalid amount")
 	}
@@ -122,7 +93,7 @@ func validatePermitDetails(details PermitDetails) error {
 		return fmt.Errorf("AMOUNT_OUT_OF_RANGE")
 	}
 
-	expiration, ok := new(big.Int).SetString(details.Expiration, 10)
+	expiration, ok := new(big.Int).SetString(permit.Details.Expiration, 10)
 	if !ok {
 		return fmt.Errorf("invalid expiration")
 	}
@@ -130,114 +101,21 @@ func validatePermitDetails(details PermitDetails) error {
 		return fmt.Errorf("EXPIRATION_OUT_OF_RANGE")
 	}
 
+	sigDeadline, ok := new(big.Int).SetString(permit.SigDeadline, 10)
+	if !ok {
+		return fmt.Errorf("invalid sigDeadline")
+	}
+	if sigDeadline.Cmp(MaxSigDeadline) > 0 {
+		return fmt.Errorf("SIG_DEADLINE_OUT_OF_RANGE")
+	}
+
 	return nil
 }
 
-func hashPermitDetails(types map[string][]TypedDataField, details PermitDetails) []byte {
-	var buffer bytes.Buffer
-
-	buffer.Write(crypto.Keccak256([]byte("PermitDetails(address token,uint160 amount,uint48 expiration,uint48 nonce)")))
-
-	value := reflect.ValueOf(details)
-	for _, field := range types["PermitDetails"] {
-		fieldName := field.Name
-		fieldValue := value.FieldByName(cases.Title(language.English).String(fieldName))
-
-		switch field.Type {
-		case "address":
-			buffer.Write(common.HexToAddress(fieldValue.String()).Bytes())
-		case "uint160":
-			intValue, ok := new(big.Int).SetString(fieldValue.String(), 10)
-			if !ok {
-				panic(fmt.Sprintf("Invalid uint160 value for field %s", fieldName))
-			}
-			buffer.Write(common.LeftPadBytes(intValue.Bytes(), 20))
-		case "uint48":
-			intValue, ok := new(big.Int).SetString(fieldValue.String(), 10)
-			if !ok {
-				panic(fmt.Sprintf("Invalid uint48 value for field %s", fieldName))
-			}
-			buffer.Write(common.LeftPadBytes(intValue.Bytes(), 6))
-		}
-	}
-
-	return crypto.Keccak256(buffer.Bytes())
-}
-
-func hashStruct(types map[string][]TypedDataField, values PermitSingle) []byte {
-	var buffer bytes.Buffer
-
-	primaryType := "PermitSingle"
-	buffer.Write(crypto.Keccak256([]byte("PermitSingle(PermitDetails details,address spender,uint256 sigDeadline)")))
-
-	value := reflect.ValueOf(values)
-	for _, field := range types[primaryType] {
-		fieldName := field.Name
-		// Manually handle the specific case for "sigDeadline" to "SigDeadline"
-		var fieldValue reflect.Value
-		if fieldName == "sigDeadline" {
-			fieldValue = value.FieldByName("SigDeadline")
-		} else {
-			fieldValue = value.FieldByName(cases.Title(language.English).String(fieldName))
-		}
-
-		switch field.Type {
-		case "address":
-			buffer.Write(common.HexToAddress(fieldValue.String()).Bytes())
-		case "uint160":
-			intValue, ok := new(big.Int).SetString(fieldValue.String(), 10)
-			if !ok {
-				panic(fmt.Sprintf("Invalid uint160 value for field %s", fieldName))
-			}
-			buffer.Write(common.LeftPadBytes(intValue.Bytes(), 20))
-		case "uint256":
-			intValue, ok := new(big.Int).SetString(fieldValue.String(), 10)
-			if !ok {
-				panic(fmt.Sprintf("Invalid uint256 value for field %s", fieldName))
-			}
-			buffer.Write(common.LeftPadBytes(intValue.Bytes(), 32))
-		case "uint48":
-			intValue, ok := new(big.Int).SetString(fieldValue.String(), 10)
-			if !ok {
-				panic(fmt.Sprintf("Invalid uint48 value for field %s", fieldName))
-			}
-			buffer.Write(common.LeftPadBytes(intValue.Bytes(), 6))
-		case "PermitDetails":
-			buffer.Write(hashPermitDetails(types, fieldValue.Interface().(PermitDetails)))
-
-		}
-	}
-
-	return crypto.Keccak256(buffer.Bytes())
-}
-
-func hashDomain(domain TypedDataDomain) []byte {
-	var buffer bytes.Buffer
-
-	buffer.Write(crypto.Keccak256([]byte("EIP712Domain(string name,uint256 chainId,address verifyingContract)")))
-
-	nameHash := crypto.Keccak256([]byte(domain.Name))
-	buffer.Write(nameHash)
-
-	chainIdBytes := common.LeftPadBytes(new(big.Int).SetInt64(int64(domain.ChainId)).Bytes(), 32)
-	buffer.Write(chainIdBytes)
-
-	addressBytes := common.HexToAddress(domain.VerifyingContract).Bytes()
-	buffer.Write(addressBytes)
-
-	return crypto.Keccak256(buffer.Bytes())
-}
-
-func hashPermitData(permit PermitSingle, permit2Address common.Address, chainId int) (string, error) {
-	permitData, err := GetPermitData(permit, permit2Address, chainId)
+func hashPermitData(permit AllowancePermitSingle, permit2Address common.Address, chainId int) (string, error) {
+	typedData, err := GetTypedDataAllowancePermitSingle(permit, permit2Address, chainId)
 	if err != nil {
 		return "", err
-	}
-	typedData := apitypes.TypedData{
-		Types:       permitData.Types,
-		PrimaryType: "PermitSingle",
-		Domain:      permitData.Domain,
-		Message:     permitData.Values,
 	}
 
 	challengeHash, _, err := apitypes.TypedDataAndHash(typedData)
