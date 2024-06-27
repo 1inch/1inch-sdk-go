@@ -43,7 +43,7 @@ func NewConfiguration(params ConfigurationParams) (*Configuration, error) {
 		httpExecutor: executor,
 	}
 
-	walletCfg, err := NewConfigurationWallet(params.PrivateKey)
+	walletCfg, err := NewConfigurationWallet(params.PrivateKey, params.ChainId)
 	if err != nil {
 		return nil, err
 	}
@@ -58,10 +58,13 @@ func NewConfiguration(params ConfigurationParams) (*Configuration, error) {
 	}, nil
 }
 
-func NewConfigurationWallet(privateKey string) (*ConfigurationWallet, error) {
-	w, err := web3_provider.DefaultWalletOnlyProvider(privateKey)
+func NewConfigurationWallet(privateKey string, chainId uint64) (*ConfigurationWallet, error) {
+	if privateKey == "" {
+		return nil, fmt.Errorf("private key cannot be empty")
+	}
+	w, err := web3_provider.DefaultWalletOnlyProvider(privateKey, chainId)
 	if err != nil {
-		return nil, fmt.Errorf("failed to create wallet: %v", err)
+		return nil, err
 	}
 	return &ConfigurationWallet{
 		Wallet: w,

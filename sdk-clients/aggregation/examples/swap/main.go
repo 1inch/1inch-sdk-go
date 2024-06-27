@@ -27,7 +27,7 @@ func main() {
 	config, err := aggregation.NewConfiguration(aggregation.ConfigurationParams{
 		NodeUrl:    nodeUrl,
 		PrivateKey: privateKey,
-		ChainId:    constants.EthereumChainId,
+		ChainId:    constants.PolygonChainId,
 		ApiUrl:     "https://api.1inch.dev",
 		ApiKey:     devPortalToken,
 	})

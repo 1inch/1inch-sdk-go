@@ -13,6 +13,7 @@ import (
 var (
 	devPortalToken = os.Getenv("DEV_PORTAL_TOKEN")
 	publicAddress  = os.Getenv("WALLET_ADDRESS")
+	privateKey     = os.Getenv("WALLET_KEY")
 )
 
 const (
@@ -24,9 +25,10 @@ const (
 
 func main() {
 	config, err := fusion.NewConfiguration(fusion.ConfigurationParams{
-		ApiUrl:  "https://api.1inch.dev",
-		ApiKey:  devPortalToken,
-		ChainId: chainId,
+		ApiUrl:     "https://api.1inch.dev",
+		ApiKey:     devPortalToken,
+		ChainId:    chainId,
+		PrivateKey: privateKey,
 	})
 	if err != nil {
 		log.Fatalf("failed to create configuration: %v", err)

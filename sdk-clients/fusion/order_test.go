@@ -112,7 +112,7 @@ func TestCreateFusionOrderData(t *testing.T) {
 				return tc.auctionStartTime
 			}
 
-			wallet, err := web3_provider.DefaultWalletOnlyProvider(privateKey)
+			wallet, err := web3_provider.DefaultWalletOnlyProvider(privateKey, tc.chainId)
 			require.NoError(t, err)
 
 			preparedOrder, orderbookOrder, err := CreateFusionOrderData(quote, tc.orderParams, wallet, tc.chainId)

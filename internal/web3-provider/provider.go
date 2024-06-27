@@ -62,7 +62,7 @@ func DefaultWalletProvider(pk string, nodeURL string, chainId uint64) (*Wallet, 
 	}, nil
 }
 
-func DefaultWalletOnlyProvider(pk string) (*Wallet, error) {
+func DefaultWalletOnlyProvider(pk string, chainId uint64) (*Wallet, error) {
 	privateKey, err := crypto.HexToECDSA(pk)
 	if err != nil {
 		return nil, err
@@ -74,5 +74,6 @@ func DefaultWalletOnlyProvider(pk string) (*Wallet, error) {
 	return &Wallet{
 		address:    &address,
 		privateKey: privateKey,
+		chainId:    big.NewInt(int64(chainId)),
 	}, nil
 }

@@ -1,10 +1,9 @@
 package orderbook
 
 import (
-	"fmt"
-
 	"github.com/1inch/1inch-sdk-go/common"
 	http_executor "github.com/1inch/1inch-sdk-go/internal/http-executor"
+	transaction_builder "github.com/1inch/1inch-sdk-go/internal/transaction-builder"
 	web3_provider "github.com/1inch/1inch-sdk-go/internal/web3-provider"
 )
 
@@ -41,7 +40,7 @@ func NewConfiguration(params ConfigurationParams) (*Configuration, error) {
 	if err != nil {
 		return nil, err
 	}
-	walletCfg, err := NewConfigurationWallet(params.PrivateKey)
+	walletCfg, err := NewConfigurationWallet(params.NodeUrl, params.PrivateKey, params.ChainId)
 	if err != nil {
 		return nil, err
 	}
@@ -70,12 +69,15 @@ func NewConfigurationAPI(chainId uint64, apiUrl string, apiKey string) (*Configu
 	}, nil
 }
 
-func NewConfigurationWallet(privateKey string) (*WalletConfiguration, error) {
-	w, err := web3_provider.DefaultWalletOnlyProvider(privateKey)
+func NewConfigurationWallet(nodeUrl string, privateKey string, chainId uint64) (*WalletConfiguration, error) {
+	w, err := web3_provider.DefaultWalletProvider(privateKey, nodeUrl, chainId)
 	if err != nil {
-		return nil, fmt.Errorf("failed to create wallet: %v", err)
+		return nil, err
 	}
+
+	f := transaction_builder.NewFactory(w)
 	return &WalletConfiguration{
-		Wallet: w,
+		Wallet:    w,
+		TxBuilder: f,
 	}, nil
 }
