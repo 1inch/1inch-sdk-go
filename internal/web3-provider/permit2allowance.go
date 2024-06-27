@@ -8,6 +8,7 @@ import (
 	"github.com/ethereum/go-ethereum"
 	"github.com/ethereum/go-ethereum/common"
 	"github.com/ethereum/go-ethereum/common/math"
+	"github.com/ethereum/go-ethereum/crypto"
 	"github.com/ethereum/go-ethereum/signer/core/apitypes"
 )
 
@@ -34,7 +35,7 @@ type AllowancePermitSingle struct {
 }
 
 func (w Wallet) GetAllowancePermitSingle(ctx context.Context, params AllowancePermitParams) (apitypes.TypedData, error) {
-	callData, err := w.erc20ABI.Pack("allowance", w.address.Hex(), params.Token, params.Spender)
+	callData, err := w.erc20ABI.Pack("nonce", w.address.Hex(), params.Token, params.Spender)
 	if err != nil {
 		return apitypes.TypedData{}, fmt.Errorf("failed to pack allowance call data: %v", err)
 	}
@@ -176,4 +177,29 @@ func AllowancePermitSingleTypedDataHash(permit AllowancePermitSingle, permit2Add
 	}
 
 	return "0x" + common.Bytes2Hex(challengeHash), nil
+}
+
+func (w Wallet) SignPermit2AllowanceAndPackToContract(permit AllowancePermitSingle) (string, error) {
+	challengeHash, err := AllowancePermitSingleTypedDataHash(permit, *w.address, int(w.chainId.Int64()))
+	if err != nil {
+		return "", err
+	}
+	challengeHashWithoutPrefix := challengeHash[2:]
+	challengeHashWithoutPrefixRaw := common.Hex2Bytes(challengeHashWithoutPrefix)
+
+	signature, err := crypto.Sign(challengeHashWithoutPrefixRaw, w.privateKey)
+	if err != nil {
+		return "", fmt.Errorf("error signing challenge hash: %v", err)
+	}
+	signature[64] += 27 // Adjust the `v` value
+
+	// Convert createPermitSignature to hex string
+	signatureHex := fmt.Sprintf("%x", signature)
+
+	// Step 5: Encode the permit data with the signature
+	permitCall, err := w.permit2ABI.Pack("permit", w.address, permit, convertSignatureToVRSString(signatureHex))
+	if err != nil {
+		return "", fmt.Errorf("failed to encode function data: %v", err)
+	}
+	return padStringWithZeroes(common.Bytes2Hex(permitCall)), nil
 }
