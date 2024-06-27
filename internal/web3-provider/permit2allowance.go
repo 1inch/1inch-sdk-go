@@ -1,13 +1,24 @@
 package web3_provider
 
 import (
+	"context"
 	"fmt"
 	"math/big"
 
+	"github.com/ethereum/go-ethereum"
 	"github.com/ethereum/go-ethereum/common"
 	"github.com/ethereum/go-ethereum/common/math"
 	"github.com/ethereum/go-ethereum/signer/core/apitypes"
 )
+
+type AllowancePermitParams struct {
+	Token          string `json:"token"`
+	Amount         string `json:"amount"`
+	Expiration     string `json:"expiration"`
+	Spender        string `json:"spender"`
+	SigDeadline    string `json:"sigDeadline"`
+	Permit2Address string
+}
 
 type AllowancePermitDetails struct {
 	Token      string `json:"token"`
@@ -22,12 +33,49 @@ type AllowancePermitSingle struct {
 	SigDeadline string                 `json:"sigDeadline"`
 }
 
-var (
-	MaxAllowanceTransferAmount = new(big.Int).Sub(new(big.Int).Lsh(big.NewInt(1), 160), big.NewInt(1))
-	MaxAllowanceExpiration     = new(big.Int).Sub(new(big.Int).Lsh(big.NewInt(1), 48), big.NewInt(1))
-	MaxOrderedNonce            = new(big.Int).Sub(new(big.Int).Lsh(big.NewInt(1), 48), big.NewInt(1))
-	MaxSigDeadline             = new(big.Int).Sub(new(big.Int).Lsh(big.NewInt(1), 256), big.NewInt(1))
-)
+func (w Wallet) GetAllowancePermitSingle(ctx context.Context, params AllowancePermitParams) (apitypes.TypedData, error) {
+	callData, err := w.erc20ABI.Pack("allowance", w.address.Hex(), params.Token, params.Spender)
+	if err != nil {
+		return apitypes.TypedData{}, fmt.Errorf("failed to pack allowance call data: %v", err)
+	}
+
+	permitAddress := common.HexToAddress(params.Permit2Address)
+
+	msg := ethereum.CallMsg{
+		To:   &permitAddress,
+		Data: callData,
+	}
+
+	result, err := w.ethClient.CallContract(ctx, msg, nil)
+	if err != nil {
+		return apitypes.TypedData{}, fmt.Errorf("failed to call contract: %v", err)
+	}
+
+	var nonce *big.Int
+	err = w.erc20ABI.UnpackIntoInterface(&nonce, "nonce", result)
+	if err != nil {
+		return apitypes.TypedData{}, fmt.Errorf("failed to unpack result: %v", err)
+	}
+
+	// Construct the permit details
+	d := AllowancePermitSingle{
+		Details: AllowancePermitDetails{
+			Token:      params.Token,
+			Amount:     params.Amount,
+			Expiration: params.Expiration,
+			Nonce:      nonce.String(),
+		},
+		Spender:     params.Spender,
+		SigDeadline: params.SigDeadline,
+	}
+
+	permit, err := GetTypedDataAllowancePermitSingle(d, permitAddress, int(w.chainId.Int64()))
+	if err != nil {
+		return apitypes.TypedData{}, fmt.Errorf("failed to generate permit: %v", err)
+	}
+
+	return permit, nil
+}
 
 func GetTypedDataAllowancePermitSingle(permit AllowancePermitSingle, permit2Address common.Address, chainId int) (apitypes.TypedData, error) {
 	err := validatePermit(permit)
@@ -74,6 +122,13 @@ func GetTypedDataAllowancePermitSingle(permit AllowancePermitSingle, permit2Addr
 }
 
 func validatePermit(permit AllowancePermitSingle) error {
+	var (
+		MaxAllowanceTransferAmount = new(big.Int).Sub(new(big.Int).Lsh(big.NewInt(1), 160), big.NewInt(1))
+		MaxAllowanceExpiration     = new(big.Int).Sub(new(big.Int).Lsh(big.NewInt(1), 48), big.NewInt(1))
+		MaxOrderedNonce            = new(big.Int).Sub(new(big.Int).Lsh(big.NewInt(1), 48), big.NewInt(1))
+		MaxSigDeadline             = new(big.Int).Sub(new(big.Int).Lsh(big.NewInt(1), 256), big.NewInt(1))
+	)
+
 	nonce, ok := new(big.Int).SetString(permit.Details.Nonce, 10)
 	if !ok {
 		return fmt.Errorf("invalid nonce")
