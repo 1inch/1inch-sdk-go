@@ -21,7 +21,7 @@ func (w Wallet) Sign(tx *types.Transaction) (*types.Transaction, error) {
 func (w Wallet) SignBytes(bytes []byte) ([]byte, error) {
 	signature, err := crypto.Sign(bytes, w.privateKey)
 	if err != nil {
-		return nil, fmt.Errorf("error signing challenge hash: %v", err)
+		return nil, fmt.Errorf("error signing bytes: %v", err)
 	}
 	return signature, nil
 }
