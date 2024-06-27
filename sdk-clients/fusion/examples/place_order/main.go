@@ -19,16 +19,17 @@ var (
 const (
 	usdc         = "0x3c499c542cEF5E3811e1192ce70d8cC03d5c3359"
 	wmatic       = "0x0d500B1d8E8eF31E21C99d1Db9A6444d3ADf1270"
-	amount       = 1000000000000000000
-	amountString = "1000000000000000000"
+	amount       = 1500000
+	amountString = "1500000"
 	chainId      = 137
 )
 
 func main() {
 	config, err := fusion.NewConfiguration(fusion.ConfigurationParams{
-		ApiUrl:  "https://api.1inch.dev",
-		ApiKey:  devPortalToken,
-		ChainId: chainId,
+		ApiUrl:     "https://api.1inch.dev",
+		ApiKey:     devPortalToken,
+		ChainId:    chainId,
+		PrivateKey: privateKey,
 	})
 	if err != nil {
 		log.Fatalf("failed to create configuration: %v", err)
@@ -39,9 +40,12 @@ func main() {
 	}
 	ctx := context.Background()
 
+	fromToken := usdc
+	toToken := wmatic
+
 	response, err := client.GetQuote(ctx, fusion.QuoterControllerGetQuoteParams{
-		FromTokenAddress: wmatic,
-		ToTokenAddress:   usdc,
+		FromTokenAddress: fromToken,
+		ToTokenAddress:   toToken,
 		Amount:           amount,
 		WalletAddress:    publicAddress,
 		EnableEstimate:   true,
@@ -57,17 +61,16 @@ func main() {
 	fmt.Printf("Response: %s\n", string(output))
 
 	orderParams := fusion.OrderParams{
-		PrivateKey:       privateKey,
 		WalletAddress:    publicAddress,
-		FromTokenAddress: wmatic,
-		ToTokenAddress:   usdc,
+		FromTokenAddress: fromToken,
+		ToTokenAddress:   toToken,
 		Amount:           amountString,
 		Receiver:         "0x0000000000000000000000000000000000000000",
 		Preset:           fusion.Fast,
 	}
 
 	fmt.Println("Placing order")
-	err = client.PlaceOrder(ctx, *response, orderParams)
+	err = client.PlaceOrder(ctx, *response, orderParams, client.Wallet)
 	if err != nil {
 		log.Fatalf("failed to request: %v", err)
 	}

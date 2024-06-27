@@ -9,6 +9,8 @@ import (
 	"github.com/1inch/1inch-sdk-go/internal/validate"
 )
 
+var walletConfiguration, _ = NewConfigurationWallet("965e092fdfc08940d2bd05c7b5c7e1c51e283e92c7f52bbf1408973ae9a9acb7")
+
 func TestCreateOrderParams_Validate(t *testing.T) {
 	testCases := []struct {
 		description  string
@@ -18,7 +20,7 @@ func TestCreateOrderParams_Validate(t *testing.T) {
 		{
 			description: "Valid parameters",
 			params: CreateOrderParams{
-				PrivateKey:   "a0b1c2d3e4f5a6b7c8d9e0f1a2b3c4d5e6f7a8b9c0d1e2f3a4b5c6d7e8f9a0b1",
+				Wallet:       walletConfiguration.Wallet,
 				Maker:        "0x1234567890abcdef1234567890abcdef12345678",
 				MakerAsset:   "0x1234567890abcdef1234567890abcdef12345678",
 				TakerAsset:   "0x1234567890abcdef1234567890abcdef12345679",
@@ -31,7 +33,6 @@ func TestCreateOrderParams_Validate(t *testing.T) {
 			description: "Missing required parameters",
 			params:      CreateOrderParams{},
 			expectErrors: []string{
-				"'privateKey' is required",
 				"'maker' is required",
 				"'makerAsset' is required",
 				"'takerAsset' is required",
@@ -43,7 +44,7 @@ func TestCreateOrderParams_Validate(t *testing.T) {
 		{
 			description: "Error - MakerAsset is native token",
 			params: CreateOrderParams{
-				PrivateKey:   "a0b1c2d3e4f5a6b7c8d9e0f1a2b3c4d5e6f7a8b9c0d1e2f3a4b5c6d7e8f9a0b1",
+				Wallet:       walletConfiguration.Wallet,
 				Maker:        "0x1234567890abcdef1234567890abcdef12345678",
 				MakerAsset:   "0xEeeeeEeeeEeEeeEeEeEeeEEEeeeeEeeeeeeeEEeE",
 				TakerAsset:   "0xa0b86991c6218b36c1d19d4a2e9eb0ce3606eb48",
@@ -58,7 +59,7 @@ func TestCreateOrderParams_Validate(t *testing.T) {
 		{
 			description: "Error - TakerAsset is native token",
 			params: CreateOrderParams{
-				PrivateKey:   "a0b1c2d3e4f5a6b7c8d9e0f1a2b3c4d5e6f7a8b9c0d1e2f3a4b5c6d7e8f9a0b1",
+				Wallet:       walletConfiguration.Wallet,
 				Maker:        "0x1234567890abcdef1234567890abcdef12345678",
 				MakerAsset:   "0xa0b86991c6218b36c1d19d4a2e9eb0ce3606eb48",
 				TakerAsset:   "0xEeeeeEeeeEeEeeEeEeEeeEEEeeeeEeeeeeeeEEeE",

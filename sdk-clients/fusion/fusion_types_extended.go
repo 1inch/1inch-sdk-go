@@ -70,7 +70,6 @@ type OrderParams struct {
 	AllowMultipleFills      bool                            `json:"allowMultipleFills,omitempty"`
 	DelayAuctionStartTimeBy float32
 	OrderExpirationDelay    uint32 // TODO this field is inaccessible in the typescript SDK
-	PrivateKey              string
 }
 
 type TakingFeeInfo struct {

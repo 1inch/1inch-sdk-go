@@ -2,17 +2,14 @@ package main
 
 import (
 	"context"
-	"crypto/ecdsa"
 	"fmt"
 	"log"
 	"os"
 	"time"
 
-	gethCommon "github.com/ethereum/go-ethereum/common"
-	"github.com/ethereum/go-ethereum/crypto"
-
 	"github.com/1inch/1inch-sdk-go/constants"
 	"github.com/1inch/1inch-sdk-go/sdk-clients/orderbook"
+	gethCommon "github.com/ethereum/go-ethereum/common"
 )
 
 /*
@@ -51,16 +48,9 @@ func main() {
 	}
 	client, err := orderbook.NewClient(config)
 
-	ecdsaPrivateKey, err := crypto.HexToECDSA(privateKey)
-	if err != nil {
-		log.Fatalf(fmt.Sprintf("error converting private key to ECDSA: %v", err))
-	}
-	publicKey := ecdsaPrivateKey.Public()
-	publicAddress := crypto.PubkeyToAddress(*publicKey.(*ecdsa.PublicKey))
-
 	expireAfter := time.Now().Add(time.Hour).Unix()
 
-	seriesNonce, err := client.GetSeriesNonce(ctx, publicAddress)
+	seriesNonce, err := client.GetSeriesNonce(ctx, client.Wallet.Address())
 	if err != nil {
 		log.Fatal(fmt.Errorf("failed to get series nonce: %v", err))
 	}
@@ -81,11 +71,11 @@ func main() {
 	})
 
 	createOrderResponse, err := client.CreateOrder(ctx, orderbook.CreateOrderParams{
+		Wallet:                         client.Wallet,
 		SeriesNonce:                    seriesNonce,
 		MakerTraits:                    makerTraits,
-		PrivateKey:                     privateKey,
 		ExpireAfter:                    time.Now().Add(time.Hour * 10).Unix(), // TODO update the field name to have "unix" suffix
-		Maker:                          publicAddress.Hex(),
+		Maker:                          client.Wallet.Address().Hex(),
 		MakerAsset:                     wmatic,
 		TakerAsset:                     usdc,
 		MakingAmount:                   ten16,
@@ -105,7 +95,7 @@ func main() {
 	time.Sleep(time.Second)
 
 	getOrderResponse, err := client.GetOrdersByCreatorAddress(ctx, orderbook.GetOrdersByCreatorAddressParams{
-		CreatorAddress: publicAddress.Hex(),
+		CreatorAddress: client.Wallet.Address().Hex(),
 	})
 
 	fmt.Printf("Order created! \nOrder hash: %v\n", getOrderResponse[0].OrderHash)

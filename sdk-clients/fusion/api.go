@@ -95,7 +95,7 @@ func (api *api) GetQuoteWithCustomPreset(ctx context.Context, params QuoterContr
 }
 
 // PlaceOrder accepts a quote and submits it as a fusion order
-func (api *api) PlaceOrder(ctx context.Context, fusionQuote GetQuoteOutputFixed, orderParams OrderParams) error {
+func (api *api) PlaceOrder(ctx context.Context, fusionQuote GetQuoteOutputFixed, orderParams OrderParams, wallet common.Wallet) error {
 	u := fmt.Sprintf("/fusion/relayer/v2.0/%d/order/submit", api.chainId)
 
 	err := orderParams.Validate()
@@ -104,7 +104,7 @@ func (api *api) PlaceOrder(ctx context.Context, fusionQuote GetQuoteOutputFixed,
 	}
 
 	// TODO This function can simply return the SignedOrderInput object
-	_, limitOrder, err := CreateFusionOrderData(fusionQuote, orderParams, api.chainId)
+	_, limitOrder, err := CreateFusionOrderData(fusionQuote, orderParams, wallet, api.chainId)
 	if err != nil {
 		return fmt.Errorf("failed to create order: %v", err)
 	}

@@ -78,8 +78,8 @@ func main() {
 	})
 
 	createOrderResponse, err := client.CreateOrder(ctx, orderbook.CreateOrderParams{
+		Wallet:                         client.Wallet,
 		SeriesNonce:                    seriesNonce,
-		PrivateKey:                     privateKey,
 		ExpireAfter:                    expireAfter, // TODO update the field name to have "unix" suffix
 		Maker:                          publicAddress.Hex(),
 		MakerAsset:                     wmatic,

@@ -61,3 +61,18 @@ func DefaultWalletProvider(pk string, nodeURL string, chainId uint64) (*Wallet, 
 		seriesNonceManagerABI: &seriesNonceManagerABI,
 	}, nil
 }
+
+func DefaultWalletOnlyProvider(pk string) (*Wallet, error) {
+	privateKey, err := crypto.HexToECDSA(pk)
+	if err != nil {
+		return nil, err
+	}
+
+	publicKey := privateKey.Public()
+	address := crypto.PubkeyToAddress(*publicKey.(*ecdsa.PublicKey))
+
+	return &Wallet{
+		address:    &address,
+		privateKey: privateKey,
+	}, nil
+}

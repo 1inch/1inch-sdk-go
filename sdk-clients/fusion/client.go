@@ -6,6 +6,7 @@ import (
 
 type Client struct {
 	api
+	Wallet common.Wallet
 }
 
 type api struct {
@@ -15,7 +16,8 @@ type api struct {
 
 func NewClient(cfg *Configuration) (*Client, error) {
 	c := Client{
-		api: cfg.API,
+		api:    cfg.APIConfiguration.API,
+		Wallet: cfg.WalletConfiguration.Wallet,
 	}
 	return &c, nil
 }

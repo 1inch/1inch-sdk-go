@@ -7,7 +7,8 @@ import (
 	"strconv"
 	"time"
 
-	"github.com/ethereum/go-ethereum/common"
+	"github.com/1inch/1inch-sdk-go/common"
+	geth_common "github.com/ethereum/go-ethereum/common"
 
 	random_number_generation "github.com/1inch/1inch-sdk-go/internal/random-number-generation"
 	"github.com/1inch/1inch-sdk-go/sdk-clients/orderbook"
@@ -15,7 +16,7 @@ import (
 
 var uint40Max = new(big.Int).Sub(new(big.Int).Lsh(big.NewInt(1), 40), big.NewInt(1))
 
-func CreateFusionOrderData(quote GetQuoteOutputFixed, orderParams OrderParams, chainId uint64) (*PreparedOrder, *orderbook.Order, error) {
+func CreateFusionOrderData(quote GetQuoteOutputFixed, orderParams OrderParams, wallet common.Wallet, chainId uint64) (*PreparedOrder, *orderbook.Order, error) {
 
 	preset, err := getPreset(quote.Presets, orderParams.Preset)
 	if err != nil {
@@ -67,7 +68,7 @@ func CreateFusionOrderData(quote GetQuoteOutputFixed, orderParams OrderParams, c
 	whitelistAddresses := make([]AuctionWhitelistItem, 0)
 	for _, address := range quote.Whitelist {
 		whitelistAddresses = append(whitelistAddresses, AuctionWhitelistItem{
-			Address:   common.HexToAddress(address),
+			Address:   geth_common.HexToAddress(address),
 			AllowFrom: big.NewInt(0), // TODO generating the correct list here requires checking for an exclusive resolver. This needs to be checked for later. The generated object does not see exclusive resolver correctly
 		})
 	}
@@ -131,9 +132,9 @@ func CreateFusionOrderData(quote GetQuoteOutputFixed, orderParams OrderParams, c
 	}
 
 	limitOrder, err := orderbook.CreateLimitOrderMessage(orderbook.CreateOrderParams{
+		Wallet:       wallet,
 		MakerTraits:  makerTraits,
 		Extension:    *fusionOrder.FusionExtension.ConvertToOrderbookExtension(),
-		PrivateKey:   orderParams.PrivateKey,
 		Maker:        fusionOrder.OrderInfo.Maker,
 		MakerAsset:   fusionOrder.OrderInfo.MakerAsset,
 		TakerAsset:   fusionOrder.OrderInfo.TakerAsset,
@@ -228,7 +229,7 @@ func CreateSettlementPostInteractionData(details Details, orderInfo FusionOrderV
 		IntegratorFee:      &details.Fees.IntFee,
 		BankFee:            details.Fees.BankFee,
 		ResolvingStartTime: resolverStartTime,
-		CustomReceiver:     common.HexToAddress(orderInfo.Receiver),
+		CustomReceiver:     geth_common.HexToAddress(orderInfo.Receiver),
 	})
 }
 
@@ -245,12 +246,12 @@ func CreateExtension(params CreateExtensionParams) (*Extension, error) {
 	var permitInteraction *Interaction
 	if params.extraParams.Permit != "" {
 		permitInteraction = &Interaction{
-			Target: common.HexToAddress(params.orderInfo.MakerAsset),
+			Target: geth_common.HexToAddress(params.orderInfo.MakerAsset),
 			Data:   params.extraParams.Permit,
 		}
 	}
 
-	settlementAddressContract := common.HexToAddress(params.settlementAddress)
+	settlementAddressContract := geth_common.HexToAddress(params.settlementAddress)
 	makingAndTakingAmountData := settlementAddressContract.String() + trim0x(params.details.Auction.Encode())
 	extensionParams := ExtensionParams{
 		MakingAmountData: makingAndTakingAmountData,
@@ -296,11 +297,11 @@ type CreateOrderDataParams struct {
 }
 
 func CreateOrder(params CreateOrderDataParams) (*Order, error) {
-	var receiver common.Address
+	var receiver geth_common.Address
 	if params.postInteractionData.IntegratorFee.Ratio != nil && params.postInteractionData.IntegratorFee.Ratio.Cmp(big.NewInt(0)) != 0 {
-		receiver = common.HexToAddress(params.settlementAddress)
+		receiver = geth_common.HexToAddress(params.settlementAddress)
 	} else {
-		receiver = common.HexToAddress(params.orderInfo.Receiver)
+		receiver = geth_common.HexToAddress(params.orderInfo.Receiver)
 	}
 
 	salt, err := params.extension.GenerateSalt() // TODO this is not the right salt
@@ -321,7 +322,7 @@ func CreateOrder(params CreateOrderDataParams) (*Order, error) {
 			MakerTraits:  params.makerTraits.Encode(),
 			Extension:    fmt.Sprintf("%x", params.extension.keccak256()),
 		},
-		SettlementExtension: common.HexToAddress(params.settlementAddress),
+		SettlementExtension: geth_common.HexToAddress(params.settlementAddress),
 		OrderInfo:           params.orderInfo,
 		AuctionDetails:      params.details.Auction,
 		PostInteractionData: params.postInteractionData,

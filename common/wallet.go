@@ -19,6 +19,7 @@ type Wallet interface {
 	GetGasPrice(ctx context.Context) (*big.Int, error)
 
 	Sign(tx *types.Transaction) (*types.Transaction, error)
+	SignBytes(data []byte) ([]byte, error)
 	BroadcastTransaction(ctx context.Context, tx *types.Transaction) error
 	TransactionReceipt(ctx context.Context, txHash gethCommon.Hash) (*types.Receipt, error)
 

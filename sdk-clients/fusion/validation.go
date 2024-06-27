@@ -18,8 +18,7 @@ func (params *QuoterControllerGetQuoteParams) Validate() error {
 	var validationErrors []error
 	validationErrors = validate.Parameter(params.FromTokenAddress, "FromTokenAddress", validate.CheckEthereumAddressRequired, validationErrors)
 	validationErrors = validate.Parameter(params.ToTokenAddress, "ToTokenAddress", validate.CheckEthereumAddressRequired, validationErrors)
-	validationErrors = validate.Parameter(params.WalletAddress, "WalletAddress", validate.CheckEthereumAddressRequired, validationErrors)
-	validationErrors = validate.Parameter(params.Permit, "WalletAddress", validate.CheckPermitHash, validationErrors)
+	validationErrors = validate.Parameter(params.Permit, "Permit", validate.CheckPermitHash, validationErrors)
 	return validate.ConsolidateValidationErorrs(validationErrors)
 }
 
@@ -46,7 +45,6 @@ func (body *OrderParams) Validate() error {
 	var validationErrors []error
 	validationErrors = validate.Parameter(body.Receiver, "Receiver", validate.CheckEthereumAddressRequired, validationErrors)
 	validationErrors = validate.Parameter(body.WalletAddress, "WalletAddress", validate.CheckEthereumAddressRequired, validationErrors)
-	validationErrors = validate.Parameter(body.PrivateKey, "PrivateKey", validate.CheckPrivateKeyRequired, validationErrors)
 	validationErrors = validate.Parameter(body.FromTokenAddress, "FromTokenAddress", validate.CheckEthereumAddress, validationErrors)
 	validationErrors = validate.Parameter(body.ToTokenAddress, "ToTokenAddress", validate.CheckEthereumAddress, validationErrors)
 	validationErrors = validate.Parameter(body.Amount, "Amount", validate.CheckBigInt, validationErrors)

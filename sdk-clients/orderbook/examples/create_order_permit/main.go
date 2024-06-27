@@ -111,10 +111,10 @@ func main() {
 	})
 
 	createOrderResponse, err := client.CreateOrder(ctx, orderbook.CreateOrderParams{
+		Wallet:                         client.Wallet,
 		SeriesNonce:                    seriesNonce,
 		MakerTraits:                    makerTraits,
 		Extension:                      extension,
-		PrivateKey:                     privateKey,
 		ExpireAfter:                    expireAfter, // TODO update the field name to have "unix" suffix
 		Maker:                          publicAddress.Hex(),
 		MakerAsset:                     PolygonFRAX,

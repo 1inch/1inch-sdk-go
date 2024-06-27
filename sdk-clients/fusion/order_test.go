@@ -7,6 +7,7 @@ import (
 	"math/big"
 	"testing"
 
+	web3_provider "github.com/1inch/1inch-sdk-go/internal/web3-provider"
 	"github.com/ethereum/go-ethereum/common"
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
@@ -31,6 +32,7 @@ func TestCreateFusionOrderData(t *testing.T) {
 	tests := []struct {
 		name                        string
 		chainId                     uint64
+		privateKey                  string
 		orderParams                 OrderParams
 		additionalParams            AdditionalParams
 		auctionStartTime            uint32
@@ -43,10 +45,10 @@ func TestCreateFusionOrderData(t *testing.T) {
 		data                        string
 	}{
 		{
-			name:    "Successful order creation",
-			chainId: chainId,
+			name:       "Successful order creation",
+			chainId:    chainId,
+			privateKey: privateKey,
 			orderParams: OrderParams{
-				PrivateKey:       privateKey,
 				WalletAddress:    publicAddress,
 				FromTokenAddress: wmatic,
 				ToTokenAddress:   usdc,
@@ -110,7 +112,10 @@ func TestCreateFusionOrderData(t *testing.T) {
 				return tc.auctionStartTime
 			}
 
-			preparedOrder, orderbookOrder, err := CreateFusionOrderData(quote, tc.orderParams, tc.chainId)
+			wallet, err := web3_provider.DefaultWalletOnlyProvider(privateKey)
+			require.NoError(t, err)
+
+			preparedOrder, orderbookOrder, err := CreateFusionOrderData(quote, tc.orderParams, wallet, tc.chainId)
 			require.NoError(t, err)
 			timeNow = originalTimeNowFunc
 			CalcAuctionStartTimeFunc = originalCalcAuctionStartTimeFunc
