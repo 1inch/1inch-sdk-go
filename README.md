@@ -30,9 +30,9 @@ Jump To:
 ### Infrastructure
 *Balance API* - [[Docs](https://portal.1inch.dev/documentation/apis/balances/introduction) | [SDK Example](https://github.com/1inch/1inch-sdk-go/blob/main/sdk-clients/balances/examples/main.go)]
 
-*Gas Price API* - [[Docs](https://portal.1inch.dev/documentation/apis/gas-price/introduction) | [SDK Example](https://github.com/1inch/1inch-sdk-go/blob/main/sdk-clients/gasprices/examples/main.go)]]
+*Gas Price API* - [[Docs](https://portal.1inch.dev/documentation/apis/gas-price/introduction) | [SDK Example](https://github.com/1inch/1inch-sdk-go/blob/main/sdk-clients/gasprices/examples/main.go)]
 
-*History API* [[Docs](https://portal.1inch.dev/documentation/apis/history/introduction) | [SDK Example](https://github.com/1inch/1inch-sdk-go/blob/main/sdk-clients/history/examples/main.go)]]
+*History API* [[Docs](https://portal.1inch.dev/documentation/apis/history/introduction) | [SDK Example](https://github.com/1inch/1inch-sdk-go/blob/main/sdk-clients/history/examples/main.go)]
 
 *NFT API* - [[Docs](https://portal.1inch.dev/documentation/apis/nft/introduction) | [SDK Example](https://github.com/1inch/1inch-sdk-go/blob/main/sdk-clients/nft/examples/main.go)]
 
