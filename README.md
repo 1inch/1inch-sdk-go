@@ -20,17 +20,27 @@ Jump To:
 
 ## Supported APIs
 
-*Swap API* - [[Docs](https://portal.1inch.dev/documentation/swap/introduction) | [SDK Example](https://github.com/1inch/1inch-sdk-go/blob/globally-refactored-main/sdk-clients/aggregation/examples/quote/main.go)]
+*Swap API* - [[Docs](https://portal.1inch.dev/documentation/apis/swap/introduction) | [SDK Example](https://github.com/1inch/1inch-sdk-go/blob/main/sdk-clients/aggregation/examples/quote/main.go)]
 
-*Orderbook API* - [[Docs](https://portal.1inch.dev/documentation/orderbook/introduction) | [SDK Example](https://github.com/1inch/1inch-sdk-go/blob/globally-refactored-main/sdk-clients/orderbook/examples/create_order/main.go)]
+*Balance API* - [[Docs](https://portal.1inch.dev/documentation/apis/balances/introduction) | [SDK Example](https://github.com/1inch/1inch-sdk-go/blob/main/sdk-clients/balances/examples/main.go)]
 
-*Balances API* - [[Docs](https://portal.1inch.dev/documentation/balances/introduction) | [SDK Example](https://github.com/1inch/1inch-sdk-go/blob/globally-refactored-main/sdk-clients/balances/examples/main.go)]
+*Gas Price API* - [[Docs](https://portal.1inch.dev/documentation/apis/gas-price/introduction) | [SDK Example](https://github.com/1inch/1inch-sdk-go/blob/main/sdk-clients/gasprices/examples/main.go)]]
 
-*Gas Price API* - [[Docs](https://portal.1inch.dev/documentation/gas-price/introduction) | [SDK Example](https://github.com/1inch/1inch-sdk-go/blob/globally-refactored-main/sdk-clients/gasprices/examples/main.go)]
+*History API* [[Docs](https://portal.1inch.dev/documentation/apis/history/introduction) | [SDK Example](https://github.com/1inch/1inch-sdk-go/blob/main/sdk-clients/history/examples/main.go)]]
 
-*NFT API* - [[Docs](https://portal.1inch.dev/documentation/nft/introduction) | [SDK Example](https://github.com/1inch/1inch-sdk-go/blob/globally-refactored-main/sdk-clients/nft/examples/main.go)]
+*NFT API* - [[Docs](https://portal.1inch.dev/documentation/apis/nft/introduction) | [SDK Example](https://github.com/1inch/1inch-sdk-go/blob/main/sdk-clients/nft/examples/main.go)]
 
-*Transaction Gateway API* - [[Docs](https://portal.1inch.dev/documentation/transaction/introduction) | [SDK Example](https://github.com/1inch/1inch-sdk-go/blob/globally-refactored-main/sdk-clients/txbroadcast/examples/main.go)]
+*Orderbook API* - [[Docs](https://portal.1inch.dev/documentation/apis/orderbook/introduction) | [SDK Example](https://github.com/1inch/1inch-sdk-go/blob/main/sdk-clients/orderbook/examples/create_order/main.go)]
+
+*Portfolio API* - [[Docs](https://portal.1inch.dev/documentation/apis/portfolio/introduction) | [SDK Example](https://github.com/1inch/1inch-sdk-go/blob/main/sdk-clients/portfolio/examples/get_current_protocols_value/main.go)]
+
+*Spot Price API* - [[Docs](https://portal.1inch.dev/documentation/apis/spot-price/introduction) | [SDK Example](https://github.com/1inch/1inch-sdk-go/blob/main/sdk-clients/spotprices/examples/main.go)]
+
+*Token API* - [[Docs](https://portal.1inch.dev/documentation/apis/tokens/introduction) | [SDK Example](https://github.com/1inch/1inch-sdk-go/blob/main/sdk-clients/tokens/examples/get_custom_token/main.go)]
+
+*Traces API* - [[Docs](https://portal.1inch.dev/documentation/apis/traces/introduction) | [SDK Example](https://github.com/1inch/1inch-sdk-go/blob/main/sdk-clients/traces/examples/main.go)]
+
+*Transaction Gateway API* - [[Docs](https://portal.1inch.dev/documentation/apis/transaction/introduction) | [SDK Example](https://github.com/1inch/1inch-sdk-go/blob/main/sdk-clients/txbroadcast/examples/main.go)]
 
 
 ## Getting started
@@ -50,7 +60,7 @@ go mod init hello1inch
 ###### Add SDK Dependencies
 
 ```
-go get github.com/1inch/1inch-sdk-go/sdk-clients/aggregation@globally-refactored-main
+go get github.com/1inch/1inch-sdk-go/sdk-clients/aggregation
 ```
 
 ###### Write Code
@@ -118,7 +128,7 @@ go run .
 
 Documentation for all API calls can be found at https://portal.1inch.dev/documentation
 
-Each folder inside the [sdk-clients directory](https://github.com/1inch/1inch-sdk-go/blob/globally-refactored-main/sdk-clients) 
+Each folder inside the [sdk-clients directory](https://github.com/1inch/1inch-sdk-go/blob/main/sdk-clients) 
 will contain an SDK for one of the 1inch APIs and will also include dedicated examples.
 
 ## Getting Help
