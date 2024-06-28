@@ -6,6 +6,7 @@ import (
 
 	"github.com/ethereum/go-ethereum/common"
 	"github.com/ethereum/go-ethereum/core/types"
+	"github.com/ethereum/go-ethereum/crypto"
 )
 
 func (w Wallet) Sign(tx *types.Transaction) (*types.Transaction, error) {
@@ -15,6 +16,14 @@ func (w Wallet) Sign(tx *types.Transaction) (*types.Transaction, error) {
 		return nil, err
 	}
 	return signedTx, nil
+}
+
+func (w Wallet) SignBytes(bytes []byte) ([]byte, error) {
+	signature, err := crypto.Sign(bytes, w.privateKey)
+	if err != nil {
+		return nil, fmt.Errorf("error signing bytes: %v", err)
+	}
+	return signature, nil
 }
 
 func (w Wallet) BroadcastTransaction(ctx context.Context, tx *types.Transaction) error {

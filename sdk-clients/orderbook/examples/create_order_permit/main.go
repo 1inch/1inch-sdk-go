@@ -103,18 +103,18 @@ func main() {
 		UsePermit2:         false,
 		UnwrapWeth:         false,
 		HasExtension:       true,
-		HasPreInteraction:  false,
-		HasPostInteraction: false,
+		AllowMultipleFills: true,
+		AllowPartialFills:  true,
 		Expiry:             expireAfter,
 		Nonce:              seriesNonce.Int64(),
 		Series:             0, // TODO: Series 0 always?
 	})
 
 	createOrderResponse, err := client.CreateOrder(ctx, orderbook.CreateOrderParams{
+		Wallet:                         client.Wallet,
 		SeriesNonce:                    seriesNonce,
 		MakerTraits:                    makerTraits,
 		Extension:                      extension,
-		PrivateKey:                     privateKey,
 		ExpireAfter:                    expireAfter, // TODO update the field name to have "unix" suffix
 		Maker:                          publicAddress.Hex(),
 		MakerAsset:                     PolygonFRAX,

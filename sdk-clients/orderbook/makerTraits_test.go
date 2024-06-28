@@ -23,6 +23,8 @@ func TestMakerTraitsEncode(t *testing.T) {
 				HasExtension:       true,
 				HasPreInteraction:  false,
 				HasPostInteraction: false,
+				AllowPartialFills:  true,
+				AllowMultipleFills: true,
 				Expiry:             1715201499,
 				Nonce:              0,
 				Series:             0,

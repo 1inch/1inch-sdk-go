@@ -198,6 +198,10 @@ func (w *MyWallet) Sign(tx *types.Transaction) (*types.Transaction, error) {
 	return tx, nil
 }
 
+func (w *MyWallet) SignBytes(data []byte) ([]byte, error) {
+	return nil, nil
+}
+
 func (w *MyWallet) BroadcastTransaction(ctx context.Context, tx *types.Transaction) error {
 	return nil
 }
