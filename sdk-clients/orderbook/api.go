@@ -3,6 +3,7 @@ package orderbook
 import (
 	"context"
 	"encoding/json"
+	"errors"
 	"fmt"
 
 	"github.com/1inch/1inch-sdk-go/common"
@@ -15,6 +16,10 @@ func (api *api) CreateOrder(ctx context.Context, params CreateOrderParams) (*Cre
 	err := params.Validate()
 	if err != nil {
 		return nil, err
+	}
+
+	if !params.MakerTraits.AllowMultipleFills || !params.MakerTraits.AllowPartialFills {
+		return nil, errors.New("allowMultipleFills and allowPartialFills must be true")
 	}
 
 	order, err := CreateLimitOrderMessage(params, int(api.chainId))

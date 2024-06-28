@@ -97,13 +97,8 @@ func CreateLimitOrderMessage(orderRequest CreateOrderParams, chainId int) (*Orde
 	challengeHash := crypto.Keccak256Hash(rawData)
 	challengeHashHex := challengeHash.Hex()
 
-	privateKey, err := crypto.HexToECDSA(orderRequest.PrivateKey)
-	if err != nil {
-		return nil, fmt.Errorf("error converting private key to ECDSA: %v", err)
-	}
-
 	// Sign the challenge hash
-	signature, err := crypto.Sign(challengeHash.Bytes(), privateKey)
+	signature, err := orderRequest.Wallet.SignBytes(challengeHash.Bytes())
 	if err != nil {
 		return nil, fmt.Errorf("error signing challenge hash: %v", err)
 	}

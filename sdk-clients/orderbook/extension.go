@@ -57,7 +57,8 @@ func (i *Extension) Encode() string {
 	if interactionsConcatednated == "" {
 		return "0x"
 	}
-	offsetsBytes := i.getOffsets().Bytes()
+
+	offsetsBytes := i.getOffsets()
 	paddedOffsetHex := fmt.Sprintf("%064x", offsetsBytes)
 	return "0x" + paddedOffsetHex + interactionsConcatednated
 }

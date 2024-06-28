@@ -3,9 +3,8 @@ package orderbook
 import (
 	"testing"
 
-	"github.com/stretchr/testify/assert"
-
 	"github.com/1inch/1inch-sdk-go/constants"
+	"github.com/stretchr/testify/assert"
 )
 
 func TestNewConfigurationAPI(t *testing.T) {

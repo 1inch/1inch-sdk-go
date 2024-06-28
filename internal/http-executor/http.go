@@ -88,8 +88,18 @@ func (c *Client) processResponse(resp *http.Response, v interface{}) error {
 		return c.handleErrorResponse(resp)
 	}
 
+	buf := new(bytes.Buffer)
+	_, err := buf.ReadFrom(resp.Body)
+	if err != nil {
+		return err
+	}
+
+	if buf.Len() == 0 {
+		return nil // No content to decode
+	}
+
 	if v != nil {
-		return json.NewDecoder(resp.Body).Decode(v)
+		return json.NewDecoder(buf).Decode(v)
 	}
 
 	return nil

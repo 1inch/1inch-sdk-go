@@ -4,14 +4,15 @@ import (
 	"math/big"
 	"time"
 
-	"github.com/ethereum/go-ethereum/common"
+	"github.com/1inch/1inch-sdk-go/common"
+	geth_common "github.com/ethereum/go-ethereum/common"
 )
 
 type CreateOrderParams struct {
+	Wallet                         common.Wallet
 	SeriesNonce                    *big.Int
 	MakerTraits                    *MakerTraits
 	Extension                      Extension
-	PrivateKey                     string
 	ExpireAfter                    int64
 	Maker                          string
 	MakerAsset                     string
@@ -149,21 +150,8 @@ type NormalizedLimitOrderData struct {
 	MakerTraits  *big.Int
 }
 
-type MakerTraitsParams struct {
-	AllowedSender      string
-	Expiry             int64
-	Nonce              int64
-	Series             int64
-	ShouldCheckEpoch   bool
-	UsePermit2         bool
-	UnwrapWeth         bool
-	HasExtension       bool
-	HasPreInteraction  bool
-	HasPostInteraction bool
-}
-
 type TakerTraitsParams struct {
-	Receiver        *common.Address
+	Receiver        *geth_common.Address
 	Extension       string
 	MakerAmount     bool
 	UnwrapWETH      bool

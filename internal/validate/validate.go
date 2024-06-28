@@ -489,3 +489,30 @@ func CheckTimerange(parameter interface{}, variableName string) error {
 	}
 	return nil
 }
+
+// TODO check for nil first and update the naming of files to account for the new format
+//func CheckWalletRequired(parameter interface{}, variableName string) error {
+//	if parameter == nil {
+//		return NewParameterMissingError(variableName)
+//	}
+//
+//	value, ok := parameter.(common.Wallet)
+//	if !ok {
+//		return fmt.Errorf("for parameter '%v' to be validated as '%v', it must be a Wallet", variableName, "Wallet")
+//	}
+//
+//	return CheckWallet(value, variableName)
+//}
+//
+//func CheckWallet(parameter interface{}, variableName string) error {
+//	value, ok := parameter.(common.Wallet)
+//	if !ok {
+//		return fmt.Errorf("for parameter '%v' to be validated as '%v', it must be a Wallet", variableName, "Wallet")
+//	}
+//
+//	var emptyAddress geth_common.Address
+//	if value.Address() == emptyAddress {
+//		return NewParameterValidationError(variableName, "no public address found on wallet - check initialization logic")
+//	}
+//	return nil
+//}
