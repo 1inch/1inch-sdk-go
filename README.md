@@ -20,8 +20,14 @@ Jump To:
 
 ## Supported APIs
 
+### Token Swaps
 *Swap API* - [[Docs](https://portal.1inch.dev/documentation/apis/swap/introduction) | [SDK Example](https://github.com/1inch/1inch-sdk-go/blob/main/sdk-clients/aggregation/examples/quote/main.go)]
 
+*Fusion API* - [[Docs](https://portal.1inch.dev/documentation/apis/fusion/introduction) | [SDK Example](https://github.com/1inch/1inch-sdk-go/blob/main/sdk-clients/fusion/examples/place_order/main.go)]
+
+*Orderbook API* - [[Docs](https://portal.1inch.dev/documentation/apis/orderbook/introduction) | [SDK Example](https://github.com/1inch/1inch-sdk-go/blob/main/sdk-clients/orderbook/examples/create_order/main.go)]
+
+### Infrastructure
 *Balance API* - [[Docs](https://portal.1inch.dev/documentation/apis/balances/introduction) | [SDK Example](https://github.com/1inch/1inch-sdk-go/blob/main/sdk-clients/balances/examples/main.go)]
 
 *Gas Price API* - [[Docs](https://portal.1inch.dev/documentation/apis/gas-price/introduction) | [SDK Example](https://github.com/1inch/1inch-sdk-go/blob/main/sdk-clients/gasprices/examples/main.go)]]
@@ -29,8 +35,6 @@ Jump To:
 *History API* [[Docs](https://portal.1inch.dev/documentation/apis/history/introduction) | [SDK Example](https://github.com/1inch/1inch-sdk-go/blob/main/sdk-clients/history/examples/main.go)]]
 
 *NFT API* - [[Docs](https://portal.1inch.dev/documentation/apis/nft/introduction) | [SDK Example](https://github.com/1inch/1inch-sdk-go/blob/main/sdk-clients/nft/examples/main.go)]
-
-*Orderbook API* - [[Docs](https://portal.1inch.dev/documentation/apis/orderbook/introduction) | [SDK Example](https://github.com/1inch/1inch-sdk-go/blob/main/sdk-clients/orderbook/examples/create_order/main.go)]
 
 *Portfolio API* - [[Docs](https://portal.1inch.dev/documentation/apis/portfolio/introduction) | [SDK Example](https://github.com/1inch/1inch-sdk-go/blob/main/sdk-clients/portfolio/examples/get_current_protocols_value/main.go)]
 
