@@ -17,11 +17,10 @@ var (
 )
 
 const (
-	usdc         = "0x3c499c542cEF5E3811e1192ce70d8cC03d5c3359"
-	wmatic       = "0x0d500B1d8E8eF31E21C99d1Db9A6444d3ADf1270"
-	amount       = 1500000
-	amountString = "1500000"
-	chainId      = 137
+	usdc    = "0x3c499c542cEF5E3811e1192ce70d8cC03d5c3359"
+	wmatic  = "0x0d500B1d8E8eF31E21C99d1Db9A6444d3ADf1270"
+	amount  = "1000000"
+	chainId = 137
 )
 
 func main() {
@@ -43,7 +42,7 @@ func main() {
 	fromToken := usdc
 	toToken := wmatic
 
-	response, err := client.GetQuote(ctx, fusion.QuoterControllerGetQuoteParams{
+	response, err := client.GetQuote(ctx, fusion.QuoterControllerGetQuoteParamsFixed{
 		FromTokenAddress: fromToken,
 		ToTokenAddress:   toToken,
 		Amount:           amount,
@@ -64,7 +63,7 @@ func main() {
 		WalletAddress:    publicAddress,
 		FromTokenAddress: fromToken,
 		ToTokenAddress:   toToken,
-		Amount:           amountString,
+		Amount:           amount,
 		Receiver:         "0x0000000000000000000000000000000000000000",
 		Preset:           fusion.Fast,
 	}

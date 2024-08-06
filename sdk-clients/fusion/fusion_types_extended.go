@@ -58,8 +58,8 @@ type OrderParams struct {
 	ToTokenAddress          string                          `json:"toTokenAddress"`
 	Amount                  string                          `json:"amount"`
 	WalletAddress           string                          `json:"walletAddress"`
-	Permit                  string                          `json:"permit,omitempty"` // without the first 20 bytes of token address
-	Receiver                string                          `json:"receiver,omitempty"`
+	Permit                  string                          `json:"permit,omitempty"`   // without the first 20 bytes of token address
+	Receiver                string                          `json:"receiver,omitempty"` // Should be set to the full zero address if this order should be filled by anyone
 	Preset                  GetQuoteOutputRecommendedPreset `json:"preset,omitempty"`
 	Nonce                   *big.Int                        `json:"nonce,omitempty"`
 	Fee                     TakingFeeInfo                   `json:"fee,omitempty"`
@@ -204,4 +204,31 @@ type ExtraData struct {
 	OrderExpirationDelay uint32
 	EnablePermit2        bool
 	Source               string
+}
+
+type QuoterControllerGetQuoteParamsFixed struct {
+	// FromTokenAddress Address of "FROM" token
+	FromTokenAddress string `url:"fromTokenAddress" json:"fromTokenAddress"`
+
+	// ToTokenAddress Address of "TO" token
+	ToTokenAddress string `url:"toTokenAddress" json:"toTokenAddress"`
+
+	// Amount to take from "FROM" token to get "TO" token
+	Amount string `url:"amount" json:"amount"`
+
+	// WalletAddress An address of the wallet or contract who will create Fusion order
+	WalletAddress string `url:"walletAddress" json:"walletAddress"`
+
+	// EnableEstimate if enabled then get estimation from 1inch swap builder and generates quoteId, by default is false
+	EnableEstimate bool `url:"enableEstimate" json:"enableEstimate"`
+
+	// Fee in bps format, 1% is equal to 100bps
+	Fee float32 `url:"fee,omitempty" json:"fee,omitempty"`
+
+	// IsPermit2 permit2 allowance transfer encoded call
+	IsPermit2    string `url:"isPermit2,omitempty" json:"isPermit2,omitempty"`
+	IsLedgerLive bool   `url:"isLedgerLive" json:"isLedgerLive"`
+
+	// Permit permit, user approval sign
+	Permit string `url:"permit,omitempty" json:"permit,omitempty"`
 }

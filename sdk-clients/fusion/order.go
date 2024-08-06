@@ -28,20 +28,6 @@ func CreateFusionOrderData(quote GetQuoteOutputFixed, orderParams OrderParams, w
 		return nil, nil, fmt.Errorf("error creating auction details: %v", err)
 	}
 
-	var nonce *big.Int
-	if isNonceRequired(orderParams.AllowPartialFills, orderParams.AllowMultipleFills) {
-		if orderParams.Nonce != nil {
-			nonce = orderParams.Nonce
-		} else {
-			nonce, err = random_number_generation.BigIntMaxFunc(uint40Max)
-			if err != nil {
-				return nil, nil, fmt.Errorf("error generating nonce: %v\n", err)
-			}
-		}
-	} else {
-		nonce = orderParams.Nonce
-	}
-
 	takerAsset := orderParams.ToTokenAddress
 	if takerAsset == NativeToken {
 		takerAssetWrapped, ok := chainToWrapper[NetworkEnum(chainId)]
@@ -73,12 +59,25 @@ func CreateFusionOrderData(quote GetQuoteOutputFixed, orderParams OrderParams, w
 		})
 	}
 
+	var nonce *big.Int
+	if isNonceRequired(orderParams.AllowPartialFills, orderParams.AllowMultipleFills) {
+		if orderParams.Nonce != nil {
+			nonce = orderParams.Nonce
+		} else {
+			nonce, err = random_number_generation.BigIntMaxFunc(uint40Max)
+			if err != nil {
+				return nil, nil, fmt.Errorf("error generating nonce: %v\n", err)
+			}
+		}
+	} else {
+		nonce = orderParams.Nonce
+	}
+
 	details := Details{
 		Auction:   auctionDetails,
 		Fees:      fees,
 		Whitelist: whitelistAddresses,
 	}
-
 	extraParams := ExtraParams{
 		Nonce:                nonce,
 		Permit:               "",

@@ -28,7 +28,7 @@ Jump To:
 *Orderbook API* - [[Docs](https://portal.1inch.dev/documentation/apis/orderbook/introduction) | [SDK Example](https://github.com/1inch/1inch-sdk-go/blob/main/sdk-clients/orderbook/examples/create_order/main.go)]
 
 ### Infrastructure
-*Balance API* - [[Docs](https://portal.1inch.dev/documentation/apis/balances/introduction) | [SDK Example](https://github.com/1inch/1inch-sdk-go/blob/main/sdk-clients/balances/examples/main.go)]
+*Balance API* - [[Docs](https://portal.1inch.dev/documentation/apis/balance/introduction) | [SDK Example](https://github.com/1inch/1inch-sdk-go/blob/main/sdk-clients/balances/examples/main.go)]
 
 *Gas Price API* - [[Docs](https://portal.1inch.dev/documentation/apis/gas-price/introduction) | [SDK Example](https://github.com/1inch/1inch-sdk-go/blob/main/sdk-clients/gasprices/examples/main.go)]
 
