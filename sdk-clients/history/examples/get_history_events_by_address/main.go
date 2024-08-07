@@ -2,10 +2,10 @@ package main
 
 import (
 	"context"
+	"encoding/json"
 	"fmt"
 	"log"
 	"os"
-	"time"
 
 	"github.com/1inch/1inch-sdk-go/constants"
 	"github.com/1inch/1inch-sdk-go/sdk-clients/history"
@@ -43,6 +43,11 @@ func main() {
 		log.Fatalf("failed to GetHistoryEventsByAddress: %v", err)
 	}
 
-	fmt.Println("GetHistoryEventsByAddress:", historyEvents)
-	time.Sleep(time.Second)
+	historyEventsIndented, err := json.MarshalIndent(historyEvents, "", "    ")
+	if err != nil {
+		log.Fatalf("failed to marshal historyEvents: %v", err)
+	}
+
+	fmt.Printf("GetHistoryEventsByAddress: %s\n", historyEventsIndented)
+
 }

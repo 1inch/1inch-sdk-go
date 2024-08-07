@@ -2,20 +2,14 @@ package main
 
 import (
 	"context"
+	"encoding/json"
 	"fmt"
 	"log"
 	"os"
-	"time"
 
 	"github.com/1inch/1inch-sdk-go/constants"
 	"github.com/1inch/1inch-sdk-go/sdk-clients/spotprices"
 )
-
-/*
-This example demonstrates how to swap tokens on the EthereumChainId network using the 1inch SDK.
-The only thing you need to provide is your wallet address, wallet key, and dev portal token.
-This can be done through your environment, or you can directly set them in the variables below
-*/
 
 var (
 	devPortalToken = os.Getenv("DEV_PORTAL_TOKEN")
@@ -32,6 +26,7 @@ const (
 )
 
 func main() {
+	// Initialize a new configuration using the 1inch SDK for the Ethereum chain.
 	config, err := spotprices.NewConfiguration(spotprices.ConfigurationParams{
 		ChainId: constants.EthereumChainId,
 		ApiUrl:  "https://api.1inch.dev",
@@ -40,33 +35,17 @@ func main() {
 	if err != nil {
 		log.Fatalf("failed to create configuration: %v", err)
 	}
+
+	// Create a new client with the provided configuration.
 	client, err := spotprices.NewClient(config)
 	if err != nil {
 		log.Fatalf("failed to create client: %v", err)
 	}
+
+	// Create a new context for the API call.
 	ctx := context.Background()
 
-	whitelistedTokensPrices, err := client.GetPricesForWhitelistedTokens(ctx, spotprices.GetWhitelistedTokensPricesParams{
-		Currency: spotprices.GetWhitelistedTokensPricesParamsCurrency(spotprices.USD),
-	})
-	if err != nil {
-		log.Fatalf("failed to GetWhitelistedTokensPrices: %v", err)
-	}
-
-	fmt.Println("GetWhitelistedTokensPricesParams:", whitelistedTokensPrices)
-	time.Sleep(time.Second)
-
-	requestedTokensPrices, err := client.GetPricesForRequestedTokens(ctx, spotprices.GetPricesRequestDto{
-		Currency: spotprices.GetPricesRequestDtoCurrency(spotprices.USD),
-		Tokens:   []string{tokenAddress1, tokenAddress2},
-	})
-	if err != nil {
-		log.Fatalf("failed to GetPricesForRequestedTokens: %v", err)
-	}
-
-	fmt.Println("GetPricesForRequestedTokens:", requestedTokensPrices)
-	time.Sleep(time.Second)
-
+	// Get prices for a larger set of requested tokens.
 	requestedTokensPricesLarge, err := client.GetPricesForRequestedTokensLarge(ctx, spotprices.GetPricesRequestDto{
 		Currency: spotprices.GetPricesRequestDtoCurrency(spotprices.USD),
 		Tokens:   []string{tokenAddress1, tokenAddress2, tokenAddress3, tokenAddress4, tokenAddress5, tokenAddress6, tokenAddress7},
@@ -75,14 +54,12 @@ func main() {
 		log.Fatalf("failed to GetPricesForRequestedTokensLarge: %v", err)
 	}
 
-	fmt.Println("GetPricesForRequestedTokensLarge:", requestedTokensPricesLarge)
-	time.Sleep(time.Second)
-
-	customCurrencies, err := client.GetCustomCurrenciesList(ctx)
+	// Marshal the response to a pretty-printed JSON format.
+	requestedTokensPricesLargeIndented, err := json.MarshalIndent(requestedTokensPricesLarge, "", "  ")
 	if err != nil {
-		log.Fatalf("failed to GetCustomCurrenciesList: %v", err)
+		log.Fatalf("failed to marshal requestedTokensPricesLarge: %v", err)
 	}
 
-	fmt.Println("GetCustomCurrenciesList:", customCurrencies)
-	time.Sleep(time.Second)
+	// Output the response.
+	fmt.Printf("GetPricesForRequestedTokensLarge: %s\n", requestedTokensPricesLargeIndented)
 }

@@ -2,26 +2,21 @@ package main
 
 import (
 	"context"
+	"encoding/json"
 	"fmt"
 	"log"
 	"os"
-	"time"
 
 	"github.com/1inch/1inch-sdk-go/constants"
 	"github.com/1inch/1inch-sdk-go/sdk-clients/txbroadcast"
 )
-
-/*
-This example demonstrates how to swap tokens on the EthereumChainId network using the 1inch SDK.
-The only thing you need to provide is your wallet address, wallet key, and dev portal token.
-This can be done through your environment, or you can directly set them in the variables below
-*/
 
 var (
 	devPortalToken = os.Getenv("DEV_PORTAL_TOKEN")
 )
 
 func main() {
+	// Initialize a new configuration using the 1inch SDK for the Ethereum chain.
 	config, err := txbroadcast.NewConfiguration(txbroadcast.ConfigurationParams{
 		ChainId: constants.EthereumChainId,
 		ApiUrl:  "https://api.1inch.dev",
@@ -30,29 +25,30 @@ func main() {
 	if err != nil {
 		log.Fatalf("failed to create configuration: %v", err)
 	}
+
+	// Create a new client with the provided configuration.
 	client, err := txbroadcast.NewClient(config)
 	if err != nil {
 		log.Fatalf("failed to create client: %v", err)
 	}
+
+	// Create a new context for the API call.
 	ctx := context.Background()
 
+	// Broadcast a public transaction.
 	broadcastPublicResponse, err := client.BroadcastPublicTransaction(ctx, txbroadcast.BroadcastRequest{
-		RawTransaction: "<YOOR RAW TX here>",
+		RawTransaction: "<YOUR RAW TX here>",
 	})
 	if err != nil {
 		log.Fatalf("failed to BroadcastPublicTransaction: %v", err)
 	}
 
-	fmt.Println("BroadcastPublicTransaction:", broadcastPublicResponse)
-	time.Sleep(time.Second)
-
-	broadcastPrivateResponse, err := client.BroadcastPrivateTransaction(ctx, txbroadcast.BroadcastRequest{
-		RawTransaction: "<YOOR RAW TX here that you want to send to private mempool>",
-	})
+	// Marshal the response to a pretty-printed JSON format.
+	broadcastPublicResponseIndented, err := json.MarshalIndent(broadcastPublicResponse, "", "  ")
 	if err != nil {
-		log.Fatalf("failed to BroadcastPrivateTransaction: %v", err)
+		log.Fatalf("failed to marshal broadcastPublicResponse: %v", err)
 	}
 
-	fmt.Println("BroadcastPrivateTransaction:", broadcastPrivateResponse)
-	time.Sleep(time.Second)
+	// Output the response.
+	fmt.Printf("BroadcastPublicTransaction: %s\n", broadcastPublicResponseIndented)
 }
