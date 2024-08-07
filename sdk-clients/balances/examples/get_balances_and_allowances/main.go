@@ -23,7 +23,6 @@ const (
 )
 
 func main() {
-	// Initialize a new configuration using the 1inch SDK.
 	config, err := balances.NewConfiguration(balances.ConfigurationParams{
 		ChainId: constants.EthereumChainId,
 		ApiUrl:  "https://api.1inch.dev",
@@ -33,16 +32,13 @@ func main() {
 		log.Fatalf("Failed to create configuration: %v\n", err)
 	}
 
-	// Create a new client with the provided configuration.
 	client, err := balances.NewClient(config)
 	if err != nil {
 		log.Fatalf("Failed to create client: %v\n", err)
 	}
 
-	// Create a new context for the API call.
 	ctx := context.Background()
 
-	// Get balances and allowances.
 	response, err := client.GetBalancesAndAllowances(ctx, balances.BalancesAndAllowancesParams{
 		Wallets:     []string{mainWalletAddress, secondaryWalletAddress},
 		FilterEmpty: true,
@@ -52,12 +48,10 @@ func main() {
 		log.Fatalf("Failed to get balances and allowances: %v\n", err)
 	}
 
-	// Marshal the response to a pretty-printed JSON format.
 	responseIndented, err := json.MarshalIndent(response, "", "  ")
 	if err != nil {
 		log.Fatalf("failed to marshal response: %v", err)
 	}
 
-	// Output the response.
 	fmt.Printf("GetBalancesAndAllowances: %s\n", responseIndented)
 }

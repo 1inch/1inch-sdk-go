@@ -25,7 +25,6 @@ const (
 )
 
 func main() {
-	// Initialize a new configuration using the 1inch SDK.
 	config, err := balances.NewConfiguration(balances.ConfigurationParams{
 		ChainId: constants.EthereumChainId,
 		ApiUrl:  "https://api.1inch.dev",
@@ -35,16 +34,13 @@ func main() {
 		log.Fatalf("Failed to create configuration: %v\n", err)
 	}
 
-	// Create a new client with the provided configuration.
 	client, err := balances.NewClient(config)
 	if err != nil {
 		log.Fatalf("Failed to create client: %v\n", err)
 	}
 
-	// Create a new context for the API call.
 	ctx := context.Background()
 
-	// Get allowances of custom tokens by wallet address.
 	response, err := client.GetAllowancesOfCustomTokensByWalletAddress(ctx, balances.AllowancesOfCustomTokensByWalletAddressParams{
 		Wallet:  mainWalletAddress,
 		Spender: spender,
@@ -54,12 +50,10 @@ func main() {
 		log.Fatalf("Failed to get allowances of custom tokens by wallet address: %v\n", err)
 	}
 
-	// Marshal the response to a pretty-printed JSON format.
 	responseIndented, err := json.MarshalIndent(response, "", "  ")
 	if err != nil {
 		log.Fatalf("failed to marshal response: %v", err)
 	}
 
-	// Output the response.
 	fmt.Printf("GetAllowancesOfCustomTokensByWalletAddress: %s\n", responseIndented)
 }

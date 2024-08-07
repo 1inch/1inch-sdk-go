@@ -26,7 +26,6 @@ const (
 )
 
 func main() {
-	// Initialize a new configuration using the 1inch SDK for the Ethereum chain.
 	config, err := spotprices.NewConfiguration(spotprices.ConfigurationParams{
 		ChainId: constants.EthereumChainId,
 		ApiUrl:  "https://api.1inch.dev",
@@ -36,16 +35,13 @@ func main() {
 		log.Fatalf("failed to create configuration: %v", err)
 	}
 
-	// Create a new client with the provided configuration.
 	client, err := spotprices.NewClient(config)
 	if err != nil {
 		log.Fatalf("failed to create client: %v", err)
 	}
 
-	// Create a new context for the API call.
 	ctx := context.Background()
 
-	// Get prices for a larger set of requested tokens.
 	requestedTokensPricesLarge, err := client.GetPricesForRequestedTokensLarge(ctx, spotprices.GetPricesRequestDto{
 		Currency: spotprices.GetPricesRequestDtoCurrency(spotprices.USD),
 		Tokens:   []string{tokenAddress1, tokenAddress2, tokenAddress3, tokenAddress4, tokenAddress5, tokenAddress6, tokenAddress7},
@@ -54,12 +50,10 @@ func main() {
 		log.Fatalf("failed to GetPricesForRequestedTokensLarge: %v", err)
 	}
 
-	// Marshal the response to a pretty-printed JSON format.
 	requestedTokensPricesLargeIndented, err := json.MarshalIndent(requestedTokensPricesLarge, "", "  ")
 	if err != nil {
 		log.Fatalf("failed to marshal requestedTokensPricesLarge: %v", err)
 	}
 
-	// Output the response.
 	fmt.Printf("GetPricesForRequestedTokensLarge: %s\n", requestedTokensPricesLargeIndented)
 }
