@@ -2,6 +2,7 @@ package main
 
 import (
 	"context"
+	"encoding/json"
 	"fmt"
 	"log"
 	"os"
@@ -44,6 +45,12 @@ func main() {
 		log.Fatalf("Failed to get balances by wallet address: %v\n", err)
 	}
 
+	// Marshal the response to a pretty-printed JSON format.
+	responseIndented, err := json.MarshalIndent(response, "", "  ")
+	if err != nil {
+		log.Fatalf("failed to marshal response: %v", err)
+	}
+
 	// Output the response.
-	fmt.Println("GetBalancesByWalletAddress:", response)
+	fmt.Printf("GetBalancesByWalletAddress: %s\n", responseIndented)
 }

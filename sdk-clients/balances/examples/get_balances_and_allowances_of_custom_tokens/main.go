@@ -2,6 +2,7 @@ package main
 
 import (
 	"context"
+	"encoding/json"
 	"fmt"
 	"log"
 	"os"
@@ -53,6 +54,12 @@ func main() {
 		log.Fatalf("Failed to get balances and allowances of custom tokens by wallet address list: %v\n", err)
 	}
 
+	// Marshal the response to a pretty-printed JSON format.
+	responseIndented, err := json.MarshalIndent(response, "", "  ")
+	if err != nil {
+		log.Fatalf("failed to marshal response: %v", err)
+	}
+
 	// Output the response.
-	fmt.Println("GetBalancesAndAllowancesOfCustomTokensByWalletAddressList:", response)
+	fmt.Printf("GetBalancesAndAllowancesOfCustomTokensByWalletAddressList: %s\n", responseIndented)
 }
