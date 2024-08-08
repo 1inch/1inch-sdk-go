@@ -23,6 +23,7 @@ type Wallet struct {
 	chainId               *big.Int
 	erc20ABI              *abi.ABI
 	seriesNonceManagerABI *abi.ABI
+	permit2ABI            *abi.ABI
 }
 
 func DefaultWalletProvider(pk string, nodeURL string, chainId uint64) (*Wallet, error) {

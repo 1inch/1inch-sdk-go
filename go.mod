@@ -7,6 +7,7 @@ require (
 	github.com/google/go-querystring v1.1.0
 	github.com/oapi-codegen/runtime v1.1.1
 	github.com/stretchr/testify v1.9.0
+	golang.org/x/text v0.14.0
 )
 
 require (

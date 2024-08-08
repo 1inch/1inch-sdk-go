@@ -233,3 +233,10 @@ func (w *MyWallet) IsEIP1559Applicable() bool {
 func (w *MyWallet) ChainId() int64 {
 	return w.chainID.Int64()
 }
+
+func (w *MyWallet) GenerateApproveCallData(addressTo string, amount uint64) (string, error) {
+	return "", nil
+}
+func (w *MyWallet) TokenAllowance(ctx context.Context, tokenAddress string, spenderAddress string) (*big.Int, error) {
+	return big.NewInt(1), nil
+}

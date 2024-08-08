@@ -28,14 +28,12 @@ type Wallet interface {
 	TokenPermit(cd ContractPermitData) (string, error)
 	TokenPermitDaiLike(cd ContractPermitDataDaiLike) (string, error)
 
+	GenerateApproveCallData(addressTo string, amount uint64) (string, error)
+
+	TokenAllowance(ctx context.Context, tokenAddress string, spenderAddress string) (*big.Int, error)
+
 	IsEIP1559Applicable() bool
 	ChainId() int64
-	//TokenApprove()
-
-	// view functions
-	//TokenBalance()
-	//TokenAllowance()
-
 }
 
 type ContractPermitData struct {
