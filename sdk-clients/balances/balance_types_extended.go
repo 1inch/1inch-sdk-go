@@ -6,7 +6,7 @@ type BalancesAndAllowancesByWalletAddressListParams struct {
 	Spender string `json:"-"`
 }
 
-// BalancesByWalletAddressListParams is used instead of codegen struct to right now as params for API handle
+// BalancesAndAllowancesByWalletAddressListResponse is used instead of codegen struct to right now as params for API handle
 type BalancesAndAllowancesByWalletAddressListResponse map[string]TokenDetails
 
 // TokenDetails holds balances and allowance for an Ethereum address (token)
@@ -40,7 +40,7 @@ type BalancesByWalletAddressParams struct {
 	Wallet string `url:"wallets" json:"walletAddress"`
 }
 
-// BalancesByWalletAddressParams is used instead of codegen struct to right now as params for API handle
+// BalancesByWalletAddressResponse is used instead of codegen struct to right now as params for API handle
 type BalancesByWalletAddressResponse map[string]string
 
 // BalancesOfCustomTokensByWalletAddressParams is used instead of codegen struct to right now as params for API handle
@@ -49,16 +49,16 @@ type BalancesOfCustomTokensByWalletAddressParams struct {
 	Tokens []string `url:"tokens" json:"tokens"`
 }
 
-// BalancesByWalletAddressParams is used instead of codegen struct to right now as params for API handle
+// BalancesOfCustomTokensByWalletAddressResponse is used instead of codegen struct to right now as params for API handle
 type BalancesOfCustomTokensByWalletAddressResponse map[string]string
 
-// BalancesOfCustomTokensByWalletAddressParams is used instead of codegen struct to right now as params for API handle
+// BalancesOfCustomTokensByWalletAddressesListParams is used instead of codegen struct to right now as params for API handle
 type BalancesOfCustomTokensByWalletAddressesListParams struct {
 	Wallets []string `url:"wallets" json:"wallets"`
 	Tokens  []string `url:"tokens" json:"tokens"`
 }
 
-// BalancesByWalletAddressParams is used instead of codegen struct to right now as params for API handle
+// BalancesOfCustomTokensByWalletAddressesListResponse is used instead of codegen struct to right now as params for API handle
 type BalancesOfCustomTokensByWalletAddressesListResponse map[string]map[string]string
 
 // AllowancesByWalletAddressParams is used instead of codegen struct to right now as params for API handle
@@ -70,12 +70,12 @@ type AllowancesByWalletAddressParams struct {
 // AllowancesByWalletAddressResponse is used instead of codegen struct to right now as params for API handle
 type AllowancesByWalletAddressResponse map[string]string
 
-// AllowancesByWalletAddressParams is used instead of codegen struct to right now as params for API handle
+// AllowancesOfCustomTokensByWalletAddressParams is used instead of codegen struct to right now as params for API handle
 type AllowancesOfCustomTokensByWalletAddressParams struct {
 	Wallet  string   `json:"-"`
 	Spender string   `json:"-"`
 	Tokens  []string `url:"tokens" json:"tokens"`
 }
 
-// AllowancesByWalletAddressResponse is used instead of codegen struct to right now as params for API handle
+// AllowancesOfCustomTokensByWalletAddressResponse is used instead of codegen struct to right now as params for API handle
 type AllowancesOfCustomTokensByWalletAddressResponse map[string]string

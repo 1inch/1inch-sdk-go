@@ -13,12 +13,6 @@ import (
 	"github.com/1inch/1inch-sdk-go/sdk-clients/aggregation"
 )
 
-/*
-This example demonstrates how to swap tokens on the PolygonChainId network using the 1inch SDK.
-The only thing you need to provide is your wallet address, wallet key, and dev portal token.
-This can be done through your environment, or you can directly set them in the variables below
-*/
-
 var (
 	privateKey     = os.Getenv("WALLET_KEY")
 	nodeUrl        = os.Getenv("NODE_URL")

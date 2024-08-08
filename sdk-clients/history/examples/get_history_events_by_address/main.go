@@ -2,20 +2,14 @@ package main
 
 import (
 	"context"
+	"encoding/json"
 	"fmt"
 	"log"
 	"os"
-	"time"
 
 	"github.com/1inch/1inch-sdk-go/constants"
 	"github.com/1inch/1inch-sdk-go/sdk-clients/history"
 )
-
-/*
-This example demonstrates how to swap tokens on the EthereumChainId network using the 1inch SDK.
-The only thing you need to provide is your wallet address, wallet key, and dev portal token.
-This can be done through your environment, or you can directly set them in the variables below
-*/
 
 var (
 	devPortalToken = os.Getenv("DEV_PORTAL_TOKEN")
@@ -43,6 +37,11 @@ func main() {
 		log.Fatalf("failed to GetHistoryEventsByAddress: %v", err)
 	}
 
-	fmt.Println("GetHistoryEventsByAddress:", historyEvents)
-	time.Sleep(time.Second)
+	historyEventsIndented, err := json.MarshalIndent(historyEvents, "", "    ")
+	if err != nil {
+		log.Fatalf("failed to marshal historyEvents: %v", err)
+	}
+
+	fmt.Printf("GetHistoryEventsByAddress: %s\n", historyEventsIndented)
+
 }

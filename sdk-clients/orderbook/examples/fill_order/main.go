@@ -13,12 +13,6 @@ import (
 	"github.com/1inch/1inch-sdk-go/sdk-clients/orderbook"
 )
 
-/*
-This example demonstrates how to fill an order on the Polygon network using the 1inch SDK.
-You need to provide your wallet address, wallet key, dev portal token, and the order hash + chain ID of the order you would like to fill.
-This can be done through your environment, or you can directly set them in the variables below
-*/
-
 var (
 	privateKey     = os.Getenv("WALLET_KEY")
 	nodeUrl        = os.Getenv("NODE_URL")
