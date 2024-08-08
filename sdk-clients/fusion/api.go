@@ -46,7 +46,7 @@ func (api *api) GetSettlementContract(ctx context.Context) (*SettlementAddressOu
 	return &response, nil
 }
 
-func (api *api) GetQuote(ctx context.Context, params QuoterControllerGetQuoteParams) (*GetQuoteOutputFixed, error) {
+func (api *api) GetQuote(ctx context.Context, params QuoterControllerGetQuoteParamsFixed) (*GetQuoteOutputFixed, error) {
 	u := fmt.Sprintf("/fusion/quoter/v2.0/%d/quote/receive", api.chainId)
 
 	err := params.Validate()

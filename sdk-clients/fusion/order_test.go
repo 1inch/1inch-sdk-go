@@ -22,10 +22,10 @@ var (
 )
 
 const (
-	usdc         = "0x3c499c542cEF5E3811e1192ce70d8cC03d5c3359"
-	wmatic       = "0x0d500B1d8E8eF31E21C99d1Db9A6444d3ADf1270"
-	amountString = "1000000000000000000"
-	chainId      = 137
+	usdc    = "0x3c499c542cEF5E3811e1192ce70d8cC03d5c3359"
+	wmatic  = "0x0d500B1d8E8eF31E21C99d1Db9A6444d3ADf1270"
+	amount  = "1000000000000000000"
+	chainId = 137
 )
 
 func TestCreateFusionOrderData(t *testing.T) {
@@ -52,7 +52,7 @@ func TestCreateFusionOrderData(t *testing.T) {
 				WalletAddress:    publicAddress,
 				FromTokenAddress: wmatic,
 				ToTokenAddress:   usdc,
-				Amount:           amountString,
+				Amount:           amount,
 				Receiver:         "0x0000000000000000000000000000000000000000",
 				Preset:           "fast",
 			},

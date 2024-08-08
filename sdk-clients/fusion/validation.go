@@ -14,10 +14,11 @@ func (params *OrderApiControllerGetActiveOrdersParams) Validate() error {
 	return validate.ConsolidateValidationErorrs(validationErrors)
 }
 
-func (params *QuoterControllerGetQuoteParams) Validate() error {
+func (params *QuoterControllerGetQuoteParamsFixed) Validate() error {
 	var validationErrors []error
 	validationErrors = validate.Parameter(params.FromTokenAddress, "FromTokenAddress", validate.CheckEthereumAddressRequired, validationErrors)
 	validationErrors = validate.Parameter(params.ToTokenAddress, "ToTokenAddress", validate.CheckEthereumAddressRequired, validationErrors)
+	validationErrors = validate.Parameter(params.Amount, "Amount", validate.CheckBigIntRequired, validationErrors)
 	validationErrors = validate.Parameter(params.Permit, "Permit", validate.CheckPermitHash, validationErrors)
 	return validate.ConsolidateValidationErorrs(validationErrors)
 }
