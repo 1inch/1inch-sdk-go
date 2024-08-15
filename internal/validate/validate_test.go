@@ -1167,6 +1167,44 @@ func TestCheckFiatCurrency(t *testing.T) {
 	}
 }
 
+func TestCheckJsonRpcVersion(t *testing.T) {
+	testcases := []struct {
+		description string
+		value       string
+		expectError bool
+	}{
+		{
+			description: "Valid - 1.0",
+			value:       "1.0",
+		},
+		{
+			description: "Valid - 2.0",
+			value:       "2.0",
+		},
+		{
+			description: "Invalid - 3.0",
+			value:       "3.0",
+			expectError: true,
+		},
+		{
+			description: "Invalid - empty",
+			value:       "",
+			expectError: true,
+		},
+	}
+
+	for _, tc := range testcases {
+		t.Run(tc.description, func(t *testing.T) {
+			err := CheckJsonRpcVersion(tc.value, "testValue")
+			if tc.expectError {
+				require.Error(t, err, fmt.Sprintf("%s should have caused an error", tc.description))
+			} else {
+				require.NoError(t, err, fmt.Sprintf("%s should not have caused an error", tc.description))
+			}
+		})
+	}
+}
+
 func TestIsSubset(t *testing.T) {
 	testCases := []struct {
 		description string

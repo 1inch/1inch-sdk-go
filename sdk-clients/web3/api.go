@@ -8,17 +8,17 @@ import (
 	"github.com/1inch/1inch-sdk-go/common"
 )
 
-func (api *api) PerformRpcCallAgainstFullNode(ctx context.Context, params PerformRpcCallAgainstFullNodeParams) error {
+func (api *api) PerformRpcCallAgainstFullNode(ctx context.Context, params PerformRpcCallAgainstFullNodeParams) (map[string]interface{}, error) {
 	u := fmt.Sprintf("web3/%d", api.chainId)
 
 	err := params.Validate()
 	if err != nil {
-		return err
+		return nil, err
 	}
 
 	body, err := json.Marshal(params.PostChainIdJSONBody)
 	if err != nil {
-		return err
+		return nil, err
 	}
 
 	payload := common.RequestPayload{
@@ -28,25 +28,26 @@ func (api *api) PerformRpcCallAgainstFullNode(ctx context.Context, params Perfor
 		Body:   body,
 	}
 
-	err = api.httpExecutor.ExecuteRequest(ctx, payload, nil)
+	var response map[string]interface{}
+	err = api.httpExecutor.ExecuteRequest(ctx, payload, &response)
 	if err != nil {
-		return err
+		return nil, err
 	}
 
-	return nil
+	return response, nil
 }
 
-func (api *api) PerformRpcCall(ctx context.Context, params PerformRpcCallParams) error {
+func (api *api) PerformRpcCall(ctx context.Context, params PerformRpcCallParams) (map[string]interface{}, error) {
 	u := fmt.Sprintf("web3/%d/%s", api.chainId, params.PostChainIdNodeTypeParamsNodeType)
 
 	err := params.Validate()
 	if err != nil {
-		return err
+		return nil, err
 	}
 
 	body, err := json.Marshal(params)
 	if err != nil {
-		return err
+		return nil, err
 	}
 
 	payload := common.RequestPayload{
@@ -56,10 +57,11 @@ func (api *api) PerformRpcCall(ctx context.Context, params PerformRpcCallParams)
 		Body:   body,
 	}
 
-	err = api.httpExecutor.ExecuteRequest(ctx, payload, nil)
+	var response map[string]interface{}
+	err = api.httpExecutor.ExecuteRequest(ctx, payload, &response)
 	if err != nil {
-		return err
+		return nil, err
 	}
 
-	return nil
+	return response, nil
 }
