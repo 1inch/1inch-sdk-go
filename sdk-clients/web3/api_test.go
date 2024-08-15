@@ -39,7 +39,14 @@ func (m *MockHttpExecutor) ExecuteRequest(ctx context.Context, payload common.Re
 func TestPerformRpcCallAgainstFullNode(t *testing.T) {
 	ctx := context.Background()
 
-	mockExecutor := &MockHttpExecutor{}
+	mockedResp := map[string]interface{}{
+		"result": "0x10",
+		"id":     "1",
+	}
+
+	mockExecutor := &MockHttpExecutor{
+		ResponseObj: mockedResp,
+	}
 
 	api := api{
 		httpExecutor: mockExecutor,
@@ -55,8 +62,9 @@ func TestPerformRpcCallAgainstFullNode(t *testing.T) {
 		},
 	}
 
-	err := api.PerformRpcCallAgainstFullNode(ctx, params)
+	response, err := api.PerformRpcCallAgainstFullNode(ctx, params)
 	require.NoError(t, err)
+	require.NotNil(t, response)
 
 	if !mockExecutor.Called {
 		t.Errorf("Expected ExecuteRequest to be called")
@@ -74,12 +82,22 @@ func TestPerformRpcCallAgainstFullNode(t *testing.T) {
 
 	require.Equal(t, expectedPayload.U, expectedURL)
 	require.Equal(t, string(expectedPayload.Body), string(expectedBody))
+
+	// Validate the response
+	require.Equal(t, mockedResp, response)
 }
 
 func TestPerformRpcCall(t *testing.T) {
 	ctx := context.Background()
 
-	mockExecutor := &MockHttpExecutor{}
+	mockedResp := map[string]interface{}{
+		"result": "0x10",
+		"id":     "1",
+	}
+
+	mockExecutor := &MockHttpExecutor{
+		ResponseObj: mockedResp,
+	}
 
 	api := api{
 		httpExecutor: mockExecutor,
@@ -96,8 +114,9 @@ func TestPerformRpcCall(t *testing.T) {
 		},
 	}
 
-	err := api.PerformRpcCall(ctx, params)
+	response, err := api.PerformRpcCall(ctx, params)
 	require.NoError(t, err)
+	require.NotNil(t, response)
 
 	if !mockExecutor.Called {
 		t.Errorf("Expected ExecuteRequest to be called")
@@ -115,4 +134,7 @@ func TestPerformRpcCall(t *testing.T) {
 
 	require.Equal(t, expectedPayload.U, expectedURL)
 	require.Equal(t, string(expectedPayload.Body), string(expectedBody))
+
+	// Validate the response
+	require.Equal(t, mockedResp, response)
 }

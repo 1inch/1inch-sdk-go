@@ -446,37 +446,6 @@ func CheckExpireAfter(parameter interface{}, variableName string) error {
 	return nil
 }
 
-func CheckBoolean(parameter interface{}, variableName string) error {
-	_, ok := parameter.(bool)
-	if !ok {
-		return fmt.Errorf("for parameter '%v' to be validated as '%v', it must be a boolean", variableName, "Boolean")
-	}
-
-	return nil
-}
-
-func CheckStringRequired(parameter interface{}, variableName string) error {
-	value, ok := parameter.(string)
-	if !ok {
-		return fmt.Errorf("'%v' must be a string", variableName)
-	}
-
-	if value == "" {
-		return NewParameterMissingError(variableName)
-	}
-
-	return CheckString(value, variableName)
-}
-
-func CheckString(parameter interface{}, variableName string) error {
-	_, ok := parameter.(string)
-	if !ok {
-		return fmt.Errorf("'%v' must be a string", variableName)
-	}
-
-	return nil
-}
-
 func CheckFiatCurrency(parameter interface{}, variableName string) error {
 	value, ok := parameter.(string)
 	if !ok {
@@ -506,7 +475,7 @@ func CheckTimerange(parameter interface{}, variableName string) error {
 func CheckJsonRpcVersionRequired(parameter interface{}, variableName string) error {
 	value, ok := parameter.(string)
 	if !ok {
-		return fmt.Errorf("for parameter '%v' to be validated as '%v', it must be a string", variableName, "JsonRPCVersion")
+		return fmt.Errorf("for parameter '%v' to be validated as '%v', it must be a string", variableName, "JsonRpcVersion")
 	}
 
 	if value == "" {
@@ -519,7 +488,7 @@ func CheckJsonRpcVersionRequired(parameter interface{}, variableName string) err
 func CheckJsonRpcVersion(parameter interface{}, variableName string) error {
 	value, ok := parameter.(string)
 	if !ok {
-		return fmt.Errorf("for parameter '%v' to be validated as '%v', it must be a string", variableName, "JsonRPCVersion")
+		return fmt.Errorf("for parameter '%v' to be validated as '%v', it must be a string", variableName, "JsonRpcVersion")
 	}
 
 	validJsonRpcValues := []string{"1.0", "2.0"}
@@ -532,7 +501,7 @@ func CheckJsonRpcVersion(parameter interface{}, variableName string) error {
 func CheckNodeType(parameter interface{}, variableName string) error {
 	value, ok := parameter.(string)
 	if !ok {
-		return fmt.Errorf("for parameter '%v' to be validated as '%v', it must be a string", variableName, "JsonRPCVersion")
+		return fmt.Errorf("for parameter '%v' to be validated as '%v', it must be a string", variableName, "NodeType")
 	}
 
 	validJsonRpcValues := []string{"1.0", "2.0"}
