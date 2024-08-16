@@ -4,6 +4,7 @@ import (
 	"testing"
 
 	"github.com/stretchr/testify/assert"
+	"github.com/stretchr/testify/require"
 )
 
 func TestMakerTraitsEncode(t *testing.T) {
@@ -35,7 +36,8 @@ func TestMakerTraitsEncode(t *testing.T) {
 
 	for _, tc := range tests {
 		t.Run(tc.name, func(t *testing.T) {
-			makerTraits := NewMakerTraits(tc.makerTraitParams)
+			makerTraits, err := NewMakerTraits(tc.makerTraitParams)
+			require.NoError(t, err)
 			assert.Equal(t, tc.expectedMakerTraits, makerTraits.Encode())
 		})
 	}

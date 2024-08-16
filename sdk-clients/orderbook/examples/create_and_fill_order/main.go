@@ -49,7 +49,7 @@ func main() {
 		log.Fatal(fmt.Errorf("failed to get series nonce: %v", err))
 	}
 
-	makerTraits := orderbook.NewMakerTraits(orderbook.MakerTraitsParams{
+	makerTraits, err := orderbook.NewMakerTraits(orderbook.MakerTraitsParams{
 		AllowedSender:      zeroAddress,
 		ShouldCheckEpoch:   false,
 		UsePermit2:         false,
@@ -61,20 +61,23 @@ func main() {
 		AllowPartialFills:  true,
 		Expiry:             expireAfter,
 		Nonce:              seriesNonce.Int64(),
-		Series:             0, // TODO: Series 0 always?
+		Series:             0,
 	})
+	if err != nil {
+		log.Fatalf("Failed to create maker traits: %v", err)
+	}
 
 	createOrderResponse, err := client.CreateOrder(ctx, orderbook.CreateOrderParams{
 		Wallet:                         client.Wallet,
 		SeriesNonce:                    seriesNonce,
 		MakerTraits:                    makerTraits,
-		ExpireAfter:                    time.Now().Add(time.Hour * 10).Unix(), // TODO update the field name to have "unix" suffix
+		ExpireAfterUnix:                time.Now().Add(time.Hour * 10).Unix(),
 		Maker:                          client.Wallet.Address().Hex(),
 		MakerAsset:                     wmatic,
 		TakerAsset:                     usdc,
 		MakingAmount:                   ten16,
 		TakingAmount:                   ten6,
-		Taker:                          zeroAddress, // TODO We should enable the user to pass in a blank string here and ssume 0x000...
+		Taker:                          zeroAddress,
 		SkipWarnings:                   false,
 		EnableOnchainApprovalsIfNeeded: false,
 	})
