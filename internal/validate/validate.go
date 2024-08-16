@@ -358,7 +358,7 @@ func CheckFee(parameter interface{}, variableName string) error {
 	return nil
 }
 
-//  TODO The enforced naming pattern for the variable name string doesn't work for generic types like "Float32NonNegativeWhole"
+//  TODO The enforced naming pattern for the variable name string literal doesn't work for generic types like "Float32NonNegativeWhole"
 
 func CheckFloat32NonNegativeWhole(parameter interface{}, variableName string) error {
 	value, ok := parameter.(float32)
