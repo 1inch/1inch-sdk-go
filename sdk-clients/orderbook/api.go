@@ -48,7 +48,7 @@ func (api *api) CreateOrder(ctx context.Context, params CreateOrderParams) (*Cre
 	return &createOrderResponse, nil
 }
 
-// TODO Reusing the same request/response objects due to bad openapi spec
+// TODO Reusing the same request/response objects until the openapi spec is updated to include the correct object definitions
 
 // GetOrdersByCreatorAddress returns all orders created by a given address in the Limit Order Protocol
 func (api *api) GetOrdersByCreatorAddress(ctx context.Context, params GetOrdersByCreatorAddressParams) ([]OrderResponse, error) {

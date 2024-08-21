@@ -10,9 +10,8 @@ import (
 func (params *CreateOrderParams) Validate() error {
 	var validationErrors []error
 	// validationErrors = validate.Parameter(params.SeriesNonce, "seriesNonce", validate.CheckBigIntRequired, validationErrors) // TODO All other places expect a string value for raw request parameters, but this value will always come in as a big.Int because of the onchain nature of retrieving it
-	//validationErrors = validate.Parameter(params.Wallet, "wallet", validate.CheckWalletRequired, validationErrors) // TODO enable after parameter validation is fixed
 	validationErrors = validate.Parameter(params.Maker, "maker", validate.CheckEthereumAddressRequired, validationErrors)
-	validationErrors = validate.Parameter(params.ExpireAfter, "expireAfter", validate.CheckExpireAfter, validationErrors)
+	validationErrors = validate.Parameter(params.ExpireAfterUnix, "expireAfter", validate.CheckExpireAfterUnix, validationErrors)
 	validationErrors = validate.Parameter(params.MakerAsset, "makerAsset", validate.CheckEthereumAddressRequired, validationErrors)
 	validationErrors = validate.Parameter(params.TakerAsset, "takerAsset", validate.CheckEthereumAddressRequired, validationErrors)
 	validationErrors = validate.Parameter(params.TakingAmount, "takingAmount", validate.CheckBigIntRequired, validationErrors)
@@ -25,7 +24,7 @@ func (params *CreateOrderParams) Validate() error {
 		validationErrors = append(validationErrors, validate.NewParameterCustomError("native gas token is not supported as maker or taker asset"))
 	}
 
-	//TODO if an extension is present, then MakerTraits must also be marked for an extension in the order
+	//TODO if an extension is present, then MakerTraits must also be marked for an extension in the order. Will be easy to do if Extension is changed to a pointer type
 
 	return validate.ConsolidateValidationErorrs(validationErrors)
 }
@@ -65,7 +64,7 @@ func (params *GetCountParams) Validate() error {
 	return validate.ConsolidateValidationErorrs(validationErrors)
 }
 
-func (params *GetEventParams) Validate() error { // TODO Find validation criteria for OrderHash
+func (params *GetEventParams) Validate() error {
 	var validationErrors []error
 	validationErrors = validate.Parameter(params.OrderHash, "orderHash", validate.CheckOrderHashRequired, validationErrors)
 	return validate.ConsolidateValidationErorrs(validationErrors)

@@ -1,12 +1,13 @@
 package orderbook
 
 import (
+	"errors"
 	"fmt"
 	"math/big"
 )
 
 var (
-// TODO currently unused masks carried over from the Typescript Limit Order SDK
+// currently unused masks carried over from the Typescript Limit Order SDK
 // allowedSenderMask = NewBitMask(big.NewInt(0), big.NewInt(80))
 // expirationMask    = NewBitMask(big.NewInt(80), big.NewInt(120))
 // nonceOrEpochMask  = NewBitMask(big.NewInt(120), big.NewInt(160))
@@ -58,15 +59,14 @@ type MakerTraits struct {
 	AllowMultipleFills bool
 }
 
-func NewMakerTraits(params MakerTraitsParams) *MakerTraits {
+func NewMakerTraits(params MakerTraitsParams) (*MakerTraits, error) {
 
-	// TODO remove panics
 	if params.AllowPartialFills && !params.AllowMultipleFills {
-		panic("AllowPartialFills must be false if AllowMultipleFills is false")
+		return nil, errors.New("AllowPartialFills must be false if AllowMultipleFills is false")
 	}
 
 	if !params.AllowPartialFills && params.AllowMultipleFills {
-		panic("AllowMultipleFills must be false if AllowPartialFills is false")
+		return nil, errors.New("AllowMultipleFills must be false if AllowPartialFills is false")
 	}
 
 	return &MakerTraits{
@@ -85,7 +85,7 @@ func NewMakerTraits(params MakerTraitsParams) *MakerTraits {
 
 		AllowPartialFills:  params.AllowPartialFills,
 		AllowMultipleFills: params.AllowMultipleFills,
-	}
+	}, nil
 }
 
 func (m *MakerTraits) IsBitInvalidatorMode() bool {

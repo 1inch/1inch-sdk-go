@@ -84,7 +84,7 @@ func CreateFusionOrderData(quote GetQuoteOutputFixed, orderParams OrderParams, w
 		AllowPartialFills:    orderParams.AllowPartialFills,
 		AllowMultipleFills:   orderParams.AllowMultipleFills,
 		OrderExpirationDelay: orderParams.OrderExpirationDelay,
-		Source:               "", // TODO unsure what this is
+		Source:               "",
 	}
 
 	makerTraits, err := CreateMakerTraits(details, extraParams)
@@ -139,7 +139,7 @@ func CreateFusionOrderData(quote GetQuoteOutputFixed, orderParams OrderParams, w
 		TakerAsset:   fusionOrder.OrderInfo.TakerAsset,
 		TakingAmount: fusionOrder.OrderInfo.TakingAmount,
 		MakingAmount: fusionOrder.OrderInfo.MakingAmount,
-		Taker:        fusionOrder.OrderInfo.Receiver, // TODO unsure if this is right
+		Taker:        fusionOrder.OrderInfo.Receiver,
 	}, int(chainId))
 	if err != nil {
 		return nil, nil, fmt.Errorf("error creating limit order message: %v", err)
@@ -276,10 +276,13 @@ func CreateMakerTraits(details Details, extraParams ExtraParams) (*orderbook.Mak
 		HasExtension:       true,
 		Nonce:              extraParams.Nonce.Int64(),
 	}
-	makerTraits := orderbook.NewMakerTraits(makerTraitParms)
+	makerTraits, err := orderbook.NewMakerTraits(makerTraitParms)
+	if err != nil {
+		return nil, fmt.Errorf("error creating maker traits: %v", err)
+	}
 	if makerTraits.IsBitInvalidatorMode() {
 		if extraParams.Nonce == nil || extraParams.Nonce.Cmp(big.NewInt(0)) == 0 {
-			return nil, errors.New("nonce required, when partial fill or multiple fill disallowed")
+			return nil, errors.New("nonce required when partial fill or multiple fill disallowed")
 		}
 	}
 	return makerTraits, nil
@@ -303,7 +306,7 @@ func CreateOrder(params CreateOrderDataParams) (*Order, error) {
 		receiver = geth_common.HexToAddress(params.orderInfo.Receiver)
 	}
 
-	salt, err := params.extension.GenerateSalt() // TODO this is not the right salt
+	salt, err := params.extension.GenerateSalt()
 	if err != nil {
 		return nil, fmt.Errorf("error generating salt: %v", err)
 	}

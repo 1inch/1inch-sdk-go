@@ -477,7 +477,7 @@ func TestCreateMakerTraits(t *testing.T) {
 			},
 			expected:    nil,
 			expectErr:   true,
-			expectedErr: errors.New("nonce required, when partial fill or multiple fill disallowed"),
+			expectedErr: errors.New("nonce required when partial fill or multiple fill disallowed"),
 		},
 	}
 
