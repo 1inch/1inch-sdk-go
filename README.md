@@ -80,6 +80,7 @@ import (
 	"context"
 	"encoding/json"
 	"fmt"
+	"log"
 
 	"github.com/1inch/1inch-sdk-go/constants"
 	"github.com/1inch/1inch-sdk-go/sdk-clients/aggregation"
@@ -92,33 +93,38 @@ var (
 func main() {
 	rpcUrl := "https://eth.llamarpc.com"
 	randomPrivateKey := "e8f32e723decf4051aefac8e6c1a25ad146334449d2792c2b8b15d0b59c2a35f"
-	
-	config, err := aggregation.NewConfiguration(rpcUrl, randomPrivateKey, constants.EthereumChainId, "https://api.1inch.dev", devPortalToken)
+
+	config, err := aggregation.NewConfiguration(aggregation.ConfigurationParams{
+		NodeUrl:    rpcUrl,
+		PrivateKey: randomPrivateKey,
+		ChainId:    constants.EthereumChainId,
+		ApiUrl:     "https://api.1inch.dev",
+		ApiKey:     devPortalToken,
+	})
 	if err != nil {
-		fmt.Printf("Failed to create configuration: %v\n", err)
-		return
+		log.Fatalf("Failed to create configuration: %v\n", err)
 	}
 	client, err := aggregation.NewClient(config)
-
+	if err != nil {
+		log.Fatalf("Failed to create client: %v\n", err)
+	}
 	ctx := context.Background()
 
 	swapData, err := client.GetSwap(ctx, aggregation.GetSwapParams{
-		Src:             "0xa0b86991c6218b36c1d19d4a2e9eb0ce3606eb48",
-		Dst:             "0x6b175474e89094c44da98b954eedeac495271d0f",
-		Amount:          "1000000",
+		Src:             "0xa0b86991c6218b36c1d19d4a2e9eb0ce3606eb48", // USDC
+		Dst:             "0x111111111117dc0aa78b770fa6a738034120c302", // 1INCH
+		Amount:          "100000000",
 		From:            client.Wallet.Address().Hex(),
 		Slippage:        1,
 		DisableEstimate: true,
 	})
 	if err != nil {
-		fmt.Printf("Failed to get swap data: %v\n", err)
-		return
+		log.Fatalf("Failed to get swap data: %v\n", err)
 	}
 
 	output, err := json.MarshalIndent(swapData, "", "  ")
 	if err != nil {
-		fmt.Printf("Failed to marshal swap data: %v\n", err)
-		return
+		log.Fatalf("Failed to marshal swap data: %v\n", err)
 	}
 	fmt.Printf("%s\n", string(output))
 }
