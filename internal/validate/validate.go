@@ -446,24 +446,6 @@ func CheckExpireAfterUnix(parameter interface{}, variableName string) error {
 	return nil
 }
 
-func CheckBoolean(parameter interface{}, variableName string) error {
-	_, ok := parameter.(bool)
-	if !ok {
-		return fmt.Errorf("for parameter '%v' to be validated as '%v', it must be a boolean", variableName, "Boolean")
-	}
-
-	return nil
-}
-
-func CheckString(parameter interface{}, variableName string) error {
-	_, ok := parameter.(string)
-	if !ok {
-		return fmt.Errorf("for parameter '%v' to be validated as '%v', it must be a string", variableName, "String")
-	}
-
-	return nil
-}
-
 func CheckFiatCurrency(parameter interface{}, variableName string) error {
 	value, ok := parameter.(string)
 	if !ok {
@@ -486,6 +468,45 @@ func CheckTimerange(parameter interface{}, variableName string) error {
 	validTimerangeValues := []string{"1day", "1week", "1month", "1year", "3years"}
 	if !slice_utils.Contains(value, validTimerangeValues) {
 		return NewParameterValidationError(variableName, fmt.Sprintf("is invalid, valid chain ids are: %v", validTimerangeValues))
+	}
+	return nil
+}
+
+func CheckJsonRpcVersionRequired(parameter interface{}, variableName string) error {
+	value, ok := parameter.(string)
+	if !ok {
+		return fmt.Errorf("for parameter '%v' to be validated as '%v', it must be a string", variableName, "JsonRpcVersion")
+	}
+
+	if value == "" {
+		return NewParameterMissingError(variableName)
+	}
+
+	return CheckJsonRpcVersion(value, variableName)
+}
+
+func CheckJsonRpcVersion(parameter interface{}, variableName string) error {
+	value, ok := parameter.(string)
+	if !ok {
+		return fmt.Errorf("for parameter '%v' to be validated as '%v', it must be a string", variableName, "JsonRpcVersion")
+	}
+
+	validJsonRpcValues := []string{"1.0", "2.0"}
+	if !slice_utils.Contains(value, validJsonRpcValues) {
+		return NewParameterValidationError(variableName, fmt.Sprintf("is invalid, valid rpc version are: %v", validJsonRpcValues))
+	}
+	return nil
+}
+
+func CheckNodeType(parameter interface{}, variableName string) error {
+	value, ok := parameter.(string)
+	if !ok {
+		return fmt.Errorf("for parameter '%v' to be validated as '%v', it must be a string", variableName, "NodeType")
+	}
+
+	validJsonRpcValues := []string{"1.0", "2.0"}
+	if !slice_utils.Contains(value, validJsonRpcValues) {
+		return NewParameterValidationError(variableName, fmt.Sprintf("is invalid, valid rpc version are: %v", validJsonRpcValues))
 	}
 	return nil
 }

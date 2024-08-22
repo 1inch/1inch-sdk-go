@@ -66,7 +66,7 @@ change_any_of_ref_to_ref() {
   local temp_file="${api_openapi_file_name}.tmp"
 
   jq '
-    def simplify_allOf:
+  def simplify_allOf:
       if type == "object" and .allOf then
         .allOf |= map(
           if type == "object" and has("$ref") then . else empty end
@@ -81,24 +81,24 @@ change_any_of_ref_to_ref() {
     .paths |= map_values(
       . as $path |
       . | map_values(
-        if .parameters then
+        if .parameters? then
           .parameters |= map(
-            if .schema then .schema |= simplify_allOf else . end
+            if .schema? then .schema |= simplify_allOf else . end
           )
         else . end |
         if .requestBody? then
           .requestBody.content."application/json".schema |= simplify_allOf
         else . end
       )
-    ) |
+    )? |
 
     # Apply the simplification to the components schemas
     .components.schemas |= map_values(
       . |= simplify_allOf |
-      if .properties then
+      if .properties? then
         .properties |= map_values(simplify_allOf)
       else . end
-    )
+    )?
   ' ${api_openapi_file_name} > ${temp_file}
 
   if [ $? -ne 0 ]; then
@@ -162,39 +162,48 @@ check_and_fix_incorrect_number_arrays() {
 # This is required to prevent the SDK from adding pointers to optional fields
 add_pointer_skip_field() {
   local api_openapi_file_name="$1"
-    local temp_file="${api_openapi_file_name}.tmp"  # Define the temporary file name
+  local temp_file="${api_openapi_file_name}.tmp"  # Define the temporary file name
 
   jq '
-           # Function to add x-go-type-skip-optional-pointer to schema objects if not already present
-           def add_skip_pointer:
-             if .type and (.["x-go-type-skip-optional-pointer"] // false) != true then
-               . + {"x-go-type-skip-optional-pointer": true}
-             else
-               .
-             end;
+    # Function to add x-go-type-skip-optional-pointer to schema objects if not already present
+    def add_skip_pointer:
+      if .type and (.["x-go-type-skip-optional-pointer"] // false) != true then
+        . + {"x-go-type-skip-optional-pointer": true}
+      elif .oneOf and (.["x-go-type-skip-optional-pointer"] // false) != true then
+        . + {"x-go-type-skip-optional-pointer": true}
+      else
+        .
+      end;
 
-           # Apply to path parameters
-           .paths |= map_values(
-             . as $path |
-             . | map_values(
-               if .parameters then
-                 .parameters |= map(
-                   if .required == false and .schema then .schema |= add_skip_pointer else . end
-                 )
-               else . end |
-               if .requestBody? then
-                 .requestBody.content."application/json".schema |= add_skip_pointer
-               else . end
-             )
-           ) |
+    # Apply to path parameters and requestBody
+    .paths |= map_values(
+      . as $path |
+      . | map_values(
+        if .parameters? and (.parameters != null) then
+          .parameters |= map(
+            if .required == false and .schema? and (.schema != null) then
+              .schema |= add_skip_pointer
+            else . end
+          )
+        else . end |
+        if .requestBody? and (.requestBody.content?["application/json"].schema != null) then
+          .requestBody.content["application/json"].schema |= add_skip_pointer |
+          if .requestBody.content["application/json"].schema.properties? then
+            .requestBody.content["application/json"].schema.properties |= map_values(add_skip_pointer)
+          else
+            .
+          end
+        else . end
+      )
+    )? |
 
-           # Apply to components schemas
-           .components.schemas |= map_values(
-             if .properties then
-               .properties |= map_values(add_skip_pointer)
-             else . end
-           )
-         ' ${api_openapi_file_name} > ${temp_file}
+    # Apply to components schemas
+    .components.schemas |= map_values(
+      if .properties? and (.properties != null) then
+        .properties |= map_values(add_skip_pointer)
+      else . end
+    )?
+  ' ${api_openapi_file_name} > ${temp_file}
 
   if [ $? -ne 0 ]; then
     echo "Error: Failed to add pointer skip fields with jq on $api_openapi_file_name."
@@ -341,4 +350,6 @@ for api_openapi_file_name in "$openapi_dir"/*-openapi.json; do
             echo "Error: Failed to move generated types to $new_dir."
             exit 1
         }
+
+    # Add logic to delete the temporary generatedtypes directory if everything succeeds
 done

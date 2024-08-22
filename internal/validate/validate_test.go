@@ -1011,110 +1011,6 @@ func TestIsBigInt(t *testing.T) {
 	}
 }
 
-func TestCheckBoolean(t *testing.T) {
-	testCases := []struct {
-		description string
-		input       interface{}
-		expectError bool
-	}{
-		{
-			description: "True",
-			input:       true,
-		},
-		{
-			description: "False",
-			input:       false,
-		},
-		{
-			description: "Must fail",
-			input:       nil,
-			expectError: true,
-		},
-		{
-			description: "Must fail 2",
-			input: struct {
-				A string
-			}{
-				A: "a",
-			},
-			expectError: true,
-		},
-		{
-			description: "Must fail 3",
-			input:       []string{"1", "2"},
-			expectError: true,
-		},
-		{
-			description: "Must fail 4",
-			input:       12,
-			expectError: true,
-		},
-	}
-
-	for _, tc := range testCases {
-		t.Run(tc.description, func(t *testing.T) {
-			err := CheckBoolean(tc.input, "testValue")
-			if tc.expectError {
-				require.Error(t, err)
-			} else {
-				require.NoError(t, err)
-			}
-		})
-	}
-}
-
-func TestCheckString(t *testing.T) {
-	testCases := []struct {
-		description string
-		input       interface{}
-		expectError bool
-	}{
-		{
-			description: "True",
-			input:       "a",
-		},
-		{
-			description: "True 2",
-			input:       "12",
-		},
-		{
-			description: "Must fail",
-			input:       nil,
-			expectError: true,
-		},
-		{
-			description: "Must fail 2",
-			input: struct {
-				A string
-			}{
-				A: "a",
-			},
-			expectError: true,
-		},
-		{
-			description: "Must fail 3",
-			input:       []string{"1", "2"},
-			expectError: true,
-		},
-		{
-			description: "Must fail 4",
-			input:       12,
-			expectError: true,
-		},
-	}
-
-	for _, tc := range testCases {
-		t.Run(tc.description, func(t *testing.T) {
-			err := CheckString(tc.input, "testValue")
-			if tc.expectError {
-				require.Error(t, err)
-			} else {
-				require.NoError(t, err)
-			}
-		})
-	}
-}
-
 func TestCheckFiatCurrency(t *testing.T) {
 	testCases := []struct {
 		description string
@@ -1162,6 +1058,44 @@ func TestCheckFiatCurrency(t *testing.T) {
 				require.Error(t, err)
 			} else {
 				require.NoError(t, err)
+			}
+		})
+	}
+}
+
+func TestCheckJsonRpcVersion(t *testing.T) {
+	testcases := []struct {
+		description string
+		value       string
+		expectError bool
+	}{
+		{
+			description: "Valid - 1.0",
+			value:       "1.0",
+		},
+		{
+			description: "Valid - 2.0",
+			value:       "2.0",
+		},
+		{
+			description: "Invalid - 3.0",
+			value:       "3.0",
+			expectError: true,
+		},
+		{
+			description: "Invalid - empty",
+			value:       "",
+			expectError: true,
+		},
+	}
+
+	for _, tc := range testcases {
+		t.Run(tc.description, func(t *testing.T) {
+			err := CheckJsonRpcVersion(tc.value, "testValue")
+			if tc.expectError {
+				require.Error(t, err, fmt.Sprintf("%s should have caused an error", tc.description))
+			} else {
+				require.NoError(t, err, fmt.Sprintf("%s should not have caused an error", tc.description))
 			}
 		})
 	}
