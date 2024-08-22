@@ -977,7 +977,7 @@ func TestExpireAfter(t *testing.T) {
 
 	for _, tc := range testcases {
 		t.Run(tc.description, func(t *testing.T) {
-			err := CheckExpireAfter(tc.value, "testValue")
+			err := CheckExpireAfterUnix(tc.value, "testValue")
 			if tc.expectError {
 				require.Error(t, err, fmt.Sprintf("%s should have caused an error", tc.description))
 			} else {

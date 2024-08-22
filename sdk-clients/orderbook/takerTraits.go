@@ -9,7 +9,7 @@ import (
 )
 
 var (
-	// TODO currently unused masks carried over from the Typescript Limit Order SDK
+	// currently unused masks carried over from the Typescript Limit Order SDK
 	//thresholdMask             = NewBitMask(big.NewInt(0), big.NewInt(185))
 	//argsInteractionLengthMask = NewBitMask(big.NewInt(220), big.NewInt(224))
 	argsExtensionLengthMask = NewBitMask(big.NewInt(224), big.NewInt(248))

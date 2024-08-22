@@ -13,7 +13,7 @@ type CreateOrderParams struct {
 	SeriesNonce                    *big.Int
 	MakerTraits                    *MakerTraits
 	Extension                      Extension
-	ExpireAfter                    int64
+	ExpireAfterUnix                int64
 	Maker                          string
 	MakerAsset                     string
 	TakerAsset                     string

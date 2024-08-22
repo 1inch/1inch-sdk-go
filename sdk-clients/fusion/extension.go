@@ -99,7 +99,7 @@ func (e *Extension) ConvertToOrderbookExtension() *orderbook.Extension {
 			strings.TrimPrefix(e.MakerPermit, "0x"),
 			e.PreInteraction,
 			e.PostInteraction,
-			//strings.TrimPrefix(e.CustomData, "0x"), // TODO blocking custom data for now because it is breaking the cumsum method
+			//strings.TrimPrefix(e.CustomData, "0x"), // TODO Blocking custom data for now because it is breaking the cumsum method. The extension constructor will return with an error if the user provides this field.
 		},
 	}
 }

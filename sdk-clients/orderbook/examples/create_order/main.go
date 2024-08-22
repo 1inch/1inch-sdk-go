@@ -58,7 +58,7 @@ func main() {
 		log.Fatal(fmt.Errorf("failed to get series nonce: %v", err))
 	}
 
-	makerTraits := orderbook.NewMakerTraits(orderbook.MakerTraitsParams{
+	makerTraits, err := orderbook.NewMakerTraits(orderbook.MakerTraitsParams{
 		AllowedSender:      zeroAddress,
 		ShouldCheckEpoch:   false,
 		UsePermit2:         false,
@@ -66,15 +66,18 @@ func main() {
 		HasExtension:       false,
 		Expiry:             expireAfter,
 		Nonce:              seriesNonce.Int64(),
-		Series:             0, // TODO: Series 0 always?
+		Series:             0,
 		AllowMultipleFills: true,
 		AllowPartialFills:  true,
 	})
+	if err != nil {
+		log.Fatalf("Failed to create maker traits: %v", err)
+	}
 
 	createOrderResponse, err := client.CreateOrder(ctx, orderbook.CreateOrderParams{
 		Wallet:                         client.Wallet,
 		SeriesNonce:                    seriesNonce,
-		ExpireAfter:                    expireAfter, // TODO update the field name to have "unix" suffix
+		ExpireAfterUnix:                expireAfter,
 		Maker:                          publicAddress.Hex(),
 		MakerAsset:                     wmatic,
 		TakerAsset:                     usdc,

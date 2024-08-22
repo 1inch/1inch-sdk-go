@@ -103,7 +103,6 @@ func (api *api) PlaceOrder(ctx context.Context, fusionQuote GetQuoteOutputFixed,
 		return err
 	}
 
-	// TODO This function can simply return the SignedOrderInput object
 	_, limitOrder, err := CreateFusionOrderData(fusionQuote, orderParams, wallet, api.chainId)
 	if err != nil {
 		return fmt.Errorf("failed to create order: %v", err)
