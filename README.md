@@ -2,7 +2,7 @@
 
 The SDK requires a minimum version of Go `1.21`.
 
-Check out the [release notes](https://github.com/1inch/1inch-sdk-go/blob/globally-refactored-main/CHANGELOG.md) for information about
+Check out the [release notes](https://github.com/1inch/1inch-sdk-go/blob/main/CHANGELOG.md) for information about
 the latest bug fixes, updates, and features added to the SDK.
 
 This is a Go SDK to simplify interactions with the 1inch Dev Portal APIs. When complete, it will support all endpoints
@@ -23,28 +23,28 @@ Jump To:
 ### Token Swaps
 *Swap API* - [[Docs](https://portal.1inch.dev/documentation/apis/swap/introduction) | [SDK Example](https://github.com/1inch/1inch-sdk-go/blob/main/sdk-clients/aggregation/examples/quote/main.go)]
 
-*Fusion API* - [[Docs](https://portal.1inch.dev/documentation/apis/fusion/introduction) | [SDK Example](https://github.com/1inch/1inch-sdk-go/blob/main/sdk-clients/fusion/examples/place_order/main.go)]
+*Fusion API* - [~~Docs~~ | [SDK Example](https://github.com/1inch/1inch-sdk-go/blob/main/sdk-clients/fusion/examples/place_order/main.go)] (Fusion does not have a docs page at this time)
 
 *Orderbook API* - [[Docs](https://portal.1inch.dev/documentation/apis/orderbook/introduction) | [SDK Example](https://github.com/1inch/1inch-sdk-go/blob/main/sdk-clients/orderbook/examples/create_order/main.go)]
 
 ### Infrastructure
-*Balance API* - [[Docs](https://portal.1inch.dev/documentation/apis/balance/introduction) | [SDK Example](https://github.com/1inch/1inch-sdk-go/blob/main/sdk-clients/balances/examples/main.go)]
+*Balance API* - [[Docs](https://portal.1inch.dev/documentation/apis/balance/introduction) | [SDK Example](https://github.com/1inch/1inch-sdk-go/blob/main/sdk-clients/balances/examples/get_allowances_of_custom_tokens/main.go)]
 
-*Gas Price API* - [[Docs](https://portal.1inch.dev/documentation/apis/gas-price/introduction) | [SDK Example](https://github.com/1inch/1inch-sdk-go/blob/main/sdk-clients/gasprices/examples/main.go)]
+*Gas Price API* - [[Docs](https://portal.1inch.dev/documentation/apis/gas-price/introduction) | [SDK Example](https://github.com/1inch/1inch-sdk-go/blob/main/sdk-clients/gasprices/examples/get_gas_price_eip1559/main.go)]
 
-*History API* [[Docs](https://portal.1inch.dev/documentation/apis/history/introduction) | [SDK Example](https://github.com/1inch/1inch-sdk-go/blob/main/sdk-clients/history/examples/main.go)]
+*History API* [[Docs](https://portal.1inch.dev/documentation/apis/history/introduction) | [SDK Example](https://github.com/1inch/1inch-sdk-go/blob/main/sdk-clients/history/examples/get_history_events_by_address/main.go)]
 
 *NFT API* - [[Docs](https://portal.1inch.dev/documentation/apis/nft/introduction) | [SDK Example](https://github.com/1inch/1inch-sdk-go/blob/main/sdk-clients/nft/examples/main.go)]
 
 *Portfolio API* - [[Docs](https://portal.1inch.dev/documentation/apis/portfolio/introduction) | [SDK Example](https://github.com/1inch/1inch-sdk-go/blob/main/sdk-clients/portfolio/examples/get_current_protocols_value/main.go)]
 
-*Spot Price API* - [[Docs](https://portal.1inch.dev/documentation/apis/spot-price/introduction) | [SDK Example](https://github.com/1inch/1inch-sdk-go/blob/main/sdk-clients/spotprices/examples/main.go)]
+*Spot Price API* - [[Docs](https://portal.1inch.dev/documentation/apis/spot-price/introduction) | [SDK Example](https://github.com/1inch/1inch-sdk-go/blob/main/sdk-clients/spotprices/examples/get_prices_for_requested_tokens/main.go)]
 
 *Token API* - [[Docs](https://portal.1inch.dev/documentation/apis/tokens/introduction) | [SDK Example](https://github.com/1inch/1inch-sdk-go/blob/main/sdk-clients/tokens/examples/get_custom_token/main.go)]
 
-*Traces API* - [[Docs](https://portal.1inch.dev/documentation/apis/traces/introduction) | [SDK Example](https://github.com/1inch/1inch-sdk-go/blob/main/sdk-clients/traces/examples/main.go)]
+*Traces API* - [[Docs](https://portal.1inch.dev/documentation/apis/traces/introduction) | [SDK Example](https://github.com/1inch/1inch-sdk-go/blob/main/sdk-clients/traces/examples/get_tx_trace_by_number_and_hash/main.go)]
 
-*Transaction Gateway API* - [[Docs](https://portal.1inch.dev/documentation/apis/transaction/introduction) | [SDK Example](https://github.com/1inch/1inch-sdk-go/blob/main/sdk-clients/txbroadcast/examples/main.go)]
+*Transaction Gateway API* - [[Docs](https://portal.1inch.dev/documentation/apis/transaction/introduction) | [SDK Example](https://github.com/1inch/1inch-sdk-go/blob/main/sdk-clients/txbroadcast/examples/broadcast_public_transaction/main.go)]
 
 
 ## Getting started
@@ -148,5 +148,5 @@ an [issue](https://github.com/1inch/1inch-sdk/issues) here on GitHub
 
 ## Development
 
-Please see our [SDK Developer Guide](https://github.com/1inch/1inch-sdk/blob/main/golang/DEVELOPMENT.md) if you would
+Please see our [SDK Developer Guide](https://github.com/1inch/1inch-sdk-go/blob/main/DEVELOPMENT.md) if you would
 like to contribute 

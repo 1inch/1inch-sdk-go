@@ -42,8 +42,8 @@ func main() {
 	ctx := context.Background()
 
 	response, err := client.GetAllowancesOfCustomTokensByWalletAddress(ctx, balances.AllowancesOfCustomTokensByWalletAddressParams{
-		Wallet:  mainWalletAddress,
 		Spender: spender,
+		Wallet:  mainWalletAddress,
 		Tokens:  []string{tokenAddress1, tokenAddress2},
 	})
 	if err != nil {
