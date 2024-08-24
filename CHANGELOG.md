@@ -1,6 +1,29 @@
-# Release(March 9, 2024)
+# Changelog
 
-Tag: [v0.0.3-developer-preview](https://github.com/1inch/1inch-sdk/releases/tag/v0.0.3-developer-preview)
+All notable changes to this project will be documented in this file.
+
+The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/), and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html) starting with the *v1.0.0-beta.1* release.
+
+## [v1.0.0-beta.1] - 2024-8-22
+[v1.0.0-beta.1 releas page](https://github.com/1inch/1inch-sdk-go/releases/tag/v1.0.0-beta.1)
+
+Note: This changelog summarizes all changes since the last *changelog* version of v0.0.3-developer-preview
+
+### Added
+- Web3 API added
+- Fusion SDK added
+- Portfolio API added
+- Permit1 support added for Orderbook orders and Aggregator Swaps
+
+### Changed
+- Readme updated to link to all API docs and examples
+- Updating Geth version
+- Types generation script updated to handle Web3 API spec design
+- Normalized and improved SDK examples
+- Improved code generation to make optional parameters pointers
+
+# [v0.0.3-developer-preview] - 2024-3-9
+[v0.0.3-developer-preview](https://github.com/1inch/1inch-sdk/releases/tag/v0.0.3-developer-preview)
 
 ### New Features and Enhancements:
 
@@ -23,8 +46,7 @@ Tag: [v0.0.3-developer-preview](https://github.com/1inch/1inch-sdk/releases/tag/
 - Project-wide validation scripts added to verify validation logic
   standards ([PR](https://github.com/1inch/1inch-sdk/pull/11))
 
-# Release(January 23, 2024)
-
+# [v0.0.2-developer-preview] 2024-1-23
 Tag: [v0.0.2-developer-preview](https://github.com/1inch/1inch-sdk/releases/tag/v0.0.2-developer-preview)
 
 ### New Features and Enhancements:
@@ -44,7 +66,7 @@ Tag: [v0.0.2-developer-preview](https://github.com/1inch/1inch-sdk/releases/tag/
 - Moved Actions into a service within the main client to consolidate SDK structure.
 - Simplified tests and refactored onchain actions to have more uniformity across the library.
 
-# Release(January 15, 2024)
+# Release (January 15, 2024)
 
 Tag: [v0.0.1-developer-preview](https://github.com/1inch/1inch-sdk/releases/tag/v0.0.1-developer-preview)
 
