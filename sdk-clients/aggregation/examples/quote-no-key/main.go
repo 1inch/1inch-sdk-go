@@ -36,7 +36,7 @@ func main() {
 		Amount:          "1000",
 		From:            "0x0000000000000000000000000000000000000000", // Change this to any wallet address
 		Slippage:        1,
-		DisableEstimate: true, // This stops the 1inch API from failing if the wallet is not able to make the swap
+		DisableEstimate: true, // This stops the 1inch API from checking if the wallet is not able to make the swap
 	})
 	if err != nil {
 		log.Fatalf("Failed to get swap data: %v\n", err)
