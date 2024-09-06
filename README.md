@@ -5,11 +5,7 @@ The SDK requires a minimum version of Go `1.21`.
 Check out the [release notes](https://github.com/1inch/1inch-sdk-go/blob/main/CHANGELOG.md) for information about
 the latest bug fixes, updates, and features added to the SDK.
 
-This is a Go SDK to simplify interactions with the 1inch Dev Portal APIs. When complete, it will support all endpoints
-tracked by our official docs [here](https://portal.1inch.dev/documentation/authentication).
-
-Beyond mirroring the Developer Portal APIs, this SDK also supports token approvals, permit signature generation, and the
-execution of 1inch swaps onchain for EOA wallets.
+Beyond simplifying Go-based interactions with our REST API, this SDK also helps broadcast transactions to the network, can generate Permit1 signatures to skip the need for Approval transactions, and enables access to our Fusion system. Each SDK has examples of how to send valid requests to each Dev Portal endpoint. 
 
 Jump To:
 
@@ -21,9 +17,9 @@ Jump To:
 ## Supported APIs
 
 ### Token Swaps
-*Swap API* - [[Docs](https://portal.1inch.dev/documentation/apis/swap/introduction) | [SDK Example](https://github.com/1inch/1inch-sdk-go/blob/main/sdk-clients/aggregation/examples/quote/main.go)]
+*Swap API* - [[Docs](https://portal.1inch.dev/documentation/apis/swap/classic-swap/introduction) | [SDK Example](https://github.com/1inch/1inch-sdk-go/blob/main/sdk-clients/aggregation/examples/quote/main.go)]
 
-*Fusion API* - [~~Docs~~ | [SDK Example](https://github.com/1inch/1inch-sdk-go/blob/main/sdk-clients/fusion/examples/place_order/main.go)] (Fusion does not have a docs page at this time)
+*Fusion API* - [[Docs](https://portal.1inch.dev/documentation/apis/swap/intent-swap/introduction) | [SDK Example](https://github.com/1inch/1inch-sdk-go/blob/main/sdk-clients/fusion/examples/place_order/main.go)] (now called Intent Swap)
 
 *Orderbook API* - [[Docs](https://portal.1inch.dev/documentation/apis/orderbook/introduction) | [SDK Example](https://github.com/1inch/1inch-sdk-go/blob/main/sdk-clients/orderbook/examples/create_order/main.go)]
 
