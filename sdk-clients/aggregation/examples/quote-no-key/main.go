@@ -16,7 +16,7 @@ var (
 )
 
 func main() {
-	config, err := aggregation.NewConfigurationAPI( // A light-weight API that is not capable of signing transactions
+	config, err := aggregation.NewConfigurationAPI(
 		constants.PolygonChainId,
 		"https://api.1inch.dev",
 		devPortalToken,
@@ -24,7 +24,7 @@ func main() {
 	if err != nil {
 		log.Fatalf("Failed to create configuration: %v\n", err)
 	}
-	client, err := aggregation.NewClientOnlyAPI(config)
+	client, err := aggregation.NewClientOnlyAPI(config) // A light-weight client that is not capable of signing transactions
 	if err != nil {
 		log.Fatalf("Failed to create client: %v\n", err)
 	}
