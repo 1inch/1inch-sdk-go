@@ -3,14 +3,15 @@ package main
 import (
 	"context"
 	"encoding/hex"
+	"fmt"
 	"log"
 	"math/big"
 	"os"
-
-	"github.com/ethereum/go-ethereum/common"
+	"time"
 
 	"github.com/1inch/1inch-sdk-go/constants"
 	"github.com/1inch/1inch-sdk-go/sdk-clients/aggregation"
+	"github.com/ethereum/go-ethereum/common"
 )
 
 var (
@@ -45,7 +46,7 @@ func main() {
 	amountToSwap := big.NewInt(1e18)
 
 	allowanceData, err := client.GetApproveAllowance(ctx, aggregation.GetAllowanceParams{
-		TokenAddress:  PolygonDai,
+		TokenAddress:  PolygonWeth,
 		WalletAddress: client.Wallet.Address().Hex(),
 	})
 
@@ -56,7 +57,7 @@ func main() {
 
 	if cmp > 0 {
 		approveData, err := client.GetApproveTransaction(ctx, aggregation.GetApproveParams{
-			TokenAddress: PolygonDai,
+			TokenAddress: PolygonWeth,
 			Amount:       amountToSwap.String(),
 		})
 		if err != nil {
@@ -67,7 +68,7 @@ func main() {
 			log.Fatalf("Failed to decode approve data: %v\n", err)
 		}
 
-		to := common.HexToAddress(approveData.Data)
+		to := common.HexToAddress(approveData.To)
 
 		tx, err := client.TxBuilder.New().SetData(data).SetTo(&to).Build(ctx)
 		if err != nil {
@@ -83,6 +84,24 @@ func main() {
 		if err != nil {
 			log.Fatalf("Failed to broadcast approve transaction: %v\n", err)
 		}
-	}
 
+		// Waiting for transaction, just an example of it
+		fmt.Printf("Transaction has been broadcast. View it on Polygonscan here: %v\n", fmt.Sprintf("https://polygonscan.com/tx/%v", signedTx.Hash().Hex()))
+		for {
+			receipt, err := client.Wallet.TransactionReceipt(ctx, signedTx.Hash())
+			if receipt != nil {
+				fmt.Println("Transaction complete!")
+				return
+			}
+			if err != nil {
+				fmt.Println("Waiting for transaction to be mined")
+			}
+			select {
+			case <-time.After(1000 * time.Millisecond): // check again after a delay
+			case <-ctx.Done():
+				fmt.Println("Context cancelled")
+				return
+			}
+		}
+	}
 }

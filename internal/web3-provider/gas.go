@@ -6,6 +6,7 @@ import (
 	"math/big"
 
 	"github.com/1inch/1inch-sdk-go/constants"
+	"github.com/ethereum/go-ethereum"
 )
 
 func (w Wallet) GetGasTipCap(ctx context.Context) (*big.Int, error) {
@@ -17,6 +18,10 @@ func (w Wallet) GetGasTipCap(ctx context.Context) (*big.Int, error) {
 
 func (w Wallet) GetGasPrice(ctx context.Context) (*big.Int, error) {
 	return w.ethClient.SuggestGasPrice(ctx)
+}
+
+func (w Wallet) GetGasEstimate(ctx context.Context, msg ethereum.CallMsg) (uint64, error) {
+	return w.ethClient.EstimateGas(ctx, msg)
 }
 
 func (w Wallet) IsEIP1559Applicable() bool {

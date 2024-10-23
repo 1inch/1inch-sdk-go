@@ -27,7 +27,7 @@ var (
 )
 
 const (
-	PolygonFRAX = "0x45c32fa6df82ead1e2ef74d17b76547eddfaff89"
+	PolygonFrax = "0x45c32fa6df82ead1e2ef74d17b76547eddfaff89"
 	PolygonWeth = "0x7ceB23fD6bC0adD59E62ac25578270cFf1b9f619"
 )
 
@@ -48,10 +48,10 @@ func main() {
 	}
 	ctx := context.Background()
 
-	amountToSwap := big.NewInt(1e17)
+	amountToSwap := big.NewInt(1e16)
 
 	allowanceData, err := client.GetApproveAllowance(ctx, aggregation.GetAllowanceParams{
-		TokenAddress:  PolygonFRAX,
+		TokenAddress:  PolygonFrax,
 		WalletAddress: client.Wallet.Address().Hex(),
 	})
 	if err != nil {
@@ -73,7 +73,7 @@ func main() {
 		now := time.Now()
 		twoDaysLater := now.Add(time.Hour * 24 * 2)
 
-		permitData, err := client.Wallet.GetContractDetailsForPermit(ctx, common.HexToAddress(PolygonFRAX), common.HexToAddress(spender.Address), amountToSwap, twoDaysLater.Unix())
+		permitData, err := client.Wallet.GetContractDetailsForPermit(ctx, common.HexToAddress(PolygonFrax), common.HexToAddress(spender.Address), amountToSwap, twoDaysLater.Unix())
 		if err != nil {
 			log.Fatalf("Failed to get permit data: %v\n", err)
 		}
@@ -85,7 +85,7 @@ func main() {
 	}
 
 	swapParams := aggregation.GetSwapParams{
-		Src:      PolygonFRAX,
+		Src:      PolygonFrax,
 		Dst:      PolygonWeth,
 		Amount:   amountToSwap.String(),
 		From:     client.Wallet.Address().Hex(),

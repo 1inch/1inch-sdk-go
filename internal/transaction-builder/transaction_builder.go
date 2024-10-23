@@ -5,6 +5,7 @@ import (
 	"fmt"
 	"math/big"
 
+	"github.com/ethereum/go-ethereum"
 	gethCommon "github.com/ethereum/go-ethereum/common"
 	"github.com/ethereum/go-ethereum/core/types"
 
@@ -143,6 +144,20 @@ func (t *TransactionBuilder) BuildDynamicTx(ctx context.Context) (*types.Transac
 			return nil, err
 		}
 		t.gasFeeCap = gasPrice
+	}
+
+	if t.gas == nil {
+		gas, err := t.wallet.GetGasEstimate(ctx, ethereum.CallMsg{
+			From:     t.wallet.Address(),
+			To:       t.to,
+			Value:    t.value,
+			GasPrice: t.gasFeeCap,
+			Data:     t.data,
+		})
+		if err != nil {
+			return nil, err
+		}
+		t.gas = &gas
 	}
 
 	return types.NewTx(&types.DynamicFeeTx{

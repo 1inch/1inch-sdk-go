@@ -1,7 +1,7 @@
 {
   "openapi": "3.0.0",
   "paths": {
-    "/v5.2/1/quote": {
+    "/v6.0/1/quote": {
       "get": {
         "operationId": "getQuote",
         "summary": "Find the best quote to swap with 1inch Router",
@@ -12,8 +12,7 @@
             "in": "query",
             "example": "0xeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeee",
             "schema": {
-              "type": "string",
-              "x-go-type-skip-optional-pointer": true
+              "type": "string"
             }
           },
           {
@@ -22,8 +21,7 @@
             "in": "query",
             "example": "0x111111111117dc0aa78b770fa6a738034120c302",
             "schema": {
-              "type": "string",
-              "x-go-type-skip-optional-pointer": true
+              "type": "string"
             }
           },
           {
@@ -32,8 +30,7 @@
             "in": "query",
             "example": "10000000000000000",
             "schema": {
-              "type": "string",
-              "x-go-type-skip-optional-pointer": true
+              "type": "string"
             }
           },
           {
@@ -149,6 +146,16 @@
             "schema": {
               "minimum": 0,
               "maximum": 5,
+              "type": "string",
+              "x-go-type-skip-optional-pointer": true
+            }
+          },
+          {
+            "name": "excludedProtocols",
+            "required": false,
+            "in": "query",
+            "description": "excluded supported liquidity sources",
+            "schema": {
               "type": "string",
               "x-go-type-skip-optional-pointer": true
             }
@@ -181,7 +188,7 @@
         ]
       }
     },
-    "/v5.2/1/swap": {
+    "/v6.0/1/swap": {
       "get": {
         "operationId": "getSwap",
         "summary": "Generate calldata to swap on 1inch Router",
@@ -192,8 +199,7 @@
             "in": "query",
             "example": "0xeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeee",
             "schema": {
-              "type": "string",
-              "x-go-type-skip-optional-pointer": true
+              "type": "string"
             }
           },
           {
@@ -202,8 +208,7 @@
             "in": "query",
             "example": "0x111111111117dc0aa78b770fa6a738034120c302",
             "schema": {
-              "type": "string",
-              "x-go-type-skip-optional-pointer": true
+              "type": "string"
             }
           },
           {
@@ -212,8 +217,7 @@
             "in": "query",
             "example": "10000000000000000",
             "schema": {
-              "type": "string",
-              "x-go-type-skip-optional-pointer": true
+              "type": "string"
             }
           },
           {
@@ -222,8 +226,16 @@
             "in": "query",
             "description": "The address that calls the 1inch contract",
             "schema": {
-              "type": "string",
-              "x-go-type-skip-optional-pointer": true
+              "type": "string"
+            }
+          },
+          {
+            "name": "origin",
+            "required": true,
+            "in": "query",
+            "description": "An EOA address that initiate the transaction",
+            "schema": {
+              "type": "string"
             }
           },
           {
@@ -235,8 +247,7 @@
             "schema": {
               "minimum": 0,
               "maximum": 50,
-              "type": "number",
-              "x-go-type-skip-optional-pointer": true
+              "type": "number"
             }
           },
           {
@@ -352,6 +363,16 @@
             "schema": {
               "minimum": 0,
               "maximum": 5,
+              "type": "string",
+              "x-go-type-skip-optional-pointer": true
+            }
+          },
+          {
+            "name": "excludedProtocols",
+            "required": false,
+            "in": "query",
+            "description": "excluded supported liquidity sources",
+            "schema": {
               "type": "string",
               "x-go-type-skip-optional-pointer": true
             }
@@ -404,6 +425,16 @@
               "type": "boolean",
               "x-go-type-skip-optional-pointer": true
             }
+          },
+          {
+            "name": "usePermit2",
+            "required": false,
+            "in": "query",
+            "description": "Enable this flag in case you did an approval to permit2 smart contract",
+            "schema": {
+              "type": "boolean",
+              "x-go-type-skip-optional-pointer": true
+            }
           }
         ],
         "responses": {
@@ -433,7 +464,7 @@
         ]
       }
     },
-    "/v5.2/1/approve/spender": {
+    "/v6.0/1/approve/spender": {
       "get": {
         "operationId": "getSpender",
         "summary": "Address of the 1inch Router that is trusted to spend funds for the swap",
@@ -455,7 +486,7 @@
         ]
       }
     },
-    "/v5.2/1/approve/transaction": {
+    "/v6.0/1/approve/transaction": {
       "get": {
         "operationId": "getApprove",
         "summary": "Generate approve calldata to allow 1inch Router to perform a swap",
@@ -467,8 +498,7 @@
             "example": "0x111111111117dc0aa78b770fa6a738034120c302",
             "description": "Token address you want to swap",
             "schema": {
-              "type": "string",
-              "x-go-type-skip-optional-pointer": true
+              "type": "string"
             }
           },
           {
@@ -500,7 +530,7 @@
         ]
       }
     },
-    "/v5.2/1/approve/allowance": {
+    "/v6.0/1/approve/allowance": {
       "get": {
         "operationId": "getAllowance",
         "summary": "Get the number of tokens that the 1inch Router is allowed to swap",
@@ -512,8 +542,7 @@
             "example": "0x111111111117dc0aa78b770fa6a738034120c302",
             "description": "Token address you want to swap",
             "schema": {
-              "type": "string",
-              "x-go-type-skip-optional-pointer": true
+              "type": "string"
             }
           },
           {
@@ -522,8 +551,7 @@
             "in": "query",
             "description": "Wallet address for which you want to check",
             "schema": {
-              "type": "string",
-              "x-go-type-skip-optional-pointer": true
+              "type": "string"
             }
           }
         ],
@@ -544,7 +572,7 @@
         ]
       }
     },
-    "/v5.2/1/liquidity-sources": {
+    "/v6.0/1/liquidity-sources": {
       "get": {
         "operationId": "getLiquiditySources",
         "summary": "List of liquidity sources that are available for routing in the 1inch Aggregation Protocol",
@@ -566,7 +594,7 @@
         ]
       }
     },
-    "/v5.2/1/tokens": {
+    "/v6.0/1/tokens": {
       "get": {
         "operationId": "getTokens",
         "summary": "List of tokens that are available for swap in the 1inch Aggregation protocol",
@@ -577,7 +605,17 @@
             "content": {
               "application/json": {
                 "schema": {
-                  "$ref": "#/components/schemas/TokensResponse"
+                  "type": "object",
+                  "properties": {
+                    "tokens": {
+                      "type": "object",
+                      "properties": {
+                        "0x111111111117dc0aa78b770fa6a738034120c302": {
+                          "$ref": "#/components/schemas/TokenInfo"
+                        }
+                      }
+                    }
+                  }
                 }
               }
             }
@@ -592,28 +630,13 @@
   "info": {
     "title": "1inch Swap API",
     "description": "\n<h2>Ethereum Network</h2>\nUsing 1inch Swap API, you can find the best route to exchange assets and make the exchange.\n<br><br>\nStep by step:\n1. Lookup addresses of tokens you want to swap, for example ‘0xxx’ , ‘0xxxx’ for DAI -> 1INCH\n2. Check for allowance of 1inch router contract to spend source asset (/approve/allowance)\n3. If necessary, give approval for 1inch router to spend source token (/approve/transaction)\n4. Monitor the best exchange route using (/quote)\n5. When you ready use to perform swap (/swap)",
-    "version": "5.2",
+    "version": "6.0",
     "contact": {}
   },
   "tags": [],
   "servers": [],
   "components": {
     "schemas": {
-      "TokensResponse": {
-        "type": "object",
-        "properties": {
-          "tokens": {
-            "type": "object",
-            "additionalProperties": {
-              "$ref": "#/components/schemas/TokenInfo"
-            },
-            "x-go-type-skip-optional-pointer": true
-          }
-        },
-        "required": [
-          "tokens"
-        ]
-      },
       "TokenInfo": {
         "type": "object",
         "properties": {
@@ -678,15 +701,13 @@
       "QuoteResponse": {
         "type": "object",
         "properties": {
-          "fromToken": {
-            "$ref": "#/components/schemas/TokenInfo",
-            "x-go-type-skip-optional-pointer": true
+          "srcToken": {
+            "$ref": "#/components/schemas/TokenInfo"
           },
-          "toToken": {
-            "$ref": "#/components/schemas/TokenInfo",
-            "x-go-type-skip-optional-pointer": true
+          "dstToken": {
+            "$ref": "#/components/schemas/TokenInfo"
           },
-          "toAmount": {
+          "dstAmount": {
             "type": "string",
             "description": "Expected amount of destination token",
             "example": "62131879850006790961",
@@ -714,7 +735,7 @@
           }
         },
         "required": [
-          "toAmount"
+          "dstAmount"
         ]
       },
       "HttpExceptionMeta": {
@@ -828,15 +849,13 @@
       "SwapResponse": {
         "type": "object",
         "properties": {
-          "fromToken": {
-            "$ref": "#/components/schemas/TokenInfo",
-            "x-go-type-skip-optional-pointer": true
+          "srcToken": {
+            "$ref": "#/components/schemas/TokenInfo"
           },
-          "toToken": {
-            "$ref": "#/components/schemas/TokenInfo",
-            "x-go-type-skip-optional-pointer": true
+          "dstToken": {
+            "$ref": "#/components/schemas/TokenInfo"
           },
-          "toAmount": {
+          "dstAmount": {
             "type": "string",
             "description": "Expected amount of destination token",
             "example": "62131879850006790961",
@@ -857,12 +876,11 @@
             "x-go-type-skip-optional-pointer": true
           },
           "tx": {
-            "$ref": "#/components/schemas/TransactionData",
-            "x-go-type-skip-optional-pointer": true
+            "$ref": "#/components/schemas/TransactionData"
           }
         },
         "required": [
-          "toAmount",
+          "dstAmount",
           "tx"
         ]
       },

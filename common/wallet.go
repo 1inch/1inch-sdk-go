@@ -4,6 +4,7 @@ import (
 	"context"
 	"math/big"
 
+	"github.com/ethereum/go-ethereum"
 	gethCommon "github.com/ethereum/go-ethereum/common"
 	"github.com/ethereum/go-ethereum/core/types"
 )
@@ -17,6 +18,7 @@ type Wallet interface {
 
 	GetGasTipCap(ctx context.Context) (*big.Int, error)
 	GetGasPrice(ctx context.Context) (*big.Int, error)
+	GetGasEstimate(ctx context.Context, msg ethereum.CallMsg) (uint64, error)
 
 	Sign(tx *types.Transaction) (*types.Transaction, error)
 	SignBytes(data []byte) ([]byte, error)
