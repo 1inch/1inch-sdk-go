@@ -16,7 +16,7 @@ var (
 
 const (
 	PolygonDai  = "0x8f3Cf7ad23Cd3CaDbD9735AFf958023239c6A063"
-	PolygonWeth = "0x7ceB23fD6bC0adD59E62ac25578270cFf1b9f619"
+	PolygonUsdc = "0x3c499c542cEF5E3811e1192ce70d8cC03d5c3359"
 )
 
 func main() {
@@ -32,13 +32,13 @@ func main() {
 
 	quote, err := client.GetQuote(ctx, aggregation.GetQuoteParams{
 		Src:    PolygonDai,
-		Dst:    PolygonWeth,
-		Amount: "10000000000000000",
+		Dst:    PolygonUsdc,
+		Amount: "1000000000000000000",
 	})
 
 	if err != nil {
 		log.Fatalf("Failed to get quote: %v\n", err)
 	}
 
-	fmt.Printf("Quote Amount: %+v\n", quote.ToAmount)
+	fmt.Printf("Quote Amount: %+v\n", quote.DstAmount)
 }

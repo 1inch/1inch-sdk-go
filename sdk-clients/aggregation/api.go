@@ -7,9 +7,11 @@ import (
 	"github.com/1inch/1inch-sdk-go/common"
 )
 
+const apiVersion = "v6.0"
+
 // GetLiquiditySources returns all liquidity sources tracked by the 1inch Aggregation Protocol for a given chain
 func (api *api) GetLiquiditySources(ctx context.Context) (*ProtocolsResponse, error) {
-	u := fmt.Sprintf("/swap/v5.2/%d/liquidity-sources", api.chainId)
+	u := fmt.Sprintf("/swap/%s/%d/liquidity-sources", apiVersion, api.chainId)
 
 	payload := common.RequestPayload{
 		Method: "GET",
@@ -29,7 +31,7 @@ func (api *api) GetLiquiditySources(ctx context.Context) (*ProtocolsResponse, er
 
 // GetTokens returns all tokens officially tracked by the 1inch Aggregation Protocol for a given chain
 func (api *api) GetTokens(ctx context.Context) (*TokensResponse, error) {
-	u := fmt.Sprintf("/swap/v5.2/%d/tokens", api.chainId)
+	u := fmt.Sprintf("/swap/%s/%d/tokens", apiVersion, api.chainId)
 
 	payload := common.RequestPayload{
 		Method: "GET",
@@ -49,7 +51,7 @@ func (api *api) GetTokens(ctx context.Context) (*TokensResponse, error) {
 
 // GetApproveAllowance returns the allowance the 1inch router has to spend a token on behalf of a wallet
 func (api *api) GetApproveAllowance(ctx context.Context, params GetAllowanceParams) (*AllowanceResponse, error) {
-	u := fmt.Sprintf("/swap/v5.2/%d/approve/allowance", api.chainId)
+	u := fmt.Sprintf("/swap/%s/%d/approve/allowance", apiVersion, api.chainId)
 
 	err := params.Validate()
 	if err != nil {
@@ -74,7 +76,7 @@ func (api *api) GetApproveAllowance(ctx context.Context, params GetAllowancePara
 
 // GetApproveSpender returns the address of the 1inch router contract
 func (api *api) GetApproveSpender(ctx context.Context) (*SpenderResponse, error) {
-	u := fmt.Sprintf("/swap/v5.2/%d/approve/spender", api.chainId)
+	u := fmt.Sprintf("/swap/%s/%d/approve/spender", apiVersion, api.chainId)
 
 	payload := common.RequestPayload{
 		Method: "GET",
@@ -94,7 +96,7 @@ func (api *api) GetApproveSpender(ctx context.Context) (*SpenderResponse, error)
 
 // GetApproveTransaction returns the transaction data for approving the 1inch router to spend a token on behalf of a wallet
 func (api *api) GetApproveTransaction(ctx context.Context, params GetApproveParams) (*ApproveCallDataResponseExtended, error) {
-	u := fmt.Sprintf("/swap/v5.2/%d/approve/transaction", api.chainId)
+	u := fmt.Sprintf("/swap/%s/%d/approve/transaction", apiVersion, api.chainId)
 
 	err := params.Validate()
 	if err != nil {
@@ -118,7 +120,7 @@ func (api *api) GetApproveTransaction(ctx context.Context, params GetApprovePara
 
 // GetQuote returns the quote for a potential swap through the Aggregation Protocol
 func (api *api) GetQuote(ctx context.Context, params GetQuoteParams) (*QuoteResponse, error) {
-	u := fmt.Sprintf("/swap/v5.2/%d/quote", api.chainId)
+	u := fmt.Sprintf("/swap/%s/%d/quote", apiVersion, api.chainId)
 
 	err := params.Validate()
 	if err != nil {
@@ -142,7 +144,7 @@ func (api *api) GetQuote(ctx context.Context, params GetQuoteParams) (*QuoteResp
 
 // GetSwap returns a swap quote with transaction data that can be used to execute a swap through the Aggregation Protocol
 func (api *api) GetSwap(ctx context.Context, params GetSwapParams) (*SwapResponseExtended, error) {
-	u := fmt.Sprintf("/swap/v5.2/%d/swap", api.chainId)
+	u := fmt.Sprintf("/swap/%s/%d/swap", apiVersion, api.chainId)
 
 	err := params.Validate()
 	if err != nil {

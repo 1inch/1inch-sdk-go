@@ -7,6 +7,7 @@ import (
 	"reflect"
 	"testing"
 
+	"github.com/ethereum/go-ethereum"
 	gethCommon "github.com/ethereum/go-ethereum/common"
 	"github.com/ethereum/go-ethereum/core/types"
 	"github.com/stretchr/testify/assert"
@@ -141,6 +142,10 @@ func (w *MyWallet) GetGasPrice(ctx context.Context) (*big.Int, error) {
 	return big.NewInt(23), nil
 }
 
+func (w MyWallet) GetGasEstimate(ctx context.Context, msg ethereum.CallMsg) (uint64, error) {
+	return 123, nil
+}
+
 func (w *MyWallet) Sign(tx *types.Transaction) (*types.Transaction, error) {
 	return tx, nil
 }
@@ -205,7 +210,7 @@ func (m *mockHttpExecutor) ExecuteRequest(ctx context.Context, payload common.Re
 }
 
 var mockedSwapHttpApiResp = SwapResponse{
-	FromToken: &TokenInfo{
+	SrcToken: &TokenInfo{
 		Address:  "0x5a98fcbea516cf06857215779fd812ca3bef1b32",
 		Symbol:   "LDO",
 		Name:     "Lido DAO Token",
@@ -215,8 +220,8 @@ var mockedSwapHttpApiResp = SwapResponse{
 			"tokens",
 		},
 	},
-	ToAmount: "6",
-	ToToken: &TokenInfo{
+	DstAmount: "6",
+	DstToken: &TokenInfo{
 		Address:  "0xc02aaa39b223fe8d0a0e5c4f27ead9083c756cc2",
 		Symbol:   "WETH",
 		Name:     "Wrapped Ether",

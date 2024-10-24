@@ -23,6 +23,9 @@ var (
 	devPortalToken = os.Getenv("DEV_PORTAL_TOKEN")
 )
 
+const PolygonPol = "0xEeeeeEeeeEeEeeEeEeEeeEEEeeeeEeeeeeeeEEeE"
+const PolygonUsdc = "0x3c499c542cEF5E3811e1192ce70d8cC03d5c3359"
+
 func main() {
 	config, err := aggregation.NewConfiguration(aggregation.ConfigurationParams{
 		NodeUrl:    nodeUrl,
@@ -41,9 +44,9 @@ func main() {
 	ctx := context.Background()
 
 	swapData, err := client.GetSwap(ctx, aggregation.GetSwapParams{
-		Src:      "0x3c499c542cEF5E3811e1192ce70d8cC03d5c3359",
-		Dst:      "0x0d500B1d8E8eF31E21C99d1Db9A6444d3ADf1270",
-		Amount:   "1000",
+		Src:      PolygonPol,
+		Dst:      PolygonUsdc,
+		Amount:   "1000000000000000000",
 		From:     client.Wallet.Address().Hex(),
 		Slippage: 1,
 	})

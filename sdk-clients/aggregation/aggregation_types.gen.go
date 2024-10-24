@@ -86,17 +86,16 @@ type QuoteRequestErrorStatusCode float32
 
 // QuoteResponse defines model for QuoteResponse.
 type QuoteResponse struct {
-	FromToken *TokenInfo `json:"fromToken,omitempty"`
+	// DstAmount Expected amount of destination token
+	DstAmount string     `json:"dstAmount"`
+	DstToken  *TokenInfo `json:"dstToken,omitempty"`
 
 	// Gas Estimated gas
 	Gas float32 `json:"gas,omitempty"`
 
 	// Protocols Selected protocols in a path
 	Protocols [][][]SelectedProtocol `json:"protocols,omitempty"`
-
-	// ToAmount Expected amount of destination token
-	ToAmount string     `json:"toAmount"`
-	ToToken  *TokenInfo `json:"toToken,omitempty"`
+	SrcToken  *TokenInfo             `json:"srcToken,omitempty"`
 }
 
 // SelectedProtocol defines model for SelectedProtocol.
@@ -143,15 +142,14 @@ type SwapRequestErrorStatusCode float32
 
 // SwapResponse defines model for SwapResponse.
 type SwapResponse struct {
-	FromToken *TokenInfo `json:"fromToken,omitempty"`
+	// DstAmount Expected amount of destination token
+	DstAmount string     `json:"dstAmount"`
+	DstToken  *TokenInfo `json:"dstToken,omitempty"`
 
 	// Protocols Selected protocols in a path
 	Protocols [][][]SelectedProtocol `json:"protocols,omitempty"`
-
-	// ToAmount Expected amount of destination token
-	ToAmount string          `json:"toAmount"`
-	ToToken  *TokenInfo      `json:"toToken,omitempty"`
-	Tx       TransactionData `json:"tx"`
+	SrcToken  *TokenInfo             `json:"srcToken,omitempty"`
+	Tx        TransactionData        `json:"tx"`
 }
 
 // TokenInfo defines model for TokenInfo.
@@ -165,11 +163,6 @@ type TokenInfo struct {
 	Name          string   `json:"name"`
 	Symbol        string   `json:"symbol"`
 	Tags          []string `json:"tags,omitempty"`
-}
-
-// TokensResponse defines model for TokensResponse.
-type TokensResponse struct {
-	Tokens map[string]TokenInfo `json:"tokens"`
 }
 
 // TransactionData defines model for TransactionData.
@@ -228,6 +221,9 @@ type GetQuoteParams struct {
 	// IncludeGas Return approximated gas in response
 	IncludeGas      bool   `url:"includeGas,omitempty" json:"includeGas,omitempty"`
 	ConnectorTokens string `url:"connectorTokens,omitempty" json:"connectorTokens,omitempty"`
+
+	// ExcludedProtocols excluded supported liquidity sources
+	ExcludedProtocols string `url:"excludedProtocols,omitempty" json:"excludedProtocols,omitempty"`
 }
 
 // GetSwapParams defines parameters for GetSwap.
@@ -238,6 +234,9 @@ type GetSwapParams struct {
 
 	// From The address that calls the 1inch contract
 	From string `url:"from" json:"from"`
+
+	// Origin An EOA address that initiate the transaction
+	Origin string `url:"origin" json:"origin"`
 
 	// Slippage min: 0; max: 50
 	Slippage float32 `url:"slippage" json:"slippage"`
@@ -265,6 +264,9 @@ type GetSwapParams struct {
 	IncludeGas      bool   `url:"includeGas,omitempty" json:"includeGas,omitempty"`
 	ConnectorTokens string `url:"connectorTokens,omitempty" json:"connectorTokens,omitempty"`
 
+	// ExcludedProtocols excluded supported liquidity sources
+	ExcludedProtocols string `url:"excludedProtocols,omitempty" json:"excludedProtocols,omitempty"`
+
 	// Permit https://eips.ethereum.org/EIPS/eip-2612
 	Permit string `url:"permit,omitempty" json:"permit,omitempty"`
 
@@ -277,4 +279,7 @@ type GetSwapParams struct {
 
 	// DisableEstimate Enable this flag to disable onchain simulation
 	DisableEstimate bool `url:"disableEstimate,omitempty" json:"disableEstimate,omitempty"`
+
+	// UsePermit2 Enable this flag in case you did an approval to permit2 smart contract
+	UsePermit2 bool `url:"usePermit2,omitempty" json:"usePermit2,omitempty"`
 }
