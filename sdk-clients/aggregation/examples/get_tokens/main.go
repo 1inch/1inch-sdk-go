@@ -14,7 +14,6 @@ var (
 	devPortalToken = os.Getenv("DEV_PORTAL_TOKEN")
 )
 
-// nodeUrl, privateKey, constants.EthereumChainId, "https://api.1inch.dev", devPortalToken
 func main() {
 	config, err := aggregation.NewConfigurationAPI(
 		constants.PolygonChainId,

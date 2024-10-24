@@ -16,7 +16,6 @@ var (
 
 const PolygonWeth = "0x7ceB23fD6bC0adD59E62ac25578270cFf1b9f619"
 
-// nodeUrl, privateKey, constants.EthereumChainId, "https://api.1inch.dev", devPortalToken
 func main() {
 	config, err := aggregation.NewConfigurationAPI(
 		constants.PolygonChainId,

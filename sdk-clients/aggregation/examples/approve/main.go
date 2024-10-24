@@ -25,7 +25,6 @@ const (
 	PolygonWeth = "0x7ceB23fD6bC0adD59E62ac25578270cFf1b9f619"
 )
 
-// nodeUrl, privateKey, constants.EthereumChainId, "https://api.1inch.dev", devPortalToken
 func main() {
 	config, err := aggregation.NewConfiguration(aggregation.ConfigurationParams{
 		NodeUrl:    nodeUrl,
@@ -85,7 +84,6 @@ func main() {
 			log.Fatalf("Failed to broadcast approve transaction: %v\n", err)
 		}
 
-		// Waiting for transaction, just an example of it
 		fmt.Printf("Transaction has been broadcast. View it on Polygonscan here: %v\n", fmt.Sprintf("https://polygonscan.com/tx/%v", signedTx.Hash().Hex()))
 		for {
 			receipt, err := client.Wallet.TransactionReceipt(ctx, signedTx.Hash())
