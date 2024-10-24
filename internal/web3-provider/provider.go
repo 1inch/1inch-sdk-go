@@ -36,7 +36,7 @@ func DefaultWalletProvider(pk string, nodeURL string, chainId uint64) (*Wallet, 
 	}
 	privateKey, err := crypto.HexToECDSA(pk)
 	if err != nil {
-		return nil, err
+		return nil, fmt.Errorf("failed to initialize private key: %v", err)
 	}
 	ethClient, err := ethclient.Dial(nodeURL)
 	if err != nil {
