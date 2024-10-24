@@ -72,7 +72,7 @@ func (c *Client) prepareRequest(ctx context.Context, method string, fullURL *url
 		return nil, err
 	}
 
-	req.Header.Set("User-Agent", "1inch-dev-portal-client-go:beta.2")
+	req.Header.Set("User-Agent", "1inch-dev-portal-client-go:v1.0.0-beta.2")
 	req.Header.Set("Authorization", fmt.Sprintf("Bearer %s", c.apiKey))
 	if len(body) > 0 {
 		req.Header.Set("Content-Type", "application/json")
