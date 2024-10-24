@@ -5,6 +5,7 @@ import (
 	"math/big"
 	"testing"
 
+	"github.com/ethereum/go-ethereum"
 	gethCommon "github.com/ethereum/go-ethereum/common"
 	"github.com/ethereum/go-ethereum/core/types"
 	"github.com/stretchr/testify/require"
@@ -192,6 +193,10 @@ func (w *MyWallet) GetGasTipCap(ctx context.Context) (*big.Int, error) {
 
 func (w *MyWallet) GetGasPrice(ctx context.Context) (*big.Int, error) {
 	return big.NewInt(23), nil
+}
+
+func (w MyWallet) GetGasEstimate(ctx context.Context, msg ethereum.CallMsg) (uint64, error) {
+	return 123, nil
 }
 
 func (w *MyWallet) Sign(tx *types.Transaction) (*types.Transaction, error) {

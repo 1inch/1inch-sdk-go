@@ -40,7 +40,7 @@ func TestGetQuote(t *testing.T) {
 	ctx := context.Background()
 
 	mockedResp := QuoteResponse{
-		FromToken: &TokenInfo{
+		SrcToken: &TokenInfo{
 			Address:  "0x6b175474e89094c44da98b954eedeac495271d0f",
 			Symbol:   "DAI",
 			Name:     "Dai Stablecoin",
@@ -51,9 +51,9 @@ func TestGetQuote(t *testing.T) {
 				"tokens",
 			},
 		},
-		Gas:      181416,
-		ToAmount: "289424403260095",
-		ToToken: &TokenInfo{
+		Gas:       181416,
+		DstAmount: "289424403260095",
+		DstToken: &TokenInfo{
 			Address:  "0xc02aaa39b223fe8d0a0e5c4f27ead9083c756cc2",
 			Symbol:   "WETH",
 			Name:     "Wrapped Ether",
@@ -109,7 +109,7 @@ func TestGetSwap(t *testing.T) {
 	ctx := context.Background()
 
 	mockedResp := SwapResponse{
-		FromToken: &TokenInfo{
+		SrcToken: &TokenInfo{
 			Address:  "0x5a98fcbea516cf06857215779fd812ca3bef1b32",
 			Symbol:   "LDO",
 			Name:     "Lido DAO Token",
@@ -119,8 +119,8 @@ func TestGetSwap(t *testing.T) {
 				"tokens",
 			},
 		},
-		ToAmount: "6",
-		ToToken: &TokenInfo{
+		DstAmount: "6",
+		DstToken: &TokenInfo{
 			Address:  "0xc02aaa39b223fe8d0a0e5c4f27ead9083c756cc2",
 			Symbol:   "WETH",
 			Name:     "Wrapped Ether",
