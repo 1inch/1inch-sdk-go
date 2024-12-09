@@ -61,8 +61,8 @@ func TestCreateFusionOrderData(t *testing.T) {
 			resolverStartTime:           1718671883,
 			baseSaltValue:               "35020243109857195061155306569",
 			serializedQuoteData:         `{"feeToken":"0x3c499c542cef5e3811e1192ce70d8cc03d5c3359","fromTokenAmount":"1000000000000000000","presets":{"fast":{"allowMultipleFills":false,"allowPartialFills":false,"auctionDuration":180,"auctionEndAmount":"538946","auctionStartAmount":"557310","bankFee":"0","estP":100,"exclusiveResolver":null,"gasCost":{"gasBumpEstimate":0,"gasPriceEstimate":"0"},"initialRateBump":340757,"points":[],"startAuctionIn":17,"tokenFee":"18366"},"medium":{"allowMultipleFills":true,"allowPartialFills":true,"auctionDuration":360,"auctionEndAmount":"538946","auctionStartAmount":"576251","bankFee":"0","estP":100,"exclusiveResolver":null,"gasCost":{"gasBumpEstimate":0,"gasPriceEstimate":"0"},"initialRateBump":692202,"points":[{"coefficient":681533,"delay":6},{"coefficient":340757,"delay":6}],"startAuctionIn":17,"tokenFee":"18366"},"slow":{"allowMultipleFills":true,"allowPartialFills":true,"auctionDuration":600,"auctionEndAmount":"538946","auctionStartAmount":"581432","bankFee":"0","estP":100,"exclusiveResolver":null,"gasCost":{"gasBumpEstimate":0,"gasPriceEstimate":"0"},"initialRateBump":788335,"points":[{"coefficient":681533,"delay":81},{"coefficient":340757,"delay":6}],"startAuctionIn":17,"tokenFee":"18366"}},"prices":{"usd":{"fromToken":"0.57493897","toToken":"0.9995015368854032"}},"quoteId":"55c3f478-b176-448c-b968-656c19b9c04a","recommended_preset":"fast","settlementAddress":"0xfb2809a5314473e1165f6b58018e20ed8f07b840","suggested":true,"toTokenAmount":"575677","volume":{"usd":{"fromToken":"0.57493897","toToken":"0.57539"}},"whitelist":["0x46fd018b32a9315ef5b4c0866635457d36ab318d","0xc1b19a08c2798c6930b8f3a44b7b0d08f4e198b8","0x0000000000000000000000000000000000000000","0xad3b67bca8935cb510c8d18bd45f0b94f54a968f","0x0000000000000000000000000000000000000000","0x0000000000000000000000000000000000000000","0x62f861201db5fdc04c48c976bf098c4dba0a061d","0x0000000000000000000000000000000000000000"]}`,
-			serializedPreparedOrderData: `{"order":{"FusionExtension":{"MakerAssetSuffix":"","TakerAssetSuffix":"","MakingAmountData":"0xfb2809A5314473E1165f6B58018E20ed8F07B840000000000000006670da1c0000b4053315","TakingAmountData":"0xfb2809A5314473E1165f6B58018E20ed8F07B840000000000000006670da1c0000b4053315","Predicate":"","MakerPermit":"","PreInteraction":"","PostInteraction":"0xfb2809A5314473E1165f6B58018E20ed8F07B8406670da0bc0866635457d36ab318d0000f3a44b7b0d08f4e198b80000000000000000000000000000d18bd45f0b94f54a968f0000000000000000000000000000000000000000000000000000c976bf098c4dba0a061d000000000000000000000000000040","CustomData":""},"Inner":{"makerAsset":"0x0d500B1d8E8eF31E21C99d1Db9A6444d3ADf1270","takerAsset":"0x3c499c542cEF5E3811e1192ce70d8cC03d5c3359","makingAmount":"1000000000000000000","takingAmount":"538946","salt":"712810ef08aca692b6d59c49fc131590b1edc52d382c2a9684cae76e49ca45bf","maker":"0x737baD27cF1374AE2af29C49Bb6D6007D5CD67EE","allowedSender":"","receiver":"0x0000000000000000000000000000000000000000","makerTraits":"0x8a0000000000000000000000ce8fbbcac9006670dad000000000000000000000","extension":"357969f7ed9a797c95a9da11fc131590b1edc52d382c2a9684cae76e49ca45bf"},"SettlementExtension":"0xfb2809a5314473e1165f6b58018e20ed8f07b840","OrderInfo":{"maker":"0x737baD27cF1374AE2af29C49Bb6D6007D5CD67EE","makerAsset":"0x0d500B1d8E8eF31E21C99d1Db9A6444d3ADf1270","makerTraits":"","makingAmount":"1000000000000000000","receiver":"0x0000000000000000000000000000000000000000","salt":"","takerAsset":"0x3c499c542cEF5E3811e1192ce70d8cC03d5c3359","takingAmount":"538946"},"AuctionDetails":{"startTime":1718671900,"duration":180,"initialRateBump":340757,"points":[],"gasCost":{"gasBumpEstimate":0,"gasPriceEstimate":0}},"PostInteractionData":{"Whitelist":[{"AddressHalf":"c0866635457d36ab318d","Delay":0},{"AddressHalf":"f3a44b7b0d08f4e198b8","Delay":0},{"AddressHalf":"00000000000000000000","Delay":0},{"AddressHalf":"d18bd45f0b94f54a968f","Delay":0},{"AddressHalf":"00000000000000000000","Delay":0},{"AddressHalf":"00000000000000000000","Delay":0},{"AddressHalf":"c976bf098c4dba0a061d","Delay":0},{"AddressHalf":"00000000000000000000","Delay":0}],"IntegratorFee":{"Ratio":0,"Receiver":"0x0000000000000000000000000000000000000000"},"BankFee":0,"ResolvingStartTime":1718671883,"CustomReceiver":"0x0000000000000000000000000000000000000000"},"Extra":{"UnwrapWETH":false,"Nonce":887174712009,"Permit":"","AllowPartialFills":false,"AllowMultipleFills":false,"OrderExpirationDelay":0,"EnablePermit2":false,"Source":""}},"hash":"0xe635531055466f92fdf64222d3e6d5ff18cda08c1a87b28c6853095d50699574","quoteId":"55c3f478-b176-448c-b968-656c19b9c04a"}`,
-			serializedLimitOrderData:    `{"orderHash":"0xe635531055466f92fdf64222d3e6d5ff18cda08c1a87b28c6853095d50699574","signature":"0xa1cb6463f2e9126fe24e5b8f1f0bb3762ed588fc0e8c7186cfa81f19806127cd21a37b8c9ee812429a2449f926736d32b1e2108f7aae8f5e96802a2d35e242781b","data":{"makerAsset":"0x0d500B1d8E8eF31E21C99d1Db9A6444d3ADf1270","takerAsset":"0x3c499c542cEF5E3811e1192ce70d8cC03d5c3359","makingAmount":"1000000000000000000","takingAmount":"538946","salt":"0x9a042bfb67cf14b0a1a98c4ae5d6295e2c08820","maker":"0x737baD27cF1374AE2af29C49Bb6D6007D5CD67EE","allowedSender":"0x0000000000000000000000000000000000000000","receiver":"0x0000000000000000000000000000000000000000","makerTraits":"0x8a0000000000000000000000ce8fbbcac9006670dad000000000000000000000","extension":"0x000000c30000004a0000004a0000004a0000004a000000250000000000000000fb2809A5314473E1165f6B58018E20ed8F07B840000000000000006670da1c0000b4053315fb2809A5314473E1165f6B58018E20ed8F07B840000000000000006670da1c0000b4053315fb2809A5314473E1165f6B58018E20ed8F07B8406670da0bc0866635457d36ab318d0000f3a44b7b0d08f4e198b80000000000000000000000000000d18bd45f0b94f54a968f0000000000000000000000000000000000000000000000000000c976bf098c4dba0a061d000000000000000000000000000040"}}`,
+			serializedPreparedOrderData: `{"order":{"FusionExtension":{"MakerAssetSuffix":"","TakerAssetSuffix":"","MakingAmountData":"0xfb2809A5314473E1165f6B58018E20ed8F07B840000000000000006670da1c0000b4053315","TakingAmountData":"0xfb2809A5314473E1165f6B58018E20ed8F07B840000000000000006670da1c0000b4053315","Predicate":"","MakerPermit":"","PreInteraction":"","PostInteraction":"0xfb2809A5314473E1165f6B58018E20ed8F07B8406670da0bc0866635457d36ab318d0000f3a44b7b0d08f4e198b80000000000000000000000000000d18bd45f0b94f54a968f0000000000000000000000000000000000000000000000000000c976bf098c4dba0a061d000000000000000000000000000040","CustomData":""},"Inner":{"makerAsset":"0x0d500B1d8E8eF31E21C99d1Db9A6444d3ADf1270","takerAsset":"0x3c499c542cEF5E3811e1192ce70d8cC03d5c3359","makingAmount":"1000000000000000000","takingAmount":"538946","salt":"712810ef08aca692b6d59c49fc131590b1edc52d382c2a9684cae76e49ca45bf","maker":"0x737baD27cF1374AE2af29C49Bb6D6007D5CD67EE","allowedSender":"","receiver":"0x0000000000000000000000000000000000000000","MakerTraits":"0x8a0000000000000000000000ce8fbbcac9006670dad000000000000000000000","Extension":"357969f7ed9a797c95a9da11fc131590b1edc52d382c2a9684cae76e49ca45bf"},"SettlementExtension":"0xfb2809a5314473e1165f6b58018e20ed8f07b840","OrderInfo":{"maker":"0x737baD27cF1374AE2af29C49Bb6D6007D5CD67EE","makerAsset":"0x0d500B1d8E8eF31E21C99d1Db9A6444d3ADf1270","MakerTraits":"","makingAmount":"1000000000000000000","receiver":"0x0000000000000000000000000000000000000000","salt":"","takerAsset":"0x3c499c542cEF5E3811e1192ce70d8cC03d5c3359","takingAmount":"538946"},"AuctionDetails":{"startTime":1718671900,"duration":180,"initialRateBump":340757,"points":[],"gasCost":{"gasBumpEstimate":0,"gasPriceEstimate":0}},"PostInteractionData":{"Whitelist":[{"AddressHalf":"c0866635457d36ab318d","Delay":0},{"AddressHalf":"f3a44b7b0d08f4e198b8","Delay":0},{"AddressHalf":"00000000000000000000","Delay":0},{"AddressHalf":"d18bd45f0b94f54a968f","Delay":0},{"AddressHalf":"00000000000000000000","Delay":0},{"AddressHalf":"00000000000000000000","Delay":0},{"AddressHalf":"c976bf098c4dba0a061d","Delay":0},{"AddressHalf":"00000000000000000000","Delay":0}],"IntegratorFee":{"Ratio":0,"Receiver":"0x0000000000000000000000000000000000000000"},"BankFee":0,"ResolvingStartTime":1718671883,"CustomReceiver":"0x0000000000000000000000000000000000000000"},"Extra":{"UnwrapWETH":false,"Nonce":887174712009,"Permit":"","AllowPartialFills":false,"AllowMultipleFills":false,"OrderExpirationDelay":0,"EnablePermit2":false,"Source":""}},"hash":"0xe635531055466f92fdf64222d3e6d5ff18cda08c1a87b28c6853095d50699574","quoteId":"55c3f478-b176-448c-b968-656c19b9c04a"}`,
+			serializedLimitOrderData:    `{"orderHash":"0xe635531055466f92fdf64222d3e6d5ff18cda08c1a87b28c6853095d50699574","signature":"0xa1cb6463f2e9126fe24e5b8f1f0bb3762ed588fc0e8c7186cfa81f19806127cd21a37b8c9ee812429a2449f926736d32b1e2108f7aae8f5e96802a2d35e242781b","data":{"makerAsset":"0x0d500B1d8E8eF31E21C99d1Db9A6444d3ADf1270","takerAsset":"0x3c499c542cEF5E3811e1192ce70d8cC03d5c3359","makingAmount":"1000000000000000000","takingAmount":"538946","salt":"0x9a042bfb67cf14b0a1a98c4ae5d6295e2c08820","maker":"0x737baD27cF1374AE2af29C49Bb6D6007D5CD67EE","allowedSender":"0x0000000000000000000000000000000000000000","receiver":"0x0000000000000000000000000000000000000000","MakerTraits":"0x8a0000000000000000000000ce8fbbcac9006670dad000000000000000000000","Extension":"0x000000c30000004a0000004a0000004a0000004a000000250000000000000000fb2809a5314473e1165f6b58018e20ed8f07b840000000000000006670da1c0000b4053315fb2809a5314473e1165f6b58018e20ed8f07b840000000000000006670da1c0000b4053315fb2809a5314473e1165f6b58018e20ed8f07b8406670da0bc0866635457d36ab318d0000f3a44b7b0d08f4e198b80000000000000000000000000000d18bd45f0b94f54a968f0000000000000000000000000000000000000000000000000000c976bf098c4dba0a061d000000000000000000000000000040"}}`,
 		},
 	}
 
@@ -695,107 +695,6 @@ func TestCreateSettlementPostInteractionData(t *testing.T) {
 	}
 }
 
-func TestCreateExtension(t *testing.T) {
-	tests := []struct {
-		name      string
-		params    CreateExtensionParams
-		expected  *Extension
-		expectErr bool
-	}{
-		{
-			name: "Valid Parameters with Permit",
-			params: CreateExtensionParams{
-				settlementAddress: "0x0000000000000000000000000000000000000001",
-				postInteractionData: &SettlementPostInteractionData{
-					Whitelist: []WhitelistItem{
-						{
-							AddressHalf: "abcdef",
-							Delay:       big.NewInt(1000),
-						},
-					},
-					IntegratorFee: &IntegratorFee{
-						Ratio:    big.NewInt(100),
-						Receiver: common.HexToAddress("0x0000000000000000000000000000000000000002"),
-					},
-					BankFee:            big.NewInt(200),
-					ResolvingStartTime: big.NewInt(1622548800),
-					CustomReceiver:     common.HexToAddress("0x0000000000000000000000000000000000000003"),
-				},
-				orderInfo: FusionOrderV4{
-					MakerAsset: "0x0000000000000000000000000000000000000004",
-					Receiver:   "0x0000000000000000000000000000000000000005",
-				},
-				details: Details{
-					Auction: &AuctionDetails{
-						StartTime: 1000,
-						Duration:  2000,
-					},
-				},
-				extraParams: ExtraParams{
-					Permit: "0xabcdef",
-				},
-			},
-			expected: &Extension{
-				MakingAmountData: "0x0000000000000000000000000000000000000001" + "00000000000000000003e80007d0000000",
-				TakingAmountData: "0x0000000000000000000000000000000000000001" + "00000000000000000003e80007d0000000",
-				PostInteraction:  "0x0000000000000000000000000000000000000001000000c800640000000000000000000000000000000000000002000000000000000000000000000000000000000360b62140abcdef03e80f",
-				MakerPermit:      "0x0000000000000000000000000000000000000004abcdef",
-			},
-			expectErr: false,
-		},
-		{
-			name: "Valid Parameters without Permit",
-			params: CreateExtensionParams{
-				settlementAddress: "0x0000000000000000000000000000000000000001",
-				postInteractionData: &SettlementPostInteractionData{
-					Whitelist: []WhitelistItem{
-						{
-							AddressHalf: "abcdef",
-							Delay:       big.NewInt(1000),
-						},
-					},
-					IntegratorFee: &IntegratorFee{
-						Ratio:    big.NewInt(100),
-						Receiver: common.HexToAddress("0x0000000000000000000000000000000000000002"),
-					},
-					BankFee:            big.NewInt(200),
-					ResolvingStartTime: big.NewInt(1622548800),
-					CustomReceiver:     common.HexToAddress("0x0000000000000000000000000000000000000003"),
-				},
-				orderInfo: FusionOrderV4{
-					MakerAsset: "0x0000000000000000000000000000000000000004",
-					Receiver:   "0x0000000000000000000000000000000000000005",
-				},
-				details: Details{
-					Auction: &AuctionDetails{
-						StartTime: 1000,
-						Duration:  2000,
-					},
-				},
-				extraParams: ExtraParams{},
-			},
-			expected: &Extension{
-				MakingAmountData: "0x0000000000000000000000000000000000000001" + "00000000000000000003e80007d0000000",
-				TakingAmountData: "0x0000000000000000000000000000000000000001" + "00000000000000000003e80007d0000000",
-				PostInteraction:  "0x0000000000000000000000000000000000000001000000c800640000000000000000000000000000000000000002000000000000000000000000000000000000000360b62140abcdef03e80f",
-			},
-			expectErr: false,
-		},
-	}
-
-	for _, tc := range tests {
-		t.Run(tc.name, func(t *testing.T) {
-			result, err := CreateExtension(tc.params)
-			if tc.expectErr {
-				require.Error(t, err)
-			} else {
-				require.NoError(t, err)
-				assert.Equal(t, tc.expected, result)
-			}
-		})
-	}
-}
-
 func TestCreateOrder(t *testing.T) {
 	tests := []struct {
 		name       string
@@ -808,15 +707,15 @@ func TestCreateOrder(t *testing.T) {
 			name:       "Valid Order with Integrator Fee",
 			staticSalt: "180431658011416401710119735245975317914670388782711199",
 			params: CreateOrderDataParams{
-				settlementAddress: "0x0000000000000000000000000000000000000001",
-				postInteractionData: &SettlementPostInteractionData{
+				SettlementAddress: "0x0000000000000000000000000000000000000001",
+				PostInteractionData: &SettlementPostInteractionData{
 					IntegratorFee: &IntegratorFee{
 						Ratio:    big.NewInt(100),
 						Receiver: common.HexToAddress("0x0000000000000000000000000000000000000002"),
 					},
 					BankFee: big.NewInt(200),
 				},
-				extension: &Extension{
+				Extension: &Extension{
 					MakerAssetSuffix: "suffix1",
 					TakerAssetSuffix: "suffix2",
 					MakingAmountData: "data1",
@@ -835,16 +734,16 @@ func TestCreateOrder(t *testing.T) {
 					TakingAmount: "2000",
 					Receiver:     "0x0000000000000000000000000000000000000006",
 				},
-				details: Details{
+				Details: Details{
 					Auction: &AuctionDetails{
 						StartTime: 1000,
 						Duration:  2000,
 					},
 				},
-				extraParams: ExtraParams{
+				ExtraParams: ExtraParams{
 					Nonce: big.NewInt(1),
 				},
-				makerTraits: &orderbook.MakerTraits{
+				MakerTraits: &orderbook.MakerTraits{
 					AllowedSender:      "0x0000000000000000000000000000000000000007",
 					Expiry:             5000,
 					Nonce:              1,
@@ -912,15 +811,15 @@ func TestCreateOrder(t *testing.T) {
 			name:       "Valid Order without Integrator Fee",
 			staticSalt: "180431658011416401710119735245975317914670388782711199",
 			params: CreateOrderDataParams{
-				settlementAddress: "0x0000000000000000000000000000000000000001",
-				postInteractionData: &SettlementPostInteractionData{
+				SettlementAddress: "0x0000000000000000000000000000000000000001",
+				PostInteractionData: &SettlementPostInteractionData{
 					IntegratorFee: &IntegratorFee{
 						Ratio:    big.NewInt(0),
 						Receiver: common.HexToAddress("0x0000000000000000000000000000000000000002"),
 					},
 					BankFee: big.NewInt(200),
 				},
-				extension: &Extension{
+				Extension: &Extension{
 					MakerAssetSuffix: "suffix1",
 					TakerAssetSuffix: "suffix2",
 					MakingAmountData: "data1",
@@ -939,16 +838,16 @@ func TestCreateOrder(t *testing.T) {
 					TakingAmount: "2000",
 					Receiver:     "0x0000000000000000000000000000000000000006",
 				},
-				details: Details{
+				Details: Details{
 					Auction: &AuctionDetails{
 						StartTime: 1000,
 						Duration:  2000,
 					},
 				},
-				extraParams: ExtraParams{
+				ExtraParams: ExtraParams{
 					Nonce: big.NewInt(1),
 				},
-				makerTraits: &orderbook.MakerTraits{
+				MakerTraits: &orderbook.MakerTraits{
 					AllowedSender:      "0x0000000000000000000000000000000000000007",
 					Expiry:             5000,
 					Nonce:              1,

@@ -83,7 +83,7 @@ func main() {
 		log.Fatal(fmt.Errorf("Failed to get permit: %v\n", err))
 	}
 
-	extension, err := orderbook.NewExtension(orderbook.ExtensionParams{
+	extension, err := orderbook.NewExtensionPure(orderbook.ExtensionParams{
 		MakerAsset: PolygonFRAX,
 		Permit:     permit,
 	})
@@ -111,7 +111,7 @@ func main() {
 		Wallet:                         client.Wallet,
 		SeriesNonce:                    seriesNonce,
 		MakerTraits:                    makerTraits,
-		Extension:                      extension,
+		Extension:                      *extension,
 		ExpireAfterUnix:                expireAfter,
 		Maker:                          publicAddress.Hex(),
 		MakerAsset:                     PolygonFRAX,

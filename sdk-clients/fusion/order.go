@@ -106,25 +106,25 @@ func CreateFusionOrderData(quote GetQuoteOutputFixed, orderParams OrderParams, w
 		return nil, nil, fmt.Errorf("error creating post interaction data: %v", err)
 	}
 
-	extension, err := CreateExtension(CreateExtensionParams{
-		settlementAddress:   quote.SettlementAddress,
-		postInteractionData: postInteractionData,
-		orderInfo:           orderInfo,
-		details:             details,
-		extraParams:         extraParams,
+	extension, err := NewExtension(ExtensionParams{
+		SettlementContract:  quote.SettlementAddress,
+		AuctionDetails:      auctionDetails,
+		PostInteractionData: postInteractionData,
+		Asset:               orderInfo.MakerAsset,
+		Permit:              extraParams.Permit,
 	})
 	if err != nil {
 		return nil, nil, fmt.Errorf("error creating extension: %v", err)
 	}
 
 	fusionOrder, err := CreateOrder(CreateOrderDataParams{
-		settlementAddress:   quote.SettlementAddress,
-		postInteractionData: postInteractionData,
-		extension:           extension,
+		SettlementAddress:   quote.SettlementAddress,
+		PostInteractionData: postInteractionData,
+		Extension:           extension,
 		orderInfo:           orderInfo,
-		details:             details,
-		extraParams:         extraParams,
-		makerTraits:         makerTraits,
+		Details:             details,
+		ExtraParams:         extraParams,
+		MakerTraits:         makerTraits,
 	})
 	if err != nil {
 		return nil, nil, fmt.Errorf("error creating fusion order: %v", err)
@@ -133,7 +133,7 @@ func CreateFusionOrderData(quote GetQuoteOutputFixed, orderParams OrderParams, w
 	limitOrder, err := orderbook.CreateLimitOrderMessage(orderbook.CreateOrderParams{
 		Wallet:       wallet,
 		MakerTraits:  makerTraits,
-		Extension:    *fusionOrder.FusionExtension.ConvertToOrderbookExtension(),
+		Extension:    *fusionOrder.FusionExtension.ConvertToOrderbookExtensionPure(),
 		Maker:        fusionOrder.OrderInfo.Maker,
 		MakerAsset:   fusionOrder.OrderInfo.MakerAsset,
 		TakerAsset:   fusionOrder.OrderInfo.TakerAsset,
@@ -164,7 +164,7 @@ func getPreset(presets QuotePresetsClass, presetType GetQuoteOutputRecommendedPr
 	switch presetType {
 	case Custom:
 		if presets.Custom == nil {
-			return nil, errors.New("custom preset is not available")
+			return nil, errors.New("custom preset is not available") // TODO support custom presets
 		}
 		return presets.Custom, nil
 	case Fast:
@@ -232,38 +232,6 @@ func CreateSettlementPostInteractionData(details Details, orderInfo FusionOrderV
 	})
 }
 
-type CreateExtensionParams struct {
-	settlementAddress   string
-	postInteractionData *SettlementPostInteractionData
-	orderInfo           FusionOrderV4
-	details             Details
-	extraParams         ExtraParams
-}
-
-func CreateExtension(params CreateExtensionParams) (*Extension, error) {
-
-	var permitInteraction *Interaction
-	if params.extraParams.Permit != "" {
-		permitInteraction = &Interaction{
-			Target: geth_common.HexToAddress(params.orderInfo.MakerAsset),
-			Data:   params.extraParams.Permit,
-		}
-	}
-
-	settlementAddressContract := geth_common.HexToAddress(params.settlementAddress)
-	makingAndTakingAmountData := settlementAddressContract.String() + trim0x(params.details.Auction.Encode())
-	extensionParams := ExtensionParams{
-		MakingAmountData: makingAndTakingAmountData,
-		TakingAmountData: makingAndTakingAmountData,
-		PostInteraction:  NewInteraction(settlementAddressContract, params.postInteractionData.Encode()).Encode(),
-	}
-	if permitInteraction != nil {
-		extensionParams.MakerPermit = permitInteraction.Target.String() + trim0x(permitInteraction.Data)
-	}
-
-	return NewExtension(extensionParams)
-}
-
 func CreateMakerTraits(details Details, extraParams ExtraParams) (*orderbook.MakerTraits, error) {
 	deadline := details.Auction.StartTime + details.Auction.Duration + extraParams.OrderExpirationDelay
 	makerTraitParms := orderbook.MakerTraitsParams{
@@ -289,30 +257,30 @@ func CreateMakerTraits(details Details, extraParams ExtraParams) (*orderbook.Mak
 }
 
 type CreateOrderDataParams struct {
-	settlementAddress   string
-	postInteractionData *SettlementPostInteractionData
-	extension           *Extension
+	SettlementAddress   string
+	PostInteractionData *SettlementPostInteractionData
+	Extension           *Extension
 	orderInfo           FusionOrderV4
-	details             Details
-	extraParams         ExtraParams
-	makerTraits         *orderbook.MakerTraits
+	Details             Details
+	ExtraParams         ExtraParams
+	MakerTraits         *orderbook.MakerTraits
 }
 
 func CreateOrder(params CreateOrderDataParams) (*Order, error) {
 	var receiver geth_common.Address
-	if params.postInteractionData.IntegratorFee.Ratio != nil && params.postInteractionData.IntegratorFee.Ratio.Cmp(big.NewInt(0)) != 0 {
-		receiver = geth_common.HexToAddress(params.settlementAddress)
+	if params.PostInteractionData.IntegratorFee.Ratio != nil && params.PostInteractionData.IntegratorFee.Ratio.Cmp(big.NewInt(0)) != 0 {
+		receiver = geth_common.HexToAddress(params.SettlementAddress)
 	} else {
 		receiver = geth_common.HexToAddress(params.orderInfo.Receiver)
 	}
 
-	salt, err := params.extension.GenerateSalt()
+	salt, err := params.Extension.GenerateSalt()
 	if err != nil {
 		return nil, fmt.Errorf("error generating salt: %v", err)
 	}
 
 	return &Order{
-		FusionExtension: params.extension,
+		FusionExtension: params.Extension,
 		Inner: orderbook.OrderData{
 			MakerAsset:   params.orderInfo.MakerAsset,
 			TakerAsset:   params.orderInfo.TakerAsset,
@@ -321,22 +289,22 @@ func CreateOrder(params CreateOrderDataParams) (*Order, error) {
 			Salt:         fmt.Sprintf("%x", salt),
 			Maker:        params.orderInfo.Maker,
 			Receiver:     receiver.Hex(),
-			MakerTraits:  params.makerTraits.Encode(),
-			Extension:    fmt.Sprintf("%x", params.extension.keccak256()),
+			MakerTraits:  params.MakerTraits.Encode(),
+			Extension:    fmt.Sprintf("%x", params.Extension.Keccak256()),
 		},
-		SettlementExtension: geth_common.HexToAddress(params.settlementAddress),
+		SettlementExtension: geth_common.HexToAddress(params.SettlementAddress),
 		OrderInfo:           params.orderInfo,
-		AuctionDetails:      params.details.Auction,
-		PostInteractionData: params.postInteractionData,
+		AuctionDetails:      params.Details.Auction,
+		PostInteractionData: params.PostInteractionData,
 		Extra: ExtraData{
-			UnwrapWETH:           params.extraParams.unwrapWeth,
-			Nonce:                params.extraParams.Nonce,
-			Permit:               params.extraParams.Permit,
-			AllowPartialFills:    params.extraParams.AllowPartialFills,
-			AllowMultipleFills:   params.extraParams.AllowMultipleFills,
-			OrderExpirationDelay: params.extraParams.OrderExpirationDelay,
-			EnablePermit2:        params.extraParams.EnablePermit2,
-			Source:               params.extraParams.Source,
+			UnwrapWETH:           params.ExtraParams.unwrapWeth,
+			Nonce:                params.ExtraParams.Nonce,
+			Permit:               params.ExtraParams.Permit,
+			AllowPartialFills:    params.ExtraParams.AllowPartialFills,
+			AllowMultipleFills:   params.ExtraParams.AllowMultipleFills,
+			OrderExpirationDelay: params.ExtraParams.OrderExpirationDelay,
+			EnablePermit2:        params.ExtraParams.EnablePermit2,
+			Source:               params.ExtraParams.Source,
 		},
 	}, nil
 }

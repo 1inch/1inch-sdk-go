@@ -16,17 +16,22 @@ import (
 
 func CreateLimitOrderMessage(orderRequest CreateOrderParams, chainId int) (*Order, error) {
 
+	encodedExtension, err := orderRequest.Extension.Encode()
+	if err != nil {
+		return nil, fmt.Errorf("error encoding extension: %v", err)
+	}
+
 	orderData := OrderData{
 		MakerAsset:    orderRequest.MakerAsset,
 		TakerAsset:    orderRequest.TakerAsset,
 		MakingAmount:  orderRequest.MakingAmount,
 		TakingAmount:  orderRequest.TakingAmount,
-		Salt:          GenerateSalt(orderRequest.Extension.Encode()),
+		Salt:          GenerateSalt(encodedExtension),
 		Maker:         orderRequest.Maker,
 		AllowedSender: "0x0000000000000000000000000000000000000000",
 		Receiver:      orderRequest.Taker,
 		MakerTraits:   orderRequest.MakerTraits.Encode(),
-		Extension:     orderRequest.Extension.Encode(),
+		Extension:     encodedExtension,
 	}
 
 	aggregationRouter, err := constants.Get1inchRouterFromChainId(chainId)
