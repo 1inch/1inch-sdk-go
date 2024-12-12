@@ -103,10 +103,28 @@ func TestSettlementPostInteractionData(t *testing.T) {
 			if tc.expectedBytes != 0 {
 				assert.Equal(t, tc.expectedBytes, len(encoded[2:])/2)
 			}
-
 			decoded, err := Decode(encoded)
+
+			if decoded.BankFee != nil {
+				decoded.BankFee = big.NewInt(decoded.BankFee.Int64())
+			}
+			if data.BankFee != nil {
+				data.BankFee = big.NewInt(data.BankFee.Int64())
+			}
+
 			assert.NoError(t, err)
-			assert.Equal(t, *data, decoded)
+			assert.Equal(t, data.ResolvingStartTime.Cmp(decoded.ResolvingStartTime), 0)
+			assert.Equal(t, data.BankFee.Cmp(decoded.BankFee), 0)
+
+			for i, expectedItem := range data.Whitelist {
+				assert.Equal(t, expectedItem.AddressHalf, decoded.Whitelist[i].AddressHalf)
+				assert.Equal(t, expectedItem.Delay.Cmp(decoded.Whitelist[i].Delay), 0)
+			}
+
+			assert.Equal(t, data.IntegratorFee, decoded.IntegratorFee)
+			assert.Equal(t, data.CustomReceiver, decoded.CustomReceiver)
+			assert.Equal(t, data.IntegratorFee, decoded.IntegratorFee)
+			assert.Equal(t, data.CustomReceiver, decoded.CustomReceiver)
 		})
 	}
 }

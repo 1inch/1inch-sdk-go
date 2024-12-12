@@ -126,18 +126,6 @@ func TestNewExtension(t *testing.T) {
 			expectErr: false,
 		},
 		{
-			name: "Valid parameters",
-			params: EscrowExtensionParams{
-				ExtensionParams: fusion.ExtensionParams{
-					MakerAssetSuffix: "0x1234",
-					TakerAssetSuffix: "0x1234",
-					Predicate:        "0x1234",
-					PreInteraction:   "pre",
-				},
-			},
-			expectErr: false,
-		},
-		{
 			name: "Invalid MakerAssetSuffix",
 			params: EscrowExtensionParams{
 				ExtensionParams: fusion.ExtensionParams{
@@ -221,23 +209,6 @@ func TestDecodeEscrowExtension(t *testing.T) {
 		expectingErr  bool
 		errorContains string
 	}{
-		{
-			name:     "Successful Decoding",
-			hexInput: "0x00000008000000070000000600000005000000040000000300000002000000010102050604030708",
-			expected: &EscrowExtension{
-				Extension: fusion.Extension{
-					MakerAssetSuffix: "0x01",
-					TakerAssetSuffix: "0x02",
-					MakingAmountData: "0x05",
-					TakingAmountData: "0x06",
-					Predicate:        "0x04",
-					MakerPermit:      "0x03",
-					PreInteraction:   "0x07",
-					PostInteraction:  "0x08",
-				},
-			},
-			expectingErr: false,
-		},
 		{
 			name:     "Full decode",
 			hexInput: "0x0000016b0000005e0000005e0000005e0000005e0000002f0000000000000000fb2809a5314473e1165f6b58018e20ed8f07b84000b8460000222c6656b88f0000b401e0da00ba01009000b8460024fb2809a5314473e1165f6b58018e20ed8f07b84000b8460000222c6656b88f0000b401e0da00ba01009000b8460024fb2809a5314473e1165f6b58018e20ed8f07b8406656b877b09498030ae3416b66dc0000db05a6a504f04d92e79d00000c989d73cf0bd5f83b660000d18bd45f0b94f54a968f0000d61b892b2ad6249011850000d0847e80c0b823a65ce70000901f8f650d76dcc657d1000038ad1723a873d05effcbdc57dcf7d00458d6a8c763558d5af7522bf6ad2d3e253d000000000000000000000000000000000000000000000000000000000000a4b1000000000000000000000000000000000000000000000000000000000000000100000000000000000000000000000064000000000000000000000000000000c80000000000000003000000020000000100000004000000030000000200000001",

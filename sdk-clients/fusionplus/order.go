@@ -38,7 +38,7 @@ func CreateFusionPlusOrderData(quoteParams QuoterControllerGetQuoteParamsFixed, 
 	}
 	presetFusion := &fusion.PresetClass{
 		AllowMultipleFills: preset.AllowMultipleFills,
-		//ExclusiveResolver: preset.ExclusiveResolver, // This is not working for fusion at the moment
+		//ExclusiveResolver: preset.ExclusiveResolver, // TODO This is not working for fusion at the moment
 		AllowPartialFills:  preset.AllowPartialFills,
 		AuctionDuration:    preset.AuctionDuration,
 		AuctionEndAmount:   preset.AuctionEndAmount,
@@ -258,10 +258,15 @@ func CreateFusionPlusOrderData(quoteParams QuoterControllerGetQuoteParamsFixed, 
 		return nil, fmt.Errorf("error creating fusion order: %v", err)
 	}
 
+	extensionOrderbook, err := extension.ConvertToOrderbookExtensionPure()
+	if err != nil {
+		return nil, fmt.Errorf("error converting extension to orderbook extension: %v", err)
+	}
+
 	limitOrder, err := orderbook.CreateLimitOrderMessage(orderbook.CreateOrderParams{
 		Wallet:       wallet,
 		MakerTraits:  makerTraitsFusion,
-		Extension:    *extension.ConvertToOrderbookExtensionPure(),
+		Extension:    *extensionOrderbook,
 		Maker:        orderInfo.Maker,
 		MakerAsset:   orderInfo.MakerAsset,
 		TakerAsset:   orderInfo.TakerAsset,

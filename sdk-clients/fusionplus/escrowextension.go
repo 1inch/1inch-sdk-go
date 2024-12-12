@@ -30,7 +30,7 @@ func NewEscrowExtension(escrowParams EscrowExtensionParams) (*EscrowExtension, e
 
 	extension, err := fusion.NewExtension(escrowParams.ExtensionParams)
 	if err != nil {
-		return nil, fmt.Errorf("error creating extension: %v", err)
+		return nil, err
 	}
 
 	escrowExtension := &EscrowExtension{
@@ -62,18 +62,18 @@ func (e *EscrowExtension) ConvertToOrderbookExtension() *orderbook.Extension {
 	}
 }
 
-func (e *EscrowExtension) ConvertToOrderbookExtensionPure() *orderbook.ExtensionPure {
+func (e *EscrowExtension) ConvertToOrderbookExtensionPure() (*orderbook.ExtensionPure, error) {
 
 	srcSafetyDepositBig := new(big.Int)
 	_, ok := srcSafetyDepositBig.SetString(e.SrcSafetyDeposit, 10)
 	if !ok {
-		log.Fatalf("Invalid hexadecimal string")
+		return nil, fmt.Errorf("invalid hexadecimal string for source safety deposit: %v", e.SrcSafetyDeposit)
 	}
 
 	dstSafetyDepositBig := new(big.Int)
 	_, ok = dstSafetyDepositBig.SetString(e.DstSafetyDeposit, 10)
 	if !ok {
-		log.Fatalf("Invalid hexadecimal string")
+		return nil, fmt.Errorf("invalid hexadecimal string for destination safety deposit: %v", e.DstSafetyDeposit)
 	}
 
 	fmt.Printf("srcSafetyDeposit: %s\n", e.SrcSafetyDeposit)
@@ -90,7 +90,7 @@ func (e *EscrowExtension) ConvertToOrderbookExtensionPure() *orderbook.Extension
 		TimeLocks:        &e.TimeLocks,
 	})
 	if err != nil {
-		log.Fatalf("Failed to encode extra data: %v", err) // TODO handle
+		return nil, fmt.Errorf("failed to encode extra data: %v", err) // TODO handle
 	}
 
 	e.PostInteraction += trim0x(fmt.Sprintf("%x", extraDataBytes))
@@ -105,7 +105,7 @@ func (e *EscrowExtension) ConvertToOrderbookExtensionPure() *orderbook.Extension
 		PreInteraction:   e.PreInteraction,
 		PostInteraction:  e.PostInteraction,
 		//strings.TrimPrefix(e.CustomData, "0x"), // TODO Blocking custom data for now because it is breaking the cumsum method. The extension constructor will return with an error if the user provides this field.
-	}
+	}, nil
 }
 
 //func (e *EscrowExtension) EncodeEscrowExtension() (string, error) {

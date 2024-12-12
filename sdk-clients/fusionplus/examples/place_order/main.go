@@ -32,12 +32,24 @@ func main() {
 	}
 	ctx := context.Background()
 
+	srcChain := 42161
+	dstChain := 8453
+
+	srcToken := "0xaf88d065e77c8cC2239327C5EDb3A432268e5831"
+	dstToken := "0x833589fCD6eDb6E08f4c7C32D4f71b54bdA02913"
+
+	invert := true
+	if invert {
+		srcChain, dstChain = dstChain, srcChain
+		srcToken, dstToken = dstToken, srcToken
+	}
+
 	quoteParams := fusionplus.QuoterControllerGetQuoteParamsFixed{
-		SrcChain:        42161,
-		DstChain:        8453,
-		SrcTokenAddress: "0xaf88d065e77c8cC2239327C5EDb3A432268e5831",
-		DstTokenAddress: "0x833589fCD6eDb6E08f4c7C32D4f71b54bdA02913",
-		Amount:          "100000",
+		SrcChain:        float32(srcChain),
+		DstChain:        float32(dstChain),
+		SrcTokenAddress: srcToken,
+		DstTokenAddress: dstToken,
+		Amount:          "1000000",
 		WalletAddress:   publicAddress,
 		EnableEstimate:  true,
 	}

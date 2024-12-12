@@ -21,6 +21,11 @@ func CreateLimitOrderMessage(orderRequest CreateOrderParams, chainId int) (*Orde
 		return nil, fmt.Errorf("error encoding extension: %v", err)
 	}
 
+	// TODO this is a temporary fix to simulate the same extension data after a refactor
+	if encodedExtension == "0x0000000000000000000000000000000000000000000000000000000000000000" {
+		encodedExtension = "0x"
+	}
+
 	orderData := OrderData{
 		MakerAsset:    orderRequest.MakerAsset,
 		TakerAsset:    orderRequest.TakerAsset,
@@ -121,9 +126,13 @@ func CreateLimitOrderMessage(orderRequest CreateOrderParams, chainId int) (*Orde
 	}, err
 }
 
+var timeNow = func() int64 {
+	return time.Now().UnixNano()
+}
+
 func GenerateSalt(extension string) string {
 	if extension == "0x" {
-		return fmt.Sprintf("%d", time.Now().UnixNano()/int64(time.Millisecond))
+		return fmt.Sprintf("%d", timeNow()/int64(time.Millisecond))
 	}
 
 	byteConverted, err := stringToHexBytes(extension)

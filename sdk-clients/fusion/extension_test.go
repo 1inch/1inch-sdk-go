@@ -3,6 +3,7 @@ package fusion
 import (
 	"bytes"
 	"encoding/hex"
+	"encoding/json"
 	"fmt"
 	"math/big"
 	"strings"
@@ -120,6 +121,47 @@ func TestNewExtension(t *testing.T) {
 			expectErr: false,
 		},
 		{
+			name: "Valid parameters 2",
+			params: ExtensionParams{
+				SettlementContract: "0x0500000000000000000000000000000000000000",
+				AuctionDetails: &AuctionDetails{
+					StartTime:       0,
+					Duration:        0,
+					InitialRateBump: 0,
+					Points:          nil,
+					GasCost:         GasCostConfigClassFixed{},
+				},
+				PostInteractionData: &SettlementPostInteractionData{
+					Whitelist: []WhitelistItem{},
+					IntegratorFee: &IntegratorFee{
+						Ratio:    big.NewInt(0),
+						Receiver: common.Address{},
+					},
+					BankFee:            big.NewInt(0),
+					ResolvingStartTime: big.NewInt(0),
+					CustomReceiver:     common.Address{},
+				},
+				Asset:  "0x1234",
+				Permit: "0x03",
+
+				MakerAssetSuffix: "0x01",
+				TakerAssetSuffix: "0x02",
+				Predicate:        "0x07",
+				PreInteraction:   "0x09",
+			},
+			expectedExtension: &Extension{
+				MakerAssetSuffix: "0x01",
+				TakerAssetSuffix: "0x02",
+				MakingAmountData: "0x05000000000000000000000000000000000000000000000000000000000000000000000000",
+				TakingAmountData: "0x05000000000000000000000000000000000000000000000000000000000000000000000000",
+				Predicate:        "0x07",
+				MakerPermit:      "0x000000000000000000000000000000000000123403",
+				PreInteraction:   "0x09",
+				PostInteraction:  "0x05000000000000000000000000000000000000000000000000",
+			},
+			expectErr: false,
+		},
+		{
 			name: "Invalid MakerAssetSuffix",
 			params: ExtensionParams{
 				MakerAssetSuffix: "invalid",
@@ -198,16 +240,16 @@ func TestDecodeExtensionPure(t *testing.T) {
 	}{
 		{
 			name:     "Successful Decoding",
-			hexInput: "00000008000000070000000600000005000000040000000300000002000000010102050604030708",
+			hexInput: "0000007c00000063000000620000004d0000004c00000027000000020000000101020500000000000000000000000000000000000000000000000000000000000000000000000005000000000000000000000000000000000000000000000000000000000000000000000000070000000000000000000000000000000000001234030905000000000000000000000000000000000000000000000000",
 			expected: &Extension{
 				MakerAssetSuffix: "0x01",
 				TakerAssetSuffix: "0x02",
-				MakingAmountData: "0x05",
-				TakingAmountData: "0x06",
-				Predicate:        "0x04",
-				MakerPermit:      "0x03",
-				PreInteraction:   "0x07",
-				PostInteraction:  "0x08",
+				MakingAmountData: "05000000000000000000000000000000000000000000000000000000000000000000000000",
+				TakingAmountData: "05000000000000000000000000000000000000000000000000000000000000000000000000",
+				Predicate:        "0x07",
+				MakerPermit:      "0x000000000000000000000000000000000000123403",
+				PreInteraction:   "0x09",
+				PostInteraction:  "0x05000000000000000000000000000000000000000000000000",
 			},
 			expectingErr: false,
 		},
@@ -223,6 +265,7 @@ func TestDecodeExtensionPure(t *testing.T) {
 
 			// Decode the data
 			decoded, err := DecodeExtensionPure(data)
+			require.NoError(t, err)
 
 			if tt.expectingErr {
 				if err == nil {
@@ -235,11 +278,30 @@ func TestDecodeExtensionPure(t *testing.T) {
 					t.Errorf("Unexpected error: %v", err)
 				}
 				if !extensionsEqual(decoded, tt.expected) {
-					t.Errorf("Decoded Extension does not match expected.\nGot: %+v\nExpected: %+v", decoded, tt.expected)
+					t.Errorf("Decoded Extension does not match expected.\nGot: %+v\nExpected: %+v", printSelectedFields(decoded), printSelectedFields(tt.expected))
 				}
 			}
 		})
 	}
+}
+
+func printSelectedFields(ext *Extension) string {
+	selectedFields := map[string]string{
+		"MakerAssetSuffix": strings.TrimPrefix(ext.MakerAssetSuffix, "0x"),
+		"TakerAssetSuffix": strings.TrimPrefix(ext.TakerAssetSuffix, "0x"),
+		"MakingAmountData": strings.TrimPrefix(ext.MakingAmountData, "0x"),
+		"TakingAmountData": strings.TrimPrefix(ext.TakingAmountData, "0x"),
+		"Predicate":        strings.TrimPrefix(ext.Predicate, "0x"),
+		"MakerPermit":      strings.TrimPrefix(ext.MakerPermit, "0x"),
+		"PreInteraction":   strings.TrimPrefix(ext.PreInteraction, "0x"),
+		"PostInteraction":  strings.TrimPrefix(ext.PostInteraction, "0x"),
+	}
+
+	jsonData, err := json.MarshalIndent(selectedFields, "", "  ")
+	if err != nil {
+		return fmt.Sprint("Error marshalling to JSON:", err)
+	}
+	return string(jsonData)
 }
 
 func TestConvertToOrderbookExtensionPure(t *testing.T) {
