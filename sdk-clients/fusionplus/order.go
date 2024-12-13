@@ -213,37 +213,6 @@ func CreateFusionPlusOrderData(quoteParams QuoterControllerGetQuoteParamsFixed, 
 		return nil, fmt.Errorf("error creating extension: %v", err)
 	}
 
-	//postInteractionDataFusion, err := fusion.CreateSettlementPostInteractionData(detailsFusion, orderInfoFusion)
-	//if err != nil {
-	//	return nil, nil, fmt.Errorf("error creating post interaction data: %v", err)
-	//}
-	//
-	//extensionFusion, err := fusion.CreateExtension(fusion.CreateExtensionParams{
-	//	SettlementAddress:   quote.SrcEscrowFactory,
-	//	PostInteractionData: postInteractionDataFusion,
-	//	OrderInfo:           orderInfoFusion,
-	//	Details:             detailsFusion,
-	//	ExtraParams:         extraParamsFusion,
-	//})
-	//if err != nil {
-	//	return nil, nil, fmt.Errorf("error creating extension: %v", err)
-	//}
-
-	//fusionOrder, err := fusion.CreateOrder(fusion.CreateOrderDataParams{
-	//	SettlementAddress: quote.SrcEscrowFactory,
-	//	Details:           detailsFusion,
-	//	ExtraParams:       extraParamsFusion,
-	//	MakerTraits:       makerTraitsFusion,
-	//})
-	//if err != nil {
-	//	return nil, nil, fmt.Errorf("error creating fusion order: %v", err)
-	//}
-
-	//innerOrder := &InnerOrder{
-	//	Order:        *fusionOrder,
-	//	EscExtension: extension,
-	//}
-
 	fusionPlusOrder, err := CreateOrder(CreateOrderDataParams{
 		srcEscrowFactory:    quote.SrcEscrowFactory,
 		orderInfo:           orderInfo,
@@ -402,34 +371,6 @@ func CreateOrder(params CreateOrderDataParams) (*Order, error) {
 	}
 
 	return &Order{
-		//Order: fusion.Order{
-		//	FusionExtension: nil,
-		//	Inner: orderbook.OrderData{
-		//		MakerAsset:   params.orderInfo.MakerAsset,
-		//		TakerAsset:   params.orderInfo.TakerAsset,
-		//		MakingAmount: params.orderInfo.MakingAmount,
-		//		TakingAmount: params.orderInfo.TakingAmount,
-		//		Salt:         fmt.Sprintf("%x", salt),
-		//		Maker:        params.orderInfo.Maker,
-		//		Receiver:     params.orderInfo.Receiver,
-		//		MakerTraits:  params.makerTraits.Encode(),
-		//		Extension:    fmt.Sprintf("%x", params.extension.Keccak256()),
-		//	},
-		//	SettlementExtension: geth_common.HexToAddress(params.srcEscrowFactory),
-		//	OrderInfo:           fusion.FusionOrderV4{
-		//		Maker:        params.orderInfo.Maker,
-		//		MakerAsset:   params.orderInfo.MakerAsset,
-		//		MakerTraits:  params.orderInfo.MakerTraits,
-		//		MakingAmount: params.orderInfo.MakingAmount,
-		//		Receiver:     params.orderInfo.Receiver,
-		//		Salt:         fmt.Sprintf("%x", salt),
-		//		TakerAsset:   params.orderInfo.TakerAsset,
-		//		TakingAmount: params.orderInfo.TakingAmount,
-		//	},
-		//	AuctionDetails:      params.details.Auction,
-		//	PostInteractionData: nil,
-		//	Extra:               fusion.ExtraData{},
-		//},
 		EscExtension: params.extension,
 		Inner: orderbook.OrderData{
 			MakerAsset:   params.orderInfo.MakerAsset,
