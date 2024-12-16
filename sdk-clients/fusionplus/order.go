@@ -335,23 +335,6 @@ func CreateSettlementPostInteractionData(details Details, orderInfo CrossChainOr
 	})
 }
 
-type CreateExtensionParams struct {
-
-	// This first group of fields is from fusion. That object can be reused if the fields are made public
-	settlementAddress   string
-	postInteractionData *SettlementPostInteractionData
-	orderInfo           CrossChainOrderDto
-	details             Details
-	extraParams         ExtraParams
-
-	HashLock         *HashLock
-	DstChainId       float32
-	DstToken         geth_common.Address
-	SrcSafetyDeposit string
-	DstSafetyDeposit string
-	TimeLocks        TimeLocks
-}
-
 type CreateOrderDataParams struct {
 	srcEscrowFactory    string
 	orderInfo           CrossChainOrderDto

@@ -2,10 +2,8 @@ package fusionplus
 
 import (
 	"bytes"
-	"encoding/hex"
 	"fmt"
 	"math/big"
-	"strings"
 	"testing"
 
 	random_number_generation "github.com/1inch/1inch-sdk-go/internal/random-number-generation"
@@ -339,44 +337,6 @@ func TestDecodeEscrowExtension(t *testing.T) {
 	}
 }
 
-//func TestEncodeEscrowExtension(t *testing.T) {
-//	tests := []struct {
-//		name            string
-//		expectedEncoded string
-//		extension       EscrowExtension
-//		expectingErr    bool
-//		errorContains   string
-//	}{
-//		{
-//			name: "Encode without any Fusion+ data",
-//			extension: EscrowExtension{
-//				Extension: fusion.Extension{
-//					MakerAssetSuffix: "0x01",
-//					TakerAssetSuffix: "0x02",
-//					MakingAmountData: "0x03",
-//					TakingAmountData: "0x04",
-//					Predicate:        "0x05",
-//					MakerPermit:      "0x06",
-//					PreInteraction:   "0x07",
-//					PostInteraction:  "0x08",
-//				},
-//			},
-//			expectedEncoded: "0x00000008000000070000000600000005000000040000000300000002000000010102030405060708",
-//			expectingErr:    false,
-//		},
-//	}
-//
-//	for _, tt := range tests {
-//		t.Run(tt.name, func(t *testing.T) {
-//
-//			encoded, err := tt.extension.EncodeEscrowExtension()
-//			require.NoError(t, err)
-//
-//			require.Equal(t, tt.expectedEncoded, encoded)
-//		})
-//	}
-//}
-
 func TestEncodeExtraData(t *testing.T) {
 	tests := []struct {
 		name            string
@@ -419,23 +379,6 @@ func TestEncodeExtraData(t *testing.T) {
 			require.Equal(t, tt.expectedEncoded, fmt.Sprintf("%x", encoded))
 		})
 	}
-}
-
-func extensionsEqual(a, b *EscrowExtension) bool {
-	return strings.TrimPrefix(a.MakerAssetSuffix, "0x") == strings.TrimPrefix(b.MakerAssetSuffix, "0x") &&
-		strings.TrimPrefix(a.TakerAssetSuffix, "0x") == strings.TrimPrefix(b.TakerAssetSuffix, "0x") &&
-		strings.TrimPrefix(a.MakingAmountData, "0x") == strings.TrimPrefix(b.MakingAmountData, "0x") &&
-		strings.TrimPrefix(a.TakingAmountData, "0x") == strings.TrimPrefix(b.TakingAmountData, "0x") &&
-		strings.TrimPrefix(a.Predicate, "0x") == strings.TrimPrefix(b.Predicate, "0x") &&
-		strings.TrimPrefix(a.MakerPermit, "0x") == strings.TrimPrefix(b.MakerPermit, "0x") &&
-		strings.TrimPrefix(a.PreInteraction, "0x") == strings.TrimPrefix(b.PreInteraction, "0x") &&
-		strings.TrimPrefix(a.PostInteraction, "0x") == strings.TrimPrefix(b.PostInteraction, "0x")
-	// strings.TrimPrefix(a.CustomData, "0x") == strings.TrimPrefix(b.CustomData, "0x")
-}
-
-// hexToBytes converts a hexadecimal string to a byte slice.
-func hexToBytes(s string) ([]byte, error) {
-	return hex.DecodeString(s)
 }
 
 // contains checks if the substring is present in the string.
