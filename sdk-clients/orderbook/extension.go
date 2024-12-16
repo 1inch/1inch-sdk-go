@@ -14,10 +14,6 @@ import (
 	"github.com/ethereum/go-ethereum/common/math"
 )
 
-type Extension struct {
-	InteractionsArray []string
-}
-
 type ExtensionParams struct {
 	MakerAsset      string
 	MakerAssetData  string
@@ -30,37 +26,7 @@ type ExtensionParams struct {
 	PostInteraction string
 }
 
-func NewExtension(params ExtensionParams) (Extension, error) {
-
-	if params.Permit != "" {
-		if params.MakerAsset == "" {
-			return Extension{}, fmt.Errorf("when Permit is present, a maker asset must also be defined requires MakerAsset")
-		}
-	}
-
-	if params.MakerAsset != "" {
-		if params.Permit == "" {
-			return Extension{}, fmt.Errorf("when MakerAsset is present, a maker asset must also be defined requires Permit")
-		}
-	}
-
-	makerAssetData := params.MakerAssetData
-	takerAssetData := params.TakerAssetData
-	getMakingAmount := params.GetMakingAmount
-	getTakingAmount := params.GetTakingAmount
-	predicate := params.Predicate
-	permit := params.MakerAsset + strings.TrimPrefix(params.Permit, "0x")
-	preInteraction := params.PreInteraction
-	postInteraction := params.PostInteraction
-
-	interactions := []string{makerAssetData, takerAssetData, getMakingAmount, getTakingAmount, predicate, permit, preInteraction, postInteraction}
-
-	return Extension{
-		InteractionsArray: interactions,
-	}, nil
-}
-
-func NewExtensionPure(params ExtensionParams) (*ExtensionPure, error) {
+func NewExtension(params ExtensionParams) (*Extension, error) {
 
 	if params.Permit != "" {
 		if params.MakerAsset == "" {
@@ -74,7 +40,7 @@ func NewExtensionPure(params ExtensionParams) (*ExtensionPure, error) {
 		}
 	}
 
-	return &ExtensionPure{
+	return &Extension{
 		MakerAssetSuffix: params.MakerAssetData,
 		TakerAssetSuffix: params.TakerAssetData,
 		MakingAmountData: params.GetMakingAmount,
@@ -86,48 +52,7 @@ func NewExtensionPure(params ExtensionParams) (*ExtensionPure, error) {
 	}, nil
 }
 
-func (i *Extension) Encode() string {
-	interactionsConcatednated := i.getConcatenatedInteractions()
-	if interactionsConcatednated == "" {
-		return "0x"
-	}
-
-	offsetsBytes := i.getOffsets()
-	paddedOffsetHex := fmt.Sprintf("%064x", offsetsBytes)
-	return "0x" + paddedOffsetHex + interactionsConcatednated
-}
-
-func (i *Extension) getConcatenatedInteractions() string {
-	var builder strings.Builder
-	for _, interaction := range i.InteractionsArray {
-		interaction = strings.TrimPrefix(interaction, "0x")
-		builder.WriteString(interaction)
-	}
-	return builder.String()
-}
-
-func (i *Extension) getOffsets() *big.Int {
-	var lengthMap []int
-	for _, interaction := range i.InteractionsArray {
-		lengthMap = append(lengthMap, len(strings.TrimPrefix(interaction, "0x"))/2)
-	}
-
-	cumulativeSum := 0
-	bytesAccumulator := big.NewInt(0)
-	var index uint64
-
-	for _, length := range lengthMap {
-		cumulativeSum += length
-		shiftVal := big.NewInt(int64(cumulativeSum))
-		shiftVal.Lsh(shiftVal, uint(32*index))           // Shift left
-		bytesAccumulator.Add(bytesAccumulator, shiftVal) // Add to accumulator
-		index++
-	}
-
-	return bytesAccumulator
-}
-
-type ExtensionPure struct {
+type Extension struct {
 	MakerAssetSuffix string
 	TakerAssetSuffix string
 	MakingAmountData string
@@ -139,28 +64,24 @@ type ExtensionPure struct {
 }
 
 // Decode decodes the input byte slice into an Extension struct using reflection.
-func Decode(data []byte) (*ExtensionPure, error) {
+func Decode(data []byte) (*Extension, error) {
 	// Handle the special case where data equals ZX.
 	//if string(data) == ZX {
 	//	return DefaultExtension(), nil
 	//}
-
-	fmt.Printf("data: %x\n", data)
 
 	iter := bytesiterator.NewBytesIter(data)
 
 	// Read the first 32 bytes as offsets.
 	offsets, err := iter.NextUint256()
 	if err != nil {
-		return &ExtensionPure{}, errors.New("failed to read offsets: " + err.Error())
+		return &Extension{}, errors.New("failed to read offsets: " + err.Error())
 	}
-
-	fmt.Printf("Offsets: %x\n", offsets)
 
 	consumed := 0
 
-	// Initialize the ExtensionPure struct
-	var ext ExtensionPure
+	// Initialize the Extension struct
+	var ext Extension
 
 	// Use reflection to iterate over the struct fields in order.
 	val := reflect.ValueOf(&ext).Elem() // Get the reflect.Value of the struct
@@ -185,23 +106,23 @@ func Decode(data []byte) (*ExtensionPure, error) {
 		bytesCount := int(offset) - consumed
 
 		if bytesCount < 0 {
-			return &ExtensionPure{}, errors.New("invalid offset leading to negative bytesCount for field: " + field.Name)
+			return &Extension{}, errors.New("invalid offset leading to negative bytesCount for field: " + field.Name)
 		}
 
 		// Read the next bytesCount bytes for the current field.
 		fieldBytes, err := iter.NextBytes(bytesCount)
 		if err != nil {
-			return &ExtensionPure{}, errors.New("failed to read field " + field.Name + ": " + err.Error())
+			return &Extension{}, errors.New("failed to read field " + field.Name + ": " + err.Error())
 		}
 		if len(fieldBytes) < bytesCount {
-			return &ExtensionPure{}, errors.New("insufficient bytes for field " + field.Name)
+			return &Extension{}, errors.New("insufficient bytes for field " + field.Name)
 		}
 
 		// Set the field value using reflection.
 		if field.Type.Kind() == reflect.String {
 			fieldVal.SetString(fmt.Sprintf("%x", fieldBytes))
 		} else {
-			return &ExtensionPure{}, errors.New("unsupported field type for field: " + field.Name)
+			return &Extension{}, errors.New("unsupported field type for field: " + field.Name)
 		}
 
 		// Update the consumed bytes and shift the offsets for the next field.
@@ -212,7 +133,7 @@ func Decode(data []byte) (*ExtensionPure, error) {
 	// The remaining bytes are considered as CustomData.
 	//customDataBytes, err := iter.Rest()
 	//if err != nil {
-	//	return &ExtensionPure{}, errors.New("failed to read CustomData: " + err.Error())
+	//	return &Extension{}, errors.New("failed to read CustomData: " + err.Error())
 	//}
 	//ext.CustomData = string(customDataBytes)
 
@@ -229,8 +150,8 @@ func contains(s, substr string) bool {
 	return bytes.Contains([]byte(s), []byte(substr))
 }
 
-// Encode encodes the ExtensionPure struct into a hex string with offsets.
-func (ext *ExtensionPure) Encode() (string, error) {
+// Encode encodes the Extension struct into a hex string with offsets.
+func (ext *Extension) Encode() (string, error) {
 	fields := []string{
 		ext.MakerAssetSuffix,
 		ext.TakerAssetSuffix,

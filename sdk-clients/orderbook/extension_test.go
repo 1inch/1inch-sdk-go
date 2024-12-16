@@ -1,7 +1,6 @@
 package orderbook
 
 import (
-	"fmt"
 	"strings"
 	"testing"
 
@@ -9,124 +8,7 @@ import (
 	"github.com/stretchr/testify/require"
 )
 
-func TestGetConcatenatedInteractions(t *testing.T) {
-
-	tests := []struct {
-		name                             string
-		extension                        Extension
-		expectedConcatenatedInteractions string
-	}{
-		{
-			name: "Single hex value",
-			extension: Extension{
-				InteractionsArray: []string{
-					"",
-					"",
-					"",
-					"",
-					"",
-					"0x45c32fa6df82ead1e2ef74d17b76547eddfaff8900000000000000000000000050c5df26654B5EFBdD0c54a062dfa6012933deFe000000000000000000000000111111125421cA6dc452d289314280a0f8842A65000000000000000000000000000000000000000000000000002386f26fc1000000000000000000000000000000000000000000000000000000000000663d7724000000000000000000000000000000000000000000000000000000000000001bd104dfa3f550a95a28d404f74c84514a39ba3b20023cf04863ee1b541e952e2649c45c8f394c68e90f38700d9951b4c1b0dc4e7bd2ae2f6fc793db846de75ee3",
-					"",
-					"",
-				},
-			},
-			expectedConcatenatedInteractions: "45c32fa6df82ead1e2ef74d17b76547eddfaff8900000000000000000000000050c5df26654B5EFBdD0c54a062dfa6012933deFe000000000000000000000000111111125421cA6dc452d289314280a0f8842A65000000000000000000000000000000000000000000000000002386f26fc1000000000000000000000000000000000000000000000000000000000000663d7724000000000000000000000000000000000000000000000000000000000000001bd104dfa3f550a95a28d404f74c84514a39ba3b20023cf04863ee1b541e952e2649c45c8f394c68e90f38700d9951b4c1b0dc4e7bd2ae2f6fc793db846de75ee3",
-		},
-		{
-			name: "Multiple hex value",
-			extension: Extension{
-				InteractionsArray: []string{
-					"",
-					"",
-					"0x12345",
-					"",
-					"",
-					"0x45c32fa6df82ead1e2ef74d17b76547eddfaff8900000000000000000000000050c5df26654B5EFBdD0c54a062dfa6012933deFe000000000000000000000000111111125421cA6dc452d289314280a0f8842A65000000000000000000000000000000000000000000000000002386f26fc1000000000000000000000000000000000000000000000000000000000000663d7724000000000000000000000000000000000000000000000000000000000000001bd104dfa3f550a95a28d404f74c84514a39ba3b20023cf04863ee1b541e952e2649c45c8f394c68e90f38700d9951b4c1b0dc4e7bd2ae2f6fc793db846de75ee3",
-					"",
-					"",
-				},
-			},
-			expectedConcatenatedInteractions: "1234545c32fa6df82ead1e2ef74d17b76547eddfaff8900000000000000000000000050c5df26654B5EFBdD0c54a062dfa6012933deFe000000000000000000000000111111125421cA6dc452d289314280a0f8842A65000000000000000000000000000000000000000000000000002386f26fc1000000000000000000000000000000000000000000000000000000000000663d7724000000000000000000000000000000000000000000000000000000000000001bd104dfa3f550a95a28d404f74c84514a39ba3b20023cf04863ee1b541e952e2649c45c8f394c68e90f38700d9951b4c1b0dc4e7bd2ae2f6fc793db846de75ee3",
-		},
-		{
-			name: "Hex and non-hex values",
-			extension: Extension{
-				InteractionsArray: []string{
-					"",
-					"",
-					"0x12345",
-					"nonhex",
-					"",
-					"0x45c32fa6df82ead1e2ef74d17b76547eddfaff8900000000000000000000000050c5df26654B5EFBdD0c54a062dfa6012933deFe000000000000000000000000111111125421cA6dc452d289314280a0f8842A65000000000000000000000000000000000000000000000000002386f26fc1000000000000000000000000000000000000000000000000000000000000663d7724000000000000000000000000000000000000000000000000000000000000001bd104dfa3f550a95a28d404f74c84514a39ba3b20023cf04863ee1b541e952e2649c45c8f394c68e90f38700d9951b4c1b0dc4e7bd2ae2f6fc793db846de75ee3",
-					"",
-					"",
-				},
-			},
-			expectedConcatenatedInteractions: "12345nonhex45c32fa6df82ead1e2ef74d17b76547eddfaff8900000000000000000000000050c5df26654B5EFBdD0c54a062dfa6012933deFe000000000000000000000000111111125421cA6dc452d289314280a0f8842A65000000000000000000000000000000000000000000000000002386f26fc1000000000000000000000000000000000000000000000000000000000000663d7724000000000000000000000000000000000000000000000000000000000000001bd104dfa3f550a95a28d404f74c84514a39ba3b20023cf04863ee1b541e952e2649c45c8f394c68e90f38700d9951b4c1b0dc4e7bd2ae2f6fc793db846de75ee3",
-		},
-	}
-
-	for _, tc := range tests {
-		t.Run(tc.name, func(t *testing.T) {
-			assert.Equal(t, tc.expectedConcatenatedInteractions, tc.extension.getConcatenatedInteractions())
-		})
-	}
-}
-
-func TestGetOffsets(t *testing.T) {
-
-	tests := []struct {
-		name            string
-		extension       Extension
-		expectedOffsets string
-	}{
-		{
-			name: "Single hex value",
-			extension: Extension{
-				InteractionsArray: []string{
-					"",
-					"",
-					"",
-					"",
-					"",
-					"0x45c32fa6df82ead1e2ef74d17b76547eddfaff8900000000000000000000000050c5df26654B5EFBdD0c54a062dfa6012933deFe000000000000000000000000111111125421cA6dc452d289314280a0f8842A65000000000000000000000000000000000000000000000000002386f26fc1000000000000000000000000000000000000000000000000000000000000663d7724000000000000000000000000000000000000000000000000000000000000001bd104dfa3f550a95a28d404f74c84514a39ba3b20023cf04863ee1b541e952e2649c45c8f394c68e90f38700d9951b4c1b0dc4e7bd2ae2f6fc793db846de75ee3",
-					"",
-					"",
-				},
-			},
-			expectedOffsets: "F4000000F4000000F40000000000000000000000000000000000000000",
-		},
-		{
-			name: "Fusion Order",
-			extension: Extension{
-				InteractionsArray: []string{
-					"0x",
-					"0x",
-					"fb2809A5314473E1165f6B58018E20ed8F07B84000000000000000666cdf850000b400c45c00688b007e",
-					"fb2809A5314473E1165f6B58018E20ed8F07B84000000000000000666cdf850000b400c45c00688b007e",
-					"0x",
-					"0x",
-					"0x",
-					"0xfb2809A5314473E1165f6B58018E20ed8F07B840666cdf74c0866635457d36ab318d0000f3a44b7b0d08f4e198b80000000000000000000000000000d18bd45f0b94f54a968f0000000000000000000000000000000000000000000000000000c976bf098c4dba0a061d000000000000000000000000000040",
-				},
-			},
-			expectedOffsets: "000000cd000000540000005400000054000000540000002a0000000000000000",
-		},
-	}
-
-	for _, tc := range tests {
-		t.Run(tc.name, func(t *testing.T) {
-			expectedOffsets := strings.ToLower(fmt.Sprintf("%064s", tc.expectedOffsets))
-
-			offsets := tc.extension.getOffsets()
-			paddedOffsetHex := strings.ToLower(fmt.Sprintf("%064x", offsets))
-			assert.Equal(t, expectedOffsets, paddedOffsetHex)
-		})
-	}
-}
-
 func TestEncode(t *testing.T) {
-
 	tests := []struct {
 		name             string
 		extension        Extension
@@ -135,71 +17,6 @@ func TestEncode(t *testing.T) {
 		{
 			name: "Simple Limit Order 1",
 			extension: Extension{
-				InteractionsArray: []string{
-					"0x01",
-					"0x02",
-					"0x05",
-					"0x06",
-					"0x04",
-					"0x03",
-					"0x07",
-					"0x08",
-				},
-			},
-			expectedEncoding: "0x00000008000000070000000600000005000000040000000300000002000000010102050604030708",
-		},
-		{
-			name: "Fusion Order 1",
-			extension: Extension{
-				InteractionsArray: []string{
-					"0x",
-					"0x",
-					"fb2809A5314473E1165f6B58018E20ed8F07B84000000000000000666cdf850000b400c45c00688b007e",
-					"fb2809A5314473E1165f6B58018E20ed8F07B84000000000000000666cdf850000b400c45c00688b007e",
-					"0x",
-					"0x",
-					"0x",
-					"0xfb2809A5314473E1165f6B58018E20ed8F07B840666cdf74c0866635457d36ab318d0000f3a44b7b0d08f4e198b80000000000000000000000000000d18bd45f0b94f54a968f0000000000000000000000000000000000000000000000000000c976bf098c4dba0a061d000000000000000000000000000040",
-				},
-			},
-			expectedEncoding: "0x000000cd000000540000005400000054000000540000002a0000000000000000fb2809A5314473E1165f6B58018E20ed8F07B84000000000000000666cdf850000b400c45c00688b007efb2809A5314473E1165f6B58018E20ed8F07B84000000000000000666cdf850000b400c45c00688b007efb2809A5314473E1165f6B58018E20ed8F07B840666cdf74c0866635457d36ab318d0000f3a44b7b0d08f4e198b80000000000000000000000000000d18bd45f0b94f54a968f0000000000000000000000000000000000000000000000000000c976bf098c4dba0a061d000000000000000000000000000040",
-		},
-		{
-			name: "Fusion Order 2",
-			extension: Extension{
-				InteractionsArray: []string{
-					"",
-					"",
-					"fb2809A5314473E1165f6B58018E20ed8F07B84000000000000000666ce2ca0000b400c45c007db8007e",
-					"fb2809A5314473E1165f6B58018E20ed8F07B84000000000000000666ce2ca0000b400c45c007db8007e",
-					"",
-					"",
-					"",
-					"0xfb2809A5314473E1165f6B58018E20ed8F07B840666ce2b9c0866635457d36ab318d0000f3a44b7b0d08f4e198b80000000000000000000000000000d18bd45f0b94f54a968f0000000000000000000000000000000000000000000000000000c976bf098c4dba0a061d000000000000000000000000000040",
-					"",
-				},
-			},
-			expectedEncoding: "0xcd000000cd000000540000005400000054000000540000002a0000000000000000fb2809A5314473E1165f6B58018E20ed8F07B84000000000000000666ce2ca0000b400c45c007db8007efb2809A5314473E1165f6B58018E20ed8F07B84000000000000000666ce2ca0000b400c45c007db8007efb2809A5314473E1165f6B58018E20ed8F07B840666ce2b9c0866635457d36ab318d0000f3a44b7b0d08f4e198b80000000000000000000000000000d18bd45f0b94f54a968f0000000000000000000000000000000000000000000000000000c976bf098c4dba0a061d000000000000000000000000000040",
-		},
-	}
-
-	for _, tc := range tests {
-		t.Run(tc.name, func(t *testing.T) {
-			result := tc.extension.Encode()
-			assert.Equal(t, strings.ToLower(tc.expectedEncoding), strings.ToLower(result))
-		})
-	}
-}
-
-func TestEncodePure(t *testing.T) {
-	tests := []struct {
-		name             string
-		extensionPure    ExtensionPure
-		expectedEncoding string
-	}{
-		{
-			name: "Simple Limit Order 1",
-			extensionPure: ExtensionPure{
 				MakerAssetSuffix: "0x01",
 				TakerAssetSuffix: "0x02",
 				MakingAmountData: "0x03",
@@ -213,7 +30,7 @@ func TestEncodePure(t *testing.T) {
 		},
 		{
 			name: "Realistic Order 1",
-			extensionPure: ExtensionPure{
+			extension: Extension{
 				MakerAssetSuffix: "0x",
 				TakerAssetSuffix: "0x",
 				MakingAmountData: "fb2809A5314473E1165f6B58018E20ed8F07B84000000000000000666cdf850000b400c45c00688b007e",
@@ -227,7 +44,7 @@ func TestEncodePure(t *testing.T) {
 		},
 		{
 			name: "Realistic Order 2",
-			extensionPure: ExtensionPure{
+			extension: Extension{
 				MakerAssetSuffix: "0x",
 				TakerAssetSuffix: "0x",
 				MakingAmountData: "fb2809A5314473E1165f6B58018E20ed8F07B8400000000000000067217a910000b401a70b",
@@ -241,7 +58,7 @@ func TestEncodePure(t *testing.T) {
 		},
 		{
 			name: "Simple Limit Order 2",
-			extensionPure: ExtensionPure{
+			extension: Extension{
 				MakerAssetSuffix: "0x01",
 				TakerAssetSuffix: "0x0222",
 				MakingAmountData: "0x033344",
@@ -257,7 +74,7 @@ func TestEncodePure(t *testing.T) {
 
 	for _, tc := range tests {
 		t.Run(tc.name, func(t *testing.T) {
-			result, err := tc.extensionPure.Encode()
+			result, err := tc.extension.Encode()
 			require.NoError(t, err)
 			assert.Equal(t, strings.ToLower(tc.expectedEncoding), strings.ToLower(result))
 		})
@@ -265,18 +82,18 @@ func TestEncodePure(t *testing.T) {
 }
 
 // TestDecodeExtension contains all unit tests for the DecodeEscrowExtension function.
-func TestDecodeExtensionPure(t *testing.T) {
+func TestDecodeExtension(t *testing.T) {
 	tests := []struct {
 		name          string
 		hexInput      string
-		expected      *ExtensionPure
+		expected      *Extension
 		expectingErr  bool
 		errorContains string
 	}{
 		{
 			name:     "Successful Decoding",
 			hexInput: "00000008000000070000000600000005000000040000000300000002000000010102050604030708",
-			expected: &ExtensionPure{
+			expected: &Extension{
 				MakerAssetSuffix: "0x01",
 				TakerAssetSuffix: "0x02",
 				MakingAmountData: "0x05",
@@ -319,7 +136,7 @@ func TestDecodeExtensionPure(t *testing.T) {
 	}
 }
 
-func extensionsEqual(a, b *ExtensionPure) bool {
+func extensionsEqual(a, b *Extension) bool {
 	return strings.TrimPrefix(a.MakerAssetSuffix, "0x") == strings.TrimPrefix(b.MakerAssetSuffix, "0x") &&
 		strings.TrimPrefix(a.TakerAssetSuffix, "0x") == strings.TrimPrefix(b.TakerAssetSuffix, "0x") &&
 		strings.TrimPrefix(a.MakingAmountData, "0x") == strings.TrimPrefix(b.MakingAmountData, "0x") &&

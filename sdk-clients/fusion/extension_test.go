@@ -230,7 +230,7 @@ func TestNewExtension(t *testing.T) {
 	}
 }
 
-func TestDecodeExtensionPure(t *testing.T) {
+func TestDecodeExtension(t *testing.T) {
 	tests := []struct {
 		name          string
 		hexInput      string
@@ -264,7 +264,7 @@ func TestDecodeExtensionPure(t *testing.T) {
 			}
 
 			// Decode the data
-			decoded, err := DecodeExtensionPure(data)
+			decoded, err := DecodeExtension(data)
 			require.NoError(t, err)
 
 			if tt.expectingErr {
@@ -304,11 +304,11 @@ func printSelectedFields(ext *Extension) string {
 	return string(jsonData)
 }
 
-func TestConvertToOrderbookExtensionPure(t *testing.T) {
+func TestConvertToOrderbookExtension(t *testing.T) {
 	tests := []struct {
 		name                       string
 		fusionExtension            Extension
-		expectedOrderbookExtension *orderbook.ExtensionPure
+		expectedOrderbookExtension *orderbook.Extension
 		expectErr                  bool
 		errMsg                     string
 	}{
@@ -324,7 +324,7 @@ func TestConvertToOrderbookExtensionPure(t *testing.T) {
 				PreInteraction:   "pre",
 				PostInteraction:  "0x00000000000000000000000000000000000056780000000000",
 			},
-			expectedOrderbookExtension: &orderbook.ExtensionPure{
+			expectedOrderbookExtension: &orderbook.Extension{
 				MakerAssetSuffix: "0x1234",
 				TakerAssetSuffix: "0x1234",
 				MakingAmountData: "0x00000000000000000000000000000000000056780000000000000000000000000000000000",
@@ -340,7 +340,7 @@ func TestConvertToOrderbookExtensionPure(t *testing.T) {
 
 	for _, tc := range tests {
 		t.Run(tc.name, func(t *testing.T) {
-			ext := tc.fusionExtension.ConvertToOrderbookExtensionPure()
+			ext := tc.fusionExtension.ConvertToOrderbookExtension()
 			assert.NotNil(t, ext)
 			assert.Equal(t, tc.expectedOrderbookExtension.MakerAssetSuffix, ext.MakerAssetSuffix)
 			assert.Equal(t, tc.expectedOrderbookExtension.TakerAssetSuffix, ext.TakerAssetSuffix)
@@ -427,8 +427,8 @@ func TestFromExtension(t *testing.T) {
 			ext, err := NewExtension(tc.params)
 			require.NoError(t, err)
 
-			limitOrderExtensionPure := ext.ConvertToOrderbookExtensionPure()
-			decodedExtension, err := FromLimitOrderExtensionPure(limitOrderExtensionPure)
+			limitOrderExtensionPure := ext.ConvertToOrderbookExtension()
+			decodedExtension, err := FromLimitOrderExtension(limitOrderExtensionPure)
 			require.NoError(t, err)
 
 			assert.NotNil(t, ext)

@@ -133,7 +133,7 @@ func CreateFusionOrderData(quote GetQuoteOutputFixed, orderParams OrderParams, w
 	limitOrder, err := orderbook.CreateLimitOrderMessage(orderbook.CreateOrderParams{
 		Wallet:       wallet,
 		MakerTraits:  makerTraits,
-		Extension:    *fusionOrder.FusionExtension.ConvertToOrderbookExtensionPure(),
+		Extension:    *fusionOrder.FusionExtension.ConvertToOrderbookExtension(),
 		Maker:        fusionOrder.OrderInfo.Maker,
 		MakerAsset:   fusionOrder.OrderInfo.MakerAsset,
 		TakerAsset:   fusionOrder.OrderInfo.TakerAsset,

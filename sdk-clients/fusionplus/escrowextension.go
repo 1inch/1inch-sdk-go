@@ -46,23 +46,7 @@ func NewEscrowExtension(escrowParams EscrowExtensionParams) (*EscrowExtension, e
 	return escrowExtension, nil
 }
 
-func (e *EscrowExtension) ConvertToOrderbookExtension() *orderbook.Extension {
-	return &orderbook.Extension{
-		InteractionsArray: []string{
-			strings.TrimPrefix(e.MakerAssetSuffix, "0x"),
-			strings.TrimPrefix(e.TakerAssetSuffix, "0x"),
-			strings.TrimPrefix(e.MakingAmountData, "0x"),
-			strings.TrimPrefix(e.TakingAmountData, "0x"),
-			strings.TrimPrefix(e.Predicate, "0x"),
-			strings.TrimPrefix(e.MakerPermit, "0x"),
-			e.PreInteraction,
-			e.PostInteraction,
-			//strings.TrimPrefix(e.CustomData, "0x"), // TODO Blocking custom data for now because it is breaking the cumsum method. The extension constructor will return with an error if the user provides this field.
-		},
-	}
-}
-
-func (e *EscrowExtension) ConvertToOrderbookExtensionPure() (*orderbook.ExtensionPure, error) {
+func (e *EscrowExtension) ConvertToOrderbookExtension() (*orderbook.Extension, error) {
 
 	srcSafetyDepositBig := new(big.Int)
 	_, ok := srcSafetyDepositBig.SetString(e.SrcSafetyDeposit, 10)
@@ -95,7 +79,7 @@ func (e *EscrowExtension) ConvertToOrderbookExtensionPure() (*orderbook.Extensio
 
 	e.PostInteraction += trim0x(fmt.Sprintf("%x", extraDataBytes))
 
-	return &orderbook.ExtensionPure{
+	return &orderbook.Extension{
 		MakerAssetSuffix: e.MakerAssetSuffix,
 		TakerAssetSuffix: e.TakerAssetSuffix,
 		MakingAmountData: e.MakingAmountData,
@@ -107,14 +91,6 @@ func (e *EscrowExtension) ConvertToOrderbookExtensionPure() (*orderbook.Extensio
 		//strings.TrimPrefix(e.CustomData, "0x"), // TODO Blocking custom data for now because it is breaking the cumsum method. The extension constructor will return with an error if the user provides this field.
 	}, nil
 }
-
-//func (e *EscrowExtension) EncodeEscrowExtension() (string, error) {
-//	limitOrderEncoded, err := e.ConvertToOrderbookExtensionPure().Encode()
-//	if err != nil {
-//		return "", fmt.Errorf("error encoding escrow extension: %v", err)
-//	}
-//	return limitOrderEncoded, nil
-//}
 
 // DecodeEscrowExtension decodes the input byte slice into an Extension struct using reflection.
 func DecodeEscrowExtension(data []byte) (*EscrowExtension, error) {
@@ -129,7 +105,7 @@ func DecodeEscrowExtension(data []byte) (*EscrowExtension, error) {
 
 	// Remove the Fusion Plus Extension data before decoding
 	orderbookExtensionTruncated.PostInteraction = orderbookExtensionTruncated.PostInteraction[:len(orderbookExtensionTruncated.PostInteraction)-extraDataCharacterLength]
-	fusionExtension, err := fusion.FromLimitOrderExtensionPure(orderbookExtensionTruncated)
+	fusionExtension, err := fusion.FromLimitOrderExtension(orderbookExtensionTruncated)
 	if err != nil {
 		return &EscrowExtension{}, fmt.Errorf("error decoding escrow extension: %v", err)
 	}

@@ -83,7 +83,7 @@ func main() {
 		log.Fatal(fmt.Errorf("Failed to get permit: %v\n", err))
 	}
 
-	extension, err := orderbook.NewExtensionPure(orderbook.ExtensionParams{
+	extension, err := orderbook.NewExtension(orderbook.ExtensionParams{
 		MakerAsset: PolygonFRAX,
 		Permit:     permit,
 	})

@@ -227,7 +227,7 @@ func CreateFusionPlusOrderData(quoteParams QuoterControllerGetQuoteParamsFixed, 
 		return nil, fmt.Errorf("error creating fusion order: %v", err)
 	}
 
-	extensionOrderbook, err := extension.ConvertToOrderbookExtensionPure()
+	extensionOrderbook, err := extension.ConvertToOrderbookExtension()
 	if err != nil {
 		return nil, fmt.Errorf("error converting extension to orderbook extension: %v", err)
 	}

@@ -49,7 +49,7 @@ func main() {
 		DstChain:        float32(dstChain),
 		SrcTokenAddress: srcToken,
 		DstTokenAddress: dstToken,
-		Amount:          "1000000",
+		Amount:          "1500000",
 		WalletAddress:   publicAddress,
 		EnableEstimate:  true,
 	}
@@ -151,6 +151,12 @@ func main() {
 			// Check if status is "executed"
 			if orderStatus == "executed" {
 				fmt.Println("Order has been executed.")
+				break
+			}
+
+			// Check if status is "executed"
+			if orderStatus == "refunded" {
+				fmt.Println("Order has been refunded.")
 				break
 			}
 		}

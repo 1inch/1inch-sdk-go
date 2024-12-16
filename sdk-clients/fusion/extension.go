@@ -111,22 +111,6 @@ func (e *Extension) Keccak256() *big.Int {
 
 func (e *Extension) ConvertToOrderbookExtension() *orderbook.Extension {
 	return &orderbook.Extension{
-		InteractionsArray: []string{
-			strings.TrimPrefix(e.MakerAssetSuffix, "0x"),
-			strings.TrimPrefix(e.TakerAssetSuffix, "0x"),
-			strings.TrimPrefix(e.MakingAmountData, "0x"),
-			strings.TrimPrefix(e.TakingAmountData, "0x"),
-			strings.TrimPrefix(e.Predicate, "0x"),
-			strings.TrimPrefix(e.MakerPermit, "0x"),
-			e.PreInteraction,
-			e.PostInteraction,
-			//strings.TrimPrefix(e.CustomData, "0x"), // TODO Blocking custom data for now because it is breaking the cumsum method. The extension constructor will return with an error if the user provides this field.
-		},
-	}
-}
-
-func (e *Extension) ConvertToOrderbookExtensionPure() *orderbook.ExtensionPure {
-	return &orderbook.ExtensionPure{
 		MakerAssetSuffix: e.MakerAssetSuffix,
 		TakerAssetSuffix: e.TakerAssetSuffix,
 		MakingAmountData: e.MakingAmountData,
@@ -172,13 +156,13 @@ func trim0x(s string) string {
 	return strings.TrimPrefix(s, "0x")
 }
 
-func DecodeExtensionPure(data []byte) (*Extension, error) {
+func DecodeExtension(data []byte) (*Extension, error) {
 	orderbookExtension, err := orderbook.Decode(data)
 	if err != nil {
 		return &Extension{}, fmt.Errorf("error decoding extension: %v", err)
 	}
 
-	fusionExtension, err := FromLimitOrderExtensionPure(orderbookExtension)
+	fusionExtension, err := FromLimitOrderExtension(orderbookExtension)
 	if err != nil {
 		return nil, fmt.Errorf("failed to convert orderbook extension to fusion extension: %v", err)
 	}
@@ -201,7 +185,7 @@ func DecodeExtensionPure(data []byte) (*Extension, error) {
 	}, nil
 }
 
-func FromLimitOrderExtensionPure(extension *orderbook.ExtensionPure) (*Extension, error) {
+func FromLimitOrderExtension(extension *orderbook.Extension) (*Extension, error) {
 
 	settlementContractAddress := trim0x(extension.MakingAmountData)[:40]
 

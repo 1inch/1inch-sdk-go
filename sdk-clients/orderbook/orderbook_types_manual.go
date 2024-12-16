@@ -12,7 +12,7 @@ type CreateOrderParams struct {
 	Wallet                         common.Wallet
 	SeriesNonce                    *big.Int
 	MakerTraits                    *MakerTraits
-	Extension                      ExtensionPure
+	Extension                      Extension
 	ExtensionEncoded               string
 	ExpireAfterUnix                int64
 	Maker                          string
