@@ -16,17 +16,27 @@ import (
 
 func CreateLimitOrderMessage(orderRequest CreateOrderParams, chainId int) (*Order, error) {
 
+	encodedExtension, err := orderRequest.Extension.Encode()
+	if err != nil {
+		return nil, fmt.Errorf("error encoding extension: %v", err)
+	}
+
+	// TODO this is a temporary fix to simulate the same extension data after a refactor
+	if encodedExtension == "0x0000000000000000000000000000000000000000000000000000000000000000" {
+		encodedExtension = "0x"
+	}
+
 	orderData := OrderData{
 		MakerAsset:    orderRequest.MakerAsset,
 		TakerAsset:    orderRequest.TakerAsset,
 		MakingAmount:  orderRequest.MakingAmount,
 		TakingAmount:  orderRequest.TakingAmount,
-		Salt:          GenerateSalt(orderRequest.Extension.Encode()),
+		Salt:          GenerateSalt(encodedExtension),
 		Maker:         orderRequest.Maker,
 		AllowedSender: "0x0000000000000000000000000000000000000000",
 		Receiver:      orderRequest.Taker,
 		MakerTraits:   orderRequest.MakerTraits.Encode(),
-		Extension:     orderRequest.Extension.Encode(),
+		Extension:     encodedExtension,
 	}
 
 	aggregationRouter, err := constants.Get1inchRouterFromChainId(chainId)
@@ -116,9 +126,13 @@ func CreateLimitOrderMessage(orderRequest CreateOrderParams, chainId int) (*Orde
 	}, err
 }
 
+var timeNow = func() int64 {
+	return time.Now().UnixNano()
+}
+
 func GenerateSalt(extension string) string {
 	if extension == "0x" {
-		return fmt.Sprintf("%d", time.Now().UnixNano()/int64(time.Millisecond))
+		return fmt.Sprintf("%d", timeNow()/int64(time.Millisecond))
 	}
 
 	byteConverted, err := stringToHexBytes(extension)

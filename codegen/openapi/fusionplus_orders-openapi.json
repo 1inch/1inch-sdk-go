@@ -1,0 +1,1340 @@
+{
+  "openapi": "3.0.0",
+  "paths": {
+    "/v1.0/order/active": {
+      "get": {
+        "operationId": "OrderApiController_getActiveOrders",
+        "summary": "Get cross chain swap active orders",
+        "parameters": [
+          {
+            "name": "page",
+            "required": false,
+            "in": "query",
+            "description": "Pagination step, default: 1 (page = offset / limit)",
+            "example": 1,
+            "schema": {
+              "type": "number",
+              "x-go-type-skip-optional-pointer": true
+            }
+          },
+          {
+            "name": "limit",
+            "required": false,
+            "in": "query",
+            "description": "Number of active orders to receive (default: 100, max: 500)",
+            "example": 100,
+            "schema": {
+              "type": "number",
+              "x-go-type-skip-optional-pointer": true
+            }
+          },
+          {
+            "name": "srcChain",
+            "required": false,
+            "in": "query",
+            "description": "Source chain of cross chain",
+            "example": 1,
+            "schema": {
+              "type": "number",
+              "x-go-type-skip-optional-pointer": true
+            }
+          },
+          {
+            "name": "dstChain",
+            "required": false,
+            "in": "query",
+            "description": "Destination chain of cross chain",
+            "example": 137,
+            "schema": {
+              "type": "number",
+              "x-go-type-skip-optional-pointer": true
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Array of queried active orders"
+          },
+          "400": {
+            "description": "Input data is invalid"
+          },
+          "default": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/GetActiveOrdersOutput"
+                }
+              }
+            }
+          }
+        },
+        "tags": [
+          "Orders"
+        ]
+      }
+    },
+    "/v1.0/order/escrow": {
+      "get": {
+        "operationId": "OrderApiController_getSettlementContract",
+        "summary": "Get actual escrow factory contract address",
+        "parameters": [
+          {
+            "name": "chainId",
+            "required": false,
+            "in": "query",
+            "description": "Chain ID",
+            "example": 1,
+            "schema": {
+              "type": "number",
+              "x-go-type-skip-optional-pointer": true
+            }
+          }
+        ],
+        "responses": {
+          "default": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/EscrowFactory"
+                }
+              }
+            }
+          }
+        },
+        "tags": [
+          "Orders"
+        ]
+      }
+    },
+    "/v1.0/order/maker/{address}": {
+      "get": {
+        "operationId": "OrderApiController_getOrdersByMaker",
+        "parameters": [
+          {
+            "name": "address",
+            "required": true,
+            "in": "path",
+            "description": "Maker's address",
+            "example": "0x1000000000000000000000000000000000000001",
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "page",
+            "required": false,
+            "in": "query",
+            "description": "Pagination step, default: 1 (page = offset / limit)",
+            "example": 1,
+            "schema": {
+              "type": "number",
+              "x-go-type-skip-optional-pointer": true
+            }
+          },
+          {
+            "name": "limit",
+            "required": false,
+            "in": "query",
+            "description": "Number of active orders to receive (default: 100, max: 500)",
+            "example": 100,
+            "schema": {
+              "type": "number",
+              "x-go-type-skip-optional-pointer": true
+            }
+          },
+          {
+            "name": "timestampFrom",
+            "required": false,
+            "in": "query",
+            "description": "timestampFrom in milliseconds for interval [timestampFrom, timestampTo)",
+            "example": 1727173462451,
+            "schema": {
+              "type": "number",
+              "x-go-type-skip-optional-pointer": true
+            }
+          },
+          {
+            "name": "timestampTo",
+            "required": false,
+            "in": "query",
+            "description": "timestampTo in milliseconds for interval [timestampFrom, timestampTo)",
+            "example": 1727173462451,
+            "schema": {
+              "type": "number",
+              "x-go-type-skip-optional-pointer": true
+            }
+          },
+          {
+            "name": "srcToken",
+            "required": false,
+            "in": "query",
+            "description": "Find history by the given source token",
+            "example": "0xc02aaa39b223fe8d0a0e5c4f27ead9083c756cc2",
+            "schema": {
+              "type": "string",
+              "x-go-type-skip-optional-pointer": true
+            }
+          },
+          {
+            "name": "dstToken",
+            "required": false,
+            "in": "query",
+            "description": "Find history by the given destination token",
+            "example": "0xc2132d05d31c914a87c6611c10748aeb04b58e8f",
+            "schema": {
+              "type": "string",
+              "x-go-type-skip-optional-pointer": true
+            }
+          },
+          {
+            "name": "withToken",
+            "required": false,
+            "in": "query",
+            "description": "Find history items by source or destination token",
+            "example": "0xc2132d05d31c914a87c6611c10748aeb04b58e8f",
+            "schema": {
+              "type": "string",
+              "x-go-type-skip-optional-pointer": true
+            }
+          },
+          {
+            "name": "dstChainId",
+            "required": false,
+            "in": "query",
+            "description": "Destination chain of cross chain",
+            "example": 137,
+            "schema": {
+              "type": "number",
+              "x-go-type-skip-optional-pointer": true
+            }
+          },
+          {
+            "name": "srcChainId",
+            "required": false,
+            "in": "query",
+            "description": "Source chain of cross chain",
+            "example": 1,
+            "schema": {
+              "type": "number",
+              "x-go-type-skip-optional-pointer": true
+            }
+          },
+          {
+            "name": "chainId",
+            "required": false,
+            "in": "query",
+            "description": "chainId for looking by dstChainId == chainId OR srcChainId == chainId",
+            "example": 56,
+            "schema": {
+              "type": "number",
+              "x-go-type-skip-optional-pointer": true
+            }
+          }
+        ],
+        "responses": {
+          "default": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/GetOrderByMakerOutput"
+                }
+              }
+            }
+          }
+        },
+        "tags": [
+          "Orders"
+        ]
+      }
+    },
+    "/v1.0/order/secrets/{orderHash}": {
+      "get": {
+        "operationId": "OrderApiController_getPublishedSecrets",
+        "summary": "Get all data to perform withdrawal and cancellation",
+        "parameters": [
+          {
+            "name": "orderHash",
+            "required": true,
+            "in": "path",
+            "example": "0xa0ea5bd12b2d04566e175de24c2df41a058bf16df4af3eb2fb9bff38a9da98e9",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "201": {
+            "description": "Public secrets and all data related to withdrawal and cancellation"
+          },
+          "default": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ResolverDataOutput"
+                }
+              }
+            }
+          }
+        },
+        "tags": [
+          "Orders"
+        ]
+      }
+    },
+    "/v1.0/order/ready-to-accept-secret-fills/{orderHash}": {
+      "get": {
+        "operationId": "OrderApiController_getReadyToAcceptSecretFills",
+        "summary": "Get idx of each secret that is ready for submission for specific order",
+        "parameters": [
+          {
+            "name": "orderHash",
+            "required": true,
+            "in": "path",
+            "example": "0xa0ea5bd12b2d04566e175de24c2df41a058bf16df4af3eb2fb9bff38a9da98e9",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "default": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ReadyToAcceptSecretFills"
+                }
+              }
+            }
+          }
+        },
+        "tags": [
+          "Orders"
+        ]
+      }
+    },
+    "/v1.0/order/ready-to-accept-secret-fills": {
+      "get": {
+        "operationId": "OrderApiController_getReadyToAcceptSecretFillsForAllOrders",
+        "summary": "Get idx of each secret that is ready for submission for all orders",
+        "parameters": [],
+        "responses": {
+          "default": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ReadyToAcceptSecretFillsForAllOrders"
+                }
+              }
+            }
+          }
+        },
+        "tags": [
+          "Orders"
+        ]
+      }
+    },
+    "/v1.0/order/ready-to-execute-public-actions": {
+      "get": {
+        "operationId": "OrderApiController_getEventsReadyForPublicAction",
+        "summary": "Get all data to perform a cancellation or withdrawal on public periods",
+        "parameters": [],
+        "responses": {
+          "default": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ReadyToExecutePublicActionsOutput"
+                }
+              }
+            }
+          }
+        },
+        "tags": [
+          "Orders"
+        ]
+      }
+    },
+    "/v1.0/order/status/{orderHash}": {
+      "get": {
+        "operationId": "OrderApiController_getOrderByOrderHash",
+        "parameters": [
+          {
+            "name": "orderHash",
+            "required": true,
+            "in": "path",
+            "example": "0xa0ea5bd12b2d04566e175de24c2df41a058bf16df4af3eb2fb9bff38a9da98e9",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "default": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/GetOrderFillsByHashOutput"
+                }
+              }
+            }
+          }
+        },
+        "tags": [
+          "Orders"
+        ]
+      }
+    },
+    "/v1.0/order/status": {
+      "post": {
+        "operationId": "OrderApiController_getOrdersByOrderHashes",
+        "parameters": [],
+        "requestBody": {
+          "required": false,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/OrdersByHashesInput"
+              }
+            }
+          }
+        },
+        "responses": {
+          "default": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/GetOrderFillsByHashOutput"
+                }
+              }
+            }
+          }
+        },
+        "tags": [
+          "Orders"
+        ]
+      }
+    }
+  },
+  "info": {
+    "title": "1inch Fusion+ Orders API",
+    "description": "Orders API provides access to active and historical orders",
+    "version": "1.0",
+    "contact": {}
+  },
+  "tags": [],
+  "servers": [
+    {
+      "url": "/orders"
+    }
+  ],
+  "components": {
+    "schemas": {
+      "Meta": {
+        "type": "object",
+        "properties": {
+          "totalItems": {
+            "type": "number",
+            "x-go-type-skip-optional-pointer": true
+          },
+          "itemsPerPage": {
+            "type": "number",
+            "x-go-type-skip-optional-pointer": true
+          },
+          "totalPages": {
+            "type": "number",
+            "x-go-type-skip-optional-pointer": true
+          },
+          "currentPage": {
+            "type": "number",
+            "x-go-type-skip-optional-pointer": true
+          }
+        },
+        "required": [
+          "totalItems",
+          "itemsPerPage",
+          "totalPages",
+          "currentPage"
+        ]
+      },
+      "CrossChainOrderDto": {
+        "type": "object",
+        "properties": {
+          "salt": {
+            "type": "string",
+            "description": "Some unique value. It is necessary to be able to create cross chain orders with the same parameters (so that they have a different hash), Lowest 160 bits of the order salt must be equal to the lowest 160 bits of the extension hash",
+            "x-go-type-skip-optional-pointer": true
+          },
+          "maker": {
+            "type": "string",
+            "description": "Address of the account creating the order (maker) in src chain.",
+            "example": "0x995BE1CA945174D5bA75410C1E658a41eB13a2FA",
+            "x-go-type-skip-optional-pointer": true
+          },
+          "receiver": {
+            "type": "string",
+            "description": "Address of the account receiving the assets (receiver), if different from maker in dst chain.",
+            "example": "0x995BE1CA945174D5bA75410C1E658a41eB13a2FB",
+            "x-go-type-skip-optional-pointer": true
+          },
+          "makerAsset": {
+            "type": "string",
+            "description": "Identifier of the asset being offered by the maker in src chain.",
+            "example": "0x995BE1CA945174D5bA75410C1E658a41eB13a2FC",
+            "x-go-type-skip-optional-pointer": true
+          },
+          "takerAsset": {
+            "type": "string",
+            "description": "Identifier of the asset being requested by the maker in exchange in dst chain.",
+            "example": "0x995BE1CA945174D5bA75410C1E658a41eB13a2FD",
+            "x-go-type-skip-optional-pointer": true
+          },
+          "makingAmount": {
+            "type": "string",
+            "description": "Amount of the makerAsset being offered by the maker in src chain.",
+            "example": "100000000000000000",
+            "x-go-type-skip-optional-pointer": true
+          },
+          "takingAmount": {
+            "type": "string",
+            "description": "Amount of the takerAsset being requested by the maker in dst chain.",
+            "example": "100000000000000000",
+            "x-go-type-skip-optional-pointer": true
+          },
+          "makerTraits": {
+            "type": "string",
+            "description": "Includes some flags like, allow multiple fills, is partial fill allowed or not, price improvement, nonce, deadline etc.",
+            "example": "0x",
+            "x-go-type-skip-optional-pointer": true
+          }
+        },
+        "required": [
+          "salt",
+          "maker",
+          "receiver",
+          "makerAsset",
+          "takerAsset",
+          "makingAmount",
+          "takingAmount",
+          "makerTraits"
+        ]
+      },
+      "ActiveOrdersOutput": {
+        "type": "object",
+        "properties": {
+          "orderHash": {
+            "type": "string",
+            "description": "Unique identifier of the order.",
+            "example": "0x496755a88564d8ded6759dff0252d3e6c3ef1fe42b4fa1bbc3f03bd2674f1078",
+            "x-go-type-skip-optional-pointer": true
+          },
+          "signature": {
+            "type": "string",
+            "description": "Signature of the order.",
+            "example": "0xf7739f12038fa25a57b51b3fb26fd68bd4b80b534c9ff2a1fd396234b7a8f59308b573db71f7c9598746ecfe6f7f2a962a9d31a1229fc570044ebf0b4bc5db0c",
+            "x-go-type-skip-optional-pointer": true
+          },
+          "deadline": {
+            "type": "number",
+            "description": "Deadline by which the order must be filled.",
+            "example": 1634025600000,
+            "x-go-type-skip-optional-pointer": true
+          },
+          "auctionStartDate": {
+            "type": "number",
+            "description": "Start date of the auction for this order.",
+            "example": 1634025600000,
+            "x-go-type-skip-optional-pointer": true
+          },
+          "auctionEndDate": {
+            "type": "number",
+            "description": "End date of the auction for this order.",
+            "example": 1634025600000,
+            "x-go-type-skip-optional-pointer": true
+          },
+          "quoteId": {
+            "type": "string",
+            "description": "Identifier of the quote associated with this order.",
+            "x-go-type-skip-optional-pointer": true
+          },
+          "remainingMakerAmount": {
+            "type": "string",
+            "description": "Remaining amount of the maker asset that can still be filled.",
+            "example": "100000000000000000",
+            "x-go-type-skip-optional-pointer": true
+          },
+          "makerBalance": {
+            "type": "string",
+            "description": "Amount of the maker asset balance.",
+            "example": "100000000000000000",
+            "x-go-type-skip-optional-pointer": true
+          },
+          "makerAllowance": {
+            "type": "string",
+            "description": "Amount of the maker asset allowance.",
+            "example": "100000000000000000",
+            "x-go-type-skip-optional-pointer": true
+          },
+          "isMakerContract": {
+            "type": "boolean",
+            "description": "True if order signed by contract (GnosisSafe, etc.)",
+            "example": true,
+            "x-go-type-skip-optional-pointer": true
+          },
+          "extension": {
+            "type": "string",
+            "description": "An interaction call data. ABI encoded set of makerAssetSuffix, takerAssetSuffix, makingAmountGetter, takingAmountGetter, predicate, permit, preInteraction, postInteraction.If extension exists then lowest 160 bits of the order salt must be equal to the lowest 160 bits of the extension hash",
+            "example": "0x",
+            "x-go-type-skip-optional-pointer": true
+          },
+          "srcChainId": {
+            "type": "number",
+            "description": "Identifier of the chain where the maker asset is located. ",
+            "example": 1,
+            "x-go-type-skip-optional-pointer": true
+          },
+          "dstChainId": {
+            "type": "number",
+            "description": "Identifier of the chain where the taker asset is located.",
+            "example": 2,
+            "x-go-type-skip-optional-pointer": true
+          },
+          "order": {
+            "$ref": "#/components/schemas/CrossChainOrderDto"
+          },
+          "secretHashes": {
+            "description": "Array of secret hashes.",
+            "example": [
+              "0x2048b38093dc53876b2bbd230ee8999791153db01de425112f449d018094e116",
+              "0x7972c1498893bb9b88baddc9decb78d8defdcc7a182a72edd8724498c75f088d",
+              "0x6d5b8f0b1f8a28564ff65e5f9c4d8a8a6babfb318bca6ecc9d872a3abe8a4ea0"
+            ],
+            "type": "array",
+            "items": {
+              "type": "array"
+            },
+            "x-go-type-skip-optional-pointer": true
+          },
+          "fills": {
+            "description": "Array of fills.",
+            "type": "array",
+            "items": {
+              "type": "string"
+            },
+            "x-go-type-skip-optional-pointer": true
+          }
+        },
+        "required": [
+          "orderHash",
+          "signature",
+          "deadline",
+          "auctionStartDate",
+          "auctionEndDate",
+          "quoteId",
+          "remainingMakerAmount",
+          "makerBalance",
+          "makerAllowance",
+          "isMakerContract",
+          "extension",
+          "srcChainId",
+          "dstChainId",
+          "order",
+          "fills"
+        ]
+      },
+      "GetActiveOrdersOutput": {
+        "type": "object",
+        "properties": {
+          "meta": {
+            "$ref": "#/components/schemas/Meta"
+          },
+          "items": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/ActiveOrdersOutput"
+            },
+            "x-go-type-skip-optional-pointer": true
+          }
+        },
+        "required": [
+          "meta",
+          "items"
+        ]
+      },
+      "EscrowFactory": {
+        "type": "object",
+        "properties": {
+          "address": {
+            "type": "string",
+            "description": "actual escrow factory contract address",
+            "x-go-type-skip-optional-pointer": true
+          }
+        },
+        "required": [
+          "address"
+        ]
+      },
+      "GetOrderByMakerOutput": {
+        "type": "object",
+        "properties": {
+          "meta": {
+            "$ref": "#/components/schemas/Meta"
+          },
+          "items": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/ActiveOrdersOutput"
+            },
+            "x-go-type-skip-optional-pointer": true
+          }
+        },
+        "required": [
+          "meta",
+          "items"
+        ]
+      },
+      "Immutables": {
+        "type": "object",
+        "properties": {
+          "orderHash": {
+            "type": "string",
+            "description": "Order's hash 32 bytes hex sting",
+            "example": "0x496755a88564d8ded6759dff0252d3e6c3ef1fe42b4fa1bbc3f03bd2674f1078",
+            "x-go-type-skip-optional-pointer": true
+          },
+          "hashlock": {
+            "type": "string",
+            "description": "keccak256(secret(idx))",
+            "example": "0x03f9ebf9075dfaae76c43b7443d07399609ffe24a5d435045fe4d3bf82d9fce4",
+            "x-go-type-skip-optional-pointer": true
+          },
+          "maker": {
+            "type": "string",
+            "description": "Maker's address which will receive tokens",
+            "example": "0xe75eD6F453c602Bd696cE27AF11565eDc9b46B0D",
+            "x-go-type-skip-optional-pointer": true
+          },
+          "taker": {
+            "type": "string",
+            "description": "Escrow creation initiator address",
+            "example": "0x00000000009E50a7dDb7a7B0e2ee6604fd120E49",
+            "x-go-type-skip-optional-pointer": true
+          },
+          "token": {
+            "type": "string",
+            "description": "Token to receive on specific chain",
+            "example": "0xdAC17F958D2ee523a2206206994597C13D831ec7",
+            "x-go-type-skip-optional-pointer": true
+          },
+          "amount": {
+            "type": "string",
+            "description": "Amount of token to receive",
+            "example": "1000000000000000000",
+            "x-go-type-skip-optional-pointer": true
+          },
+          "safetyDeposit": {
+            "type": "string",
+            "description": "Security deposit in chain's native currency",
+            "example": "50000000000000000000",
+            "x-go-type-skip-optional-pointer": true
+          },
+          "timelocks": {
+            "type": "string",
+            "description": "Encoded timelocks. To decode use: https://github.com/1inch/cross-chain-sdk/blob/master/src/cross-chain-order/time-locks/time-locks.ts",
+            "example": "0x3000000020000000100000004000000030000000200000001",
+            "x-go-type-skip-optional-pointer": true
+          }
+        },
+        "required": [
+          "orderHash",
+          "hashlock",
+          "maker",
+          "taker",
+          "token",
+          "amount",
+          "safetyDeposit",
+          "timelocks"
+        ]
+      },
+      "PublicSecret": {
+        "type": "object",
+        "properties": {
+          "idx": {
+            "type": "number",
+            "description": "Sequence number of secrets",
+            "example": 1,
+            "x-go-type-skip-optional-pointer": true
+          },
+          "secret": {
+            "type": "string",
+            "description": "Public secret to perform a withdrawal",
+            "example": "0xdb475911f2d1c5df6b1fb959777ddd01c89d881175a3b9693ec884f18dcb5734",
+            "x-go-type-skip-optional-pointer": true
+          },
+          "srcImmutables": {
+            "$ref": "#/components/schemas/Immutables"
+          },
+          "dstImmutables": {
+            "$ref": "#/components/schemas/Immutables"
+          }
+        },
+        "required": [
+          "idx",
+          "secret",
+          "srcImmutables",
+          "dstImmutables"
+        ]
+      },
+      "ResolverDataOutput": {
+        "type": "object",
+        "properties": {
+          "orderType": {
+            "type": "string",
+            "enum": [
+              "SingleFill",
+              "MultipleFills"
+            ],
+            "description": "Type of the order: enabled or disabled partial fills",
+            "example": "SingleFill",
+            "x-go-type-skip-optional-pointer": true
+          },
+          "secrets": {
+            "description": "The data required for order withdraw and cancel",
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/PublicSecret"
+            },
+            "x-go-type-skip-optional-pointer": true
+          },
+          "secretHashes": {
+            "description": "keccak256(secret(idx))[]",
+            "example": [
+              "0x2048b38093dc53876b2bbd230ee8999791153db01de425112f449d018094e116",
+              "0x7972c1498893bb9b88baddc9decb78d8defdcc7a182a72edd8724498c75f088d",
+              "0x6d5b8f0b1f8a28564ff65e5f9c4d8a8a6babfb318bca6ecc9d872a3abe8a4ea0"
+            ],
+            "type": "array",
+            "items": {
+              "type": "array"
+            },
+            "x-go-type-skip-optional-pointer": true
+          }
+        },
+        "required": [
+          "orderType",
+          "secrets"
+        ]
+      },
+      "ReadyToAcceptSecretFill": {
+        "type": "object",
+        "properties": {
+          "idx": {
+            "type": "number",
+            "description": "Sequence number of secrets for submission",
+            "x-go-type-skip-optional-pointer": true
+          },
+          "srcEscrowDeployTxHash": {
+            "type": "string",
+            "description": "Transaction hash where the source chain escrow was deployed",
+            "x-go-type-skip-optional-pointer": true
+          },
+          "dstEscrowDeployTxHash": {
+            "type": "string",
+            "description": "Transaction hash where the destination chain escrow was deployed",
+            "x-go-type-skip-optional-pointer": true
+          }
+        },
+        "required": [
+          "idx",
+          "srcEscrowDeployTxHash",
+          "dstEscrowDeployTxHash"
+        ]
+      },
+      "ReadyToAcceptSecretFills": {
+        "type": "object",
+        "properties": {
+          "fills": {
+            "description": "Fills that are ready to accept secrets from the client",
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/ReadyToAcceptSecretFill"
+            },
+            "x-go-type-skip-optional-pointer": true
+          }
+        },
+        "required": [
+          "fills"
+        ]
+      },
+      "ReadyToAcceptSecretFillsForOrder": {
+        "type": "object",
+        "properties": {
+          "orderHash": {
+            "type": "string",
+            "description": "Order hash",
+            "example": "0x496755a88564d8ded6759dff0252d3e6c3ef1fe42b4fa1bbc3f03bd2674f1078",
+            "x-go-type-skip-optional-pointer": true
+          },
+          "makerAddress": {
+            "type": "string",
+            "description": "Maker address",
+            "example": "0x496755a88564d8ded6759dff0252d3e6c3ef1fe42b4fa1bbc3f03bd2674f1079",
+            "x-go-type-skip-optional-pointer": true
+          },
+          "fills": {
+            "description": "Fills that are ready to accept secrets from the client",
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/ReadyToAcceptSecretFill"
+            },
+            "x-go-type-skip-optional-pointer": true
+          }
+        },
+        "required": [
+          "orderHash",
+          "makerAddress",
+          "fills"
+        ]
+      },
+      "ReadyToAcceptSecretFillsForAllOrders": {
+        "type": "object",
+        "properties": {
+          "orders": {
+            "description": "Fills that are ready to accept secrets from the client for all orders",
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/ReadyToAcceptSecretFillsForOrder"
+            },
+            "x-go-type-skip-optional-pointer": true
+          }
+        },
+        "required": [
+          "orders"
+        ]
+      },
+      "ReadyToExecutePublicAction": {
+        "type": "object",
+        "properties": {
+          "action": {
+            "type": "string",
+            "enum": [
+              "withdraw",
+              "cancel"
+            ],
+            "example": "withdraw",
+            "x-go-type-skip-optional-pointer": true
+          },
+          "immutables": {
+            "$ref": "#/components/schemas/Immutables"
+          },
+          "chainId": {
+            "type": "number",
+            "description": "Execute action on this chain",
+            "example": 1,
+            "x-go-type-skip-optional-pointer": true
+          },
+          "escrow": {
+            "type": "string",
+            "description": "Escrow's address to perform public action",
+            "example": "0xf1325353e081023520d44b7a24f72905ada3a080",
+            "x-go-type-skip-optional-pointer": true
+          },
+          "secret": {
+            "type": "string",
+            "description": "Presented only for withdraw action",
+            "example": "0x496755a88564d8ded6759dff0252d3e6c3ef1fe42b4fa1bbc3f03bd2674f1078",
+            "x-go-type-skip-optional-pointer": true
+          }
+        },
+        "required": [
+          "action",
+          "immutables",
+          "chainId",
+          "escrow"
+        ]
+      },
+      "ReadyToExecutePublicActionsOutput": {
+        "type": "object",
+        "properties": {
+          "actions": {
+            "description": "Actions allowed to be performed on public timelock periods",
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/ReadyToExecutePublicAction"
+            },
+            "x-go-type-skip-optional-pointer": true
+          }
+        },
+        "required": [
+          "actions"
+        ]
+      },
+      "LimitOrderV4StructOutput": {
+        "type": "object",
+        "properties": {
+          "salt": {
+            "type": "string",
+            "x-go-type-skip-optional-pointer": true
+          },
+          "maker": {
+            "type": "string",
+            "description": "Maker address",
+            "example": "0x995BE1CA945174D5bA75410C1E658a41eB13a2FA",
+            "x-go-type-skip-optional-pointer": true
+          },
+          "receiver": {
+            "type": "string",
+            "description": "Receiver address",
+            "example": "0x995BE1CA945174D5bA75410C1E658a41eB13a2FA",
+            "x-go-type-skip-optional-pointer": true
+          },
+          "makerAsset": {
+            "type": "string",
+            "description": "Maker asset address",
+            "example": "0x995BE1CA945174D5bA75410C1E658a41eB13a2FA",
+            "x-go-type-skip-optional-pointer": true
+          },
+          "takerAsset": {
+            "type": "string",
+            "description": "Taker asset address",
+            "example": "0x995BE1CA945174D5bA75410C1E658a41eB13a2FA",
+            "x-go-type-skip-optional-pointer": true
+          },
+          "makingAmount": {
+            "type": "string",
+            "description": "Amount of the maker asset",
+            "example": "100000000000000000",
+            "x-go-type-skip-optional-pointer": true
+          },
+          "takingAmount": {
+            "type": "string",
+            "description": "Amount of the taker asset",
+            "example": "100000000000000000",
+            "x-go-type-skip-optional-pointer": true
+          },
+          "makerTraits": {
+            "type": "string",
+            "x-go-type-skip-optional-pointer": true
+          }
+        },
+        "required": [
+          "salt",
+          "maker",
+          "receiver",
+          "makerAsset",
+          "takerAsset",
+          "makingAmount",
+          "takingAmount",
+          "makerTraits"
+        ]
+      },
+      "AuctionPointOutput": {
+        "type": "object",
+        "properties": {
+          "delay": {
+            "type": "number",
+            "description": "The delay in seconds from the previous point or auction start time",
+            "example": 234,
+            "x-go-type-skip-optional-pointer": true
+          },
+          "coefficient": {
+            "type": "number",
+            "description": "The rate bump from the order min taker amount",
+            "example": 200,
+            "x-go-type-skip-optional-pointer": true
+          }
+        },
+        "required": [
+          "delay",
+          "coefficient"
+        ]
+      },
+      "EscrowEventDataOutput": {
+        "type": "object",
+        "properties": {
+          "transactionHash": {
+            "type": "string",
+            "description": "Transaction hash",
+            "example": "0x806039f5149065924ad52de616b50abff488c986716d052e9c160887bc09e559",
+            "x-go-type-skip-optional-pointer": true
+          },
+          "side": {
+            "type": "string",
+            "description": "Side of the escrow event SRC or DST",
+            "example": "src",
+            "enum": [
+              "src",
+              "dst"
+            ],
+            "x-go-type-skip-optional-pointer": true
+          },
+          "action": {
+            "type": "string",
+            "description": "Action of the escrow event",
+            "example": "src_escrow_created",
+            "enum": [
+              "src_escrow_created",
+              "dst_escrow_created",
+              "withdrawn",
+              "funds_rescued",
+              "escrow_cancelled"
+            ],
+            "x-go-type-skip-optional-pointer": true
+          },
+          "blockTimestamp": {
+            "type": "number",
+            "description": "Unix timestamp in milliseconds",
+            "example": 123123123123,
+            "x-go-type-skip-optional-pointer": true
+          }
+        },
+        "required": [
+          "transactionHash",
+          "side",
+          "action",
+          "blockTimestamp"
+        ]
+      },
+      "FillOutputDto": {
+        "type": "object",
+        "properties": {
+          "status": {
+            "type": "string",
+            "description": "Fill status",
+            "example": "pending",
+            "enum": [
+              "pending",
+              "executed",
+              "refunding",
+              "refunded"
+            ],
+            "x-go-type-skip-optional-pointer": true
+          },
+          "txHash": {
+            "type": "string",
+            "description": "Transaction hash",
+            "example": "0x806039f5149065924ad52de616b50abff488c986716d052e9c160887bc09e559",
+            "x-go-type-skip-optional-pointer": true
+          },
+          "filledMakerAmount": {
+            "type": "string",
+            "description": "Amount of the makerAsset filled in src chain.",
+            "example": "100000000000000000",
+            "x-go-type-skip-optional-pointer": true
+          },
+          "filledAuctionTakerAmount": {
+            "type": "string",
+            "description": "Amount of the takerAsset filled in dst chain.",
+            "example": "100000000000000000",
+            "x-go-type-skip-optional-pointer": true
+          },
+          "escrowEvents": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/EscrowEventDataOutput"
+            },
+            "x-go-type-skip-optional-pointer": true
+          }
+        },
+        "required": [
+          "status",
+          "txHash",
+          "filledMakerAmount",
+          "filledAuctionTakerAmount",
+          "escrowEvents"
+        ]
+      },
+      "GetOrderFillsByHashOutput": {
+        "type": "object",
+        "properties": {
+          "orderHash": {
+            "type": "string",
+            "description": "Order hash",
+            "example": "0x496755a88564d8ded6759dff0252d3e6c3ef1fe42b4fa1bbc3f03bd2674f1078",
+            "x-go-type-skip-optional-pointer": true
+          },
+          "status": {
+            "type": "string",
+            "description": "Order status",
+            "example": "pending",
+            "enum": [
+              "pending",
+              "executed",
+              "expired",
+              "cancelled",
+              "refunding",
+              "refunded"
+            ],
+            "x-go-type-skip-optional-pointer": true
+          },
+          "validation": {
+            "type": "string",
+            "description": "Order validation status",
+            "example": "valid",
+            "enum": [
+              "valid",
+              "order-predicate-returned-false",
+              "not-enough-balance",
+              "not-enough-allowance",
+              "invalid-permit-signature",
+              "invalid-permit-spender",
+              "invalid-permit-signer",
+              "invalid-signature",
+              "failed-to-parse-permit-details",
+              "unknown-permit-version",
+              "wrong-epoch-manager-and-bit-invalidator",
+              "failed-to-decode-remaining",
+              "unknown-failure"
+            ],
+            "x-go-type-skip-optional-pointer": true
+          },
+          "order": {
+            "$ref": "#/components/schemas/LimitOrderV4StructOutput"
+          },
+          "extension": {
+            "type": "string",
+            "description": "An interaction call data. ABI encoded set of makerAssetSuffix, takerAssetSuffix, makingAmountGetter, takingAmountGetter, predicate, permit, preInteraction, postInteraction.If extension exists then lowest 160 bits of the order salt must be equal to the lowest 160 bits of the extension hash",
+            "x-go-type-skip-optional-pointer": true
+          },
+          "points": {
+            "$ref": "#/components/schemas/AuctionPointOutput"
+          },
+          "approximateTakingAmount": {
+            "type": "string",
+            "description": "Approximate amount of the takerAsset being requested by the maker in dst chain.",
+            "example": "100000000000000000",
+            "x-go-type-skip-optional-pointer": true
+          },
+          "fills": {
+            "description": "Fills",
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/FillOutputDto"
+            },
+            "x-go-type-skip-optional-pointer": true
+          },
+          "auctionStartDate": {
+            "type": "number",
+            "description": "Unix timestamp in milliseconds",
+            "example": 123123123123,
+            "x-go-type-skip-optional-pointer": true
+          },
+          "auctionDuration": {
+            "type": "number",
+            "description": "Unix timestamp in milliseconds",
+            "example": 123123123123,
+            "x-go-type-skip-optional-pointer": true
+          },
+          "initialRateBump": {
+            "type": "number",
+            "description": "Initial rate bump",
+            "example": 1000,
+            "x-go-type-skip-optional-pointer": true
+          },
+          "createdAt": {
+            "type": "number",
+            "description": "Unix timestamp in milliseconds",
+            "example": 123123123123,
+            "x-go-type-skip-optional-pointer": true
+          },
+          "srcTokenPriceUsd": {
+            "type": "object",
+            "example": 100,
+            "x-go-type-skip-optional-pointer": true
+          },
+          "dstTokenPriceUsd": {
+            "type": "object",
+            "example": 200,
+            "x-go-type-skip-optional-pointer": true
+          },
+          "cancelTx": {
+            "type": "object",
+            "example": "0xa2768a9826b2c45a6937010ce21a91b1da9f8c7aa5194f68aa99306b22518b41",
+            "x-go-type-skip-optional-pointer": true
+          },
+          "srcChainId": {
+            "type": "number",
+            "description": "Identifier of the chain where the maker asset is located. ",
+            "example": 1,
+            "x-go-type-skip-optional-pointer": true
+          },
+          "dstChainId": {
+            "type": "number",
+            "description": "Identifier of the chain where the taker asset is located.",
+            "example": 2,
+            "x-go-type-skip-optional-pointer": true
+          },
+          "cancelable": {
+            "type": "boolean",
+            "description": "Is order cancelable",
+            "example": true,
+            "x-go-type-skip-optional-pointer": true
+          },
+          "takerAsset": {
+            "type": "string",
+            "description": "Identifier of the asset being requested by the maker in exchange in dst chain.",
+            "example": "0x995BE1CA945174D5bA75410C1E658a41eB13a2FD",
+            "x-go-type-skip-optional-pointer": true
+          },
+          "timeLocks": {
+            "type": "string",
+            "description": "TimeLocks without deployedAt",
+            "example": "0xfc000000840000000c000001bc00000144000000a800000024",
+            "x-go-type-skip-optional-pointer": true
+          }
+        },
+        "required": [
+          "orderHash",
+          "status",
+          "validation",
+          "order",
+          "extension",
+          "points",
+          "approximateTakingAmount",
+          "fills",
+          "auctionStartDate",
+          "auctionDuration",
+          "initialRateBump",
+          "createdAt",
+          "srcTokenPriceUsd",
+          "dstTokenPriceUsd",
+          "cancelTx",
+          "srcChainId",
+          "dstChainId",
+          "cancelable",
+          "takerAsset",
+          "timeLocks"
+        ]
+      },
+      "OrdersByHashesInput": {
+        "type": "object",
+        "properties": {
+          "orderHashes": {
+            "example": [
+              "0x10ea5bd12b2d04566e175de24c2df41a058bf16df4af3eb2fb9bff38a9da98e9",
+              "0x20ea5bd12b2d04566e175de24c2df41a058bf16df4af3eb2fb9bff38a9da98e8",
+              "0x30ea5bd12b2d04566e175de24c2df41a058bf16df4af3eb2fb9bff38a9da98e7",
+              "0x40ea5bd12b2d04566e175de24c2df41a058bf16df4af3eb2fb9bff38a9da98e6"
+            ],
+            "type": "array",
+            "items": {
+              "type": "string"
+            },
+            "x-go-type-skip-optional-pointer": true
+          }
+        },
+        "required": [
+          "orderHashes"
+        ]
+      }
+    }
+  }
+}
