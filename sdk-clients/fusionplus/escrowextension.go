@@ -14,8 +14,6 @@ import (
 	"github.com/ethereum/go-ethereum/common"
 )
 
-const zeroAddress = "0x0000000000000000000000000000000000000000"
-
 type EscrowExtension struct {
 	fusion.Extension
 	HashLock         *HashLock
