@@ -10,10 +10,10 @@ import (
 
 type GetQuoteOutputFixed struct {
 	// FeeToken Destination token address
-	FeeToken        string            `json:"feeToken"`
-	FromTokenAmount string            `json:"fromTokenAmount"`
-	Presets         QuotePresetsClass `json:"presets"`
-	Prices          TokenPairValue    `json:"prices"`
+	FeeToken        string                 `json:"feeToken"`
+	FromTokenAmount string                 `json:"fromTokenAmount"`
+	Presets         QuotePresetsClassFixed `json:"presets"`
+	Prices          TokenPairValue         `json:"prices"`
 
 	// QuoteId Current generated quote id, should be passed with order
 	QuoteId string `json:"quoteId"` // TODO This field is marked as "object" instead of "string" in the swagger file. This is an easy fix from the Fusion team
@@ -231,4 +231,29 @@ type QuoterControllerGetQuoteParamsFixed struct {
 
 	// Permit permit, user approval sign
 	Permit string `url:"permit,omitempty" json:"permit,omitempty"`
+}
+
+// PresetClassFixed defines model for PresetClass.
+type PresetClassFixed struct {
+	AllowMultipleFills bool                `json:"allowMultipleFills"`
+	AllowPartialFills  bool                `json:"allowPartialFills"`
+	AuctionDuration    float32             `json:"auctionDuration"`
+	AuctionEndAmount   string              `json:"auctionEndAmount"`
+	AuctionStartAmount string              `json:"auctionStartAmount"`
+	BankFee            string              `json:"bankFee"`
+	EstP               float32             `json:"estP"`
+	ExclusiveResolver  string              `json:"exclusiveResolver"` // This was changed to a string from a map[string]interface{}
+	GasCost            GasCostConfigClass  `json:"gasCost"`
+	InitialRateBump    float32             `json:"initialRateBump"`
+	Points             []AuctionPointClass `json:"points"`
+	StartAuctionIn     float32             `json:"startAuctionIn"`
+	TokenFee           string              `json:"tokenFee"`
+}
+
+// QuotePresetsClassFixed defines model for QuotePresetsClass.
+type QuotePresetsClassFixed struct {
+	Custom *PresetClassFixed `json:"custom,omitempty"`
+	Fast   PresetClassFixed  `json:"fast"`
+	Medium PresetClassFixed  `json:"medium"`
+	Slow   PresetClassFixed  `json:"slow"`
 }
