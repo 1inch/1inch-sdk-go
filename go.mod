@@ -8,7 +8,6 @@ require (
 	github.com/google/go-querystring v1.1.0
 	github.com/oapi-codegen/runtime v1.1.1
 	github.com/stretchr/testify v1.9.0
-	github.com/txaty/go-merkletree v0.2.2
 	golang.org/x/crypto v0.22.0
 )
 
@@ -45,7 +44,3 @@ require (
 	gopkg.in/yaml.v3 v3.0.1 // indirect
 	rsc.io/tmplfunc v0.0.3 // indirect
 )
-
-replace github.com/FantasyJony/openzeppelin-merkle-tree-go => /Users/tanner/1inch/openzeppelin-merkle-tree-go
-
-replace github.com/txaty/go-merkletree => /Users/tanner/1inch/local-dependencies/go-merkletree

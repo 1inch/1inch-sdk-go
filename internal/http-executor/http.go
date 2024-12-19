@@ -94,10 +94,6 @@ func (c *Client) processResponse(resp *http.Response, v interface{}) error {
 		return err
 	}
 
-	//rawBody := buf.String()
-	//indented, err := json.MarshalIndent(json.RawMessage(rawBody), "", "    ")
-	//log.Printf("Raw body: %s", indented)
-
 	if buf.Len() == 0 {
 		return nil // No content to decode
 	}

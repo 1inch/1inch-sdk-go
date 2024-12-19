@@ -67,7 +67,7 @@ func TestUint32FromHex(t *testing.T) {
 		{
 			name:        "Four bytes 0x01020304",
 			hexStr:      "0x01020304",
-			expected:    16909060, // 1*256^3 + 2*256^2 + 3*256 + 4
+			expected:    16909060,
 			expectError: false,
 		},
 		{
@@ -120,7 +120,7 @@ func TestUint32FromHex(t *testing.T) {
 		{
 			name:        "Four bytes 0x0A0B0C0D",
 			hexStr:      "0x0A0B0C0D",
-			expected:    168496141, // 10<<24 + 11<<16 + 12<<8 +13
+			expected:    168496141,
 			expectError: false,
 		},
 	}
