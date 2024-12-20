@@ -14,7 +14,7 @@ import (
 )
 
 func TestGetPreset(t *testing.T) {
-	customPreset := &PresetClass{
+	customPreset := &PresetClassFixed{
 		AllowMultipleFills: true,
 		AllowPartialFills:  true,
 		AuctionDuration:    10.0,
@@ -22,7 +22,7 @@ func TestGetPreset(t *testing.T) {
 		AuctionStartAmount: "500",
 		BankFee:            "5",
 		EstP:               0.1,
-		ExclusiveResolver:  map[string]interface{}{"resolver": "value"},
+		ExclusiveResolver:  "resolver",
 		GasCost: GasCostConfigClass{
 			GasBumpEstimate:  1.0,
 			GasPriceEstimate: "100",
@@ -35,7 +35,7 @@ func TestGetPreset(t *testing.T) {
 		TokenFee:       "1",
 	}
 
-	fastPreset := PresetClass{
+	fastPreset := PresetClassFixed{
 		AllowMultipleFills: false,
 		AllowPartialFills:  false,
 		AuctionDuration:    20.0,
@@ -43,7 +43,7 @@ func TestGetPreset(t *testing.T) {
 		AuctionStartAmount: "1000",
 		BankFee:            "10",
 		EstP:               0.2,
-		ExclusiveResolver:  map[string]interface{}{"resolver": "value"},
+		ExclusiveResolver:  "resolver",
 		GasCost: GasCostConfigClass{
 			GasBumpEstimate:  2.0,
 			GasPriceEstimate: "200",
@@ -56,7 +56,7 @@ func TestGetPreset(t *testing.T) {
 		TokenFee:       "2",
 	}
 
-	mediumPreset := PresetClass{
+	mediumPreset := PresetClassFixed{
 		AllowMultipleFills: true,
 		AllowPartialFills:  false,
 		AuctionDuration:    30.0,
@@ -64,7 +64,7 @@ func TestGetPreset(t *testing.T) {
 		AuctionStartAmount: "1500",
 		BankFee:            "15",
 		EstP:               0.3,
-		ExclusiveResolver:  map[string]interface{}{"resolver": "value"},
+		ExclusiveResolver:  "resolver",
 		GasCost: GasCostConfigClass{
 			GasBumpEstimate:  3.0,
 			GasPriceEstimate: "300",
@@ -77,7 +77,7 @@ func TestGetPreset(t *testing.T) {
 		TokenFee:       "3",
 	}
 
-	slowPreset := PresetClass{
+	slowPreset := PresetClassFixed{
 		AllowMultipleFills: false,
 		AllowPartialFills:  true,
 		AuctionDuration:    40.0,
@@ -85,7 +85,7 @@ func TestGetPreset(t *testing.T) {
 		AuctionStartAmount: "2000",
 		BankFee:            "20",
 		EstP:               0.4,
-		ExclusiveResolver:  map[string]interface{}{"resolver": "value"},
+		ExclusiveResolver:  "resolver",
 		GasCost: GasCostConfigClass{
 			GasBumpEstimate:  4.0,
 			GasPriceEstimate: "400",
@@ -98,7 +98,7 @@ func TestGetPreset(t *testing.T) {
 		TokenFee:       "4",
 	}
 
-	presets := QuotePresetsClass{
+	presets := QuotePresetsClassFixed{
 		Custom: customPreset,
 		Fast:   fastPreset,
 		Medium: mediumPreset,
@@ -108,7 +108,7 @@ func TestGetPreset(t *testing.T) {
 	tests := []struct {
 		name       string
 		presetType GetQuoteOutputRecommendedPreset
-		expected   *PresetClass
+		expected   *PresetClassFixed
 		expectErr  bool
 	}{
 		{
@@ -159,14 +159,14 @@ func TestGetPreset(t *testing.T) {
 func TestCreateAuctionDetails(t *testing.T) {
 	tests := []struct {
 		name                 string
-		preset               *PresetClass
+		preset               *PresetClassFixed
 		additionalWaitPeriod float32
 		expected             *AuctionDetails
 		expectErr            bool
 	}{
 		{
 			name: "Valid Preset",
-			preset: &PresetClass{
+			preset: &PresetClassFixed{
 				AllowMultipleFills: true,
 				AllowPartialFills:  true,
 				AuctionDuration:    60.0,
@@ -174,7 +174,7 @@ func TestCreateAuctionDetails(t *testing.T) {
 				AuctionStartAmount: "500",
 				BankFee:            "5",
 				EstP:               0.1,
-				ExclusiveResolver:  map[string]interface{}{"resolver": "value"},
+				ExclusiveResolver:  "resolver",
 				GasCost: GasCostConfigClass{
 					GasBumpEstimate:  1.0,
 					GasPriceEstimate: "100",
@@ -203,7 +203,7 @@ func TestCreateAuctionDetails(t *testing.T) {
 		},
 		{
 			name: "Invalid Gas Price Estimate",
-			preset: &PresetClass{
+			preset: &PresetClassFixed{
 				AllowMultipleFills: true,
 				AllowPartialFills:  true,
 				AuctionDuration:    60.0,
@@ -211,7 +211,7 @@ func TestCreateAuctionDetails(t *testing.T) {
 				AuctionStartAmount: "500",
 				BankFee:            "5",
 				EstP:               0.1,
-				ExclusiveResolver:  map[string]interface{}{"resolver": "value"},
+				ExclusiveResolver:  "resolver",
 				GasCost: GasCostConfigClass{
 					GasBumpEstimate:  1.0,
 					GasPriceEstimate: "invalid",

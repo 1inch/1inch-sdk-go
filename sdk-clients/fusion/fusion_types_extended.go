@@ -10,10 +10,10 @@ import (
 
 type GetQuoteOutputFixed struct {
 	// FeeToken Destination token address
-	FeeToken        string            `json:"feeToken"`
-	FromTokenAmount string            `json:"fromTokenAmount"`
-	Presets         QuotePresetsClass `json:"presets"`
-	Prices          TokenPairValue    `json:"prices"`
+	FeeToken        string                 `json:"feeToken"`
+	FromTokenAmount string                 `json:"fromTokenAmount"`
+	Presets         QuotePresetsClassFixed `json:"presets"`
+	Prices          TokenPairValue         `json:"prices"`
 
 	// QuoteId Current generated quote id, should be passed with order
 	QuoteId string `json:"quoteId"` // TODO This field is marked as "object" instead of "string" in the swagger file. This is an easy fix from the Fusion team
@@ -231,4 +231,60 @@ type QuoterControllerGetQuoteParamsFixed struct {
 
 	// Permit permit, user approval sign
 	Permit string `url:"permit,omitempty" json:"permit,omitempty"`
+}
+
+type OrderResponse struct {
+	ApproximateTakingAmount string  `json:"approximateTakingAmount"`
+	AuctionDuration         int     `json:"auctionDuration"`
+	AuctionStartDate        int64   `json:"auctionStartDate"`
+	CancelTx                *string `json:"cancelTx"`
+	CreatedAt               string  `json:"createdAt"`
+	Extension               string  `json:"extension"`
+	Fills                   []struct {
+		FilledAuctionTakerAmount string `json:"filledAuctionTakerAmount"`
+		FilledMakerAmount        string `json:"filledMakerAmount"`
+		TxHash                   string `json:"txHash"`
+	} `json:"fills"`
+	FromTokenToUsdPrice string `json:"fromTokenToUsdPrice"`
+	InitialRateBump     int    `json:"initialRateBump"`
+	IsNativeCurrency    bool   `json:"isNativeCurrency"`
+	Order               struct {
+		Maker        string `json:"maker"`
+		MakerAsset   string `json:"makerAsset"`
+		MakerTraits  string `json:"makerTraits"`
+		MakingAmount string `json:"makingAmount"`
+		Receiver     string `json:"receiver"`
+		Salt         string `json:"salt"`
+		TakerAsset   string `json:"takerAsset"`
+		TakingAmount string `json:"takingAmount"`
+	} `json:"order"`
+	OrderHash         string                   `json:"orderHash"`
+	Points            []AuctionPointClassFixed `json:"points"`
+	Status            string                   `json:"status"`
+	ToTokenToUsdPrice string                   `json:"toTokenToUsdPrice"`
+}
+
+// PresetClassFixed defines model for PresetClass.
+type PresetClassFixed struct {
+	AllowMultipleFills bool                `json:"allowMultipleFills"`
+	AllowPartialFills  bool                `json:"allowPartialFills"`
+	AuctionDuration    float32             `json:"auctionDuration"`
+	AuctionEndAmount   string              `json:"auctionEndAmount"`
+	AuctionStartAmount string              `json:"auctionStartAmount"`
+	BankFee            string              `json:"bankFee"`
+	EstP               float32             `json:"estP"`
+	ExclusiveResolver  string              `json:"exclusiveResolver"` // This was changed to a string from a map[string]interface{}
+	GasCost            GasCostConfigClass  `json:"gasCost"`
+	InitialRateBump    float32             `json:"initialRateBump"`
+	Points             []AuctionPointClass `json:"points"`
+	StartAuctionIn     float32             `json:"startAuctionIn"`
+	TokenFee           string              `json:"tokenFee"`
+}
+
+// QuotePresetsClassFixed defines model for QuotePresetsClass.
+type QuotePresetsClassFixed struct {
+	Custom *PresetClassFixed `json:"custom,omitempty"`
+	Fast   PresetClassFixed  `json:"fast"`
+	Medium PresetClassFixed  `json:"medium"`
+	Slow   PresetClassFixed  `json:"slow"`
 }

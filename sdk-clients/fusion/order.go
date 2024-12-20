@@ -160,7 +160,7 @@ func BigIntFromString(s string) (*big.Int, error) {
 	return bigInt, nil
 }
 
-func getPreset(presets QuotePresetsClass, presetType GetQuoteOutputRecommendedPreset) (*PresetClass, error) {
+func getPreset(presets QuotePresetsClassFixed, presetType GetQuoteOutputRecommendedPreset) (*PresetClassFixed, error) {
 	switch presetType {
 	case Custom:
 		if presets.Custom == nil {
@@ -184,7 +184,7 @@ func CalcAuctionStartTime(startAuctionIn uint32, additionalWaitPeriod uint32) ui
 	return uint32(currentTime) + additionalWaitPeriod + startAuctionIn
 }
 
-func CreateAuctionDetails(preset *PresetClass, additionalWaitPeriod float32) (*AuctionDetails, error) {
+func CreateAuctionDetails(preset *PresetClassFixed, additionalWaitPeriod float32) (*AuctionDetails, error) {
 	pointsFixed := make([]AuctionPointClassFixed, 0)
 	for _, point := range preset.Points {
 		pointsFixed = append(pointsFixed, AuctionPointClassFixed{
