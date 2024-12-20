@@ -233,6 +233,37 @@ type QuoterControllerGetQuoteParamsFixed struct {
 	Permit string `url:"permit,omitempty" json:"permit,omitempty"`
 }
 
+type OrderResponse struct {
+	ApproximateTakingAmount string  `json:"approximateTakingAmount"`
+	AuctionDuration         int     `json:"auctionDuration"`
+	AuctionStartDate        int64   `json:"auctionStartDate"`
+	CancelTx                *string `json:"cancelTx"`
+	CreatedAt               string  `json:"createdAt"`
+	Extension               string  `json:"extension"`
+	Fills                   []struct {
+		FilledAuctionTakerAmount string `json:"filledAuctionTakerAmount"`
+		FilledMakerAmount        string `json:"filledMakerAmount"`
+		TxHash                   string `json:"txHash"`
+	} `json:"fills"`
+	FromTokenToUsdPrice string `json:"fromTokenToUsdPrice"`
+	InitialRateBump     int    `json:"initialRateBump"`
+	IsNativeCurrency    bool   `json:"isNativeCurrency"`
+	Order               struct {
+		Maker        string `json:"maker"`
+		MakerAsset   string `json:"makerAsset"`
+		MakerTraits  string `json:"makerTraits"`
+		MakingAmount string `json:"makingAmount"`
+		Receiver     string `json:"receiver"`
+		Salt         string `json:"salt"`
+		TakerAsset   string `json:"takerAsset"`
+		TakingAmount string `json:"takingAmount"`
+	} `json:"order"`
+	OrderHash         string                   `json:"orderHash"`
+	Points            []AuctionPointClassFixed `json:"points"`
+	Status            string                   `json:"status"`
+	ToTokenToUsdPrice string                   `json:"toTokenToUsdPrice"`
+}
+
 // PresetClassFixed defines model for PresetClass.
 type PresetClassFixed struct {
 	AllowMultipleFills bool                `json:"allowMultipleFills"`

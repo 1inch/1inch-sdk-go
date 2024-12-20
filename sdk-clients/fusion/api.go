@@ -95,17 +95,17 @@ func (api *api) GetQuoteWithCustomPreset(ctx context.Context, params QuoterContr
 }
 
 // PlaceOrder accepts a quote and submits it as a fusion order
-func (api *api) PlaceOrder(ctx context.Context, fusionQuote GetQuoteOutputFixed, orderParams OrderParams, wallet common.Wallet) error {
+func (api *api) PlaceOrder(ctx context.Context, fusionQuote GetQuoteOutputFixed, orderParams OrderParams, wallet common.Wallet) (string, error) {
 	u := fmt.Sprintf("/fusion/relayer/v2.0/%d/order/submit", api.chainId)
 
 	err := orderParams.Validate()
 	if err != nil {
-		return err
+		return "", err
 	}
 
 	_, limitOrder, err := CreateFusionOrderData(fusionQuote, orderParams, wallet, api.chainId)
 	if err != nil {
-		return fmt.Errorf("failed to create order: %v", err)
+		return "", fmt.Errorf("failed to create order: %v", err)
 	}
 
 	signedOrder := SignedOrderInput{
@@ -126,7 +126,7 @@ func (api *api) PlaceOrder(ctx context.Context, fusionQuote GetQuoteOutputFixed,
 
 	body, err := json.Marshal(signedOrder)
 	if err != nil {
-		return err
+		return "", err
 	}
 
 	payload := common.RequestPayload{
@@ -138,10 +138,10 @@ func (api *api) PlaceOrder(ctx context.Context, fusionQuote GetQuoteOutputFixed,
 
 	err = api.httpExecutor.ExecuteRequest(ctx, payload, nil)
 	if err != nil {
-		return err
+		return "", err
 	}
 
-	return nil
+	return limitOrder.OrderHash, nil
 }
 
 func (api *api) PlaceOrders(ctx context.Context, body []PlaceOrderBody) (*GetQuoteOutput, error) {
@@ -168,6 +168,25 @@ func (api *api) PlaceOrders(ctx context.Context, body []PlaceOrderBody) (*GetQuo
 
 	var response GetQuoteOutput
 	err = api.httpExecutor.ExecuteRequest(ctx, payload, &response)
+	if err != nil {
+		return nil, err
+	}
+
+	return &response, nil
+}
+
+func (api *api) GetOrderStatus(ctx context.Context, orderHash string) (*OrderResponse, error) {
+	u := fmt.Sprintf("/fusion/orders/v2.0/%d/order/status/%s", api.chainId, orderHash)
+
+	payload := common.RequestPayload{
+		Method: "GET",
+		Params: nil,
+		U:      u,
+		Body:   nil,
+	}
+
+	var response OrderResponse
+	err := api.httpExecutor.ExecuteRequest(ctx, payload, &response)
 	if err != nil {
 		return nil, err
 	}
