@@ -111,7 +111,7 @@ func main() {
 		Wallet:                         client.Wallet,
 		SeriesNonce:                    seriesNonce,
 		MakerTraits:                    makerTraits,
-		Extension:                      extension,
+		Extension:                      *extension,
 		ExpireAfterUnix:                expireAfter,
 		Maker:                          publicAddress.Hex(),
 		MakerAsset:                     PolygonFRAX,

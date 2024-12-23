@@ -108,12 +108,12 @@ type GasCostConfigClassFixed struct {
 }
 
 type Preset struct {
-	AuctionDuration    *big.Int            `json:"auctionDuration"`
-	StartAuctionIn     *big.Int            `json:"startAuctionIn"`
+	AuctionDuration    float32             `json:"auctionDuration"`
+	StartAuctionIn     float32             `json:"startAuctionIn"`
 	BankFee            *big.Int            `json:"bankFee"`
-	InitialRateBump    *big.Int            `json:"initialRateBump"`
-	AuctionStartAmount *big.Int            `json:"auctionStartAmount"`
-	AuctionEndAmount   *big.Int            `json:"auctionEndAmount"`
+	InitialRateBump    float32             `json:"initialRateBump"`
+	AuctionStartAmount string              `json:"auctionStartAmount"`
+	AuctionEndAmount   string              `json:"auctionEndAmount"`
 	TokenFee           *big.Int            `json:"tokenFee"`
 	Points             []AuctionPointClass `json:"points"`
 	GasCostInfo        GasCostConfigClass  `json:"gasCostInfo"`
