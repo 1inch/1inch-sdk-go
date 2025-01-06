@@ -16,8 +16,11 @@ func (params *OrderApiControllerGetActiveOrdersParams) Validate() error {
 
 func (params *QuoterControllerGetQuoteParamsFixed) Validate() error {
 	var validationErrors []error
-	//validationErrors = validate.Parameter(params.FromTokenAddress, "FromTokenAddress", validate.CheckEthereumAddressRequired, validationErrors)
-	//validationErrors = validate.Parameter(params.ToTokenAddress, "ToTokenAddress", validate.CheckEthereumAddressRequired, validationErrors)
+	validationErrors = validate.Parameter(params.SrcTokenAddress, "SrcTokenAddress", validate.CheckEthereumAddressRequired, validationErrors)
+	validationErrors = validate.Parameter(params.DstTokenAddress, "SrcTokenAddress", validate.CheckEthereumAddressRequired, validationErrors)
+	validationErrors = validate.Parameter(params.WalletAddress, "WalletAddress", validate.CheckEthereumAddressRequired, validationErrors)
+	validationErrors = validate.Parameter(params.SrcChain, "SrcChain", validate.CheckChainIdRequired, validationErrors)
+	validationErrors = validate.Parameter(params.DstChain, "DstChain", validate.CheckChainIdRequired, validationErrors)
 	validationErrors = validate.Parameter(params.Amount, "Amount", validate.CheckBigIntRequired, validationErrors)
 	validationErrors = validate.Parameter(params.Permit, "Permit", validate.CheckPermitHash, validationErrors)
 	return validate.ConsolidateValidationErorrs(validationErrors)
@@ -25,11 +28,14 @@ func (params *QuoterControllerGetQuoteParamsFixed) Validate() error {
 
 func (params *QuoterControllerGetQuoteWithCustomPresetsParams) Validate() error {
 	var validationErrors []error
-	//validationErrors = validate.Parameter(params.FromTokenAddress, "FromTokenAddress", validate.CheckEthereumAddressRequired, validationErrors)
-	//validationErrors = validate.Parameter(params.ToTokenAddress, "ToTokenAddress", validate.CheckEthereumAddressRequired, validationErrors)
+	validationErrors = validate.Parameter(params.SrcTokenAddress, "SrcTokenAddress", validate.CheckEthereumAddressRequired, validationErrors)
+	validationErrors = validate.Parameter(params.DstTokenAddress, "SrcTokenAddress", validate.CheckEthereumAddressRequired, validationErrors)
+	validationErrors = validate.Parameter(params.WalletAddress, "WalletAddress", validate.CheckEthereumAddressRequired, validationErrors)
 	validationErrors = validate.Parameter(params.Amount, "Amount", validate.CheckBigIntRequired, validationErrors)
-	validationErrors = validate.Parameter(params.WalletAddress, "WalletAddress", validate.CheckEthereumAddressRequired, validationErrors)
-	validationErrors = validate.Parameter(params.WalletAddress, "WalletAddress", validate.CheckEthereumAddressRequired, validationErrors)
+	validationErrors = validate.Parameter(params.SrcChain, "SrcChain", validate.CheckChainIdRequired, validationErrors)
+	validationErrors = validate.Parameter(params.DstChain, "DstChain", validate.CheckChainIdRequired, validationErrors)
+	validationErrors = validate.Parameter(params.Amount, "Amount", validate.CheckBigIntRequired, validationErrors)
+	validationErrors = validate.Parameter(params.Permit, "Permit", validate.CheckPermitHash, validationErrors)
 	return validate.ConsolidateValidationErorrs(validationErrors)
 }
 
@@ -44,11 +50,7 @@ func (body *PlaceOrderBody) Validate() error {
 
 func (body *OrderParams) Validate() error {
 	var validationErrors []error
-	//validationErrors = validate.Parameter(body.Receiver, "Receiver", validate.CheckEthereumAddressRequired, validationErrors)
-	//validationErrors = validate.Parameter(body.WalletAddress, "WalletAddress", validate.CheckEthereumAddressRequired, validationErrors)
-	//validationErrors = validate.Parameter(body.FromTokenAddress, "FromTokenAddress", validate.CheckEthereumAddress, validationErrors)
-	//validationErrors = validate.Parameter(body.ToTokenAddress, "ToTokenAddress", validate.CheckEthereumAddress, validationErrors)
-	//validationErrors = validate.Parameter(body.Amount, "Amount", validate.CheckBigInt, validationErrors)
+	validationErrors = validate.Parameter(body.Receiver, "Receiver", validate.CheckEthereumAddressRequired, validationErrors)
 	validationErrors = validate.Parameter(body.Permit, "Permit", validate.CheckPermitHash, validationErrors)
 	if body.Preset == "" {
 		validationErrors = append(validationErrors, validate.NewParameterCustomError(fmt.Sprintf("Preset is required. Pass in one of the Fusion library constants: %v", constants.ValidFusionPresets)))

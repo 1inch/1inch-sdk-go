@@ -36,7 +36,7 @@ func main() {
 		DstChain:        8453,
 		SrcTokenAddress: "0xaf88d065e77c8cC2239327C5EDb3A432268e5831",
 		DstTokenAddress: "0x833589fCD6eDb6E08f4c7C32D4f71b54bdA02913",
-		Amount:          "1000000",
+		Amount:          "10000000",
 		WalletAddress:   publicAddress,
 		EnableEstimate:  true,
 	})

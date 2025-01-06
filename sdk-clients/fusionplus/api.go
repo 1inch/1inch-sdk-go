@@ -97,10 +97,10 @@ func (api *api) GetActiveOrders(ctx context.Context, params OrderApiControllerGe
 func (api *api) GetQuote(ctx context.Context, params QuoterControllerGetQuoteParamsFixed) (*GetQuoteOutputFixed, error) {
 	u := "/fusion-plus/quoter/v1.0/quote/receive"
 
-	//err := params.Validate()
-	//if err != nil {
-	//	return nil, err
-	//}
+	err := params.Validate()
+	if err != nil {
+		return nil, err
+	}
 
 	payload := common.RequestPayload{
 		Method: "GET",
@@ -110,7 +110,7 @@ func (api *api) GetQuote(ctx context.Context, params QuoterControllerGetQuotePar
 	}
 
 	var response GetQuoteOutputFixed
-	err := api.httpExecutor.ExecuteRequest(ctx, payload, &response)
+	err = api.httpExecutor.ExecuteRequest(ctx, payload, &response)
 	if err != nil {
 		return nil, err
 	}

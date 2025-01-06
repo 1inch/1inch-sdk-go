@@ -36,7 +36,7 @@ func CreateFusionPlusOrderData(quoteParams QuoterControllerGetQuoteParamsFixed, 
 		GasBumpEstimate:  preset.GasCost.GasBumpEstimate,
 		GasPriceEstimate: preset.GasCost.GasPriceEstimate,
 	}
-	presetFusion := &fusion.PresetClass{
+	presetFusion := &fusion.PresetClassFixed{
 		AllowMultipleFills: preset.AllowMultipleFills,
 		//ExclusiveResolver: preset.ExclusiveResolver, // TODO This is not working for fusion at the moment
 		AllowPartialFills:  preset.AllowPartialFills,
