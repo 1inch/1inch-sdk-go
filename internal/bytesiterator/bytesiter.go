@@ -11,8 +11,8 @@ type BytesIter struct {
 	pos  int
 }
 
-// NewBytesIter initializes a new BytesIter with the provided data.
-func NewBytesIter(data []byte) *BytesIter {
+// New initializes a new BytesIter with the provided data.
+func New(data []byte) *BytesIter {
 	return &BytesIter{data: data, pos: 0}
 }
 

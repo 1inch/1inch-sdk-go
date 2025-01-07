@@ -54,12 +54,6 @@ func (api *api) SubmitSecret(ctx context.Context, params SecretInput) error {
 		return err
 	}
 
-	bodyIndented, err := json.MarshalIndent(body, "", "  ")
-	if err != nil {
-		return err
-	}
-	fmt.Printf("Order: %s\n", string(bodyIndented))
-
 	payload := common.RequestPayload{
 		Method: "POST",
 		Params: params,
@@ -196,12 +190,6 @@ func (api *api) PlaceOrder(ctx context.Context, quoteParams QuoterControllerGetQ
 	if err != nil {
 		return "", err
 	}
-
-	bodyIndented, err := json.MarshalIndent(signedOrder, "", "  ")
-	if err != nil {
-		return "", err
-	}
-	fmt.Printf("Order: %s\n", string(bodyIndented))
 
 	payload := common.RequestPayload{
 		Method: "POST",

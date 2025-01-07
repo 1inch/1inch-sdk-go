@@ -9,6 +9,7 @@ import (
 	"strings"
 
 	"github.com/1inch/1inch-sdk-go/internal/bytesbuilder"
+	"github.com/1inch/1inch-sdk-go/internal/bytesiterator"
 	"github.com/ethereum/go-ethereum/common"
 )
 
@@ -78,7 +79,7 @@ func Decode(data string) (SettlementPostInteractionData, error) {
 	flags := big.NewInt(int64(bytes[len(bytes)-1]))
 	bytesWithoutFlags := bytes[:len(bytes)-1]
 
-	iter := NewBytesIter(bytesWithoutFlags)
+	iter := bytesiterator.New(bytesWithoutFlags)
 	var bankFee *big.Int
 	var integratorFee *IntegratorFee
 	var customReceiver common.Address

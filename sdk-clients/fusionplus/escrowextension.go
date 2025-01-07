@@ -9,6 +9,7 @@ import (
 	"math/big"
 	"strings"
 
+	"github.com/1inch/1inch-sdk-go/internal/bytesiterator"
 	"github.com/1inch/1inch-sdk-go/sdk-clients/fusion"
 	"github.com/1inch/1inch-sdk-go/sdk-clients/orderbook"
 	"github.com/ethereum/go-ethereum/common"
@@ -57,11 +58,6 @@ func (e *EscrowExtension) ConvertToOrderbookExtension() (*orderbook.Extension, e
 	if !ok {
 		return nil, fmt.Errorf("invalid hexadecimal string for destination safety deposit: %v", e.DstSafetyDeposit)
 	}
-
-	fmt.Printf("srcSafetyDeposit: %s\n", e.SrcSafetyDeposit)
-	fmt.Printf("dstSafetyDeposit: %s\n", e.DstSafetyDeposit)
-	fmt.Printf("srcSafetyDepositBig: %x\n", srcSafetyDepositBig)
-	fmt.Printf("dstSafetyDepositBig: %x\n", dstSafetyDepositBig)
 
 	extraDataBytes, err := encodeExtraData(&EscrowExtraData{
 		HashLock:         e.HashLock,
@@ -138,7 +134,7 @@ func DecodeEscrowExtension(data []byte) (*EscrowExtension, error) {
 
 func decodeExtraData(data []byte) (*EscrowExtraData, error) {
 	fmt.Printf("data: %x\n", data)
-	iter := NewBytesIter(data)
+	iter := bytesiterator.New(data)
 	hashlockData, err := iter.NextUint256()
 	if err != nil {
 		log.Fatalf("Failed to read first uint256: %v", err)
@@ -279,19 +275,15 @@ func encodeExtraData(data *EscrowExtraData) ([]byte, error) {
 		return nil, err
 	}
 
-	fmt.Printf("Safety deposit data: %x\n", safetyDepositData)
-
 	// 5. Encode TimeLocks
 	timeLocksData, err := encodeTimeLocks(data.TimeLocks)
 	if err != nil {
 		return nil, err
 	}
-	fmt.Printf("Encoded ExtraData pre-timelocks: %x\n", buffer.Bytes())
 	err = writeBigIntAsUint256(&buffer, timeLocksData)
 	if err != nil {
 		return nil, err
 	}
-	fmt.Printf("Encoded ExtraData: %x\n", buffer.Bytes())
 
 	return buffer.Bytes(), nil
 }
@@ -311,11 +303,7 @@ func encodeTimeLocks(tl *TimeLocks) (*big.Int, error) {
 	binary.BigEndian.PutUint32(data[20:24], uint32(tl.SrcCancellation))
 	binary.BigEndian.PutUint32(data[24:28], uint32(tl.SrcPublicWithdrawal))
 	binary.BigEndian.PutUint32(data[28:32], uint32(tl.SrcWithdrawal))
-
-	fmt.Printf("Encoded TimeLocks: %x\n", data)
-
 	timeLocksData := new(big.Int).SetBytes(data)
-	fmt.Printf("TimeLocksData as big: %x\n", timeLocksData)
 	return timeLocksData, nil
 }
 

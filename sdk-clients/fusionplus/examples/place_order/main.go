@@ -63,7 +63,6 @@ func main() {
 		log.Fatalf("Failed to get preset: %v", err)
 	}
 	secretsCount := preset.SecretsCount
-	fmt.Printf("Secrets count: %v\n", secretsCount)
 
 	secrets := make([]string, int(secretsCount))
 	for i := 0; i < int(secretsCount); i++ {
@@ -96,12 +95,6 @@ func main() {
 		}
 	}
 
-	output, err := json.MarshalIndent(hashLock, "", "  ")
-	if err != nil {
-		log.Fatalf("Failed to marshal response: %v\n", err)
-	}
-	fmt.Printf("Response: %s\n", string(output))
-
 	orderParams := fusionplus.OrderParams{
 		HashLock:     hashLock,
 		SecretHashes: secretHashes,
@@ -113,28 +106,26 @@ func main() {
 	if err != nil {
 		log.Fatalf("Failed to create order data: %v", err)
 	}
-	fmt.Printf("order hash: %v\n", orderHash)
 
 	// Get order by hash
-	orderQuickLook, err := client.GetOrderByOrderHash(ctx, fusionplus.GetOrderByOrderHashParams{
+	order, err := client.GetOrderByOrderHash(ctx, fusionplus.GetOrderByOrderHashParams{
 		Hash: orderHash,
 	})
 	if err != nil {
 		log.Fatalf("Failed to get order by hash: %v", err)
 	}
 
-	orderQuickLookIndented, err := json.MarshalIndent(orderQuickLook, "", "  ")
+	orderQuickLookIndented, err := json.MarshalIndent(order, "", "  ")
 	if err != nil {
 		log.Fatalf("Failed to marshal response: %v\n", err)
 	}
-	fmt.Printf("Order Quick Look: %s\n", string(orderQuickLookIndented))
+	fmt.Printf("Order: %s\n", string(orderQuickLookIndented))
 
 	// Define loop parameters
 	delay := 1 * time.Second // Delay between retries
 	retryCount := 0          // Current retry count
 	orderStatus := ""        // Current order status
 
-	var order *fusionplus.GetOrderFillsByHashOutputFixed
 	// Loop until order status is "executed" or max retries reached
 	for {
 		// Get order by hash

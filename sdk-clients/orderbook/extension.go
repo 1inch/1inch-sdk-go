@@ -70,7 +70,7 @@ func Decode(data []byte) (*Extension, error) {
 	//	return DefaultExtension(), nil
 	//}
 
-	iter := bytesiterator.NewBytesIter(data)
+	iter := bytesiterator.New(data)
 
 	// Read the first 32 bytes as offsets.
 	offsets, err := iter.NextUint256()

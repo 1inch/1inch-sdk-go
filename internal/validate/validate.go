@@ -103,7 +103,7 @@ func CheckBigInt(parameter interface{}, variableName string) error {
 func CheckChainIdIntRequired(parameter interface{}, variableName string) error {
 	value, ok := parameter.(int)
 	if !ok {
-		return fmt.Errorf("for parameter '%v' to be validated as '%v', it must be an int", variableName, "ChainId")
+		return fmt.Errorf("for parameter '%v' to be validated as '%v', it must be an int", variableName, "ChainIdInt")
 	}
 
 	if value == 0 {
@@ -116,7 +116,7 @@ func CheckChainIdIntRequired(parameter interface{}, variableName string) error {
 func CheckChainIdInt(parameter interface{}, variableName string) error {
 	value, ok := parameter.(int)
 	if !ok {
-		return fmt.Errorf("for parameter '%v' to be validated as '%v', it must be an int", variableName, "ChainId")
+		return fmt.Errorf("for parameter '%v' to be validated as '%v', it must be an int", variableName, "ChainIdInt")
 	}
 	if value == 0 {
 		return nil
@@ -131,7 +131,7 @@ func CheckChainIdInt(parameter interface{}, variableName string) error {
 func CheckChainIdFloat32Required(parameter interface{}, variableName string) error {
 	value, ok := parameter.(float32)
 	if !ok {
-		return fmt.Errorf("for parameter '%v' to be validated as '%v', it must be a float32", variableName, "ChainId")
+		return fmt.Errorf("for parameter '%v' to be validated as '%v', it must be a float32", variableName, "ChainIdFloat32")
 	}
 
 	if value == 0 {
@@ -144,7 +144,7 @@ func CheckChainIdFloat32Required(parameter interface{}, variableName string) err
 func CheckChainIdFloat32(parameter interface{}, variableName string) error {
 	value, ok := parameter.(float32)
 	if !ok {
-		return fmt.Errorf("for parameter '%v' to be validated as '%v', it must be a float32", variableName, "ChainId")
+		return fmt.Errorf("for parameter '%v' to be validated as '%v', it must be a float32", variableName, "ChainIdFloat32")
 	}
 	if value == 0 {
 		return nil

@@ -44,7 +44,7 @@ func DecodeAuctionDetails(data string) (*AuctionDetails, error) {
 		return nil, errors.New("data too short for mandatory fields")
 	}
 
-	iter := bytesiterator.NewBytesIter(rawBytes)
+	iter := bytesiterator.New(rawBytes)
 
 	// 1) GasBumpEstimate (3 bytes)
 	gasBumpEstimate, err := iter.NextUint24()

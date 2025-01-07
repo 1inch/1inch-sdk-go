@@ -174,7 +174,7 @@ func TestBytesIter_NextByte(t *testing.T) {
 		t.Run(tt.name, func(t *testing.T) {
 			data, err := hexToBytes(tt.hexData)
 			require.NoError(t, err)
-			iter := NewBytesIter(data)
+			iter := New(data)
 
 			var result []byte
 			var readErr error
@@ -224,7 +224,7 @@ func TestBytesIter_NextUint16(t *testing.T) {
 		t.Run(tt.name, func(t *testing.T) {
 			data, err := hexToBytes(tt.hexData)
 			require.NoError(t, err)
-			iter := NewBytesIter(data)
+			iter := New(data)
 
 			val, err := iter.NextUint16()
 
@@ -265,7 +265,7 @@ func TestBytesIter_NextUint24(t *testing.T) {
 		t.Run(tt.name, func(t *testing.T) {
 			data, err := hexToBytes(tt.hexData)
 			require.NoError(t, err)
-			iter := NewBytesIter(data)
+			iter := New(data)
 
 			val, err := iter.NextUint24()
 
@@ -306,7 +306,7 @@ func TestBytesIter_NextUint32(t *testing.T) {
 		t.Run(tt.name, func(t *testing.T) {
 			data, err := hexToBytes(tt.hexData)
 			require.NoError(t, err)
-			iter := NewBytesIter(data)
+			iter := New(data)
 
 			val, err := iter.NextUint32()
 
@@ -345,7 +345,7 @@ func TestBytesIter_NextUint160(t *testing.T) {
 		t.Run(tt.name, func(t *testing.T) {
 			data, err := hexToBytes(tt.hexData)
 			require.NoError(t, err)
-			iter := NewBytesIter(data)
+			iter := New(data)
 
 			val, err := iter.NextUint160()
 			if tt.expectError {
@@ -383,7 +383,7 @@ func TestBytesIter_NextUint256(t *testing.T) {
 		t.Run(tt.name, func(t *testing.T) {
 			data, err := hexToBytes(tt.hexData)
 			require.NoError(t, err)
-			iter := NewBytesIter(data)
+			iter := New(data)
 
 			val, err := iter.NextUint256()
 			if tt.expectError {
@@ -439,7 +439,7 @@ func TestBytesIter_NextBytes(t *testing.T) {
 		t.Run(tt.name, func(t *testing.T) {
 			data, err := hexToBytes(tt.hexData)
 			require.NoError(t, err)
-			iter := NewBytesIter(data)
+			iter := New(data)
 
 			val, err := iter.NextBytes(tt.readSize)
 
@@ -497,7 +497,7 @@ func TestBytesIter_NextString(t *testing.T) {
 		t.Run(tt.name, func(t *testing.T) {
 			data, err := hexToBytes(tt.hexData)
 			require.NoError(t, err)
-			iter := NewBytesIter(data)
+			iter := New(data)
 
 			strVal, err := iter.NextString(tt.readSize)
 
@@ -546,7 +546,7 @@ func TestBytesIter_Rest(t *testing.T) {
 		t.Run(tt.name, func(t *testing.T) {
 			data, err := hexToBytes(tt.hexData)
 			require.NoError(t, err)
-			iter := NewBytesIter(data)
+			iter := New(data)
 
 			if tt.readSize > 0 {
 				_, _ = iter.NextBytes(tt.readSize)
@@ -610,7 +610,7 @@ func TestBytesIter_IsEmpty(t *testing.T) {
 		t.Run(tt.name, func(t *testing.T) {
 			data, err := hexToBytes(tt.hexData)
 			require.NoError(t, err)
-			iter := NewBytesIter(data)
+			iter := New(data)
 
 			for i := 0; i < tt.reads; i++ {
 				_, _ = iter.NextByte()
