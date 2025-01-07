@@ -100,7 +100,7 @@ func CheckBigInt(parameter interface{}, variableName string) error {
 	return nil
 }
 
-func CheckChainIdRequired(parameter interface{}, variableName string) error {
+func CheckChainIdIntRequired(parameter interface{}, variableName string) error {
 	value, ok := parameter.(int)
 	if !ok {
 		return fmt.Errorf("for parameter '%v' to be validated as '%v', it must be an int", variableName, "ChainId")
@@ -110,10 +110,10 @@ func CheckChainIdRequired(parameter interface{}, variableName string) error {
 		return NewParameterMissingError(variableName)
 	}
 
-	return CheckChainId(value, variableName)
+	return CheckChainIdInt(value, variableName)
 }
 
-func CheckChainId(parameter interface{}, variableName string) error {
+func CheckChainIdInt(parameter interface{}, variableName string) error {
 	value, ok := parameter.(int)
 	if !ok {
 		return fmt.Errorf("for parameter '%v' to be validated as '%v', it must be an int", variableName, "ChainId")
@@ -123,6 +123,34 @@ func CheckChainId(parameter interface{}, variableName string) error {
 	}
 
 	if !slice_utils.Contains(value, constants.ValidChainIds) {
+		return NewParameterValidationError(variableName, fmt.Sprintf("is invalid, valid chain ids are: %v", constants.ValidChainIds))
+	}
+	return nil
+}
+
+func CheckChainIdFloat32Required(parameter interface{}, variableName string) error {
+	value, ok := parameter.(float32)
+	if !ok {
+		return fmt.Errorf("for parameter '%v' to be validated as '%v', it must be a float32", variableName, "ChainId")
+	}
+
+	if value == 0 {
+		return NewParameterMissingError(variableName)
+	}
+
+	return CheckChainIdFloat32(value, variableName)
+}
+
+func CheckChainIdFloat32(parameter interface{}, variableName string) error {
+	value, ok := parameter.(float32)
+	if !ok {
+		return fmt.Errorf("for parameter '%v' to be validated as '%v', it must be a float32", variableName, "ChainId")
+	}
+	if value == 0 {
+		return nil
+	}
+
+	if !slice_utils.Contains(int(value), constants.ValidChainIds) {
 		return NewParameterValidationError(variableName, fmt.Sprintf("is invalid, valid chain ids are: %v", constants.ValidChainIds))
 	}
 	return nil

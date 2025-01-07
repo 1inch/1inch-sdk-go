@@ -8,6 +8,7 @@ import (
 	"sort"
 	"strings"
 
+	"github.com/1inch/1inch-sdk-go/internal/bytesbuilder"
 	"github.com/ethereum/go-ethereum/common"
 )
 
@@ -150,7 +151,7 @@ func Decode(data string) (SettlementPostInteractionData, error) {
 
 func (spid SettlementPostInteractionData) Encode() string {
 	bitMask := big.NewInt(0)
-	bytes := NewBytesBuilder()
+	bytes := bytesbuilder.New()
 
 	if spid.BankFee != nil && spid.BankFee.Cmp(big.NewInt(0)) != 0 {
 		bitMask.SetBit(bitMask, 0, 1)
@@ -214,50 +215,4 @@ func (spid SettlementPostInteractionData) IsExclusiveResolver(wallet common.Addr
 	}
 
 	return addressHalf == spid.Whitelist[0].AddressHalf
-}
-
-type BytesBuilder struct {
-	data []byte
-}
-
-func NewBytesBuilder() *BytesBuilder {
-	return &BytesBuilder{data: []byte{}}
-}
-
-func (b *BytesBuilder) AddUint32(val *big.Int) {
-	bytes := val.Bytes()
-	if len(bytes) < 4 {
-		padded := make([]byte, 4-len(bytes))
-		bytes = append(padded, bytes...)
-	}
-	b.data = append(b.data, bytes...)
-}
-
-func (b *BytesBuilder) AddUint16(val *big.Int) {
-	bytes := val.Bytes()
-	if len(bytes) < 2 {
-		padded := make([]byte, 2-len(bytes))
-		bytes = append(padded, bytes...)
-	}
-	b.data = append(b.data, bytes...)
-}
-
-func (b *BytesBuilder) AddUint8(val uint8) {
-	b.data = append(b.data, byte(val))
-}
-
-func (b *BytesBuilder) AddAddress(address common.Address) {
-	b.data = append(b.data, address.Bytes()...)
-}
-
-func (b *BytesBuilder) AddBytes(data string) {
-	bytes, err := hex.DecodeString(strings.TrimPrefix(data, "0x"))
-	if err != nil {
-		panic("invalid hex string")
-	}
-	b.data = append(b.data, bytes...)
-}
-
-func (b *BytesBuilder) AsHex() string {
-	return hex.EncodeToString(b.data)
 }

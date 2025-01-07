@@ -225,7 +225,7 @@ func TestChainIdRequired(t *testing.T) {
 
 	for _, tc := range testcases {
 		t.Run(tc.description, func(t *testing.T) {
-			err := CheckChainIdRequired(tc.value, "testValue")
+			err := CheckChainIdIntRequired(tc.value, "testValue")
 			if tc.expectError {
 				require.Error(t, err, fmt.Sprintf("%s should have caused an error", tc.description))
 			} else {
@@ -262,7 +262,7 @@ func TestChainId(t *testing.T) {
 
 	for _, tc := range testcases {
 		t.Run(tc.description, func(t *testing.T) {
-			err := CheckChainId(tc.value, "testValue")
+			err := CheckChainIdInt(tc.value, "testValue")
 			if tc.expectError {
 				require.Error(t, err, fmt.Sprintf("%s should have caused an error", tc.description))
 			} else {

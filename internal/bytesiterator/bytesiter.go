@@ -108,6 +108,11 @@ func (iter *BytesIter) Rest() ([]byte, error) {
 	return val, nil
 }
 
+// BytesLeft returns the number of bytes that are left unread.
+func (iter *BytesIter) BytesLeft() int {
+	return len(iter.data) - iter.pos
+}
+
 // IsEmpty checks if there are no more bytes to read.
 func (iter *BytesIter) IsEmpty() bool {
 	return iter.pos >= len(iter.data)
