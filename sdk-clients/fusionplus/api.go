@@ -145,7 +145,7 @@ func (api *api) GetQuoteWithCustomPreset(ctx context.Context, params QuoterContr
 }
 
 // PlaceOrder accepts a quote and submits it as a fusion plus order
-func (api *api) PlaceOrder(ctx context.Context, fusionQuoteParams QuoterControllerGetQuoteParamsFixed, fusionQuote *GetQuoteOutputFixed, orderParams OrderParams, wallet common.Wallet) (string, error) {
+func (api *api) PlaceOrder(ctx context.Context, quoteParams QuoterControllerGetQuoteParamsFixed, quote *GetQuoteOutputFixed, orderParams OrderParams, wallet common.Wallet) (string, error) {
 	u := "/fusion-plus/relayer/v1.0/submit"
 
 	err := orderParams.Validate()
@@ -153,10 +153,23 @@ func (api *api) PlaceOrder(ctx context.Context, fusionQuoteParams QuoterControll
 		return "", err
 	}
 
-	// TODO validate secret length
-	// https://github.com/1inch/cross-chain-sdk/blob/532f6ae6dc401ddaf8fe3ad040305f2500156710/src/sdk/sdk.ts#L164-L164
+	preset, err := GetPreset(quote.Presets, orderParams.Preset)
+	if err != nil {
+		return "", fmt.Errorf("failed to get preset: %v", err)
+	}
 
-	fusionPlusOrder, err := CreateFusionPlusOrderData(fusionQuoteParams, fusionQuote, orderParams, wallet, int(fusionQuoteParams.SrcChain))
+	// TODO orders will now be allowed with multiple secret hashes for now
+	if len(orderParams.SecretHashes) > 1 {
+		return "", fmt.Errorf("Multiple secret hashes are not supported at this time. Please ")
+	}
+
+	if !preset.AllowMultipleFills && len(orderParams.SecretHashes) > 1 {
+		return "", fmt.Errorf("multiple secrets are required with multiple secret hashes")
+	} else {
+		// TODO support multiple secrets
+	}
+
+	fusionPlusOrder, err := CreateFusionPlusOrderData(quoteParams, quote, orderParams, wallet, int(quoteParams.SrcChain))
 	if err != nil {
 		return "", fmt.Errorf("failed to create order: %v", err)
 	}
@@ -173,10 +186,10 @@ func (api *api) PlaceOrder(ctx context.Context, fusionQuoteParams QuoterControll
 			TakerAsset:   fusionPlusOrder.LimitOrder.Data.TakerAsset,
 			TakingAmount: fusionPlusOrder.LimitOrder.Data.TakingAmount,
 		},
-		QuoteId: fusionQuote.QuoteId,
+		QuoteId: quote.QuoteId,
 		//SecretHashes: orderParams.SecretHashes, // TODO this only should be submitted when there are multiple secrets
 		Signature:  fusionPlusOrder.LimitOrder.Signature,
-		SrcChainId: fusionQuoteParams.SrcChain,
+		SrcChainId: quoteParams.SrcChain,
 	}
 
 	body, err := json.Marshal(signedOrder)

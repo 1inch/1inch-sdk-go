@@ -62,9 +62,6 @@ func ForMultipleFills(leaves []string) (*HashLock, error) {
 		rootWithCountBytes = append(padding, rootWithCountBytes...)
 	}
 
-	// Print result in hex format
-	//fmt.Printf("Modified root with count: 0x%x\n", rootWithCountBytes)
-
 	// Create and return the HashLock
 	return &HashLock{fmt.Sprintf("0x%x", rootWithCountBytes)}, nil
 }
