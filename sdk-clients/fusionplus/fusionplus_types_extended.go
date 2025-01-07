@@ -124,18 +124,6 @@ type GetQuoteOutputFixed struct {
 	Whitelist []string `json:"whitelist"`
 }
 
-// Copy/paste
-
-type PlaceOrderBody struct {
-	Maker        string
-	MakerAsset   string
-	MakerTraits  string
-	MakingAmount string
-	Receiver     string
-	TakerAsset   string
-	TakingAmount string
-}
-
 type Order struct {
 	EscExtension        *EscrowExtension
 	Inner               orderbook.OrderData
@@ -221,21 +209,6 @@ type GasCostConfigClassFixed struct {
 	GasPriceEstimate uint32 `json:"gasPriceEstimate"`
 }
 
-//type Preset struct {
-//	AuctionDuration    *big.Int            `json:"auctionDuration"`
-//	StartAuctionIn     *big.Int            `json:"startAuctionIn"`
-//	BankFee            *big.Int            `json:"bankFee"`
-//	InitialRateBump    *big.Int            `json:"initialRateBump"`
-//	AuctionStartAmount *big.Int            `json:"auctionStartAmount"`
-//	AuctionEndAmount   *big.Int            `json:"auctionEndAmount"`
-//	TokenFee           *big.Int            `json:"tokenFee"`
-//	Points             []AuctionPointClass `json:"points"`
-//	GasCostInfo        GasCostConfigClass  `json:"gasCostInfo"`
-//	ExclusiveResolver  *common.Address     `json:"exclusiveResolver,omitempty"`
-//	AllowPartialFills  bool                `json:"allowPartialFills"`
-//	AllowMultipleFills bool                `json:"allowMultipleFills"`
-//}
-
 type PreparedOrder struct {
 	Order      Order  `json:"order"`
 	Hash       string `json:"hash"`
@@ -248,11 +221,6 @@ type AdditionalParams struct {
 	FromAddress string
 	PrivateKey  string
 }
-
-//type FusionOrderConstructor struct {
-//	SettlementExtension common.Address
-//	OrderInfo           FusionOrderV4
-//}
 
 type Details struct {
 	Auction            *AuctionDetails `json:"auction"`

@@ -217,34 +217,3 @@ func (api *api) PlaceOrder(ctx context.Context, quoteParams QuoterControllerGetQ
 
 	return fusionPlusOrder.Hash, nil
 }
-
-func (api *api) PlaceOrders(ctx context.Context, body []PlaceOrderBody) (*GetQuoteOutput, error) {
-	u := fmt.Sprintf("/fusion/relayer/v2.0/%d/order/submit/many", api.chainId)
-
-	for _, order := range body {
-		err := order.Validate()
-		if err != nil {
-			return nil, err
-		}
-	}
-
-	bodyMarshaled, err := json.Marshal(body)
-	if err != nil {
-		return nil, err
-	}
-
-	payload := common.RequestPayload{
-		Method: "GET",
-		Params: nil,
-		U:      u,
-		Body:   bodyMarshaled,
-	}
-
-	var response GetQuoteOutput
-	err = api.httpExecutor.ExecuteRequest(ctx, payload, &response)
-	if err != nil {
-		return nil, err
-	}
-
-	return &response, nil
-}

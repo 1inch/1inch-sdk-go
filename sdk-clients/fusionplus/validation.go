@@ -39,15 +39,6 @@ func (params *QuoterControllerGetQuoteWithCustomPresetsParams) Validate() error 
 	return validate.ConsolidateValidationErorrs(validationErrors)
 }
 
-func (body *PlaceOrderBody) Validate() error {
-	var validationErrors []error
-	validationErrors = validate.Parameter(body.Maker, "Maker", validate.CheckEthereumAddressRequired, validationErrors)
-	validationErrors = validate.Parameter(body.MakerAsset, "MakerAsset", validate.CheckEthereumAddressRequired, validationErrors)
-	validationErrors = validate.Parameter(body.MakingAmount, "MakingAmount", validate.CheckBigIntRequired, validationErrors)
-	validationErrors = validate.Parameter(body.Receiver, "Receiver", validate.CheckEthereumAddressRequired, validationErrors)
-	return validate.ConsolidateValidationErorrs(validationErrors)
-}
-
 func (body *OrderParams) Validate() error {
 	var validationErrors []error
 	validationErrors = validate.Parameter(body.Receiver, "Receiver", validate.CheckEthereumAddressRequired, validationErrors)
