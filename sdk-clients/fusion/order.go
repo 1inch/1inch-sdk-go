@@ -8,6 +8,7 @@ import (
 	"time"
 
 	"github.com/1inch/1inch-sdk-go/common"
+	"github.com/1inch/1inch-sdk-go/internal/bigint"
 	geth_common "github.com/ethereum/go-ethereum/common"
 
 	random_number_generation "github.com/1inch/1inch-sdk-go/internal/random-number-generation"
@@ -38,7 +39,7 @@ func CreateFusionOrderData(quote GetQuoteOutputFixed, orderParams OrderParams, w
 	}
 
 	//TODO this should be parsed as a big.int after the generated struct types are fixed
-	bankFee, err := BigIntFromString(preset.BankFee)
+	bankFee, err := bigint.FromString(preset.BankFee)
 	if err != nil {
 		return nil, nil, fmt.Errorf("error parsing bank fee: %v", err)
 	}
@@ -150,14 +151,6 @@ func CreateFusionOrderData(quote GetQuoteOutputFixed, orderParams OrderParams, w
 		Hash:    limitOrder.OrderHash,
 		QuoteId: quote.QuoteId,
 	}, limitOrder, nil
-}
-
-func BigIntFromString(s string) (*big.Int, error) {
-	bigInt, ok := new(big.Int).SetString(s, 10) // base 10 for decimal
-	if !ok {
-		return nil, fmt.Errorf("failed to convert string (%v) to big.Int", s)
-	}
-	return bigInt, nil
 }
 
 func getPreset(presets QuotePresetsClassFixed, presetType GetQuoteOutputRecommendedPreset) (*PresetClassFixed, error) {

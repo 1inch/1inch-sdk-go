@@ -65,7 +65,7 @@ type Extension struct {
 
 // Decode decodes the input byte slice into an Extension struct using reflection.
 func Decode(data []byte) (*Extension, error) {
-	// Handle the special case where data equals ZX.
+	// TODO Handle the special case where data equals ZX.
 	//if string(data) == ZX {
 	//	return DefaultExtension(), nil
 	//}
@@ -130,7 +130,7 @@ func Decode(data []byte) (*Extension, error) {
 		offsets = new(big.Int).Rsh(offsets, 32)
 	}
 
-	// The remaining bytes are considered as CustomData.
+	// TODO The remaining bytes are considered as CustomData, but it is not supported yet.
 	//customDataBytes, err := iter.Rest()
 	//if err != nil {
 	//	return &Extension{}, errors.New("failed to read CustomData: " + err.Error())

@@ -6,6 +6,7 @@ import (
 	"math/big"
 	"testing"
 
+	"github.com/1inch/1inch-sdk-go/internal/bigint"
 	random_number_generation "github.com/1inch/1inch-sdk-go/internal/random-number-generation"
 	"github.com/1inch/1inch-sdk-go/sdk-clients/fusion"
 	"github.com/ethereum/go-ethereum/common"
@@ -56,7 +57,7 @@ func TestGenerateSalt(t *testing.T) {
 
 	for _, tc := range tests {
 		t.Run(tc.name, func(t *testing.T) {
-			expected, err := BigIntFromString(tc.expected)
+			expected, err := bigint.FromString(tc.expected)
 			require.NoError(t, err)
 
 			result, err := tc.extension.GenerateSalt()
@@ -315,9 +316,6 @@ func TestDecodeEscrowExtension(t *testing.T) {
 				if err != nil {
 					t.Errorf("Unexpected error: %v", err)
 				}
-				//if !extensionsEqual(decoded, tt.expected) {
-				//	t.Errorf("Decoded Extension does not match expected.\nGot: %+v\nExpected: %+v", decoded, tt.expected)
-				//}
 				assert.Equal(t, tt.expected.SettlementContract, decoded.SettlementContract)
 				assert.Equal(t, tt.expected.AuctionDetails, decoded.AuctionDetails)
 				assert.Equal(t, tt.expected.PostInteractionData, decoded.PostInteractionData)

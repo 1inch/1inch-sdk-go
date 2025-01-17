@@ -8,6 +8,7 @@ import (
 	"time"
 
 	"github.com/1inch/1inch-sdk-go/constants"
+	"github.com/1inch/1inch-sdk-go/internal/bigint"
 	"github.com/1inch/1inch-sdk-go/internal/slice_utils"
 )
 
@@ -62,7 +63,7 @@ func CheckEthereumAddressListRequired(parameter interface{}, variableName string
 	return nil
 }
 
-var bigIntMax, _ = BigIntFromString("115792089237316195423570985008687907853269984665640564039457584007913129639935")
+var bigIntMax, _ = bigint.FromString("115792089237316195423570985008687907853269984665640564039457584007913129639935")
 var bigIntZero = big.NewInt(0)
 
 func CheckBigIntRequired(parameter interface{}, variableName string) error {
@@ -87,7 +88,7 @@ func CheckBigInt(parameter interface{}, variableName string) error {
 		return nil
 	}
 
-	parsedValue, err := BigIntFromString(value)
+	parsedValue, err := bigint.FromString(value)
 	if err != nil {
 		return NewParameterValidationError(variableName, "not a valid value")
 	}

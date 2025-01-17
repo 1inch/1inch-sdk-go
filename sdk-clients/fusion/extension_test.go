@@ -9,6 +9,7 @@ import (
 	"strings"
 	"testing"
 
+	"github.com/1inch/1inch-sdk-go/internal/bigint"
 	"github.com/1inch/1inch-sdk-go/sdk-clients/orderbook"
 	"github.com/ethereum/go-ethereum/common"
 	"github.com/stretchr/testify/assert"
@@ -57,7 +58,7 @@ func TestGenerateSalt(t *testing.T) {
 
 	for _, tc := range tests {
 		t.Run(tc.name, func(t *testing.T) {
-			expected, err := BigIntFromString(tc.expected)
+			expected, err := bigint.FromString(tc.expected)
 			require.NoError(t, err)
 
 			result, err := tc.extension.GenerateSalt()

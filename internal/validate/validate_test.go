@@ -4,6 +4,7 @@ import (
 	"fmt"
 	"testing"
 
+	"github.com/1inch/1inch-sdk-go/internal/bigint"
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
 
@@ -1005,7 +1006,7 @@ func TestIsBigInt(t *testing.T) {
 
 	for _, tc := range testCases {
 		t.Run(tc.description, func(t *testing.T) {
-			_, err := BigIntFromString(tc.input)
+			_, err := bigint.FromString(tc.input)
 			require.NoError(t, err)
 		})
 	}

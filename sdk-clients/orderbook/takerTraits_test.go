@@ -4,11 +4,10 @@ import (
 	"fmt"
 	"testing"
 
+	"github.com/1inch/1inch-sdk-go/internal/bigint"
 	"github.com/ethereum/go-ethereum/common"
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
-
-	"github.com/1inch/1inch-sdk-go/internal/validate"
 )
 
 func TestTakerTraitsEncode(t *testing.T) {
@@ -32,7 +31,7 @@ func TestTakerTraitsEncode(t *testing.T) {
 	for _, tc := range tests {
 		t.Run(tc.name, func(t *testing.T) {
 
-			expectedTakerTraitsBig, err := validate.BigIntFromString(tc.expectedTakerTraits)
+			expectedTakerTraitsBig, err := bigint.FromString(tc.expectedTakerTraits)
 			require.NoError(t, err)
 
 			takerTraits := NewTakerTraits(tc.takerTraitParams)
