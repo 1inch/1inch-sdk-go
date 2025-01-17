@@ -159,9 +159,10 @@ func (api *api) PlaceOrder(ctx context.Context, quoteParams QuoterControllerGetQ
 
 	if !preset.AllowMultipleFills && len(orderParams.SecretHashes) > 1 {
 		return "", fmt.Errorf("multiple secrets are required with multiple secret hashes")
-	} else {
-		// TODO support multiple secrets
 	}
+	//else {
+	// TODO support multiple secrets
+	//}
 
 	fusionPlusOrder, err := CreateFusionPlusOrderData(quoteParams, quote, orderParams, wallet, int(quoteParams.SrcChain))
 	if err != nil {

@@ -10,6 +10,7 @@ import (
 	"math/big"
 	"strings"
 
+	"github.com/1inch/1inch-sdk-go/internal/keccak"
 	"github.com/ethereum/go-ethereum/common/hexutil"
 	"github.com/ethereum/go-ethereum/crypto"
 	"golang.org/x/crypto/sha3"
@@ -143,12 +144,6 @@ func rightChildIndex(i int) int {
 	return 2*i + 2
 }
 
-func keccak256(value []byte) string {
-	hash := sha3.NewLegacyKeccak256()
-	hash.Write(value)
-	return fmt.Sprintf("0x%x", hash.Sum(nil))
-}
-
 func getBytesCount(hex string) int {
 	return len(trim0x(hex)) / 2
 }
@@ -163,7 +158,7 @@ func HashSecret(secret string) (string, error) {
 		log.Fatalf("Failed to decode hex string: %v", err)
 	}
 
-	return keccak256(hexBytes), nil
+	return keccak.Keccak256Legacy(hexBytes), nil
 }
 
 func hexlify(data []byte) string {
