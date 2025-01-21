@@ -92,6 +92,11 @@ type OrderResponse struct {
 	OrderInvalidReason   interface{} `json:"orderInvalidReason"`
 }
 
+type OrderResponseExtended struct {
+	OrderResponse
+	LimitOrderDataNormalized NormalizedLimitOrderData
+}
+
 type GetOrderByHashResponse struct {
 	ID                   int         `json:"id"`
 	OrderHash            string      `json:"orderHash"`
@@ -101,7 +106,6 @@ type GetOrderByHashResponse struct {
 	MakerAsset           string      `json:"makerAsset"`
 	OrderMaker           string      `json:"orderMaker"`
 	OrderStatus          int         `json:"orderStatus"`
-	Signature            string      `json:"signature"`
 	MakerAmount          string      `json:"makerAmount"`
 	RemainingMakerAmount string      `json:"remainingMakerAmount"`
 	MakerBalance         string      `json:"makerBalance"`

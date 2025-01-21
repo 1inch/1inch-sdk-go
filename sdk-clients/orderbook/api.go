@@ -51,7 +51,7 @@ func (api *api) CreateOrder(ctx context.Context, params CreateOrderParams) (*Cre
 // TODO Reusing the same request/response objects until the openapi spec is updated to include the correct object definitions
 
 // GetOrdersByCreatorAddress returns all orders created by a given address in the Limit Order Protocol
-func (api *api) GetOrdersByCreatorAddress(ctx context.Context, params GetOrdersByCreatorAddressParams) ([]OrderResponse, error) {
+func (api *api) GetOrdersByCreatorAddress(ctx context.Context, params GetOrdersByCreatorAddressParams) ([]*OrderResponse, error) {
 	u := fmt.Sprintf("/orderbook/v4.0/%d/address/%s", api.chainId, params.CreatorAddress)
 
 	err := params.Validate()
@@ -65,7 +65,7 @@ func (api *api) GetOrdersByCreatorAddress(ctx context.Context, params GetOrdersB
 		U:      u,
 	}
 
-	var ordersResponse []OrderResponse
+	var ordersResponse []*OrderResponse
 	err = api.httpExecutor.ExecuteRequest(ctx, payload, &ordersResponse)
 	if err != nil {
 		return nil, err

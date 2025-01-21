@@ -91,20 +91,19 @@ func main() {
 	// Sleep to accommodate free-tier API keys
 	time.Sleep(time.Second)
 
-	getOrderResponse, err := client.GetOrdersByCreatorAddress(ctx, orderbook.GetOrdersByCreatorAddressParams{
+	ordersByCreatorResponse, err := client.GetOrdersByCreatorAddress(ctx, orderbook.GetOrdersByCreatorAddressParams{
 		CreatorAddress: client.Wallet.Address().Hex(),
 	})
 
-	fmt.Printf("Order created! \nOrder hash: %v\n", getOrderResponse[0].OrderHash)
+	fmt.Printf("Order created! \nOrder hash: %v\n", ordersByCreatorResponse[0].OrderHash)
 
 	// Sleep to accommodate free-tier API keys
 	time.Sleep(time.Second)
 
-	getOrderRresponse, err := client.GetOrder(ctx, orderbook.GetOrderParams{
-		OrderHash: getOrderResponse[0].OrderHash,
-	})
-
-	fillOrderData, err := client.GetFillOrderCalldata(getOrderRresponse, nil)
+	fillOrderData, err := client.GetFillOrderCalldata(ordersByCreatorResponse[0], nil)
+	if err != nil {
+		log.Fatalf("Failed to get fill order calldata: %v", err)
+	}
 
 	aggregationRouter, err := constants.Get1inchRouterFromChainId(chainId)
 	if err != nil {
