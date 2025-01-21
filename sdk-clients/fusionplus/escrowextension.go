@@ -133,7 +133,6 @@ func DecodeEscrowExtension(data []byte) (*EscrowExtension, error) {
 }
 
 func decodeExtraData(data []byte) (*EscrowExtraData, error) {
-	fmt.Printf("data: %x\n", data)
 	iter := bytesiterator.New(data)
 	hashlockData, err := iter.NextUint256()
 	if err != nil {
@@ -169,21 +168,10 @@ func decodeExtraData(data []byte) (*EscrowExtraData, error) {
 		log.Fatalf("Failed to read fourth uint256: %v", err)
 	}
 
-	fmt.Printf("depsoit safe: %v\n", safetyDepositData.Bytes())
-	fmt.Printf("timelocksData: %v\n", timelocksData.Bytes())
-
 	timelocks, err := decodeTimeLocks(timelocksData)
 	if err != nil {
 		log.Fatalf("Failed to decode timelocks: %v", err)
 	}
-
-	fmt.Println("\nExtracted Data:")
-	fmt.Printf("hashlockData: %x\n", hashlockData)
-	fmt.Printf("dstChainIdData: %d\n", dstChainIdData)
-	fmt.Printf("Address: %s\n", addressHex)
-	fmt.Printf("safetyDepositData: %x\n", safetyDepositData)
-	fmt.Printf("timelocksData: %x\n", timelocksData)
-	fmt.Printf("timelocks: %v\n", timelocks)
 
 	return &EscrowExtraData{
 		HashLock: &HashLock{
@@ -210,8 +198,6 @@ func decodeTimeLocks(value *big.Int) (*TimeLocks, error) {
 		data = padded
 	}
 
-	fmt.Printf("Decoded TimeLocks: %x\n", data)
-
 	//TODO big.Int cannot preserve leading zeroes, so decoding the deploy time is impossible atm
 
 	// tl.DeployTime = float32(binary.BigEndian.Uint32((data[0:4])))
@@ -222,8 +208,6 @@ func decodeTimeLocks(value *big.Int) (*TimeLocks, error) {
 	tl.SrcCancellation = float32(binary.BigEndian.Uint32((data[20:24])))
 	tl.SrcPublicWithdrawal = float32(binary.BigEndian.Uint32((data[24:28])))
 	tl.SrcWithdrawal = float32(binary.BigEndian.Uint32((data[28:32])))
-
-	fmt.Printf("Decoded TimeLocks: %v\n", tl)
 
 	return tl, nil
 }
