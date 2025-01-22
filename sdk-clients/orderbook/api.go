@@ -117,6 +117,9 @@ func (api *api) GetOrderWithSignature(ctx context.Context, params GetOrderParams
 	allOrdersByCreator, err := api.GetOrdersByCreatorAddress(ctx, GetOrdersByCreatorAddressParams{
 		CreatorAddress: order.OrderMaker,
 	})
+	if err != nil {
+		return nil, err
+	}
 
 	// Filter through the second set of orders to find the signature
 	for _, o := range allOrdersByCreator {
