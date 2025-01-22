@@ -39,10 +39,10 @@ func (c *Client) GetSeriesNonce(ctx context.Context, publicAddress gethCommon.Ad
 	return nonce, nil
 }
 
-func (c *Client) GetFillOrderCalldata(getOrderResponse *GetOrderByHashResponseExtended, takerTraits *TakerTraits) ([]byte, error) {
+func (c *Client) GetFillOrderCalldata(order *OrderExtendedWithSignature, takerTraits *TakerTraits) ([]byte, error) {
 
 	var function string
-	if getOrderResponse.Data.Extension == "0x" {
+	if order.Data.Extension == "0x" {
 		function = "fillOrder"
 	} else {
 		if takerTraits == nil {
@@ -52,7 +52,7 @@ func (c *Client) GetFillOrderCalldata(getOrderResponse *GetOrderByHashResponseEx
 		function = "fillOrderArgs"
 	}
 
-	compressedSignature, err := CompressSignature(getOrderResponse.Signature[2:])
+	compressedSignature, err := CompressSignature(order.Signature[2:])
 	if err != nil {
 		return nil, err
 	}
@@ -71,13 +71,13 @@ func (c *Client) GetFillOrderCalldata(getOrderResponse *GetOrderByHashResponseEx
 
 	switch function {
 	case "fillOrder":
-		fillOrderData, err = c.AggregationRouterV6.Pack(function, getOrderResponse.LimitOrderDataNormalized, rCompressed, vsCompressed, getOrderResponse.LimitOrderDataNormalized.TakingAmount, big.NewInt(0))
+		fillOrderData, err = c.AggregationRouterV6.Pack(function, order.LimitOrderDataNormalized, rCompressed, vsCompressed, order.LimitOrderDataNormalized.TakingAmount, big.NewInt(0))
 		if err != nil {
 			return nil, err
 		}
 	case "fillOrderArgs":
 		takerTraitsEncoded := takerTraits.Encode()
-		fillOrderData, err = c.AggregationRouterV6.Pack(function, getOrderResponse.LimitOrderDataNormalized, rCompressed, vsCompressed, getOrderResponse.LimitOrderDataNormalized.TakingAmount, takerTraitsEncoded.TraitFlags, takerTraitsEncoded.Args)
+		fillOrderData, err = c.AggregationRouterV6.Pack(function, order.LimitOrderDataNormalized, rCompressed, vsCompressed, order.LimitOrderDataNormalized.TakingAmount, takerTraitsEncoded.TraitFlags, takerTraitsEncoded.Args)
 		if err != nil {
 			return nil, err
 		}

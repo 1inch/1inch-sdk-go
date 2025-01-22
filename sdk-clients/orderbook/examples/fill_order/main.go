@@ -39,9 +39,11 @@ func main() {
 	}
 	client, err := orderbook.NewClient(config)
 
-	getOrderResponse, err := client.GetOrder(ctx, orderbook.GetOrderParams{
-		OrderHash: limitOrderHash,
-	})
+	params := orderbook.GetOrderParams{
+		OrderHash:               limitOrderHash,
+		SleepBetweenSubrequests: true,
+	}
+	getOrderResponse, err := client.GetOrderWithSignature(ctx, params)
 
 	takerTraits := orderbook.NewTakerTraits(orderbook.TakerTraitsParams{
 		Extension: getOrderResponse.Data.Extension,

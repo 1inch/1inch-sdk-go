@@ -31,7 +31,8 @@ type GetOrdersByCreatorAddressParams struct {
 }
 
 type GetOrderParams struct {
-	OrderHash string
+	OrderHash               string
+	SleepBetweenSubrequests bool // For free accounts, this should be set to true to avoid 429 errors when using the GetOrderWithSignature method
 }
 
 type GetAllOrdersParams struct {
@@ -92,6 +93,11 @@ type OrderResponse struct {
 	OrderInvalidReason   interface{} `json:"orderInvalidReason"`
 }
 
+type OrderResponseExtended struct {
+	OrderResponse
+	LimitOrderDataNormalized NormalizedLimitOrderData
+}
+
 type GetOrderByHashResponse struct {
 	ID                   int         `json:"id"`
 	OrderHash            string      `json:"orderHash"`
@@ -101,7 +107,6 @@ type GetOrderByHashResponse struct {
 	MakerAsset           string      `json:"makerAsset"`
 	OrderMaker           string      `json:"orderMaker"`
 	OrderStatus          int         `json:"orderStatus"`
-	Signature            string      `json:"signature"`
 	MakerAmount          string      `json:"makerAmount"`
 	RemainingMakerAmount string      `json:"remainingMakerAmount"`
 	MakerBalance         string      `json:"makerBalance"`
@@ -138,6 +143,12 @@ type GetOrderByHashResponseExtended struct {
 	GetOrderByHashResponse
 
 	LimitOrderDataNormalized NormalizedLimitOrderData
+}
+
+type OrderExtendedWithSignature struct {
+	GetOrderByHashResponse
+	LimitOrderDataNormalized NormalizedLimitOrderData
+	Signature                string
 }
 
 type NormalizedLimitOrderData struct {
