@@ -31,7 +31,8 @@ type GetOrdersByCreatorAddressParams struct {
 }
 
 type GetOrderParams struct {
-	OrderHash string
+	OrderHash               string
+	SleepBetweenSubrequests bool // For free accounts, this should be set to true to avoid 429 errors when using the GetOrderWithSignature method
 }
 
 type GetAllOrdersParams struct {
@@ -142,6 +143,12 @@ type GetOrderByHashResponseExtended struct {
 	GetOrderByHashResponse
 
 	LimitOrderDataNormalized NormalizedLimitOrderData
+}
+
+type OrderExtendedWithSignature struct {
+	GetOrderByHashResponse
+	LimitOrderDataNormalized NormalizedLimitOrderData
+	Signature                string
 }
 
 type NormalizedLimitOrderData struct {

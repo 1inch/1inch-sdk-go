@@ -88,6 +88,8 @@ func main() {
 		log.Fatalf("Request completed, but order creation status was a failure: %v\n", createOrderResponse)
 	}
 
+	fmt.Println("Order created! Getting order hash...")
+
 	// Sleep to accommodate free-tier API keys
 	time.Sleep(time.Second)
 
@@ -95,12 +97,20 @@ func main() {
 		CreatorAddress: client.Wallet.Address().Hex(),
 	})
 
-	fmt.Printf("Order created! \nOrder hash: %v\n", ordersByCreatorResponse[0].OrderHash)
+	fmt.Printf("Order hash: %v\n", ordersByCreatorResponse[0].OrderHash)
+	fmt.Println("Getting signature...")
 
 	// Sleep to accommodate free-tier API keys
 	time.Sleep(time.Second)
 
-	fillOrderData, err := client.GetFillOrderCalldata(ordersByCreatorResponse[0], nil)
+	orderWithSignature, err := client.GetOrderWithSignature(ctx, orderbook.GetOrderParams{
+		OrderHash:               ordersByCreatorResponse[0].OrderHash,
+		SleepBetweenSubrequests: true,
+	})
+
+	fmt.Println("Getting retrieved! Filling order...")
+
+	fillOrderData, err := client.GetFillOrderCalldata(orderWithSignature, nil)
 	if err != nil {
 		log.Fatalf("Failed to get fill order calldata: %v", err)
 	}

@@ -5,6 +5,7 @@ import (
 	"encoding/json"
 	"errors"
 	"fmt"
+	"time"
 
 	"github.com/1inch/1inch-sdk-go/common"
 )
@@ -96,6 +97,39 @@ func (api *api) GetOrder(ctx context.Context, params GetOrderParams) (*GetOrderB
 	}
 
 	return NormalizeGetOrderByHashResponse(getOrderByHashResponse)
+}
+
+// GetOrderWithSignature first looks up an order by hash, then does a second request to get the signature data
+func (api *api) GetOrderWithSignature(ctx context.Context, params GetOrderParams) (*OrderExtendedWithSignature, error) {
+
+	// First lookup the order by hash (no signature on this response)
+	order, err := api.GetOrder(ctx, params)
+	if err != nil {
+		return nil, err
+	}
+
+	// For free accounts, this sleep is required to avoid 429 errors
+	if params.SleepBetweenSubrequests {
+		time.Sleep(time.Second)
+	}
+
+	// Second, lookup all orders by that creator (these orders will contain the signature data)
+	allOrdersByCreator, err := api.GetOrdersByCreatorAddress(ctx, GetOrdersByCreatorAddressParams{
+		CreatorAddress: order.OrderMaker,
+	})
+
+	// Filter through the second set of orders to find the signature
+	for _, o := range allOrdersByCreator {
+		if o.OrderHash == params.OrderHash {
+			return &OrderExtendedWithSignature{
+				GetOrderByHashResponse:   order.GetOrderByHashResponse,
+				LimitOrderDataNormalized: order.LimitOrderDataNormalized,
+				Signature:                o.Signature,
+			}, nil
+		}
+	}
+
+	return nil, errors.New("order not found")
 }
 
 // GetAllOrders returns all orders in the Limit Order Protocol
