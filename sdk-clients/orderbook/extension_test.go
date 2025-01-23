@@ -1,6 +1,7 @@
 package orderbook
 
 import (
+	"encoding/hex"
 	"strings"
 	"testing"
 
@@ -33,8 +34,8 @@ func TestEncode(t *testing.T) {
 			extension: Extension{
 				MakerAssetSuffix: "0x",
 				TakerAssetSuffix: "0x",
-				MakingAmountData: "fb2809A5314473E1165f6B58018E20ed8F07B84000000000000000666cdf850000b400c45c00688b007e",
-				TakingAmountData: "fb2809A5314473E1165f6B58018E20ed8F07B84000000000000000666cdf850000b400c45c00688b007e",
+				MakingAmountData: "0xfb2809A5314473E1165f6B58018E20ed8F07B84000000000000000666cdf850000b400c45c00688b007e",
+				TakingAmountData: "0xfb2809A5314473E1165f6B58018E20ed8F07B84000000000000000666cdf850000b400c45c00688b007e",
 				Predicate:        "0x",
 				MakerPermit:      "0x",
 				PreInteraction:   "0x",
@@ -47,8 +48,8 @@ func TestEncode(t *testing.T) {
 			extension: Extension{
 				MakerAssetSuffix: "0x",
 				TakerAssetSuffix: "0x",
-				MakingAmountData: "fb2809A5314473E1165f6B58018E20ed8F07B8400000000000000067217a910000b401a70b",
-				TakingAmountData: "fb2809A5314473E1165f6B58018E20ed8F07B8400000000000000067217a910000b401a70b",
+				MakingAmountData: "0xfb2809A5314473E1165f6B58018E20ed8F07B8400000000000000067217a910000b401a70b",
+				TakingAmountData: "0xfb2809A5314473E1165f6B58018E20ed8F07B8400000000000000067217a910000b401a70b",
 				Predicate:        "0x",
 				MakerPermit:      "0x",
 				PreInteraction:   "0x",
@@ -110,7 +111,7 @@ func TestDecodeExtension(t *testing.T) {
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
 			// Convert hex string to bytes
-			data, err := hexToBytes(tt.hexInput)
+			data, err := hex.DecodeString(tt.hexInput)
 			if err != nil {
 				t.Fatalf("Failed to convert hex to bytes: %v", err)
 			}
@@ -137,13 +138,13 @@ func TestDecodeExtension(t *testing.T) {
 }
 
 func extensionsEqual(a, b *Extension) bool {
-	return strings.TrimPrefix(a.MakerAssetSuffix, "0x") == strings.TrimPrefix(b.MakerAssetSuffix, "0x") &&
-		strings.TrimPrefix(a.TakerAssetSuffix, "0x") == strings.TrimPrefix(b.TakerAssetSuffix, "0x") &&
-		strings.TrimPrefix(a.MakingAmountData, "0x") == strings.TrimPrefix(b.MakingAmountData, "0x") &&
-		strings.TrimPrefix(a.TakingAmountData, "0x") == strings.TrimPrefix(b.TakingAmountData, "0x") &&
-		strings.TrimPrefix(a.Predicate, "0x") == strings.TrimPrefix(b.Predicate, "0x") &&
-		strings.TrimPrefix(a.MakerPermit, "0x") == strings.TrimPrefix(b.MakerPermit, "0x") &&
-		strings.TrimPrefix(a.PreInteraction, "0x") == strings.TrimPrefix(b.PreInteraction, "0x") &&
-		strings.TrimPrefix(a.PostInteraction, "0x") == strings.TrimPrefix(b.PostInteraction, "0x")
-	// strings.TrimPrefix(a.CustomData, "0x") == strings.TrimPrefix(b.CustomData, "0x")
+	return a.MakerAssetSuffix == b.MakerAssetSuffix &&
+		a.TakerAssetSuffix == b.TakerAssetSuffix &&
+		a.MakingAmountData == b.MakingAmountData &&
+		a.TakingAmountData == b.TakingAmountData &&
+		a.Predicate == b.Predicate &&
+		a.MakerPermit == b.MakerPermit &&
+		a.PreInteraction == b.PreInteraction &&
+		a.PostInteraction == b.PostInteraction
+	// a.CustomData == b.CustomData
 }

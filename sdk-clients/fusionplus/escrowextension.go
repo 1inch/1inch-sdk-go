@@ -10,6 +10,7 @@ import (
 	"strings"
 
 	"github.com/1inch/1inch-sdk-go/internal/bytesiterator"
+	"github.com/1inch/1inch-sdk-go/internal/hexidecimal"
 	"github.com/1inch/1inch-sdk-go/sdk-clients/fusion"
 	"github.com/1inch/1inch-sdk-go/sdk-clients/orderbook"
 	"github.com/ethereum/go-ethereum/common"
@@ -71,7 +72,7 @@ func (e *EscrowExtension) ConvertToOrderbookExtension() (*orderbook.Extension, e
 		return nil, fmt.Errorf("failed to encode extra data: %v", err) // TODO handle
 	}
 
-	e.PostInteraction += trim0x(fmt.Sprintf("%x", extraDataBytes))
+	e.PostInteraction += hexidecimal.Trim0x(fmt.Sprintf("%x", extraDataBytes))
 
 	return &orderbook.Extension{
 		MakerAssetSuffix: e.MakerAssetSuffix,
@@ -82,7 +83,7 @@ func (e *EscrowExtension) ConvertToOrderbookExtension() (*orderbook.Extension, e
 		MakerPermit:      e.MakerPermit,
 		PreInteraction:   e.PreInteraction,
 		PostInteraction:  e.PostInteraction,
-		//strings.TrimPrefix(e.CustomData, "0x"), // TODO Blocking custom data for now because it is breaking the cumsum method. The extension constructor will return with an error if the user provides this field.
+		//hexidecimal.Trim0x(e.CustomData), // TODO Blocking custom data for now because it is breaking the cumsum method. The extension constructor will return with an error if the user provides this field.
 	}, nil
 }
 
@@ -227,7 +228,7 @@ func encodeExtraData(data *EscrowExtraData) ([]byte, error) {
 
 	// 1. Encode HashLock.Value
 	hashlockData := new(big.Int)
-	_, ok := hashlockData.SetString(trim0x(data.HashLock.Value), 16)
+	_, ok := hashlockData.SetString(hexidecimal.Trim0x(data.HashLock.Value), 16)
 	if !ok {
 		return nil, fmt.Errorf("invalid HashLock value: %s", data.HashLock.Value)
 	}

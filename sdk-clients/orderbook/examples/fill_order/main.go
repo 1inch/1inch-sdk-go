@@ -44,6 +44,9 @@ func main() {
 		SleepBetweenSubrequests: true,
 	}
 	getOrderResponse, err := client.GetOrderWithSignature(ctx, params)
+	if err != nil {
+		log.Fatalf("Failed to get order: %v", err)
+	}
 
 	takerTraits := orderbook.NewTakerTraits(orderbook.TakerTraitsParams{
 		Extension: getOrderResponse.Data.Extension,

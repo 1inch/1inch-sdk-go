@@ -6,7 +6,6 @@ import (
 	"encoding/json"
 	"fmt"
 	"math/big"
-	"strings"
 	"testing"
 
 	"github.com/1inch/1inch-sdk-go/internal/bigint"
@@ -107,7 +106,7 @@ func TestNewExtension(t *testing.T) {
 				MakerAssetSuffix: "0x1234",
 				TakerAssetSuffix: "0x1234",
 				Predicate:        "0x1234",
-				PreInteraction:   "pre",
+				PreInteraction:   "0x5678",
 			},
 			expectedExtension: &Extension{
 				MakerAssetSuffix: "0x1234",
@@ -116,7 +115,7 @@ func TestNewExtension(t *testing.T) {
 				TakingAmountData: "0x00000000000000000000000000000000000056780000000000000000000000000000000000",
 				Predicate:        "0x1234",
 				MakerPermit:      "0x00000000000000000000000000000000000012343456",
-				PreInteraction:   "pre",
+				PreInteraction:   "0x5678",
 				PostInteraction:  "0x00000000000000000000000000000000000056780000000000",
 			},
 			expectErr: false,
@@ -163,12 +162,25 @@ func TestNewExtension(t *testing.T) {
 			expectErr: false,
 		},
 		{
+			name: "Invalid SettlementContract",
+			params: ExtensionParams{
+				SettlementContract: "invalid",
+				MakerAssetSuffix:   "0x1234",
+				TakerAssetSuffix:   "0x1234",
+				Predicate:          "0x1234",
+				PreInteraction:     "0x5678",
+			},
+			expectErr: true,
+			errMsg:    "Settlement contract must be valid hex string",
+		},
+		{
 			name: "Invalid MakerAssetSuffix",
 			params: ExtensionParams{
-				MakerAssetSuffix: "invalid",
-				TakerAssetSuffix: "0x1234",
-				Predicate:        "0x1234",
-				PreInteraction:   "pre",
+				SettlementContract: "0x9012",
+				MakerAssetSuffix:   "invalid",
+				TakerAssetSuffix:   "0x1234",
+				Predicate:          "0x1234",
+				PreInteraction:     "0x5678",
 			},
 			expectErr: true,
 			errMsg:    "MakerAssetSuffix must be valid hex string",
@@ -176,10 +188,11 @@ func TestNewExtension(t *testing.T) {
 		{
 			name: "Invalid TakerAssetSuffix",
 			params: ExtensionParams{
-				MakerAssetSuffix: "0x1234",
-				TakerAssetSuffix: "invalid",
-				Predicate:        "0x1234",
-				PreInteraction:   "pre",
+				SettlementContract: "0x9012",
+				MakerAssetSuffix:   "0x1234",
+				TakerAssetSuffix:   "invalid",
+				Predicate:          "0x1234",
+				PreInteraction:     "0x5678",
 			},
 			expectErr: true,
 			errMsg:    "TakerAssetSuffix must be valid hex string",
@@ -187,10 +200,11 @@ func TestNewExtension(t *testing.T) {
 		{
 			name: "Invalid Predicate",
 			params: ExtensionParams{
-				MakerAssetSuffix: "0x1234",
-				TakerAssetSuffix: "0x1234",
-				Predicate:        "invalid",
-				PreInteraction:   "pre",
+				SettlementContract: "0x9012",
+				MakerAssetSuffix:   "0x1234",
+				TakerAssetSuffix:   "0x1234",
+				Predicate:          "invalid",
+				PreInteraction:     "0x5678",
 			},
 			expectErr: true,
 			errMsg:    "Predicate must be valid hex string",
@@ -198,11 +212,12 @@ func TestNewExtension(t *testing.T) {
 		{
 			name: "CustomData not supported",
 			params: ExtensionParams{
-				MakerAssetSuffix: "0x1234",
-				TakerAssetSuffix: "0x1234",
-				Predicate:        "0x1234",
-				PreInteraction:   "pre",
-				CustomData:       "0x1234",
+				SettlementContract: "0x9012",
+				MakerAssetSuffix:   "0x1234",
+				TakerAssetSuffix:   "0x1234",
+				Predicate:          "0x1234",
+				PreInteraction:     "0x5678",
+				CustomData:         "0x1234",
 			},
 			expectErr: true,
 			errMsg:    "CustomData is not currently supported",
@@ -245,8 +260,8 @@ func TestDecodeExtension(t *testing.T) {
 			expected: &Extension{
 				MakerAssetSuffix: "0x01",
 				TakerAssetSuffix: "0x02",
-				MakingAmountData: "05000000000000000000000000000000000000000000000000000000000000000000000000",
-				TakingAmountData: "05000000000000000000000000000000000000000000000000000000000000000000000000",
+				MakingAmountData: "0x05000000000000000000000000000000000000000000000000000000000000000000000000",
+				TakingAmountData: "0x05000000000000000000000000000000000000000000000000000000000000000000000000",
 				Predicate:        "0x07",
 				MakerPermit:      "0x000000000000000000000000000000000000123403",
 				PreInteraction:   "0x09",
@@ -259,7 +274,7 @@ func TestDecodeExtension(t *testing.T) {
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
 			// Convert hex string to bytes
-			data, err := hexToBytes(tt.hexInput)
+			data, err := hex.DecodeString(tt.hexInput)
 			if err != nil {
 				t.Fatalf("Failed to convert hex to bytes: %v", err)
 			}
@@ -288,14 +303,14 @@ func TestDecodeExtension(t *testing.T) {
 
 func printSelectedFields(ext *Extension) string {
 	selectedFields := map[string]string{
-		"MakerAssetSuffix": strings.TrimPrefix(ext.MakerAssetSuffix, "0x"),
-		"TakerAssetSuffix": strings.TrimPrefix(ext.TakerAssetSuffix, "0x"),
-		"MakingAmountData": strings.TrimPrefix(ext.MakingAmountData, "0x"),
-		"TakingAmountData": strings.TrimPrefix(ext.TakingAmountData, "0x"),
-		"Predicate":        strings.TrimPrefix(ext.Predicate, "0x"),
-		"MakerPermit":      strings.TrimPrefix(ext.MakerPermit, "0x"),
-		"PreInteraction":   strings.TrimPrefix(ext.PreInteraction, "0x"),
-		"PostInteraction":  strings.TrimPrefix(ext.PostInteraction, "0x"),
+		"MakerAssetSuffix": ext.MakerAssetSuffix,
+		"TakerAssetSuffix": ext.TakerAssetSuffix,
+		"MakingAmountData": ext.MakingAmountData,
+		"TakingAmountData": ext.TakingAmountData,
+		"Predicate":        ext.Predicate,
+		"MakerPermit":      ext.MakerPermit,
+		"PreInteraction":   ext.PreInteraction,
+		"PostInteraction":  ext.PostInteraction,
 	}
 
 	jsonData, err := json.MarshalIndent(selectedFields, "", "  ")
@@ -452,20 +467,15 @@ func TestFromExtension(t *testing.T) {
 }
 
 func extensionsEqual(a, b *Extension) bool {
-	return strings.TrimPrefix(a.MakerAssetSuffix, "0x") == strings.TrimPrefix(b.MakerAssetSuffix, "0x") &&
-		strings.TrimPrefix(a.TakerAssetSuffix, "0x") == strings.TrimPrefix(b.TakerAssetSuffix, "0x") &&
-		strings.TrimPrefix(a.MakingAmountData, "0x") == strings.TrimPrefix(b.MakingAmountData, "0x") &&
-		strings.TrimPrefix(a.TakingAmountData, "0x") == strings.TrimPrefix(b.TakingAmountData, "0x") &&
-		strings.TrimPrefix(a.Predicate, "0x") == strings.TrimPrefix(b.Predicate, "0x") &&
-		strings.TrimPrefix(a.MakerPermit, "0x") == strings.TrimPrefix(b.MakerPermit, "0x") &&
-		strings.TrimPrefix(a.PreInteraction, "0x") == strings.TrimPrefix(b.PreInteraction, "0x") &&
-		strings.TrimPrefix(a.PostInteraction, "0x") == strings.TrimPrefix(b.PostInteraction, "0x")
-	// strings.TrimPrefix(a.CustomData, "0x") == strings.TrimPrefix(b.CustomData, "0x")
-}
-
-// hexToBytes converts a hexadecimal string to a byte slice.
-func hexToBytes(s string) ([]byte, error) {
-	return hex.DecodeString(s)
+	return a.MakerAssetSuffix == b.MakerAssetSuffix &&
+		a.TakerAssetSuffix == b.TakerAssetSuffix &&
+		a.MakingAmountData == b.MakingAmountData &&
+		a.TakingAmountData == b.TakingAmountData &&
+		a.Predicate == b.Predicate &&
+		a.MakerPermit == b.MakerPermit &&
+		a.PreInteraction == b.PreInteraction &&
+		a.PostInteraction == b.PostInteraction
+	// a.CustomData == b.CustomData
 }
 
 // contains checks if the substring is present in the string.

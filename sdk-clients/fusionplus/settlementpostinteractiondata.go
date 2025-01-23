@@ -11,6 +11,7 @@ import (
 	"github.com/1inch/1inch-sdk-go/internal/bytesbuilder"
 	"github.com/1inch/1inch-sdk-go/internal/bytesiterator"
 	"github.com/ethereum/go-ethereum/common"
+	"github.com/ethereum/go-ethereum/common/hexutil"
 )
 
 type SettlementPostInteractionData struct {
@@ -71,7 +72,7 @@ func NewSettlementPostInteractionData(data SettlementSuffixData) (*SettlementPos
 }
 
 func Decode(data string) (SettlementPostInteractionData, error) {
-	bytes, err := hex.DecodeString(strings.TrimPrefix(data, "0x"))
+	bytes, err := hexutil.Decode(data)
 	if err != nil {
 		return SettlementPostInteractionData{}, errors.New("invalid hex string")
 	}

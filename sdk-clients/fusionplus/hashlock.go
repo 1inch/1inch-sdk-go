@@ -8,8 +8,8 @@ import (
 	"fmt"
 	"log"
 	"math/big"
-	"strings"
 
+	"github.com/1inch/1inch-sdk-go/internal/hexidecimal"
 	"github.com/1inch/1inch-sdk-go/internal/keccak"
 	"github.com/ethereum/go-ethereum/common/hexutil"
 	"github.com/ethereum/go-ethereum/crypto"
@@ -145,7 +145,7 @@ func rightChildIndex(i int) int {
 }
 
 func getBytesCount(hex string) int {
-	return len(trim0x(hex)) / 2
+	return len(hexidecimal.Trim0x(hex)) / 2
 }
 
 func HashSecret(secret string) (string, error) {
@@ -153,7 +153,7 @@ func HashSecret(secret string) (string, error) {
 		return "", fmt.Errorf("secret length must be 32 bytes hex encoded. Got %s", secret)
 	}
 
-	hexBytes, err := hex.DecodeString(secret[2:])
+	hexBytes, err := hexutil.Decode(secret)
 	if err != nil {
 		log.Fatalf("Failed to decode hex string: %v", err)
 	}
@@ -221,7 +221,7 @@ func pack(typ string, value interface{}) ([]byte, error) {
 		if !ok {
 			return nil, fmt.Errorf("expected string for bytes32 type, got %T", value)
 		}
-		bytes, err := hex.DecodeString(s[2:]) // Remove "0x" prefix
+		bytes, err := hexutil.Decode(s)
 		if err != nil {
 			return nil, err
 		}
@@ -233,8 +233,4 @@ func pack(typ string, value interface{}) ([]byte, error) {
 	default:
 		return nil, fmt.Errorf("unsupported type: %s", typ)
 	}
-}
-
-func trim0x(s string) string {
-	return strings.TrimPrefix(s, "0x")
 }

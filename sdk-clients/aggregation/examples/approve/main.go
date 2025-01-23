@@ -2,7 +2,6 @@ package main
 
 import (
 	"context"
-	"encoding/hex"
 	"fmt"
 	"log"
 	"math/big"
@@ -12,6 +11,7 @@ import (
 	"github.com/1inch/1inch-sdk-go/constants"
 	"github.com/1inch/1inch-sdk-go/sdk-clients/aggregation"
 	"github.com/ethereum/go-ethereum/common"
+	"github.com/ethereum/go-ethereum/common/hexutil"
 )
 
 var (
@@ -62,7 +62,7 @@ func main() {
 		if err != nil {
 			log.Fatalf("Failed to get approve data: %v\n", err)
 		}
-		data, err := hex.DecodeString(approveData.Data[2:])
+		data, err := hexutil.Decode(approveData.Data)
 		if err != nil {
 			log.Fatalf("Failed to decode approve data: %v\n", err)
 		}

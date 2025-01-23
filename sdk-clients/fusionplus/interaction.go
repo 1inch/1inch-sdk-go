@@ -1,11 +1,11 @@
 package fusionplus
 
 import (
-	"encoding/hex"
 	"fmt"
-	"strings"
 
+	"github.com/1inch/1inch-sdk-go/internal/hexidecimal"
 	"github.com/ethereum/go-ethereum/common"
+	"github.com/ethereum/go-ethereum/common/hexutil"
 )
 
 type Interaction struct {
@@ -24,7 +24,7 @@ func NewInteraction(target common.Address, data string) *Interaction {
 }
 
 func (i *Interaction) Encode() string {
-	return i.Target.String() + trim0x(i.Data)
+	return i.Target.String() + hexidecimal.Trim0x(i.Data)
 }
 
 func DecodeInteraction(bytes string) (*Interaction, error) {
@@ -39,6 +39,6 @@ func DecodeInteraction(bytes string) (*Interaction, error) {
 }
 
 func isHexBytes(s string) bool {
-	_, err := hex.DecodeString(strings.TrimPrefix(s, "0x"))
+	_, err := hexutil.Decode(s)
 	return err == nil
 }
