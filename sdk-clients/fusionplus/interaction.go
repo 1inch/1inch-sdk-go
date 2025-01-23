@@ -3,7 +3,7 @@ package fusionplus
 import (
 	"fmt"
 
-	"github.com/1inch/1inch-sdk-go/internal/hexidecimal"
+	"github.com/1inch/1inch-sdk-go/internal/hexadecimal"
 	"github.com/ethereum/go-ethereum/common"
 	"github.com/ethereum/go-ethereum/common/hexutil"
 )
@@ -24,7 +24,7 @@ func NewInteraction(target common.Address, data string) *Interaction {
 }
 
 func (i *Interaction) Encode() string {
-	return i.Target.String() + hexidecimal.Trim0x(i.Data)
+	return i.Target.String() + hexadecimal.Trim0x(i.Data)
 }
 
 func DecodeInteraction(bytes string) (*Interaction, error) {

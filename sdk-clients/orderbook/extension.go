@@ -10,7 +10,7 @@ import (
 	"reflect"
 
 	"github.com/1inch/1inch-sdk-go/internal/bytesiterator"
-	"github.com/1inch/1inch-sdk-go/internal/hexidecimal"
+	"github.com/1inch/1inch-sdk-go/internal/hexadecimal"
 	"github.com/ethereum/go-ethereum/common/math"
 )
 
@@ -46,7 +46,7 @@ func NewExtension(params ExtensionParams) (*Extension, error) {
 		MakingAmountData: params.GetMakingAmount,
 		TakingAmountData: params.GetTakingAmount,
 		Predicate:        params.Predicate,
-		MakerPermit:      params.MakerAsset + hexidecimal.Trim0x(params.Permit),
+		MakerPermit:      params.MakerAsset + hexadecimal.Trim0x(params.Permit),
 		PreInteraction:   params.PreInteraction,
 		PostInteraction:  params.PostInteraction,
 	}, nil
@@ -163,8 +163,8 @@ func (ext *Extension) Encode() (string, error) {
 
 	// Decode each field and collect byte counts
 	for _, field := range fields {
-		fieldStr := hexidecimal.Trim0x(field)
-		fieldStr = hexidecimal.Trim0x(fieldStr)
+		fieldStr := hexadecimal.Trim0x(field)
+		fieldStr = hexadecimal.Trim0x(fieldStr)
 
 		// Ensure even length for hex decoding
 		if len(fieldStr)%2 != 0 {

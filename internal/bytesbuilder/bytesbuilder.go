@@ -4,7 +4,7 @@ import (
 	"encoding/hex"
 	"math/big"
 
-	"github.com/1inch/1inch-sdk-go/internal/hexidecimal"
+	"github.com/1inch/1inch-sdk-go/internal/hexadecimal"
 	"github.com/ethereum/go-ethereum/common"
 )
 
@@ -57,7 +57,7 @@ func (b *BytesBuilder) AddAddress(address common.Address) {
 }
 
 func (b *BytesBuilder) AddBytes(data string) error {
-	bytes, err := hex.DecodeString(hexidecimal.Trim0x(data))
+	bytes, err := hex.DecodeString(hexadecimal.Trim0x(data))
 	if err != nil {
 		return err
 	}

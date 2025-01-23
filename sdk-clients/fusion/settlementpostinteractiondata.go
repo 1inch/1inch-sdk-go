@@ -9,7 +9,7 @@ import (
 	"strings"
 
 	"github.com/1inch/1inch-sdk-go/internal/bytesbuilder"
-	"github.com/1inch/1inch-sdk-go/internal/hexidecimal"
+	"github.com/1inch/1inch-sdk-go/internal/hexadecimal"
 	"github.com/ethereum/go-ethereum/common"
 )
 
@@ -71,7 +71,7 @@ func NewSettlementPostInteractionData(data SettlementSuffixData) (*SettlementPos
 }
 
 func Decode(data string) (SettlementPostInteractionData, error) {
-	bytes, err := hex.DecodeString(hexidecimal.Trim0x(data))
+	bytes, err := hex.DecodeString(hexadecimal.Trim0x(data))
 	if err != nil {
 		return SettlementPostInteractionData{}, errors.New("invalid hex string")
 	}

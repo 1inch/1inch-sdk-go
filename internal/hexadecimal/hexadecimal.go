@@ -1,4 +1,4 @@
-package hexidecimal
+package hexadecimal
 
 import (
 	"encoding/hex"

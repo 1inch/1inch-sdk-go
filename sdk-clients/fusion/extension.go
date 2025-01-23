@@ -6,7 +6,7 @@ import (
 	"fmt"
 	"math/big"
 
-	"github.com/1inch/1inch-sdk-go/internal/hexidecimal"
+	"github.com/1inch/1inch-sdk-go/internal/hexadecimal"
 	geth_common "github.com/ethereum/go-ethereum/common"
 	"golang.org/x/crypto/sha3"
 
@@ -51,16 +51,16 @@ type ExtensionParams struct {
 }
 
 func NewExtension(params ExtensionParams) (*Extension, error) {
-	if !hexidecimal.IsHexBytes(params.SettlementContract) {
+	if !hexadecimal.IsHexBytes(params.SettlementContract) {
 		return nil, errors.New("Settlement contract must be valid hex string")
 	}
-	if !hexidecimal.IsHexBytes(params.MakerAssetSuffix) {
+	if !hexadecimal.IsHexBytes(params.MakerAssetSuffix) {
 		return nil, errors.New("MakerAssetSuffix must be valid hex string")
 	}
-	if !hexidecimal.IsHexBytes(params.TakerAssetSuffix) {
+	if !hexadecimal.IsHexBytes(params.TakerAssetSuffix) {
 		return nil, errors.New("TakerAssetSuffix must be valid hex string")
 	}
-	if !hexidecimal.IsHexBytes(params.Predicate) {
+	if !hexadecimal.IsHexBytes(params.Predicate) {
 		return nil, errors.New("Predicate must be valid hex string")
 	}
 	if params.CustomData != "" {
@@ -68,7 +68,7 @@ func NewExtension(params ExtensionParams) (*Extension, error) {
 	}
 
 	settlementContractAddress := geth_common.HexToAddress(params.SettlementContract)
-	makingAndTakingAmountData := settlementContractAddress.String() + hexidecimal.Trim0x(params.AuctionDetails.Encode())
+	makingAndTakingAmountData := settlementContractAddress.String() + hexadecimal.Trim0x(params.AuctionDetails.Encode())
 
 	fusionExtension := &Extension{
 		SettlementContract:  params.SettlementContract,
@@ -97,7 +97,7 @@ func NewExtension(params ExtensionParams) (*Extension, error) {
 			Target: geth_common.HexToAddress(params.Asset),
 			Data:   params.Permit,
 		}
-		fusionExtension.MakerPermit = permitInteraction.Target.String() + hexidecimal.Trim0x(permitInteraction.Data)
+		fusionExtension.MakerPermit = permitInteraction.Target.String() + hexadecimal.Trim0x(permitInteraction.Data)
 	}
 
 	return fusionExtension, nil
@@ -124,7 +124,7 @@ func (e *Extension) ConvertToOrderbookExtension() *orderbook.Extension {
 		MakerPermit:      e.MakerPermit,
 		PreInteraction:   e.PreInteraction,
 		PostInteraction:  e.PostInteraction,
-		//hexidecimal.Trim0x(e.CustomData), // TODO Blocking custom data for now because it is breaking the cumsum method. The extension constructor will return with an error if the user provides this field.
+		//hexadecimal.Trim0x(e.CustomData), // TODO Blocking custom data for now because it is breaking the cumsum method. The extension constructor will return with an error if the user provides this field.
 	}
 }
 

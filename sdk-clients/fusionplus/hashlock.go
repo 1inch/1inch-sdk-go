@@ -9,7 +9,7 @@ import (
 	"log"
 	"math/big"
 
-	"github.com/1inch/1inch-sdk-go/internal/hexidecimal"
+	"github.com/1inch/1inch-sdk-go/internal/hexadecimal"
 	"github.com/1inch/1inch-sdk-go/internal/keccak"
 	"github.com/ethereum/go-ethereum/common/hexutil"
 	"github.com/ethereum/go-ethereum/crypto"
@@ -145,7 +145,7 @@ func rightChildIndex(i int) int {
 }
 
 func getBytesCount(hex string) int {
-	return len(hexidecimal.Trim0x(hex)) / 2
+	return len(hexadecimal.Trim0x(hex)) / 2
 }
 
 func HashSecret(secret string) (string, error) {

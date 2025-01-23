@@ -6,7 +6,7 @@ import (
 	"math/big"
 	"time"
 
-	"github.com/1inch/1inch-sdk-go/internal/hexidecimal"
+	"github.com/1inch/1inch-sdk-go/internal/hexadecimal"
 	"github.com/ethereum/go-ethereum/common/math"
 	"github.com/ethereum/go-ethereum/crypto"
 	"github.com/ethereum/go-ethereum/signer/core/apitypes"
@@ -155,7 +155,7 @@ func GenerateSalt(extension string) (string, error) {
 
 func stringToHexBytes(hexStr string) ([]byte, error) {
 	// Strip the "0x" prefix if it exists
-	cleanedStr := hexidecimal.Trim0x(hexStr)
+	cleanedStr := hexadecimal.Trim0x(hexStr)
 
 	// Ensure the string has an even length by padding with a zero if it's odd
 	if len(cleanedStr)%2 != 0 {
