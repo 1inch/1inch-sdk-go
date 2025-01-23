@@ -3,8 +3,8 @@ package bytesbuilder
 import (
 	"encoding/hex"
 	"math/big"
-	"strings"
 
+	"github.com/1inch/1inch-sdk-go/internal/hexadecimal"
 	"github.com/ethereum/go-ethereum/common"
 )
 
@@ -56,12 +56,13 @@ func (b *BytesBuilder) AddAddress(address common.Address) {
 	b.data = append(b.data, address.Bytes()...)
 }
 
-func (b *BytesBuilder) AddBytes(data string) {
-	bytes, err := hex.DecodeString(strings.TrimPrefix(data, "0x"))
+func (b *BytesBuilder) AddBytes(data string) error {
+	bytes, err := hex.DecodeString(hexadecimal.Trim0x(data))
 	if err != nil {
-		panic("invalid hex string")
+		return err
 	}
 	b.data = append(b.data, bytes...)
+	return nil
 }
 
 func (b *BytesBuilder) AsHex() string {

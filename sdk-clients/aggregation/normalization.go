@@ -1,11 +1,11 @@
 package aggregation
 
 import (
-	"encoding/hex"
 	"errors"
 	"math/big"
 
 	"github.com/ethereum/go-ethereum/common"
+	"github.com/ethereum/go-ethereum/common/hexutil"
 
 	"github.com/1inch/1inch-sdk-go/constants"
 )
@@ -30,7 +30,7 @@ func normalizeSwapResponse(resp SwapResponse) (*SwapResponseExtended, error) {
 		return nil, errors.New("invalid 'Value' value")
 	}
 
-	data, err := hex.DecodeString(resp.Tx.Data[2:])
+	data, err := hexutil.Decode(resp.Tx.Data)
 	if err != nil {
 		return nil, errors.New("invalid 'Data' value")
 	}
@@ -69,7 +69,7 @@ func normalizeApproveCallDataResponse(resp ApproveCallDataResponse) (*ApproveCal
 		return nil, errors.New("invalid 'Value' value")
 	}
 
-	data, err := hex.DecodeString(resp.Data[2:])
+	data, err := hexutil.Decode(resp.Data)
 	if err != nil {
 		return nil, errors.New("invalid 'Data' value")
 	}

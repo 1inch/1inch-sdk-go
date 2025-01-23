@@ -11,6 +11,7 @@ import (
 	"github.com/1inch/1inch-sdk-go/internal/bytesbuilder"
 	"github.com/1inch/1inch-sdk-go/internal/bytesiterator"
 	"github.com/ethereum/go-ethereum/common"
+	"github.com/ethereum/go-ethereum/common/hexutil"
 )
 
 type SettlementPostInteractionData struct {
@@ -71,7 +72,7 @@ func NewSettlementPostInteractionData(data SettlementSuffixData) (*SettlementPos
 }
 
 func Decode(data string) (SettlementPostInteractionData, error) {
-	bytes, err := hex.DecodeString(strings.TrimPrefix(data, "0x"))
+	bytes, err := hexutil.Decode(data)
 	if err != nil {
 		return SettlementPostInteractionData{}, errors.New("invalid hex string")
 	}
@@ -150,7 +151,7 @@ func Decode(data string) (SettlementPostInteractionData, error) {
 	}, nil
 }
 
-func (spid SettlementPostInteractionData) Encode() string {
+func (spid SettlementPostInteractionData) Encode() (string, error) {
 	bitMask := big.NewInt(0)
 	bytes := bytesbuilder.New()
 
@@ -174,7 +175,10 @@ func (spid SettlementPostInteractionData) Encode() string {
 	bytes.AddUint32(spid.ResolvingStartTime)
 
 	for _, wl := range spid.Whitelist {
-		bytes.AddBytes(wl.AddressHalf)
+		err := bytes.AddBytes(wl.AddressHalf)
+		if err != nil {
+			return "", err
+		}
 		bytes.AddUint16(wl.Delay)
 	}
 
@@ -183,7 +187,7 @@ func (spid SettlementPostInteractionData) Encode() string {
 
 	output := fmt.Sprintf("0x%s", bytes.AsHex())
 
-	return output
+	return output, nil
 }
 
 func (spid SettlementPostInteractionData) CanExecuteAt(executor common.Address, executionTime *big.Int) bool {

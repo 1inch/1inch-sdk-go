@@ -1,11 +1,11 @@
 package fusion
 
 import (
-	"encoding/hex"
 	"fmt"
-	"strings"
 
+	"github.com/1inch/1inch-sdk-go/internal/hexadecimal"
 	"github.com/ethereum/go-ethereum/common"
+	"github.com/ethereum/go-ethereum/common/hexutil"
 )
 
 type Interaction struct {
@@ -14,7 +14,7 @@ type Interaction struct {
 }
 
 func NewInteraction(target common.Address, data string) *Interaction {
-	if !isHexBytes(data) {
+	if _, err := hexutil.Decode(data); err != nil {
 		panic("Interaction data must be valid hex bytes")
 	}
 	return &Interaction{
@@ -24,11 +24,11 @@ func NewInteraction(target common.Address, data string) *Interaction {
 }
 
 func (i *Interaction) Encode() string {
-	return i.Target.String() + trim0x(i.Data)
+	return i.Target.String() + hexadecimal.Trim0x(i.Data)
 }
 
 func DecodeInteraction(bytes string) (*Interaction, error) {
-	if !isHexBytes(bytes) {
+	if !hexadecimal.IsHexBytes(bytes) {
 		return nil, fmt.Errorf("invalid hex bytes: %s", bytes)
 	}
 
@@ -36,9 +36,4 @@ func DecodeInteraction(bytes string) (*Interaction, error) {
 		Target: common.HexToAddress(bytes[:42]),
 		Data:   fmt.Sprintf("0x%s", bytes[42:]),
 	}, nil
-}
-
-func isHexBytes(s string) bool {
-	_, err := hex.DecodeString(strings.TrimPrefix(s, "0x"))
-	return err == nil
 }

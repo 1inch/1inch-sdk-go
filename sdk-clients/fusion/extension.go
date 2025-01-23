@@ -5,8 +5,8 @@ import (
 	"errors"
 	"fmt"
 	"math/big"
-	"strings"
 
+	"github.com/1inch/1inch-sdk-go/internal/hexadecimal"
 	geth_common "github.com/ethereum/go-ethereum/common"
 	"golang.org/x/crypto/sha3"
 
@@ -51,24 +51,24 @@ type ExtensionParams struct {
 }
 
 func NewExtension(params ExtensionParams) (*Extension, error) {
-	if !isHexBytes(params.MakerAssetSuffix) {
+	if !hexadecimal.IsHexBytes(params.SettlementContract) {
+		return nil, errors.New("Settlement contract must be valid hex string")
+	}
+	if !hexadecimal.IsHexBytes(params.MakerAssetSuffix) {
 		return nil, errors.New("MakerAssetSuffix must be valid hex string")
 	}
-	if !isHexBytes(params.TakerAssetSuffix) {
+	if !hexadecimal.IsHexBytes(params.TakerAssetSuffix) {
 		return nil, errors.New("TakerAssetSuffix must be valid hex string")
 	}
-	if !isHexBytes(params.Predicate) {
+	if !hexadecimal.IsHexBytes(params.Predicate) {
 		return nil, errors.New("Predicate must be valid hex string")
 	}
 	if params.CustomData != "" {
 		return nil, errors.New("CustomData is not currently supported")
 	}
-	if !isHexBytes(params.CustomData) {
-		return nil, errors.New("CustomData must be valid hex string")
-	}
 
 	settlementContractAddress := geth_common.HexToAddress(params.SettlementContract)
-	makingAndTakingAmountData := settlementContractAddress.String() + trim0x(params.AuctionDetails.Encode())
+	makingAndTakingAmountData := settlementContractAddress.String() + hexadecimal.Trim0x(params.AuctionDetails.Encode())
 
 	fusionExtension := &Extension{
 		SettlementContract:  params.SettlementContract,
@@ -83,16 +83,21 @@ func NewExtension(params ExtensionParams) (*Extension, error) {
 		TakingAmountData: makingAndTakingAmountData,
 		Predicate:        params.Predicate,
 		PreInteraction:   params.PreInteraction,
-		PostInteraction:  NewInteraction(settlementContractAddress, params.PostInteractionData.Encode()).Encode(),
 		CustomData:       params.CustomData,
 	}
+
+	postInteractoinDataEncoded, err := params.PostInteractionData.Encode()
+	if err != nil {
+		return nil, fmt.Errorf("failed to encode post interaction data: %v", err)
+	}
+	fusionExtension.PostInteraction = NewInteraction(settlementContractAddress, postInteractoinDataEncoded).Encode()
 
 	if params.Permit != "" {
 		permitInteraction := &Interaction{
 			Target: geth_common.HexToAddress(params.Asset),
 			Data:   params.Permit,
 		}
-		fusionExtension.MakerPermit = permitInteraction.Target.String() + trim0x(permitInteraction.Data)
+		fusionExtension.MakerPermit = permitInteraction.Target.String() + hexadecimal.Trim0x(permitInteraction.Data)
 	}
 
 	return fusionExtension, nil
@@ -119,7 +124,7 @@ func (e *Extension) ConvertToOrderbookExtension() *orderbook.Extension {
 		MakerPermit:      e.MakerPermit,
 		PreInteraction:   e.PreInteraction,
 		PostInteraction:  e.PostInteraction,
-		//strings.TrimPrefix(e.CustomData, "0x"), // TODO Blocking custom data for now because it is breaking the cumsum method. The extension constructor will return with an error if the user provides this field.
+		//hexadecimal.Trim0x(e.CustomData), // TODO Blocking custom data for now because it is breaking the cumsum method. The extension constructor will return with an error if the user provides this field.
 	}
 }
 
@@ -150,10 +155,6 @@ func (e *Extension) GenerateSalt() (*big.Int, error) {
 // isEmpty checks if the extension data is empty
 func (e *Extension) isEmpty() bool {
 	return *e == (Extension{})
-}
-
-func trim0x(s string) string {
-	return strings.TrimPrefix(s, "0x")
 }
 
 func DecodeExtension(data []byte) (*Extension, error) {
@@ -187,27 +188,27 @@ func DecodeExtension(data []byte) (*Extension, error) {
 
 func FromLimitOrderExtension(extension *orderbook.Extension) (*Extension, error) {
 
-	settlementContractAddress := trim0x(extension.MakingAmountData)[:40]
+	settlementContractAddress := extension.MakingAmountData[:42]
 
-	if settlementContractAddress != trim0x(extension.TakingAmountData)[:40] {
+	if settlementContractAddress != extension.TakingAmountData[:42] {
 		return nil, fmt.Errorf("malfomed extension: settlement contract address should be the same in making and taking amount data")
 	}
-	if settlementContractAddress != trim0x(extension.PostInteraction)[:40] {
+	if settlementContractAddress != extension.PostInteraction[:42] {
 		return nil, fmt.Errorf("malfomed extension: settlement contract address should be the same in making and post interaction")
 	}
 
-	auctionDetails, err := DecodeAuctionDetails(trim0x(extension.MakingAmountData)[40:])
+	auctionDetails, err := DecodeAuctionDetails(extension.MakingAmountData[42:])
 	if err != nil {
 		return nil, fmt.Errorf("failed to decode auction details: %v", err)
 	}
 
-	postInteractionData, err := Decode(trim0x(extension.PostInteraction)[40:])
+	postInteractionData, err := Decode(extension.PostInteraction[42:])
 	if err != nil {
 		return nil, fmt.Errorf("failed to decode post interaction data: %v", err)
 	}
 
 	fusionExtension := &Extension{
-		SettlementContract:  fmt.Sprintf("0x%s", settlementContractAddress),
+		SettlementContract:  settlementContractAddress,
 		AuctionDetails:      auctionDetails,
 		PostInteractionData: &postInteractionData,
 
@@ -222,7 +223,7 @@ func FromLimitOrderExtension(extension *orderbook.Extension) (*Extension, error)
 	}
 
 	var permitInteraction *Interaction
-	if extension.MakerPermit != "" {
+	if extension.MakerPermit != "" && extension.MakerPermit != "0x" {
 		permitInteraction, err = DecodeInteraction(extension.MakerPermit)
 		if err != nil {
 			return nil, fmt.Errorf("failed to decode permit interaction: %v", err)

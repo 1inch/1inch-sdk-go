@@ -8,9 +8,9 @@ import (
 	"fmt"
 	"math/big"
 	"reflect"
-	"strings"
 
 	"github.com/1inch/1inch-sdk-go/internal/bytesiterator"
+	"github.com/1inch/1inch-sdk-go/internal/hexadecimal"
 	"github.com/ethereum/go-ethereum/common/math"
 )
 
@@ -46,7 +46,7 @@ func NewExtension(params ExtensionParams) (*Extension, error) {
 		MakingAmountData: params.GetMakingAmount,
 		TakingAmountData: params.GetTakingAmount,
 		Predicate:        params.Predicate,
-		MakerPermit:      params.MakerAsset + strings.TrimPrefix(params.Permit, "0x"),
+		MakerPermit:      params.MakerAsset + hexadecimal.Trim0x(params.Permit),
 		PreInteraction:   params.PreInteraction,
 		PostInteraction:  params.PostInteraction,
 	}, nil
@@ -120,7 +120,7 @@ func Decode(data []byte) (*Extension, error) {
 
 		// Set the field value using reflection.
 		if field.Type.Kind() == reflect.String {
-			fieldVal.SetString(fmt.Sprintf("%x", fieldBytes))
+			fieldVal.SetString(fmt.Sprintf("0x%x", fieldBytes))
 		} else {
 			return &Extension{}, errors.New("unsupported field type for field: " + field.Name)
 		}
@@ -138,11 +138,6 @@ func Decode(data []byte) (*Extension, error) {
 	//ext.CustomData = string(customDataBytes)
 
 	return &ext, nil
-}
-
-// hexToBytes converts a hexadecimal string to a byte slice.
-func hexToBytes(s string) ([]byte, error) {
-	return hex.DecodeString(s)
 }
 
 // contains checks if the substring is present in the string.
@@ -168,8 +163,8 @@ func (ext *Extension) Encode() (string, error) {
 
 	// Decode each field and collect byte counts
 	for _, field := range fields {
-		fieldStr := strings.TrimPrefix(field, "0x")
-		fieldStr = strings.TrimPrefix(fieldStr, "0X")
+		fieldStr := hexadecimal.Trim0x(field)
+		fieldStr = hexadecimal.Trim0x(fieldStr)
 
 		// Ensure even length for hex decoding
 		if len(fieldStr)%2 != 0 {

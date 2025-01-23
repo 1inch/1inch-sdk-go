@@ -8,6 +8,8 @@ import (
 	"sort"
 	"strings"
 
+	"github.com/1inch/1inch-sdk-go/internal/bytesbuilder"
+	"github.com/1inch/1inch-sdk-go/internal/hexadecimal"
 	"github.com/ethereum/go-ethereum/common"
 )
 
@@ -69,7 +71,7 @@ func NewSettlementPostInteractionData(data SettlementSuffixData) (*SettlementPos
 }
 
 func Decode(data string) (SettlementPostInteractionData, error) {
-	bytes, err := hex.DecodeString(strings.TrimPrefix(data, "0x"))
+	bytes, err := hex.DecodeString(hexadecimal.Trim0x(data))
 	if err != nil {
 		return SettlementPostInteractionData{}, errors.New("invalid hex string")
 	}
@@ -118,9 +120,9 @@ func Decode(data string) (SettlementPostInteractionData, error) {
 	}, nil
 }
 
-func (spid SettlementPostInteractionData) Encode() string {
+func (spid SettlementPostInteractionData) Encode() (string, error) {
 	bitMask := big.NewInt(0)
-	bytes := NewBytesBuilder()
+	bytes := bytesbuilder.New()
 
 	if spid.BankFee != nil && spid.BankFee.Cmp(big.NewInt(0)) != 0 {
 		bitMask.SetBit(bitMask, 0, 1)
@@ -142,14 +144,17 @@ func (spid SettlementPostInteractionData) Encode() string {
 	bytes.AddUint32(spid.ResolvingStartTime)
 
 	for _, wl := range spid.Whitelist {
-		bytes.AddBytes(wl.AddressHalf)
+		err := bytes.AddBytes(wl.AddressHalf)
+		if err != nil {
+			return "", err
+		}
 		bytes.AddUint16(wl.Delay)
 	}
 
 	bitMask.Or(bitMask, big.NewInt(int64(len(spid.Whitelist)<<3)))
 	bytes.AddUint8(uint8(bitMask.Int64()))
 
-	return fmt.Sprintf("0x%s", bytes.AsHex())
+	return fmt.Sprintf("0x%s", bytes.AsHex()), nil
 }
 
 func (spid SettlementPostInteractionData) CanExecuteAt(executor common.Address, executionTime *big.Int) bool {
@@ -182,50 +187,4 @@ func (spid SettlementPostInteractionData) IsExclusiveResolver(wallet common.Addr
 	}
 
 	return addressHalf == spid.Whitelist[0].AddressHalf
-}
-
-type BytesBuilder struct {
-	data []byte
-}
-
-func NewBytesBuilder() *BytesBuilder {
-	return &BytesBuilder{data: []byte{}}
-}
-
-func (b *BytesBuilder) AddUint32(val *big.Int) {
-	bytes := val.Bytes()
-	if len(bytes) < 4 {
-		padded := make([]byte, 4-len(bytes))
-		bytes = append(padded, bytes...)
-	}
-	b.data = append(b.data, bytes...)
-}
-
-func (b *BytesBuilder) AddUint16(val *big.Int) {
-	bytes := val.Bytes()
-	if len(bytes) < 2 {
-		padded := make([]byte, 2-len(bytes))
-		bytes = append(padded, bytes...)
-	}
-	b.data = append(b.data, bytes...)
-}
-
-func (b *BytesBuilder) AddUint8(val uint8) {
-	b.data = append(b.data, byte(val))
-}
-
-func (b *BytesBuilder) AddAddress(address common.Address) {
-	b.data = append(b.data, address.Bytes()...)
-}
-
-func (b *BytesBuilder) AddBytes(data string) {
-	bytes, err := hex.DecodeString(strings.TrimPrefix(data, "0x"))
-	if err != nil {
-		panic("invalid hex string")
-	}
-	b.data = append(b.data, bytes...)
-}
-
-func (b *BytesBuilder) AsHex() string {
-	return hex.EncodeToString(b.data)
 }
