@@ -151,7 +151,7 @@ func Decode(data string) (SettlementPostInteractionData, error) {
 	}, nil
 }
 
-func (spid SettlementPostInteractionData) Encode() string {
+func (spid SettlementPostInteractionData) Encode() (string, error) {
 	bitMask := big.NewInt(0)
 	bytes := bytesbuilder.New()
 
@@ -175,7 +175,10 @@ func (spid SettlementPostInteractionData) Encode() string {
 	bytes.AddUint32(spid.ResolvingStartTime)
 
 	for _, wl := range spid.Whitelist {
-		bytes.AddBytes(wl.AddressHalf)
+		err := bytes.AddBytes(wl.AddressHalf)
+		if err != nil {
+			return "", err
+		}
 		bytes.AddUint16(wl.Delay)
 	}
 
@@ -184,7 +187,7 @@ func (spid SettlementPostInteractionData) Encode() string {
 
 	output := fmt.Sprintf("0x%s", bytes.AsHex())
 
-	return output
+	return output, nil
 }
 
 func (spid SettlementPostInteractionData) CanExecuteAt(executor common.Address, executionTime *big.Int) bool {

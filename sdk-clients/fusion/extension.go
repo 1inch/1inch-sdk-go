@@ -208,7 +208,7 @@ func FromLimitOrderExtension(extension *orderbook.Extension) (*Extension, error)
 	}
 
 	fusionExtension := &Extension{
-		SettlementContract:  fmt.Sprintf("%s", settlementContractAddress),
+		SettlementContract:  settlementContractAddress,
 		AuctionDetails:      auctionDetails,
 		PostInteractionData: &postInteractionData,
 
