@@ -8,6 +8,7 @@ import (
 	"time"
 
 	"github.com/1inch/1inch-sdk-go/constants"
+	"github.com/1inch/1inch-sdk-go/internal/bigint"
 	"github.com/1inch/1inch-sdk-go/internal/slice_utils"
 )
 
@@ -62,7 +63,7 @@ func CheckEthereumAddressListRequired(parameter interface{}, variableName string
 	return nil
 }
 
-var bigIntMax, _ = BigIntFromString("115792089237316195423570985008687907853269984665640564039457584007913129639935")
+var bigIntMax, _ = bigint.FromString("115792089237316195423570985008687907853269984665640564039457584007913129639935")
 var bigIntZero = big.NewInt(0)
 
 func CheckBigIntRequired(parameter interface{}, variableName string) error {
@@ -87,7 +88,7 @@ func CheckBigInt(parameter interface{}, variableName string) error {
 		return nil
 	}
 
-	parsedValue, err := BigIntFromString(value)
+	parsedValue, err := bigint.FromString(value)
 	if err != nil {
 		return NewParameterValidationError(variableName, "not a valid value")
 	}
@@ -100,29 +101,57 @@ func CheckBigInt(parameter interface{}, variableName string) error {
 	return nil
 }
 
-func CheckChainIdRequired(parameter interface{}, variableName string) error {
+func CheckChainIdIntRequired(parameter interface{}, variableName string) error {
 	value, ok := parameter.(int)
 	if !ok {
-		return fmt.Errorf("for parameter '%v' to be validated as '%v', it must be an int", variableName, "ChainId")
+		return fmt.Errorf("for parameter '%v' to be validated as '%v', it must be an int", variableName, "ChainIdInt")
 	}
 
 	if value == 0 {
 		return NewParameterMissingError(variableName)
 	}
 
-	return CheckChainId(value, variableName)
+	return CheckChainIdInt(value, variableName)
 }
 
-func CheckChainId(parameter interface{}, variableName string) error {
+func CheckChainIdInt(parameter interface{}, variableName string) error {
 	value, ok := parameter.(int)
 	if !ok {
-		return fmt.Errorf("for parameter '%v' to be validated as '%v', it must be an int", variableName, "ChainId")
+		return fmt.Errorf("for parameter '%v' to be validated as '%v', it must be an int", variableName, "ChainIdInt")
 	}
 	if value == 0 {
 		return nil
 	}
 
 	if !slice_utils.Contains(value, constants.ValidChainIds) {
+		return NewParameterValidationError(variableName, fmt.Sprintf("is invalid, valid chain ids are: %v", constants.ValidChainIds))
+	}
+	return nil
+}
+
+func CheckChainIdFloat32Required(parameter interface{}, variableName string) error {
+	value, ok := parameter.(float32)
+	if !ok {
+		return fmt.Errorf("for parameter '%v' to be validated as '%v', it must be a float32", variableName, "ChainIdFloat32")
+	}
+
+	if value == 0 {
+		return NewParameterMissingError(variableName)
+	}
+
+	return CheckChainIdFloat32(value, variableName)
+}
+
+func CheckChainIdFloat32(parameter interface{}, variableName string) error {
+	value, ok := parameter.(float32)
+	if !ok {
+		return fmt.Errorf("for parameter '%v' to be validated as '%v', it must be a float32", variableName, "ChainIdFloat32")
+	}
+	if value == 0 {
+		return nil
+	}
+
+	if !slice_utils.Contains(int(value), constants.ValidChainIds) {
 		return NewParameterValidationError(variableName, fmt.Sprintf("is invalid, valid chain ids are: %v", constants.ValidChainIds))
 	}
 	return nil

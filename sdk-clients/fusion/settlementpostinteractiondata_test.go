@@ -99,7 +99,8 @@ func TestSettlementPostInteractionData(t *testing.T) {
 			data, err := NewSettlementPostInteractionData(tc.data)
 			require.NoError(t, err)
 
-			encoded := data.Encode()
+			encoded, err := data.Encode()
+			require.NoError(t, err)
 			if tc.expectedBytes != 0 {
 				assert.Equal(t, tc.expectedBytes, len(encoded[2:])/2)
 			}

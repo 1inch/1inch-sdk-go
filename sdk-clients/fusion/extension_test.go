@@ -1,9 +1,16 @@
 package fusion
 
 import (
+	"bytes"
+	"encoding/hex"
+	"encoding/json"
+	"fmt"
 	"math/big"
 	"testing"
 
+	"github.com/1inch/1inch-sdk-go/internal/bigint"
+	"github.com/1inch/1inch-sdk-go/sdk-clients/orderbook"
+	"github.com/ethereum/go-ethereum/common"
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
 
@@ -43,14 +50,14 @@ func TestGenerateSalt(t *testing.T) {
 				PostInteraction:  "post",
 				CustomData:       "custom",
 			},
-			expected:  "180431658011416401710119735245975317914670388782711199",
+			expected:  "180431178743033967347942937469468920088249224033532329",
 			expectErr: false,
 		},
 	}
 
 	for _, tc := range tests {
 		t.Run(tc.name, func(t *testing.T) {
-			expected, err := BigIntFromString(tc.expected)
+			expected, err := bigint.FromString(tc.expected)
 			require.NoError(t, err)
 
 			result, err := tc.extension.GenerateSalt()
@@ -66,36 +73,114 @@ func TestGenerateSalt(t *testing.T) {
 
 func TestNewExtension(t *testing.T) {
 	tests := []struct {
-		name      string
-		params    ExtensionParams
-		expectErr bool
-		errMsg    string
+		name              string
+		params            ExtensionParams
+		expectedExtension *Extension
+		expectErr         bool
+		errMsg            string
 	}{
 		{
 			name: "Valid parameters",
 			params: ExtensionParams{
+				SettlementContract: "0x5678",
+				AuctionDetails: &AuctionDetails{
+					StartTime:       0,
+					Duration:        0,
+					InitialRateBump: 0,
+					Points:          nil,
+					GasCost:         GasCostConfigClassFixed{},
+				},
+				PostInteractionData: &SettlementPostInteractionData{
+					Whitelist: []WhitelistItem{},
+					IntegratorFee: &IntegratorFee{
+						Ratio:    big.NewInt(0),
+						Receiver: common.Address{},
+					},
+					BankFee:            big.NewInt(0),
+					ResolvingStartTime: big.NewInt(0),
+					CustomReceiver:     common.Address{},
+				},
+				Asset:  "0x1234",
+				Permit: "0x3456",
+
 				MakerAssetSuffix: "0x1234",
 				TakerAssetSuffix: "0x1234",
-				MakingAmountData: "0x1234",
-				TakingAmountData: "0x1234",
 				Predicate:        "0x1234",
-				MakerPermit:      "0x1234",
-				PreInteraction:   "pre",
-				PostInteraction:  "post",
+				PreInteraction:   "0x5678",
+			},
+			expectedExtension: &Extension{
+				MakerAssetSuffix: "0x1234",
+				TakerAssetSuffix: "0x1234",
+				MakingAmountData: "0x00000000000000000000000000000000000056780000000000000000000000000000000000",
+				TakingAmountData: "0x00000000000000000000000000000000000056780000000000000000000000000000000000",
+				Predicate:        "0x1234",
+				MakerPermit:      "0x00000000000000000000000000000000000012343456",
+				PreInteraction:   "0x5678",
+				PostInteraction:  "0x00000000000000000000000000000000000056780000000000",
 			},
 			expectErr: false,
 		},
 		{
+			name: "Valid parameters 2",
+			params: ExtensionParams{
+				SettlementContract: "0x0500000000000000000000000000000000000000",
+				AuctionDetails: &AuctionDetails{
+					StartTime:       0,
+					Duration:        0,
+					InitialRateBump: 0,
+					Points:          nil,
+					GasCost:         GasCostConfigClassFixed{},
+				},
+				PostInteractionData: &SettlementPostInteractionData{
+					Whitelist: []WhitelistItem{},
+					IntegratorFee: &IntegratorFee{
+						Ratio:    big.NewInt(0),
+						Receiver: common.Address{},
+					},
+					BankFee:            big.NewInt(0),
+					ResolvingStartTime: big.NewInt(0),
+					CustomReceiver:     common.Address{},
+				},
+				Asset:  "0x1234",
+				Permit: "0x03",
+
+				MakerAssetSuffix: "0x01",
+				TakerAssetSuffix: "0x02",
+				Predicate:        "0x07",
+				PreInteraction:   "0x09",
+			},
+			expectedExtension: &Extension{
+				MakerAssetSuffix: "0x01",
+				TakerAssetSuffix: "0x02",
+				MakingAmountData: "0x05000000000000000000000000000000000000000000000000000000000000000000000000",
+				TakingAmountData: "0x05000000000000000000000000000000000000000000000000000000000000000000000000",
+				Predicate:        "0x07",
+				MakerPermit:      "0x000000000000000000000000000000000000123403",
+				PreInteraction:   "0x09",
+				PostInteraction:  "0x05000000000000000000000000000000000000000000000000",
+			},
+			expectErr: false,
+		},
+		{
+			name: "Invalid SettlementContract",
+			params: ExtensionParams{
+				SettlementContract: "invalid",
+				MakerAssetSuffix:   "0x1234",
+				TakerAssetSuffix:   "0x1234",
+				Predicate:          "0x1234",
+				PreInteraction:     "0x5678",
+			},
+			expectErr: true,
+			errMsg:    "Settlement contract must be valid hex string",
+		},
+		{
 			name: "Invalid MakerAssetSuffix",
 			params: ExtensionParams{
-				MakerAssetSuffix: "invalid",
-				TakerAssetSuffix: "0x1234",
-				MakingAmountData: "0x1234",
-				TakingAmountData: "0x1234",
-				Predicate:        "0x1234",
-				MakerPermit:      "0x1234",
-				PreInteraction:   "pre",
-				PostInteraction:  "post",
+				SettlementContract: "0x9012",
+				MakerAssetSuffix:   "invalid",
+				TakerAssetSuffix:   "0x1234",
+				Predicate:          "0x1234",
+				PreInteraction:     "0x5678",
 			},
 			expectErr: true,
 			errMsg:    "MakerAssetSuffix must be valid hex string",
@@ -103,90 +188,36 @@ func TestNewExtension(t *testing.T) {
 		{
 			name: "Invalid TakerAssetSuffix",
 			params: ExtensionParams{
-				MakerAssetSuffix: "0x1234",
-				TakerAssetSuffix: "invalid",
-				MakingAmountData: "0x1234",
-				TakingAmountData: "0x1234",
-				Predicate:        "0x1234",
-				MakerPermit:      "0x1234",
-				PreInteraction:   "pre",
-				PostInteraction:  "post",
+				SettlementContract: "0x9012",
+				MakerAssetSuffix:   "0x1234",
+				TakerAssetSuffix:   "invalid",
+				Predicate:          "0x1234",
+				PreInteraction:     "0x5678",
 			},
 			expectErr: true,
 			errMsg:    "TakerAssetSuffix must be valid hex string",
 		},
 		{
-			name: "Invalid MakingAmountData",
-			params: ExtensionParams{
-				MakerAssetSuffix: "0x1234",
-				TakerAssetSuffix: "0x1234",
-				MakingAmountData: "invalid",
-				TakingAmountData: "0x1234",
-				Predicate:        "0x1234",
-				MakerPermit:      "0x1234",
-				PreInteraction:   "pre",
-				PostInteraction:  "post",
-			},
-			expectErr: true,
-			errMsg:    "MakingAmountData must be valid hex string",
-		},
-		{
-			name: "Invalid TakingAmountData",
-			params: ExtensionParams{
-				MakerAssetSuffix: "0x1234",
-				TakerAssetSuffix: "0x1234",
-				MakingAmountData: "0x1234",
-				TakingAmountData: "invalid",
-				Predicate:        "0x1234",
-				MakerPermit:      "0x1234",
-				PreInteraction:   "pre",
-				PostInteraction:  "post",
-			},
-			expectErr: true,
-			errMsg:    "TakingAmountData must be valid hex string",
-		},
-		{
 			name: "Invalid Predicate",
 			params: ExtensionParams{
-				MakerAssetSuffix: "0x1234",
-				TakerAssetSuffix: "0x1234",
-				MakingAmountData: "0x1234",
-				TakingAmountData: "0x1234",
-				Predicate:        "invalid",
-				MakerPermit:      "0x1234",
-				PreInteraction:   "pre",
-				PostInteraction:  "post",
+				SettlementContract: "0x9012",
+				MakerAssetSuffix:   "0x1234",
+				TakerAssetSuffix:   "0x1234",
+				Predicate:          "invalid",
+				PreInteraction:     "0x5678",
 			},
 			expectErr: true,
 			errMsg:    "Predicate must be valid hex string",
 		},
 		{
-			name: "Invalid MakerPermit",
-			params: ExtensionParams{
-				MakerAssetSuffix: "0x1234",
-				TakerAssetSuffix: "0x1234",
-				MakingAmountData: "0x1234",
-				TakingAmountData: "0x1234",
-				Predicate:        "0x1234",
-				MakerPermit:      "invalid",
-				PreInteraction:   "pre",
-				PostInteraction:  "post",
-			},
-			expectErr: true,
-			errMsg:    "MakerPermit must be valid hex string",
-		},
-		{
 			name: "CustomData not supported",
 			params: ExtensionParams{
-				MakerAssetSuffix: "0x1234",
-				TakerAssetSuffix: "0x1234",
-				MakingAmountData: "0x1234",
-				TakingAmountData: "0x1234",
-				Predicate:        "0x1234",
-				MakerPermit:      "0x1234",
-				PreInteraction:   "pre",
-				PostInteraction:  "post",
-				CustomData:       "0x1234",
+				SettlementContract: "0x9012",
+				MakerAssetSuffix:   "0x1234",
+				TakerAssetSuffix:   "0x1234",
+				Predicate:          "0x1234",
+				PreInteraction:     "0x5678",
+				CustomData:         "0x1234",
 			},
 			expectErr: true,
 			errMsg:    "CustomData is not currently supported",
@@ -202,16 +233,252 @@ func TestNewExtension(t *testing.T) {
 			} else {
 				require.NoError(t, err)
 				assert.NotNil(t, ext)
-				assert.Equal(t, tc.params.MakerAssetSuffix, ext.MakerAssetSuffix)
-				assert.Equal(t, tc.params.TakerAssetSuffix, ext.TakerAssetSuffix)
-				assert.Equal(t, tc.params.MakingAmountData, ext.MakingAmountData)
-				assert.Equal(t, tc.params.TakingAmountData, ext.TakingAmountData)
-				assert.Equal(t, tc.params.Predicate, ext.Predicate)
-				assert.Equal(t, tc.params.MakerPermit, ext.MakerPermit)
-				assert.Equal(t, tc.params.PreInteraction, ext.PreInteraction)
-				assert.Equal(t, tc.params.PostInteraction, ext.PostInteraction)
-				assert.Equal(t, tc.params.CustomData, ext.CustomData)
+				assert.Equal(t, tc.expectedExtension.MakerAssetSuffix, ext.MakerAssetSuffix)
+				assert.Equal(t, tc.expectedExtension.TakerAssetSuffix, ext.TakerAssetSuffix)
+				assert.Equal(t, tc.expectedExtension.MakingAmountData, ext.MakingAmountData)
+				assert.Equal(t, tc.expectedExtension.TakingAmountData, ext.TakingAmountData)
+				assert.Equal(t, tc.expectedExtension.Predicate, ext.Predicate)
+				assert.Equal(t, tc.expectedExtension.MakerPermit, ext.MakerPermit)
+				assert.Equal(t, tc.expectedExtension.PreInteraction, ext.PreInteraction)
+				assert.Equal(t, tc.expectedExtension.PostInteraction, ext.PostInteraction)
 			}
 		})
 	}
+}
+
+func TestDecodeExtension(t *testing.T) {
+	tests := []struct {
+		name          string
+		hexInput      string
+		expected      *Extension
+		expectingErr  bool
+		errorContains string
+	}{
+		{
+			name:     "Successful Decoding",
+			hexInput: "0000007c00000063000000620000004d0000004c00000027000000020000000101020500000000000000000000000000000000000000000000000000000000000000000000000005000000000000000000000000000000000000000000000000000000000000000000000000070000000000000000000000000000000000001234030905000000000000000000000000000000000000000000000000",
+			expected: &Extension{
+				MakerAssetSuffix: "0x01",
+				TakerAssetSuffix: "0x02",
+				MakingAmountData: "0x05000000000000000000000000000000000000000000000000000000000000000000000000",
+				TakingAmountData: "0x05000000000000000000000000000000000000000000000000000000000000000000000000",
+				Predicate:        "0x07",
+				MakerPermit:      "0x000000000000000000000000000000000000123403",
+				PreInteraction:   "0x09",
+				PostInteraction:  "0x05000000000000000000000000000000000000000000000000",
+			},
+			expectingErr: false,
+		},
+	}
+
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			// Convert hex string to bytes
+			data, err := hex.DecodeString(tt.hexInput)
+			if err != nil {
+				t.Fatalf("Failed to convert hex to bytes: %v", err)
+			}
+
+			// Decode the data
+			decoded, err := DecodeExtension(data)
+			require.NoError(t, err)
+
+			if tt.expectingErr {
+				if err == nil {
+					t.Errorf("Expected error but got none")
+				} else if tt.errorContains != "" && !contains(err.Error(), tt.errorContains) {
+					t.Errorf("Expected error to contain '%s' but got '%s'", tt.errorContains, err.Error())
+				}
+			} else {
+				if err != nil {
+					t.Errorf("Unexpected error: %v", err)
+				}
+				if !extensionsEqual(decoded, tt.expected) {
+					t.Errorf("Decoded Extension does not match expected.\nGot: %+v\nExpected: %+v", printSelectedFields(decoded), printSelectedFields(tt.expected))
+				}
+			}
+		})
+	}
+}
+
+func printSelectedFields(ext *Extension) string {
+	selectedFields := map[string]string{
+		"MakerAssetSuffix": ext.MakerAssetSuffix,
+		"TakerAssetSuffix": ext.TakerAssetSuffix,
+		"MakingAmountData": ext.MakingAmountData,
+		"TakingAmountData": ext.TakingAmountData,
+		"Predicate":        ext.Predicate,
+		"MakerPermit":      ext.MakerPermit,
+		"PreInteraction":   ext.PreInteraction,
+		"PostInteraction":  ext.PostInteraction,
+	}
+
+	jsonData, err := json.MarshalIndent(selectedFields, "", "  ")
+	if err != nil {
+		return fmt.Sprint("Error marshalling to JSON:", err)
+	}
+	return string(jsonData)
+}
+
+func TestConvertToOrderbookExtension(t *testing.T) {
+	tests := []struct {
+		name                       string
+		fusionExtension            Extension
+		expectedOrderbookExtension *orderbook.Extension
+		expectErr                  bool
+		errMsg                     string
+	}{
+		{
+			name: "Valid parameters",
+			fusionExtension: Extension{
+				MakerAssetSuffix: "0x1234",
+				TakerAssetSuffix: "0x1234",
+				MakingAmountData: "0x00000000000000000000000000000000000056780000000000000000000000000000000000",
+				TakingAmountData: "0x00000000000000000000000000000000000056780000000000000000000000000000000000",
+				Predicate:        "0x1234",
+				MakerPermit:      "0x00000000000000000000000000000000000012343456",
+				PreInteraction:   "pre",
+				PostInteraction:  "0x00000000000000000000000000000000000056780000000000",
+			},
+			expectedOrderbookExtension: &orderbook.Extension{
+				MakerAssetSuffix: "0x1234",
+				TakerAssetSuffix: "0x1234",
+				MakingAmountData: "0x00000000000000000000000000000000000056780000000000000000000000000000000000",
+				TakingAmountData: "0x00000000000000000000000000000000000056780000000000000000000000000000000000",
+				Predicate:        "0x1234",
+				MakerPermit:      "0x00000000000000000000000000000000000012343456",
+				PreInteraction:   "pre",
+				PostInteraction:  "0x00000000000000000000000000000000000056780000000000",
+			},
+			expectErr: false,
+		},
+	}
+
+	for _, tc := range tests {
+		t.Run(tc.name, func(t *testing.T) {
+			ext := tc.fusionExtension.ConvertToOrderbookExtension()
+			assert.NotNil(t, ext)
+			assert.Equal(t, tc.expectedOrderbookExtension.MakerAssetSuffix, ext.MakerAssetSuffix)
+			assert.Equal(t, tc.expectedOrderbookExtension.TakerAssetSuffix, ext.TakerAssetSuffix)
+			assert.Equal(t, tc.expectedOrderbookExtension.MakingAmountData, ext.MakingAmountData)
+			assert.Equal(t, tc.expectedOrderbookExtension.TakingAmountData, ext.TakingAmountData)
+			assert.Equal(t, tc.expectedOrderbookExtension.Predicate, ext.Predicate)
+			assert.Equal(t, tc.expectedOrderbookExtension.MakerPermit, ext.MakerPermit)
+			assert.Equal(t, tc.expectedOrderbookExtension.PreInteraction, ext.PreInteraction)
+			assert.Equal(t, tc.expectedOrderbookExtension.PostInteraction, ext.PostInteraction)
+		})
+	}
+}
+
+var asset = "0xBAb2C3d4e5f67890123456789AbcDEf123456789"
+var permit = "9999999999999999999999"
+var fullAuctionDetails = &AuctionDetails{
+	StartTime:       1,
+	Duration:        2,
+	InitialRateBump: 3,
+	Points:          []AuctionPointClassFixed{{Coefficient: 4, Delay: 5}},
+	GasCost:         GasCostConfigClassFixed{GasBumpEstimate: 6, GasPriceEstimate: 7},
+}
+
+var fullPostInteractionData = &SettlementPostInteractionData{
+	Whitelist: []WhitelistItem{
+		{
+			AddressHalf: "a1b2c3d4e5f678901234",
+			Delay:       big.NewInt(8),
+		},
+	},
+	IntegratorFee: &IntegratorFee{
+		Ratio:    big.NewInt(9),
+		Receiver: common.HexToAddress("0xB1B2C3D4E5F67890123456789ABCDEF123456789"),
+	},
+	BankFee:            big.NewInt(10),
+	ResolvingStartTime: big.NewInt(11),
+	CustomReceiver:     common.HexToAddress("0xC1B2C3D4E5F67890123456789ABCDEF123456789"),
+}
+
+func TestFromExtension(t *testing.T) {
+	tests := []struct {
+		name              string
+		params            ExtensionParams
+		expectedExtension *Extension
+		expectErr         bool
+		errMsg            string
+	}{
+		{
+			name: "Valid parameters",
+			params: ExtensionParams{
+				SettlementContract:  "0xAAB2C3d4E5F67890123456789abcdef123456789",
+				AuctionDetails:      fullAuctionDetails,
+				PostInteractionData: fullPostInteractionData,
+				Asset:               asset,
+				Permit:              permit,
+
+				MakerAssetSuffix: "0x1234",
+				TakerAssetSuffix: "0x1234",
+				Predicate:        "0x1234",
+				PreInteraction:   "pre",
+			},
+			expectedExtension: &Extension{
+				SettlementContract:  "0xAAB2C3d4E5F67890123456789abcdef123456789",
+				AuctionDetails:      fullAuctionDetails,
+				PostInteractionData: fullPostInteractionData,
+				Asset:               asset,
+				Permit:              permit,
+
+				MakerAssetSuffix: "0x1234",
+				TakerAssetSuffix: "0x1234",
+				MakingAmountData: "0xAAB2C3d4E5F67890123456789abcdef12345678900000600000007000000010000020000030000040005",
+				TakingAmountData: "0xAAB2C3d4E5F67890123456789abcdef12345678900000600000007000000010000020000030000040005",
+				Predicate:        "0x1234",
+				MakerPermit:      fmt.Sprintf("%s%s", asset, permit),
+				PreInteraction:   "pre",
+				PostInteraction:  "0xAAB2C3d4E5F67890123456789abcdef1234567890000000a0009b1b2c3d4e5f67890123456789abcdef123456789c1b2c3d4e5f67890123456789abcdef1234567890000000ba1b2c3d4e5f67890123400080f",
+			},
+			expectErr: false,
+		},
+	}
+
+	for _, tc := range tests {
+		t.Run(tc.name, func(t *testing.T) {
+			ext, err := NewExtension(tc.params)
+			require.NoError(t, err)
+
+			limitOrderExtensionPure := ext.ConvertToOrderbookExtension()
+			decodedExtension, err := FromLimitOrderExtension(limitOrderExtensionPure)
+			require.NoError(t, err)
+
+			assert.NotNil(t, ext)
+			assert.Equal(t, tc.expectedExtension.SettlementContract, decodedExtension.SettlementContract)
+			assert.Equal(t, tc.expectedExtension.AuctionDetails, decodedExtension.AuctionDetails)
+			assert.Equal(t, tc.expectedExtension.PostInteractionData, decodedExtension.PostInteractionData)
+			//assert.Equal(t, tc.expectedExtension.Asset, decodedExtension.Asset)
+			//assert.Equal(t, tc.expectedExtension.Permit, decodedExtension.Permit)
+
+			assert.Equal(t, tc.expectedExtension.MakerAssetSuffix, decodedExtension.MakerAssetSuffix)
+			assert.Equal(t, tc.expectedExtension.TakerAssetSuffix, decodedExtension.TakerAssetSuffix)
+			assert.Equal(t, tc.expectedExtension.MakingAmountData, decodedExtension.MakingAmountData)
+			assert.Equal(t, tc.expectedExtension.TakingAmountData, decodedExtension.TakingAmountData)
+			assert.Equal(t, tc.expectedExtension.Predicate, decodedExtension.Predicate)
+			assert.Equal(t, tc.expectedExtension.MakerPermit, decodedExtension.MakerPermit)
+			assert.Equal(t, tc.expectedExtension.PreInteraction, decodedExtension.PreInteraction)
+			assert.Equal(t, tc.expectedExtension.PostInteraction, decodedExtension.PostInteraction)
+		})
+	}
+}
+
+func extensionsEqual(a, b *Extension) bool {
+	return a.MakerAssetSuffix == b.MakerAssetSuffix &&
+		a.TakerAssetSuffix == b.TakerAssetSuffix &&
+		a.MakingAmountData == b.MakingAmountData &&
+		a.TakingAmountData == b.TakingAmountData &&
+		a.Predicate == b.Predicate &&
+		a.MakerPermit == b.MakerPermit &&
+		a.PreInteraction == b.PreInteraction &&
+		a.PostInteraction == b.PostInteraction
+	// a.CustomData == b.CustomData
+}
+
+// contains checks if the substring is present in the string.
+func contains(s, substr string) bool {
+	return bytes.Contains([]byte(s), []byte(substr))
 }

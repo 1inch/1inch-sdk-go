@@ -4,9 +4,9 @@ import (
 	"encoding/hex"
 	"fmt"
 	"math/big"
-	"strings"
 	"time"
 
+	"github.com/1inch/1inch-sdk-go/internal/hexadecimal"
 	"github.com/ethereum/go-ethereum/common/math"
 	"github.com/ethereum/go-ethereum/crypto"
 	"github.com/ethereum/go-ethereum/signer/core/apitypes"
@@ -16,17 +16,32 @@ import (
 
 func CreateLimitOrderMessage(orderRequest CreateOrderParams, chainId int) (*Order, error) {
 
+	encodedExtension, err := orderRequest.Extension.Encode()
+	if err != nil {
+		return nil, fmt.Errorf("error encoding extension: %v", err)
+	}
+
+	// TODO this is a temporary fix to simulate the same extension data after a refactor
+	if encodedExtension == "0x0000000000000000000000000000000000000000000000000000000000000000" {
+		encodedExtension = "0x"
+	}
+
+	salt, err := GenerateSalt(encodedExtension)
+	if err != nil {
+		return nil, fmt.Errorf("error generating salt: %v", err)
+	}
+
 	orderData := OrderData{
 		MakerAsset:    orderRequest.MakerAsset,
 		TakerAsset:    orderRequest.TakerAsset,
 		MakingAmount:  orderRequest.MakingAmount,
 		TakingAmount:  orderRequest.TakingAmount,
-		Salt:          GenerateSalt(orderRequest.Extension.Encode()),
+		Salt:          salt,
 		Maker:         orderRequest.Maker,
 		AllowedSender: "0x0000000000000000000000000000000000000000",
 		Receiver:      orderRequest.Taker,
 		MakerTraits:   orderRequest.MakerTraits.Encode(),
-		Extension:     orderRequest.Extension.Encode(),
+		Extension:     encodedExtension,
 	}
 
 	aggregationRouter, err := constants.Get1inchRouterFromChainId(chainId)
@@ -116,14 +131,18 @@ func CreateLimitOrderMessage(orderRequest CreateOrderParams, chainId int) (*Orde
 	}, err
 }
 
-func GenerateSalt(extension string) string {
+var timeNow = func() int64 {
+	return time.Now().UnixNano()
+}
+
+func GenerateSalt(extension string) (string, error) {
 	if extension == "0x" {
-		return fmt.Sprintf("%d", time.Now().UnixNano()/int64(time.Millisecond))
+		return fmt.Sprintf("%d", timeNow()/int64(time.Millisecond)), nil
 	}
 
 	byteConverted, err := stringToHexBytes(extension)
 	if err != nil {
-		panic(err)
+		return "", err
 	}
 
 	keccakHash := crypto.Keccak256Hash(byteConverted)
@@ -131,12 +150,12 @@ func GenerateSalt(extension string) string {
 	// We need to keccak256 the extension and then bitwise & it with uint_160_max
 	var uint160Max = new(big.Int).Sub(new(big.Int).Lsh(big.NewInt(1), 160), big.NewInt(1))
 	salt.And(salt, uint160Max)
-	return fmt.Sprintf("0x%x", salt)
+	return fmt.Sprintf("0x%x", salt), nil
 }
 
 func stringToHexBytes(hexStr string) ([]byte, error) {
 	// Strip the "0x" prefix if it exists
-	cleanedStr := strings.TrimPrefix(hexStr, "0x")
+	cleanedStr := hexadecimal.Trim0x(hexStr)
 
 	// Ensure the string has an even length by padding with a zero if it's odd
 	if len(cleanedStr)%2 != 0 {

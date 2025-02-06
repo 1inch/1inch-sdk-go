@@ -1,11 +1,11 @@
 package aggregation
 
 import (
-	"encoding/hex"
 	"math/big"
 	"testing"
 
 	"github.com/ethereum/go-ethereum/common"
+	"github.com/ethereum/go-ethereum/common/hexutil"
 	"github.com/stretchr/testify/assert"
 
 	"github.com/1inch/1inch-sdk-go/constants"
@@ -13,7 +13,7 @@ import (
 
 func TestNormalizeSwapResponse(t *testing.T) {
 	d := "0x0502b1c50000000000000000000000005a98fcbea516cf06857215779fd812ca3bef1b32000000000000000000000000000000000000000000000000000000000000271000000000000000000000000000000000000000000000000000000000000000050000000000000000000000000000000000000000000000000000000000000080000000000000000000000000000000000000000000000000000000000000000100000000000000003b6d0340c558f600b34a5f69dd2f0d06cb8a88d829b7420ade8bb62d"
-	wantedDataLDOWETH, err := hex.DecodeString(d[2:])
+	wantedDataLDOWETH, err := hexutil.Decode(d)
 	assert.NoError(t, err)
 
 	testCases := []struct {
@@ -102,7 +102,7 @@ func TestNormalizeSwapResponse(t *testing.T) {
 
 func TestNormalizeApproveCallDataResponse(t *testing.T) {
 	d := "0x095ea7b30000000000000000000000001111111254eeb25477b68fb85ed929f73a9605820000000000000000000000000000000000000000000000000000000556cd83c2"
-	ldoApproveData, err := hex.DecodeString(d[2:])
+	ldoApproveData, err := hexutil.Decode(d)
 	assert.NoError(t, err)
 
 	testCases := []struct {

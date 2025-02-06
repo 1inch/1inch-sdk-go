@@ -1,0 +1,225 @@
+{
+  "openapi": "3.0.0",
+  "paths": {
+    "/v1.0/submit": {
+      "post": {
+        "operationId": "RelayerController_submit",
+        "summary": "Submit a cross chain order that resolvers will be able to fill",
+        "parameters": [],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/SignedOrderInput"
+              }
+            }
+          }
+        },
+        "responses": {
+          "201": {
+            "description": "The order has been successfully saved"
+          }
+        },
+        "tags": [
+          "Relayer"
+        ]
+      }
+    },
+    "/v1.0/submit/many": {
+      "post": {
+        "operationId": "RelayerController_submitMany",
+        "summary": "Submit many cross chain orders that resolvers will be able to fill",
+        "parameters": [],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "array",
+                "items": {
+                  "type": "string"
+                },
+                "x-go-type-skip-optional-pointer": true
+              }
+            }
+          }
+        },
+        "responses": {
+          "201": {
+            "description": "The orders has been successfully saved"
+          }
+        },
+        "tags": [
+          "Relayer"
+        ]
+      }
+    },
+    "/v1.0/submit/secret": {
+      "post": {
+        "operationId": "RelayerController_submitSecrets",
+        "summary": "Submit a secret for order fill after SrcEscrow and DstEscrow deployed and DstChain finality lock passed",
+        "parameters": [],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/SecretInput"
+              }
+            }
+          }
+        },
+        "responses": {
+          "201": {
+            "description": "The secret has been successfully saved"
+          }
+        },
+        "tags": [
+          "Relayer"
+        ]
+      }
+    }
+  },
+  "info": {
+    "title": "1inch Fusion+ Relayer API",
+    "description": "Relayer API accepts orders and distribute them across resolvers",
+    "version": "1.0",
+    "contact": {}
+  },
+  "tags": [],
+  "servers": [
+    {
+      "url": "/relayer"
+    }
+  ],
+  "components": {
+    "schemas": {
+      "OrderInput": {
+        "type": "object",
+        "properties": {
+          "salt": {
+            "type": "string",
+            "example": "42",
+            "x-go-type-skip-optional-pointer": true
+          },
+          "makerAsset": {
+            "type": "string",
+            "description": "Source chain address of the maker asset",
+            "example": "0x0000000000000000000000000000000000000001",
+            "x-go-type-skip-optional-pointer": true
+          },
+          "takerAsset": {
+            "type": "string",
+            "description": "Destination chain address of the taker asset",
+            "example": "0x0000000000000000000000000000000000000001",
+            "x-go-type-skip-optional-pointer": true
+          },
+          "maker": {
+            "type": "string",
+            "description": "Source chain address of the maker (wallet or contract address)",
+            "example": "0x0000000000000000000000000000000000000001",
+            "x-go-type-skip-optional-pointer": true
+          },
+          "receiver": {
+            "type": "string",
+            "description": "Destination chain address of the wallet or contract who will receive filled amount ",
+            "default": "0x0000000000000000000000000000000000000001",
+            "x-go-type-skip-optional-pointer": true
+          },
+          "makingAmount": {
+            "type": "string",
+            "description": "Order maker's token amount",
+            "example": "100000000000000000000",
+            "x-go-type-skip-optional-pointer": true
+          },
+          "takingAmount": {
+            "type": "string",
+            "description": "Order taker's token amount",
+            "example": "100000000000000000000",
+            "x-go-type-skip-optional-pointer": true
+          },
+          "makerTraits": {
+            "type": "string",
+            "description": "Includes some flags like: allow multiple fills, is partial fill allowed or not, price improvement, nonce, deadline etc. See <a href=\"https://github.com/1inch/limit-order-sdk/blob/master/src/limit-order/maker-traits.ts\" target=\"_blank\">maker-traits.ts</a>",
+            "default": "0",
+            "x-go-type-skip-optional-pointer": true
+          }
+        },
+        "required": [
+          "salt",
+          "makerAsset",
+          "takerAsset",
+          "maker",
+          "receiver",
+          "makingAmount",
+          "takingAmount",
+          "makerTraits"
+        ]
+      },
+      "SignedOrderInput": {
+        "type": "object",
+        "properties": {
+          "order": {
+            "$ref": "#/components/schemas/OrderInput"
+          },
+          "srcChainId": {
+            "type": "number",
+            "description": "Source chain id",
+            "example": 1,
+            "x-go-type-skip-optional-pointer": true
+          },
+          "signature": {
+            "type": "string",
+            "description": "Signature of the cross chain order typed data (using signTypedData v4)",
+            "x-go-type-skip-optional-pointer": true
+          },
+          "extension": {
+            "type": "string",
+            "description": "An interaction call data. ABI encoded a set of makerAssetSuffix, takerAssetSuffix, makingAmountGetter, takingAmountGetter, predicate, permit, preInteraction, postInteraction.Lowest 160 bits of the order salt must be equal to the lowest 160 bits of the extension hash. See <a href=\"https://github.com/1inch/cross-chain-sdk/blob/master/src/cross-chain-order/escrow-extension.ts\" target=\"_blank\">escrow-extension.ts</a>>",
+            "example": "0x",
+            "x-go-type-skip-optional-pointer": true
+          },
+          "quoteId": {
+            "type": "string",
+            "description": "Quote id of the quote with presets",
+            "x-go-type-skip-optional-pointer": true
+          },
+          "secretHashes": {
+            "description": "Secret Hashes, required for order with multiple fills allowed. keccak256(secret(idx))",
+            "type": "array",
+            "items": {
+              "type": "string"
+            },
+            "x-go-type-skip-optional-pointer": true
+          }
+        },
+        "required": [
+          "order",
+          "srcChainId",
+          "signature",
+          "extension",
+          "quoteId"
+        ]
+      },
+      "SecretInput": {
+        "type": "object",
+        "properties": {
+          "secret": {
+            "type": "string",
+            "description": "A secret for the fill hashlock",
+            "x-go-type-skip-optional-pointer": true
+          },
+          "orderHash": {
+            "type": "string",
+            "x-go-type-skip-optional-pointer": true
+          }
+        },
+        "required": [
+          "secret",
+          "orderHash"
+        ]
+      }
+    }
+  }
+}

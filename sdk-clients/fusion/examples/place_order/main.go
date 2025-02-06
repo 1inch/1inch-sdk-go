@@ -6,6 +6,7 @@ import (
 	"fmt"
 	"log"
 	"os"
+	"time"
 
 	"github.com/1inch/1inch-sdk-go/sdk-clients/fusion"
 )
@@ -19,7 +20,7 @@ var (
 const (
 	usdc    = "0x3c499c542cEF5E3811e1192ce70d8cC03d5c3359"
 	wmatic  = "0x0d500B1d8E8eF31E21C99d1Db9A6444d3ADf1270"
-	amount  = "1000000"
+	amount  = "1000000000000000000"
 	chainId = 137
 )
 
@@ -39,8 +40,8 @@ func main() {
 	}
 	ctx := context.Background()
 
-	fromToken := usdc
-	toToken := wmatic
+	fromToken := wmatic
+	toToken := usdc
 
 	response, err := client.GetQuote(ctx, fusion.QuoterControllerGetQuoteParamsFixed{
 		FromTokenAddress: fromToken,
@@ -68,12 +69,27 @@ func main() {
 		Preset:           fusion.Fast,
 	}
 
-	fmt.Println("Placing order")
-	err = client.PlaceOrder(ctx, *response, orderParams, client.Wallet)
+	orderHash, err := client.PlaceOrder(ctx, *response, orderParams, client.Wallet)
 	if err != nil {
-		log.Fatalf("failed to request: %v", err)
+		log.Fatalf("failed to place order: %v", err)
 	}
 
-	// A successful Fusion order submission has no response body
-	fmt.Printf("Success!")
+	fmt.Printf("Order placed! Order hash: %s\n", orderHash)
+	fmt.Println("Monitoring order until it completes...")
+
+	for {
+		select {
+		case <-time.After(1 * time.Second):
+			order, err := client.GetOrderStatus(ctx, orderHash)
+			if err != nil {
+				fmt.Printf("failed to get order from order hash: %v", err)
+				return
+			}
+
+			fmt.Printf("Order status: %s\n", order.Status)
+			if order.Status == "filled" {
+				return
+			}
+		}
+	}
 }

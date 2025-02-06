@@ -88,23 +88,32 @@ func main() {
 		log.Fatalf("Request completed, but order creation status was a failure: %v\n", createOrderResponse)
 	}
 
+	fmt.Println("Order created! Getting order hash...")
+
 	// Sleep to accommodate free-tier API keys
 	time.Sleep(time.Second)
 
-	getOrderResponse, err := client.GetOrdersByCreatorAddress(ctx, orderbook.GetOrdersByCreatorAddressParams{
+	ordersByCreatorResponse, err := client.GetOrdersByCreatorAddress(ctx, orderbook.GetOrdersByCreatorAddressParams{
 		CreatorAddress: client.Wallet.Address().Hex(),
 	})
 
-	fmt.Printf("Order created! \nOrder hash: %v\n", getOrderResponse[0].OrderHash)
+	fmt.Printf("Order hash: %v\n", ordersByCreatorResponse[0].OrderHash)
+	fmt.Println("Getting signature...")
 
 	// Sleep to accommodate free-tier API keys
 	time.Sleep(time.Second)
 
-	getOrderRresponse, err := client.GetOrder(ctx, orderbook.GetOrderParams{
-		OrderHash: getOrderResponse[0].OrderHash,
+	orderWithSignature, err := client.GetOrderWithSignature(ctx, orderbook.GetOrderParams{
+		OrderHash:               ordersByCreatorResponse[0].OrderHash,
+		SleepBetweenSubrequests: true,
 	})
 
-	fillOrderData, err := client.GetFillOrderCalldata(getOrderRresponse, nil)
+	fmt.Println("Getting retrieved! Filling order...")
+
+	fillOrderData, err := client.GetFillOrderCalldata(orderWithSignature, nil)
+	if err != nil {
+		log.Fatalf("Failed to get fill order calldata: %v", err)
+	}
 
 	aggregationRouter, err := constants.Get1inchRouterFromChainId(chainId)
 	if err != nil {
