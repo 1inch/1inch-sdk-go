@@ -12,8 +12,8 @@ import (
 
 var (
 	devPortalToken = os.Getenv("DEV_PORTAL_TOKEN")
-	publicAddress  = os.Getenv("WALLET_ADDRESS_NEW")
-	privateKey     = os.Getenv("WALLET_KEY_NEW")
+	publicAddress  = os.Getenv("WALLET_ADDRESS")
+	privateKey     = os.Getenv("WALLET_KEY")
 )
 
 func main() {
