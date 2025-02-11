@@ -11,7 +11,6 @@ import (
 
 	"github.com/1inch/1inch-sdk-go/internal/bytesiterator"
 	"github.com/1inch/1inch-sdk-go/internal/hexadecimal"
-	"github.com/ethereum/go-ethereum/common/math"
 )
 
 type ExtensionParams struct {
@@ -99,7 +98,7 @@ func Decode(data []byte) (*Extension, error) {
 			continue
 		}
 
-		const uint32Max = math.MaxUint32
+		const uint32Max = (1 << 32) - 1
 
 		// Extract the lowest 32 bits for the current field's offset.
 		offset := new(big.Int).And(offsets, big.NewInt(uint32Max)).Uint64()

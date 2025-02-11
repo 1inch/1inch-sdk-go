@@ -1,6 +1,6 @@
 # Dev Portal Go SDK
 
-The SDK requires a minimum version of Go `1.21`.
+The SDK requires a minimum version of Go `1.22`.
 
 Check out the [release notes](https://github.com/1inch/1inch-sdk-go/blob/main/CHANGELOG.md) for information about
 the latest bug fixes, updates, and features added to the SDK.
