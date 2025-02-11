@@ -4,7 +4,6 @@ import (
 	"encoding/hex"
 	"errors"
 	"fmt"
-	"math"
 	"math/big"
 
 	"github.com/1inch/1inch-sdk-go/internal/bytesbuilder"
@@ -13,7 +12,7 @@ import (
 
 const (
 	uint24Max = (1 << 24) - 1
-	uint32Max = math.MaxUint32
+	uint32Max = (1 << 32) - 1
 )
 
 func NewAuctionDetails(startTime, duration, initialRateBump uint32, points []AuctionPointClassFixed, gasCost GasCostConfigClassFixed) (*AuctionDetails, error) {
