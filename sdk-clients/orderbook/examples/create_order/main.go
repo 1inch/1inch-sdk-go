@@ -77,7 +77,6 @@ func main() {
 	createOrderResponse, err := client.CreateOrder(ctx, orderbook.CreateOrderParams{
 		Wallet:                         client.Wallet,
 		SeriesNonce:                    seriesNonce,
-		ExpireAfterUnix:                expireAfter,
 		Maker:                          publicAddress.Hex(),
 		MakerAsset:                     wmatic,
 		TakerAsset:                     usdc,

@@ -14,7 +14,6 @@ type CreateOrderParams struct {
 	MakerTraits                    *MakerTraits
 	Extension                      Extension
 	ExtensionEncoded               string
-	ExpireAfterUnix                int64
 	Maker                          string
 	MakerAsset                     string
 	TakerAsset                     string

@@ -11,7 +11,6 @@ func (params *CreateOrderParams) Validate() error {
 	var validationErrors []error
 	// validationErrors = validate.Parameter(params.SeriesNonce, "seriesNonce", validate.CheckBigIntRequired, validationErrors) // TODO All other places expect a string value for raw request parameters, but this value will always come in as a big.Int because of the onchain nature of retrieving it
 	validationErrors = validate.Parameter(params.Maker, "maker", validate.CheckEthereumAddressRequired, validationErrors)
-	validationErrors = validate.Parameter(params.ExpireAfterUnix, "expireAfter", validate.CheckExpireAfterUnix, validationErrors)
 	validationErrors = validate.Parameter(params.MakerAsset, "makerAsset", validate.CheckEthereumAddressRequired, validationErrors)
 	validationErrors = validate.Parameter(params.TakerAsset, "takerAsset", validate.CheckEthereumAddressRequired, validationErrors)
 	validationErrors = validate.Parameter(params.TakingAmount, "takingAmount", validate.CheckBigIntRequired, validationErrors)
