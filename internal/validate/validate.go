@@ -5,7 +5,6 @@ import (
 	"math/big"
 	"regexp"
 	"strings"
-	"time"
 
 	"github.com/1inch/1inch-sdk-go/constants"
 	"github.com/1inch/1inch-sdk-go/internal/bigint"
@@ -456,21 +455,6 @@ func CheckPermitHash(parameter interface{}, variableName string) error {
 	re := regexp.MustCompile(`^0x[a-fA-F0-9]*$`)
 	if !re.MatchString(value) {
 		return NewParameterValidationError(variableName, "not a valid permit hash")
-	}
-	return nil
-}
-
-func CheckExpireAfterUnix(parameter interface{}, variableName string) error {
-	value, ok := parameter.(int64)
-	if !ok {
-		return fmt.Errorf("for parameter '%v' to be validated as '%v', it must be a string", variableName, "ExpireAfterUnix")
-	}
-	if value == 0 {
-		return nil
-	}
-
-	if value < time.Now().Unix() {
-		return NewParameterValidationError(variableName, "must be a future timestamp")
 	}
 	return nil
 }

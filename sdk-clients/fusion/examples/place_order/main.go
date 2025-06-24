@@ -2,7 +2,6 @@ package main
 
 import (
 	"context"
-	"encoding/json"
 	"fmt"
 	"log"
 	"os"
@@ -20,7 +19,8 @@ var (
 const (
 	usdc    = "0x3c499c542cEF5E3811e1192ce70d8cC03d5c3359"
 	wmatic  = "0x0d500B1d8E8eF31E21C99d1Db9A6444d3ADf1270"
-	amount  = "1000000000000000000"
+	weth    = "0x7ceB23fD6bC0adD59E62ac25578270cFf1b9f619"
+	amount  = "200000000000000"
 	chainId = 137
 )
 
@@ -40,7 +40,7 @@ func main() {
 	}
 	ctx := context.Background()
 
-	fromToken := wmatic
+	fromToken := weth
 	toToken := usdc
 
 	response, err := client.GetQuote(ctx, fusion.QuoterControllerGetQuoteParamsFixed{
@@ -54,11 +54,11 @@ func main() {
 		log.Fatalf("failed to request: %v", err)
 	}
 
-	output, err := json.MarshalIndent(response, "", "  ")
-	if err != nil {
-		log.Fatalf("Failed to marshal response: %v\n", err)
-	}
-	fmt.Printf("Response: %s\n", string(output))
+	//output, err := json.MarshalIndent(response, "", "  ")
+	//if err != nil {
+	//	log.Fatalf("Failed to marshal response: %v\n", err)
+	//}
+	//fmt.Printf("Response: %s\n", string(output))
 
 	orderParams := fusion.OrderParams{
 		WalletAddress:    publicAddress,

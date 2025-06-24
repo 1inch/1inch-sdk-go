@@ -124,6 +124,12 @@ func (api *api) PlaceOrder(ctx context.Context, fusionQuote GetQuoteOutputFixed,
 		Signature: limitOrder.Signature,
 	}
 
+	orderIntended, err := json.MarshalIndent(signedOrder, "", "  ")
+	if err != nil {
+		return "", err
+	}
+	fmt.Printf("signedOrder: %s\n", orderIntended)
+
 	body, err := json.Marshal(signedOrder)
 	if err != nil {
 		return "", err

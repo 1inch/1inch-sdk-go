@@ -31,6 +31,9 @@ type GetQuoteOutputFixed struct {
 
 	// Whitelist current executors whitelist addresses
 	Whitelist []string `json:"whitelist"`
+
+	SurplusFee   float32 `json:"surplusFee"`
+	MarketAmount string  `json:"marketAmount"`
 }
 
 type PlaceOrderBody struct {
@@ -141,14 +144,20 @@ type FusionOrderConstructor struct {
 
 type Details struct {
 	Auction            *AuctionDetails `json:"auction"`
-	Fees               Fees            `json:"fees"`
+	Fees               FeesOld         `json:"fees"`
 	Whitelist          []AuctionWhitelistItem
 	ResolvingStartTime *big.Int
+	FeesNew            *FeesNew
 }
 
-type Fees struct {
+type FeesOld struct {
 	IntFee  IntegratorFee
 	BankFee *big.Int
+}
+
+type FeesNew struct {
+	Resolver   ResolverFee
+	Integrator IntegratorFeeNew
 }
 
 type IntegratorFee struct {
@@ -181,6 +190,7 @@ type SettlementSuffixData struct {
 	BankFee            *big.Int
 	ResolvingStartTime *big.Int
 	CustomReceiver     common.Address
+	Fees               FeesNew
 }
 
 type WhitelistItem struct {

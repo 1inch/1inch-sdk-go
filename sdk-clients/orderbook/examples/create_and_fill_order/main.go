@@ -71,7 +71,6 @@ func main() {
 		Wallet:                         client.Wallet,
 		SeriesNonce:                    seriesNonce,
 		MakerTraits:                    makerTraits,
-		ExpireAfterUnix:                time.Now().Add(time.Hour * 10).Unix(),
 		Maker:                          client.Wallet.Address().Hex(),
 		MakerAsset:                     wmatic,
 		TakerAsset:                     usdc,

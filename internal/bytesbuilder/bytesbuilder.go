@@ -16,6 +16,19 @@ func New() *BytesBuilder {
 	return &BytesBuilder{data: []byte{}}
 }
 
+func (b *BytesBuilder) AddUint256(val *big.Int) {
+	bytes := val.Bytes()
+	if len(bytes) < 32 {
+		// Pad on the left (big-endian) to 32 bytes
+		padded := make([]byte, 32-len(bytes))
+		bytes = append(padded, bytes...)
+	} else if len(bytes) > 32 {
+		// Truncate to last 32 bytes if larger (high bits ignored)
+		bytes = bytes[len(bytes)-32:]
+	}
+	b.data = append(b.data, bytes...)
+}
+
 func (b *BytesBuilder) AddUint24(val *big.Int) {
 	bytes := val.Bytes()
 	switch {

@@ -112,7 +112,6 @@ func main() {
 		SeriesNonce:                    seriesNonce,
 		MakerTraits:                    makerTraits,
 		Extension:                      *extension,
-		ExpireAfterUnix:                expireAfter,
 		Maker:                          publicAddress.Hex(),
 		MakerAsset:                     PolygonFRAX,
 		TakerAsset:                     PolygonUsdc,

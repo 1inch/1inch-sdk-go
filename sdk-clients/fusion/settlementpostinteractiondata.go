@@ -19,6 +19,7 @@ type SettlementPostInteractionData struct {
 	BankFee            *big.Int
 	ResolvingStartTime *big.Int
 	CustomReceiver     common.Address
+	AuctionFees        *FeesNew
 }
 
 var uint16Max = new(big.Int).Sub(new(big.Int).Lsh(big.NewInt(1), 16), big.NewInt(1))
@@ -68,6 +69,98 @@ func NewSettlementPostInteractionData(data SettlementSuffixData) (*SettlementPos
 		ResolvingStartTime: data.ResolvingStartTime,
 		CustomReceiver:     data.CustomReceiver,
 	}, nil
+}
+
+//func GenerateWhitelist(data *SettlementSuffixData) ([]WhitelistItem, error) {
+//	if len(data.Whitelist) == 0 {
+//		return nil, errors.New("whitelist cannot be empty")
+//	}
+//
+//	sumDelay := big.NewInt(0)
+//	whitelist := make([]WhitelistItem, len(data.Whitelist))
+//
+//	// Transform timestamps to cumulative delays
+//	sort.Slice(data.Whitelist, func(i, j int) bool {
+//		return data.Whitelist[i].AllowFrom.Cmp(data.Whitelist[j].AllowFrom) < 0
+//	})
+//
+//	for i, d := range data.Whitelist {
+//		allowFrom := d.AllowFrom
+//		if d.AllowFrom.Cmp(data.ResolvingStartTime) < 0 {
+//			allowFrom = data.ResolvingStartTime
+//		}
+//
+//		zero := big.NewInt(0)
+//		delay := new(big.Int).Sub(allowFrom, data.ResolvingStartTime)
+//		delay.Sub(delay, sumDelay)
+//		// If the resulting value of delay is zero, set it to a fresh big.Int of value zero (for comparisons in tests)
+//		if delay.Cmp(zero) == 0 {
+//			delay = zero
+//		}
+//		whitelist[i] = WhitelistItem{
+//			AddressHalf: strings.ToLower(d.Address.Hex())[len(d.Address.Hex())-20:],
+//			Delay:       delay,
+//		}
+//
+//		sumDelay.Add(sumDelay, whitelist[i].Delay)
+//
+//		if whitelist[i].Delay.Cmp(uint16Max) >= 0 {
+//			return nil, fmt.Errorf("delay too big - %d must be less than %d", whitelist[i].Delay, uint16Max)
+//		}
+//	}
+//
+//	return whitelist, nil
+//}
+
+func GenerateWhitelist(whitelistStrings []string, resolvingStartTime *big.Int) ([]WhitelistItem, error) {
+	if len(whitelistStrings) == 0 {
+		return nil, errors.New("whitelist cannot be empty")
+	}
+
+	//whitelistAddresses := make([]AuctionWhitelistItem, 0)
+	//for _, address := range whitelistStrings {
+	//	whitelistAddresses = append(whitelistAddresses, AuctionWhitelistItem{
+	//		Address:   geth_common.HexToAddress(address),
+	//		AllowFrom: big.NewInt(0), // TODO generating the correct list here requires checking for an exclusive resolver. This needs to be checked for later. The generated object does not see exclusive resolver correctly
+	//	})
+	//}
+
+	sumDelay := big.NewInt(0)
+	whitelist := make([]WhitelistItem, len(whitelistStrings))
+
+	// Transform timestamps to cumulative delays
+
+	// TODO this sorting step is currently skipped since we do not calculate AllowFrom
+	//sort.Slice(data.Whitelist, func(i, j int) bool {
+	//	return data.Whitelist[i].AllowFrom.Cmp(data.Whitelist[j].AllowFrom) < 0
+	//})
+	for i, d := range whitelistStrings {
+		allowFrom := big.NewInt(0).Set(resolvingStartTime)
+		//allowFrom := d.AllowFrom
+		//if d.AllowFrom.Cmp(data.ResolvingStartTime) < 0 {
+		//	allowFrom = data.ResolvingStartTime
+		//}
+
+		zero := big.NewInt(0)
+		delay := new(big.Int).Sub(allowFrom, resolvingStartTime)
+		delay.Sub(delay, sumDelay)
+		// If the resulting value of delay is zero, set it to a fresh big.Int of value zero (for comparisons in tests)
+		if delay.Cmp(zero) == 0 {
+			delay = zero
+		}
+		whitelist[i] = WhitelistItem{
+			AddressHalf: strings.ToLower(d)[len(d)-20:],
+			Delay:       delay,
+		}
+
+		sumDelay.Add(sumDelay, whitelist[i].Delay)
+
+		if whitelist[i].Delay.Cmp(uint16Max) >= 0 {
+			return nil, fmt.Errorf("delay too big - %d must be less than %d", whitelist[i].Delay, uint16Max)
+		}
+	}
+
+	return whitelist, nil
 }
 
 func Decode(data string) (SettlementPostInteractionData, error) {
@@ -120,6 +213,126 @@ func Decode(data string) (SettlementPostInteractionData, error) {
 	}, nil
 }
 
+const ZERO_ADDRESS = "0x0000000000000000000000000000000000000000"
+const CUSTOM_RECEIVER_FLAG_BIT = 0
+
+func CreateEncodedPostInteractionData(extension *Extension) (string, error) {
+	builder := bytesbuilder.New()
+
+	customReceiver := extension.PostInteractionData.CustomReceiver
+	if customReceiver == (common.Address{}) {
+		customReceiver = common.HexToAddress(ZERO_ADDRESS)
+	}
+
+	// Set bit flags
+	flags := big.NewInt(0)
+	if customReceiver.Hex() != ZERO_ADDRESS {
+		flags.SetBit(flags, CUSTOM_RECEIVER_FLAG_BIT, 1)
+	}
+	builder.AddUint8(uint8(flags.Uint64()))
+
+	// Set receivers
+	integratorReceiver := common.HexToAddress(ZERO_ADDRESS)
+	if extension.PostInteractionData.AuctionFees != nil && extension.PostInteractionData.AuctionFees.Integrator.Integrator != "" && extension.PostInteractionData.AuctionFees.Integrator.Integrator != ZERO_ADDRESS {
+		integratorReceiver = common.HexToAddress(extension.PostInteractionData.AuctionFees.Integrator.Integrator)
+	}
+
+	protocolReceiver := common.HexToAddress(ZERO_ADDRESS)
+	if extension.PostInteractionData.AuctionFees != nil && extension.PostInteractionData.AuctionFees.Integrator.Protocol != "" && extension.PostInteractionData.AuctionFees.Integrator.Protocol != ZERO_ADDRESS {
+		protocolReceiver = common.HexToAddress(extension.PostInteractionData.AuctionFees.Integrator.Protocol)
+	}
+
+	// TODO verify 0x is not appended
+	builder.AddAddress(integratorReceiver)
+	builder.AddAddress(protocolReceiver)
+
+	// Optional customReceiver
+	if flags.Bit(CUSTOM_RECEIVER_FLAG_BIT) == 1 {
+		builder.AddAddress(customReceiver)
+	}
+
+	params := &BuildAmountGetterDataParams{
+		AuctionDetails:      extension.AuctionDetails,
+		PostInteractionData: extension.PostInteractionData,
+		ResolvingStartTime:  extension.ResolvingStartTime,
+	}
+	// Add amount getter data (forAmountGetters = false)
+	amountGetterData, err := BuildAmountGetterData(params, false)
+	if err != nil {
+		return "", fmt.Errorf("failed to build amount getter data: %w", err)
+	}
+	if err := builder.AddBytes(amountGetterData); err != nil {
+		return "", fmt.Errorf("failed to add amount getter data: %w", err)
+	}
+
+	builder.AddUint256(extension.Surplus.EstimatedTakerAmount)
+
+	// Add protocol fee as uint8 percent
+	protocolFeePercent := extension.Surplus.ProtocolFee.ToPercent(GetDefaultBase())
+	builder.AddUint8(uint8(protocolFeePercent))
+
+	return fmt.Sprintf("0x%s", builder.AsHex()), nil
+}
+
+func (spid SettlementPostInteractionData) EncodeNew(extension Extension) (string, error) {
+	builder := bytesbuilder.New()
+
+	customReceiver := spid.CustomReceiver
+	if customReceiver == (common.Address{}) {
+		customReceiver = common.HexToAddress(ZERO_ADDRESS)
+	}
+
+	// Set bit flags
+	flags := big.NewInt(0)
+	if customReceiver.Hex() != ZERO_ADDRESS {
+		flags.SetBit(flags, CUSTOM_RECEIVER_FLAG_BIT, 1)
+	}
+	builder.AddUint8(uint8(flags.Uint64()))
+
+	// Set receivers
+	integratorReceiver := common.HexToAddress(ZERO_ADDRESS)
+	if spid.AuctionFees != nil && spid.AuctionFees.Integrator.Integrator != "" && spid.AuctionFees.Integrator.Integrator != ZERO_ADDRESS {
+		integratorReceiver = common.HexToAddress(spid.AuctionFees.Integrator.Integrator)
+	}
+
+	protocolReceiver := common.HexToAddress(ZERO_ADDRESS)
+	if spid.AuctionFees != nil && spid.AuctionFees.Integrator.Protocol != "" && spid.AuctionFees.Integrator.Protocol != ZERO_ADDRESS {
+		protocolReceiver = common.HexToAddress(spid.AuctionFees.Integrator.Protocol)
+	}
+
+	// TODO verify 0x is not appended
+	builder.AddAddress(integratorReceiver)
+	builder.AddAddress(protocolReceiver)
+
+	// Optional customReceiver
+	if flags.Bit(CUSTOM_RECEIVER_FLAG_BIT) == 1 {
+		builder.AddAddress(customReceiver)
+	}
+
+	params := &BuildAmountGetterDataParams{
+		AuctionDetails:      extension.AuctionDetails,
+		PostInteractionData: extension.PostInteractionData,
+		ResolvingStartTime:  extension.ResolvingStartTime,
+	}
+
+	// Add amount getter data (forAmountGetters = false)
+	amountGetterData, err := BuildAmountGetterData(params, false)
+	if err != nil {
+		return "", fmt.Errorf("failed to build amount getter data: %w", err)
+	}
+	if err := builder.AddBytes(amountGetterData); err != nil {
+		return "", fmt.Errorf("failed to add amount getter data: %w", err)
+	}
+
+	builder.AddUint256(extension.Surplus.EstimatedTakerAmount)
+
+	// Add protocol fee as uint8 percent
+	protocolFeePercent := extension.Surplus.ProtocolFee.ToPercent(GetDefaultBase())
+	builder.AddUint8(uint8(protocolFeePercent))
+
+	return fmt.Sprintf("0x%s", builder.AsHex()), nil
+}
+
 func (spid SettlementPostInteractionData) Encode() (string, error) {
 	bitMask := big.NewInt(0)
 	bytes := bytesbuilder.New()
@@ -129,7 +342,7 @@ func (spid SettlementPostInteractionData) Encode() (string, error) {
 		bytes.AddUint32(spid.BankFee)
 	}
 
-	if spid.IntegratorFee != nil && spid.IntegratorFee.Ratio.Cmp(big.NewInt(0)) != 0 {
+	if spid.IntegratorFee != nil && spid.IntegratorFee.Ratio != nil && spid.IntegratorFee.Ratio.Cmp(big.NewInt(0)) != 0 {
 		bitMask.SetBit(bitMask, 1, 1)
 		bytes.AddUint16(spid.IntegratorFee.Ratio)
 		bytes.AddAddress(spid.IntegratorFee.Receiver)

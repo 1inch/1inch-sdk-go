@@ -82,7 +82,7 @@ func CreateFusionPlusOrderData(quoteParams QuoterControllerGetQuoteParamsFixed, 
 		},
 		BankFee: big.NewInt(0),
 	}
-	feesFusion := fusion.Fees{
+	feesFusion := fusion.FeesOld{
 		IntFee: fusion.IntegratorFee{
 			Ratio:    bpsToRatioFormat(quoteParams.Fee),
 			Receiver: takingFreeReceiver,
@@ -189,7 +189,9 @@ func CreateFusionPlusOrderData(quoteParams QuoterControllerGetQuoteParamsFixed, 
 	if err != nil {
 		return nil, fmt.Errorf("error creating post interaction data: %v", err)
 	}
-	postInteractionDataFusion, err := fusion.CreateSettlementPostInteractionData(detailsFusion, orderInfoFusion)
+
+	// TODO  passing nil in for the whitelist for now
+	postInteractionDataFusion, err := fusion.CreateSettlementPostInteractionData(detailsFusion, nil, orderInfoFusion)
 	if err != nil {
 		return nil, fmt.Errorf("error creating post interaction data: %v", err)
 	}

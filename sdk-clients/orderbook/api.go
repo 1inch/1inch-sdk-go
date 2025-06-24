@@ -23,12 +23,13 @@ func (api *api) CreateOrder(ctx context.Context, params CreateOrderParams) (*Cre
 		return nil, errors.New("allowMultipleFills and allowPartialFills must be true")
 	}
 
-	order, err := CreateLimitOrderMessage(params, int(api.chainId))
-	if err != nil {
-		return nil, err
-	}
+	//order, err := CreateLimitOrderMessage(params, int(api.chainId))
+	//if err != nil {
+	//	return nil, err
+	//}
 
-	body, err := json.Marshal(order)
+	body, err := json.Marshal(nil)
+	//body, err := json.Marshal(order)
 	if err != nil {
 		return nil, err
 	}
