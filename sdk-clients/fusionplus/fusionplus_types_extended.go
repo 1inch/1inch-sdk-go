@@ -223,22 +223,10 @@ type AdditionalParams struct {
 }
 
 type Details struct {
-	Auction            *AuctionDetails `json:"auction"`
-	Fees               Fees            `json:"fees"`
-	Whitelist          []AuctionWhitelistItem
-	ResolvingStartTime *big.Int
+	Auction            *AuctionDetails        `json:"auction"`
+	Whitelist          []AuctionWhitelistItem `json:"whitelist"`
+	ResolvingStartTime *big.Int               `json:"resolvingStartTime"`
 }
-
-type Fees struct {
-	IntFee  IntegratorFee
-	BankFee *big.Int
-}
-
-type IntegratorFee struct {
-	Ratio    *big.Int
-	Receiver common.Address
-}
-
 type AuctionWhitelistItem struct {
 	Address common.Address
 	/**
@@ -260,8 +248,6 @@ type ExtraParams struct {
 
 type SettlementSuffixData struct {
 	Whitelist          []AuctionWhitelistItem
-	IntegratorFee      *IntegratorFee
-	BankFee            *big.Int
 	ResolvingStartTime *big.Int
 	CustomReceiver     common.Address
 }

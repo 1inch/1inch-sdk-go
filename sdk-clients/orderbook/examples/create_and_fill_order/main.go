@@ -14,7 +14,7 @@ import (
 
 var (
 	privateKey     = os.Getenv("WALLET_KEY")
-	nodeUrl        = os.Getenv("NODE_URL_BACKUP")
+	nodeUrl        = os.Getenv("NODE_URL")
 	devPortalToken = os.Getenv("DEV_PORTAL_TOKEN")
 )
 

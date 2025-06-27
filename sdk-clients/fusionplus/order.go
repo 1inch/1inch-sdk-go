@@ -68,21 +68,6 @@ func CreateFusionPlusOrderData(quoteParams QuoterControllerGetQuoteParamsFixed, 
 		takerAsset = takerAssetWrapped.Hex()
 	}
 
-	var takingFreeReceiver geth_common.Address
-	if orderParams.TakingFeeReceiver == "" {
-		takingFreeReceiver = geth_common.HexToAddress("0x0000000000000000000000000000000000000000")
-	} else {
-		takingFreeReceiver = geth_common.HexToAddress(orderParams.TakingFeeReceiver)
-	}
-
-	fees := Fees{
-		IntFee: IntegratorFee{
-			Ratio:    bpsToRatioFormat(quoteParams.Fee),
-			Receiver: takingFreeReceiver,
-		},
-		BankFee: big.NewInt(0),
-	}
-
 	whitelistAddresses := make([]AuctionWhitelistItem, 0)
 	for _, address := range quote.Whitelist {
 		whitelistAddresses = append(whitelistAddresses, AuctionWhitelistItem{
@@ -114,7 +99,6 @@ func CreateFusionPlusOrderData(quoteParams QuoterControllerGetQuoteParamsFixed, 
 
 	details := Details{
 		Auction:   auctionDetails,
-		Fees:      fees,
 		Whitelist: whitelistAddresses,
 	}
 	detailsFusion := fusion.Details{
@@ -182,7 +166,7 @@ func CreateFusionPlusOrderData(quoteParams QuoterControllerGetQuoteParamsFixed, 
 		return nil, fmt.Errorf("error creating post interaction data: %v", err)
 	}
 
-	// TODO passing nil in for the whitelist until Fusion is fully working
+	// TODO passing nil in for the whitelist until Fusion+ is updated
 	postInteractionDataFusion, err := fusion.CreateSettlementPostInteractionData(detailsFusion, nil, orderInfoFusion)
 	if err != nil {
 		return nil, fmt.Errorf("error creating post interaction data: %v", err)
@@ -314,8 +298,6 @@ func CreateSettlementPostInteractionData(details Details, orderInfo CrossChainOr
 	}
 	return NewSettlementPostInteractionData(SettlementSuffixData{
 		Whitelist:          details.Whitelist,
-		IntegratorFee:      &details.Fees.IntFee,
-		BankFee:            details.Fees.BankFee,
 		ResolvingStartTime: resolverStartTime,
 		CustomReceiver:     geth_common.HexToAddress(orderInfo.Receiver),
 	})

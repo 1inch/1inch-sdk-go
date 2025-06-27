@@ -69,7 +69,7 @@ func GenerateWhitelist(whitelistStrings []string, resolvingStartTime *big.Int) (
 	return whitelist, nil
 }
 
-const CUSTOM_RECEIVER_FLAG_BIT = 0
+const customReceiverBitFlag = 0
 
 func CreateEncodedPostInteractionData(extension *Extension) (string, error) {
 	builder := bytesbuilder.New()
@@ -79,14 +79,12 @@ func CreateEncodedPostInteractionData(extension *Extension) (string, error) {
 		customReceiver = common.HexToAddress(addresses.ZeroAddress)
 	}
 
-	// Set bit flags
 	flags := big.NewInt(0)
 	if customReceiver.Hex() != addresses.ZeroAddress {
-		flags.SetBit(flags, CUSTOM_RECEIVER_FLAG_BIT, 1)
+		flags.SetBit(flags, customReceiverBitFlag, 1)
 	}
 	builder.AddUint8(uint8(flags.Uint64()))
 
-	// Set receivers
 	integratorReceiver := common.HexToAddress(addresses.ZeroAddress)
 	if extension.PostInteractionData.AuctionFees != nil && extension.PostInteractionData.AuctionFees.Integrator.Integrator != "" && extension.PostInteractionData.AuctionFees.Integrator.Integrator != addresses.ZeroAddress {
 		integratorReceiver = common.HexToAddress(extension.PostInteractionData.AuctionFees.Integrator.Integrator)
@@ -97,12 +95,10 @@ func CreateEncodedPostInteractionData(extension *Extension) (string, error) {
 		protocolReceiver = common.HexToAddress(extension.PostInteractionData.AuctionFees.Integrator.Protocol)
 	}
 
-	// TODO verify 0x is not appended
 	builder.AddAddress(integratorReceiver)
 	builder.AddAddress(protocolReceiver)
 
-	// Optional customReceiver
-	if flags.Bit(CUSTOM_RECEIVER_FLAG_BIT) == 1 {
+	if flags.Bit(customReceiverBitFlag) == 1 {
 		builder.AddAddress(customReceiver)
 	}
 
@@ -111,7 +107,7 @@ func CreateEncodedPostInteractionData(extension *Extension) (string, error) {
 		PostInteractionData: extension.PostInteractionData,
 		ResolvingStartTime:  extension.ResolvingStartTime,
 	}
-	// Add amount getter data (forAmountGetters = false)
+
 	amountGetterData, err := BuildAmountGetterData(params, false)
 	if err != nil {
 		return "", fmt.Errorf("failed to build amount getter data: %w", err)
@@ -122,66 +118,6 @@ func CreateEncodedPostInteractionData(extension *Extension) (string, error) {
 
 	builder.AddUint256(extension.Surplus.EstimatedTakerAmount)
 
-	// Add protocol fee as uint8 percent
-	protocolFeePercent := extension.Surplus.ProtocolFee.ToPercent(GetDefaultBase())
-	builder.AddUint8(uint8(protocolFeePercent))
-
-	return fmt.Sprintf("0x%s", builder.AsHex()), nil
-}
-
-func (spid SettlementPostInteractionData) EncodeNew(extension Extension) (string, error) {
-	builder := bytesbuilder.New()
-
-	customReceiver := spid.CustomReceiver
-	if customReceiver == (common.Address{}) {
-		customReceiver = common.HexToAddress(addresses.ZeroAddress)
-	}
-
-	// Set bit flags
-	flags := big.NewInt(0)
-	if customReceiver.Hex() != addresses.ZeroAddress {
-		flags.SetBit(flags, CUSTOM_RECEIVER_FLAG_BIT, 1)
-	}
-	builder.AddUint8(uint8(flags.Uint64()))
-
-	// Set receivers
-	integratorReceiver := common.HexToAddress(addresses.ZeroAddress)
-	if spid.AuctionFees != nil && spid.AuctionFees.Integrator.Integrator != "" && spid.AuctionFees.Integrator.Integrator != addresses.ZeroAddress {
-		integratorReceiver = common.HexToAddress(spid.AuctionFees.Integrator.Integrator)
-	}
-
-	protocolReceiver := common.HexToAddress(addresses.ZeroAddress)
-	if spid.AuctionFees != nil && spid.AuctionFees.Integrator.Protocol != "" && spid.AuctionFees.Integrator.Protocol != addresses.ZeroAddress {
-		protocolReceiver = common.HexToAddress(spid.AuctionFees.Integrator.Protocol)
-	}
-
-	// TODO verify 0x is not appended
-	builder.AddAddress(integratorReceiver)
-	builder.AddAddress(protocolReceiver)
-
-	// Optional customReceiver
-	if flags.Bit(CUSTOM_RECEIVER_FLAG_BIT) == 1 {
-		builder.AddAddress(customReceiver)
-	}
-
-	params := &BuildAmountGetterDataParams{
-		AuctionDetails:      extension.AuctionDetails,
-		PostInteractionData: extension.PostInteractionData,
-		ResolvingStartTime:  extension.ResolvingStartTime,
-	}
-
-	// Add amount getter data (forAmountGetters = false)
-	amountGetterData, err := BuildAmountGetterData(params, false)
-	if err != nil {
-		return "", fmt.Errorf("failed to build amount getter data: %w", err)
-	}
-	if err := builder.AddBytes(amountGetterData); err != nil {
-		return "", fmt.Errorf("failed to add amount getter data: %w", err)
-	}
-
-	builder.AddUint256(extension.Surplus.EstimatedTakerAmount)
-
-	// Add protocol fee as uint8 percent
 	protocolFeePercent := extension.Surplus.ProtocolFee.ToPercent(GetDefaultBase())
 	builder.AddUint8(uint8(protocolFeePercent))
 

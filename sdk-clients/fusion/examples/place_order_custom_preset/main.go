@@ -22,7 +22,7 @@ const (
 	wmatic     = "0x0d500B1d8E8eF31E21C99d1Db9A6444d3ADf1270"
 	weth       = "0x7ceB23fD6bC0adD59E62ac25578270cFf1b9f619"
 	amountEth  = "200000000000000" // ~50 cents of ETH
-	amountUSDC = "500000"          // 50 cents of USDC
+	amountUsdc = "500000"          // 50 cents of USDC
 	chainId    = 137
 )
 
@@ -44,7 +44,7 @@ func main() {
 
 	fromToken := usdc
 	toToken := weth
-	amount := amountUSDC
+	amount := amountUsdc
 
 	response, err := client.GetQuoteWithCustomPreset(ctx,
 		fusion.QuoterControllerGetQuoteWithCustomPresetsParamsFixed{

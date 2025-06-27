@@ -16,8 +16,6 @@ import (
 
 type SettlementPostInteractionData struct {
 	Whitelist          []WhitelistItem
-	IntegratorFee      *IntegratorFee
-	BankFee            *big.Int
 	ResolvingStartTime *big.Int
 	CustomReceiver     common.Address
 }
@@ -64,8 +62,6 @@ func NewSettlementPostInteractionData(data SettlementSuffixData) (*SettlementPos
 
 	return &SettlementPostInteractionData{
 		Whitelist:          whitelist,
-		IntegratorFee:      data.IntegratorFee,
-		BankFee:            data.BankFee,
 		ResolvingStartTime: data.ResolvingStartTime,
 		CustomReceiver:     data.CustomReceiver,
 	}, nil
@@ -81,33 +77,32 @@ func Decode(data string) (SettlementPostInteractionData, error) {
 	bytesWithoutFlags := bytes[:len(bytes)-1]
 
 	iter := bytesiterator.New(bytesWithoutFlags)
-	var bankFee *big.Int
-	var integratorFee *IntegratorFee
+	//var bankFee *big.Int
 	var customReceiver common.Address
 
-	if flags.Bit(0) == 1 {
-		bankFee, err = iter.NextUint32()
-		if err != nil {
-			return SettlementPostInteractionData{}, err
-		}
-	}
+	//if flags.Bit(0) == 1 {
+	//	bankFee, err = iter.NextUint32()
+	//	if err != nil {
+	//		return SettlementPostInteractionData{}, err
+	//	}
+	//}
 
 	if flags.Bit(1) == 1 {
 
-		ratio, err := iter.NextUint16()
-		if err != nil {
-			return SettlementPostInteractionData{}, err
-		}
-
-		receiver, err := iter.NextUint160()
-		if err != nil {
-			return SettlementPostInteractionData{}, err
-		}
-
-		integratorFee = &IntegratorFee{
-			Ratio:    ratio,
-			Receiver: common.HexToAddress(receiver.Text(16)),
-		}
+		//ratio, err := iter.NextUint16()
+		//if err != nil {
+		//	return SettlementPostInteractionData{}, err
+		//}
+		//
+		//receiver, err := iter.NextUint160()
+		//if err != nil {
+		//	return SettlementPostInteractionData{}, err
+		//}
+		//
+		//integratorFee = &IntegratorFee{
+		//	Ratio:    ratio,
+		//	Receiver: common.HexToAddress(receiver.Text(16)),
+		//}
 
 		if flags.Bit(2) == 1 {
 
@@ -143,8 +138,6 @@ func Decode(data string) (SettlementPostInteractionData, error) {
 	}
 
 	return SettlementPostInteractionData{
-		IntegratorFee:      integratorFee,
-		BankFee:            bankFee,
 		ResolvingStartTime: resolvingStartTime,
 		Whitelist:          whitelist,
 		CustomReceiver:     customReceiver,
@@ -155,22 +148,22 @@ func (spid SettlementPostInteractionData) Encode() (string, error) {
 	bitMask := big.NewInt(0)
 	bytes := bytesbuilder.New()
 
-	if spid.BankFee != nil && spid.BankFee.Cmp(big.NewInt(0)) != 0 {
-		bitMask.SetBit(bitMask, 0, 1)
-		bytes.AddUint32(spid.BankFee)
-	}
-
-	if spid.IntegratorFee != nil && spid.IntegratorFee.Ratio.Cmp(big.NewInt(0)) != 0 {
-		bitMask.SetBit(bitMask, 1, 1)
-		bytes.AddUint16(spid.IntegratorFee.Ratio)
-		bytes.AddAddress(spid.IntegratorFee.Receiver)
-
-		// TODO this check is probably not good enough
-		if spid.CustomReceiver.Hex() != "0x0000000000000000000000000000000000000000" {
-			bitMask.SetBit(bitMask, 2, 1)
-			bytes.AddAddress(spid.CustomReceiver)
-		}
-	}
+	//if spid.BankFee != nil && spid.BankFee.Cmp(big.NewInt(0)) != 0 {
+	//	bitMask.SetBit(bitMask, 0, 1)
+	//	bytes.AddUint32(spid.BankFee)
+	//}
+	//
+	//if spid.IntegratorFee != nil && spid.IntegratorFee.Ratio.Cmp(big.NewInt(0)) != 0 {
+	//	bitMask.SetBit(bitMask, 1, 1)
+	//	bytes.AddUint16(spid.IntegratorFee.Ratio)
+	//	bytes.AddAddress(spid.IntegratorFee.Receiver)
+	//
+	//	// TODO this check is probably not good enough
+	//	if spid.CustomReceiver.Hex() != "0x0000000000000000000000000000000000000000" {
+	//		bitMask.SetBit(bitMask, 2, 1)
+	//		bytes.AddAddress(spid.CustomReceiver)
+	//	}
+	//}
 
 	bytes.AddUint32(spid.ResolvingStartTime)
 

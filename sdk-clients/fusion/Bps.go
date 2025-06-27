@@ -17,7 +17,6 @@ func GetDefaultBase() *big.Int {
 
 var BpsZero = NewBps(big.NewInt(0))
 
-// NewBps creates a new Bps and validates its range (0 to 10,000 inclusive)
 func NewBps(val *big.Int) *Bps {
 	if val.Cmp(big.NewInt(0)) < 0 || val.Cmp(big.NewInt(10000)) > 0 {
 		panic(fmt.Sprintf("invalid bps %s", val.String()))
@@ -25,15 +24,11 @@ func NewBps(val *big.Int) *Bps {
 	return &Bps{value: new(big.Int).Set(val)}
 }
 
-// FromPercent constructs Bps from a percentage in range [0, 100]
-// 1% = 100 bps
 func FromPercent(val float64, base *big.Int) *Bps {
 	mult := new(big.Float).SetFloat64(100 * val)
 	return fromFloatWithBase(mult, base)
 }
 
-// FromFraction constructs Bps from a fractional value in range [0.0, 1.0]
-// 1.0 = 10,000 bps
 func FromFraction(val float64, base *big.Int) *Bps {
 	mult := new(big.Float).SetFloat64(10000 * val)
 	return fromFloatWithBase(mult, base)
@@ -47,17 +42,14 @@ func fromFloatWithBase(f *big.Float, base *big.Int) *Bps {
 	return NewBps(bpsInt)
 }
 
-// Equal compares two Bps values
 func (b *Bps) Equal(other *Bps) bool {
 	return b.value.Cmp(other.value) == 0
 }
 
-// IsZero returns true if value == 0
 func (b *Bps) IsZero() bool {
 	return b.value.Sign() == 0
 }
 
-// ToPercent converts Bps to a float64 percentage
 func (b *Bps) ToPercent(base *big.Int) float64 {
 	num := new(big.Int).Mul(b.value, base)
 	f := new(big.Float).SetInt(num)

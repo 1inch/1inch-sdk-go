@@ -566,135 +566,6 @@ func TestCreateSettlementPostInteractionData(t *testing.T) {
 
 var extensionContract = "0x8273f37417da37c4a6c3995e82cf442f87a25d9c"
 
-//func TestCreateFusionOrder(t *testing.T) {
-//
-//	details := Details{
-//		Auction: &AuctionDetails{
-//			StartTime:       1673548149,
-//			Duration:        180,
-//			InitialRateBump: 50000,
-//			Points:          []AuctionPointClassFixed{{Coefficient: 20000, Delay: 12}},
-//		},
-//		Fees: Fees{
-//			IntFee:  IntegratorFee{},
-//			BankFee: nil,
-//		},
-//		Whitelist:          []AuctionWhitelistItem{{Address: common.HexToAddress("0x00000000219ab540356cbb839cbe05303d7705fa"), AllowFrom: big.NewInt(0)}},
-//		ResolvingStartTime: big.NewInt(1673548139),
-//	}
-//
-//	postInteractionSufixDataNew := &SettlementSuffixData{
-//		Whitelist:          details.Whitelist,
-//		ResolvingStartTime: details.ResolvingStartTime,
-//		CustomReceiver:     common.Address{},
-//		Fees:               FeesIntegratorResolver{},
-//	}
-//
-//	whitelist, err := GenerateWhitelist(postInteractionSufixDataNew)
-//	require.NoError(t, err)
-//
-//	postInteractionDataNew := SettlementPostInteractionData{
-//		Whitelist:          whitelist,
-//		IntegratorFee:      &details.FeesOld.IntFee,
-//		BankFee:            details.FeesOld.BankFee,
-//		ResolvingStartTime: details.ResolvingStartTime,
-//		CustomReceiver:     common.Address{},
-//		AuctionFees:        FeesIntegratorResolver{},
-//	}
-//
-//	extensionTmp, err := NewExtension(ExtensionParams{
-//		SettlementContract:  extensionContract,
-//		AuctionDetails:      details.Auction,
-//		PostInteractionData: nil,
-//		Asset:               "0xc02aaa39b223fe8d0a0e5c4f27ead9083c756cc2",
-//		Surplus:             SurplusParamsNoFee,
-//		ResolvingStartTime:  details.ResolvingStartTime,
-//	})
-//	require.NoError(t, err)
-//
-//	encodedPostInteractionData, err := postInteractionDataNew.EncodeNew(*extensionTmp)
-//	require.NoError(t, err)
-//
-//	//postInteractionData, err := CreateSettlementPostInteractionData(details, FusionOrderV4{})
-//	//if err != nil {
-//	//	require.NoError(t, err)
-//	//}
-//
-//	amountData, err := extensionTmp.BuildAmountGetterData(postInteractionDataNew.Whitelist, true)
-//	require.NoError(t, err)
-//
-//	extension, err := NewExtension(ExtensionParams{
-//		SettlementContract:         extensionContract,
-//		AuctionDetails:             details.Auction,
-//		PostInteractionData:        nil,
-//		PostInteractionDataEncoded: encodedPostInteractionData,
-//		Asset:                      "0xc02aaa39b223fe8d0a0e5c4f27ead9083c756cc2",
-//		Surplus:                    SurplusParamsNoFee,
-//		AmountData:                 amountData,
-//	})
-//	require.NoError(t, err)
-//
-//	extensionEncoded, err := extension.ConvertToOrderbookExtension().Encode()
-//
-//	var receiver = "0x0000000000000000000000000000000000000000" // needs to be explicitly set
-//	extra := ExtraParams{
-//		AllowPartialFills:    true,
-//		AllowMultipleFills:   true,
-//		OrderExpirationDelay: 12,
-//		EnablePermit2:        false,
-//	}
-//
-//	makerTraits, err := CreateMakerTraits(details, extra)
-//	require.NoError(t, err)
-//
-//	var baseSalt int64 = 10
-//	// Save the original function
-//	originalBigIntMaxFunc := random_number_generation.BigIntMaxFunc
-//	// Monkey patch the function
-//	random_number_generation.BigIntMaxFunc = func(max *big.Int) (*big.Int, error) {
-//		return big.NewInt(baseSalt), nil
-//	}
-//	// Restore the original function after the test
-//	defer func() {
-//		random_number_generation.BigIntMaxFunc = originalBigIntMaxFunc
-//	}()
-//	salt, err := extension.GenerateSalt()
-//	require.NoError(t, err)
-//
-//	orderData := orderbook.OrderData{
-//		MakerAsset:   "0xc02aaa39b223fe8d0a0e5c4f27ead9083c756cc2",
-//		TakerAsset:   "0xa0b86991c6218b36c1d19d4a2e9eb0ce3606eb48",
-//		MakingAmount: "1000000000000000000",
-//		TakingAmount: "1420000000",
-//		Salt:         salt.String(),
-//		Maker:        "0x00000000219ab540356cbb839cbe05303d7705fa",
-//		Receiver:     getReceiver(details.FeesIntegratorResolver, extensionContract, receiver),
-//		MakerTraits:  makerTraits.Encode(),
-//		Extension:    extensionEncoded,
-//	}
-//
-//	order := FusionOrderV4{
-//		Maker:        orderData.Maker,
-//		MakerAsset:   orderData.MakerAsset,
-//		MakerTraits:  orderData.MakerTraits,
-//		MakingAmount: orderData.MakingAmount,
-//		Receiver:     orderData.Receiver,
-//		Salt:         orderData.Salt,
-//		TakerAsset:   orderData.TakerAsset,
-//		TakingAmount: orderData.TakingAmount,
-//	}
-//
-//	assert.Equal(t, "0x00000000219ab540356cbb839cbe05303d7705fa", order.Maker)
-//	assert.Equal(t, "0xc02aaa39b223fe8d0a0e5c4f27ead9083c756cc2", order.MakerAsset)
-//	assert.Equal(t, "1000000000000000000", order.MakingAmount)
-//	assert.Equal(t, "0x0000000000000000000000000000000000000000", order.Receiver)
-//	assert.Equal(t, "0xa0b86991c6218b36c1d19d4a2e9eb0ce3606eb48", order.TakerAsset)
-//	assert.Equal(t, "1420000000", order.TakingAmount)
-//	assert.Equal(t, "0x4a000000000000000000000000000000000063c0523500000000000000000000", order.MakerTraits)
-//	assert.Equal(t, "15367444032321112222254918300472459458657037823940", order.Salt)
-//	assert.Equal(t, "0x8273f37417Da37c4A6c3995E82Cf442f87a25D9c000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000006463c0516b01bb839cbe05303d7705fa0000ffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffff00", extension.PostInteraction)
-//}
-
 func TestCreateFusionOrderTdd(t *testing.T) {
 	tests := []struct {
 		name                    string
@@ -722,7 +593,7 @@ func TestCreateFusionOrderTdd(t *testing.T) {
 				TakerAsset:   "0xa0b86991c6218b36c1d19d4a2e9eb0ce3606eb48",
 				TakingAmount: "1420000000",
 				MakerTraits:  "0x4a000000000000000000000000000000000063c0523500000000000000000000",
-				Salt:         "15367444032321112222254918300472459458657037823940",
+				Salt:         "14679558882554932042282058802251795067956940930415",
 			},
 			expectedPostInteraction: "0x8273f37417da37c4a6c3995e82cf442f87a25d9c000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000006463c0516b01bb839cbe05303d7705fa0000ffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffff00",
 		},
@@ -756,7 +627,7 @@ func TestCreateFusionOrderTdd(t *testing.T) {
 				TakerAsset:   "0xa0b86991c6218b36c1d19d4a2e9eb0ce3606eb48",
 				TakingAmount: "1420000000",
 				MakerTraits:  "0x4a000000000000000000000000000000000063c0523500000000000000000000",
-				Salt:         "15367444032321112222254918300472459458657037823940",
+				Salt:         "16016700118879158052424223179219258028224998528613",
 			},
 			expectedPostInteraction: "0x8273f37417da37c4a6c3995e82cf442f87a25d9c000000000000000000000000000000000000000001000000000000000000000000000000000000000203e83200006463c0516b01bb839cbe05303d7705fa0000ffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffff00",
 		},
@@ -794,22 +665,6 @@ func TestCreateFusionOrderTdd(t *testing.T) {
 				CustomReceiver:     common.Address{},
 				AuctionFees:        tt.details.FeesNew,
 			}
-
-			//extensionTmp, err := NewExtension(ExtensionParams{
-			//	SettlementContract:  extensionContract,
-			//	AuctionDetails:      tt.details.Auction,
-			//	PostInteractionData: nil,
-			//	Asset:               "0xc02aaa39b223fe8d0a0e5c4f27ead9083c756cc2",
-			//	Surplus:             SurplusParamsNoFee,
-			//	ResolvingStartTime:  tt.details.ResolvingStartTime,
-			//})
-			//// TODO put this in the constructor
-			//extensionTmp.Fees = tt.details.FeesIntegratorResolver
-			//
-			//require.NoError(t, err)
-
-			//encodedPostInteractionData, err := postInteractionData.EncodeNew(*extensionTmp)
-			//require.NoError(t, err)
 
 			extension, err := NewExtension(ExtensionParams{
 				SettlementContract:  extensionContract,
@@ -865,7 +720,7 @@ func TestCreateFusionOrderTdd(t *testing.T) {
 			assert.Equal(t, tt.expected.TakerAsset, order.TakerAsset)
 			assert.Equal(t, tt.expected.TakingAmount, order.TakingAmount)
 			assert.Equal(t, tt.expected.MakerTraits, order.MakerTraits)
-			//assert.Equal(t, tt.expected.Salt, order.Salt)
+			assert.Equal(t, tt.expected.Salt, order.Salt)
 			assert.Equal(t, tt.expectedPostInteraction, extension.PostInteraction)
 		})
 	}
