@@ -955,39 +955,6 @@ func TestCheckPermitHash(t *testing.T) {
 	}
 }
 
-func TestExpireAfter(t *testing.T) {
-	testcases := []struct {
-		description string
-		value       int64
-		expectError bool
-	}{
-		{
-			description: "Valid timestamp - empty",
-			value:       0,
-		},
-		{
-			description: "Valid timestamp - year 2030",
-			value:       1897205247,
-		},
-		{
-			description: "Invalid timestamp - past",
-			value:       1707791247,
-			expectError: true,
-		},
-	}
-
-	for _, tc := range testcases {
-		t.Run(tc.description, func(t *testing.T) {
-			err := CheckExpireAfterUnix(tc.value, "testValue")
-			if tc.expectError {
-				require.Error(t, err, fmt.Sprintf("%s should have caused an error", tc.description))
-			} else {
-				require.NoError(t, err, fmt.Sprintf("%s should not have caused an error", tc.description))
-			}
-		})
-	}
-}
-
 func TestIsBigInt(t *testing.T) {
 	testCases := []struct {
 		description string

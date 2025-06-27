@@ -3,6 +3,7 @@ package fusionplus
 import (
 	"context"
 	"encoding/json"
+	"errors"
 	"fmt"
 
 	"github.com/1inch/1inch-sdk-go/common"
@@ -91,6 +92,8 @@ func (api *api) GetActiveOrders(ctx context.Context, params OrderApiControllerGe
 func (api *api) GetQuote(ctx context.Context, params QuoterControllerGetQuoteParamsFixed) (*GetQuoteOutputFixed, error) {
 	u := "/fusion-plus/quoter/v1.0/quote/receive"
 
+	return nil, errors.New("fusion Plus API currently not supported")
+
 	err := params.Validate()
 	if err != nil {
 		return nil, err
@@ -152,7 +155,7 @@ func (api *api) PlaceOrder(ctx context.Context, quoteParams QuoterControllerGetQ
 		return "", fmt.Errorf("failed to get preset: %v", err)
 	}
 
-	// TODO orders will now be allowed with multiple secret hashes for now
+	// TODO orders will not be allowed with multiple secret hashes for now
 	if len(orderParams.SecretHashes) > 1 {
 		return "", fmt.Errorf("Multiple secret hashes are not supported at this time. Please ")
 	}
@@ -189,7 +192,7 @@ func (api *api) PlaceOrder(ctx context.Context, quoteParams QuoterControllerGetQ
 
 	body, err := json.Marshal(signedOrder)
 	if err != nil {
-		return "", err
+		return "", fmt.Errorf("failed to serialize order: %v", err)
 	}
 
 	payload := common.RequestPayload{
@@ -201,7 +204,7 @@ func (api *api) PlaceOrder(ctx context.Context, quoteParams QuoterControllerGetQ
 
 	err = api.httpExecutor.ExecuteRequest(ctx, payload, nil)
 	if err != nil {
-		return "", err
+		return "", fmt.Errorf("failed to place order: %v", err)
 	}
 
 	return fusionPlusOrder.Hash, nil

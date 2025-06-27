@@ -8,7 +8,6 @@ import (
 	"time"
 
 	"github.com/1inch/1inch-sdk-go/common"
-	"github.com/1inch/1inch-sdk-go/internal/bigint"
 	geth_common "github.com/ethereum/go-ethereum/common"
 
 	random_number_generation "github.com/1inch/1inch-sdk-go/internal/random-number-generation"
@@ -38,26 +37,14 @@ func CreateFusionOrderData(quote GetQuoteOutputFixed, orderParams OrderParams, w
 		takerAsset = takerAssetWrapped.Hex()
 	}
 
-	//TODO this should be parsed as a big.int after the generated struct types are fixed
-	bankFee, err := bigint.FromString(preset.BankFee)
-	if err != nil {
-		return nil, nil, fmt.Errorf("error parsing bank fee: %v", err)
-	}
-
-	fees := Fees{
-		IntFee: IntegratorFee{
-			Ratio:    bpsToRatioFormat(orderParams.Fee.TakingFeeBps),
-			Receiver: orderParams.Fee.TakingFeeReceiver,
-		},
-		BankFee: bankFee,
-	}
-
 	whitelistAddresses := make([]AuctionWhitelistItem, 0)
+	whitelistAddressesStrings := make([]string, 0)
 	for _, address := range quote.Whitelist {
 		whitelistAddresses = append(whitelistAddresses, AuctionWhitelistItem{
 			Address:   geth_common.HexToAddress(address),
 			AllowFrom: big.NewInt(0), // TODO generating the correct list here requires checking for an exclusive resolver. This needs to be checked for later. The generated object does not see exclusive resolver correctly
 		})
+		whitelistAddressesStrings = append(whitelistAddressesStrings, address)
 	}
 
 	var nonce *big.Int
@@ -75,9 +62,13 @@ func CreateFusionOrderData(quote GetQuoteOutputFixed, orderParams OrderParams, w
 	}
 
 	details := Details{
-		Auction:   auctionDetails,
-		Fees:      fees,
-		Whitelist: whitelistAddresses,
+		Auction: auctionDetails,
+		FeesNew: &FeesIntegratorResolver{
+			Resolver:   ResolverFee{},
+			Integrator: IntegratorFeeNew{},
+		},
+		Whitelist:          whitelistAddresses,
+		ResolvingStartTime: big.NewInt(int64(auctionDetails.StartTime)),
 	}
 	extraParams := ExtraParams{
 		Nonce:                nonce,
@@ -102,9 +93,24 @@ func CreateFusionOrderData(quote GetQuoteOutputFixed, orderParams OrderParams, w
 		TakingAmount: preset.AuctionEndAmount,
 	}
 
-	postInteractionData, err := CreateSettlementPostInteractionData(details, orderInfo)
+	whitelist, err := GenerateWhitelist(whitelistAddressesStrings, details.ResolvingStartTime)
+	if err != nil {
+		return nil, nil, fmt.Errorf("error generating whitelist: %v", err)
+	}
+	postInteractionData, err := CreateSettlementPostInteractionData(details, whitelist, orderInfo)
 	if err != nil {
 		return nil, nil, fmt.Errorf("error creating post interaction data: %v", err)
+	}
+
+	marketAmountBig := big.NewInt(0)
+	_, ok := marketAmountBig.SetString(quote.MarketAmount, 10)
+	if !ok {
+		return nil, nil, fmt.Errorf("error parsing marketAmount: %v", quote.MarketAmount)
+	}
+
+	surplus, err := NewSurplusParams(marketAmountBig, FromPercent(float64(quote.SurplusFee), GetDefaultBase()))
+	if err != nil {
+		return nil, nil, fmt.Errorf("error creating surplus: %v", err)
 	}
 
 	extension, err := NewExtension(ExtensionParams{
@@ -113,6 +119,8 @@ func CreateFusionOrderData(quote GetQuoteOutputFixed, orderParams OrderParams, w
 		PostInteractionData: postInteractionData,
 		Asset:               orderInfo.MakerAsset,
 		Permit:              extraParams.Permit,
+		ResolvingStartTime:  details.ResolvingStartTime,
+		Surplus:             surplus,
 	})
 	if err != nil {
 		return nil, nil, fmt.Errorf("error creating extension: %v", err)
@@ -131,16 +139,30 @@ func CreateFusionOrderData(quote GetQuoteOutputFixed, orderParams OrderParams, w
 		return nil, nil, fmt.Errorf("error creating fusion order: %v", err)
 	}
 
+	orderbookExtension := fusionOrder.FusionExtension.ConvertToOrderbookExtension()
+	orderbookExtensionEncoded, err := orderbookExtension.Encode()
+	if err != nil {
+		return nil, nil, fmt.Errorf("error encoding orderbookExtension: %v", err)
+	}
+
+	salt, err := orderbook.GenerateSalt(orderbookExtensionEncoded, nil)
+	if err != nil {
+		return nil, nil, fmt.Errorf("error generating salt for orderbook: %v", err)
+	}
+
 	limitOrder, err := orderbook.CreateLimitOrderMessage(orderbook.CreateOrderParams{
-		Wallet:       wallet,
-		MakerTraits:  makerTraits,
-		Extension:    *fusionOrder.FusionExtension.ConvertToOrderbookExtension(),
-		Maker:        fusionOrder.OrderInfo.Maker,
-		MakerAsset:   fusionOrder.OrderInfo.MakerAsset,
-		TakerAsset:   fusionOrder.OrderInfo.TakerAsset,
-		TakingAmount: fusionOrder.OrderInfo.TakingAmount,
-		MakingAmount: fusionOrder.OrderInfo.MakingAmount,
-		Taker:        fusionOrder.OrderInfo.Receiver,
+		Wallet:             wallet,
+		MakerTraits:        makerTraits,
+		MakerTraitsEncoded: makerTraits.Encode(),
+		Extension:          *orderbookExtension,
+		ExtensionEncoded:   orderbookExtensionEncoded,
+		Salt:               salt,
+		Maker:              fusionOrder.OrderInfo.Maker,
+		MakerAsset:         fusionOrder.OrderInfo.MakerAsset,
+		TakerAsset:         fusionOrder.OrderInfo.TakerAsset,
+		TakingAmount:       fusionOrder.OrderInfo.TakingAmount,
+		MakingAmount:       fusionOrder.OrderInfo.MakingAmount,
+		Taker:              fusionOrder.OrderInfo.Receiver,
 	}, int(chainId))
 	if err != nil {
 		return nil, nil, fmt.Errorf("error creating limit order message: %v", err)
@@ -157,7 +179,7 @@ func getPreset(presets QuotePresetsClassFixed, presetType GetQuoteOutputRecommen
 	switch presetType {
 	case Custom:
 		if presets.Custom == nil {
-			return nil, errors.New("custom preset is not available") // TODO support custom presets
+			return nil, errors.New("custom preset selected, but no custom preset data provided")
 		}
 		return presets.Custom, nil
 	case Fast:
@@ -211,22 +233,28 @@ func GetCurrentTime() int64 {
 	return time.Now().Unix()
 }
 
-func CreateSettlementPostInteractionData(details Details, orderInfo FusionOrderV4) (*SettlementPostInteractionData, error) {
+func CreateSettlementPostInteractionData(details Details, whitelist []WhitelistItem, orderInfo FusionOrderV4) (*SettlementPostInteractionData, error) {
 	resolverStartTime := details.ResolvingStartTime
 	if details.ResolvingStartTime == nil || details.ResolvingStartTime.Cmp(big.NewInt(0)) == 0 {
 		resolverStartTime = big.NewInt(timeNow())
 	}
-	return NewSettlementPostInteractionData(SettlementSuffixData{
-		Whitelist:          details.Whitelist,
-		IntegratorFee:      &details.Fees.IntFee,
-		BankFee:            details.Fees.BankFee,
+
+	return &SettlementPostInteractionData{
+		Whitelist:          whitelist,
+		AuctionFees:        details.FeesNew,
 		ResolvingStartTime: resolverStartTime,
 		CustomReceiver:     geth_common.HexToAddress(orderInfo.Receiver),
-	})
+	}, nil
 }
 
 func CreateMakerTraits(details Details, extraParams ExtraParams) (*orderbook.MakerTraits, error) {
 	deadline := details.Auction.StartTime + details.Auction.Duration + extraParams.OrderExpirationDelay
+	var nonce int64
+	if extraParams.Nonce == nil {
+		nonce = 0
+	} else {
+		nonce = extraParams.Nonce.Int64()
+	}
 	makerTraitParms := orderbook.MakerTraitsParams{
 		Expiry:             int64(deadline),
 		AllowPartialFills:  extraParams.AllowPartialFills,
@@ -235,7 +263,7 @@ func CreateMakerTraits(details Details, extraParams ExtraParams) (*orderbook.Mak
 		UnwrapWeth:         extraParams.unwrapWeth,
 		UsePermit2:         extraParams.EnablePermit2,
 		HasExtension:       true,
-		Nonce:              extraParams.Nonce.Int64(),
+		Nonce:              nonce,
 	}
 	makerTraits, err := orderbook.NewMakerTraits(makerTraitParms)
 	if err != nil {
@@ -259,13 +287,15 @@ type CreateOrderDataParams struct {
 	MakerTraits         *orderbook.MakerTraits
 }
 
-func CreateOrder(params CreateOrderDataParams) (*Order, error) {
-	var receiver geth_common.Address
-	if params.PostInteractionData.IntegratorFee.Ratio != nil && params.PostInteractionData.IntegratorFee.Ratio.Cmp(big.NewInt(0)) != 0 {
-		receiver = geth_common.HexToAddress(params.SettlementAddress)
-	} else {
-		receiver = geth_common.HexToAddress(params.orderInfo.Receiver)
+func getReceiver(fees *FeesIntegratorResolver, settlementAddress string, receiver string) string {
+	if fees != nil {
+		return settlementAddress
 	}
+	return receiver
+}
+
+func CreateOrder(params CreateOrderDataParams) (*Order, error) {
+	receiver := getReceiver(params.Details.FeesNew, params.SettlementAddress, params.orderInfo.Receiver)
 
 	salt, err := params.Extension.GenerateSalt()
 	if err != nil {
@@ -281,7 +311,7 @@ func CreateOrder(params CreateOrderDataParams) (*Order, error) {
 			TakingAmount: params.orderInfo.TakingAmount,
 			Salt:         fmt.Sprintf("%x", salt),
 			Maker:        params.orderInfo.Maker,
-			Receiver:     receiver.Hex(),
+			Receiver:     receiver,
 			MakerTraits:  params.MakerTraits.Encode(),
 			Extension:    fmt.Sprintf("%x", params.Extension.Keccak256()),
 		},

@@ -18,11 +18,12 @@ var (
 )
 
 const (
-	usdc    = "0x3c499c542cEF5E3811e1192ce70d8cC03d5c3359"
-	wmatic  = "0x0d500B1d8E8eF31E21C99d1Db9A6444d3ADf1270"
-	weth    = "0x7ceB23fD6bC0adD59E62ac25578270cFf1b9f619"
-	amount  = "200000000000000"
-	chainId = 137
+	usdc       = "0x3c499c542cEF5E3811e1192ce70d8cC03d5c3359"
+	wmatic     = "0x0d500B1d8E8eF31E21C99d1Db9A6444d3ADf1270"
+	weth       = "0x7ceB23fD6bC0adD59E62ac25578270cFf1b9f619"
+	amountEth  = "200000000000000" // ~50 cents of ETH
+	amountUSDC = "500000"          // 50 cents of USDC
+	chainId    = 137
 )
 
 func main() {
@@ -41,17 +42,28 @@ func main() {
 	}
 	ctx := context.Background()
 
-	fromToken := weth
-	toToken := usdc
+	fromToken := usdc
+	toToken := weth
+	amount := amountUSDC
 
-	response, err := client.GetQuote(ctx, fusion.QuoterControllerGetQuoteParamsFixed{
-		FromTokenAddress: fromToken,
-		ToTokenAddress:   toToken,
-		Amount:           amount,
-		WalletAddress:    publicAddress,
-		EnableEstimate:   true,
-		Surplus:          true,
-	})
+	response, err := client.GetQuoteWithCustomPreset(ctx,
+		fusion.QuoterControllerGetQuoteWithCustomPresetsParamsFixed{
+			FromTokenAddress: fromToken,
+			ToTokenAddress:   toToken,
+			Amount:           amount,
+			WalletAddress:    publicAddress,
+			EnableEstimate:   true,
+			Surplus:          true,
+		},
+		fusion.CustomPreset{
+			AuctionDuration:    30,
+			AuctionStartAmount: "240000000000000",
+			AuctionEndAmount:   "150000000000000",
+			Points: []fusion.CustomPresetPoint{
+				{ToTokenAmount: "240000000000000", Delay: 10},
+				{ToTokenAmount: "150000000000000", Delay: 20},
+			},
+		})
 	if err != nil {
 		log.Fatalf("failed to request: %v", err)
 	}
@@ -68,7 +80,7 @@ func main() {
 		ToTokenAddress:   toToken,
 		Amount:           amount,
 		Receiver:         "0x0000000000000000000000000000000000000000",
-		Preset:           fusion.Fast,
+		Preset:           fusion.Custom,
 	}
 
 	orderHash, err := client.PlaceOrder(ctx, *response, orderParams, client.Wallet)
@@ -79,6 +91,7 @@ func main() {
 	fmt.Printf("Order placed! Order hash: %s\n", orderHash)
 	fmt.Println("Monitoring order until it completes...")
 
+	auctionSecondsPassed := 0
 	for {
 		select {
 		case <-time.After(1 * time.Second):
@@ -88,8 +101,13 @@ func main() {
 				return
 			}
 
+			auctionSecondsPassed++
+			fmt.Printf("Seconds passed: %v\n", auctionSecondsPassed)
 			fmt.Printf("Order status: %s\n", order.Status)
 			if order.Status == "filled" {
+				return
+			}
+			if order.Status == "expired" {
 				return
 			}
 		}

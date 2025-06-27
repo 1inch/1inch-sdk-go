@@ -2,6 +2,7 @@ package fusion
 
 import (
 	"fmt"
+	"strings"
 
 	"github.com/1inch/1inch-sdk-go/internal/hexadecimal"
 	"github.com/ethereum/go-ethereum/common"
@@ -13,18 +14,18 @@ type Interaction struct {
 	Data   string
 }
 
-func NewInteraction(target common.Address, data string) *Interaction {
+func NewInteraction(target common.Address, data string) (*Interaction, error) {
 	if _, err := hexutil.Decode(data); err != nil {
-		panic("Interaction data must be valid hex bytes")
+		return nil, fmt.Errorf("failed to decode interaction data: %v", err)
 	}
 	return &Interaction{
 		Target: target,
 		Data:   data,
-	}
+	}, nil
 }
 
 func (i *Interaction) Encode() string {
-	return i.Target.String() + hexadecimal.Trim0x(i.Data)
+	return strings.ToLower(i.Target.String()) + hexadecimal.Trim0x(i.Data)
 }
 
 func DecodeInteraction(bytes string) (*Interaction, error) {

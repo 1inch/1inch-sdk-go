@@ -14,7 +14,7 @@ import (
 
 var (
 	privateKey     = os.Getenv("WALLET_KEY")
-	nodeUrl        = os.Getenv("NODE_URL")
+	nodeUrl        = os.Getenv("NODE_URL_BACKUP")
 	devPortalToken = os.Getenv("DEV_PORTAL_TOKEN")
 )
 
@@ -67,11 +67,17 @@ func main() {
 		log.Fatalf("Failed to create maker traits: %v", err)
 	}
 
+	salt, err := orderbook.GenerateSalt("", nil)
+	if err != nil {
+		log.Fatalf("Failed to generate salt: %v", err)
+	}
+
 	createOrderResponse, err := client.CreateOrder(ctx, orderbook.CreateOrderParams{
 		Wallet:                         client.Wallet,
 		SeriesNonce:                    seriesNonce,
 		MakerTraits:                    makerTraits,
-		ExpireAfterUnix:                time.Now().Add(time.Hour * 10).Unix(),
+		MakerTraitsEncoded:             makerTraits.Encode(),
+		Salt:                           salt,
 		Maker:                          client.Wallet.Address().Hex(),
 		MakerAsset:                     wmatic,
 		TakerAsset:                     usdc,

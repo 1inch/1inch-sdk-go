@@ -54,6 +54,10 @@ func (api *api) GetQuote(ctx context.Context, params QuoterControllerGetQuotePar
 		return nil, err
 	}
 
+	if params.Surplus != true {
+		return nil, fmt.Errorf("surplus query parameter must be true to get quote")
+	}
+
 	payload := common.RequestPayload{
 		Method: "GET",
 		Params: params,
@@ -70,16 +74,26 @@ func (api *api) GetQuote(ctx context.Context, params QuoterControllerGetQuotePar
 	return &response, nil
 }
 
-func (api *api) GetQuoteWithCustomPreset(ctx context.Context, params QuoterControllerGetQuoteWithCustomPresetsParams, presetDetails QuoterControllerGetQuoteWithCustomPresetsJSONRequestBody) (*GetQuoteOutputFixed, error) {
+func (api *api) GetQuoteWithCustomPreset(ctx context.Context, params QuoterControllerGetQuoteWithCustomPresetsParamsFixed, customPreset CustomPreset) (*GetQuoteOutputFixed, error) {
 	u := fmt.Sprintf("/fusion/quoter/v2.0/%d/quote/receive", api.chainId)
 
-	body, err := json.Marshal(presetDetails)
+	err := params.Validate()
+	if err != nil {
+		return nil, err
+	}
+
+	err = customPreset.Validate()
+	if err != nil {
+		return nil, err
+	}
+
+	body, err := json.Marshal(customPreset)
 	if err != nil {
 		return nil, err
 	}
 
 	payload := common.RequestPayload{
-		Method: "GET",
+		Method: "POST",
 		Params: params,
 		U:      u,
 		Body:   body,

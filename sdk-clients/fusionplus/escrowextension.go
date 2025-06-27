@@ -3,7 +3,6 @@ package fusionplus
 import (
 	"bytes"
 	"encoding/binary"
-	"encoding/hex"
 	"fmt"
 	"log"
 	"math/big"
@@ -84,52 +83,6 @@ func (e *EscrowExtension) ConvertToOrderbookExtension() (*orderbook.Extension, e
 		PreInteraction:   e.PreInteraction,
 		PostInteraction:  e.PostInteraction,
 		//hexadecimal.Trim0x(e.CustomData), // TODO Blocking custom data for now because it is breaking the cumsum method. The extension constructor will return with an error if the user provides this field.
-	}, nil
-}
-
-// DecodeEscrowExtension decodes the input byte slice into an Extension struct using reflection.
-func DecodeEscrowExtension(data []byte) (*EscrowExtension, error) {
-
-	const extraDataCharacterLength = 320
-
-	// Create one extension that will be used for the Escrow extension data
-	orderbookExtensionTruncated, err := orderbook.Decode(data)
-	if err != nil {
-		return nil, fmt.Errorf("error decoding extension: %v", err)
-	}
-
-	// Remove the Fusion Plus Extension data before decoding
-	orderbookExtensionTruncated.PostInteraction = orderbookExtensionTruncated.PostInteraction[:len(orderbookExtensionTruncated.PostInteraction)-extraDataCharacterLength]
-	fusionExtension, err := fusion.FromLimitOrderExtension(orderbookExtensionTruncated)
-	if err != nil {
-		return &EscrowExtension{}, fmt.Errorf("error decoding escrow extension: %v", err)
-	}
-
-	// Create a second extension that will be used as a Fusion extension
-	orderbookExtension, err := orderbook.Decode(data)
-	if err != nil {
-		return nil, fmt.Errorf("error decoding extension: %v", err)
-	}
-	extraDataRaw := orderbookExtension.PostInteraction[len(orderbookExtension.PostInteraction)-extraDataCharacterLength:]
-	extraDataBytes, err := hex.DecodeString(extraDataRaw)
-	if err != nil {
-		return nil, fmt.Errorf("error decoding escrow extension extra data: %v", err)
-	}
-
-	// Send the final 160 bytes of the postInteraction to decodeExtraData
-	extraData, err := decodeExtraData(extraDataBytes)
-	if err != nil {
-		return nil, fmt.Errorf("error decoding escrow extension extra data: %v", err)
-	}
-
-	return &EscrowExtension{
-		Extension:        *fusionExtension,
-		HashLock:         extraData.HashLock,
-		DstChainId:       extraData.DstChainId,
-		DstToken:         extraData.DstToken,
-		SrcSafetyDeposit: fmt.Sprintf("%x", extraData.SrcSafetyDeposit),
-		DstSafetyDeposit: fmt.Sprintf("%x", extraData.DstSafetyDeposit),
-		TimeLocks:        *extraData.TimeLocks,
 	}, nil
 }
 

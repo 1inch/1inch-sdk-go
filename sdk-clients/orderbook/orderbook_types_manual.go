@@ -14,6 +14,8 @@ type CreateOrderParams struct {
 	MakerTraits                    *MakerTraits
 	Extension                      Extension
 	ExtensionEncoded               string
+	MakerTraitsEncoded             string
+	Salt                           string
 	Maker                          string
 	MakerAsset                     string
 	TakerAsset                     string

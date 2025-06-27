@@ -38,7 +38,7 @@ func main() {
 	srcToken := "0xaf88d065e77c8cC2239327C5EDb3A432268e5831"
 	dstToken := "0x833589fCD6eDb6E08f4c7C32D4f71b54bdA02913"
 
-	invert := true
+	invert := false
 	if invert {
 		srcChain, dstChain = dstChain, srcChain
 		srcToken, dstToken = dstToken, srcToken
