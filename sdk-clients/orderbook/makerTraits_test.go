@@ -23,14 +23,14 @@ func TestMakerTraitsEncode(t *testing.T) {
 				UnwrapWeth:         false,
 				HasExtension:       true,
 				HasPreInteraction:  false,
-				HasPostInteraction: false,
+				HasPostInteraction: true,
 				AllowPartialFills:  true,
 				AllowMultipleFills: true,
 				Expiry:             1715201499,
 				Nonce:              0,
 				Series:             0,
 			},
-			expectedMakerTraits: "0x420000000000000000000000000000000000663be5db00000000000000000000",
+			expectedMakerTraits: "0x4a0000000000000000000000000000000000663be5db00000000000000000000",
 		},
 	}
 
