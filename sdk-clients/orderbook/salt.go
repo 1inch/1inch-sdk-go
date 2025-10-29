@@ -11,7 +11,7 @@ import (
 
 type GetSaltParams struct {
 	Extension string
-	Source    *string // Optional string for tracking code (defaults to "sdk" if nil)
+	Source    *string // Optional string for tracking code
 	UseRandom bool    // If true, uses random bits for the middle section; otherwise uses timestamp
 }
 

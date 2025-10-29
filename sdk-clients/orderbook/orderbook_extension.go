@@ -11,6 +11,8 @@ import (
 
 const nullAddress = "0x0000000000000000000000000000000000000000"
 
+// packFeeParameter encodes integrator and resolver fee details into a single 48-bit value with error checks on input ranges.
+// Returns the packed 48-bit value and an error if any input values exceed their allowed ranges.
 func packFeeParameter(integratorFee *IntegratorFee, resolverFee *ResolverFee) (uint64, error) {
 	var integratorFeeValue uint64 = 0
 	var integratorShare uint64 = 0
@@ -49,6 +51,8 @@ func packFeeParameter(integratorFee *IntegratorFee, resolverFee *ResolverFee) (u
 	return packed, nil
 }
 
+// encodeWhitelist encodes a list of Ethereum addresses into a single *big.Int value with a specific bit layout.
+// Returns an error if any address is invalid, has more than 255 addresses, or encounters issues during encoding.
 func encodeWhitelist(whitelist []string) (*big.Int, error) {
 	if len(whitelist) == 0 {
 		return big.NewInt(0), nil
@@ -64,7 +68,7 @@ func encodeWhitelist(whitelist []string) (*big.Int, error) {
 
 	for _, address := range whitelist {
 		address = strings.TrimPrefix(address, "0x")
-		address = strings.TrimPrefix(address, "0X")
+		address = strings.TrimPrefix(address, "0X") // Check for capital x too
 
 		addressInt := new(big.Int)
 		_, success := addressInt.SetString(address, 16)
@@ -116,6 +120,7 @@ func concatFeeAndWhitelist(whitelist []string, integratorFee *IntegratorFee, res
 	return feeAndWhitelist, totalBitLength, nil
 }
 
+// buildFeePostInteractionData encodes interaction data combining receiver, fee, whitelist, and optional interaction inputs into a byte array.
 func buildFeePostInteractionData(params *buildFeePostInteractionDataParams) ([]byte, error) {
 
 	if params.Whitelist == nil {
@@ -278,22 +283,16 @@ func BuildOrderExtensionBytes(params *BuildOrderExtensionBytesParams) (string, e
 
 // buildExtensionFromBytes builds an extension hex string from byte slices
 func buildExtensionFromBytes(interactions [][]byte) string {
-	// Calculate offsets for first 8 interactions only
 	var byteCounts []int
 	var dataBytes []byte
 
-	// Process first 8 interactions (excluding customData)
-	mainInteractions := interactions
-	if len(interactions) > 8 {
-		mainInteractions = interactions[:8]
+	// Process first 8 interactions (these are used in the cumulative sum calculation)
+	for i := 0; i < len(interactions) && i < 8; i++ {
+		byteCounts = append(byteCounts, len(interactions[i]))
+		dataBytes = append(dataBytes, interactions[i]...)
 	}
 
-	for _, interaction := range mainInteractions {
-		byteCounts = append(byteCounts, len(interaction))
-		dataBytes = append(dataBytes, interaction...)
-	}
-
-	// Add customData if present (9th element)
+	// Add customData if present (no offset data)
 	if len(interactions) > 8 {
 		dataBytes = append(dataBytes, interactions[8]...)
 	}
@@ -308,15 +307,13 @@ func buildExtensionFromBytes(interactions [][]byte) string {
 		offsets = append(offsetBytes, offsets...)
 	}
 
-	// If no data, return empty extension
+	// If no data, return an empty extension
 	if len(dataBytes) == 0 {
 		return "0x"
 	}
 
-	// Encode offsets and data to hex
 	offsetsHex := hex.EncodeToString(offsets)
 	dataHex := hex.EncodeToString(dataBytes)
 
-	// Concatenate with "0x" prefix
 	return "0x" + offsetsHex + dataHex
 }
