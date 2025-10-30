@@ -70,7 +70,7 @@ type OrderData struct {
 	TakingAmount  string `json:"takingAmount"`
 	Salt          string `json:"salt"`
 	Maker         string `json:"maker"`
-	AllowedSender string `json:"allowedSender"`
+	AllowedSender string `json:"allowedSender,omitempty"`
 	Receiver      string `json:"receiver"`
 	MakerTraits   string `json:"makerTraits"`
 	Extension     string `json:"extension"`
@@ -100,26 +100,19 @@ type OrderResponseExtended struct {
 }
 
 type GetOrderByHashResponse struct {
-	ID                   int         `json:"id"`
-	OrderHash            string      `json:"orderHash"`
-	CreateDateTime       time.Time   `json:"createDateTime"`
-	LastChangedDateTime  time.Time   `json:"lastChangedDateTime"`
-	TakerAsset           string      `json:"takerAsset"`
-	MakerAsset           string      `json:"makerAsset"`
-	OrderMaker           string      `json:"orderMaker"`
-	OrderStatus          int         `json:"orderStatus"`
-	MakerAmount          string      `json:"makerAmount"`
-	RemainingMakerAmount string      `json:"remainingMakerAmount"`
-	MakerBalance         string      `json:"makerBalance"`
-	MakerAllowance       string      `json:"makerAllowance"`
-	TakerAmount          string      `json:"takerAmount"`
-	Data                 OrderData   `json:"data"`
-	MakerRate            string      `json:"makerRate"`
-	TakerRate            string      `json:"takerRate"`
-	TakerRateDoubled     float64     `json:"takerRateDoubled"`
-	OrderHashSelector    int         `json:"orderHashSelector"`
-	OrderInvalidReason   interface{} `json:"orderInvalidReason"`
-	IsMakerContract      bool        `json:"isMakerContract"`
+	OrderHash            string    `json:"orderHash"`
+	CreateDateTime       time.Time `json:"createDateTime"`
+	Signature            string    `json:"signature"`
+	OrderStatus          int       `json:"orderStatus"`
+	RemainingMakerAmount string    `json:"remainingMakerAmount"`
+	MakerBalance         string    `json:"makerBalance"`
+	MakerAllowance       string    `json:"makerAllowance"`
+	Data                 OrderData `json:"data"`
+	MakerRate            string    `json:"makerRate"`
+	TakerRate            string    `json:"takerRate"`
+	OrderInvalidReason   string    `json:"orderInvalidReason"`
+	IsMakerContract      bool      `json:"isMakerContract"`
+	Events               string    `json:"events"`
 }
 
 type CountResponse struct {
@@ -144,6 +137,15 @@ type GetOrderByHashResponseExtended struct {
 	GetOrderByHashResponse
 
 	LimitOrderDataNormalized NormalizedLimitOrderData
+}
+
+type Orders struct {
+	Meta struct {
+		HasMore    bool   `json:"hasMore"`
+		NextCursor string `json:"nextCursor"`
+		Count      int    `json:"count"`
+	} `json:"meta"`
+	Items []GetOrderByHashResponse `json:"items"`
 }
 
 type OrderExtendedWithSignature struct {
@@ -176,4 +178,71 @@ type TakerTraitsParams struct {
 type TakerTraitsCalldata struct {
 	Trait *big.Int
 	Args  string
+}
+
+type GetFeeInfoParams struct {
+	MakerAsset  string `url:"makerAsset"`
+	TakerAsset  string `url:"takerAsset"`
+	MakerAmount string `url:"makerAmount"`
+	TakerAmount string `url:"takerAmount"`
+}
+
+type FeeInfoResponse struct {
+	Whitelist                map[string]string `json:"whitelist"`                // Map of resolver addresses to their corresponding addresses
+	FeeBps                   int               `json:"feeBps"`                   // Fee in basis points (e.g., 50 = 0.5%)
+	WhitelistDiscountPercent int               `json:"whitelistDiscountPercent"` // Discount percentage for whitelisted resolvers (e.g., 50 = 50% off)
+	ProtocolFeeReceiver      string            `json:"protocolFeeReceiver"`      // Address that receives protocol fees
+	ExtensionAddress         string            `json:"extensionAddress"`         // Address of the fee extension contract
+}
+
+type OrderStatus int
+
+const (
+	ValidOrders              OrderStatus = 1
+	TemporarilyInvalidOrders OrderStatus = 2
+	InvalidOrders            OrderStatus = 3
+)
+
+type GetOrderCountParams struct {
+	Statuses   []OrderStatus `url:"Statuses"`
+	TakerAsset string        `url:"TakerAsset"`
+	MakerAsset string        `url:"MakerAsset"`
+}
+
+type GetOrderCountResponse struct {
+	Count int `json:"count"`
+}
+
+type IntegratorFee struct {
+	Integrator string
+	Protocol   string
+	Fee        int // Fee in basis points (e.g., 1 = 0.01%, 100 = 1%)
+	Share      int // Integrator's share in basis points (e.g., 1 = 0.01%, 100 = 1%)
+}
+
+type ResolverFee struct {
+	Receiver          string
+	Fee               int // Fee in basis points (e.g., 1 = 0.01%, 100 = 1%)
+	WhitelistDiscount int // Discount percentage for whitelisted addresses (0-100)
+}
+
+type buildFeePostInteractionDataParams struct {
+	CustomReceiver         bool
+	CustomReceiverAddress  string
+	IntegratorFee          *IntegratorFee
+	ResolverFee            *ResolverFee
+	Whitelist              []string
+	ExtraInteractionTarget string
+	ExtraInteractionData   []byte
+}
+
+type BuildOrderExtensionBytesParams struct {
+	ExtensionTarget  string
+	IntegratorFee    *IntegratorFee
+	ResolverFee      *ResolverFee
+	Whitelist        map[string]string
+	MakerPermit      []byte
+	CustomReceiver   string
+	ExtraInteraction []byte
+	CustomData       []byte
 }

@@ -39,7 +39,7 @@ func (c *Client) GetSeriesNonce(ctx context.Context, publicAddress gethCommon.Ad
 	return nonce, nil
 }
 
-func (c *Client) GetFillOrderCalldata(order *OrderExtendedWithSignature, takerTraits *TakerTraits) ([]byte, error) {
+func (c *Client) GetFillOrderCalldata(order *GetOrderByHashResponseExtended, takerTraits *TakerTraits) ([]byte, error) {
 
 	var function string
 	if order.Data.Extension == "0x" {
