@@ -146,17 +146,12 @@ type Details struct {
 	Auction            *AuctionDetails `json:"auction"`
 	Whitelist          []AuctionWhitelistItem
 	ResolvingStartTime *big.Int
-	FeesNew            *FeesIntegratorResolver
+	FeesIntAndRes      *FeesIntegratorAndResolver
 }
 
-type FeesIntegratorResolver struct {
+type FeesIntegratorAndResolver struct {
 	Resolver   ResolverFee
-	Integrator IntegratorFeeNew
-}
-
-type IntegratorFee struct {
-	Ratio    *big.Int
-	Receiver common.Address
+	Integrator IntegratorFee
 }
 
 type AuctionWhitelistItem struct {
@@ -176,15 +171,6 @@ type ExtraParams struct {
 	EnablePermit2        bool
 	Source               string
 	unwrapWeth           bool
-}
-
-type SettlementSuffixData struct {
-	Whitelist          []AuctionWhitelistItem
-	IntegratorFee      *IntegratorFee
-	BankFee            *big.Int
-	ResolvingStartTime *big.Int
-	CustomReceiver     common.Address
-	Fees               FeesIntegratorResolver
 }
 
 type WhitelistItem struct {

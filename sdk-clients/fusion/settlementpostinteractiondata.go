@@ -15,7 +15,7 @@ type SettlementPostInteractionData struct {
 	Whitelist          []WhitelistItem
 	ResolvingStartTime *big.Int
 	CustomReceiver     common.Address
-	AuctionFees        *FeesIntegratorResolver
+	AuctionFees        *FeesIntegratorAndResolver
 }
 
 var uint16Max = new(big.Int).Sub(new(big.Int).Lsh(big.NewInt(1), 16), big.NewInt(1))

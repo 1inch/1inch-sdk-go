@@ -4,6 +4,7 @@ import (
 	"math/big"
 	"testing"
 
+	"github.com/1inch/1inch-sdk-go/internal/times"
 	"github.com/stretchr/testify/assert"
 )
 
@@ -164,7 +165,7 @@ func TestCreateAuctionDetails(t *testing.T) {
 			},
 			additionalWaitPeriod: 2,
 			expected: &AuctionDetails{
-				StartTime:       CalcAuctionStartTimeFunc(5, 2),
+				StartTime:       times.CalcAuctionStartTimeFunc(5, 2),
 				Duration:        300,
 				InitialRateBump: 1,
 				Points: []AuctionPointClassFixed{
@@ -214,7 +215,7 @@ func TestCreateAuctionDetails(t *testing.T) {
 			},
 			additionalWaitPeriod: 2,
 			expected: &AuctionDetails{
-				StartTime:       CalcAuctionStartTimeFunc(5, 2),
+				StartTime:       times.CalcAuctionStartTimeFunc(5, 2),
 				Duration:        300,
 				InitialRateBump: 1,
 				Points:          []AuctionPointClassFixed{},

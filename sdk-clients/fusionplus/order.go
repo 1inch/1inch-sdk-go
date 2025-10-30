@@ -5,10 +5,10 @@ import (
 	"fmt"
 	"math/big"
 	"strconv"
-	"time"
 
 	"github.com/1inch/1inch-sdk-go/common"
 	random_number_generation "github.com/1inch/1inch-sdk-go/internal/random-number-generation"
+	"github.com/1inch/1inch-sdk-go/internal/times"
 	"github.com/1inch/1inch-sdk-go/sdk-clients/fusion"
 	"github.com/1inch/1inch-sdk-go/sdk-clients/orderbook"
 	geth_common "github.com/ethereum/go-ethereum/common"
@@ -250,13 +250,6 @@ func GetPreset(presets QuotePresets, presetType GetQuoteOutputRecommendedPreset)
 	return nil, fmt.Errorf("unknown preset type: %v", presetType)
 }
 
-var CalcAuctionStartTimeFunc func(uint32, uint32) uint32 = CalcAuctionStartTime
-
-func CalcAuctionStartTime(startAuctionIn uint32, additionalWaitPeriod uint32) uint32 {
-	currentTime := time.Now().Unix()
-	return uint32(currentTime) + additionalWaitPeriod + startAuctionIn
-}
-
 func CreateAuctionDetails(preset *Preset, additionalWaitPeriod float32) (*AuctionDetails, error) {
 	pointsFixed := make([]AuctionPointClassFixed, 0)
 	for _, point := range preset.Points {
@@ -277,7 +270,7 @@ func CreateAuctionDetails(preset *Preset, additionalWaitPeriod float32) (*Auctio
 	}
 
 	return &AuctionDetails{
-		StartTime:       CalcAuctionStartTimeFunc(uint32(preset.StartAuctionIn), uint32(additionalWaitPeriod)),
+		StartTime:       times.CalcAuctionStartTimeFunc(uint32(preset.StartAuctionIn), uint32(additionalWaitPeriod)),
 		Duration:        uint32(preset.AuctionDuration),
 		InitialRateBump: uint32(preset.InitialRateBump),
 		Points:          pointsFixed,
@@ -285,16 +278,10 @@ func CreateAuctionDetails(preset *Preset, additionalWaitPeriod float32) (*Auctio
 	}, nil
 }
 
-var timeNow func() int64 = GetCurrentTime
-
-func GetCurrentTime() int64 {
-	return time.Now().Unix()
-}
-
 func CreateSettlementPostInteractionData(details Details, orderInfo CrossChainOrderDto) (*SettlementPostInteractionData, error) {
 	resolverStartTime := details.ResolvingStartTime
 	if details.ResolvingStartTime == nil || details.ResolvingStartTime.Cmp(big.NewInt(0)) == 0 {
-		resolverStartTime = big.NewInt(timeNow())
+		resolverStartTime = big.NewInt(times.GetCurrentTime())
 	}
 	return NewSettlementPostInteractionData(SettlementSuffixData{
 		Whitelist:          details.Whitelist,

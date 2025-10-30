@@ -8,6 +8,7 @@ import (
 	"time"
 
 	"github.com/1inch/1inch-sdk-go/common"
+	"github.com/1inch/1inch-sdk-go/internal/times"
 	geth_common "github.com/ethereum/go-ethereum/common"
 
 	random_number_generation "github.com/1inch/1inch-sdk-go/internal/random-number-generation"
@@ -63,9 +64,9 @@ func CreateFusionOrderData(quote GetQuoteOutputFixed, orderParams OrderParams, w
 
 	details := Details{
 		Auction: auctionDetails,
-		FeesNew: &FeesIntegratorResolver{
+		FeesIntAndRes: &FeesIntegratorAndResolver{
 			Resolver:   ResolverFee{},
-			Integrator: IntegratorFeeNew{},
+			Integrator: IntegratorFee{},
 		},
 		Whitelist:          whitelistAddresses,
 		ResolvingStartTime: big.NewInt(int64(auctionDetails.StartTime)),
@@ -227,21 +228,15 @@ func CreateAuctionDetails(preset *PresetClassFixed, additionalWaitPeriod float32
 	}, nil
 }
 
-var timeNow func() int64 = GetCurrentTime
-
-func GetCurrentTime() int64 {
-	return time.Now().Unix()
-}
-
 func CreateSettlementPostInteractionData(details Details, whitelist []WhitelistItem, orderInfo FusionOrderV4) (*SettlementPostInteractionData, error) {
 	resolverStartTime := details.ResolvingStartTime
 	if details.ResolvingStartTime == nil || details.ResolvingStartTime.Cmp(big.NewInt(0)) == 0 {
-		resolverStartTime = big.NewInt(timeNow())
+		resolverStartTime = big.NewInt(times.GetCurrentTime())
 	}
 
 	return &SettlementPostInteractionData{
 		Whitelist:          whitelist,
-		AuctionFees:        details.FeesNew,
+		AuctionFees:        details.FeesIntAndRes,
 		ResolvingStartTime: resolverStartTime,
 		CustomReceiver:     geth_common.HexToAddress(orderInfo.Receiver),
 	}, nil
@@ -287,7 +282,7 @@ type CreateOrderDataParams struct {
 	MakerTraits         *orderbook.MakerTraits
 }
 
-func getReceiver(fees *FeesIntegratorResolver, settlementAddress string, receiver string) string {
+func getReceiver(fees *FeesIntegratorAndResolver, settlementAddress string, receiver string) string {
 	if fees != nil {
 		return settlementAddress
 	}
@@ -295,7 +290,7 @@ func getReceiver(fees *FeesIntegratorResolver, settlementAddress string, receive
 }
 
 func CreateOrder(params CreateOrderDataParams) (*Order, error) {
-	receiver := getReceiver(params.Details.FeesNew, params.SettlementAddress, params.orderInfo.Receiver)
+	receiver := getReceiver(params.Details.FeesIntAndRes, params.SettlementAddress, params.orderInfo.Receiver)
 
 	salt, err := params.Extension.GenerateSalt()
 	if err != nil {

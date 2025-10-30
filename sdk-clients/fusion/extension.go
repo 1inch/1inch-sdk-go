@@ -10,6 +10,7 @@ import (
 	"github.com/1inch/1inch-sdk-go/internal/bigint"
 	"github.com/1inch/1inch-sdk-go/internal/bytesbuilder"
 	"github.com/1inch/1inch-sdk-go/internal/hexadecimal"
+	"github.com/1inch/1inch-sdk-go/internal/times"
 	geth_common "github.com/ethereum/go-ethereum/common"
 	"golang.org/x/crypto/sha3"
 
@@ -27,7 +28,7 @@ type Extension struct {
 	PostInteractionDataEncoded string
 	Asset                      string
 	Permit                     string
-	Fees                       *FeesIntegratorResolver
+	Fees                       *FeesIntegratorAndResolver
 	Surplus                    *SurplusParams
 	ResolvingStartTime         *big.Int
 
@@ -84,10 +85,17 @@ func NewExtension(params ExtensionParams) (*Extension, error) {
 		return nil, errors.New("CustomData is not currently supported")
 	}
 
+	var resolvingStartTime *big.Int
+	if params.ResolvingStartTime == nil {
+		resolvingStartTime = big.NewInt(times.GetCurrentTime())
+	} else {
+		resolvingStartTime = params.ResolvingStartTime
+	}
+
 	bagdParams := &BuildAmountGetterDataParams{
 		AuctionDetails:      params.AuctionDetails,
 		PostInteractionData: params.PostInteractionData,
-		ResolvingStartTime:  params.ResolvingStartTime,
+		ResolvingStartTime:  resolvingStartTime,
 	}
 
 	amountData, err := BuildAmountGetterData(bagdParams, true)
@@ -105,7 +113,7 @@ func NewExtension(params ExtensionParams) (*Extension, error) {
 		Asset:               params.Asset,
 		Permit:              params.Permit,
 		Surplus:             params.Surplus,
-		ResolvingStartTime:  params.ResolvingStartTime,
+		ResolvingStartTime:  resolvingStartTime,
 
 		MakerAssetSuffix: prefix0x(params.MakerAssetSuffix),
 		TakerAssetSuffix: prefix0x(params.TakerAssetSuffix),

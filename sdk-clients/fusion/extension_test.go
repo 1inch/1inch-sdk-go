@@ -91,9 +91,9 @@ func TestNewExtension(t *testing.T) {
 				},
 				PostInteractionData: &SettlementPostInteractionData{
 					Whitelist: []WhitelistItem{},
-					AuctionFees: &FeesIntegratorResolver{
+					AuctionFees: &FeesIntegratorAndResolver{
 						Resolver:   ResolverFee{},
-						Integrator: IntegratorFeeNew{},
+						Integrator: IntegratorFee{},
 					},
 					ResolvingStartTime: big.NewInt(0),
 					CustomReceiver:     common.Address{},
@@ -139,9 +139,9 @@ func TestNewExtension(t *testing.T) {
 				},
 				PostInteractionData: &SettlementPostInteractionData{
 					Whitelist: []WhitelistItem{},
-					AuctionFees: &FeesIntegratorResolver{
+					AuctionFees: &FeesIntegratorAndResolver{
 						Resolver:   ResolverFee{},
-						Integrator: IntegratorFeeNew{},
+						Integrator: IntegratorFee{},
 					},
 					ResolvingStartTime: big.NewInt(0),
 					CustomReceiver:     common.Address{},
@@ -414,8 +414,8 @@ func TestBuildAmountGetterData(t *testing.T) {
 					InitialRateBump: 50000,
 					Points:          []AuctionPointClassFixed{{Coefficient: 20000, Delay: 12}},
 				},
-				FeesNew: &FeesIntegratorResolver{
-					Integrator: IntegratorFeeNew{
+				FeesIntAndRes: &FeesIntegratorAndResolver{
+					Integrator: IntegratorFee{
 						Integrator: "0x0000000000000000000000000000000000000001",
 						Protocol:   "0x0000000000000000000000000000000000000002",
 						Fee:        FromPercent(1, GetDefaultBase()),
@@ -447,7 +447,7 @@ func TestBuildAmountGetterData(t *testing.T) {
 					Whitelist:          tt.whitelist,
 					ResolvingStartTime: tt.detailsFull.ResolvingStartTime,
 					CustomReceiver:     common.Address{},
-					AuctionFees:        tt.detailsFull.FeesNew,
+					AuctionFees:        tt.detailsFull.FeesIntAndRes,
 				},
 			}
 

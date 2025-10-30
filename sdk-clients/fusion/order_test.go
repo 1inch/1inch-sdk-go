@@ -606,8 +606,8 @@ func TestCreateFusionOrderTdd(t *testing.T) {
 					InitialRateBump: 50000,
 					Points:          []AuctionPointClassFixed{{Coefficient: 20000, Delay: 12}},
 				},
-				FeesNew: &FeesIntegratorResolver{
-					Integrator: IntegratorFeeNew{
+				FeesIntAndRes: &FeesIntegratorAndResolver{
+					Integrator: IntegratorFee{
 						Integrator: "0x0000000000000000000000000000000000000001",
 						Protocol:   "0x0000000000000000000000000000000000000002",
 						Fee:        FromPercent(1, GetDefaultBase()),
@@ -635,11 +635,6 @@ func TestCreateFusionOrderTdd(t *testing.T) {
 
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			postInteractionSufixDataNew := &SettlementSuffixData{
-				Whitelist:          tt.details.Whitelist,
-				ResolvingStartTime: tt.details.ResolvingStartTime,
-			}
-
 			var whitelistStrings []string
 			for _, whitelistItem := range tt.details.Whitelist {
 				whitelistStrings = append(whitelistStrings, whitelistItem.Address.Hex())
@@ -663,17 +658,16 @@ func TestCreateFusionOrderTdd(t *testing.T) {
 				Whitelist:          whitelist,
 				ResolvingStartTime: tt.details.ResolvingStartTime,
 				CustomReceiver:     common.Address{},
-				AuctionFees:        tt.details.FeesNew,
+				AuctionFees:        tt.details.FeesIntAndRes,
 			}
 
 			extension, err := NewExtension(ExtensionParams{
 				SettlementContract:  extensionContract,
 				AuctionDetails:      tt.details.Auction,
 				PostInteractionData: postInteractionData,
-				//PostInteractionDataEncoded: encodedPostInteractionData,
-				Asset:              "0xc02aaa39b223fe8d0a0e5c4f27ead9083c756cc2",
-				Surplus:            SurplusParamsNoFee,
-				ResolvingStartTime: tt.details.ResolvingStartTime,
+				Asset:               "0xc02aaa39b223fe8d0a0e5c4f27ead9083c756cc2",
+				Surplus:             SurplusParamsNoFee,
+				ResolvingStartTime:  tt.details.ResolvingStartTime,
 			})
 			require.NoError(t, err)
 
@@ -697,7 +691,7 @@ func TestCreateFusionOrderTdd(t *testing.T) {
 				TakingAmount: tt.expected.TakingAmount,
 				Salt:         salt.String(),
 				Maker:        tt.expected.Maker,
-				Receiver:     getReceiver(tt.details.FeesNew, extensionContract, postInteractionSufixDataNew.CustomReceiver.Hex()),
+				Receiver:     getReceiver(tt.details.FeesIntAndRes, extensionContract, tt.expected.Receiver),
 				MakerTraits:  makerTraits.Encode(),
 				Extension:    extensionEncoded,
 			}

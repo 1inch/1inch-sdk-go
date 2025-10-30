@@ -7,7 +7,7 @@ import (
 	"github.com/1inch/1inch-sdk-go/internal/addresses"
 )
 
-type IntegratorFeeNew struct {
+type IntegratorFee struct {
 	Integrator string
 	Protocol   string
 	Fee        *Bps
@@ -15,15 +15,15 @@ type IntegratorFeeNew struct {
 }
 
 // IntegratorFeeZero is a safe default with all zero values
-var IntegratorFeeZero = &IntegratorFeeNew{
+var IntegratorFeeZero = &IntegratorFee{
 	Integrator: addresses.ZeroAddress,
 	Protocol:   addresses.ZeroAddress,
 	Fee:        BpsZero,
 	Share:      BpsZero,
 }
 
-// NewIntegratorFee constructs a validated IntegratorFeeNew or returns an error
-func NewIntegratorFee(integrator, protocol string, fee, share *Bps) (*IntegratorFeeNew, error) {
+// NewIntegratorFee constructs a validated IntegratorFee or returns an error
+func NewIntegratorFee(integrator, protocol string, fee, share *Bps) (*IntegratorFee, error) {
 	if fee.IsZero() {
 		if !share.IsZero() {
 			return nil, errors.New("integrator share must be zero if fee is zero")
@@ -40,7 +40,7 @@ func NewIntegratorFee(integrator, protocol string, fee, share *Bps) (*Integrator
 		return nil, errors.New("fee must be zero if integrator or protocol is zero address")
 	}
 
-	return &IntegratorFeeNew{
+	return &IntegratorFee{
 		Integrator: integrator,
 		Protocol:   protocol,
 		Fee:        fee,
@@ -48,7 +48,7 @@ func NewIntegratorFee(integrator, protocol string, fee, share *Bps) (*Integrator
 	}, nil
 }
 
-func (f *IntegratorFeeNew) String() string {
-	return fmt.Sprintf("IntegratorFeeNew{Integrator: %s, Protocol: %s, Fee: %s, Share: %s}",
+func (f *IntegratorFee) String() string {
+	return fmt.Sprintf("IntegratorFee{Integrator: %s, Protocol: %s, Fee: %s, Share: %s}",
 		f.Integrator, f.Protocol, f.Fee.String(), f.Share.String())
 }
