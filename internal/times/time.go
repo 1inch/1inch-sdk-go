@@ -2,15 +2,15 @@ package times
 
 import "time"
 
-var timeNow func() int64 = GetCurrentTime
+var Now func() int64 = NowImpl
 
-func GetCurrentTime() int64 {
+func NowImpl() int64 {
 	return time.Now().Unix()
 }
 
-var CalcAuctionStartTimeFunc func(uint32, uint32) uint32 = CalcAuctionStartTime
+var CalculateAuctionStartTime func(uint32, uint32) uint32 = CalculateAuctionStartTimeImpl
 
-func CalcAuctionStartTime(startAuctionIn uint32, additionalWaitPeriod uint32) uint32 {
+func CalculateAuctionStartTimeImpl(startAuctionIn uint32, additionalWaitPeriod uint32) uint32 {
 	currentTime := time.Now().Unix()
 	return uint32(currentTime) + additionalWaitPeriod + startAuctionIn
 }

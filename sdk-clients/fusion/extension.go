@@ -87,7 +87,7 @@ func NewExtension(params ExtensionParams) (*Extension, error) {
 
 	var resolvingStartTime *big.Int
 	if params.ResolvingStartTime == nil {
-		resolvingStartTime = big.NewInt(times.GetCurrentTime())
+		resolvingStartTime = big.NewInt(times.Now())
 	} else {
 		resolvingStartTime = params.ResolvingStartTime
 	}

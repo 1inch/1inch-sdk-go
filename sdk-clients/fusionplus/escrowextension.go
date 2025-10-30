@@ -4,11 +4,8 @@ import (
 	"bytes"
 	"encoding/binary"
 	"fmt"
-	"log"
 	"math/big"
-	"strings"
 
-	"github.com/1inch/1inch-sdk-go/internal/bytesiterator"
 	"github.com/1inch/1inch-sdk-go/internal/hexadecimal"
 	"github.com/1inch/1inch-sdk-go/sdk-clients/fusion"
 	"github.com/1inch/1inch-sdk-go/sdk-clients/orderbook"
@@ -84,86 +81,6 @@ func (e *EscrowExtension) ConvertToOrderbookExtension() (*orderbook.Extension, e
 		PostInteraction:  e.PostInteraction,
 		//hexadecimal.Trim0x(e.CustomData), // TODO Blocking custom data for now because it is breaking the cumsum method. The extension constructor will return with an error if the user provides this field.
 	}, nil
-}
-
-func decodeExtraData(data []byte) (*EscrowExtraData, error) {
-	iter := bytesiterator.New(data)
-	hashlockData, err := iter.NextUint256()
-	if err != nil {
-		log.Fatalf("Failed to read first uint256: %v", err)
-	}
-
-	dstChainIdData, err := iter.NextUint256()
-	if err != nil {
-		log.Fatalf("Failed to read second uint256: %v", err)
-	}
-
-	addressBig, err := iter.NextUint256()
-	if err != nil {
-		log.Fatalf("Failed to read address: %v", err)
-	}
-
-	addressHex := strings.ToLower(common.BigToAddress(addressBig).Hex())
-
-	safetyDepositData, err := iter.NextUint256()
-	if err != nil {
-		log.Fatalf("Failed to read third uint256: %v", err)
-	}
-
-	// Define a 128-bit mask (2^128 - 1)
-	mask := new(big.Int)
-	mask.Exp(big.NewInt(2), big.NewInt(128), nil).Sub(mask, big.NewInt(1))
-
-	srcSafetyDeposit := new(big.Int).And(safetyDepositData, mask)
-	dstSafetyDeposit := new(big.Int).Rsh(safetyDepositData, 128)
-
-	timelocksData, err := iter.NextUint256()
-	if err != nil {
-		log.Fatalf("Failed to read fourth uint256: %v", err)
-	}
-
-	timelocks, err := decodeTimeLocks(timelocksData)
-	if err != nil {
-		log.Fatalf("Failed to decode timelocks: %v", err)
-	}
-
-	return &EscrowExtraData{
-		HashLock: &HashLock{
-			hashlockData.String(),
-		},
-		DstChainId:       float32(dstChainIdData.Uint64()),
-		DstToken:         common.HexToAddress(addressHex),
-		SrcSafetyDeposit: srcSafetyDeposit,
-		DstSafetyDeposit: dstSafetyDeposit,
-		TimeLocks:        timelocks,
-	}, nil
-}
-
-// decodeTimeLocks takes a *big.Int containing the raw hex data and returns a TimeLocks struct.
-func decodeTimeLocks(value *big.Int) (*TimeLocks, error) {
-	tl := &TimeLocks{}
-
-	// Convert big.Int to byte slice
-	data := value.Bytes()
-
-	if len(data) < 32 {
-		padded := make([]byte, 32)
-		copy(padded[32-len(data):], data)
-		data = padded
-	}
-
-	//TODO big.Int cannot preserve leading zeroes, so decoding the deploy time is impossible atm
-
-	// tl.DeployTime = float32(binary.BigEndian.Uint32((data[0:4])))
-	tl.DstCancellation = float32(binary.BigEndian.Uint32((data[4:8])))
-	tl.DstPublicWithdrawal = float32(binary.BigEndian.Uint32((data[8:12])))
-	tl.DstWithdrawal = float32(binary.BigEndian.Uint32((data[12:16])))
-	tl.SrcPublicCancellation = float32(binary.BigEndian.Uint32((data[16:20])))
-	tl.SrcCancellation = float32(binary.BigEndian.Uint32((data[20:24])))
-	tl.SrcPublicWithdrawal = float32(binary.BigEndian.Uint32((data[24:28])))
-	tl.SrcWithdrawal = float32(binary.BigEndian.Uint32((data[28:32])))
-
-	return tl, nil
 }
 
 type EscrowExtraData struct {

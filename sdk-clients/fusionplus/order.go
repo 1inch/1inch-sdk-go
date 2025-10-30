@@ -270,7 +270,7 @@ func CreateAuctionDetails(preset *Preset, additionalWaitPeriod float32) (*Auctio
 	}
 
 	return &AuctionDetails{
-		StartTime:       times.CalcAuctionStartTimeFunc(uint32(preset.StartAuctionIn), uint32(additionalWaitPeriod)),
+		StartTime:       times.CalculateAuctionStartTime(uint32(preset.StartAuctionIn), uint32(additionalWaitPeriod)),
 		Duration:        uint32(preset.AuctionDuration),
 		InitialRateBump: uint32(preset.InitialRateBump),
 		Points:          pointsFixed,
@@ -281,7 +281,7 @@ func CreateAuctionDetails(preset *Preset, additionalWaitPeriod float32) (*Auctio
 func CreateSettlementPostInteractionData(details Details, orderInfo CrossChainOrderDto) (*SettlementPostInteractionData, error) {
 	resolverStartTime := details.ResolvingStartTime
 	if details.ResolvingStartTime == nil || details.ResolvingStartTime.Cmp(big.NewInt(0)) == 0 {
-		resolverStartTime = big.NewInt(times.GetCurrentTime())
+		resolverStartTime = big.NewInt(times.Now())
 	}
 	return NewSettlementPostInteractionData(SettlementSuffixData{
 		Whitelist:          details.Whitelist,

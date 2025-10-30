@@ -93,7 +93,7 @@ func (params *GetFeeInfoParams) Validate() error {
 
 func (params *GetOrderCountParams) Validate() error {
 	var validationErrors []error
-	//validationErrors = validate.Parameter(params.Statuses, "statuses", validate.CheckStatusesListRequired, validationErrors)
+	validationErrors = validate.Parameter(params.Statuses, "statuses", validate.CheckStatusesStrings, validationErrors)
 	validationErrors = validate.Parameter(params.MakerAsset, "makerAsset", validate.CheckEthereumAddressRequired, validationErrors)
 	validationErrors = validate.Parameter(params.TakerAsset, "takerAsset", validate.CheckEthereumAddressRequired, validationErrors)
 	return validate.ConsolidateValidationErorrs(validationErrors)

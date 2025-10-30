@@ -1,9 +1,6 @@
 package fusion
 
 import (
-	"bytes"
-	"encoding/json"
-	"fmt"
 	"math/big"
 	"testing"
 
@@ -111,7 +108,6 @@ func TestNewExtension(t *testing.T) {
 					ProtocolFee:          FromPercent(1, GetDefaultBase()),
 				},
 
-				// todo these are needed now
 				ResolvingStartTime: big.NewInt(0),
 			},
 			expectedExtension: &Extension{
@@ -159,7 +155,6 @@ func TestNewExtension(t *testing.T) {
 					ProtocolFee:          FromPercent(1, GetDefaultBase()),
 				},
 
-				// todo these are needed now
 				ResolvingStartTime: big.NewInt(0),
 			},
 			expectedExtension: &Extension{
@@ -259,25 +254,6 @@ func TestNewExtension(t *testing.T) {
 	}
 }
 
-func printSelectedFields(ext *Extension) string {
-	selectedFields := map[string]string{
-		"MakerAssetSuffix": ext.MakerAssetSuffix,
-		"TakerAssetSuffix": ext.TakerAssetSuffix,
-		"MakingAmountData": ext.MakingAmountData,
-		"TakingAmountData": ext.TakingAmountData,
-		"Predicate":        ext.Predicate,
-		"MakerPermit":      ext.MakerPermit,
-		"PreInteraction":   ext.PreInteraction,
-		"PostInteraction":  ext.PostInteraction,
-	}
-
-	jsonData, err := json.MarshalIndent(selectedFields, "", "  ")
-	if err != nil {
-		return fmt.Sprint("Error marshalling to JSON:", err)
-	}
-	return string(jsonData)
-}
-
 func TestConvertToOrderbookExtension(t *testing.T) {
 	tests := []struct {
 		name                       string
@@ -326,16 +302,6 @@ func TestConvertToOrderbookExtension(t *testing.T) {
 			assert.Equal(t, tc.expectedOrderbookExtension.PostInteraction, ext.PostInteraction)
 		})
 	}
-}
-
-var asset = "0xBAb2C3d4e5f67890123456789AbcDEf123456789"
-var permit = "9999999999999999999999"
-var fullAuctionDetails = &AuctionDetails{
-	StartTime:       1,
-	Duration:        2,
-	InitialRateBump: 3,
-	Points:          []AuctionPointClassFixed{{Coefficient: 4, Delay: 5}},
-	GasCost:         GasCostConfigClassFixed{GasBumpEstimate: 6, GasPriceEstimate: 7},
 }
 
 func TestBuildAmountGetterData(t *testing.T) {
@@ -456,21 +422,4 @@ func TestBuildAmountGetterData(t *testing.T) {
 			require.Equal(t, tt.expected, gotHex)
 		})
 	}
-}
-
-func extensionsEqual(a, b *Extension) bool {
-	return a.MakerAssetSuffix == b.MakerAssetSuffix &&
-		a.TakerAssetSuffix == b.TakerAssetSuffix &&
-		a.MakingAmountData == b.MakingAmountData &&
-		a.TakingAmountData == b.TakingAmountData &&
-		a.Predicate == b.Predicate &&
-		a.MakerPermit == b.MakerPermit &&
-		a.PreInteraction == b.PreInteraction &&
-		a.PostInteraction == b.PostInteraction
-	// a.CustomData == b.CustomData
-}
-
-// contains checks if the substring is present in the string.
-func contains(s, substr string) bool {
-	return bytes.Contains([]byte(s), []byte(substr))
 }

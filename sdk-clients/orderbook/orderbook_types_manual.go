@@ -188,11 +188,11 @@ type GetFeeInfoParams struct {
 }
 
 type FeeInfoResponse struct {
-	Whitelist                map[string]string `json:"whitelist"`                // Map of resolver addresses to their corresponding addresses
+	Whitelist                map[string]string `json:"whitelist"`
 	FeeBps                   int               `json:"feeBps"`                   // Fee in basis points (e.g., 50 = 0.5%)
 	WhitelistDiscountPercent int               `json:"whitelistDiscountPercent"` // Discount percentage for whitelisted resolvers (e.g., 50 = 50% off)
-	ProtocolFeeReceiver      string            `json:"protocolFeeReceiver"`      // Address that receives protocol fees
-	ExtensionAddress         string            `json:"extensionAddress"`         // Address of the fee extension contract
+	ProtocolFeeReceiver      string            `json:"protocolFeeReceiver"`
+	ExtensionAddress         string            `json:"extensionAddress"`
 }
 
 type OrderStatus int

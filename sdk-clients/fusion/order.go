@@ -231,7 +231,7 @@ func CreateAuctionDetails(preset *PresetClassFixed, additionalWaitPeriod float32
 func CreateSettlementPostInteractionData(details Details, whitelist []WhitelistItem, orderInfo FusionOrderV4) (*SettlementPostInteractionData, error) {
 	resolverStartTime := details.ResolvingStartTime
 	if details.ResolvingStartTime == nil || details.ResolvingStartTime.Cmp(big.NewInt(0)) == 0 {
-		resolverStartTime = big.NewInt(times.GetCurrentTime())
+		resolverStartTime = big.NewInt(times.Now())
 	}
 
 	return &SettlementPostInteractionData{

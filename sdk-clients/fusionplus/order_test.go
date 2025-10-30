@@ -165,7 +165,7 @@ func TestCreateAuctionDetails(t *testing.T) {
 			},
 			additionalWaitPeriod: 2,
 			expected: &AuctionDetails{
-				StartTime:       times.CalcAuctionStartTimeFunc(5, 2),
+				StartTime:       times.CalculateAuctionStartTime(5, 2),
 				Duration:        300,
 				InitialRateBump: 1,
 				Points: []AuctionPointClassFixed{
@@ -215,7 +215,7 @@ func TestCreateAuctionDetails(t *testing.T) {
 			},
 			additionalWaitPeriod: 2,
 			expected: &AuctionDetails{
-				StartTime:       times.CalcAuctionStartTimeFunc(5, 2),
+				StartTime:       times.CalculateAuctionStartTime(5, 2),
 				Duration:        300,
 				InitialRateBump: 1,
 				Points:          []AuctionPointClassFixed{},

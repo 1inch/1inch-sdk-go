@@ -21,8 +21,8 @@ const (
 	usdc       = "0x3c499c542cEF5E3811e1192ce70d8cC03d5c3359"
 	wmatic     = "0x0d500B1d8E8eF31E21C99d1Db9A6444d3ADf1270"
 	weth       = "0x7ceB23fD6bC0adD59E62ac25578270cFf1b9f619"
-	amountEth  = "200000000000000" // ~50 cents of ETH
-	amountUsdc = "500000"          // 50 cents of USDC
+	amountEth  = "200000000000000"
+	amountUsdc = "500000" // 50 cents of USDC
 	chainId    = 137
 )
 
