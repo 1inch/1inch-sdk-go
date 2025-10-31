@@ -1,7 +1,6 @@
 package fusionplus
 
 import (
-	"bytes"
 	"fmt"
 	"math/big"
 	"testing"
@@ -237,9 +236,4 @@ func TestEncodeExtraData(t *testing.T) {
 			require.Equal(t, tt.expectedEncoded, fmt.Sprintf("%x", encoded))
 		})
 	}
-}
-
-// contains checks if the substring is present in the string.
-func contains(s, substr string) bool {
-	return bytes.Contains([]byte(s), []byte(substr))
 }
