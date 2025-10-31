@@ -19,7 +19,7 @@ Jump To:
 ### Token Swaps
 *Classic Swap API* - [[Docs](https://portal.1inch.dev/documentation/apis/swap/classic-swap/introduction) | [SDK Example](https://github.com/1inch/1inch-sdk-go/blob/main/sdk-clients/aggregation/examples/quote/main.go)]
 
-*Intent-based Swap (Fusion) API* - [[Docs](https://portal.1inch.dev/documentation/apis/swap/intent-swap/introduction) | [SDK Example](https://github.com/1inch/1inch-sdk-go/blob/main/sdk-clients/fusion/examples/place_order/main.go)]
+*Intent Swap (Fusion) API* - [[Docs](https://portal.1inch.dev/documentation/apis/swap/intent-swap/introduction) | [SDK Example](https://github.com/1inch/1inch-sdk-go/blob/main/sdk-clients/fusion/examples/place_order/main.go)]
 
 *Cross-chain Swap (Fusion+) API* - [[Docs](https://portal.1inch.dev/documentation/apis/swap/fusion-plus/introduction) | [SDK Example](https://github.com/1inch/1inch-sdk-go/blob/main/sdk-clients/fusionplus/examples/place_order/main.go)]
 

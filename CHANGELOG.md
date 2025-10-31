@@ -4,7 +4,16 @@ All notable changes to this project will be documented in this file.
 
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/), and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html) starting with the *v1.0.0-beta.1* release.
 
-## [v2.0.0-preview] - 2025-1-22
+## [v2.0.0-preview.2] - 2025-10-30
+[v2.0.0-preview.2 release page](https://github.com/1inch/1inch-sdk-go/releases/tag/v2.0.0-preview.2)
+
+### Breaking Changes
+- Limit Orders have been refactored. Order creation now uses a different flow. See the examples for more details.
+
+### Changed
+- Limit Order SDK updated to support v4.1 API
+
+## [v2.0.0-preview] - 2025-6-26
 [v2.0.0-preview release page](https://github.com/1inch/1inch-sdk-go/releases/tag/v2.0.0-preview)
 
 ### Breaking Changes
