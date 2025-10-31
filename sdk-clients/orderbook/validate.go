@@ -81,3 +81,20 @@ func (params *GetActiveOrdersWithPermitParams) Validate() error {
 	validationErrors = validate.Parameter(params.Token, "token", validate.CheckEthereumAddressRequired, validationErrors)
 	return validate.ConsolidateValidationErorrs(validationErrors)
 }
+
+func (params *GetFeeInfoParams) Validate() error {
+	var validationErrors []error
+	validationErrors = validate.Parameter(params.MakerAmount, "makerAmount", validate.CheckBigIntRequired, validationErrors)
+	validationErrors = validate.Parameter(params.MakerAsset, "makerAsset", validate.CheckEthereumAddressRequired, validationErrors)
+	validationErrors = validate.Parameter(params.TakerAmount, "takerAmount", validate.CheckBigIntRequired, validationErrors)
+	validationErrors = validate.Parameter(params.TakerAsset, "takerAsset", validate.CheckEthereumAddressRequired, validationErrors)
+	return validate.ConsolidateValidationErorrs(validationErrors)
+}
+
+func (params *GetOrderCountParams) Validate() error {
+	var validationErrors []error
+	validationErrors = validate.Parameter(params.Statuses, "statuses", validate.CheckStatusesStrings, validationErrors)
+	validationErrors = validate.Parameter(params.MakerAsset, "makerAsset", validate.CheckEthereumAddressRequired, validationErrors)
+	validationErrors = validate.Parameter(params.TakerAsset, "takerAsset", validate.CheckEthereumAddressRequired, validationErrors)
+	return validate.ConsolidateValidationErorrs(validationErrors)
+}

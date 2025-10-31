@@ -23,10 +23,17 @@ var (
 const (
 	wmatic      = "0x0d500B1d8E8eF31E21C99d1Db9A6444d3ADf1270"
 	usdc        = "0x3c499c542cEF5E3811e1192ce70d8cC03d5c3359"
-	ten16       = "10000000000000000"
-	ten6        = "1000000"
+	ten18       = "1000000000000000000"
+	ten8        = "100000000"
 	zeroAddress = "0x0000000000000000000000000000000000000000"
 	chainId     = 137
+)
+
+var (
+	makerAsset  = wmatic
+	takerAsset  = usdc
+	makerAmount = ten18
+	takerAmount = ten8
 )
 
 func main() {
@@ -43,6 +50,9 @@ func main() {
 		log.Fatal(err)
 	}
 	client, err := orderbook.NewClient(config)
+	if err != nil {
+		log.Fatalf("Failed to create client: %v\n", err)
+	}
 
 	ecdsaPrivateKey, err := crypto.HexToECDSA(privateKey)
 	if err != nil {
@@ -51,41 +61,58 @@ func main() {
 	publicKey := ecdsaPrivateKey.Public()
 	publicAddress := crypto.PubkeyToAddress(*publicKey.(*ecdsa.PublicKey))
 
-	expireAfter := time.Now().Add(time.Hour).Unix()
-
-	seriesNonce, err := client.GetSeriesNonce(ctx, publicAddress)
-	if err != nil {
-		log.Fatal(fmt.Errorf("failed to get series nonce: %v", err))
-	}
-
-	makerTraits, err := orderbook.NewMakerTraits(orderbook.MakerTraitsParams{
-		AllowedSender:      zeroAddress,
-		ShouldCheckEpoch:   false,
-		UsePermit2:         false,
-		UnwrapWeth:         false,
-		HasExtension:       false,
-		Expiry:             expireAfter,
-		Nonce:              seriesNonce.Int64(),
-		Series:             0,
-		AllowMultipleFills: true,
-		AllowPartialFills:  true,
+	feeInfo, err := client.GetFeeInfo(ctx, orderbook.GetFeeInfoParams{
+		MakerAsset:  makerAsset,
+		TakerAsset:  takerAsset,
+		MakerAmount: makerAmount,
+		TakerAmount: takerAmount,
 	})
 	if err != nil {
-		log.Fatalf("Failed to create maker traits: %v", err)
+		log.Fatalf("Failed to get fee info: %v", err)
+	}
+
+	buildOrderExtensionBytesParams := &orderbook.BuildOrderExtensionBytesParams{
+		ExtensionTarget: feeInfo.ExtensionAddress,
+		IntegratorFee: &orderbook.IntegratorFee{
+			Integrator: zeroAddress,
+			Protocol:   zeroAddress,
+			Fee:        0,
+			Share:      0,
+		},
+		ResolverFee: &orderbook.ResolverFee{
+			Receiver:          feeInfo.ProtocolFeeReceiver,
+			Fee:               feeInfo.FeeBps,
+			WhitelistDiscount: feeInfo.WhitelistDiscountPercent,
+		},
+		Whitelist:      feeInfo.Whitelist,
+		CustomReceiver: publicAddress.Hex(),
+	}
+
+	extensionEncoded, err := orderbook.BuildOrderExtensionBytes(buildOrderExtensionBytesParams)
+	if err != nil {
+		log.Fatalf("Failed to create extension: %v\n", err)
+	}
+
+	salt, err := orderbook.GenerateSaltWithFees(&orderbook.GetSaltParams{
+		Extension: extensionEncoded,
+	})
+	if err != nil {
+		log.Fatalf("Failed to generate salt: %v", err)
 	}
 
 	createOrderResponse, err := client.CreateOrder(ctx, orderbook.CreateOrderParams{
 		Wallet:                         client.Wallet,
-		SeriesNonce:                    seriesNonce,
+		Salt:                           fmt.Sprintf("%d", salt),
 		Maker:                          publicAddress.Hex(),
-		MakerAsset:                     wmatic,
-		TakerAsset:                     usdc,
-		MakingAmount:                   ten16,
-		TakingAmount:                   ten6,
-		Taker:                          zeroAddress,
+		MakerAsset:                     makerAsset,
+		TakerAsset:                     takerAsset,
+		MakingAmount:                   makerAmount,
+		TakingAmount:                   takerAmount,
+		Taker:                          feeInfo.ExtensionAddress,
 		SkipWarnings:                   false,
 		EnableOnchainApprovalsIfNeeded: false,
-		MakerTraits:                    makerTraits,
+		MakerTraits:                    orderbook.NewMakerTraitsDefault(),
+		ExtensionEncoded:               extensionEncoded,
 	})
 	if err != nil {
 		log.Fatal(fmt.Errorf("Failed to create order: %v\n", err))

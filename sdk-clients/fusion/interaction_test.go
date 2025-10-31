@@ -24,7 +24,8 @@ func TestInteraction(t *testing.T) {
 
 	for _, tc := range tests {
 		t.Run(tc.name, func(t *testing.T) {
-			interaction := NewInteraction(tc.target, tc.data)
+			interaction, err := NewInteraction(tc.target, tc.data)
+			require.NoError(t, err)
 			encoded := interaction.Encode()
 			decoded, err := DecodeInteraction(encoded)
 			require.NoError(t, err)

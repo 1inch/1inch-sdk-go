@@ -23,14 +23,18 @@ var (
 	devPortalToken = os.Getenv("DEV_PORTAL_TOKEN")
 )
 
-const PolygonPol = "0xEeeeeEeeeEeEeeEeEeEeeEEEeeeeEeeeeeeeEEeE"
-const PolygonUsdc = "0x3c499c542cEF5E3811e1192ce70d8cC03d5c3359"
+const (
+	UsdcBase   = "0x833589fCD6eDb6E08f4c7C32D4f71b54bdA02913"
+	WethBase   = "0x4200000000000000000000000000000000000006"
+	amountWeth = "10000000000000000"
+	amountUsdc = "100000"
+)
 
 func main() {
 	config, err := aggregation.NewConfiguration(aggregation.ConfigurationParams{
 		NodeUrl:    nodeUrl,
 		PrivateKey: privateKey,
-		ChainId:    constants.PolygonChainId,
+		ChainId:    constants.BaseChainId,
 		ApiUrl:     "https://api.1inch.dev",
 		ApiKey:     devPortalToken,
 	})
@@ -44,9 +48,9 @@ func main() {
 	ctx := context.Background()
 
 	swapData, err := client.GetSwap(ctx, aggregation.GetSwapParams{
-		Src:      PolygonPol,
-		Dst:      PolygonUsdc,
-		Amount:   "1000000000000000000",
+		Src:      UsdcBase,
+		Dst:      WethBase,
+		Amount:   amountUsdc,
 		From:     client.Wallet.Address().Hex(),
 		Slippage: 1,
 	})

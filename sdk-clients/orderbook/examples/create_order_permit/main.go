@@ -29,8 +29,16 @@ const (
 	PolygonUsdc = "0x3c499c542cEF5E3811e1192ce70d8cC03d5c3359"
 	ten16       = "10000000000000000"
 	ten6        = "1000000"
+	ten4        = "10000"
 	zeroAddress = "0x0000000000000000000000000000000000000000"
 	chainId     = 137
+)
+
+var (
+	makerAsset  = PolygonUsdc
+	takerAsset  = PolygonFRAX
+	makerAmount = ten4
+	takerAmount = ten16
 )
 
 func main() {
@@ -47,6 +55,9 @@ func main() {
 		log.Fatal(err)
 	}
 	client, err := orderbook.NewClient(config)
+	if err != nil {
+		log.Fatalf("Failed to create client: %v\n", err)
+	}
 
 	ecdsaPrivateKey, err := crypto.HexToECDSA(privateKey)
 	if err != nil {
@@ -57,68 +68,79 @@ func main() {
 
 	expireAfter := time.Now().Add(time.Hour).Unix()
 
-	seriesNonce, err := client.GetSeriesNonce(ctx, publicAddress)
-	if err != nil {
-		log.Fatal(fmt.Errorf("failed to get series nonce: %v", err))
-	}
-
 	router, err := constants.Get1inchRouterFromChainId(chainId)
 	if err != nil {
 		log.Fatal(fmt.Errorf("failed to get 1inch router address: %v", err))
 	}
 
-	makingAmount := ten16
-	makingAmountInt, err := strconv.ParseInt(makingAmount, 10, 64)
+	makingAmountInt, err := strconv.ParseInt(makerAmount, 10, 64)
 	if err != nil {
 		fmt.Println("Error converting string to int:", err)
 		return
 	}
 
-	permitData, err := client.Wallet.GetContractDetailsForPermit(ctx, common.HexToAddress(PolygonFRAX), common.HexToAddress(router), big.NewInt(makingAmountInt), expireAfter)
+	permitData, err := client.Wallet.GetContractDetailsForPermit(ctx, common.HexToAddress(makerAsset), common.HexToAddress(router), big.NewInt(makingAmountInt), expireAfter)
 	if err != nil {
-		panic(err)
+		log.Fatal("failed to get permit data:", err)
 	}
 	permit, err := client.Wallet.TokenPermit(*permitData)
 	if err != nil {
 		log.Fatal(fmt.Errorf("Failed to get permit: %v\n", err))
 	}
 
-	extension, err := orderbook.NewExtension(orderbook.ExtensionParams{
-		MakerAsset: PolygonFRAX,
-		Permit:     permit,
+	fmt.Printf("Permit: %v\n", permit)
+
+	feeInfo, err := client.GetFeeInfo(ctx, orderbook.GetFeeInfoParams{
+		MakerAsset:  makerAsset,
+		TakerAsset:  takerAsset,
+		MakerAmount: makerAmount,
+		TakerAmount: takerAmount,
 	})
+	if err != nil {
+		log.Fatalf("Failed to get fee info: %v", err)
+	}
+
+	buildOrderExtensionBytesParams := &orderbook.BuildOrderExtensionBytesParams{
+		ExtensionTarget: feeInfo.ExtensionAddress,
+		IntegratorFee: &orderbook.IntegratorFee{
+			Integrator: zeroAddress,
+			Protocol:   zeroAddress,
+			Fee:        0,
+			Share:      0,
+		},
+		MakerPermit: []byte(permit),
+		ResolverFee: &orderbook.ResolverFee{
+			Receiver:          feeInfo.ProtocolFeeReceiver,
+			Fee:               feeInfo.FeeBps,
+			WhitelistDiscount: feeInfo.WhitelistDiscountPercent,
+		},
+		Whitelist:      feeInfo.Whitelist,
+		CustomReceiver: publicAddress.Hex(),
+	}
+
+	extensionEncoded, err := orderbook.BuildOrderExtensionBytes(buildOrderExtensionBytesParams)
 	if err != nil {
 		log.Fatalf("Failed to create extension: %v\n", err)
 	}
 
-	makerTraits, err := orderbook.NewMakerTraits(orderbook.MakerTraitsParams{
-		AllowedSender:      zeroAddress,
-		ShouldCheckEpoch:   false,
-		UsePermit2:         false,
-		UnwrapWeth:         false,
-		HasExtension:       true,
-		AllowMultipleFills: true,
-		AllowPartialFills:  true,
-		Expiry:             expireAfter,
-		Nonce:              seriesNonce.Int64(),
-		Series:             0,
+	salt, err := orderbook.GenerateSaltWithFees(&orderbook.GetSaltParams{
+		Extension: extensionEncoded,
 	})
 	if err != nil {
-		log.Fatalf("Failed to create maker traits: %v", err)
+		log.Fatalf("Failed to generate salt: %v", err)
 	}
 
 	createOrderResponse, err := client.CreateOrder(ctx, orderbook.CreateOrderParams{
 		Wallet:                         client.Wallet,
-		SeriesNonce:                    seriesNonce,
-		MakerTraits:                    makerTraits,
-		Extension:                      *extension,
-		ExpireAfterUnix:                expireAfter,
+		Salt:                           fmt.Sprintf("%d", salt),
+		MakerTraits:                    orderbook.NewMakerTraitsDefault(), // Defaults to a 1 hour expiration
+		ExtensionEncoded:               extensionEncoded,
 		Maker:                          publicAddress.Hex(),
-		MakerAsset:                     PolygonFRAX,
-		TakerAsset:                     PolygonUsdc,
-		MakingAmount:                   makingAmount,
-		TakingAmount:                   ten6,
-		Taker:                          zeroAddress,
+		MakerAsset:                     makerAsset,
+		TakerAsset:                     takerAsset,
+		MakingAmount:                   makerAmount,
+		TakingAmount:                   takerAmount,
+		Taker:                          feeInfo.ExtensionAddress,
 		SkipWarnings:                   false,
 		EnableOnchainApprovalsIfNeeded: false,
 	})

@@ -44,7 +44,7 @@ func DecodeAuctionDetails(data string) (*AuctionDetails, error) {
 	initialRateBump := binary.BigEndian.Uint32(append([]byte{0x00}, bytes[14:17]...))
 
 	var points []AuctionPointClassFixed
-	for i := 17; i+5 <= len(bytes); i += 5 {
+	for i := 18; i+5 <= len(bytes); i += 5 {
 		points = append(points, AuctionPointClassFixed{
 			Coefficient: binary.BigEndian.Uint32(append([]byte{0x00}, bytes[i:i+3]...)),
 			Delay:       binary.BigEndian.Uint16(bytes[i+3 : i+5]),
@@ -64,6 +64,7 @@ func (ad AuctionDetails) Encode() string {
 	bytes = append(bytes, byte(ad.StartTime>>24), byte(ad.StartTime>>16), byte(ad.StartTime>>8), byte(ad.StartTime))
 	bytes = append(bytes, byte(ad.Duration>>16), byte(ad.Duration>>8), byte(ad.Duration))
 	bytes = append(bytes, byte(ad.InitialRateBump>>16), byte(ad.InitialRateBump>>8), byte(ad.InitialRateBump))
+	bytes = append(bytes, byte(len(ad.Points)))
 
 	for _, point := range ad.Points {
 		bytes = append(bytes, byte(point.Coefficient>>16), byte(point.Coefficient>>8), byte(point.Coefficient))

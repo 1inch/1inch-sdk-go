@@ -31,6 +31,9 @@ type GetQuoteOutputFixed struct {
 
 	// Whitelist current executors whitelist addresses
 	Whitelist []string `json:"whitelist"`
+
+	SurplusFee   float32 `json:"surplusFee"`
+	MarketAmount string  `json:"marketAmount"`
 }
 
 type PlaceOrderBody struct {
@@ -141,19 +144,14 @@ type FusionOrderConstructor struct {
 
 type Details struct {
 	Auction            *AuctionDetails `json:"auction"`
-	Fees               Fees            `json:"fees"`
 	Whitelist          []AuctionWhitelistItem
 	ResolvingStartTime *big.Int
+	FeesIntAndRes      *FeesIntegratorAndResolver
 }
 
-type Fees struct {
-	IntFee  IntegratorFee
-	BankFee *big.Int
-}
-
-type IntegratorFee struct {
-	Ratio    *big.Int
-	Receiver common.Address
+type FeesIntegratorAndResolver struct {
+	Resolver   ResolverFee
+	Integrator IntegratorFee
 }
 
 type AuctionWhitelistItem struct {
@@ -173,14 +171,6 @@ type ExtraParams struct {
 	EnablePermit2        bool
 	Source               string
 	unwrapWeth           bool
-}
-
-type SettlementSuffixData struct {
-	Whitelist          []AuctionWhitelistItem
-	IntegratorFee      *IntegratorFee
-	BankFee            *big.Int
-	ResolvingStartTime *big.Int
-	CustomReceiver     common.Address
 }
 
 type WhitelistItem struct {
@@ -230,7 +220,36 @@ type QuoterControllerGetQuoteParamsFixed struct {
 	IsLedgerLive bool   `url:"isLedgerLive" json:"isLedgerLive"`
 
 	// Permit permit, user approval sign
-	Permit string `url:"permit,omitempty" json:"permit,omitempty"`
+	Permit  string `url:"permit,omitempty" json:"permit,omitempty"`
+	Surplus bool   `url:"surplus,omitempty" json:"surplus,omitempty"`
+}
+
+type QuoterControllerGetQuoteWithCustomPresetsParamsFixed struct {
+	// FromTokenAddress Address of "FROM" token
+	FromTokenAddress string `url:"fromTokenAddress" json:"fromTokenAddress"`
+
+	// ToTokenAddress Address of "TO" token
+	ToTokenAddress string `url:"toTokenAddress" json:"toTokenAddress"`
+
+	// Amount to take from "FROM" token to get "TO" token
+	Amount string `url:"amount" json:"amount"`
+
+	// WalletAddress An address of the wallet or contract who will create Fusion order
+	WalletAddress string `url:"walletAddress" json:"walletAddress"`
+
+	// EnableEstimate if enabled then get estimation from 1inch swap builder and generates quoteId, by default is false
+	EnableEstimate bool `url:"enableEstimate" json:"enableEstimate"`
+
+	// Fee in bps format, 1% is equal to 100bps
+	Fee float32 `url:"fee,omitempty" json:"fee,omitempty"`
+
+	// IsPermit2 permit2 allowance transfer encoded call
+	IsPermit2    string `url:"isPermit2,omitempty" json:"isPermit2,omitempty"`
+	IsLedgerLive bool   `url:"isLedgerLive" json:"isLedgerLive"`
+
+	// Permit permit, user approval sign
+	Permit  string `url:"permit,omitempty" json:"permit,omitempty"`
+	Surplus bool   `url:"surplus,omitempty" json:"surplus,omitempty"`
 }
 
 type OrderResponse struct {

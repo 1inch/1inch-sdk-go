@@ -17,11 +17,11 @@ Jump To:
 ## Supported APIs
 
 ### Token Swaps
-*Swap API* - [[Docs](https://portal.1inch.dev/documentation/apis/swap/classic-swap/introduction) | [SDK Example](https://github.com/1inch/1inch-sdk-go/blob/main/sdk-clients/aggregation/examples/quote/main.go)]
+*Classic Swap API* - [[Docs](https://portal.1inch.dev/documentation/apis/swap/classic-swap/introduction) | [SDK Example](https://github.com/1inch/1inch-sdk-go/blob/main/sdk-clients/aggregation/examples/quote/main.go)]
 
-*Fusion API* - [[Docs](https://portal.1inch.dev/documentation/apis/swap/intent-swap/introduction) | [SDK Example](https://github.com/1inch/1inch-sdk-go/blob/main/sdk-clients/fusion/examples/place_order/main.go)] (now called Intent Swap)
+*Intent-based Swap (Fusion) API* - [[Docs](https://portal.1inch.dev/documentation/apis/swap/intent-swap/introduction) | [SDK Example](https://github.com/1inch/1inch-sdk-go/blob/main/sdk-clients/fusion/examples/place_order/main.go)]
 
-*Fusion Plus API* - [[Docs](https://portal.1inch.dev/documentation/apis/swap/fusion-plus/introduction) | [SDK Example](https://github.com/1inch/1inch-sdk-go/blob/main/sdk-clients/fusionplus/examples/place_order/main.go)]
+*Cross-chain Swap (Fusion+) API* - [[Docs](https://portal.1inch.dev/documentation/apis/swap/fusion-plus/introduction) | [SDK Example](https://github.com/1inch/1inch-sdk-go/blob/main/sdk-clients/fusionplus/examples/place_order/main.go)]
 
 *Orderbook API* - [[Docs](https://portal.1inch.dev/documentation/apis/orderbook/introduction) | [SDK Example](https://github.com/1inch/1inch-sdk-go/blob/main/sdk-clients/orderbook/examples/create_order/main.go)]
 

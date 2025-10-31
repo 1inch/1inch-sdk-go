@@ -4,6 +4,7 @@ import (
 	"errors"
 	"fmt"
 	"math/big"
+	"time"
 )
 
 var (
@@ -59,6 +60,24 @@ type MakerTraits struct {
 	AllowMultipleFills bool
 }
 
+func NewMakerTraitsDefault() *MakerTraits {
+	return &MakerTraits{
+		AllowedSender:       "0x0000000000000000000000000000000000000000",
+		Expiry:              time.Now().Add(time.Hour).Unix(),
+		Nonce:               0,
+		Series:              0,
+		NoPartialFills:      false,
+		NeedPostinteraction: true,
+		NeedPreinteraction:  false,
+		NeedEpochCheck:      false,
+		HasExtension:        true,
+		ShouldUsePermit2:    false,
+		ShouldUnwrapWeth:    false,
+		AllowPartialFills:   true,
+		AllowMultipleFills:  true,
+	}
+}
+
 func NewMakerTraits(params MakerTraitsParams) (*MakerTraits, error) {
 
 	if params.AllowPartialFills && !params.AllowMultipleFills {
@@ -67,6 +86,10 @@ func NewMakerTraits(params MakerTraitsParams) (*MakerTraits, error) {
 
 	if !params.AllowPartialFills && params.AllowMultipleFills {
 		return nil, errors.New("AllowMultipleFills must be false if AllowPartialFills is false")
+	}
+
+	if !params.HasPostInteraction {
+		return nil, errors.New("in the current iteration of Limit Order Protocol, HasPostInteraction must be true")
 	}
 
 	return &MakerTraits{

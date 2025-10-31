@@ -7,7 +7,7 @@ import (
 	"github.com/stretchr/testify/require"
 )
 
-func TestAuctionDetails(t *testing.T) {
+func TestDecodeAuctionDetails(t *testing.T) {
 	tests := []struct {
 		name    string
 		details AuctionDetails
@@ -38,6 +38,41 @@ func TestAuctionDetails(t *testing.T) {
 			decoded, err := DecodeAuctionDetails(encoded)
 			require.NoError(t, err)
 			assert.Equal(t, tc.details, *decoded)
+		})
+	}
+}
+
+func TestEncodeAuctionDetails(t *testing.T) {
+	tests := []struct {
+		name     string
+		details  AuctionDetails
+		expected string
+	}{
+		{
+			name: "Encode AuctionDetails",
+			details: AuctionDetails{
+				GasCost: GasCostConfigClassFixed{
+					GasBumpEstimate:  0,
+					GasPriceEstimate: 0,
+				},
+				StartTime:       1673548149,
+				Duration:        180,
+				InitialRateBump: 50000,
+				Points: []AuctionPointClassFixed{
+					{
+						Delay:       12,
+						Coefficient: 20000,
+					},
+				},
+			},
+			expected: "0000000000000063c051750000b400c35001004e20000c",
+		},
+	}
+
+	for _, tc := range tests {
+		t.Run(tc.name, func(t *testing.T) {
+			encoded := tc.details.Encode()
+			assert.Equal(t, tc.expected, encoded)
 		})
 	}
 }

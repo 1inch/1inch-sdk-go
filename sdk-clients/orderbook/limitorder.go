@@ -1,6 +1,7 @@
 package orderbook
 
 import (
+	"crypto/rand"
 	"encoding/hex"
 	"fmt"
 	"math/big"
@@ -16,19 +17,11 @@ import (
 
 func CreateLimitOrderMessage(orderRequest CreateOrderParams, chainId int) (*Order, error) {
 
-	encodedExtension, err := orderRequest.Extension.Encode()
-	if err != nil {
-		return nil, fmt.Errorf("error encoding extension: %v", err)
-	}
-
-	// TODO this is a temporary fix to simulate the same extension data after a refactor
-	if encodedExtension == "0x0000000000000000000000000000000000000000000000000000000000000000" {
-		encodedExtension = "0x"
-	}
-
-	salt, err := GenerateSalt(encodedExtension)
-	if err != nil {
-		return nil, fmt.Errorf("error generating salt: %v", err)
+	var makerTraitsEncoded string
+	if orderRequest.MakerTraits == nil {
+		makerTraitsEncoded = ""
+	} else {
+		makerTraitsEncoded = orderRequest.MakerTraits.Encode()
 	}
 
 	orderData := OrderData{
@@ -36,12 +29,12 @@ func CreateLimitOrderMessage(orderRequest CreateOrderParams, chainId int) (*Orde
 		TakerAsset:    orderRequest.TakerAsset,
 		MakingAmount:  orderRequest.MakingAmount,
 		TakingAmount:  orderRequest.TakingAmount,
-		Salt:          salt,
+		Salt:          orderRequest.Salt,
 		Maker:         orderRequest.Maker,
 		AllowedSender: "0x0000000000000000000000000000000000000000",
 		Receiver:      orderRequest.Taker,
-		MakerTraits:   orderRequest.MakerTraits.Encode(),
-		Extension:     encodedExtension,
+		MakerTraits:   makerTraitsEncoded,
+		Extension:     orderRequest.ExtensionEncoded,
 	}
 
 	aggregationRouter, err := constants.Get1inchRouterFromChainId(chainId)
@@ -107,7 +100,9 @@ func CreateLimitOrderMessage(orderRequest CreateOrderParams, chainId int) (*Orde
 	}
 
 	// Add required prefix to the message
-	rawData := []byte(fmt.Sprintf("\x19\x01%s%s", string(domainSeparator), string(typedDataHash)))
+	rawData := []byte{0x19, 0x01}
+	rawData = append(rawData, domainSeparator...)
+	rawData = append(rawData, typedDataHash...)
 
 	challengeHash := crypto.Keccak256Hash(rawData)
 	challengeHashHex := challengeHash.Hex()
@@ -135,8 +130,8 @@ var timeNow = func() int64 {
 	return time.Now().UnixNano()
 }
 
-func GenerateSalt(extension string) (string, error) {
-	if extension == "0x" {
+func GenerateSalt(extension string, customBaseSalt *big.Int) (string, error) {
+	if extension == "0x" || extension == "" {
 		return fmt.Sprintf("%d", timeNow()/int64(time.Millisecond)), nil
 	}
 
@@ -150,7 +145,37 @@ func GenerateSalt(extension string) (string, error) {
 	// We need to keccak256 the extension and then bitwise & it with uint_160_max
 	var uint160Max = new(big.Int).Sub(new(big.Int).Lsh(big.NewInt(1), 160), big.NewInt(1))
 	salt.And(salt, uint160Max)
-	return fmt.Sprintf("0x%x", salt), nil
+
+	// Convert salt (20 bytes) to byte slice
+	saltBytes := salt.Bytes()
+	if len(saltBytes) < 20 {
+		pad := make([]byte, 20-len(saltBytes))
+		saltBytes = append(pad, saltBytes...) // pad to 20 bytes
+	}
+
+	var prefixBytes []byte
+	if customBaseSalt != nil {
+		prefixBytes = customBaseSalt.Bytes()
+		if len(prefixBytes) > 12 {
+			return "", fmt.Errorf("custom base salt cannot be larger than 96 bits")
+		}
+		if len(prefixBytes) < 12 {
+			pad := make([]byte, 12-len(prefixBytes))
+			prefixBytes = append(pad, prefixBytes...)
+		}
+	} else {
+		// Generate random 12-byte prefix
+		prefixBytes = make([]byte, 12)
+		_, err = rand.Read(prefixBytes)
+		if err != nil {
+			return "", err
+		}
+	}
+
+	// Combine random prefix and salt
+	full := append(prefixBytes, saltBytes...)
+
+	return fmt.Sprintf("0x%x", full), nil
 }
 
 func stringToHexBytes(hexStr string) ([]byte, error) {

@@ -4,6 +4,16 @@ All notable changes to this project will be documented in this file.
 
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/), and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html) starting with the *v1.0.0-beta.1* release.
 
+## [v2.0.0-preview] - 2025-1-22
+[v2.0.0-preview release page](https://github.com/1inch/1inch-sdk-go/releases/tag/v2.0.0-preview)
+
+### Breaking Changes
+- a new `surplus=true` query parameter must be added to Fusion quote requests
+
+### Changed
+- Fusion implementation updated to support new Fusion backend
+- Fusion+ is disabled until refactor is complete
+
 ## [v1.0.0-beta.3] - 2025-1-22
 [v1.0.0-beta.3 release page](https://github.com/1inch/1inch-sdk-go/releases/tag/v1.0.0-beta.3)
 ### Changed
