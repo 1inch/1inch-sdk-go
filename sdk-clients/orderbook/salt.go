@@ -15,8 +15,8 @@ type GetSaltParams struct {
 	UseRandom bool    // If true, uses random bits for the middle section; otherwise uses timestamp
 }
 
-// GenerateSaltNew generates a salt value with specific bit patterns
-func GenerateSaltNew(params *GetSaltParams) (*big.Int, error) {
+// GenerateSaltWithFees generates a salt value with specific bit patterns
+func GenerateSaltWithFees(params *GetSaltParams) (*big.Int, error) {
 	salt := big.NewInt(0)
 
 	// Generate upper 32 bits (bits 224-255) - tracking code mask

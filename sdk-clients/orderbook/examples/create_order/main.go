@@ -50,6 +50,9 @@ func main() {
 		log.Fatal(err)
 	}
 	client, err := orderbook.NewClient(config)
+	if err != nil {
+		log.Fatalf("Failed to create client: %v\n", err)
+	}
 
 	ecdsaPrivateKey, err := crypto.HexToECDSA(privateKey)
 	if err != nil {
@@ -90,7 +93,7 @@ func main() {
 		log.Fatalf("Failed to create extension: %v\n", err)
 	}
 
-	salt, err := orderbook.GenerateSaltNew(&orderbook.GetSaltParams{
+	salt, err := orderbook.GenerateSaltWithFees(&orderbook.GetSaltParams{
 		Extension: extensionEncoded,
 	})
 	if err != nil {
@@ -109,7 +112,6 @@ func main() {
 		SkipWarnings:                   false,
 		EnableOnchainApprovalsIfNeeded: false,
 		MakerTraits:                    orderbook.NewMakerTraitsDefault(),
-		MakerTraitsEncoded:             orderbook.NewMakerTraitsDefault().Encode(),
 		ExtensionEncoded:               extensionEncoded,
 	})
 	if err != nil {

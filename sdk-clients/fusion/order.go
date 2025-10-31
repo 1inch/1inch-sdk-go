@@ -152,18 +152,17 @@ func CreateFusionOrderData(quote GetQuoteOutputFixed, orderParams OrderParams, w
 	}
 
 	limitOrder, err := orderbook.CreateLimitOrderMessage(orderbook.CreateOrderParams{
-		Wallet:             wallet,
-		MakerTraits:        makerTraits,
-		MakerTraitsEncoded: makerTraits.Encode(),
-		Extension:          *orderbookExtension,
-		ExtensionEncoded:   orderbookExtensionEncoded,
-		Salt:               salt,
-		Maker:              fusionOrder.OrderInfo.Maker,
-		MakerAsset:         fusionOrder.OrderInfo.MakerAsset,
-		TakerAsset:         fusionOrder.OrderInfo.TakerAsset,
-		TakingAmount:       fusionOrder.OrderInfo.TakingAmount,
-		MakingAmount:       fusionOrder.OrderInfo.MakingAmount,
-		Taker:              fusionOrder.OrderInfo.Receiver,
+		Wallet:           wallet,
+		MakerTraits:      makerTraits,
+		Extension:        *orderbookExtension,
+		ExtensionEncoded: orderbookExtensionEncoded,
+		Salt:             salt,
+		Maker:            fusionOrder.OrderInfo.Maker,
+		MakerAsset:       fusionOrder.OrderInfo.MakerAsset,
+		TakerAsset:       fusionOrder.OrderInfo.TakerAsset,
+		TakingAmount:     fusionOrder.OrderInfo.TakingAmount,
+		MakingAmount:     fusionOrder.OrderInfo.MakingAmount,
+		Taker:            fusionOrder.OrderInfo.Receiver,
 	}, int(chainId))
 	if err != nil {
 		return nil, nil, fmt.Errorf("error creating limit order message: %v", err)

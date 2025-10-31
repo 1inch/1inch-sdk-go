@@ -123,7 +123,7 @@ func main() {
 		log.Fatalf("Failed to create extension: %v\n", err)
 	}
 
-	salt, err := orderbook.GenerateSaltNew(&orderbook.GetSaltParams{
+	salt, err := orderbook.GenerateSaltWithFees(&orderbook.GetSaltParams{
 		Extension: extensionEncoded,
 	})
 	if err != nil {
@@ -134,7 +134,6 @@ func main() {
 		Wallet:                         client.Wallet,
 		Salt:                           fmt.Sprintf("%d", salt),
 		MakerTraits:                    orderbook.NewMakerTraitsDefault(), // Defaults to a 1 hour expiration
-		MakerTraitsEncoded:             orderbook.NewMakerTraitsDefault().Encode(),
 		ExtensionEncoded:               extensionEncoded,
 		Maker:                          publicAddress.Hex(),
 		MakerAsset:                     makerAsset,

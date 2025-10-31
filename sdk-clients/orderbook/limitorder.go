@@ -17,6 +17,13 @@ import (
 
 func CreateLimitOrderMessage(orderRequest CreateOrderParams, chainId int) (*Order, error) {
 
+	var makerTraitsEncoded string
+	if orderRequest.MakerTraits == nil {
+		makerTraitsEncoded = ""
+	} else {
+		makerTraitsEncoded = orderRequest.MakerTraits.Encode()
+	}
+
 	orderData := OrderData{
 		MakerAsset:    orderRequest.MakerAsset,
 		TakerAsset:    orderRequest.TakerAsset,
@@ -26,7 +33,7 @@ func CreateLimitOrderMessage(orderRequest CreateOrderParams, chainId int) (*Orde
 		Maker:         orderRequest.Maker,
 		AllowedSender: "0x0000000000000000000000000000000000000000",
 		Receiver:      orderRequest.Taker,
-		MakerTraits:   orderRequest.MakerTraitsEncoded,
+		MakerTraits:   makerTraitsEncoded,
 		Extension:     orderRequest.ExtensionEncoded,
 	}
 
