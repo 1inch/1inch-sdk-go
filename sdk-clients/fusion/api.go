@@ -54,7 +54,7 @@ func (api *api) GetQuote(ctx context.Context, params QuoterControllerGetQuotePar
 		return nil, err
 	}
 
-	if params.Surplus != true {
+	if !params.Surplus {
 		return nil, fmt.Errorf("surplus query parameter must be true to get quote")
 	}
 

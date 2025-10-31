@@ -90,31 +90,31 @@ func (api *api) GetActiveOrders(ctx context.Context, params OrderApiControllerGe
 }
 
 func (api *api) GetQuote(ctx context.Context, params QuoterControllerGetQuoteParamsFixed) (*GetQuoteOutputFixed, error) {
-	u := "/fusion-plus/quoter/v1.0/quote/receive"
-
 	return nil, errors.New("fusion Plus API currently not supported")
 
-	err := params.Validate()
-	if err != nil {
-		return nil, err
-	}
-
-	payload := common.RequestPayload{
-		Method: "GET",
-		Params: params,
-		U:      u,
-		Body:   nil,
-	}
-
-	var response GetQuoteOutputFixed
-	err = api.httpExecutor.ExecuteRequest(ctx, payload, &response)
-	if err != nil {
-		return nil, err
-	}
-
-	// TODO must normalize response here
-
-	return &response, nil
+	//u := "/fusion-plus/quoter/v1.0/quote/receive"
+	//
+	//err := params.Validate()
+	//if err != nil {
+	//	return nil, err
+	//}
+	//
+	//payload := common.RequestPayload{
+	//	Method: "GET",
+	//	Params: params,
+	//	U:      u,
+	//	Body:   nil,
+	//}
+	//
+	//var response GetQuoteOutputFixed
+	//err = api.httpExecutor.ExecuteRequest(ctx, payload, &response)
+	//if err != nil {
+	//	return nil, err
+	//}
+	//
+	//// TODO must normalize response here
+	//
+	//return &response, nil
 }
 
 func (api *api) GetQuoteWithCustomPreset(ctx context.Context, params QuoterControllerGetQuoteWithCustomPresetsParams, presetDetails QuoterControllerGetQuoteWithCustomPresetsJSONRequestBody) (*GetQuoteOutputFixed, error) {

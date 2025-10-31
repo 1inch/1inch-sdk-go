@@ -48,7 +48,7 @@ func (q *CustomPreset) validatePoints(
 	auctionStartAmount string,
 	auctionEndAmount string,
 ) error {
-	if points == nil || len(points) == 0 {
+	if len(points) == 0 {
 		return nil
 	}
 
