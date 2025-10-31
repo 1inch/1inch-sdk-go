@@ -69,130 +69,91 @@ func TestGenerateSalt(t *testing.T) {
 	}
 }
 
-//TODO commenting out until Fusion is working again
-//func TestNewExtension(t *testing.T) {
-//	tests := []struct {
-//		name      string
-//		params    EscrowExtensionParams
-//		expected  *EscrowExtension
-//		expectErr bool
-//		errMsg    string
-//	}{
-//		{
-//			name: "Valid parameters with Escrow",
-//			params: EscrowExtensionParams{
-//				ExtensionParams: fusion.ExtensionParams{
-//					SettlementContract: "0x5678",
-//					AuctionDetails: &fusion.AuctionDetails{
-//						StartTime:       0,
-//						Duration:        0,
-//						InitialRateBump: 0,
-//						Points:          nil,
-//						GasCost:         fusion.GasCostConfigClassFixed{},
-//					},
-//					PostInteractionData: &fusion.SettlementPostInteractionData{
-//						Whitelist: []fusion.WhitelistItem{},
-//						IntegratorFee: &fusion.IntegratorFee{
-//							Ratio:    big.NewInt(0),
-//							Receiver: common.Address{},
-//						},
-//						BankFee:            big.NewInt(0),
-//						ResolvingStartTime: big.NewInt(0),
-//						CustomReceiver:     common.Address{},
-//					},
-//				},
-//			},
-//			expected: &EscrowExtension{
-//				Extension: fusion.Extension{
-//					MakerAssetSuffix: "0x1234",
-//					TakerAssetSuffix: "0x1234",
-//					MakingAmountData: "0x0000000000000000000000000000000000005678",
-//					TakingAmountData: "0x0000000000000000000000000000000000005678",
-//					Predicate:        "0x1234",
-//					MakerPermit:      "0x00000000000000000000000000000000000012343456",
-//					PreInteraction:   "0xpre",
-//					PostInteraction:  "0x0000000000000000000000000000000000005678",
-//				},
-//			},
-//			expectErr: false,
-//		},
-//		{
-//			name: "Invalid MakerAssetSuffix",
-//			params: EscrowExtensionParams{
-//				ExtensionParams: fusion.ExtensionParams{
-//					SettlementContract: "0x5678",
-//					MakerAssetSuffix:   "invalid",
-//					TakerAssetSuffix:   "0x1234",
-//					Predicate:          "0x1234",
-//					PreInteraction:     "pre",
-//				},
-//			},
-//			expectErr: true,
-//			errMsg:    "MakerAssetSuffix must be valid hex string",
-//		},
-//		{
-//			name: "Invalid TakerAssetSuffix",
-//			params: EscrowExtensionParams{
-//				ExtensionParams: fusion.ExtensionParams{
-//					SettlementContract: "0x5678",
-//					MakerAssetSuffix:   "0x1234",
-//					TakerAssetSuffix:   "invalid",
-//					Predicate:          "0x1234",
-//					PreInteraction:     "pre",
-//				},
-//			},
-//			expectErr: true,
-//			errMsg:    "TakerAssetSuffix must be valid hex string",
-//		},
-//		{
-//			name: "Invalid Predicate",
-//			params: EscrowExtensionParams{
-//				ExtensionParams: fusion.ExtensionParams{
-//					SettlementContract: "0x5678",
-//					MakerAssetSuffix:   "0x1234",
-//					TakerAssetSuffix:   "0x1234",
-//					Predicate:          "invalid",
-//					PreInteraction:     "pre",
-//				},
-//			},
-//			expectErr: true,
-//			errMsg:    "Predicate must be valid hex string",
-//		},
-//		{
-//			name: "CustomData not supported",
-//			params: EscrowExtensionParams{
-//				ExtensionParams: fusion.ExtensionParams{
-//					SettlementContract: "0x5678",
-//					MakerAssetSuffix:   "0x1234",
-//					TakerAssetSuffix:   "0x1234",
-//					Predicate:          "0x1234",
-//					PreInteraction:     "pre",
-//					CustomData:         "0x1234",
-//				},
-//			},
-//			expectErr: true,
-//			errMsg:    "CustomData is not currently supported",
-//		},
-//	}
-//
-//	for _, tc := range tests {
-//		t.Run(tc.name, func(t *testing.T) {
-//			ext, err := NewEscrowExtension(tc.params)
-//			if tc.expectErr {
-//				require.Error(t, err)
-//				assert.Equal(t, tc.errMsg, err.Error())
-//			} else {
-//				require.NoError(t, err)
-//				assert.NotNil(t, ext)
-//				assert.Equal(t, tc.expected.MakerAssetSuffix, ext.MakerAssetSuffix)
-//				assert.Equal(t, tc.expected.TakerAssetSuffix, ext.TakerAssetSuffix)
-//				assert.Equal(t, tc.expected.Predicate, ext.Predicate)
-//				assert.Equal(t, tc.expected.PreInteraction, ext.PreInteraction)
-//				assert.Equal(t, tc.expected.PostInteraction, ext.PostInteraction)
-//			}
-//		})
-//	}
-//}
+func TestNewExtension(t *testing.T) {
+	tests := []struct {
+		name      string
+		params    EscrowExtensionParams
+		expected  *EscrowExtension
+		expectErr bool
+		errMsg    string
+	}{
+		{
+			name: "Invalid MakerAssetSuffix",
+			params: EscrowExtensionParams{
+				ExtensionParams: fusion.ExtensionParams{
+					SettlementContract: "0x5678",
+					MakerAssetSuffix:   "invalid",
+					TakerAssetSuffix:   "0x1234",
+					Predicate:          "0x1234",
+					PreInteraction:     "pre",
+				},
+			},
+			expectErr: true,
+			errMsg:    "MakerAssetSuffix must be valid hex string",
+		},
+		{
+			name: "Invalid TakerAssetSuffix",
+			params: EscrowExtensionParams{
+				ExtensionParams: fusion.ExtensionParams{
+					SettlementContract: "0x5678",
+					MakerAssetSuffix:   "0x1234",
+					TakerAssetSuffix:   "invalid",
+					Predicate:          "0x1234",
+					PreInteraction:     "pre",
+				},
+			},
+			expectErr: true,
+			errMsg:    "TakerAssetSuffix must be valid hex string",
+		},
+		{
+			name: "Invalid Predicate",
+			params: EscrowExtensionParams{
+				ExtensionParams: fusion.ExtensionParams{
+					SettlementContract: "0x5678",
+					MakerAssetSuffix:   "0x1234",
+					TakerAssetSuffix:   "0x1234",
+					Predicate:          "invalid",
+					PreInteraction:     "pre",
+				},
+			},
+			expectErr: true,
+			errMsg:    "Predicate must be valid hex string",
+		},
+		{
+			name: "CustomData not supported",
+			params: EscrowExtensionParams{
+				ExtensionParams: fusion.ExtensionParams{
+					SettlementContract: "0x5678",
+					MakerAssetSuffix:   "0x1234",
+					TakerAssetSuffix:   "0x1234",
+					Predicate:          "0x1234",
+					PreInteraction:     "pre",
+					CustomData:         "0x1234",
+				},
+			},
+			expectErr: true,
+			errMsg:    "CustomData is not currently supported",
+		},
+	}
+
+	for _, tc := range tests {
+		t.Run(tc.name, func(t *testing.T) {
+			ext, err := NewEscrowExtension(tc.params)
+			if tc.expectErr {
+				require.Error(t, err)
+				assert.Equal(t, tc.errMsg, err.Error())
+			} else {
+				require.NoError(t, err)
+				assert.NotNil(t, ext)
+				assert.Equal(t, tc.expected.MakerAssetSuffix, ext.MakerAssetSuffix)
+				assert.Equal(t, tc.expected.TakerAssetSuffix, ext.TakerAssetSuffix)
+				assert.Equal(t, tc.expected.Predicate, ext.Predicate)
+				assert.Equal(t, tc.expected.PreInteraction, ext.PreInteraction)
+				assert.Equal(t, tc.expected.PostInteraction, ext.PostInteraction)
+			}
+		})
+	}
+}
 
 func TestEncodeExtraData(t *testing.T) {
 	tests := []struct {
