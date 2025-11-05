@@ -18,16 +18,6 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 
 ### Changed
 - Limit Order SDK updated to support v4.1 API
-- 
-## [v2.0.0] - 2025-1-22
-[v2.0.0-preview release page](https://github.com/1inch/1inch-sdk-go/releases/tag/v2.0.0-preview)
-
-### Breaking Changes
-- a new `surplus=true` query parameter must be added to Fusion quote requests
-
-### Changed
-- Fusion implementation updated to support new Fusion backend
-- Fusion+ is disabled until refactor is complete
 
 ## [v2.0.0-preview] - 2025-1-22
 [v2.0.0-preview release page](https://github.com/1inch/1inch-sdk-go/releases/tag/v2.0.0-preview)
