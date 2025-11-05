@@ -10,7 +10,6 @@ type Client struct {
 }
 
 type api struct {
-	chainId      uint64
 	httpExecutor common.HttpExecutor
 }
 

@@ -22,8 +22,6 @@ type SettlementPostInteractionDataFusion struct {
 	CustomReceiver     common.Address
 }
 
-var uint16MaxFusion = new(big.Int).Sub(new(big.Int).Lsh(big.NewInt(1), 16), big.NewInt(1))
-
 func NewSettlementPostInteractionDataFusion(data SettlementSuffixDataFusion) (*SettlementPostInteractionDataFusion, error) {
 	if len(data.Whitelist) == 0 {
 		return nil, errors.New("whitelist cannot be empty")
