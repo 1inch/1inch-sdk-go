@@ -38,7 +38,7 @@ func main() {
 	srcToken := "0xaf88d065e77c8cC2239327C5EDb3A432268e5831"
 	dstToken := "0x833589fCD6eDb6E08f4c7C32D4f71b54bdA02913"
 
-	invert := false
+	invert := true
 	if invert {
 		srcChain, dstChain = dstChain, srcChain
 		srcToken, dstToken = dstToken, srcToken
@@ -107,7 +107,6 @@ func main() {
 		log.Fatalf("Failed to create order data: %v", err)
 	}
 
-	// Get order by hash
 	order, err := client.GetOrderByOrderHash(ctx, fusionplus.GetOrderByOrderHashParams{
 		Hash: orderHash,
 	})
@@ -121,39 +120,31 @@ func main() {
 	}
 	fmt.Printf("Order: %s\n", string(orderQuickLookIndented))
 
-	// Define loop parameters
 	delay := 1 * time.Second // Delay between retries
 	retryCount := 0          // Current retry count
 	orderStatus := ""        // Current order status
 
-	// Loop until order status is "executed" or max retries reached
+	fmt.Println("Waiting for fill requests from the Cross Chain Swap system...")
+
 	for {
-		// Get order by hash
 		order, err = client.GetOrderByOrderHash(ctx, fusionplus.GetOrderByOrderHashParams{
 			Hash: orderHash,
 		})
 		if err != nil {
 			log.Printf("Failed to get order by hash: %v", err)
 		} else {
-			// Assuming order.Status is a string. Adjust the field access as per actual response structure.
 			orderStatus = string(order.Status)
-			fmt.Printf("Attempt %d: Order Status: %s\n", retryCount+1, orderStatus)
-
-			// Check if status is "executed"
 			if orderStatus == "executed" {
-				fmt.Println("Order has been executed.")
+				fmt.Println("Order completed successfully.")
 				break
 			}
-
-			// Check if status is "executed"
 			if orderStatus == "refunded" {
-				fmt.Println("Order has been refunded.")
+				fmt.Println("Order did not complete and has been refunded.")
 				break
 			}
 		}
 
-		// TODO fix params on this
-		fills, err := client.GetReadyToAcceptFills(ctx, fusionplus.GetOrderByOrderHashParams{
+		fills, err := client.GetReadyToAcceptFills(ctx, fusionplus.GetReadyToAcceptFillsParams{
 			Hash: orderHash,
 		})
 		if err != nil {
@@ -161,30 +152,17 @@ func main() {
 		}
 
 		if len(fills.Fills) > 0 {
-			// TODO the secret index needs to match the index of the fill object, but I can ignore it for single-secre orders
+			// TODO the secret index needs to match the index of the fill object, but this is not important for single-secre orders
 			err = client.SubmitSecret(ctx, fusionplus.SecretInput{
 				OrderHash: orderHash,
 				Secret:    secrets[0],
 			})
 			if err != nil {
 				log.Fatalf("failed to submit secret: %v", err)
-			} else {
-				fmt.Println("Secret submitted!")
 			}
+			fmt.Println("Fill request received and secret submitted! Checking for more fills...")
 		}
-
-		fmt.Printf("Fills: %v\n", fills)
-
-		// Increment retry count
 		retryCount++
-
-		// Wait before next retry
 		time.Sleep(delay)
 	}
-
-	orderIndented, err := json.MarshalIndent(order, "", "  ")
-	if err != nil {
-		log.Fatalf("Failed to marshal response: %v\n", err)
-	}
-	fmt.Printf("Order: %s\n", string(orderIndented))
 }

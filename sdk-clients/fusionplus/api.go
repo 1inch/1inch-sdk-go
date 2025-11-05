@@ -3,14 +3,13 @@ package fusionplus
 import (
 	"context"
 	"encoding/json"
-	"errors"
 	"fmt"
 
 	"github.com/1inch/1inch-sdk-go/common"
 )
 
 func (api *api) GetOrderByOrderHash(ctx context.Context, params GetOrderByOrderHashParams) (*GetOrderFillsByHashOutputFixed, error) {
-	u := fmt.Sprintf("/fusion-plus/orders/v1.0/order/status/%s", params.Hash)
+	u := fmt.Sprintf("/fusion-plus/orders/v1.1/order/status/%s", params.Hash)
 
 	payload := common.RequestPayload{
 		Method: "GET",
@@ -28,8 +27,8 @@ func (api *api) GetOrderByOrderHash(ctx context.Context, params GetOrderByOrderH
 	return &response, nil
 }
 
-func (api *api) GetReadyToAcceptFills(ctx context.Context, params GetOrderByOrderHashParams) (*ReadyToAcceptSecretFills, error) {
-	u := fmt.Sprintf("/fusion-plus/orders/v1.0/order/ready-to-accept-secret-fills/%s", params.Hash)
+func (api *api) GetReadyToAcceptFills(ctx context.Context, params GetReadyToAcceptFillsParams) (*ReadyToAcceptSecretFills, error) {
+	u := fmt.Sprintf("/fusion-plus/orders/v1.1/order/ready-to-accept-secret-fills/%s", params.Hash)
 
 	payload := common.RequestPayload{
 		Method: "GET",
@@ -48,7 +47,7 @@ func (api *api) GetReadyToAcceptFills(ctx context.Context, params GetOrderByOrde
 }
 
 func (api *api) SubmitSecret(ctx context.Context, params SecretInput) error {
-	u := "/fusion-plus/relayer/v1.0/submit/secret"
+	u := "/fusion-plus/relayer/v1.1/submit/secret"
 
 	body, err := json.Marshal(params)
 	if err != nil {
@@ -70,8 +69,13 @@ func (api *api) SubmitSecret(ctx context.Context, params SecretInput) error {
 	return nil
 }
 
-func (api *api) GetActiveOrders(ctx context.Context, params OrderApiControllerGetActiveOrdersParams) (*GetActiveOrdersOutput, error) {
-	u := fmt.Sprintf("/fusion/orders/v2.0/%d/order/active", api.chainId)
+func (api *api) GetQuote(ctx context.Context, params QuoterControllerGetQuoteParamsFixed) (*GetQuoteOutputFixed, error) {
+	u := "/fusion-plus/quoter/v1.1/quote/receive"
+
+	err := params.Validate()
+	if err != nil {
+		return nil, err
+	}
 
 	payload := common.RequestPayload{
 		Method: "GET",
@@ -80,70 +84,20 @@ func (api *api) GetActiveOrders(ctx context.Context, params OrderApiControllerGe
 		Body:   nil,
 	}
 
-	var response GetActiveOrdersOutput
-	err := api.httpExecutor.ExecuteRequest(ctx, payload, &response)
-	if err != nil {
-		return nil, err
-	}
-
-	return &response, nil
-}
-
-func (api *api) GetQuote(ctx context.Context, params QuoterControllerGetQuoteParamsFixed) (*GetQuoteOutputFixed, error) {
-	return nil, errors.New("fusion Plus API currently not supported")
-
-	//u := "/fusion-plus/quoter/v1.0/quote/receive"
-	//
-	//err := params.Validate()
-	//if err != nil {
-	//	return nil, err
-	//}
-	//
-	//payload := common.RequestPayload{
-	//	Method: "GET",
-	//	Params: params,
-	//	U:      u,
-	//	Body:   nil,
-	//}
-	//
-	//var response GetQuoteOutputFixed
-	//err = api.httpExecutor.ExecuteRequest(ctx, payload, &response)
-	//if err != nil {
-	//	return nil, err
-	//}
-	//
-	//// TODO must normalize response here
-	//
-	//return &response, nil
-}
-
-func (api *api) GetQuoteWithCustomPreset(ctx context.Context, params QuoterControllerGetQuoteWithCustomPresetsParams, presetDetails QuoterControllerGetQuoteWithCustomPresetsJSONRequestBody) (*GetQuoteOutputFixed, error) {
-	u := fmt.Sprintf("/fusion/quoter/v2.0/%d/quote/receive", api.chainId)
-
-	body, err := json.Marshal(presetDetails)
-	if err != nil {
-		return nil, err
-	}
-
-	payload := common.RequestPayload{
-		Method: "GET",
-		Params: params,
-		U:      u,
-		Body:   body,
-	}
-
 	var response GetQuoteOutputFixed
 	err = api.httpExecutor.ExecuteRequest(ctx, payload, &response)
 	if err != nil {
 		return nil, err
 	}
 
+	// TODO must normalize response here
+
 	return &response, nil
 }
 
 // PlaceOrder accepts a quote and submits it as a fusion plus order
 func (api *api) PlaceOrder(ctx context.Context, quoteParams QuoterControllerGetQuoteParamsFixed, quote *GetQuoteOutputFixed, orderParams OrderParams, wallet common.Wallet) (string, error) {
-	u := "/fusion-plus/relayer/v1.0/submit"
+	u := "/fusion-plus/relayer/v1.1/submit"
 
 	err := orderParams.Validate()
 	if err != nil {

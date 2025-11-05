@@ -30,7 +30,7 @@ func main() {
 	}
 	ctx := context.Background()
 
-	response, err := client.GetReadyToAcceptFills(ctx, fusionplus.GetOrderByOrderHashParams{
+	response, err := client.GetOrderByOrderHash(ctx, fusionplus.GetOrderByOrderHashParams{
 		Hash: "0x97729858044d3838c82f2ea5ca4764bd20bfdf1f99d3af05786e4a358b16fa91",
 	})
 	if err != nil {

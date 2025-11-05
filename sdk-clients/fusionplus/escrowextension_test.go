@@ -1,13 +1,13 @@
 package fusionplus
 
 import (
+	"bytes"
 	"fmt"
 	"math/big"
 	"testing"
 
 	"github.com/1inch/1inch-sdk-go/internal/bigint"
 	random_number_generation "github.com/1inch/1inch-sdk-go/internal/random-number-generation"
-	"github.com/1inch/1inch-sdk-go/sdk-clients/fusion"
 	"github.com/ethereum/go-ethereum/common"
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
@@ -36,7 +36,7 @@ func TestGenerateSalt(t *testing.T) {
 		{
 			name: "Generate salt when extension is not empty",
 			extension: &EscrowExtension{
-				Extension: fusion.Extension{
+				ExtensionFusion: ExtensionFusion{
 					MakerAssetSuffix: "suffix1",
 					TakerAssetSuffix: "suffix2",
 					MakingAmountData: "data1",
@@ -48,7 +48,7 @@ func TestGenerateSalt(t *testing.T) {
 					CustomData:       "custom",
 				},
 			},
-			expected:  "180431909497609865807168059378624320943465639784996571",
+			expected:  "180431178743033967347942937469468920088249224033532329",
 			expectErr: false,
 		},
 	}
@@ -78,9 +78,54 @@ func TestNewExtension(t *testing.T) {
 		errMsg    string
 	}{
 		{
+			name: "Valid parameters with Escrow",
+			params: EscrowExtensionParams{
+				ExtensionParamsFusion: ExtensionParamsFusion{
+					SettlementContract: "0x5678",
+					AuctionDetails: &AuctionDetails{
+						StartTime:       0,
+						Duration:        0,
+						InitialRateBump: 0,
+						Points:          nil,
+						GasCost:         GasCostConfigClassFixed{},
+					},
+					PostInteractionData: &SettlementPostInteractionDataFusion{
+						Whitelist: []WhitelistItem{},
+						IntegratorFee: &IntegratorFeeFusion{
+							Ratio:    big.NewInt(0),
+							Receiver: common.Address{},
+						},
+						BankFee:            big.NewInt(0),
+						ResolvingStartTime: big.NewInt(0),
+						CustomReceiver:     common.Address{},
+					},
+					Asset:  "0x1234",
+					Permit: "0x3456",
+
+					MakerAssetSuffix: "0x1234",
+					TakerAssetSuffix: "0x1234",
+					Predicate:        "0x1234",
+					PreInteraction:   "pre",
+				},
+			},
+			expected: &EscrowExtension{
+				ExtensionFusion: ExtensionFusion{
+					MakerAssetSuffix: "0x1234",
+					TakerAssetSuffix: "0x1234",
+					MakingAmountData: "0x00000000000000000000000000000000000056780000000000000000000000000000000000",
+					TakingAmountData: "0x00000000000000000000000000000000000056780000000000000000000000000000000000",
+					Predicate:        "0x1234",
+					MakerPermit:      "0x00000000000000000000000000000000000012343456",
+					PreInteraction:   "pre",
+					PostInteraction:  "0x00000000000000000000000000000000000056780000000000",
+				},
+			},
+			expectErr: false,
+		},
+		{
 			name: "Invalid MakerAssetSuffix",
 			params: EscrowExtensionParams{
-				ExtensionParams: fusion.ExtensionParams{
+				ExtensionParamsFusion: ExtensionParamsFusion{
 					SettlementContract: "0x5678",
 					MakerAssetSuffix:   "invalid",
 					TakerAssetSuffix:   "0x1234",
@@ -94,7 +139,7 @@ func TestNewExtension(t *testing.T) {
 		{
 			name: "Invalid TakerAssetSuffix",
 			params: EscrowExtensionParams{
-				ExtensionParams: fusion.ExtensionParams{
+				ExtensionParamsFusion: ExtensionParamsFusion{
 					SettlementContract: "0x5678",
 					MakerAssetSuffix:   "0x1234",
 					TakerAssetSuffix:   "invalid",
@@ -108,7 +153,7 @@ func TestNewExtension(t *testing.T) {
 		{
 			name: "Invalid Predicate",
 			params: EscrowExtensionParams{
-				ExtensionParams: fusion.ExtensionParams{
+				ExtensionParamsFusion: ExtensionParamsFusion{
 					SettlementContract: "0x5678",
 					MakerAssetSuffix:   "0x1234",
 					TakerAssetSuffix:   "0x1234",
@@ -122,7 +167,7 @@ func TestNewExtension(t *testing.T) {
 		{
 			name: "CustomData not supported",
 			params: EscrowExtensionParams{
-				ExtensionParams: fusion.ExtensionParams{
+				ExtensionParamsFusion: ExtensionParamsFusion{
 					SettlementContract: "0x5678",
 					MakerAssetSuffix:   "0x1234",
 					TakerAssetSuffix:   "0x1234",
@@ -150,6 +195,7 @@ func TestNewExtension(t *testing.T) {
 				assert.Equal(t, tc.expected.Predicate, ext.Predicate)
 				assert.Equal(t, tc.expected.PreInteraction, ext.PreInteraction)
 				assert.Equal(t, tc.expected.PostInteraction, ext.PostInteraction)
+				assert.Equal(t, tc.expected.CustomData, ext.CustomData)
 			}
 		})
 	}
@@ -197,4 +243,9 @@ func TestEncodeExtraData(t *testing.T) {
 			require.Equal(t, tt.expectedEncoded, fmt.Sprintf("%x", encoded))
 		})
 	}
+}
+
+// contains checks if the substring is present in the string.
+func contains(s, substr string) bool {
+	return bytes.Contains([]byte(s), []byte(substr))
 }

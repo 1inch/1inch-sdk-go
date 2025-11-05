@@ -3,17 +3,20 @@ package fusionplus
 import (
 	"bytes"
 	"encoding/binary"
+	"encoding/hex"
 	"fmt"
+	"log"
 	"math/big"
+	"strings"
 
+	"github.com/1inch/1inch-sdk-go/internal/bytesiterator"
 	"github.com/1inch/1inch-sdk-go/internal/hexadecimal"
-	"github.com/1inch/1inch-sdk-go/sdk-clients/fusion"
 	"github.com/1inch/1inch-sdk-go/sdk-clients/orderbook"
 	"github.com/ethereum/go-ethereum/common"
 )
 
 type EscrowExtension struct {
-	fusion.Extension
+	ExtensionFusion
 	HashLock         *HashLock
 	DstChainId       float32
 	DstToken         common.Address
@@ -24,13 +27,13 @@ type EscrowExtension struct {
 
 func NewEscrowExtension(escrowParams EscrowExtensionParams) (*EscrowExtension, error) {
 
-	extension, err := fusion.NewExtension(escrowParams.ExtensionParams)
+	extension, err := NewExtensionFusion(escrowParams.ExtensionParamsFusion)
 	if err != nil {
 		return nil, err
 	}
 
 	escrowExtension := &EscrowExtension{
-		Extension:        *extension,
+		ExtensionFusion:  *extension,
 		HashLock:         escrowParams.HashLock,
 		DstChainId:       escrowParams.DstChainId,
 		DstToken:         escrowParams.DstToken,
@@ -81,6 +84,132 @@ func (e *EscrowExtension) ConvertToOrderbookExtension() (*orderbook.Extension, e
 		PostInteraction:  e.PostInteraction,
 		//hexadecimal.Trim0x(e.CustomData), // TODO Blocking custom data for now because it is breaking the cumsum method. The extension constructor will return with an error if the user provides this field.
 	}, nil
+}
+
+// DecodeEscrowExtension decodes the input byte slice into an Extension struct using reflection.
+func DecodeEscrowExtension(data []byte) (*EscrowExtension, error) {
+
+	const extraDataCharacterLength = 320
+
+	// Create one extension that will be used for the Escrow extension data
+	orderbookExtensionTruncated, err := orderbook.Decode(data)
+	if err != nil {
+		return nil, fmt.Errorf("error decoding extension: %v", err)
+	}
+
+	// Remove the Fusion Plus Extension data before decoding
+	orderbookExtensionTruncated.PostInteraction = orderbookExtensionTruncated.PostInteraction[:len(orderbookExtensionTruncated.PostInteraction)-extraDataCharacterLength]
+	fusionExtension, err := FromLimitOrderExtension(orderbookExtensionTruncated)
+	if err != nil {
+		return &EscrowExtension{}, fmt.Errorf("error decoding escrow extension: %v", err)
+	}
+
+	// Create a second extension that will be used as a Fusion extension
+	orderbookExtension, err := orderbook.Decode(data)
+	if err != nil {
+		return nil, fmt.Errorf("error decoding extension: %v", err)
+	}
+	extraDataRaw := orderbookExtension.PostInteraction[len(orderbookExtension.PostInteraction)-extraDataCharacterLength:]
+	extraDataBytes, err := hex.DecodeString(extraDataRaw)
+	if err != nil {
+		return nil, fmt.Errorf("error decoding escrow extension extra data: %v", err)
+	}
+
+	// Send the final 160 bytes of the postInteraction to decodeExtraData
+	extraData, err := decodeExtraData(extraDataBytes)
+	if err != nil {
+		return nil, fmt.Errorf("error decoding escrow extension extra data: %v", err)
+	}
+
+	return &EscrowExtension{
+		ExtensionFusion:  *fusionExtension,
+		HashLock:         extraData.HashLock,
+		DstChainId:       extraData.DstChainId,
+		DstToken:         extraData.DstToken,
+		SrcSafetyDeposit: fmt.Sprintf("%x", extraData.SrcSafetyDeposit),
+		DstSafetyDeposit: fmt.Sprintf("%x", extraData.DstSafetyDeposit),
+		TimeLocks:        *extraData.TimeLocks,
+	}, nil
+}
+
+func decodeExtraData(data []byte) (*EscrowExtraData, error) {
+	iter := bytesiterator.New(data)
+	hashlockData, err := iter.NextUint256()
+	if err != nil {
+		log.Fatalf("Failed to read first uint256: %v", err)
+	}
+
+	dstChainIdData, err := iter.NextUint256()
+	if err != nil {
+		log.Fatalf("Failed to read second uint256: %v", err)
+	}
+
+	addressBig, err := iter.NextUint256()
+	if err != nil {
+		log.Fatalf("Failed to read address: %v", err)
+	}
+
+	addressHex := strings.ToLower(common.BigToAddress(addressBig).Hex())
+
+	safetyDepositData, err := iter.NextUint256()
+	if err != nil {
+		log.Fatalf("Failed to read third uint256: %v", err)
+	}
+
+	// Define a 128-bit mask (2^128 - 1)
+	mask := new(big.Int)
+	mask.Exp(big.NewInt(2), big.NewInt(128), nil).Sub(mask, big.NewInt(1))
+
+	srcSafetyDeposit := new(big.Int).And(safetyDepositData, mask)
+	dstSafetyDeposit := new(big.Int).Rsh(safetyDepositData, 128)
+
+	timelocksData, err := iter.NextUint256()
+	if err != nil {
+		log.Fatalf("Failed to read fourth uint256: %v", err)
+	}
+
+	timelocks, err := decodeTimeLocks(timelocksData)
+	if err != nil {
+		log.Fatalf("Failed to decode timelocks: %v", err)
+	}
+
+	return &EscrowExtraData{
+		HashLock: &HashLock{
+			hashlockData.String(),
+		},
+		DstChainId:       float32(dstChainIdData.Uint64()),
+		DstToken:         common.HexToAddress(addressHex),
+		SrcSafetyDeposit: srcSafetyDeposit,
+		DstSafetyDeposit: dstSafetyDeposit,
+		TimeLocks:        timelocks,
+	}, nil
+}
+
+// decodeTimeLocks takes a *big.Int containing the raw hex data and returns a TimeLocks struct.
+func decodeTimeLocks(value *big.Int) (*TimeLocks, error) {
+	tl := &TimeLocks{}
+
+	// Convert big.Int to byte slice
+	data := value.Bytes()
+
+	if len(data) < 32 {
+		padded := make([]byte, 32)
+		copy(padded[32-len(data):], data)
+		data = padded
+	}
+
+	//TODO big.Int cannot preserve leading zeroes, so decoding the deploy time is impossible atm
+
+	// tl.DeployTime = float32(binary.BigEndian.Uint32((data[0:4])))
+	tl.DstCancellation = float32(binary.BigEndian.Uint32((data[4:8])))
+	tl.DstPublicWithdrawal = float32(binary.BigEndian.Uint32((data[8:12])))
+	tl.DstWithdrawal = float32(binary.BigEndian.Uint32((data[12:16])))
+	tl.SrcPublicCancellation = float32(binary.BigEndian.Uint32((data[16:20])))
+	tl.SrcCancellation = float32(binary.BigEndian.Uint32((data[20:24])))
+	tl.SrcPublicWithdrawal = float32(binary.BigEndian.Uint32((data[24:28])))
+	tl.SrcWithdrawal = float32(binary.BigEndian.Uint32((data[28:32])))
+
+	return tl, nil
 }
 
 type EscrowExtraData struct {
