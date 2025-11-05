@@ -25,10 +25,7 @@ func CreateFusionPlusOrderData(quoteParams QuoterControllerGetQuoteParamsFixed, 
 
 	auctionPointsFusion := make([]AuctionPointClassFusion, 0)
 	for _, point := range preset.Points {
-		auctionPointsFusion = append(auctionPointsFusion, AuctionPointClassFusion{
-			Coefficient: point.Coefficient,
-			Delay:       point.Delay,
-		})
+		auctionPointsFusion = append(auctionPointsFusion, AuctionPointClassFusion(point))
 	}
 
 	gasCostsFusion := GasCostConfigClassFusion{
