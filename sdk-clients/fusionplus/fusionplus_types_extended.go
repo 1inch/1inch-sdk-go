@@ -11,6 +11,9 @@ import (
 type GetOrderByOrderHashParams struct {
 	Hash string `url:"hash" json:"hash"`
 }
+type GetReadyToAcceptFillsParams struct {
+	Hash string `url:"hash" json:"hash"`
+}
 
 // GetOrderFillsByHashOutputFixed replaces the DstTokenPriceUsd and SrcTokenPriceUsd fields with string and changes Points to be an array
 type GetOrderFillsByHashOutputFixed struct {
@@ -136,6 +139,7 @@ type Order struct {
 
 type EscrowExtensionParams struct {
 	fusion.ExtensionParams
+	ExtensionParamsFusion
 	HashLock         *HashLock
 	DstChainId       float32
 	DstToken         common.Address
@@ -223,10 +227,22 @@ type AdditionalParams struct {
 }
 
 type Details struct {
-	Auction            *AuctionDetails        `json:"auction"`
-	Whitelist          []AuctionWhitelistItem `json:"whitelist"`
-	ResolvingStartTime *big.Int               `json:"resolvingStartTime"`
+	Auction            *AuctionDetails `json:"auction"`
+	Fees               Fees            `json:"fees"`
+	Whitelist          []AuctionWhitelistItem
+	ResolvingStartTime *big.Int
 }
+
+type Fees struct {
+	IntFee  IntegratorFee
+	BankFee *big.Int
+}
+
+type IntegratorFee struct {
+	Ratio    *big.Int
+	Receiver common.Address
+}
+
 type AuctionWhitelistItem struct {
 	Address common.Address
 	/**
@@ -248,6 +264,8 @@ type ExtraParams struct {
 
 type SettlementSuffixData struct {
 	Whitelist          []AuctionWhitelistItem
+	IntegratorFee      *IntegratorFee
+	BankFee            *big.Int
 	ResolvingStartTime *big.Int
 	CustomReceiver     common.Address
 }
@@ -273,4 +291,121 @@ type ExtraData struct {
 	OrderExpirationDelay uint32
 	EnablePermit2        bool
 	Source               string
+}
+
+// PresetClassFixedFusion defines model for PresetClass.
+type PresetClassFixedFusion struct {
+	AllowMultipleFills bool                      `json:"allowMultipleFills"`
+	AllowPartialFills  bool                      `json:"allowPartialFills"`
+	AuctionDuration    float32                   `json:"auctionDuration"`
+	AuctionEndAmount   string                    `json:"auctionEndAmount"`
+	AuctionStartAmount string                    `json:"auctionStartAmount"`
+	BankFee            string                    `json:"bankFee"`
+	EstP               float32                   `json:"estP"`
+	ExclusiveResolver  string                    `json:"exclusiveResolver"` // This was changed to a string from a map[string]interface{}
+	GasCost            GasCostConfigClassFusion  `json:"gasCost"`
+	InitialRateBump    float32                   `json:"initialRateBump"`
+	Points             []AuctionPointClassFusion `json:"points"`
+	StartAuctionIn     float32                   `json:"startAuctionIn"`
+	TokenFee           string                    `json:"tokenFee"`
+}
+
+// GasCostConfigClassFusion defines model for GasCostConfigClass.
+type GasCostConfigClassFusion struct {
+	GasBumpEstimate  float32 `json:"gasBumpEstimate"`
+	GasPriceEstimate string  `json:"gasPriceEstimate"`
+}
+
+// AuctionPointClassFusion defines model for AuctionPointClass.
+type AuctionPointClassFusion struct {
+	Coefficient float32 `json:"coefficient"`
+	Delay       float32 `json:"delay"`
+}
+
+type FeesFusion struct {
+	IntFee  IntegratorFeeFusion
+	BankFee *big.Int
+}
+
+type IntegratorFeeFusion struct {
+	Ratio    *big.Int
+	Receiver common.Address
+}
+
+type DetailsFusion struct {
+	Auction            *AuctionDetails `json:"auction"`
+	Fees               FeesFusion      `json:"fees"`
+	Whitelist          []AuctionWhitelistItem
+	ResolvingStartTime *big.Int
+}
+
+// FusionOrderV4 defines model for FusionOrderV4.
+type FusionOrderV4 struct {
+	// Maker Address of the account creating the order (maker).
+	Maker string `json:"maker"`
+
+	// MakerAsset Identifier of the asset being offered by the maker.
+	MakerAsset string `json:"makerAsset"`
+
+	// MakerTraits Includes some flags like, allow multiple fills, is partial fill allowed or not, price improvement, nonce, deadline etc.
+	MakerTraits string `json:"makerTraits"`
+
+	// MakingAmount Amount of the makerAsset being offered by the maker.
+	MakingAmount string `json:"makingAmount"`
+
+	// Receiver Address of the account receiving the assets (receiver), if different from maker.
+	Receiver string `json:"receiver"`
+
+	// Salt Some unique value. It is necessary to be able to create limit orders with the same parameters (so that they have a different hash), Lowest 160 bits of the order salt must be equal to the lowest 160 bits of the extension hash
+	Salt string `json:"salt"`
+
+	// TakerAsset Identifier of the asset being requested by the maker in exchange.
+	TakerAsset string `json:"takerAsset"`
+
+	// TakingAmount Amount of the takerAsset being requested by the maker.
+	TakingAmount string `json:"takingAmount"`
+}
+
+type ExtensionParamsFusion struct {
+	SettlementContract  string
+	AuctionDetails      *AuctionDetails
+	PostInteractionData *SettlementPostInteractionDataFusion
+	Asset               string
+	Permit              string
+
+	MakerAssetSuffix string
+	TakerAssetSuffix string
+	Predicate        string
+	PreInteraction   string
+	CustomData       string
+}
+
+type SettlementSuffixDataFusion struct {
+	Whitelist          []AuctionWhitelistItem
+	IntegratorFee      *IntegratorFeeFusion
+	BankFee            *big.Int
+	ResolvingStartTime *big.Int
+	CustomReceiver     common.Address
+}
+
+// ExtensionFusion represents the extension data for the Fusion order
+// and should be only created using the NewExtensionFusion function
+type ExtensionFusion struct {
+	// Raw unencoded data
+	SettlementContract  string
+	AuctionDetails      *AuctionDetails
+	PostInteractionData *SettlementPostInteractionDataFusion
+	Asset               string
+	Permit              string
+
+	// Data formatted for Limit Order Extension
+	MakerAssetSuffix string
+	TakerAssetSuffix string
+	MakingAmountData string
+	TakingAmountData string
+	Predicate        string
+	MakerPermit      string
+	PreInteraction   string
+	PostInteraction  string
+	CustomData       string
 }

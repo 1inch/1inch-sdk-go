@@ -5,11 +5,10 @@ import (
 	"fmt"
 	"math/big"
 	"strconv"
+	"time"
 
 	"github.com/1inch/1inch-sdk-go/common"
 	random_number_generation "github.com/1inch/1inch-sdk-go/internal/random-number-generation"
-	"github.com/1inch/1inch-sdk-go/internal/times"
-	"github.com/1inch/1inch-sdk-go/sdk-clients/fusion"
 	"github.com/1inch/1inch-sdk-go/sdk-clients/orderbook"
 	geth_common "github.com/ethereum/go-ethereum/common"
 )
@@ -24,19 +23,16 @@ func CreateFusionPlusOrderData(quoteParams QuoterControllerGetQuoteParamsFixed, 
 		return nil, fmt.Errorf("error getting preset: %v", err)
 	}
 
-	auctionPointsFusion := make([]fusion.AuctionPointClass, 0)
+	auctionPointsFusion := make([]AuctionPointClassFusion, 0)
 	for _, point := range preset.Points {
-		auctionPointsFusion = append(auctionPointsFusion, fusion.AuctionPointClass{
-			Coefficient: point.Coefficient,
-			Delay:       point.Delay,
-		})
+		auctionPointsFusion = append(auctionPointsFusion, AuctionPointClassFusion(point))
 	}
 
-	gasCostsFusion := fusion.GasCostConfigClass{
+	gasCostsFusion := GasCostConfigClassFusion{
 		GasBumpEstimate:  preset.GasCost.GasBumpEstimate,
 		GasPriceEstimate: preset.GasCost.GasPriceEstimate,
 	}
-	presetFusion := &fusion.PresetClassFixed{
+	presetFusion := &PresetClassFixedFusion{
 		AllowMultipleFills: preset.AllowMultipleFills,
 		//ExclusiveResolver: preset.ExclusiveResolver, // TODO This is not working for fusion at the moment
 		AllowPartialFills:  preset.AllowPartialFills,
@@ -54,7 +50,7 @@ func CreateFusionPlusOrderData(quoteParams QuoterControllerGetQuoteParamsFixed, 
 		return nil, fmt.Errorf("error creating auction details: %v", err)
 	}
 
-	auctionDetailsFusion, err := fusion.CreateAuctionDetails(presetFusion, 0)
+	auctionDetailsFusion, err := CreateAuctionDetailsFusion(presetFusion, 0)
 	if err != nil {
 		return nil, fmt.Errorf("error creating auction details: %v", err)
 	}
@@ -68,6 +64,28 @@ func CreateFusionPlusOrderData(quoteParams QuoterControllerGetQuoteParamsFixed, 
 		takerAsset = takerAssetWrapped.Hex()
 	}
 
+	var takingFreeReceiver geth_common.Address
+	if orderParams.TakingFeeReceiver == "" {
+		takingFreeReceiver = geth_common.HexToAddress("0x0000000000000000000000000000000000000000")
+	} else {
+		takingFreeReceiver = geth_common.HexToAddress(orderParams.TakingFeeReceiver)
+	}
+
+	fees := Fees{
+		IntFee: IntegratorFee{
+			Ratio:    bpsToRatioFormat(quoteParams.Fee),
+			Receiver: takingFreeReceiver,
+		},
+		BankFee: big.NewInt(0),
+	}
+	feesFusion := FeesFusion{
+		IntFee: IntegratorFeeFusion{
+			Ratio:    bpsToRatioFormat(quoteParams.Fee),
+			Receiver: takingFreeReceiver,
+		},
+		BankFee: big.NewInt(0),
+	}
+
 	whitelistAddresses := make([]AuctionWhitelistItem, 0)
 	for _, address := range quote.Whitelist {
 		whitelistAddresses = append(whitelistAddresses, AuctionWhitelistItem{
@@ -75,9 +93,9 @@ func CreateFusionPlusOrderData(quoteParams QuoterControllerGetQuoteParamsFixed, 
 			AllowFrom: big.NewInt(0), // TODO generating the correct list here requires checking for an exclusive resolver. This needs to be checked for later. The generated object does not see exclusive resolver correctly
 		})
 	}
-	whitelistAddressesFusion := make([]fusion.AuctionWhitelistItem, 0)
+	whitelistAddressesFusion := make([]AuctionWhitelistItem, 0)
 	for _, address := range quote.Whitelist {
-		whitelistAddressesFusion = append(whitelistAddressesFusion, fusion.AuctionWhitelistItem{
+		whitelistAddressesFusion = append(whitelistAddressesFusion, AuctionWhitelistItem{
 			Address:   geth_common.HexToAddress(address),
 			AllowFrom: big.NewInt(0), // TODO generating the correct list here requires checking for an exclusive resolver. This needs to be checked for later. The generated object does not see exclusive resolver correctly
 		})
@@ -99,10 +117,12 @@ func CreateFusionPlusOrderData(quoteParams QuoterControllerGetQuoteParamsFixed, 
 
 	details := Details{
 		Auction:   auctionDetails,
+		Fees:      fees,
 		Whitelist: whitelistAddresses,
 	}
-	detailsFusion := fusion.Details{
+	detailsFusion := DetailsFusion{
 		Auction:   auctionDetailsFusion,
+		Fees:      feesFusion,
 		Whitelist: whitelistAddressesFusion,
 	}
 
@@ -114,7 +134,7 @@ func CreateFusionPlusOrderData(quoteParams QuoterControllerGetQuoteParamsFixed, 
 		OrderExpirationDelay: 0,
 		Source:               "",
 	}
-	extraParamsFusion := fusion.ExtraParams{
+	extraParamsFusion := ExtraParams{
 		Nonce:                nonce,
 		Permit:               orderParams.Permit,
 		AllowPartialFills:    preset.AllowPartialFills,
@@ -123,7 +143,7 @@ func CreateFusionPlusOrderData(quoteParams QuoterControllerGetQuoteParamsFixed, 
 		Source:               "",
 	}
 
-	makerTraitsFusion, err := fusion.CreateMakerTraits(detailsFusion, extraParamsFusion)
+	makerTraitsFusion, err := CreateMakerTraitsFusion(detailsFusion, extraParamsFusion)
 	if err != nil {
 		return nil, fmt.Errorf("error creating maker traits: %v", err)
 	}
@@ -136,7 +156,7 @@ func CreateFusionPlusOrderData(quoteParams QuoterControllerGetQuoteParamsFixed, 
 		TakerAsset:   takerAsset,
 		TakingAmount: preset.AuctionEndAmount,
 	}
-	orderInfoFusion := fusion.FusionOrderV4{
+	orderInfoFusion := FusionOrderV4{
 		Maker:        quoteParams.WalletAddress,
 		MakerAsset:   quoteParams.SrcTokenAddress,
 		MakingAmount: quoteParams.Amount,
@@ -165,15 +185,13 @@ func CreateFusionPlusOrderData(quoteParams QuoterControllerGetQuoteParamsFixed, 
 	if err != nil {
 		return nil, fmt.Errorf("error creating post interaction data: %v", err)
 	}
-
-	// TODO passing nil in for the whitelist until Fusion+ is updated
-	postInteractionDataFusion, err := fusion.CreateSettlementPostInteractionData(detailsFusion, nil, orderInfoFusion)
+	postInteractionDataFusion, err := CreateSettlementPostInteractionDataFusion(detailsFusion, orderInfoFusion)
 	if err != nil {
 		return nil, fmt.Errorf("error creating post interaction data: %v", err)
 	}
 
 	extension, err := NewEscrowExtension(EscrowExtensionParams{
-		ExtensionParams: fusion.ExtensionParams{
+		ExtensionParamsFusion: ExtensionParamsFusion{
 			SettlementContract:  quote.SrcEscrowFactory,
 			PostInteractionData: postInteractionDataFusion,
 			AuctionDetails:      auctionDetailsFusion,
@@ -210,16 +228,28 @@ func CreateFusionPlusOrderData(quoteParams QuoterControllerGetQuoteParamsFixed, 
 		return nil, fmt.Errorf("error converting extension to orderbook extension: %v", err)
 	}
 
+	extensionEncoded, err := extensionOrderbook.Encode()
+	if err != nil {
+		return nil, fmt.Errorf("error encoding extension: %v", err)
+	}
+
+	salt, err := orderbook.GenerateSalt(extensionEncoded, nil)
+	if err != nil {
+		return nil, fmt.Errorf("error generating salt: %v", err)
+	}
+
 	limitOrder, err := orderbook.CreateLimitOrderMessage(orderbook.CreateOrderParams{
-		Wallet:       wallet,
-		MakerTraits:  makerTraitsFusion,
-		Extension:    *extensionOrderbook,
-		Maker:        orderInfo.Maker,
-		MakerAsset:   orderInfo.MakerAsset,
-		TakerAsset:   orderInfo.TakerAsset,
-		TakingAmount: orderInfo.TakingAmount,
-		MakingAmount: orderInfo.MakingAmount,
-		Taker:        orderInfo.Receiver,
+		Wallet:           wallet,
+		MakerTraits:      makerTraitsFusion,
+		Extension:        *extensionOrderbook,
+		ExtensionEncoded: extensionEncoded,
+		Salt:             salt,
+		Maker:            orderInfo.Maker,
+		MakerAsset:       orderInfo.MakerAsset,
+		TakerAsset:       orderInfo.TakerAsset,
+		TakingAmount:     orderInfo.TakingAmount,
+		MakingAmount:     orderInfo.MakingAmount,
+		Taker:            orderInfo.Receiver,
 	}, chainId)
 	if err != nil {
 		return nil, fmt.Errorf("error creating limit order message: %v", err)
@@ -250,6 +280,13 @@ func GetPreset(presets QuotePresets, presetType GetQuoteOutputRecommendedPreset)
 	return nil, fmt.Errorf("unknown preset type: %v", presetType)
 }
 
+var CalcAuctionStartTimeFunc func(uint32, uint32) uint32 = CalcAuctionStartTime
+
+func CalcAuctionStartTime(startAuctionIn uint32, additionalWaitPeriod uint32) uint32 {
+	currentTime := time.Now().Unix()
+	return uint32(currentTime) + additionalWaitPeriod + startAuctionIn
+}
+
 func CreateAuctionDetails(preset *Preset, additionalWaitPeriod float32) (*AuctionDetails, error) {
 	pointsFixed := make([]AuctionPointClassFixed, 0)
 	for _, point := range preset.Points {
@@ -270,7 +307,7 @@ func CreateAuctionDetails(preset *Preset, additionalWaitPeriod float32) (*Auctio
 	}
 
 	return &AuctionDetails{
-		StartTime:       times.CalculateAuctionStartTime(uint32(preset.StartAuctionIn), uint32(additionalWaitPeriod)),
+		StartTime:       CalcAuctionStartTimeFunc(uint32(preset.StartAuctionIn), uint32(additionalWaitPeriod)),
 		Duration:        uint32(preset.AuctionDuration),
 		InitialRateBump: uint32(preset.InitialRateBump),
 		Points:          pointsFixed,
@@ -278,13 +315,21 @@ func CreateAuctionDetails(preset *Preset, additionalWaitPeriod float32) (*Auctio
 	}, nil
 }
 
+var timeNow func() int64 = GetCurrentTime
+
+func GetCurrentTime() int64 {
+	return time.Now().Unix()
+}
+
 func CreateSettlementPostInteractionData(details Details, orderInfo CrossChainOrderDto) (*SettlementPostInteractionData, error) {
 	resolverStartTime := details.ResolvingStartTime
 	if details.ResolvingStartTime == nil || details.ResolvingStartTime.Cmp(big.NewInt(0)) == 0 {
-		resolverStartTime = big.NewInt(times.Now())
+		resolverStartTime = big.NewInt(timeNow())
 	}
 	return NewSettlementPostInteractionData(SettlementSuffixData{
 		Whitelist:          details.Whitelist,
+		IntegratorFee:      &details.Fees.IntFee,
+		BankFee:            details.Fees.BankFee,
 		ResolvingStartTime: resolverStartTime,
 		CustomReceiver:     geth_common.HexToAddress(orderInfo.Receiver),
 	})
@@ -353,4 +398,70 @@ func bpsToRatioFormat(bps *big.Int) *big.Int {
 	}
 
 	return bps.Mul(bps, bpsToRatioNumber)
+}
+
+func CreateAuctionDetailsFusion(preset *PresetClassFixedFusion, additionalWaitPeriod float32) (*AuctionDetails, error) {
+	pointsFixed := make([]AuctionPointClassFixed, 0)
+	for _, point := range preset.Points {
+		pointsFixed = append(pointsFixed, AuctionPointClassFixed{
+			Coefficient: uint32(point.Coefficient),
+			Delay:       uint16(point.Delay),
+		})
+	}
+
+	gasPriceEstimateFixed, err := strconv.ParseUint(preset.GasCost.GasPriceEstimate, 10, 32)
+	if err != nil {
+		return nil, fmt.Errorf("error parsing gas price estimate: %v", err)
+	}
+
+	gasCostFixed := GasCostConfigClassFixed{
+		GasBumpEstimate:  uint32(preset.GasCost.GasBumpEstimate),
+		GasPriceEstimate: uint32(gasPriceEstimateFixed),
+	}
+
+	return &AuctionDetails{
+		StartTime:       CalcAuctionStartTimeFunc(uint32(preset.StartAuctionIn), uint32(additionalWaitPeriod)),
+		Duration:        uint32(preset.AuctionDuration),
+		InitialRateBump: uint32(preset.InitialRateBump),
+		Points:          pointsFixed,
+		GasCost:         gasCostFixed,
+	}, nil
+}
+
+func CreateMakerTraitsFusion(details DetailsFusion, extraParams ExtraParams) (*orderbook.MakerTraits, error) {
+	deadline := details.Auction.StartTime + details.Auction.Duration + extraParams.OrderExpirationDelay
+	makerTraitParms := orderbook.MakerTraitsParams{
+		Expiry:             int64(deadline),
+		AllowPartialFills:  extraParams.AllowPartialFills,
+		AllowMultipleFills: extraParams.AllowMultipleFills,
+		HasPostInteraction: true,
+		UnwrapWeth:         extraParams.unwrapWeth,
+		UsePermit2:         extraParams.EnablePermit2,
+		HasExtension:       true,
+		Nonce:              extraParams.Nonce.Int64(),
+	}
+	makerTraits, err := orderbook.NewMakerTraits(makerTraitParms)
+	if err != nil {
+		return nil, fmt.Errorf("error creating maker traits: %v", err)
+	}
+	if makerTraits.IsBitInvalidatorMode() {
+		if extraParams.Nonce == nil || extraParams.Nonce.Cmp(big.NewInt(0)) == 0 {
+			return nil, errors.New("nonce required when partial fill or multiple fill disallowed")
+		}
+	}
+	return makerTraits, nil
+}
+
+func CreateSettlementPostInteractionDataFusion(details DetailsFusion, orderInfo FusionOrderV4) (*SettlementPostInteractionDataFusion, error) {
+	resolverStartTime := details.ResolvingStartTime
+	if details.ResolvingStartTime == nil || details.ResolvingStartTime.Cmp(big.NewInt(0)) == 0 {
+		resolverStartTime = big.NewInt(timeNow())
+	}
+	return NewSettlementPostInteractionDataFusion(SettlementSuffixDataFusion{
+		Whitelist:          details.Whitelist,
+		IntegratorFee:      &details.Fees.IntFee,
+		BankFee:            details.Fees.BankFee,
+		ResolvingStartTime: resolverStartTime,
+		CustomReceiver:     geth_common.HexToAddress(orderInfo.Receiver),
+	})
 }
