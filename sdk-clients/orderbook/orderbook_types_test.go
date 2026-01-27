@@ -443,26 +443,63 @@ func TestGetOrderCountParams_Validate(t *testing.T) {
 		params       GetOrderCountParams
 		expectErrors []string
 	}{
-		// This test documents the validation bug - even valid statuses fail validation
-		// because []OrderStatus != []string
 		{
-			description: "Type mismatch causes validation error even with valid statuses",
+			description: "Valid params with all statuses",
+			params: GetOrderCountParams{
+				Statuses:   []OrderStatus{ValidOrders, TemporarilyInvalidOrders, InvalidOrders},
+				MakerAsset: validAddress,
+				TakerAsset: "0xabcdef1234567890abcdef1234567890abcdef12",
+			},
+			expectErrors: nil,
+		},
+		{
+			description: "Valid params with single status",
 			params: GetOrderCountParams{
 				Statuses:   []OrderStatus{ValidOrders},
 				MakerAsset: validAddress,
 				TakerAsset: "0xabcdef1234567890abcdef1234567890abcdef12",
 			},
-			expectErrors: []string{
-				"must be a []string",
+			expectErrors: nil,
+		},
+		{
+			description: "Invalid status value",
+			params: GetOrderCountParams{
+				Statuses:   []OrderStatus{ValidOrders, 4}, // 4 is not a valid status
+				MakerAsset: validAddress,
+				TakerAsset: "0xabcdef1234567890abcdef1234567890abcdef12",
 			},
+			expectErrors: []string{"statuses"},
+		},
+		{
+			description: "Duplicate statuses",
+			params: GetOrderCountParams{
+				Statuses:   []OrderStatus{ValidOrders, ValidOrders},
+				MakerAsset: validAddress,
+				TakerAsset: "0xabcdef1234567890abcdef1234567890abcdef12",
+			},
+			expectErrors: []string{"duplicates"},
+		},
+		{
+			description: "Missing MakerAsset",
+			params: GetOrderCountParams{
+				Statuses:   []OrderStatus{ValidOrders},
+				TakerAsset: validAddress,
+			},
+			expectErrors: []string{"makerAsset"},
+		},
+		{
+			description: "Missing TakerAsset",
+			params: GetOrderCountParams{
+				Statuses:   []OrderStatus{ValidOrders},
+				MakerAsset: validAddress,
+			},
+			expectErrors: []string{"takerAsset"},
 		},
 	}
 
 	for _, tc := range testCases {
 		t.Run(tc.description, func(t *testing.T) {
 			err := tc.params.Validate()
-
-			fmt.Printf("Errors: %v\n", err)
 
 			if len(tc.expectErrors) > 0 {
 				require.Error(t, err)

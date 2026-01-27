@@ -293,6 +293,26 @@ func CheckStatusesStrings(parameter interface{}, variableName string) error {
 	return nil
 }
 
+func CheckStatusesOrderStatus(parameter interface{}, variableName string) error {
+	value, ok := parameter.([]int)
+	if !ok {
+		return fmt.Errorf("for parameter '%v' to be validated as '%v', it must be a []int", variableName, "StatusesOrderStatus")
+	}
+
+	if value == nil {
+		return nil
+	}
+
+	if HasDuplicates(value) {
+		return NewParameterValidationError(variableName, "must not contain duplicates")
+	}
+	validStatuses := []int{1, 2, 3}
+	if !IsSubset(value, validStatuses) {
+		return NewParameterValidationError(variableName, fmt.Sprintf("can only contain %v", validStatuses))
+	}
+	return nil
+}
+
 func CheckSortBy(parameter interface{}, variableName string) error {
 	value, ok := parameter.(string)
 	if !ok {

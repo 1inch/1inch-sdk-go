@@ -6,6 +6,7 @@ import (
 	"testing"
 
 	random_number_generation "github.com/1inch/1inch-sdk-go/internal/random-number-generation"
+	"github.com/1inch/1inch-sdk-go/internal/times"
 	"github.com/ethereum/go-ethereum/common"
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
@@ -401,140 +402,90 @@ func TestCreateSettlementPostInteractionData(t *testing.T) {
 			},
 			expectErr: false,
 		},
-		//{
-		//	name: "Valid Details and Order Info with non-zero Delay",
-		//	details: Details{
-		//		ResolvingStartTime: big.NewInt(1622548800), // Example timestamp
-		//		Fees: FeesOld{
-		//			IntFee: IntegratorFee{
-		//				Ratio:    big.NewInt(100),
-		//				Receiver: common.HexToAddress("0x0000000000000000000000000000000000000001"),
-		//			},
-		//			BankFee: big.NewInt(200),
-		//		},
-		//		Whitelist: []AuctionWhitelistItem{
-		//			{
-		//				Address:   common.HexToAddress("0x0000000000000000000000000000000000000002"),
-		//				AllowFrom: big.NewInt(1622549800),
-		//			},
-		//		},
-		//	},
-		//	orderInfo: FusionOrderV4{
-		//		Receiver: "0x0000000000000000000000000000000000000003",
-		//	},
-		//	expected: &SettlementPostInteractionData{
-		//		Whitelist: []WhitelistItem{
-		//			{
-		//				AddressHalf: "00000000000000000002",
-		//				Delay:       big.NewInt(1000),
-		//			},
-		//		},
-		//		IntegratorFee: &IntegratorFee{
-		//			Ratio:    big.NewInt(100),
-		//			Receiver: common.HexToAddress("0x0000000000000000000000000000000000000001"),
-		//		},
-		//		BankFee:            big.NewInt(200),
-		//		ResolvingStartTime: big.NewInt(1622548800),
-		//		CustomReceiver:     common.HexToAddress("0x0000000000000000000000000000000000000003"),
-		//	},
-		//	expectErr: false,
-		//},
-		//{
-		//	name: "Valid Details and Order Info without Resolving Start Time",
-		//	details: Details{
-		//		ResolvingStartTime: nil,
-		//		Fees: FeesOld{
-		//			IntFee: IntegratorFee{
-		//				Ratio:    big.NewInt(100),
-		//				Receiver: common.HexToAddress("0x0000000000000000000000000000000000000001"),
-		//			},
-		//			BankFee: big.NewInt(200),
-		//		},
-		//		Whitelist: []AuctionWhitelistItem{
-		//			{
-		//				Address:   common.HexToAddress("0x0000000000000000000000000000000000000002"),
-		//				AllowFrom: big.NewInt(1622548800),
-		//			},
-		//		},
-		//	},
-		//	orderInfo: FusionOrderV4{
-		//		Receiver: "0x0000000000000000000000000000000000000003",
-		//	},
-		//	expected: &SettlementPostInteractionData{
-		//		Whitelist: []WhitelistItem{
-		//			{
-		//				AddressHalf: "00000000000000000002",
-		//				Delay:       big.NewInt(0),
-		//			},
-		//		},
-		//		IntegratorFee: &IntegratorFee{
-		//			Ratio:    big.NewInt(100),
-		//			Receiver: common.HexToAddress("0x0000000000000000000000000000000000000001"),
-		//		},
-		//		BankFee:            big.NewInt(200),
-		//		ResolvingStartTime: big.NewInt(timeNow()), // This will be dynamically set
-		//		CustomReceiver:     common.HexToAddress("0x0000000000000000000000000000000000000003"),
-		//	},
-		//	expectErr: false,
-		//},
-		//{
-		//	name: "Delay too large",
-		//	details: Details{
-		//		ResolvingStartTime: big.NewInt(1622548800), // Example timestamp
-		//		Fees: FeesOld{
-		//			IntFee: IntegratorFee{
-		//				Ratio:    big.NewInt(100),
-		//				Receiver: common.HexToAddress("0x0000000000000000000000000000000000000001"),
-		//			},
-		//			BankFee: big.NewInt(200),
-		//		},
-		//		Whitelist: []AuctionWhitelistItem{
-		//			{
-		//				Address:   common.HexToAddress("0x0000000000000000000000000000000000000002"),
-		//				AllowFrom: big.NewInt(1622649800),
-		//			},
-		//		},
-		//	},
-		//	orderInfo: FusionOrderV4{
-		//		Receiver: "0x0000000000000000000000000000000000000003",
-		//	},
-		//	expected: &SettlementPostInteractionData{
-		//		Whitelist: []WhitelistItem{
-		//			{
-		//				AddressHalf: "00000000000000000002",
-		//				Delay:       big.NewInt(1000),
-		//			},
-		//		},
-		//		IntegratorFee: &IntegratorFee{
-		//			Ratio:    big.NewInt(100),
-		//			Receiver: common.HexToAddress("0x0000000000000000000000000000000000000001"),
-		//		},
-		//		BankFee:            big.NewInt(200),
-		//		ResolvingStartTime: big.NewInt(1622548800),
-		//		CustomReceiver:     common.HexToAddress("0x0000000000000000000000000000000000000003"),
-		//	},
-		//	expectErr:   true,
-		//	expectedErr: fmt.Errorf("delay too big - %d must be less than %d", 101000, uint16Max),
-		//},
-		//{
-		//	name: "Whitelist empty",
-		//	details: Details{
-		//		ResolvingStartTime: nil,
-		//		Fees: FeesOld{
-		//			IntFee: IntegratorFee{
-		//				Ratio:    big.NewInt(100),
-		//				Receiver: common.HexToAddress("0x0000000000000000000000000000000000000001"),
-		//			},
-		//			BankFee: big.NewInt(200),
-		//		},
-		//		Whitelist: []AuctionWhitelistItem{},
-		//	},
-		//	orderInfo: FusionOrderV4{
-		//		Receiver: "0x0000000000000000000000000000000000000003",
-		//	},
-		//	expectErr:   true,
-		//	expectedErr: errors.New("whitelist cannot be empty"),
-		//},
+		{
+			name: "Valid Details and Order Info with Integrator Fees",
+			details: Details{
+				ResolvingStartTime: big.NewInt(1622548800),
+				FeesIntAndRes: &FeesIntegratorAndResolver{
+					Integrator: IntegratorFee{
+						Integrator: "0x0000000000000000000000000000000000000001",
+						Protocol:   "0x0000000000000000000000000000000000000002",
+						Fee:        FromPercent(1, GetDefaultBase()),
+						Share:      FromPercent(50, GetDefaultBase()),
+					},
+				},
+				Whitelist: []AuctionWhitelistItem{
+					{
+						Address:   common.HexToAddress("0x0000000000000000000000000000000000000002"),
+						AllowFrom: big.NewInt(1622548800),
+					},
+				},
+			},
+			orderInfo: FusionOrderV4{
+				Receiver: "0x0000000000000000000000000000000000000003",
+			},
+			expected: &SettlementPostInteractionData{
+				Whitelist: []WhitelistItem{
+					{
+						AddressHalf: "00000000000000000002",
+						Delay:       big.NewInt(0),
+					},
+				},
+				AuctionFees: &FeesIntegratorAndResolver{
+					Integrator: IntegratorFee{
+						Integrator: "0x0000000000000000000000000000000000000001",
+						Protocol:   "0x0000000000000000000000000000000000000002",
+						Fee:        FromPercent(1, GetDefaultBase()),
+						Share:      FromPercent(50, GetDefaultBase()),
+					},
+				},
+				ResolvingStartTime: big.NewInt(1622548800),
+				CustomReceiver:     common.HexToAddress("0x0000000000000000000000000000000000000003"),
+			},
+			expectErr: false,
+		},
+		{
+			name: "Valid Details and Order Info without Resolving Start Time",
+			details: Details{
+				ResolvingStartTime: nil,
+				FeesIntAndRes: &FeesIntegratorAndResolver{
+					Integrator: IntegratorFee{
+						Integrator: "0x0000000000000000000000000000000000000001",
+						Protocol:   "0x0000000000000000000000000000000000000002",
+						Fee:        FromPercent(1, GetDefaultBase()),
+						Share:      FromPercent(50, GetDefaultBase()),
+					},
+				},
+				Whitelist: []AuctionWhitelistItem{
+					{
+						Address:   common.HexToAddress("0x0000000000000000000000000000000000000002"),
+						AllowFrom: big.NewInt(1622548800),
+					},
+				},
+			},
+			orderInfo: FusionOrderV4{
+				Receiver: "0x0000000000000000000000000000000000000003",
+			},
+			expected: &SettlementPostInteractionData{
+				Whitelist: []WhitelistItem{
+					{
+						AddressHalf: "00000000000000000002",
+						Delay:       big.NewInt(0),
+					},
+				},
+				AuctionFees: &FeesIntegratorAndResolver{
+					Integrator: IntegratorFee{
+						Integrator: "0x0000000000000000000000000000000000000001",
+						Protocol:   "0x0000000000000000000000000000000000000002",
+						Fee:        FromPercent(1, GetDefaultBase()),
+						Share:      FromPercent(50, GetDefaultBase()),
+					},
+				},
+				ResolvingStartTime: nil, // Will be dynamically set
+				CustomReceiver:     common.HexToAddress("0x0000000000000000000000000000000000000003"),
+			},
+			expectErr: false,
+		},
 	}
 
 	for _, tc := range tests {
@@ -545,8 +496,13 @@ func TestCreateSettlementPostInteractionData(t *testing.T) {
 				whitelistStrings = append(whitelistStrings, whitelistItem.Address.Hex())
 			}
 
-			// TODO this does not track AllowFrom anymore. Need to refactor these tests
-			whitelist, err := GenerateWhitelist(whitelistStrings, tc.details.ResolvingStartTime)
+			// Handle nil ResolvingStartTime the same way CreateSettlementPostInteractionData does
+			resolvingStartTimeForWhitelist := tc.details.ResolvingStartTime
+			if resolvingStartTimeForWhitelist == nil || resolvingStartTimeForWhitelist.Cmp(big.NewInt(0)) == 0 {
+				resolvingStartTimeForWhitelist = big.NewInt(times.Now())
+			}
+
+			whitelist, err := GenerateWhitelist(whitelistStrings, resolvingStartTimeForWhitelist)
 			require.NoError(t, err)
 
 			result, err := CreateSettlementPostInteractionData(tc.details, whitelist, tc.orderInfo)

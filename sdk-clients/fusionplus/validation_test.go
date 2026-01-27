@@ -169,36 +169,68 @@ func TestQuoterControllerGetQuoteParamsFixed_Validate(t *testing.T) {
 	}
 }
 
-// NOTE: QuoterControllerGetQuoteWithCustomPresetsParams has a type mismatch bug - the Amount field
-// is float32 but the validation function CheckBigIntRequired expects a string. This causes
-// validation to always fail for this field.
-func TestQuoterControllerGetQuoteWithCustomPresetsParams_Validate(t *testing.T) {
+func TestQuoterControllerGetQuoteWithCustomPresetsParamsFixed_Validate(t *testing.T) {
 	validAddress := "0x6B175474E89094C44Da98b954EedeAC495271d0F"
 
 	tests := []struct {
 		name        string
-		params      QuoterControllerGetQuoteWithCustomPresetsParams
+		params      QuoterControllerGetQuoteWithCustomPresetsParamsFixed
 		expectError bool
 		errorMsg    string
 	}{
-		// This test documents the validation bug - the Amount field is float32
-		// but validation expects string for BigInt
 		{
-			name: "Type mismatch causes validation error for Amount field",
-			params: QuoterControllerGetQuoteWithCustomPresetsParams{
+			name: "Valid params",
+			params: QuoterControllerGetQuoteWithCustomPresetsParamsFixed{
 				SrcTokenAddress: validAddress,
 				DstTokenAddress: validAddress,
 				WalletAddress:   validAddress,
 				SrcChain:        1,
 				DstChain:        137,
-				Amount:          1000000000000000000,
+				Amount:          "1000000000000000000",
+			},
+			expectError: false,
+		},
+		{
+			name: "Missing SrcTokenAddress",
+			params: QuoterControllerGetQuoteWithCustomPresetsParamsFixed{
+				DstTokenAddress: validAddress,
+				WalletAddress:   validAddress,
+				SrcChain:        1,
+				DstChain:        137,
+				Amount:          "1000000000000000000",
 			},
 			expectError: true,
-			errorMsg:    "must be a string",
+			errorMsg:    "SrcTokenAddress",
+		},
+		{
+			name: "Missing Amount",
+			params: QuoterControllerGetQuoteWithCustomPresetsParamsFixed{
+				SrcTokenAddress: validAddress,
+				DstTokenAddress: validAddress,
+				WalletAddress:   validAddress,
+				SrcChain:        1,
+				DstChain:        137,
+				Amount:          "",
+			},
+			expectError: true,
+			errorMsg:    "Amount",
+		},
+		{
+			name: "Invalid chain",
+			params: QuoterControllerGetQuoteWithCustomPresetsParamsFixed{
+				SrcTokenAddress: validAddress,
+				DstTokenAddress: validAddress,
+				WalletAddress:   validAddress,
+				SrcChain:        999999,
+				DstChain:        137,
+				Amount:          "1000000000000000000",
+			},
+			expectError: true,
+			errorMsg:    "SrcChain",
 		},
 		{
 			name:        "Missing all required fields",
-			params:      QuoterControllerGetQuoteWithCustomPresetsParams{},
+			params:      QuoterControllerGetQuoteWithCustomPresetsParamsFixed{},
 			expectError: true,
 		},
 	}
@@ -208,6 +240,9 @@ func TestQuoterControllerGetQuoteWithCustomPresetsParams_Validate(t *testing.T) 
 			err := tc.params.Validate()
 			if tc.expectError {
 				require.Error(t, err)
+				if tc.errorMsg != "" {
+					assert.Contains(t, err.Error(), tc.errorMsg)
+				}
 			} else {
 				require.NoError(t, err)
 			}

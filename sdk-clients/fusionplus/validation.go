@@ -17,7 +17,7 @@ func (params *OrderApiControllerGetActiveOrdersParams) Validate() error {
 func (params *QuoterControllerGetQuoteParamsFixed) Validate() error {
 	var validationErrors []error
 	validationErrors = validate.Parameter(params.SrcTokenAddress, "SrcTokenAddress", validate.CheckEthereumAddressRequired, validationErrors)
-	validationErrors = validate.Parameter(params.DstTokenAddress, "SrcTokenAddress", validate.CheckEthereumAddressRequired, validationErrors)
+	validationErrors = validate.Parameter(params.DstTokenAddress, "DstTokenAddress", validate.CheckEthereumAddressRequired, validationErrors)
 	validationErrors = validate.Parameter(params.WalletAddress, "WalletAddress", validate.CheckEthereumAddressRequired, validationErrors)
 	validationErrors = validate.Parameter(params.SrcChain, "SrcChain", validate.CheckChainIdFloat32Required, validationErrors)
 	validationErrors = validate.Parameter(params.DstChain, "DstChain", validate.CheckChainIdFloat32Required, validationErrors)
@@ -26,12 +26,11 @@ func (params *QuoterControllerGetQuoteParamsFixed) Validate() error {
 	return validate.ConsolidateValidationErorrs(validationErrors)
 }
 
-func (params *QuoterControllerGetQuoteWithCustomPresetsParams) Validate() error {
+func (params *QuoterControllerGetQuoteWithCustomPresetsParamsFixed) Validate() error {
 	var validationErrors []error
 	validationErrors = validate.Parameter(params.SrcTokenAddress, "SrcTokenAddress", validate.CheckEthereumAddressRequired, validationErrors)
-	validationErrors = validate.Parameter(params.DstTokenAddress, "SrcTokenAddress", validate.CheckEthereumAddressRequired, validationErrors)
+	validationErrors = validate.Parameter(params.DstTokenAddress, "DstTokenAddress", validate.CheckEthereumAddressRequired, validationErrors)
 	validationErrors = validate.Parameter(params.WalletAddress, "WalletAddress", validate.CheckEthereumAddressRequired, validationErrors)
-	validationErrors = validate.Parameter(params.Amount, "Amount", validate.CheckBigIntRequired, validationErrors)
 	validationErrors = validate.Parameter(params.SrcChain, "SrcChain", validate.CheckChainIdFloat32Required, validationErrors)
 	validationErrors = validate.Parameter(params.DstChain, "DstChain", validate.CheckChainIdFloat32Required, validationErrors)
 	validationErrors = validate.Parameter(params.Amount, "Amount", validate.CheckBigIntRequired, validationErrors)

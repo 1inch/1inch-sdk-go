@@ -101,6 +101,34 @@ type QuoterControllerGetQuoteParamsFixed struct {
 	Permit string `url:"permit,omitempty" json:"permit,omitempty"`
 }
 
+// QuoterControllerGetQuoteWithCustomPresetsParamsFixed defines parameters for QuoterControllerGetQuoteWithCustomPresets.
+// This is a fixed version with Amount as string instead of float32 for proper BigInt validation.
+type QuoterControllerGetQuoteWithCustomPresetsParamsFixed struct {
+	// SrcChain Id of source chain
+	SrcChain float32 `url:"srcChain" json:"srcChain"`
+
+	// DstChain Id of destination chain
+	DstChain float32 `url:"dstChain" json:"dstChain"`
+
+	// SrcTokenAddress Address of "SOURCE" token
+	SrcTokenAddress string `url:"srcTokenAddress" json:"srcTokenAddress"`
+
+	// DstTokenAddress Address of "DESTINATION" token
+	DstTokenAddress string `url:"dstTokenAddress" json:"dstTokenAddress"`
+
+	// Amount Amount to take from "SOURCE" token to get "DESTINATION" token
+	Amount string `url:"amount" json:"amount"`
+
+	// WalletAddress An address of the wallet or contract who will create Fusion order
+	WalletAddress string `url:"walletAddress" json:"walletAddress"`
+
+	// EnableEstimate if enabled then get estimation from 1inch swap builder and generates quoteId, by default is false
+	EnableEstimate bool `url:"enableEstimate" json:"enableEstimate"`
+
+	// Permit permit, user approval sign
+	Permit string `url:"permit,omitempty" json:"permit,omitempty"`
+}
+
 // GetQuoteOutputFixed defines model for GetQuoteOutput. QuoteId, DstSafetyDeposit, and SrcSafetyDeposit have been fixed
 type GetQuoteOutputFixed struct {
 	// DstEscrowFactory Escrow factory contract address at destination chain

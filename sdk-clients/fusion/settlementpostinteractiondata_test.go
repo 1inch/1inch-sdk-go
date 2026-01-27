@@ -14,6 +14,8 @@ func TestGenerateWhitelist(t *testing.T) {
 		whitelistStrings   []string
 		resolvingStartTime *big.Int
 		expected           []WhitelistItem
+		expectError        bool
+		errorMsg           string
 	}{
 		{
 			name:               "Should generate whitelist",
@@ -25,14 +27,44 @@ func TestGenerateWhitelist(t *testing.T) {
 					Delay:       big.NewInt(0),
 				},
 			},
+			expectError: false,
+		},
+		{
+			name:               "Should generate whitelist with multiple addresses",
+			whitelistStrings:   []string{"0x00000000219ab540356cbb839cbe05303d7705fa", "0x1234567890123456789012345678901234567890"},
+			resolvingStartTime: big.NewInt(1708117482),
+			expected: []WhitelistItem{
+				{
+					AddressHalf: "bb839cbe05303d7705fa",
+					Delay:       big.NewInt(0),
+				},
+				{
+					AddressHalf: "12345678901234567890",
+					Delay:       big.NewInt(0),
+				},
+			},
+			expectError: false,
+		},
+		{
+			name:               "Empty whitelist should return error",
+			whitelistStrings:   []string{},
+			resolvingStartTime: big.NewInt(1708117482),
+			expected:           nil,
+			expectError:        true,
+			errorMsg:           "whitelist cannot be empty",
 		},
 	}
 
 	for _, tc := range tests {
 		t.Run(tc.name, func(t *testing.T) {
 			whitelist, err := GenerateWhitelist(tc.whitelistStrings, tc.resolvingStartTime)
-			require.NoError(t, err)
-			assert.Equal(t, tc.expected, whitelist)
+			if tc.expectError {
+				require.Error(t, err)
+				assert.Contains(t, err.Error(), tc.errorMsg)
+			} else {
+				require.NoError(t, err)
+				assert.Equal(t, tc.expected, whitelist)
+			}
 		})
 	}
 }
