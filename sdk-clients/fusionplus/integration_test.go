@@ -10,6 +10,7 @@ import (
 	"github.com/stretchr/testify/require"
 
 	random_number_generation "github.com/1inch/1inch-sdk-go/internal/random-number-generation"
+	"github.com/1inch/1inch-sdk-go/sdk-clients/fusionorder"
 )
 
 // createTestQuoteFusionPlus creates a realistic quote for testing
@@ -288,7 +289,7 @@ func TestBpsToRatioFormat_Integration(t *testing.T) {
 
 	for _, tc := range tests {
 		t.Run(tc.name, func(t *testing.T) {
-			result := bpsToRatioFormat(tc.input)
+			result := fusionorder.BpsToRatioFormat(tc.input)
 			assert.Equal(t, 0, tc.expected.Cmp(result))
 		})
 	}
@@ -298,17 +299,17 @@ func TestBpsToRatioFormat_Integration(t *testing.T) {
 func TestNativeTokenWrapping_FusionPlus(t *testing.T) {
 	tests := []struct {
 		name     string
-		chainId  NetworkEnum
+		chainId  fusionorder.NetworkEnum
 		expected string
 	}{
-		{"Ethereum WETH", ETHEREUM, "0xC02aaA39b223FE8D0A0e5C4F27eAD9083C756Cc2"},
-		{"Polygon WMATIC", POLYGON, "0x0d500B1d8E8eF31E21C99d1Db9A6444d3ADf1270"},
-		{"Arbitrum WETH", ARBITRUM, "0x82aF49447D8a07e3bd95BD0d56f35241523fBab1"},
+		{"Ethereum WETH", fusionorder.ETHEREUM, "0xC02aaA39b223FE8D0A0e5C4F27eAD9083C756Cc2"},
+		{"Polygon WMATIC", fusionorder.POLYGON, "0x0d500B1d8E8eF31E21C99d1Db9A6444d3ADf1270"},
+		{"Arbitrum WETH", fusionorder.ARBITRUM, "0x82aF49447D8a07e3bd95BD0d56f35241523fBab1"},
 	}
 
 	for _, tc := range tests {
 		t.Run(tc.name, func(t *testing.T) {
-			wrapper, exists := chainToWrapper[tc.chainId]
+			wrapper, exists := fusionorder.ChainToWrapper[tc.chainId]
 			assert.True(t, exists)
 			assert.Equal(t, common.HexToAddress(tc.expected), wrapper)
 		})
@@ -367,7 +368,7 @@ func TestNonceRequirement_FusionPlus(t *testing.T) {
 
 	for _, tc := range tests {
 		t.Run(tc.name, func(t *testing.T) {
-			result := isNonceRequired(tc.allowPartialFills, tc.allowMultipleFills)
+			result := fusionorder.IsNonceRequired(tc.allowPartialFills, tc.allowMultipleFills)
 			assert.Equal(t, tc.expected, result)
 		})
 	}

@@ -1,9 +1,11 @@
-package fusionplus
+package fusionorder
 
 import "github.com/ethereum/go-ethereum/common"
 
+// NativeToken is the address used to represent the native token (ETH, MATIC, etc.)
 const NativeToken = "0xEeeeeEeeeEeEeeEeEeEeeEEEeeeeEeeeeeeeEEeE"
 
+// NetworkEnum represents supported network chain IDs
 type NetworkEnum int
 
 const (
@@ -18,7 +20,8 @@ const (
 	COINBASE  NetworkEnum = 8453
 )
 
-var chainToWrapper = map[NetworkEnum]common.Address{
+// ChainToWrapper maps chain IDs to their wrapped native token addresses
+var ChainToWrapper = map[NetworkEnum]common.Address{
 	ETHEREUM:  common.HexToAddress("0xc02aaa39b223fe8d0a0e5c4f27ead9083c756cc2"),
 	BINANCE:   common.HexToAddress("0xbb4cdb9cbd36b01bd1cbaebf2de08d9173bc095c"),
 	POLYGON:   common.HexToAddress("0x0d500b1d8e8ef31e21c99d1db9a6444d3adf1270"),
@@ -28,4 +31,10 @@ var chainToWrapper = map[NetworkEnum]common.Address{
 	COINBASE:  common.HexToAddress("0x4200000000000000000000000000000000000006"),
 	OPTIMISM:  common.HexToAddress("0x4200000000000000000000000000000000000006"),
 	FANTOM:    common.HexToAddress("0x21be370d5312f44cb42ce377bc9b8a0cef1a4c83"),
+}
+
+// GetWrappedToken returns the wrapped token address for a given chain
+func GetWrappedToken(chainID NetworkEnum) (common.Address, bool) {
+	addr, ok := ChainToWrapper[chainID]
+	return addr, ok
 }

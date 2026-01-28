@@ -4,12 +4,13 @@ import (
 	"math/big"
 	"testing"
 
+	"github.com/1inch/1inch-sdk-go/sdk-clients/fusionorder"
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
 )
 
 func TestGetDefaultBase(t *testing.T) {
-	base := GetDefaultBase()
+	base := fusionorder.GetDefaultBase()
 	require.NotNil(t, base)
 	assert.Equal(t, int64(1), base.Int64())
 }
@@ -56,10 +57,10 @@ func TestNewBps(t *testing.T) {
 		t.Run(tc.name, func(t *testing.T) {
 			if tc.expectPanic {
 				assert.Panics(t, func() {
-					NewBps(tc.value)
+					fusionorder.NewBps(tc.value)
 				})
 			} else {
-				bps := NewBps(tc.value)
+				bps := fusionorder.NewBps(tc.value)
 				require.NotNil(t, bps)
 				assert.Equal(t, tc.value.String(), bps.String())
 			}
@@ -120,7 +121,7 @@ func TestFromPercent(t *testing.T) {
 
 	for _, tc := range tests {
 		t.Run(tc.name, func(t *testing.T) {
-			bps := FromPercent(tc.percent, tc.base)
+			bps := fusionorder.FromPercent(tc.percent, tc.base)
 			require.NotNil(t, bps)
 			assert.Equal(t, tc.expected, bps.String())
 		})
@@ -174,7 +175,7 @@ func TestFromFraction(t *testing.T) {
 
 	for _, tc := range tests {
 		t.Run(tc.name, func(t *testing.T) {
-			bps := FromFraction(tc.fraction, tc.base)
+			bps := fusionorder.FromFraction(tc.fraction, tc.base)
 			require.NotNil(t, bps)
 			assert.Equal(t, tc.expected, bps.String())
 		})
@@ -190,26 +191,26 @@ func TestBps_Equal(t *testing.T) {
 	}{
 		{
 			name:     "Equal - both zero",
-			bps1:     NewBps(big.NewInt(0)),
-			bps2:     NewBps(big.NewInt(0)),
+			bps1:     fusionorder.NewBps(big.NewInt(0)),
+			bps2:     fusionorder.NewBps(big.NewInt(0)),
 			expected: true,
 		},
 		{
 			name:     "Equal - same non-zero value",
-			bps1:     NewBps(big.NewInt(100)),
-			bps2:     NewBps(big.NewInt(100)),
+			bps1:     fusionorder.NewBps(big.NewInt(100)),
+			bps2:     fusionorder.NewBps(big.NewInt(100)),
 			expected: true,
 		},
 		{
 			name:     "Not equal - different values",
-			bps1:     NewBps(big.NewInt(100)),
-			bps2:     NewBps(big.NewInt(200)),
+			bps1:     fusionorder.NewBps(big.NewInt(100)),
+			bps2:     fusionorder.NewBps(big.NewInt(200)),
 			expected: false,
 		},
 		{
 			name:     "Not equal - zero vs non-zero",
-			bps1:     NewBps(big.NewInt(0)),
-			bps2:     NewBps(big.NewInt(100)),
+			bps1:     fusionorder.NewBps(big.NewInt(0)),
+			bps2:     fusionorder.NewBps(big.NewInt(100)),
 			expected: false,
 		},
 	}
@@ -230,17 +231,17 @@ func TestBps_IsZero(t *testing.T) {
 	}{
 		{
 			name:     "Is zero",
-			bps:      NewBps(big.NewInt(0)),
+			bps:      fusionorder.NewBps(big.NewInt(0)),
 			expected: true,
 		},
 		{
 			name:     "Is not zero - small value",
-			bps:      NewBps(big.NewInt(1)),
+			bps:      fusionorder.NewBps(big.NewInt(1)),
 			expected: false,
 		},
 		{
 			name:     "Is not zero - large value",
-			bps:      NewBps(big.NewInt(10000)),
+			bps:      fusionorder.NewBps(big.NewInt(10000)),
 			expected: false,
 		},
 	}
@@ -262,31 +263,31 @@ func TestBps_ToPercent(t *testing.T) {
 	}{
 		{
 			name:     "0 bps to percent",
-			bps:      NewBps(big.NewInt(0)),
+			bps:      fusionorder.NewBps(big.NewInt(0)),
 			base:     big.NewInt(1),
 			expected: 0,
 		},
 		{
 			name:     "100 bps (1%) to percent",
-			bps:      NewBps(big.NewInt(100)),
+			bps:      fusionorder.NewBps(big.NewInt(100)),
 			base:     big.NewInt(1),
 			expected: 1,
 		},
 		{
 			name:     "5000 bps (50%) to percent",
-			bps:      NewBps(big.NewInt(5000)),
+			bps:      fusionorder.NewBps(big.NewInt(5000)),
 			base:     big.NewInt(1),
 			expected: 50,
 		},
 		{
 			name:     "10000 bps (100%) to percent",
-			bps:      NewBps(big.NewInt(10000)),
+			bps:      fusionorder.NewBps(big.NewInt(10000)),
 			base:     big.NewInt(1),
 			expected: 100,
 		},
 		{
 			name:     "100 bps with base 2",
-			bps:      NewBps(big.NewInt(100)),
+			bps:      fusionorder.NewBps(big.NewInt(100)),
 			base:     big.NewInt(2),
 			expected: 2,
 		},
@@ -309,25 +310,25 @@ func TestBps_ToFraction(t *testing.T) {
 	}{
 		{
 			name:     "0 bps to fraction",
-			bps:      NewBps(big.NewInt(0)),
+			bps:      fusionorder.NewBps(big.NewInt(0)),
 			base:     big.NewInt(1),
 			expected: big.NewInt(0),
 		},
 		{
 			name:     "10000 bps (100%) to fraction",
-			bps:      NewBps(big.NewInt(10000)),
+			bps:      fusionorder.NewBps(big.NewInt(10000)),
 			base:     big.NewInt(1),
 			expected: big.NewInt(1),
 		},
 		{
 			name:     "5000 bps (50%) to fraction with base 2",
-			bps:      NewBps(big.NewInt(5000)),
+			bps:      fusionorder.NewBps(big.NewInt(5000)),
 			base:     big.NewInt(2),
 			expected: big.NewInt(1), // 5000 * 2 / 10000 = 1
 		},
 		{
 			name:     "100 bps (1%) to fraction with large base",
-			bps:      NewBps(big.NewInt(100)),
+			bps:      fusionorder.NewBps(big.NewInt(100)),
 			base:     big.NewInt(10000),
 			expected: big.NewInt(100), // 100 * 10000 / 10000 = 100
 		},
@@ -349,17 +350,17 @@ func TestBps_String(t *testing.T) {
 	}{
 		{
 			name:     "Zero",
-			bps:      NewBps(big.NewInt(0)),
+			bps:      fusionorder.NewBps(big.NewInt(0)),
 			expected: "0",
 		},
 		{
 			name:     "100 bps",
-			bps:      NewBps(big.NewInt(100)),
+			bps:      fusionorder.NewBps(big.NewInt(100)),
 			expected: "100",
 		},
 		{
 			name:     "10000 bps",
-			bps:      NewBps(big.NewInt(10000)),
+			bps:      fusionorder.NewBps(big.NewInt(10000)),
 			expected: "10000",
 		},
 	}
@@ -373,7 +374,7 @@ func TestBps_String(t *testing.T) {
 }
 
 func TestBpsZero(t *testing.T) {
-	require.NotNil(t, BpsZero)
-	assert.True(t, BpsZero.IsZero())
-	assert.Equal(t, "0", BpsZero.String())
+	require.NotNil(t, fusionorder.BpsZero)
+	assert.True(t, fusionorder.BpsZero.IsZero())
+	assert.Equal(t, "0", fusionorder.BpsZero.String())
 }

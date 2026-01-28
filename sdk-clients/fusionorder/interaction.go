@@ -1,4 +1,4 @@
-package fusion
+package fusionorder
 
 import (
 	"fmt"
@@ -9,11 +9,13 @@ import (
 	"github.com/ethereum/go-ethereum/common/hexutil"
 )
 
+// Interaction represents an interaction with a target contract
 type Interaction struct {
 	Target common.Address
 	Data   string
 }
 
+// NewInteraction creates a new Interaction with validated hex data
 func NewInteraction(target common.Address, data string) (*Interaction, error) {
 	if _, err := hexutil.Decode(data); err != nil {
 		return nil, fmt.Errorf("failed to decode interaction data: %v", err)
@@ -24,13 +26,19 @@ func NewInteraction(target common.Address, data string) (*Interaction, error) {
 	}, nil
 }
 
+// Encode encodes the interaction as a hex string (lowercase target + data)
 func (i *Interaction) Encode() string {
 	return strings.ToLower(i.Target.String()) + hexadecimal.Trim0x(i.Data)
 }
 
+// DecodeInteraction decodes a hex string into an Interaction
 func DecodeInteraction(bytes string) (*Interaction, error) {
 	if !hexadecimal.IsHexBytes(bytes) {
 		return nil, fmt.Errorf("invalid hex bytes: %s", bytes)
+	}
+
+	if len(bytes) < 42 {
+		return nil, fmt.Errorf("interaction data too short: %s", bytes)
 	}
 
 	return &Interaction{

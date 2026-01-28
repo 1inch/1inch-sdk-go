@@ -17,6 +17,7 @@ This is the official Go SDK for interacting with 1inch Network APIs. It provides
 │   ├── aggregation/      # DEX aggregation (swap) API client
 │   ├── fusion/           # Fusion swap (gasless) API client
 │   ├── fusionplus/       # Fusion+ cross-chain swap client
+│   ├── fusionorder/      # Shared types/utilities for fusion and fusionplus
 │   ├── orderbook/        # Limit order protocol client
 │   ├── balances/         # Token balance/allowance queries
 │   ├── gasprices/        # Gas price oracle
@@ -271,6 +272,84 @@ status, _ := client.GetOrderStatus(ctx, orderHash)
 - `*_types_extended.go` - Manual type extensions
 - `examples/` - Usage examples per operation
 
+## Fusion Package Architecture
+
+The `fusion`, `fusionplus`, and `fusionorder` packages share a layered architecture:
+
+### Package Hierarchy
+```
+fusionorder/          # Shared types and utilities (base layer)
+├── bps.go            # Basis points type and operations
+├── interaction.go    # Order interaction encoding/decoding
+├── whitelist.go      # Whitelist generation (GenerateWhitelist, GenerateWhitelistFromItems)
+├── whitelist_utils.go # Whitelist helpers (CanExecuteAt, IsExclusiveResolver)
+├── auction.go        # Auction details encoding
+├── nativetokenwrappers.go # Chain-specific wrapped token addresses
+└── ...
+
+fusion/               # Fusion (single-chain gasless swaps)
+├── Uses fusionorder types via aliases
+├── Extension, ExtensionParams (fusion-specific)
+└── SettlementPostInteractionData (fusion-specific encoding)
+
+fusionplus/           # Fusion+ (cross-chain swaps)
+├── Uses fusionorder types via aliases
+├── ExtensionPlus, ExtensionParamsPlus (fusionplus-specific)
+├── EscrowExtension (cross-chain escrow data)
+└── SettlementPostInteractionData (fusionplus-specific encoding)
+```
+
+### Naming Conventions
+
+**Type Aliases**: Both `fusion` and `fusionplus` use type aliases to re-export shared types:
+```go
+// In fusion/fusion_types_extended.go
+type Bps = fusionorder.Bps
+type Interaction = fusionorder.Interaction
+type WhitelistItem = fusionorder.WhitelistItem
+
+// In fusionplus/fusionplus_types_extended.go  
+type Interaction = fusionorder.Interaction
+type WhitelistItem = fusionorder.WhitelistItem
+```
+
+**Plus Suffix**: Types in `fusionplus` that need to be distinguished from `fusion` equivalents use the `Plus` suffix:
+- `ExtensionPlus` (not `Extension` - would conflict with fusion.Extension conceptually)
+- `ExtensionParamsPlus`
+- `NewExtensionPlus()`
+- `CreateAuctionDetailsPlus()`
+
+**Variable Naming**: Match the package context:
+- In `fusion`: `fusionExtension`, `fusionOrder`
+- In `fusionplus`: `extensionPlus`, `auctionDetailsPlus`, `presetPlus`
+
+### Function Aliasing Pattern
+
+When a function is shared, create an alias rather than duplicating code:
+```go
+// In fusion/settlementpostinteractiondata.go
+var GenerateWhitelist = fusionorder.GenerateWhitelist
+```
+
+### Encoding Differences
+
+The packages have different binary encoding formats:
+- **Fusion**: Auction details include a point count byte (`Encode()`)
+- **FusionPlus**: Auction details omit the point count byte (`EncodeWithoutPointCount()`)
+
+### Common Pitfalls to Avoid
+
+1. **Don't duplicate functions** - If logic is identical, put it in `fusionorder` and alias it
+2. **Don't use `log.Fatalf`** - Always return errors properly
+3. **Watch for case sensitivity** - Ethereum addresses are case-insensitive; use `strings.ToLower()` when comparing address halves
+4. **Keep variable names consistent** - Use `*Plus` in fusionplus, not `*Fusion`
+
+## Breaking Changes Documentation
+
+When making breaking changes, update both files:
+- `BREAKING_CHANGES.md` - Detailed migration guide with tables
+- `CHANGELOG.md` - Summary for release notes
+
 ## Notes for Development
 
 1. **ABIs are embedded** via `//go:embed` in `constants/abis.go`
@@ -280,3 +359,7 @@ status, _ := client.GetOrderStatus(ctx, orderHash)
 5. **Permit1** support for gasless approvals on supported tokens
 6. **API rate limits** - Use a valid Dev Portal API key
 7. **Error handling** - API errors are JSON with `statusCode`, `error`, `description`
+8. **No `log.Fatalf`** - Always return errors; `log.Fatalf` terminates the program
+9. **Check for duplicate code** - Before adding a function, search if it exists elsewhere
+10. **Test files should match source** - If `foo.go` is deleted, check if `foo_test.go` should be too
+11. **Run `go vet`** - Catches unused imports and other issues

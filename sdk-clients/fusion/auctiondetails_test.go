@@ -3,6 +3,7 @@ package fusion
 import (
 	"testing"
 
+	"github.com/1inch/1inch-sdk-go/sdk-clients/fusionorder"
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
 )
@@ -35,7 +36,7 @@ func TestDecodeAuctionDetails(t *testing.T) {
 	for _, tc := range tests {
 		t.Run(tc.name, func(t *testing.T) {
 			encoded := tc.details.Encode()
-			decoded, err := DecodeAuctionDetails(encoded)
+			decoded, err := fusionorder.DecodeLegacyAuctionDetails(encoded)
 			require.NoError(t, err)
 			assert.Equal(t, tc.details, *decoded)
 		})
@@ -112,7 +113,7 @@ func TestIsNonceRequired(t *testing.T) {
 
 	for _, tc := range tests {
 		t.Run(tc.name, func(t *testing.T) {
-			result := isNonceRequired(tc.allowPartialFills, tc.allowMultipleFills)
+			result := fusionorder.IsNonceRequired(tc.allowPartialFills, tc.allowMultipleFills)
 			assert.Equal(t, tc.expectedNonceResult, result)
 		})
 	}

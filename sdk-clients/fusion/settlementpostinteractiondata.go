@@ -1,13 +1,12 @@
 package fusion
 
 import (
-	"errors"
 	"fmt"
 	"math/big"
-	"strings"
 
 	"github.com/1inch/1inch-sdk-go/internal/addresses"
 	"github.com/1inch/1inch-sdk-go/internal/bytesbuilder"
+	"github.com/1inch/1inch-sdk-go/sdk-clients/fusionorder"
 	"github.com/ethereum/go-ethereum/common"
 )
 
@@ -18,56 +17,9 @@ type SettlementPostInteractionData struct {
 	AuctionFees        *FeesIntegratorAndResolver
 }
 
-var uint16Max = new(big.Int).Sub(new(big.Int).Lsh(big.NewInt(1), 16), big.NewInt(1))
-
-func GenerateWhitelist(whitelistStrings []string, resolvingStartTime *big.Int) ([]WhitelistItem, error) {
-	if len(whitelistStrings) == 0 {
-		return nil, errors.New("whitelist cannot be empty")
-	}
-
-	//whitelistAddresses := make([]AuctionWhitelistItem, 0)
-	//for _, address := range whitelistStrings {
-	//	whitelistAddresses = append(whitelistAddresses, AuctionWhitelistItem{
-	//		Address:   geth_common.HexToAddress(address),
-	//		AllowFrom: big.NewInt(0), // TODO generating the correct list here requires checking for an exclusive resolver. This needs to be checked for later. The generated object does not see exclusive resolver correctly
-	//	})
-	//}
-
-	sumDelay := big.NewInt(0)
-	whitelist := make([]WhitelistItem, len(whitelistStrings))
-
-	// TODO this sorting step is currently skipped since we do not calculate AllowFrom
-	//sort.Slice(data.Whitelist, func(i, j int) bool {
-	//	return data.Whitelist[i].AllowFrom.Cmp(data.Whitelist[j].AllowFrom) < 0
-	//})
-	for i, d := range whitelistStrings {
-		allowFrom := big.NewInt(0).Set(resolvingStartTime)
-		//allowFrom := d.AllowFrom
-		//if d.AllowFrom.Cmp(data.ResolvingStartTime) < 0 {
-		//	allowFrom = data.ResolvingStartTime
-		//}
-
-		zero := big.NewInt(0)
-		delay := new(big.Int).Sub(allowFrom, resolvingStartTime)
-		delay.Sub(delay, sumDelay)
-		// If the resulting value of delay is zero, set it to a fresh big.Int of value zero (for comparisons in tests)
-		if delay.Cmp(zero) == 0 {
-			delay = zero
-		}
-		whitelist[i] = WhitelistItem{
-			AddressHalf: strings.ToLower(d)[len(d)-20:],
-			Delay:       delay,
-		}
-
-		sumDelay.Add(sumDelay, whitelist[i].Delay)
-
-		if whitelist[i].Delay.Cmp(uint16Max) >= 0 {
-			return nil, fmt.Errorf("delay too big - %d must be less than %d", whitelist[i].Delay, uint16Max)
-		}
-	}
-
-	return whitelist, nil
-}
+// GenerateWhitelist converts a list of address strings into WhitelistItems with delays.
+// This is an alias for fusionorder.GenerateWhitelist.
+var GenerateWhitelist = fusionorder.GenerateWhitelist
 
 const customReceiverBitFlag = 0
 
@@ -118,40 +70,16 @@ func CreateEncodedPostInteractionData(extension *Extension) (string, error) {
 
 	builder.AddUint256(extension.Surplus.EstimatedTakerAmount)
 
-	protocolFeePercent := extension.Surplus.ProtocolFee.ToPercent(GetDefaultBase())
+	protocolFeePercent := extension.Surplus.ProtocolFee.ToPercent(fusionorder.GetDefaultBase())
 	builder.AddUint8(uint8(protocolFeePercent))
 
 	return fmt.Sprintf("0x%s", builder.AsHex()), nil
 }
 
 func (spid SettlementPostInteractionData) CanExecuteAt(executor common.Address, executionTime *big.Int) bool {
-	addressHalf := executor.Hex()[len(executor.Hex())-20:]
-
-	allowedFrom := spid.ResolvingStartTime
-
-	for _, whitelist := range spid.Whitelist {
-		allowedFrom.Add(allowedFrom, whitelist.Delay)
-
-		if addressHalf == whitelist.AddressHalf {
-			return executionTime.Cmp(allowedFrom) >= 0
-		} else if executionTime.Cmp(allowedFrom) < 0 {
-			return false
-		}
-	}
-
-	return false
+	return fusionorder.CanExecuteAt(spid.Whitelist, spid.ResolvingStartTime, executor, executionTime)
 }
 
 func (spid SettlementPostInteractionData) IsExclusiveResolver(wallet common.Address) bool {
-	addressHalf := wallet.Hex()[len(wallet.Hex())-20:]
-
-	if len(spid.Whitelist) == 1 {
-		return addressHalf == spid.Whitelist[0].AddressHalf
-	}
-
-	if spid.Whitelist[0].Delay.Cmp(spid.Whitelist[1].Delay) == 0 {
-		return false
-	}
-
-	return addressHalf == spid.Whitelist[0].AddressHalf
+	return fusionorder.IsExclusiveResolver(spid.Whitelist, wallet)
 }

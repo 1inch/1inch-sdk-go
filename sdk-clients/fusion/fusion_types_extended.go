@@ -3,9 +3,16 @@ package fusion
 import (
 	"math/big"
 
-	"github.com/ethereum/go-ethereum/common"
-
+	"github.com/1inch/1inch-sdk-go/sdk-clients/fusionorder"
 	"github.com/1inch/1inch-sdk-go/sdk-clients/orderbook"
+	"github.com/ethereum/go-ethereum/common"
+)
+
+// Type aliases for internal use - these types are now in fusionorder
+// Users should import from fusionorder directly for new code
+type (
+	Bps         = fusionorder.Bps
+	Interaction = fusionorder.Interaction
 )
 
 type GetQuoteOutputFixed struct {
@@ -75,40 +82,23 @@ type OrderParams struct {
 	OrderExpirationDelay    uint32 // TODO this field is inaccessible in the typescript SDK
 }
 
-type TakingFeeInfo struct {
-	TakingFeeBps      *big.Int // 100 == 1%
-	TakingFeeReceiver common.Address
-}
+// TakingFeeInfo is an alias for the shared fusionorder.TakingFeeInfo type
+type TakingFeeInfo = fusionorder.TakingFeeInfo
 
-type CustomPreset struct {
-	AuctionDuration    int                 `json:"auctionDuration"`
-	AuctionStartAmount string              `json:"auctionStartAmount"`
-	AuctionEndAmount   string              `json:"auctionEndAmount"`
-	Points             []CustomPresetPoint `json:"points,omitempty"`
-}
+// CustomPreset is an alias for the shared fusionorder.CustomPreset type
+type CustomPreset = fusionorder.CustomPreset
 
-type CustomPresetPoint struct {
-	ToTokenAmount string `json:"toTokenAmount"`
-	Delay         int    `json:"delay"`
-}
+// CustomPresetPoint is an alias for the shared fusionorder.CustomPresetPoint type
+type CustomPresetPoint = fusionorder.CustomPresetPoint
 
-type AuctionDetails struct {
-	StartTime       uint32                   `json:"startTime"`
-	Duration        uint32                   `json:"duration"`
-	InitialRateBump uint32                   `json:"initialRateBump"`
-	Points          []AuctionPointClassFixed `json:"points"`
-	GasCost         GasCostConfigClassFixed  `json:"gasCost"`
-}
+// AuctionDetails is an alias for the shared fusionorder.AuctionDetails type
+type AuctionDetails = fusionorder.AuctionDetails
 
-type AuctionPointClassFixed struct {
-	Coefficient uint32 `json:"coefficient"`
-	Delay       uint16 `json:"delay"`
-}
+// AuctionPointClassFixed is an alias for the shared fusionorder.AuctionPointClassFixed type
+type AuctionPointClassFixed = fusionorder.AuctionPointClassFixed
 
-type GasCostConfigClassFixed struct {
-	GasBumpEstimate  uint32 `json:"gasBumpEstimate"`
-	GasPriceEstimate uint32 `json:"gasPriceEstimate"`
-}
+// GasCostConfigClassFixed is an alias for the shared fusionorder.GasCostConfigClassFixed type
+type GasCostConfigClassFixed = fusionorder.GasCostConfigClassFixed
 
 type Preset struct {
 	AuctionDuration    float32             `json:"auctionDuration"`
@@ -154,13 +144,8 @@ type FeesIntegratorAndResolver struct {
 	Integrator IntegratorFee
 }
 
-type AuctionWhitelistItem struct {
-	Address common.Address
-	/**
-	 * Timestamp in sec at which address can start resolving
-	 */
-	AllowFrom *big.Int
-}
+// AuctionWhitelistItem is an alias for the shared fusionorder.AuctionWhitelistItem type
+type AuctionWhitelistItem = fusionorder.AuctionWhitelistItem
 
 type ExtraParams struct {
 	Nonce                *big.Int
@@ -173,28 +158,11 @@ type ExtraParams struct {
 	unwrapWeth           bool
 }
 
-type WhitelistItem struct {
-	/**
-	 * last 10 bytes of address, no 0x prefix
-	 */
-	AddressHalf string
-	/**
-	 * Delay from previous resolver in seconds
-	 * For first resolver delay from `resolvingStartTime`
-	 */
-	Delay *big.Int
-}
+// WhitelistItem is an alias for the shared fusionorder.WhitelistItem type
+type WhitelistItem = fusionorder.WhitelistItem
 
-type ExtraData struct {
-	UnwrapWETH           bool
-	Nonce                *big.Int
-	Permit               string
-	AllowPartialFills    bool
-	AllowMultipleFills   bool
-	OrderExpirationDelay uint32
-	EnablePermit2        bool
-	Source               string
-}
+// ExtraData is an alias for the shared fusionorder.ExtraData type
+type ExtraData = fusionorder.ExtraData
 
 type QuoterControllerGetQuoteParamsFixed struct {
 	// FromTokenAddress Address of "FROM" token

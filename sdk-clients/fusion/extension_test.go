@@ -5,12 +5,12 @@ import (
 	"testing"
 
 	"github.com/1inch/1inch-sdk-go/internal/bigint"
+	random_number_generation "github.com/1inch/1inch-sdk-go/internal/random-number-generation"
+	"github.com/1inch/1inch-sdk-go/sdk-clients/fusionorder"
 	"github.com/1inch/1inch-sdk-go/sdk-clients/orderbook"
 	"github.com/ethereum/go-ethereum/common"
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
-
-	random_number_generation "github.com/1inch/1inch-sdk-go/internal/random-number-generation"
 )
 
 func TestGenerateSalt(t *testing.T) {
@@ -105,7 +105,7 @@ func TestNewExtension(t *testing.T) {
 
 				Surplus: &SurplusParams{
 					EstimatedTakerAmount: big.NewInt(1),
-					ProtocolFee:          FromPercent(1, GetDefaultBase()),
+					ProtocolFee:          fusionorder.FromPercent(1, fusionorder.GetDefaultBase()),
 				},
 
 				ResolvingStartTime: big.NewInt(0),
@@ -152,7 +152,7 @@ func TestNewExtension(t *testing.T) {
 
 				Surplus: &SurplusParams{
 					EstimatedTakerAmount: big.NewInt(1),
-					ProtocolFee:          FromPercent(1, GetDefaultBase()),
+					ProtocolFee:          fusionorder.FromPercent(1, fusionorder.GetDefaultBase()),
 				},
 
 				ResolvingStartTime: big.NewInt(0),
@@ -384,8 +384,8 @@ func TestBuildAmountGetterData(t *testing.T) {
 					Integrator: IntegratorFee{
 						Integrator: "0x0000000000000000000000000000000000000001",
 						Protocol:   "0x0000000000000000000000000000000000000002",
-						Fee:        FromPercent(1, GetDefaultBase()),
-						Share:      FromPercent(50, GetDefaultBase()),
+						Fee:        fusionorder.FromPercent(1, fusionorder.GetDefaultBase()),
+						Share:      fusionorder.FromPercent(50, fusionorder.GetDefaultBase()),
 					},
 				},
 				Whitelist: []AuctionWhitelistItem{

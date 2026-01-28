@@ -5,6 +5,7 @@ import (
 	"fmt"
 
 	"github.com/1inch/1inch-sdk-go/internal/addresses"
+	"github.com/1inch/1inch-sdk-go/sdk-clients/fusionorder"
 )
 
 type IntegratorFee struct {
@@ -18,8 +19,8 @@ type IntegratorFee struct {
 var IntegratorFeeZero = &IntegratorFee{
 	Integrator: addresses.ZeroAddress,
 	Protocol:   addresses.ZeroAddress,
-	Fee:        BpsZero,
-	Share:      BpsZero,
+	Fee:        fusionorder.BpsZero,
+	Share:      fusionorder.BpsZero,
 }
 
 // NewIntegratorFee constructs a validated IntegratorFee or returns an error

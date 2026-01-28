@@ -4,10 +4,10 @@ import (
 	"math/big"
 	"testing"
 
+	"github.com/1inch/1inch-sdk-go/internal/addresses"
+	"github.com/1inch/1inch-sdk-go/sdk-clients/fusionorder"
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
-
-	"github.com/1inch/1inch-sdk-go/internal/addresses"
 )
 
 func TestResolverFeeZero(t *testing.T) {
@@ -31,76 +31,76 @@ func TestNewResolverFee(t *testing.T) {
 		{
 			name:              "Valid - zero fee with zero address",
 			receiver:          addresses.ZeroAddress,
-			fee:               BpsZero,
-			whitelistDiscount: BpsZero,
+			fee:               fusionorder.BpsZero,
+			whitelistDiscount: fusionorder.BpsZero,
 			expectError:       false,
 		},
 		{
 			name:              "Valid - zero fee with empty receiver",
 			receiver:          "",
-			fee:               BpsZero,
-			whitelistDiscount: BpsZero,
+			fee:               fusionorder.BpsZero,
+			whitelistDiscount: fusionorder.BpsZero,
 			expectError:       false,
 		},
 		{
 			name:              "Valid - non-zero fee with valid receiver",
 			receiver:          validAddress,
-			fee:               NewBps(big.NewInt(100)),
-			whitelistDiscount: NewBps(big.NewInt(100)), // 1% discount
+			fee:               fusionorder.NewBps(big.NewInt(100)),
+			whitelistDiscount: fusionorder.NewBps(big.NewInt(100)), // 1% discount
 			expectError:       false,
 		},
 		{
 			name:              "Valid - fee with zero whitelist discount",
 			receiver:          validAddress,
-			fee:               NewBps(big.NewInt(100)),
-			whitelistDiscount: BpsZero,
+			fee:               fusionorder.NewBps(big.NewInt(100)),
+			whitelistDiscount: fusionorder.BpsZero,
 			expectError:       false,
 		},
 		{
 			name:              "Invalid - non-zero fee with zero address",
 			receiver:          addresses.ZeroAddress,
-			fee:               NewBps(big.NewInt(100)),
-			whitelistDiscount: BpsZero,
+			fee:               fusionorder.NewBps(big.NewInt(100)),
+			whitelistDiscount: fusionorder.BpsZero,
 			expectError:       true,
 			errorMsg:          "fee must be zero if receiver is zero address",
 		},
 		{
 			name:              "Invalid - non-zero fee with empty receiver",
 			receiver:          "",
-			fee:               NewBps(big.NewInt(100)),
-			whitelistDiscount: BpsZero,
+			fee:               fusionorder.NewBps(big.NewInt(100)),
+			whitelistDiscount: fusionorder.BpsZero,
 			expectError:       true,
 			errorMsg:          "fee must be zero if receiver is zero address",
 		},
 		{
 			name:              "Invalid - zero fee with non-zero receiver",
 			receiver:          validAddress,
-			fee:               BpsZero,
-			whitelistDiscount: BpsZero,
+			fee:               fusionorder.BpsZero,
+			whitelistDiscount: fusionorder.BpsZero,
 			expectError:       true,
 			errorMsg:          "receiver must be zero address if fee is zero",
 		},
 		{
 			name:              "Invalid - zero fee with non-zero whitelist discount",
 			receiver:          addresses.ZeroAddress,
-			fee:               BpsZero,
-			whitelistDiscount: NewBps(big.NewInt(100)),
+			fee:               fusionorder.BpsZero,
+			whitelistDiscount: fusionorder.NewBps(big.NewInt(100)),
 			expectError:       true,
 			errorMsg:          "whitelist discount must be zero if fee is zero",
 		},
 		{
 			name:              "Invalid - whitelist discount not percent precision (50 bps = 0.5%)",
 			receiver:          validAddress,
-			fee:               NewBps(big.NewInt(100)),
-			whitelistDiscount: NewBps(big.NewInt(50)), // 0.5% - not whole percent
+			fee:               fusionorder.NewBps(big.NewInt(100)),
+			whitelistDiscount: fusionorder.NewBps(big.NewInt(50)), // 0.5% - not whole percent
 			expectError:       true,
 			errorMsg:          "whitelist discount must have percent precision",
 		},
 		{
 			name:              "Valid - whitelist discount with percent precision (200 bps = 2%)",
 			receiver:          validAddress,
-			fee:               NewBps(big.NewInt(100)),
-			whitelistDiscount: NewBps(big.NewInt(200)), // 2%
+			fee:               fusionorder.NewBps(big.NewInt(100)),
+			whitelistDiscount: fusionorder.NewBps(big.NewInt(200)), // 2%
 			expectError:       false,
 		},
 	}
@@ -126,7 +126,7 @@ func TestNewResolverFee(t *testing.T) {
 func TestResolverFee_String(t *testing.T) {
 	validAddress := "0x6B175474E89094C44Da98b954EedeAC495271d0F"
 
-	fee, err := NewResolverFee(validAddress, NewBps(big.NewInt(100)), NewBps(big.NewInt(200)))
+	fee, err := NewResolverFee(validAddress, fusionorder.NewBps(big.NewInt(100)), fusionorder.NewBps(big.NewInt(200)))
 	require.NoError(t, err)
 
 	result := fee.String()

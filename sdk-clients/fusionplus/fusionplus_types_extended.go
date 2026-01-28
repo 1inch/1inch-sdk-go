@@ -4,9 +4,14 @@ import (
 	"math/big"
 
 	"github.com/1inch/1inch-sdk-go/sdk-clients/fusion"
+	"github.com/1inch/1inch-sdk-go/sdk-clients/fusionorder"
 	"github.com/1inch/1inch-sdk-go/sdk-clients/orderbook"
 	"github.com/ethereum/go-ethereum/common"
 )
+
+// Type alias for internal use - this type is now in fusionorder
+// Users should import from fusionorder directly for new code
+type Interaction = fusionorder.Interaction
 
 type GetOrderByOrderHashParams struct {
 	Hash string `url:"hash" json:"hash"`
@@ -167,7 +172,7 @@ type Order struct {
 
 type EscrowExtensionParams struct {
 	fusion.ExtensionParams
-	ExtensionParamsFusion
+	ExtensionParamsPlus
 	HashLock         *HashLock
 	DstChainId       float32
 	DstToken         common.Address
@@ -206,40 +211,23 @@ type OrderParams struct {
 	CustomPreset      CustomPreset
 }
 
-type TakingFeeInfo struct {
-	TakingFeeBps      *big.Int // 100 == 1%
-	TakingFeeReceiver common.Address
-}
+// TakingFeeInfo is an alias for the shared fusionorder.TakingFeeInfo type
+type TakingFeeInfo = fusionorder.TakingFeeInfo
 
-type CustomPreset struct {
-	AuctionDuration    int                 `json:"auctionDuration"`
-	AuctionStartAmount string              `json:"auctionStartAmount"`
-	AuctionEndAmount   string              `json:"auctionEndAmount"`
-	Points             []CustomPresetPoint `json:"points,omitempty"`
-}
+// CustomPreset is an alias for the shared fusionorder.CustomPreset type
+type CustomPreset = fusionorder.CustomPreset
 
-type CustomPresetPoint struct {
-	ToTokenAmount string `json:"toTokenAmount"`
-	Delay         int    `json:"delay"`
-}
+// CustomPresetPoint is an alias for the shared fusionorder.CustomPresetPoint type
+type CustomPresetPoint = fusionorder.CustomPresetPoint
 
-type AuctionDetails struct {
-	StartTime       uint32                   `json:"startTime"`
-	Duration        uint32                   `json:"duration"`
-	InitialRateBump uint32                   `json:"initialRateBump"`
-	Points          []AuctionPointClassFixed `json:"points"`
-	GasCost         GasCostConfigClassFixed  `json:"gasCost"`
-}
+// AuctionDetails is an alias for the shared fusionorder.AuctionDetails type
+type AuctionDetails = fusionorder.AuctionDetails
 
-type AuctionPointClassFixed struct {
-	Coefficient uint32 `json:"coefficient"`
-	Delay       uint16 `json:"delay"`
-}
+// AuctionPointClassFixed is an alias for the shared fusionorder.AuctionPointClassFixed type
+type AuctionPointClassFixed = fusionorder.AuctionPointClassFixed
 
-type GasCostConfigClassFixed struct {
-	GasBumpEstimate  uint32 `json:"gasBumpEstimate"`
-	GasPriceEstimate uint32 `json:"gasPriceEstimate"`
-}
+// GasCostConfigClassFixed is an alias for the shared fusionorder.GasCostConfigClassFixed type
+type GasCostConfigClassFixed = fusionorder.GasCostConfigClassFixed
 
 type PreparedOrder struct {
 	Order      Order  `json:"order"`
@@ -271,13 +259,8 @@ type IntegratorFee struct {
 	Receiver common.Address
 }
 
-type AuctionWhitelistItem struct {
-	Address common.Address
-	/**
-	 * Timestamp in sec at which address can start resolving
-	 */
-	AllowFrom *big.Int
-}
+// AuctionWhitelistItem is an alias for the shared fusionorder.AuctionWhitelistItem type
+type AuctionWhitelistItem = fusionorder.AuctionWhitelistItem
 
 type ExtraParams struct {
 	Nonce                *big.Int
@@ -298,31 +281,14 @@ type SettlementSuffixData struct {
 	CustomReceiver     common.Address
 }
 
-type WhitelistItem struct {
-	/**
-	 * last 10 bytes of address, no 0x prefix
-	 */
-	AddressHalf string
-	/**
-	 * Delay from previous resolver in seconds
-	 * For first resolver delay from `resolvingStartTime`
-	 */
-	Delay *big.Int
-}
+// WhitelistItem is an alias for the shared fusionorder.WhitelistItem type
+type WhitelistItem = fusionorder.WhitelistItem
 
-type ExtraData struct {
-	UnwrapWETH           bool
-	Nonce                *big.Int
-	Permit               string
-	AllowPartialFills    bool
-	AllowMultipleFills   bool
-	OrderExpirationDelay uint32
-	EnablePermit2        bool
-	Source               string
-}
+// ExtraData is an alias for the shared fusionorder.ExtraData type
+type ExtraData = fusionorder.ExtraData
 
-// PresetClassFixedFusion defines model for PresetClass.
-type PresetClassFixedFusion struct {
+// PresetClassFixed defines model for PresetClass.
+type PresetClassFixed struct {
 	AllowMultipleFills bool                      `json:"allowMultipleFills"`
 	AllowPartialFills  bool                      `json:"allowPartialFills"`
 	AuctionDuration    float32                   `json:"auctionDuration"`
@@ -331,40 +297,23 @@ type PresetClassFixedFusion struct {
 	BankFee            string                    `json:"bankFee"`
 	EstP               float32                   `json:"estP"`
 	ExclusiveResolver  string                    `json:"exclusiveResolver"` // This was changed to a string from a map[string]interface{}
-	GasCost            GasCostConfigClassFusion  `json:"gasCost"`
+	GasCost            GasCostConfigClass  `json:"gasCost"`
 	InitialRateBump    float32                   `json:"initialRateBump"`
-	Points             []AuctionPointClassFusion `json:"points"`
+	Points             []AuctionPointClass `json:"points"`
 	StartAuctionIn     float32                   `json:"startAuctionIn"`
 	TokenFee           string                    `json:"tokenFee"`
 }
 
-// GasCostConfigClassFusion defines model for GasCostConfigClass.
-type GasCostConfigClassFusion struct {
+// GasCostConfigClass defines model for GasCostConfigClass.
+type GasCostConfigClass struct {
 	GasBumpEstimate  float32 `json:"gasBumpEstimate"`
 	GasPriceEstimate string  `json:"gasPriceEstimate"`
 }
 
-// AuctionPointClassFusion defines model for AuctionPointClass.
-type AuctionPointClassFusion struct {
+// AuctionPointClass defines model for AuctionPointClass.
+type AuctionPointClass struct {
 	Coefficient float32 `json:"coefficient"`
 	Delay       float32 `json:"delay"`
-}
-
-type FeesFusion struct {
-	IntFee  IntegratorFeeFusion
-	BankFee *big.Int
-}
-
-type IntegratorFeeFusion struct {
-	Ratio    *big.Int
-	Receiver common.Address
-}
-
-type DetailsFusion struct {
-	Auction            *AuctionDetails `json:"auction"`
-	Fees               FeesFusion      `json:"fees"`
-	Whitelist          []AuctionWhitelistItem
-	ResolvingStartTime *big.Int
 }
 
 // FusionOrderV4 defines model for FusionOrderV4.
@@ -394,10 +343,10 @@ type FusionOrderV4 struct {
 	TakingAmount string `json:"takingAmount"`
 }
 
-type ExtensionParamsFusion struct {
+type ExtensionParamsPlus struct {
 	SettlementContract  string
 	AuctionDetails      *AuctionDetails
-	PostInteractionData *SettlementPostInteractionDataFusion
+	PostInteractionData *SettlementPostInteractionData
 	Asset               string
 	Permit              string
 
@@ -408,21 +357,13 @@ type ExtensionParamsFusion struct {
 	CustomData       string
 }
 
-type SettlementSuffixDataFusion struct {
-	Whitelist          []AuctionWhitelistItem
-	IntegratorFee      *IntegratorFeeFusion
-	BankFee            *big.Int
-	ResolvingStartTime *big.Int
-	CustomReceiver     common.Address
-}
-
-// ExtensionFusion represents the extension data for the Fusion order
-// and should be only created using the NewExtensionFusion function
-type ExtensionFusion struct {
+// ExtensionPlus represents the extension data for the FusionPlus order
+// and should be only created using the NewExtensionPlus function
+type ExtensionPlus struct {
 	// Raw unencoded data
 	SettlementContract  string
 	AuctionDetails      *AuctionDetails
-	PostInteractionData *SettlementPostInteractionDataFusion
+	PostInteractionData *SettlementPostInteractionData
 	Asset               string
 	Permit              string
 

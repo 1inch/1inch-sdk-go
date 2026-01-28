@@ -6,6 +6,7 @@ import (
 	"math/big"
 
 	"github.com/1inch/1inch-sdk-go/internal/addresses"
+	"github.com/1inch/1inch-sdk-go/sdk-clients/fusionorder"
 )
 
 type ResolverFee struct {
@@ -16,8 +17,8 @@ type ResolverFee struct {
 
 var ResolverFeeZero = &ResolverFee{
 	Receiver:          addresses.ZeroAddress,
-	Fee:               BpsZero,
-	WhitelistDiscount: BpsZero,
+	Fee:               fusionorder.BpsZero,
+	WhitelistDiscount: fusionorder.BpsZero,
 }
 
 func NewResolverFee(receiver string, fee *Bps, whitelistDiscount *Bps) (*ResolverFee, error) {
@@ -32,7 +33,7 @@ func NewResolverFee(receiver string, fee *Bps, whitelistDiscount *Bps) (*Resolve
 	}
 
 	// Check percent precision: must be divisible by 100 (i.e. 1%)
-	if new(big.Int).Rem(whitelistDiscount.value, big.NewInt(100)).Sign() != 0 {
+	if new(big.Int).Rem(whitelistDiscount.Value(), big.NewInt(100)).Sign() != 0 {
 		return nil, errors.New("whitelist discount must have percent precision: 1%, 2% and so on")
 	}
 

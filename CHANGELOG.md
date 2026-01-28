@@ -7,8 +7,25 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 ## [v2.0.0] - 2025-11-05
 [v2.0.0 release page](https://github.com/1inch/1inch-sdk-go/releases/tag/v2.0.0)
 
+### Breaking Changes
+- **New `fusionorder` package**: Created shared package for common types and utilities used by `fusion` and `fusionplus`
+- **Removed re-exports**: Functions like `NewBps()`, `NewInteraction()`, `GetWrappedToken()` are no longer exported from `fusion` and `fusionplus` packages. Import from `fusionorder` instead.
+- **Removed wrapper files**: Deleted `bps.go`, `interaction.go`, `nativetokenwrappers.go`, `auctiondetails.go` from both packages
+- **Consolidated functions**: `CalcAuctionStartTime()`, `IsNonceRequired()`, `BpsToRatioFormat()`, `CanExecuteAt()`, `IsExclusiveResolver()`, `GenerateWhitelistFromItems()` now only exist in `fusionorder`
+- **Merged types in fusionplus**: `SettlementPostInteractionData` and `SettlementPostInteractionDataFusion` consolidated into single type
+- **Renamed types in fusionplus**: Types with `Fusion` suffix renamed to use `Plus` suffix (e.g., `ExtensionFusion` → `ExtensionPlus`, `NewExtensionFusion()` → `NewExtensionPlus()`)
+- **Removed duplicate types in fusionplus**: `SettlementSuffixDataFusion`, `FeesFusion`, `IntegratorFeeFusion`, `DetailsFusion` removed
+- See `BREAKING_CHANGES.md` for full migration guide
+
+### Added
+- New `fusionorder` package with shared types: `Bps`, `Interaction`, `AuctionDetails`, `WhitelistItem`, `CustomPreset`, etc.
+- New shared functions: `NewBps()`, `FromPercent()`, `FromFraction()`, `NewInteraction()`, `DecodeInteraction()`, `GetWrappedToken()`, `GenerateWhitelist()`, etc.
+- Comprehensive test coverage for `fusionorder` package
+
 ### Changed
 - Fusion Plus updated to use v1.1 API
+- Eliminated code duplication between `fusion` and `fusionplus` packages
+- Type aliases in `fusion` and `fusionplus` now reference `fusionorder` types
 
 ## [v2.0.0-preview.2] - 2025-10-30
 [v2.0.0-preview.2 release page](https://github.com/1inch/1inch-sdk-go/releases/tag/v2.0.0-preview.2)

@@ -149,7 +149,7 @@ func getBytesCount(hex string) int {
 }
 
 func HashSecret(secret string) (string, error) {
-	if !isHexBytes(secret) || getBytesCount(secret) != 32 {
+	if !hexadecimal.IsHexBytes(secret) || getBytesCount(secret) != 32 {
 		return "", fmt.Errorf("secret length must be 32 bytes hex encoded. Got %s", secret)
 	}
 

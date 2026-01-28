@@ -5,6 +5,7 @@ import (
 	"testing"
 
 	"github.com/1inch/1inch-sdk-go/internal/times"
+	"github.com/1inch/1inch-sdk-go/sdk-clients/fusionorder"
 	"github.com/stretchr/testify/assert"
 )
 
@@ -276,7 +277,7 @@ func TestIsNonceRequired(t *testing.T) {
 
 	for _, tc := range tests {
 		t.Run(tc.name, func(t *testing.T) {
-			result := isNonceRequired(tc.allowPartialFills, tc.allowMultipleFills)
+			result := fusionorder.IsNonceRequired(tc.allowPartialFills, tc.allowMultipleFills)
 			assert.Equal(t, tc.expected, result)
 		})
 	}
@@ -312,7 +313,7 @@ func TestBpsToRatioFormat(t *testing.T) {
 
 	for _, tc := range tests {
 		t.Run(tc.name, func(t *testing.T) {
-			result := bpsToRatioFormat(tc.bps)
+			result := fusionorder.BpsToRatioFormat(tc.bps)
 			assert.Equal(t, tc.expected, result)
 		})
 	}

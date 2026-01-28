@@ -5,13 +5,13 @@ import (
 	"fmt"
 	"math/big"
 	"strconv"
-	"time"
 
 	"github.com/1inch/1inch-sdk-go/common"
 	"github.com/1inch/1inch-sdk-go/internal/times"
 	geth_common "github.com/ethereum/go-ethereum/common"
 
 	random_number_generation "github.com/1inch/1inch-sdk-go/internal/random-number-generation"
+	"github.com/1inch/1inch-sdk-go/sdk-clients/fusionorder"
 	"github.com/1inch/1inch-sdk-go/sdk-clients/orderbook"
 )
 
@@ -30,8 +30,8 @@ func CreateFusionOrderData(quote GetQuoteOutputFixed, orderParams OrderParams, w
 	}
 
 	takerAsset := orderParams.ToTokenAddress
-	if takerAsset == NativeToken {
-		takerAssetWrapped, ok := chainToWrapper[NetworkEnum(chainId)]
+	if takerAsset == fusionorder.NativeToken {
+		takerAssetWrapped, ok := fusionorder.ChainToWrapper[fusionorder.NetworkEnum(chainId)]
 		if !ok {
 			return nil, nil, fmt.Errorf("unable to get address for taker asset's wrapped token. unrecognized network: %v", chainId)
 		}
@@ -49,7 +49,7 @@ func CreateFusionOrderData(quote GetQuoteOutputFixed, orderParams OrderParams, w
 	}
 
 	var nonce *big.Int
-	if isNonceRequired(orderParams.AllowPartialFills, orderParams.AllowMultipleFills) {
+	if fusionorder.IsNonceRequired(orderParams.AllowPartialFills, orderParams.AllowMultipleFills) {
 		if orderParams.Nonce != nil {
 			nonce = orderParams.Nonce
 		} else {
@@ -109,7 +109,7 @@ func CreateFusionOrderData(quote GetQuoteOutputFixed, orderParams OrderParams, w
 		return nil, nil, fmt.Errorf("error parsing marketAmount: %v", quote.MarketAmount)
 	}
 
-	surplus, err := NewSurplusParams(marketAmountBig, FromPercent(float64(quote.SurplusFee), GetDefaultBase()))
+	surplus, err := NewSurplusParams(marketAmountBig, fusionorder.FromPercent(float64(quote.SurplusFee), fusionorder.GetDefaultBase()))
 	if err != nil {
 		return nil, nil, fmt.Errorf("error creating surplus: %v", err)
 	}
@@ -192,12 +192,11 @@ func getPreset(presets QuotePresetsClassFixed, presetType GetQuoteOutputRecommen
 	return nil, fmt.Errorf("unknown preset type: %v", presetType)
 }
 
-var CalcAuctionStartTimeFunc func(uint32, uint32) uint32 = CalcAuctionStartTime
+// CalcAuctionStartTimeFunc allows overriding the auction start time calculation for testing
+var CalcAuctionStartTimeFunc func(uint32, uint32) uint32 = fusionorder.CalcAuctionStartTime
 
-func CalcAuctionStartTime(startAuctionIn uint32, additionalWaitPeriod uint32) uint32 {
-	currentTime := time.Now().Unix()
-	return uint32(currentTime) + additionalWaitPeriod + startAuctionIn
-}
+// CalcAuctionStartTime is a convenience alias for fusionorder.CalcAuctionStartTime
+var CalcAuctionStartTime = fusionorder.CalcAuctionStartTime
 
 func CreateAuctionDetails(preset *PresetClassFixed, additionalWaitPeriod float32) (*AuctionDetails, error) {
 	pointsFixed := make([]AuctionPointClassFixed, 0)
@@ -326,20 +325,5 @@ func CreateOrder(params CreateOrderDataParams) (*Order, error) {
 	}, nil
 }
 
-func isNonceRequired(allowPartialFills, allowMultipleFills bool) bool {
-	return !allowPartialFills || !allowMultipleFills
-}
-
-var (
-	feeBase          = big.NewInt(100_000)
-	bpsBase          = big.NewInt(10_000)
-	bpsToRatioNumber = new(big.Int).Div(feeBase, bpsBase)
-)
-
-func bpsToRatioFormat(bps *big.Int) *big.Int {
-	if bps == nil || bps.Cmp(big.NewInt(0)) == 0 {
-		return big.NewInt(0)
-	}
-
-	return bps.Mul(bps, bpsToRatioNumber)
-}
+// bpsToRatioFormat is an alias for fusionorder.BpsToRatioFormat
+var bpsToRatioFormat = fusionorder.BpsToRatioFormat

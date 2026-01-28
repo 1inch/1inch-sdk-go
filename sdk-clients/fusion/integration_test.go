@@ -5,11 +5,11 @@ import (
 	"math/big"
 	"testing"
 
+	random_number_generation "github.com/1inch/1inch-sdk-go/internal/random-number-generation"
+	"github.com/1inch/1inch-sdk-go/sdk-clients/fusionorder"
 	"github.com/ethereum/go-ethereum/common"
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
-
-	random_number_generation "github.com/1inch/1inch-sdk-go/internal/random-number-generation"
 )
 
 // createTestQuote creates a realistic quote for testing
@@ -512,8 +512,8 @@ func TestFeesIntegration(t *testing.T) {
 		Integrator: IntegratorFee{
 			Integrator: "0x0000000000000000000000000000000000000001",
 			Protocol:   "0x0000000000000000000000000000000000000002",
-			Fee:        FromPercent(1, GetDefaultBase()),
-			Share:      FromPercent(50, GetDefaultBase()),
+			Fee:        fusionorder.FromPercent(1, fusionorder.GetDefaultBase()),
+			Share:      fusionorder.FromPercent(50, fusionorder.GetDefaultBase()),
 		},
 		Resolver: ResolverFee{},
 	}
@@ -534,18 +534,18 @@ func TestFeesIntegration(t *testing.T) {
 func TestNativeTokenWrapping(t *testing.T) {
 	tests := []struct {
 		name            string
-		chainId         NetworkEnum
+		chainId         fusionorder.NetworkEnum
 		expectedWrapper string
 	}{
-		{"Ethereum WETH", ETHEREUM, "0xC02aaA39b223FE8D0A0e5C4F27eAD9083C756Cc2"},
-		{"Polygon WMATIC", POLYGON, "0x0d500B1d8E8eF31E21C99d1Db9A6444d3ADf1270"},
-		{"Arbitrum WETH", ARBITRUM, "0x82aF49447D8a07e3bd95BD0d56f35241523fBab1"},
-		{"Binance WBNB", BINANCE, "0xbb4CdB9CBd36B01bD1cBaEBF2De08d9173bc095c"},
+		{"Ethereum WETH", fusionorder.ETHEREUM, "0xC02aaA39b223FE8D0A0e5C4F27eAD9083C756Cc2"},
+		{"Polygon WMATIC", fusionorder.POLYGON, "0x0d500B1d8E8eF31E21C99d1Db9A6444d3ADf1270"},
+		{"Arbitrum WETH", fusionorder.ARBITRUM, "0x82aF49447D8a07e3bd95BD0d56f35241523fBab1"},
+		{"Binance WBNB", fusionorder.BINANCE, "0xbb4CdB9CBd36B01bD1cBaEBF2De08d9173bc095c"},
 	}
 
 	for _, tc := range tests {
 		t.Run(tc.name, func(t *testing.T) {
-			wrapper, exists := chainToWrapper[tc.chainId]
+			wrapper, exists := fusionorder.ChainToWrapper[tc.chainId]
 			assert.True(t, exists)
 			assert.Equal(t, common.HexToAddress(tc.expectedWrapper), wrapper)
 		})
