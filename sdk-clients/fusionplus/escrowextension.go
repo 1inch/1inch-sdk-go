@@ -32,7 +32,7 @@ func NewEscrowExtension(escrowParams EscrowExtensionParams) (*EscrowExtension, e
 	}
 
 	escrowExtension := &EscrowExtension{
-		ExtensionPlus:  *extension,
+		ExtensionPlus:    *extension,
 		HashLock:         escrowParams.HashLock,
 		DstChainId:       escrowParams.DstChainId,
 		DstToken:         escrowParams.DstToken,
@@ -121,7 +121,7 @@ func DecodeEscrowExtension(data []byte) (*EscrowExtension, error) {
 	}
 
 	return &EscrowExtension{
-		ExtensionPlus:  *extensionPlus,
+		ExtensionPlus:    *extensionPlus,
 		HashLock:         extraData.HashLock,
 		DstChainId:       extraData.DstChainId,
 		DstToken:         extraData.DstToken,

@@ -7,12 +7,11 @@ import (
 	"time"
 
 	"github.com/1inch/1inch-sdk-go/common"
+	"github.com/1inch/1inch-sdk-go/common/fusionorder"
 	random_number_generation "github.com/1inch/1inch-sdk-go/internal/random-number-generation"
-	"github.com/1inch/1inch-sdk-go/sdk-clients/fusionorder"
 	"github.com/1inch/1inch-sdk-go/sdk-clients/orderbook"
 	geth_common "github.com/ethereum/go-ethereum/common"
 )
-
 
 func CreateFusionPlusOrderData(quoteParams QuoterControllerGetQuoteParamsFixed, quote *GetQuoteOutputFixed, orderParams OrderParams, wallet common.Wallet, chainId int) (*PreparedOrder, error) {
 
@@ -338,7 +337,6 @@ func CreateOrder(params CreateOrderDataParams) (*Order, error) {
 		},
 	}, nil
 }
-
 
 func CreateAuctionDetailsPlus(preset *PresetClassFixed, additionalWaitPeriod float32) (*AuctionDetails, error) {
 	points := make([]fusionorder.AuctionPointInput, len(preset.Points))

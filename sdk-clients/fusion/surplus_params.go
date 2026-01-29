@@ -4,7 +4,7 @@ import (
 	"errors"
 	"math/big"
 
-	"github.com/1inch/1inch-sdk-go/sdk-clients/fusionorder"
+	"github.com/1inch/1inch-sdk-go/common/fusionorder"
 )
 
 var Uint256Max = new(big.Int).Sub(new(big.Int).Lsh(big.NewInt(1), 256), big.NewInt(1))

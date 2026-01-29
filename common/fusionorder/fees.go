@@ -8,7 +8,7 @@ import (
 
 // TakingFeeInfo contains fee information for order taking
 type TakingFeeInfo struct {
-	TakingFeeBps      *big.Int       // 100 == 1%
+	TakingFeeBps      *big.Int // 100 == 1%
 	TakingFeeReceiver common.Address
 }
 

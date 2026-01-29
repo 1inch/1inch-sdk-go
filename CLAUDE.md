@@ -17,7 +17,6 @@ This is the official Go SDK for interacting with 1inch Network APIs. It provides
 │   ├── aggregation/      # DEX aggregation (swap) API client
 │   ├── fusion/           # Fusion swap (gasless) API client
 │   ├── fusionplus/       # Fusion+ cross-chain swap client
-│   ├── fusionorder/      # Shared types/utilities for fusion and fusionplus
 │   ├── orderbook/        # Limit order protocol client
 │   ├── balances/         # Token balance/allowance queries
 │   ├── gasprices/        # Gas price oracle
@@ -29,7 +28,8 @@ This is the official Go SDK for interacting with 1inch Network APIs. It provides
 │   ├── traces/           # Transaction traces
 │   ├── txbroadcast/      # Transaction broadcasting
 │   └── web3/             # Web3 RPC calls
-├── common/               # Shared interfaces (HttpExecutor, Wallet, TransactionBuilder)
+├── common/               # Shared interfaces and types
+│   └── fusionorder/      # Shared types/utilities for fusion and fusionplus
 ├── constants/            # Chain IDs, contract addresses, ABIs
 ├── internal/             # Internal utilities (not exported)
 │   ├── http-executor/    # HTTP client implementation
@@ -63,6 +63,32 @@ make codegen-types   # Must run from codegen/ directory
 
 # Get dependencies
 make get
+```
+
+## Post-Change Verification
+
+After making changes, run these checks to ensure code quality:
+
+```bash
+# 1. Build all packages (catch compile errors)
+go build ./...
+
+# 2. Run static analysis (catch common issues)
+go vet ./...
+
+# 3. Run linter with import formatting check
+golangci-lint run --enable goimports
+
+# 4. Run all tests
+go test ./...
+
+# Or run tests with race detection (slower but catches race conditions)
+go test -race ./...
+```
+
+To auto-fix import formatting issues:
+```bash
+goimports -w .
 ```
 
 ## Architecture Patterns
@@ -278,7 +304,7 @@ The `fusion`, `fusionplus`, and `fusionorder` packages share a layered architect
 
 ### Package Hierarchy
 ```
-fusionorder/          # Shared types and utilities (base layer)
+common/fusionorder/   # Shared types and utilities (base layer)
 ├── bps.go            # Basis points type and operations
 ├── interaction.go    # Order interaction encoding/decoding
 ├── whitelist.go      # Whitelist generation (GenerateWhitelist, GenerateWhitelistFromItems)
@@ -362,4 +388,4 @@ When making breaking changes, update both files:
 8. **No `log.Fatalf`** - Always return errors; `log.Fatalf` terminates the program
 9. **Check for duplicate code** - Before adding a function, search if it exists elsewhere
 10. **Test files should match source** - If `foo.go` is deleted, check if `foo_test.go` should be too
-11. **Run `go vet`** - Catches unused imports and other issues
+11. **Always run post-change verification** - See "Post-Change Verification" section above

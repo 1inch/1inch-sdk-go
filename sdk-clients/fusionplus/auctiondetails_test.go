@@ -3,7 +3,7 @@ package fusionplus
 import (
 	"testing"
 
-	"github.com/1inch/1inch-sdk-go/sdk-clients/fusionorder"
+	"github.com/1inch/1inch-sdk-go/common/fusionorder"
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
 )

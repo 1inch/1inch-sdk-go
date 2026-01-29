@@ -5,8 +5,8 @@ import (
 	"math/big"
 	"testing"
 
+	"github.com/1inch/1inch-sdk-go/common/fusionorder"
 	random_number_generation "github.com/1inch/1inch-sdk-go/internal/random-number-generation"
-	"github.com/1inch/1inch-sdk-go/sdk-clients/fusionorder"
 	"github.com/ethereum/go-ethereum/common"
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
@@ -374,32 +374,32 @@ func TestMakerTraitsCreation_Integration(t *testing.T) {
 	// - If AllowMultipleFills is false, AllowPartialFills must also be false
 	// This means partial/multiple fills must both be true or both be false
 	tests := []struct {
-		name              string
-		allowPartialFills bool
+		name               string
+		allowPartialFills  bool
 		allowMultipleFills bool
-		nonce             *big.Int
-		expectError       bool
+		nonce              *big.Int
+		expectError        bool
 	}{
 		{
-			name:              "Both fills allowed - no nonce required",
-			allowPartialFills: true,
+			name:               "Both fills allowed - no nonce required",
+			allowPartialFills:  true,
 			allowMultipleFills: true,
-			nonce:             nil,
-			expectError:       false,
+			nonce:              nil,
+			expectError:        false,
 		},
 		{
-			name:              "Both fills disabled with nonce - valid",
-			allowPartialFills: false,
+			name:               "Both fills disabled with nonce - valid",
+			allowPartialFills:  false,
 			allowMultipleFills: false,
-			nonce:             big.NewInt(12345),
-			expectError:       false,
+			nonce:              big.NewInt(12345),
+			expectError:        false,
 		},
 		{
-			name:              "Both fills disabled without nonce - error",
-			allowPartialFills: false,
+			name:               "Both fills disabled without nonce - error",
+			allowPartialFills:  false,
 			allowMultipleFills: false,
-			nonce:             nil,
-			expectError:       true,
+			nonce:              nil,
+			expectError:        true,
 		},
 	}
 

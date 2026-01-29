@@ -48,11 +48,11 @@ func GenerateWhitelist(addresses []string, resolvingStartTime *big.Int) ([]White
 		zero := big.NewInt(0)
 		delay := new(big.Int).Sub(allowFrom, resolvingStartTime)
 		delay.Sub(delay, sumDelay)
-		
+
 		if delay.Cmp(zero) == 0 {
 			delay = zero
 		}
-		
+
 		whitelist[i] = WhitelistItem{
 			AddressHalf: strings.ToLower(addr)[len(addr)-20:],
 			Delay:       delay,
@@ -92,11 +92,11 @@ func GenerateWhitelistFromItems(items []AuctionWhitelistItem, resolvingStartTime
 		zero := big.NewInt(0)
 		delay := new(big.Int).Sub(allowFrom, resolvingStartTime)
 		delay.Sub(delay, sumDelay)
-		
+
 		if delay.Cmp(zero) == 0 {
 			delay = zero
 		}
-		
+
 		whitelist[i] = WhitelistItem{
 			AddressHalf: strings.ToLower(item.Address.Hex())[len(item.Address.Hex())-20:],
 			Delay:       delay,

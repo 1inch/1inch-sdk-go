@@ -13,11 +13,11 @@ import (
 
 // AuctionDetails contains the auction configuration for a fusion order
 type AuctionDetails struct {
-	StartTime       uint32                      `json:"startTime"`
-	Duration        uint32                      `json:"duration"`
-	InitialRateBump uint32                      `json:"initialRateBump"`
-	Points          []AuctionPointClassFixed    `json:"points"`
-	GasCost         GasCostConfigClassFixed     `json:"gasCost"`
+	StartTime       uint32                   `json:"startTime"`
+	Duration        uint32                   `json:"duration"`
+	InitialRateBump uint32                   `json:"initialRateBump"`
+	Points          []AuctionPointClassFixed `json:"points"`
+	GasCost         GasCostConfigClassFixed  `json:"gasCost"`
 }
 
 // AuctionPointClassFixed represents a point in the auction curve

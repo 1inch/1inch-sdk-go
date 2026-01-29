@@ -56,9 +56,9 @@ func TestBpsToRatioFormat(t *testing.T) {
 func TestBpsToRatioFormatDoesNotMutateInput(t *testing.T) {
 	original := big.NewInt(100)
 	originalCopy := new(big.Int).Set(original)
-	
+
 	_ = BpsToRatioFormat(original)
-	
+
 	// Original should not be mutated
 	assert.Equal(t, originalCopy, original)
 }

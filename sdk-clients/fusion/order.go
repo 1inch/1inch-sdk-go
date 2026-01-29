@@ -9,11 +9,10 @@ import (
 	"github.com/1inch/1inch-sdk-go/internal/times"
 	geth_common "github.com/ethereum/go-ethereum/common"
 
+	"github.com/1inch/1inch-sdk-go/common/fusionorder"
 	random_number_generation "github.com/1inch/1inch-sdk-go/internal/random-number-generation"
-	"github.com/1inch/1inch-sdk-go/sdk-clients/fusionorder"
 	"github.com/1inch/1inch-sdk-go/sdk-clients/orderbook"
 )
-
 
 func CreateFusionOrderData(quote GetQuoteOutputFixed, orderParams OrderParams, wallet common.Wallet, chainId uint64) (*PreparedOrder, *orderbook.Order, error) {
 

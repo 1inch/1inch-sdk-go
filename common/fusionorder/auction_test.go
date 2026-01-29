@@ -200,17 +200,17 @@ func TestDecodeAuctionDetailsErrors(t *testing.T) {
 
 func TestCalcAuctionStartTime(t *testing.T) {
 	// Test that the function returns a time in the future
-	startAuctionIn := uint32(60)      // 60 seconds
-	additionalWait := uint32(30)      // 30 seconds
-	
+	startAuctionIn := uint32(60) // 60 seconds
+	additionalWait := uint32(30) // 30 seconds
+
 	before := time.Now().Unix()
 	result := CalcAuctionStartTime(startAuctionIn, additionalWait)
 	after := time.Now().Unix()
-	
+
 	// Result should be current time + startAuctionIn + additionalWait
 	expectedMin := uint32(before) + startAuctionIn + additionalWait
 	expectedMax := uint32(after) + startAuctionIn + additionalWait
-	
+
 	assert.GreaterOrEqual(t, result, expectedMin)
 	assert.LessOrEqual(t, result, expectedMax)
 }
@@ -219,7 +219,7 @@ func TestCalcAuctionStartTimeZeroDelays(t *testing.T) {
 	before := time.Now().Unix()
 	result := CalcAuctionStartTime(0, 0)
 	after := time.Now().Unix()
-	
+
 	assert.GreaterOrEqual(t, result, uint32(before))
 	assert.LessOrEqual(t, result, uint32(after))
 }

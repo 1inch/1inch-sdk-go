@@ -59,7 +59,7 @@ token, ok := fusion.GetWrappedToken(fusion.ETHEREUM)
 
 After:
 ```go
-import "github.com/1inch/1inch-sdk-go/sdk-clients/fusionorder"
+import "github.com/1inch/1inch-sdk-go/common/fusionorder"
 
 bps := fusionorder.NewBps(big.NewInt(100))
 token, ok := fusionorder.GetWrappedToken(fusionorder.ETHEREUM)

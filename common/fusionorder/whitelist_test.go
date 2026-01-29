@@ -12,9 +12,9 @@ import (
 func TestNewWhitelistItem(t *testing.T) {
 	addressHalf := "1234567890abcdef1234"
 	delay := big.NewInt(100)
-	
+
 	item := NewWhitelistItem(addressHalf, delay)
-	
+
 	assert.Equal(t, addressHalf, item.AddressHalf)
 	assert.Equal(t, delay, item.Delay)
 }
@@ -56,14 +56,14 @@ func TestGenerateWhitelist(t *testing.T) {
 	for _, tc := range tests {
 		t.Run(tc.name, func(t *testing.T) {
 			result, err := GenerateWhitelist(tc.addresses, tc.resolvingStartTime)
-			
+
 			if tc.expectError {
 				assert.Error(t, err)
 				assert.Nil(t, result)
 			} else {
 				require.NoError(t, err)
 				assert.Len(t, result, tc.expectedLen)
-				
+
 				// Verify address halves are lowercase and correct length
 				for i, item := range result {
 					assert.Len(t, item.AddressHalf, 20, "Address half should be 20 chars (10 bytes)")
@@ -150,14 +150,14 @@ func TestGenerateWhitelistFromItems(t *testing.T) {
 	for _, tc := range tests {
 		t.Run(tc.name, func(t *testing.T) {
 			result, err := GenerateWhitelistFromItems(tc.items, tc.resolvingStartTime)
-			
+
 			if tc.expectError {
 				assert.Error(t, err)
 				assert.Nil(t, result)
 			} else {
 				require.NoError(t, err)
 				assert.Len(t, result, tc.expectedLen)
-				
+
 				// Verify address halves are lowercase and correct length
 				for _, item := range result {
 					assert.Len(t, item.AddressHalf, 20, "Address half should be 20 chars (10 bytes)")
@@ -189,10 +189,10 @@ func TestGenerateWhitelistDelayCalculation(t *testing.T) {
 
 	// First item should have delay 0 (starts at resolving start time)
 	assert.Equal(t, big.NewInt(0), result[0].Delay)
-	
+
 	// Second item should have delay 100 (100 seconds after first)
 	assert.Equal(t, big.NewInt(100), result[1].Delay)
-	
+
 	// Third item should have delay 100 (100 seconds after second)
 	assert.Equal(t, big.NewInt(100), result[2].Delay)
 }

@@ -3,8 +3,8 @@ package fusionplus
 import (
 	"math/big"
 
+	"github.com/1inch/1inch-sdk-go/common/fusionorder"
 	"github.com/1inch/1inch-sdk-go/sdk-clients/fusion"
-	"github.com/1inch/1inch-sdk-go/sdk-clients/fusionorder"
 	"github.com/1inch/1inch-sdk-go/sdk-clients/orderbook"
 	"github.com/ethereum/go-ethereum/common"
 )
@@ -289,19 +289,19 @@ type ExtraData = fusionorder.ExtraData
 
 // PresetClassFixed defines model for PresetClass.
 type PresetClassFixed struct {
-	AllowMultipleFills bool                      `json:"allowMultipleFills"`
-	AllowPartialFills  bool                      `json:"allowPartialFills"`
-	AuctionDuration    float32                   `json:"auctionDuration"`
-	AuctionEndAmount   string                    `json:"auctionEndAmount"`
-	AuctionStartAmount string                    `json:"auctionStartAmount"`
-	BankFee            string                    `json:"bankFee"`
-	EstP               float32                   `json:"estP"`
-	ExclusiveResolver  string                    `json:"exclusiveResolver"` // This was changed to a string from a map[string]interface{}
+	AllowMultipleFills bool                `json:"allowMultipleFills"`
+	AllowPartialFills  bool                `json:"allowPartialFills"`
+	AuctionDuration    float32             `json:"auctionDuration"`
+	AuctionEndAmount   string              `json:"auctionEndAmount"`
+	AuctionStartAmount string              `json:"auctionStartAmount"`
+	BankFee            string              `json:"bankFee"`
+	EstP               float32             `json:"estP"`
+	ExclusiveResolver  string              `json:"exclusiveResolver"` // This was changed to a string from a map[string]interface{}
 	GasCost            GasCostConfigClass  `json:"gasCost"`
-	InitialRateBump    float32                   `json:"initialRateBump"`
+	InitialRateBump    float32             `json:"initialRateBump"`
 	Points             []AuctionPointClass `json:"points"`
-	StartAuctionIn     float32                   `json:"startAuctionIn"`
-	TokenFee           string                    `json:"tokenFee"`
+	StartAuctionIn     float32             `json:"startAuctionIn"`
+	TokenFee           string              `json:"tokenFee"`
 }
 
 // GasCostConfigClass defines model for GasCostConfigClass.

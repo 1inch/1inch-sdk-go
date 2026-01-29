@@ -258,11 +258,11 @@ func TestBpsString(t *testing.T) {
 func TestBpsValue(t *testing.T) {
 	original := big.NewInt(100)
 	bps := MustNewBps(original)
-	
+
 	// Value should return a copy, not the original
 	value := bps.Value()
 	require.Equal(t, original, value)
-	
+
 	// Modifying the returned value should not affect the Bps
 	value.SetInt64(999)
 	assert.Equal(t, big.NewInt(100), bps.Value())
