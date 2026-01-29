@@ -35,10 +35,10 @@ func CreateFusionOrderData(quote GetQuoteOutputFixed, orderParams OrderParams, w
 		takerAsset = takerAssetWrapped.Hex()
 	}
 
-	whitelistAddresses := make([]AuctionWhitelistItem, 0)
+	whitelistAddresses := make([]fusionorder.AuctionWhitelistItem, 0)
 	whitelistAddressesStrings := make([]string, 0)
 	for _, address := range quote.Whitelist {
-		whitelistAddresses = append(whitelistAddresses, AuctionWhitelistItem{
+		whitelistAddresses = append(whitelistAddresses, fusionorder.AuctionWhitelistItem{
 			Address:   geth_common.HexToAddress(address),
 			AllowFrom: big.NewInt(0), // TODO generating the correct list here requires checking for an exclusive resolver. This needs to be checked for later. The generated object does not see exclusive resolver correctly
 		})
@@ -91,7 +91,7 @@ func CreateFusionOrderData(quote GetQuoteOutputFixed, orderParams OrderParams, w
 		TakingAmount: preset.AuctionEndAmount,
 	}
 
-	whitelist, err := GenerateWhitelist(whitelistAddressesStrings, details.ResolvingStartTime)
+	whitelist, err := fusionorder.GenerateWhitelist(whitelistAddressesStrings, details.ResolvingStartTime)
 	if err != nil {
 		return nil, nil, fmt.Errorf("failed to generate whitelist: %w", err)
 	}
@@ -194,13 +194,7 @@ func getPreset(presets QuotePresetsClassFixed, presetType GetQuoteOutputRecommen
 	return nil, fmt.Errorf("unsupported preset type: %v", presetType)
 }
 
-// CalcAuctionStartTimeFunc allows overriding the auction start time calculation for testing
-var CalcAuctionStartTimeFunc func(uint32, uint32) uint32 = fusionorder.CalcAuctionStartTime
-
-// CalcAuctionStartTime is a convenience alias for fusionorder.CalcAuctionStartTime
-var CalcAuctionStartTime = fusionorder.CalcAuctionStartTime
-
-func CreateAuctionDetails(preset *PresetClassFixed, additionalWaitPeriod float32) (*AuctionDetails, error) {
+func CreateAuctionDetails(preset *PresetClassFixed, additionalWaitPeriod float32) (*fusionorder.AuctionDetails, error) {
 	points := make([]fusionorder.AuctionPointInput, len(preset.Points))
 	for i, point := range preset.Points {
 		points[i] = fusionorder.AuctionPointInput{
@@ -221,7 +215,7 @@ func CreateAuctionDetails(preset *PresetClassFixed, additionalWaitPeriod float32
 	})
 }
 
-func CreateSettlementPostInteractionData(details Details, whitelist []WhitelistItem, orderInfo FusionOrderV4) (*SettlementPostInteractionData, error) {
+func CreateSettlementPostInteractionData(details Details, whitelist []fusionorder.WhitelistItem, orderInfo FusionOrderV4) (*SettlementPostInteractionData, error) {
 	resolverStartTime := details.ResolvingStartTime
 	if details.ResolvingStartTime == nil || details.ResolvingStartTime.Cmp(big.NewInt(0)) == 0 {
 		resolverStartTime = big.NewInt(times.Now())
@@ -295,7 +289,7 @@ func CreateOrder(params CreateOrderDataParams) (*Order, error) {
 		OrderInfo:           params.orderInfo,
 		AuctionDetails:      params.Details.Auction,
 		PostInteractionData: params.PostInteractionData,
-		Extra: ExtraData{
+		Extra: fusionorder.ExtraData{
 			UnwrapWETH:           params.ExtraParams.unwrapWeth,
 			Nonce:                params.ExtraParams.Nonce,
 			Permit:               params.ExtraParams.Permit,
@@ -307,6 +301,3 @@ func CreateOrder(params CreateOrderDataParams) (*Order, error) {
 		},
 	}, nil
 }
-
-// bpsToRatioFormat is an alias for fusionorder.BpsToRatioFormat
-var bpsToRatioFormat = fusionorder.BpsToRatioFormat

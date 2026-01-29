@@ -240,12 +240,6 @@ func GetPreset(presets QuotePresets, presetType GetQuoteOutputRecommendedPreset)
 	return nil, fmt.Errorf("unsupported preset type: %v", presetType)
 }
 
-// CalcAuctionStartTimeFunc allows overriding the auction start time calculation for testing
-var CalcAuctionStartTimeFunc func(uint32, uint32) uint32 = fusionorder.CalcAuctionStartTime
-
-// CalcAuctionStartTime is a convenience alias for fusionorder.CalcAuctionStartTime
-var CalcAuctionStartTime = fusionorder.CalcAuctionStartTime
-
 func CreateAuctionDetails(preset *Preset, additionalWaitPeriod float32) (*AuctionDetails, error) {
 	points := make([]fusionorder.AuctionPointInput, len(preset.Points))
 	for i, point := range preset.Points {

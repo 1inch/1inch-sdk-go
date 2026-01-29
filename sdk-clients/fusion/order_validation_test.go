@@ -25,7 +25,7 @@ func TestMakerTraitsEncoding_KnownValues(t *testing.T) {
 		{
 			name: "Standard fusion order - partial and multiple fills allowed",
 			details: Details{
-				Auction: &AuctionDetails{
+				Auction: &fusionorder.AuctionDetails{
 					StartTime: 1673548149,
 					Duration:  180,
 				},
@@ -41,7 +41,7 @@ func TestMakerTraitsEncoding_KnownValues(t *testing.T) {
 		{
 			name: "No partial fills - requires nonce",
 			details: Details{
-				Auction: &AuctionDetails{
+				Auction: &fusionorder.AuctionDetails{
 					StartTime: 1673548149,
 					Duration:  180,
 				},
@@ -57,7 +57,7 @@ func TestMakerTraitsEncoding_KnownValues(t *testing.T) {
 		{
 			name: "With unwrap WETH flag",
 			details: Details{
-				Auction: &AuctionDetails{
+				Auction: &fusionorder.AuctionDetails{
 					StartTime: 1673548149,
 					Duration:  180,
 				},
@@ -73,7 +73,7 @@ func TestMakerTraitsEncoding_KnownValues(t *testing.T) {
 		{
 			name: "With permit2 flag",
 			details: Details{
-				Auction: &AuctionDetails{
+				Auction: &fusionorder.AuctionDetails{
 					StartTime: 1673548149,
 					Duration:  180,
 				},
@@ -105,7 +105,7 @@ func TestMakerTraitsEncoding_KnownValues(t *testing.T) {
 // TestMakerTraitsEncoding_FlagVariations verifies different flag combinations produce different encodings
 func TestMakerTraitsEncoding_FlagVariations(t *testing.T) {
 	baseDetails := Details{
-		Auction: &AuctionDetails{
+		Auction: &fusionorder.AuctionDetails{
 			StartTime: 1673548149,
 			Duration:  180,
 		},
@@ -159,7 +159,7 @@ func TestMakerTraitsEncoding_FlagVariations(t *testing.T) {
 
 // TestExtensionKeccak256_Deterministic verifies that extension hash is deterministic
 func TestExtensionKeccak256_Deterministic(t *testing.T) {
-	whitelist := []WhitelistItem{
+	whitelist := []fusionorder.WhitelistItem{
 		{AddressHalf: "bb839cbe05303d7705fa", Delay: big.NewInt(0)},
 	}
 
@@ -170,12 +170,12 @@ func TestExtensionKeccak256_Deterministic(t *testing.T) {
 		AuctionFees:        nil,
 	}
 
-	auctionDetails := &AuctionDetails{
+	auctionDetails := &fusionorder.AuctionDetails{
 		StartTime:       1673548149,
 		Duration:        180,
 		InitialRateBump: 50000,
-		Points:          []AuctionPointClassFixed{{Coefficient: 20000, Delay: 12}},
-		GasCost:         GasCostConfigClassFixed{GasBumpEstimate: 10000, GasPriceEstimate: 1000000},
+		Points:          []fusionorder.AuctionPointClassFixed{{Coefficient: 20000, Delay: 12}},
+		GasCost:         fusionorder.GasCostConfigClassFixed{GasBumpEstimate: 10000, GasPriceEstimate: 1000000},
 	}
 
 	extension, err := NewExtension(ExtensionParams{
@@ -209,7 +209,7 @@ func TestOrderDataConsistency(t *testing.T) {
 
 	settlementAddress := "0x8273f37417da37c4a6c3995e82cf442f87a25d9c"
 
-	whitelist := []WhitelistItem{
+	whitelist := []fusionorder.WhitelistItem{
 		{AddressHalf: "bb839cbe05303d7705fa", Delay: big.NewInt(0)},
 	}
 
@@ -220,12 +220,12 @@ func TestOrderDataConsistency(t *testing.T) {
 		AuctionFees:        nil,
 	}
 
-	auctionDetails := &AuctionDetails{
+	auctionDetails := &fusionorder.AuctionDetails{
 		StartTime:       1673548149,
 		Duration:        180,
 		InitialRateBump: 50000,
-		Points:          []AuctionPointClassFixed{{Coefficient: 20000, Delay: 12}},
-		GasCost:         GasCostConfigClassFixed{GasBumpEstimate: 10000, GasPriceEstimate: 1000000},
+		Points:          []fusionorder.AuctionPointClassFixed{{Coefficient: 20000, Delay: 12}},
+		GasCost:         fusionorder.GasCostConfigClassFixed{GasBumpEstimate: 10000, GasPriceEstimate: 1000000},
 	}
 
 	extension, err := NewExtension(ExtensionParams{
@@ -241,7 +241,7 @@ func TestOrderDataConsistency(t *testing.T) {
 	details := Details{
 		Auction:            auctionDetails,
 		ResolvingStartTime: big.NewInt(1673548139),
-		Whitelist:          []AuctionWhitelistItem{{Address: common.HexToAddress("0x00000000219ab540356cbb839cbe05303d7705fa"), AllowFrom: big.NewInt(0)}},
+		Whitelist:          []fusionorder.AuctionWhitelistItem{{Address: common.HexToAddress("0x00000000219ab540356cbb839cbe05303d7705fa"), AllowFrom: big.NewInt(0)}},
 	}
 
 	extraParams := ExtraParams{
@@ -289,28 +289,28 @@ func TestOrderDataConsistency(t *testing.T) {
 func TestAuctionDetailsEncoding_Fusion_KnownValues(t *testing.T) {
 	tests := []struct {
 		name           string
-		auctionDetails *AuctionDetails
+		auctionDetails *fusionorder.AuctionDetails
 		expectedEncode string
 	}{
 		{
 			name: "Standard auction - no gas cost",
-			auctionDetails: &AuctionDetails{
+			auctionDetails: &fusionorder.AuctionDetails{
 				StartTime:       1673548149,
 				Duration:        180,
 				InitialRateBump: 50000,
-				Points:          []AuctionPointClassFixed{{Coefficient: 20000, Delay: 12}},
-				GasCost:         GasCostConfigClassFixed{GasBumpEstimate: 0, GasPriceEstimate: 0},
+				Points:          []fusionorder.AuctionPointClassFixed{{Coefficient: 20000, Delay: 12}},
+				GasCost:         fusionorder.GasCostConfigClassFixed{GasBumpEstimate: 0, GasPriceEstimate: 0},
 			},
 			expectedEncode: "0000000000000063c051750000b400c35001004e20000c",
 		},
 		{
 			name: "With gas cost",
-			auctionDetails: &AuctionDetails{
+			auctionDetails: &fusionorder.AuctionDetails{
 				StartTime:       1673548149,
 				Duration:        180,
 				InitialRateBump: 50000,
-				Points:          []AuctionPointClassFixed{{Coefficient: 20000, Delay: 12}},
-				GasCost:         GasCostConfigClassFixed{GasBumpEstimate: 10000, GasPriceEstimate: 1000000},
+				Points:          []fusionorder.AuctionPointClassFixed{{Coefficient: 20000, Delay: 12}},
+				GasCost:         fusionorder.GasCostConfigClassFixed{GasBumpEstimate: 10000, GasPriceEstimate: 1000000},
 			},
 			expectedEncode: "002710000f424063c051750000b400c35001004e20000c",
 		},
@@ -319,14 +319,14 @@ func TestAuctionDetailsEncoding_Fusion_KnownValues(t *testing.T) {
 	for _, tc := range tests {
 		t.Run(tc.name, func(t *testing.T) {
 			encoded := tc.auctionDetails.Encode()
-			assert.Equal(t, tc.expectedEncode, encoded, "AuctionDetails encoding mismatch")
+			assert.Equal(t, tc.expectedEncode, encoded, "fusionorder.AuctionDetails encoding mismatch")
 		})
 	}
 }
 
 // TestOrderbookExtensionConversion verifies fusion extension converts correctly
 func TestOrderbookExtensionConversion(t *testing.T) {
-	whitelist := []WhitelistItem{
+	whitelist := []fusionorder.WhitelistItem{
 		{AddressHalf: "bb839cbe05303d7705fa", Delay: big.NewInt(0)},
 	}
 
@@ -337,12 +337,12 @@ func TestOrderbookExtensionConversion(t *testing.T) {
 		AuctionFees:        nil,
 	}
 
-	auctionDetails := &AuctionDetails{
+	auctionDetails := &fusionorder.AuctionDetails{
 		StartTime:       1673548149,
 		Duration:        180,
 		InitialRateBump: 50000,
-		Points:          []AuctionPointClassFixed{{Coefficient: 20000, Delay: 12}},
-		GasCost:         GasCostConfigClassFixed{GasBumpEstimate: 10000, GasPriceEstimate: 1000000},
+		Points:          []fusionorder.AuctionPointClassFixed{{Coefficient: 20000, Delay: 12}},
+		GasCost:         fusionorder.GasCostConfigClassFixed{GasBumpEstimate: 10000, GasPriceEstimate: 1000000},
 	}
 
 	extension, err := NewExtension(ExtensionParams{
@@ -375,36 +375,36 @@ func TestOrderbookExtensionConversion(t *testing.T) {
 func TestBuildAmountGetterData_KnownValues(t *testing.T) {
 	tests := []struct {
 		name             string
-		auctionDetails   *AuctionDetails
-		whitelist        []WhitelistItem
+		auctionDetails   *fusionorder.AuctionDetails
+		whitelist        []fusionorder.WhitelistItem
 		resolvingTime    *big.Int
 		forAmountGetters bool
 		expected         string
 	}{
 		{
 			name: "Basic auction details with forAmountGetters true",
-			auctionDetails: &AuctionDetails{
-				GasCost:         GasCostConfigClassFixed{GasBumpEstimate: 0, GasPriceEstimate: 0},
+			auctionDetails: &fusionorder.AuctionDetails{
+				GasCost:         fusionorder.GasCostConfigClassFixed{GasBumpEstimate: 0, GasPriceEstimate: 0},
 				StartTime:       1673548149,
 				Duration:        180,
 				InitialRateBump: 50000,
-				Points:          []AuctionPointClassFixed{{Delay: 12, Coefficient: 20000}},
+				Points:          []fusionorder.AuctionPointClassFixed{{Delay: 12, Coefficient: 20000}},
 			},
-			whitelist:        []WhitelistItem{{AddressHalf: "bb839cbe05303d7705fa", Delay: big.NewInt(0)}},
+			whitelist:        []fusionorder.WhitelistItem{{AddressHalf: "bb839cbe05303d7705fa", Delay: big.NewInt(0)}},
 			resolvingTime:    big.NewInt(1673548139),
 			forAmountGetters: true,
 			expected:         "0x0000000000000063c051750000b400c35001004e20000c00000000006401bb839cbe05303d7705fa",
 		},
 		{
 			name: "Basic auction details with forAmountGetters false",
-			auctionDetails: &AuctionDetails{
-				GasCost:         GasCostConfigClassFixed{GasBumpEstimate: 0, GasPriceEstimate: 0},
+			auctionDetails: &fusionorder.AuctionDetails{
+				GasCost:         fusionorder.GasCostConfigClassFixed{GasBumpEstimate: 0, GasPriceEstimate: 0},
 				StartTime:       1673548149,
 				Duration:        180,
 				InitialRateBump: 50000,
-				Points:          []AuctionPointClassFixed{{Delay: 12, Coefficient: 20000}},
+				Points:          []fusionorder.AuctionPointClassFixed{{Delay: 12, Coefficient: 20000}},
 			},
-			whitelist:        []WhitelistItem{{AddressHalf: "bb839cbe05303d7705fa", Delay: big.NewInt(0)}},
+			whitelist:        []fusionorder.WhitelistItem{{AddressHalf: "bb839cbe05303d7705fa", Delay: big.NewInt(0)}},
 			resolvingTime:    big.NewInt(1673548139),
 			forAmountGetters: false,
 			expected:         "0x00000000006463c0516b01bb839cbe05303d7705fa0000",
@@ -445,15 +445,15 @@ func TestExtensionCreation_KnownValues(t *testing.T) {
 			name: "Extension with surplus params",
 			params: ExtensionParams{
 				SettlementContract: "0x5678",
-				AuctionDetails: &AuctionDetails{
+				AuctionDetails: &fusionorder.AuctionDetails{
 					StartTime:       0,
 					Duration:        0,
 					InitialRateBump: 0,
 					Points:          nil,
-					GasCost:         GasCostConfigClassFixed{},
+					GasCost:         fusionorder.GasCostConfigClassFixed{},
 				},
 				PostInteractionData: &SettlementPostInteractionData{
-					Whitelist: []WhitelistItem{},
+					Whitelist: []fusionorder.WhitelistItem{},
 					AuctionFees: &FeesIntegratorAndResolver{
 						Resolver:   ResolverFee{},
 						Integrator: IntegratorFee{},

@@ -162,7 +162,7 @@ func TestCreateAuctionDetails(t *testing.T) {
 		name                 string
 		preset               *PresetClassFixed
 		additionalWaitPeriod float32
-		expected             *AuctionDetails
+		expected             *fusionorder.AuctionDetails
 		expectErr            bool
 	}{
 		{
@@ -188,14 +188,14 @@ func TestCreateAuctionDetails(t *testing.T) {
 				TokenFee:       "1",
 			},
 			additionalWaitPeriod: 10.0,
-			expected: &AuctionDetails{
-				StartTime:       CalcAuctionStartTimeFunc(5, 10),
+			expected: &fusionorder.AuctionDetails{
+				StartTime:       fusionorder.CalcAuctionStartTimeFunc(5, 10),
 				Duration:        60,
 				InitialRateBump: 2,
-				Points: []AuctionPointClassFixed{
+				Points: []fusionorder.AuctionPointClassFixed{
 					{Coefficient: 1, Delay: 2},
 				},
-				GasCost: GasCostConfigClassFixed{
+				GasCost: fusionorder.GasCostConfigClassFixed{
 					GasBumpEstimate:  1,
 					GasPriceEstimate: 100,
 				},
@@ -278,7 +278,7 @@ func TestBpsToRatioFormat(t *testing.T) {
 
 	for _, tc := range tests {
 		t.Run(tc.name, func(t *testing.T) {
-			result := bpsToRatioFormat(tc.input)
+			result := fusionorder.BpsToRatioFormat(tc.input)
 			require.NotNil(t, result)
 			assert.Equal(t, tc.expected, result)
 		})
@@ -297,7 +297,7 @@ func TestCreateMakerTraits(t *testing.T) {
 		{
 			name: "Valid Maker Traits",
 			details: Details{
-				Auction: &AuctionDetails{
+				Auction: &fusionorder.AuctionDetails{
 					StartTime: 1000,
 					Duration:  2000,
 				},
@@ -332,7 +332,7 @@ func TestCreateMakerTraits(t *testing.T) {
 		{
 			name: "Invalid Maker Traits - No Nonce",
 			details: Details{
-				Auction: &AuctionDetails{
+				Auction: &fusionorder.AuctionDetails{
 					StartTime: 1000,
 					Duration:  2000,
 				},
@@ -380,7 +380,7 @@ func TestCreateSettlementPostInteractionData(t *testing.T) {
 			name: "Valid Details and Order Info with Resolving Start Time",
 			details: Details{
 				ResolvingStartTime: big.NewInt(1622548800), // Example timestamp
-				Whitelist: []AuctionWhitelistItem{
+				Whitelist: []fusionorder.AuctionWhitelistItem{
 					{
 						Address:   common.HexToAddress("0x0000000000000000000000000000000000000002"),
 						AllowFrom: big.NewInt(1622548800),
@@ -391,7 +391,7 @@ func TestCreateSettlementPostInteractionData(t *testing.T) {
 				Receiver: "0x0000000000000000000000000000000000000003",
 			},
 			expected: &SettlementPostInteractionData{
-				Whitelist: []WhitelistItem{
+				Whitelist: []fusionorder.WhitelistItem{
 					{
 						AddressHalf: "00000000000000000002",
 						Delay:       big.NewInt(0),
@@ -414,7 +414,7 @@ func TestCreateSettlementPostInteractionData(t *testing.T) {
 						Share:      fusionorder.MustFromPercent(50, fusionorder.GetDefaultBase()),
 					},
 				},
-				Whitelist: []AuctionWhitelistItem{
+				Whitelist: []fusionorder.AuctionWhitelistItem{
 					{
 						Address:   common.HexToAddress("0x0000000000000000000000000000000000000002"),
 						AllowFrom: big.NewInt(1622548800),
@@ -425,7 +425,7 @@ func TestCreateSettlementPostInteractionData(t *testing.T) {
 				Receiver: "0x0000000000000000000000000000000000000003",
 			},
 			expected: &SettlementPostInteractionData{
-				Whitelist: []WhitelistItem{
+				Whitelist: []fusionorder.WhitelistItem{
 					{
 						AddressHalf: "00000000000000000002",
 						Delay:       big.NewInt(0),
@@ -456,7 +456,7 @@ func TestCreateSettlementPostInteractionData(t *testing.T) {
 						Share:      fusionorder.MustFromPercent(50, fusionorder.GetDefaultBase()),
 					},
 				},
-				Whitelist: []AuctionWhitelistItem{
+				Whitelist: []fusionorder.AuctionWhitelistItem{
 					{
 						Address:   common.HexToAddress("0x0000000000000000000000000000000000000002"),
 						AllowFrom: big.NewInt(1622548800),
@@ -467,7 +467,7 @@ func TestCreateSettlementPostInteractionData(t *testing.T) {
 				Receiver: "0x0000000000000000000000000000000000000003",
 			},
 			expected: &SettlementPostInteractionData{
-				Whitelist: []WhitelistItem{
+				Whitelist: []fusionorder.WhitelistItem{
 					{
 						AddressHalf: "00000000000000000002",
 						Delay:       big.NewInt(0),
@@ -502,7 +502,7 @@ func TestCreateSettlementPostInteractionData(t *testing.T) {
 				resolvingStartTimeForWhitelist = big.NewInt(times.Now())
 			}
 
-			whitelist, err := GenerateWhitelist(whitelistStrings, resolvingStartTimeForWhitelist)
+			whitelist, err := fusionorder.GenerateWhitelist(whitelistStrings, resolvingStartTimeForWhitelist)
 			require.NoError(t, err)
 
 			result, err := CreateSettlementPostInteractionData(tc.details, whitelist, tc.orderInfo)
@@ -532,13 +532,13 @@ func TestCreateFusionOrderTdd(t *testing.T) {
 		{
 			name: "basic fusion order (no fees)",
 			details: Details{
-				Auction: &AuctionDetails{
+				Auction: &fusionorder.AuctionDetails{
 					StartTime:       1673548149,
 					Duration:        180,
 					InitialRateBump: 50000,
-					Points:          []AuctionPointClassFixed{{Coefficient: 20000, Delay: 12}},
+					Points:          []fusionorder.AuctionPointClassFixed{{Coefficient: 20000, Delay: 12}},
 				},
-				Whitelist:          []AuctionWhitelistItem{{Address: common.HexToAddress("0x00000000219ab540356cbb839cbe05303d7705fa"), AllowFrom: big.NewInt(0)}},
+				Whitelist:          []fusionorder.AuctionWhitelistItem{{Address: common.HexToAddress("0x00000000219ab540356cbb839cbe05303d7705fa"), AllowFrom: big.NewInt(0)}},
 				ResolvingStartTime: big.NewInt(1673548139),
 			},
 			expected: FusionOrderV4{
@@ -556,11 +556,11 @@ func TestCreateFusionOrderTdd(t *testing.T) {
 		{
 			name: "fusion order with integrator fees",
 			details: Details{
-				Auction: &AuctionDetails{
+				Auction: &fusionorder.AuctionDetails{
 					StartTime:       1673548149,
 					Duration:        180,
 					InitialRateBump: 50000,
-					Points:          []AuctionPointClassFixed{{Coefficient: 20000, Delay: 12}},
+					Points:          []fusionorder.AuctionPointClassFixed{{Coefficient: 20000, Delay: 12}},
 				},
 				FeesIntAndRes: &FeesIntegratorAndResolver{
 					Integrator: IntegratorFee{
@@ -570,7 +570,7 @@ func TestCreateFusionOrderTdd(t *testing.T) {
 						Share:      fusionorder.MustFromPercent(50, fusionorder.GetDefaultBase()),
 					},
 				},
-				Whitelist: []AuctionWhitelistItem{
+				Whitelist: []fusionorder.AuctionWhitelistItem{
 					{Address: common.HexToAddress("0x00000000219ab540356cbb839cbe05303d7705fa"), AllowFrom: big.NewInt(0)},
 				},
 				ResolvingStartTime: big.NewInt(1673548139),
@@ -596,7 +596,7 @@ func TestCreateFusionOrderTdd(t *testing.T) {
 				whitelistStrings = append(whitelistStrings, whitelistItem.Address.Hex())
 			}
 
-			whitelist, err := GenerateWhitelist(whitelistStrings, tt.details.ResolvingStartTime)
+			whitelist, err := fusionorder.GenerateWhitelist(whitelistStrings, tt.details.ResolvingStartTime)
 			require.NoError(t, err)
 
 			extra := ExtraParams{
@@ -686,7 +686,7 @@ func TestCreateOrder(t *testing.T) {
 
 	settlementAddress := "0x8273f37417da37c4a6c3995e82cf442f87a25d9c"
 
-	whitelist := []WhitelistItem{
+	whitelist := []fusionorder.WhitelistItem{
 		{AddressHalf: "bb839cbe05303d7705fa", Delay: big.NewInt(0)},
 	}
 
@@ -697,12 +697,12 @@ func TestCreateOrder(t *testing.T) {
 		AuctionFees:        nil,
 	}
 
-	auctionDetails := &AuctionDetails{
+	auctionDetails := &fusionorder.AuctionDetails{
 		StartTime:       1673548149,
 		Duration:        180,
 		InitialRateBump: 50000,
-		Points:          []AuctionPointClassFixed{{Coefficient: 20000, Delay: 12}},
-		GasCost:         GasCostConfigClassFixed{GasBumpEstimate: 10000, GasPriceEstimate: 1000000},
+		Points:          []fusionorder.AuctionPointClassFixed{{Coefficient: 20000, Delay: 12}},
+		GasCost:         fusionorder.GasCostConfigClassFixed{GasBumpEstimate: 10000, GasPriceEstimate: 1000000},
 	}
 
 	extension, err := NewExtension(ExtensionParams{
@@ -718,7 +718,7 @@ func TestCreateOrder(t *testing.T) {
 	details := Details{
 		Auction:            auctionDetails,
 		ResolvingStartTime: big.NewInt(1673548139),
-		Whitelist:          []AuctionWhitelistItem{{Address: common.HexToAddress("0x00000000219ab540356cbb839cbe05303d7705fa"), AllowFrom: big.NewInt(0)}},
+		Whitelist:          []fusionorder.AuctionWhitelistItem{{Address: common.HexToAddress("0x00000000219ab540356cbb839cbe05303d7705fa"), AllowFrom: big.NewInt(0)}},
 	}
 
 	extraParams := ExtraParams{
@@ -777,7 +777,7 @@ func TestCreateOrder_WithFees(t *testing.T) {
 
 	settlementAddress := "0x8273f37417da37c4a6c3995e82cf442f87a25d9c"
 
-	whitelist := []WhitelistItem{
+	whitelist := []fusionorder.WhitelistItem{
 		{AddressHalf: "bb839cbe05303d7705fa", Delay: big.NewInt(0)},
 	}
 
@@ -795,12 +795,12 @@ func TestCreateOrder_WithFees(t *testing.T) {
 		AuctionFees:        fees,
 	}
 
-	auctionDetails := &AuctionDetails{
+	auctionDetails := &fusionorder.AuctionDetails{
 		StartTime:       1673548149,
 		Duration:        180,
 		InitialRateBump: 50000,
-		Points:          []AuctionPointClassFixed{{Coefficient: 20000, Delay: 12}},
-		GasCost:         GasCostConfigClassFixed{GasBumpEstimate: 10000, GasPriceEstimate: 1000000},
+		Points:          []fusionorder.AuctionPointClassFixed{{Coefficient: 20000, Delay: 12}},
+		GasCost:         fusionorder.GasCostConfigClassFixed{GasBumpEstimate: 10000, GasPriceEstimate: 1000000},
 	}
 
 	extension, err := NewExtension(ExtensionParams{
@@ -816,7 +816,7 @@ func TestCreateOrder_WithFees(t *testing.T) {
 	details := Details{
 		Auction:            auctionDetails,
 		ResolvingStartTime: big.NewInt(1673548139),
-		Whitelist:          []AuctionWhitelistItem{{Address: common.HexToAddress("0x00000000219ab540356cbb839cbe05303d7705fa"), AllowFrom: big.NewInt(0)}},
+		Whitelist:          []fusionorder.AuctionWhitelistItem{{Address: common.HexToAddress("0x00000000219ab540356cbb839cbe05303d7705fa"), AllowFrom: big.NewInt(0)}},
 		FeesIntAndRes:      fees,
 	}
 

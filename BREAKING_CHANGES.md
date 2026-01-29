@@ -21,14 +21,17 @@ The following types and functions are no longer exported from the `fusion` packa
 | `fusion.GetDefaultBase()` | `fusionorder.GetDefaultBase()` |
 | `fusion.NewInteraction()` | `fusionorder.NewInteraction()` |
 | `fusion.DecodeInteraction()` | `fusionorder.DecodeInteraction()` |
-| `fusion.NativeToken` | `fusionorder.NativeToken` |
-| `fusion.NetworkEnum` | `fusionorder.NetworkEnum` |
-| `fusion.ETHEREUM`, `fusion.POLYGON`, etc. | `fusionorder.ETHEREUM`, `fusionorder.POLYGON`, etc. |
-| `fusion.GetWrappedToken()` | `fusionorder.GetWrappedToken()` |
-| `fusion.ChainToWrapper` | `fusionorder.ChainToWrapper` |
+| `fusion.NativeToken` | `constants.NativeToken` |
+| `fusion.NetworkEnum` | `constants.NetworkEnum` |
+| `fusion.ETHEREUM`, `fusion.POLYGON`, etc. | `constants.NetworkEthereum`, `constants.NetworkPolygon`, etc. |
+| `fusion.GetWrappedToken()` | `constants.GetWrappedToken()` |
+| `fusion.ChainToWrapper` | `constants.ChainToWrapper` |
 | `fusion.NewAuctionDetails()` | `fusionorder.NewAuctionDetails()` |
 | `fusion.DecodeAuctionDetails()` | `fusionorder.DecodeLegacyAuctionDetails()` |
 | `fusion.CalcAuctionStartTime()` | `fusionorder.CalcAuctionStartTime()` |
+| `fusion.CalcAuctionStartTimeFunc` | `fusionorder.CalcAuctionStartTimeFunc` |
+| `fusion.GenerateWhitelist()` | `fusionorder.GenerateWhitelist()` |
+| `fusion.BpsToRatioFormat()` | `fusionorder.BpsToRatioFormat()` |
 
 #### Removed Exports from `fusionplus` Package
 
@@ -38,14 +41,15 @@ The following types and functions are no longer exported from the `fusionplus` p
 |------------|------------|
 | `fusionplus.NewInteraction()` | `fusionorder.NewInteraction()` |
 | `fusionplus.DecodeInteraction()` | `fusionorder.DecodeInteraction()` |
-| `fusionplus.NativeToken` | `fusionorder.NativeToken` |
-| `fusionplus.NetworkEnum` | `fusionorder.NetworkEnum` |
-| `fusionplus.ETHEREUM`, `fusionplus.POLYGON`, etc. | `fusionorder.ETHEREUM`, `fusionorder.POLYGON`, etc. |
-| `fusionplus.GetWrappedToken()` | `fusionorder.GetWrappedToken()` |
-| `fusionplus.ChainToWrapper` | `fusionorder.ChainToWrapper` |
+| `fusionplus.NativeToken` | `constants.NativeToken` |
+| `fusionplus.NetworkEnum` | `constants.NetworkEnum` |
+| `fusionplus.ETHEREUM`, `fusionplus.POLYGON`, etc. | `constants.NetworkEthereum`, `constants.NetworkPolygon`, etc. |
+| `fusionplus.GetWrappedToken()` | `constants.GetWrappedToken()` |
+| `fusionplus.ChainToWrapper` | `constants.ChainToWrapper` |
 | `fusionplus.NewAuctionDetails()` | `fusionorder.NewAuctionDetails()` |
 | `fusionplus.DecodeAuctionDetails()` | `fusionorder.DecodeAuctionDetails()` |
 | `fusionplus.CalcAuctionStartTime()` | `fusionorder.CalcAuctionStartTime()` |
+| `fusionplus.CalcAuctionStartTimeFunc` | `fusionorder.CalcAuctionStartTimeFunc` |
 
 #### Migration Example
 
@@ -59,38 +63,52 @@ token, ok := fusion.GetWrappedToken(fusion.ETHEREUM)
 
 After:
 ```go
-import "github.com/1inch/1inch-sdk-go/common/fusionorder"
+import (
+    "github.com/1inch/1inch-sdk-go/common/fusionorder"
+    "github.com/1inch/1inch-sdk-go/constants"
+)
 
 bps := fusionorder.NewBps(big.NewInt(100))
-token, ok := fusionorder.GetWrappedToken(fusionorder.ETHEREUM)
+token, ok := constants.GetWrappedToken(constants.NetworkEthereum)
 ```
 
-#### Type Aliases Remain (Internal Use)
+#### Type Aliases Kept (Required for Public API)
 
-The following type aliases remain in `fusion` and `fusionplus` packages. These are used internally and also available to external users through the existing packages:
+Only type aliases needed by users at the public API level remain:
 
 **In `fusion`:**
-- `fusion.Bps` = `fusionorder.Bps`
-- `fusion.Interaction` = `fusionorder.Interaction`
-- `fusion.AuctionDetails` = `fusionorder.AuctionDetails`
-- `fusion.AuctionPointClassFixed` = `fusionorder.AuctionPointClassFixed`
-- `fusion.GasCostConfigClassFixed` = `fusionorder.GasCostConfigClassFixed`
-- `fusion.WhitelistItem` = `fusionorder.WhitelistItem`
-- `fusion.ExtraData` = `fusionorder.ExtraData`
-- `fusion.CustomPreset` = `fusionorder.CustomPreset`
-- `fusion.TakingFeeInfo` = `fusionorder.TakingFeeInfo`
-- `fusion.AuctionWhitelistItem` = `fusionorder.AuctionWhitelistItem`
+- `fusion.TakingFeeInfo` = `fusionorder.TakingFeeInfo` (used in `OrderParams.Fee`)
+- `fusion.CustomPreset` = `fusionorder.CustomPreset` (used in `GetQuoteWithCustomPreset()`)
+- `fusion.CustomPresetPoint` = `fusionorder.CustomPresetPoint` (used in `CustomPreset.Points`)
 
 **In `fusionplus`:**
+- `fusionplus.TakingFeeInfo` = `fusionorder.TakingFeeInfo`
+- `fusionplus.CustomPreset` = `fusionorder.CustomPreset`
+- `fusionplus.CustomPresetPoint` = `fusionorder.CustomPresetPoint`
 - `fusionplus.Interaction` = `fusionorder.Interaction`
 - `fusionplus.AuctionDetails` = `fusionorder.AuctionDetails`
 - `fusionplus.AuctionPointClassFixed` = `fusionorder.AuctionPointClassFixed`
 - `fusionplus.GasCostConfigClassFixed` = `fusionorder.GasCostConfigClassFixed`
 - `fusionplus.WhitelistItem` = `fusionorder.WhitelistItem`
 - `fusionplus.ExtraData` = `fusionorder.ExtraData`
-- `fusionplus.CustomPreset` = `fusionorder.CustomPreset`
-- `fusionplus.TakingFeeInfo` = `fusionorder.TakingFeeInfo`
 - `fusionplus.AuctionWhitelistItem` = `fusionorder.AuctionWhitelistItem`
+
+#### Type Aliases Removed (Internal-only types)
+
+The following type aliases have been removed from `fusion` - use `fusionorder.*` directly:
+
+| Removed Alias | Use Instead |
+|---------------|-------------|
+| `fusion.AuctionDetails` | `fusionorder.AuctionDetails` |
+| `fusion.AuctionPointClassFixed` | `fusionorder.AuctionPointClassFixed` |
+| `fusion.GasCostConfigClassFixed` | `fusionorder.GasCostConfigClassFixed` |
+| `fusion.WhitelistItem` | `fusionorder.WhitelistItem` |
+| `fusion.AuctionWhitelistItem` | `fusionorder.AuctionWhitelistItem` |
+| `fusion.ExtraData` | `fusionorder.ExtraData` |
+| `fusion.Bps` | `fusionorder.Bps` |
+| `fusion.Interaction` | `fusionorder.Interaction` |
+
+These types are only used internally by the SDK and users do not need to construct them directly.
 
 ### Deleted Files
 
@@ -161,8 +179,13 @@ Types with the `Fusion` suffix have been renamed for consistency. Types that nee
 
 ### Code Quality Improvements
 
-**Removed duplicate code:**
-- `fusion.GenerateWhitelist` now aliases `fusionorder.GenerateWhitelist` instead of duplicating the logic
+**Removed re-exports and aliases:**
+- `fusion.GenerateWhitelist` removed - use `fusionorder.GenerateWhitelist` directly
+- `fusion.CalcAuctionStartTimeFunc` removed - use `fusionorder.CalcAuctionStartTimeFunc` directly
+- `fusion.CalcAuctionStartTime` removed - use `fusionorder.CalcAuctionStartTime` directly
+- `fusion.BpsToRatioFormat` removed - use `fusionorder.BpsToRatioFormat` directly
+- `fusionplus.CalcAuctionStartTimeFunc` removed - use `fusionorder.CalcAuctionStartTimeFunc` directly
+- `fusionplus.CalcAuctionStartTime` removed - use `fusionorder.CalcAuctionStartTime` directly
 
 **Fixed error handling:**
 - `fusionplus/escrowextension.go`: Replaced `log.Fatalf` calls with proper error returns in `decodeExtraData()`
@@ -173,10 +196,25 @@ Types with the `Fusion` suffix have been renamed for consistency. Types that nee
 
 ### New `fusionorder` Package
 
-A new shared package has been created at `sdk-clients/fusionorder/` containing:
+A new shared package has been created at `common/fusionorder/` containing:
 
-- **Types:** `Bps`, `Interaction`, `AuctionDetails`, `WhitelistItem`, `ExtraData`, `CustomPreset`, `TakingFeeInfo`, `AuctionWhitelistItem`, `NetworkEnum`, and more
-- **Functions:** `NewBps`, `FromPercent`, `FromFraction`, `GetDefaultBase`, `NewInteraction`, `DecodeInteraction`, `NewAuctionDetails`, `DecodeAuctionDetails`, `DecodeLegacyAuctionDetails`, `CalcAuctionStartTime`, `IsNonceRequired`, `BpsToRatioFormat`, `GetWrappedToken`, `GenerateWhitelist`, `CanExecuteAt`, `IsExclusiveResolver`, and more
-- **Constants:** `NativeToken`, `ETHEREUM`, `POLYGON`, `BINANCE`, `ARBITRUM`, `AVALANCHE`, `OPTIMISM`, `FANTOM`, `GNOSIS`, `COINBASE`, `ChainToWrapper`
+- **Types:** `Bps`, `Interaction`, `AuctionDetails`, `WhitelistItem`, `ExtraData`, `CustomPreset`, `TakingFeeInfo`, `AuctionWhitelistItem`, and more
+- **Functions:** `NewBps`, `FromPercent`, `FromFraction`, `GetDefaultBase`, `NewInteraction`, `DecodeInteraction`, `NewAuctionDetails`, `DecodeAuctionDetails`, `DecodeLegacyAuctionDetails`, `CalcAuctionStartTime`, `IsNonceRequired`, `BpsToRatioFormat`, `GenerateWhitelist`, `CanExecuteAt`, `IsExclusiveResolver`, `ToOrderbookExtension`, and more
 
 This package is the single source of truth for shared order-related types and functions used by both `fusion` and `fusionplus` packages.
+
+### Constants Consolidation
+
+Token and network constants have been moved to the top-level `constants` package:
+
+| Constant | Location |
+|----------|----------|
+| `NativeToken` | `constants.NativeToken` |
+| `ZeroAddress` | `constants.ZeroAddress` |
+| `NetworkEnum` | `constants.NetworkEnum` |
+| `NetworkEthereum`, `NetworkPolygon`, etc. | `constants.NetworkEthereum`, `constants.NetworkPolygon`, etc. |
+| `ChainToWrapper` | `constants.ChainToWrapper` |
+| `GetWrappedToken()` | `constants.GetWrappedToken()` |
+| `Uint16Max`, `Uint24Max`, `Uint32Max`, `Uint40Max`, `Uint256Max` | `constants.Uint16Max`, etc. |
+
+The `internal/addresses` package has been removed; use `constants.ZeroAddress` instead.

@@ -11,15 +11,15 @@ import (
 func TestDecodeAuctionDetails(t *testing.T) {
 	tests := []struct {
 		name    string
-		details AuctionDetails
+		details fusionorder.AuctionDetails
 	}{
 		{
 			name: "Encode/Decode AuctionDetails",
-			details: AuctionDetails{
+			details: fusionorder.AuctionDetails{
 				Duration:        180,
 				StartTime:       1673548149,
 				InitialRateBump: 50000,
-				Points: []AuctionPointClassFixed{
+				Points: []fusionorder.AuctionPointClassFixed{
 					{
 						Delay:       10,
 						Coefficient: 10000,
@@ -46,20 +46,20 @@ func TestDecodeAuctionDetails(t *testing.T) {
 func TestEncodeAuctionDetails(t *testing.T) {
 	tests := []struct {
 		name     string
-		details  AuctionDetails
+		details  fusionorder.AuctionDetails
 		expected string
 	}{
 		{
-			name: "Encode AuctionDetails",
-			details: AuctionDetails{
-				GasCost: GasCostConfigClassFixed{
+			name: "Encode fusionorder.AuctionDetails",
+			details: fusionorder.AuctionDetails{
+				GasCost: fusionorder.GasCostConfigClassFixed{
 					GasBumpEstimate:  0,
 					GasPriceEstimate: 0,
 				},
 				StartTime:       1673548149,
 				Duration:        180,
 				InitialRateBump: 50000,
-				Points: []AuctionPointClassFixed{
+				Points: []fusionorder.AuctionPointClassFixed{
 					{
 						Delay:       12,
 						Coefficient: 20000,

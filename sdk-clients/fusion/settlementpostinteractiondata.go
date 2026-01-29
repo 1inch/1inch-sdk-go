@@ -11,15 +11,11 @@ import (
 )
 
 type SettlementPostInteractionData struct {
-	Whitelist          []WhitelistItem
+	Whitelist          []fusionorder.WhitelistItem
 	ResolvingStartTime *big.Int
 	CustomReceiver     common.Address
 	AuctionFees        *FeesIntegratorAndResolver
 }
-
-// GenerateWhitelist converts a list of address strings into WhitelistItems with delays.
-// This is an alias for fusionorder.GenerateWhitelist.
-var GenerateWhitelist = fusionorder.GenerateWhitelist
 
 const customReceiverBitFlag = 0
 

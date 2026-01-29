@@ -58,9 +58,9 @@ type Order struct {
 	Inner               orderbook.OrderData
 	SettlementExtension common.Address
 	OrderInfo           FusionOrderV4
-	AuctionDetails      *AuctionDetails
+	AuctionDetails      *fusionorder.AuctionDetails
 	PostInteractionData *SettlementPostInteractionData
-	Extra               ExtraData
+	Extra               fusionorder.ExtraData
 }
 
 type OrderParams struct {
@@ -91,14 +91,6 @@ type CustomPreset = fusionorder.CustomPreset
 // CustomPresetPoint is an alias for the shared fusionorder.CustomPresetPoint type
 type CustomPresetPoint = fusionorder.CustomPresetPoint
 
-// AuctionDetails is an alias for the shared fusionorder.AuctionDetails type
-type AuctionDetails = fusionorder.AuctionDetails
-
-// AuctionPointClassFixed is an alias for the shared fusionorder.AuctionPointClassFixed type
-type AuctionPointClassFixed = fusionorder.AuctionPointClassFixed
-
-// GasCostConfigClassFixed is an alias for the shared fusionorder.GasCostConfigClassFixed type
-type GasCostConfigClassFixed = fusionorder.GasCostConfigClassFixed
 
 type Preset struct {
 	AuctionDuration    float32             `json:"auctionDuration"`
@@ -133,8 +125,8 @@ type FusionOrderConstructor struct {
 }
 
 type Details struct {
-	Auction            *AuctionDetails `json:"auction"`
-	Whitelist          []AuctionWhitelistItem
+	Auction            *fusionorder.AuctionDetails `json:"auction"`
+	Whitelist          []fusionorder.AuctionWhitelistItem
 	ResolvingStartTime *big.Int
 	FeesIntAndRes      *FeesIntegratorAndResolver
 }
@@ -143,9 +135,6 @@ type FeesIntegratorAndResolver struct {
 	Resolver   ResolverFee
 	Integrator IntegratorFee
 }
-
-// AuctionWhitelistItem is an alias for the shared fusionorder.AuctionWhitelistItem type
-type AuctionWhitelistItem = fusionorder.AuctionWhitelistItem
 
 type ExtraParams struct {
 	Nonce                *big.Int
@@ -157,12 +146,6 @@ type ExtraParams struct {
 	Source               string
 	unwrapWeth           bool
 }
-
-// WhitelistItem is an alias for the shared fusionorder.WhitelistItem type
-type WhitelistItem = fusionorder.WhitelistItem
-
-// ExtraData is an alias for the shared fusionorder.ExtraData type
-type ExtraData = fusionorder.ExtraData
 
 type QuoterControllerGetQuoteParamsFixed struct {
 	// FromTokenAddress Address of "FROM" token
@@ -246,7 +229,7 @@ type OrderResponse struct {
 		TakingAmount string `json:"takingAmount"`
 	} `json:"order"`
 	OrderHash         string                   `json:"orderHash"`
-	Points            []AuctionPointClassFixed `json:"points"`
+	Points            []fusionorder.AuctionPointClassFixed `json:"points"`
 	Status            string                   `json:"status"`
 	ToTokenToUsdPrice string                   `json:"toTokenToUsdPrice"`
 }

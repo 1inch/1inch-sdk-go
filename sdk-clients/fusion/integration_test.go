@@ -221,7 +221,7 @@ func TestGetQuoteOutputFixed_Serialization(t *testing.T) {
 // TestExtensionEncoding_Integration tests that extension encoding works end-to-end
 func TestExtensionEncoding_Integration(t *testing.T) {
 	// Create a realistic extension
-	whitelist := []WhitelistItem{
+	whitelist := []fusionorder.WhitelistItem{
 		{AddressHalf: "bb839cbe05303d7705fa", Delay: big.NewInt(0)},
 	}
 
@@ -232,11 +232,11 @@ func TestExtensionEncoding_Integration(t *testing.T) {
 		AuctionFees:        nil,
 	}
 
-	auctionDetails := &AuctionDetails{
+	auctionDetails := &fusionorder.AuctionDetails{
 		StartTime:       1673548149,
 		Duration:        180,
 		InitialRateBump: 50000,
-		Points:          []AuctionPointClassFixed{{Coefficient: 20000, Delay: 12}},
+		Points:          []fusionorder.AuctionPointClassFixed{{Coefficient: 20000, Delay: 12}},
 	}
 
 	extension, err := NewExtension(ExtensionParams{
@@ -330,7 +330,7 @@ func TestWhitelistGeneration_Integration(t *testing.T) {
 	quote := createTestQuote()
 	resolvingStartTime := big.NewInt(1673548139)
 
-	whitelist, err := GenerateWhitelist(quote.Whitelist, resolvingStartTime)
+	whitelist, err := fusionorder.GenerateWhitelist(quote.Whitelist, resolvingStartTime)
 	require.NoError(t, err)
 
 	// Should have same number of items
@@ -348,7 +348,7 @@ func TestSettlementPostInteractionData_Integration(t *testing.T) {
 	quote := createTestQuote()
 	resolvingStartTime := big.NewInt(1673548139)
 
-	whitelist, err := GenerateWhitelist(quote.Whitelist, resolvingStartTime)
+	whitelist, err := fusionorder.GenerateWhitelist(quote.Whitelist, resolvingStartTime)
 	require.NoError(t, err)
 
 	details := Details{
@@ -407,7 +407,7 @@ func TestMakerTraitsCreation_Integration(t *testing.T) {
 	for _, tc := range tests {
 		t.Run(tc.name, func(t *testing.T) {
 			details := Details{
-				Auction: &AuctionDetails{
+				Auction: &fusionorder.AuctionDetails{
 					StartTime: 1700000000,
 					Duration:  180,
 				},
@@ -444,7 +444,7 @@ func TestSaltGeneration_Integration(t *testing.T) {
 	}
 	defer func() { random_number_generation.BigIntMaxFunc = originalBigIntMaxFunc }()
 
-	whitelist := []WhitelistItem{
+	whitelist := []fusionorder.WhitelistItem{
 		{AddressHalf: "bb839cbe05303d7705fa", Delay: big.NewInt(0)},
 	}
 
@@ -455,11 +455,11 @@ func TestSaltGeneration_Integration(t *testing.T) {
 		AuctionFees:        nil,
 	}
 
-	auctionDetails := &AuctionDetails{
+	auctionDetails := &fusionorder.AuctionDetails{
 		StartTime:       1673548149,
 		Duration:        180,
 		InitialRateBump: 50000,
-		Points:          []AuctionPointClassFixed{{Coefficient: 20000, Delay: 12}},
+		Points:          []fusionorder.AuctionPointClassFixed{{Coefficient: 20000, Delay: 12}},
 	}
 
 	extension, err := NewExtension(ExtensionParams{

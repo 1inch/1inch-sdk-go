@@ -19,7 +19,7 @@ import (
 type Extension struct {
 	// Raw unencoded data
 	SettlementContract         string
-	AuctionDetails             *AuctionDetails
+	AuctionDetails             *fusionorder.AuctionDetails
 	PostInteractionData        *SettlementPostInteractionData
 	PostInteractionDataEncoded string
 	Asset                      string
@@ -42,7 +42,7 @@ type Extension struct {
 
 type ExtensionParams struct {
 	SettlementContract         string
-	AuctionDetails             *AuctionDetails
+	AuctionDetails             *fusionorder.AuctionDetails
 	PostInteractionData        *SettlementPostInteractionData
 	PostInteractionDataEncoded string
 	Asset                      string
@@ -163,7 +163,7 @@ func (e *Extension) isEmpty() bool {
 }
 
 type BuildAmountGetterDataParams struct {
-	AuctionDetails      *AuctionDetails
+	AuctionDetails      *fusionorder.AuctionDetails
 	PostInteractionData *SettlementPostInteractionData
 	ResolvingStartTime  *big.Int
 }
