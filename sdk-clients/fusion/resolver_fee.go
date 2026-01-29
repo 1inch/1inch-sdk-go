@@ -6,7 +6,7 @@ import (
 	"math/big"
 
 	"github.com/1inch/1inch-sdk-go/common/fusionorder"
-	"github.com/1inch/1inch-sdk-go/internal/addresses"
+	"github.com/1inch/1inch-sdk-go/constants"
 )
 
 type ResolverFee struct {
@@ -16,16 +16,16 @@ type ResolverFee struct {
 }
 
 var ResolverFeeZero = &ResolverFee{
-	Receiver:          addresses.ZeroAddress,
+	Receiver:          constants.ZeroAddress,
 	Fee:               fusionorder.BpsZero,
 	WhitelistDiscount: fusionorder.BpsZero,
 }
 
 func NewResolverFee(receiver string, fee *Bps, whitelistDiscount *Bps) (*ResolverFee, error) {
-	if (receiver == "" || receiver == addresses.ZeroAddress) && !fee.IsZero() {
+	if (receiver == "" || receiver == constants.ZeroAddress) && !fee.IsZero() {
 		return nil, errors.New("fee requires non-zero receiver address")
 	}
-	if !(receiver == "" || receiver == addresses.ZeroAddress) && fee.IsZero() {
+	if !(receiver == "" || receiver == constants.ZeroAddress) && fee.IsZero() {
 		return nil, errors.New("zero fee requires zero receiver address")
 	}
 	if fee.IsZero() && !whitelistDiscount.IsZero() {

@@ -8,6 +8,7 @@ import (
 	"strconv"
 	"time"
 
+	"github.com/1inch/1inch-sdk-go/constants"
 	"github.com/1inch/1inch-sdk-go/internal/bytesiterator"
 )
 
@@ -34,8 +35,8 @@ type GasCostConfigClassFixed struct {
 
 // NewAuctionDetails creates validated AuctionDetails
 func NewAuctionDetails(startTime, duration, initialRateBump uint32, points []AuctionPointClassFixed, gasCost GasCostConfigClassFixed) (*AuctionDetails, error) {
-	if gasCost.GasBumpEstimate > Uint24Max || gasCost.GasPriceEstimate > Uint32Max ||
-		startTime > Uint32Max || duration > Uint24Max || initialRateBump > Uint24Max {
+	if gasCost.GasBumpEstimate > constants.Uint24Max || gasCost.GasPriceEstimate > constants.Uint32Max ||
+		startTime > constants.Uint32Max || duration > constants.Uint24Max || initialRateBump > constants.Uint24Max {
 		return nil, errors.New("values exceed limits")
 	}
 

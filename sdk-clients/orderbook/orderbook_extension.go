@@ -7,9 +7,9 @@ import (
 	"math/big"
 	"sort"
 	"strings"
-)
 
-const nullAddress = "0x0000000000000000000000000000000000000000"
+	"github.com/1inch/1inch-sdk-go/constants"
+)
 
 // packFeeParameter encodes integrator and resolver fee details into a single 48-bit value with error checks on input ranges.
 // Returns the packed 48-bit value and an error if any input values exceed their allowed ranges.
@@ -128,17 +128,17 @@ func buildFeePostInteractionData(params *buildFeePostInteractionDataParams) ([]b
 	}
 
 	if params.CustomReceiverAddress == "" {
-		params.CustomReceiverAddress = nullAddress
+		params.CustomReceiverAddress = constants.ZeroAddress
 	}
 
 	if params.ExtraInteractionTarget == "" {
-		params.ExtraInteractionTarget = nullAddress
+		params.ExtraInteractionTarget = constants.ZeroAddress
 	}
 
 	postInteraction := big.NewInt(0)
 
 	// Add integrator address (20 bytes = 160 bits)
-	integratorAddress := nullAddress
+	integratorAddress := constants.ZeroAddress
 	if params.IntegratorFee != nil && params.IntegratorFee.Integrator != "" {
 		integratorAddress = params.IntegratorFee.Integrator
 	}
@@ -147,7 +147,7 @@ func buildFeePostInteractionData(params *buildFeePostInteractionDataParams) ([]b
 	postInteraction.Or(postInteraction, integratorInt)
 
 	// Add resolver/protocol fee receiver address (20 bytes = 160 bits)
-	resolverAddress := nullAddress
+	resolverAddress := constants.ZeroAddress
 	if params.ResolverFee != nil && params.ResolverFee.Receiver != "" {
 		resolverAddress = params.ResolverFee.Receiver
 	}
@@ -157,7 +157,7 @@ func buildFeePostInteractionData(params *buildFeePostInteractionDataParams) ([]b
 	postInteraction.Or(postInteraction, resolverInt)
 
 	// Add custom receiver if present (20 bytes = 160 bits)
-	if params.CustomReceiver && params.CustomReceiverAddress != nullAddress {
+	if params.CustomReceiver && params.CustomReceiverAddress != constants.ZeroAddress {
 		receiverInt := new(big.Int)
 		receiverInt.SetString(strings.TrimPrefix(params.CustomReceiverAddress, "0x"), 16)
 		postInteraction.Lsh(postInteraction, 160)
@@ -173,7 +173,7 @@ func buildFeePostInteractionData(params *buildFeePostInteractionDataParams) ([]b
 	postInteraction.Or(postInteraction, feeAndWhitelist)
 
 	// Add extra interaction if present
-	if params.ExtraInteractionTarget != nullAddress && len(params.ExtraInteractionData) > 0 {
+	if params.ExtraInteractionTarget != constants.ZeroAddress && len(params.ExtraInteractionData) > 0 {
 		targetInt := new(big.Int)
 		targetInt.SetString(strings.TrimPrefix(params.ExtraInteractionTarget, "0x"), 16)
 		postInteraction.Lsh(postInteraction, 160)
@@ -187,7 +187,7 @@ func buildFeePostInteractionData(params *buildFeePostInteractionDataParams) ([]b
 
 	// Calculate expected byte length
 	expectedLength := 1 + 20 + 20 // flag + integrator + resolver
-	if params.CustomReceiver && params.CustomReceiverAddress != nullAddress {
+	if params.CustomReceiver && params.CustomReceiverAddress != constants.ZeroAddress {
 		expectedLength += 20 // custom receiver
 	}
 	if len(params.Whitelist) == 0 {
@@ -195,7 +195,7 @@ func buildFeePostInteractionData(params *buildFeePostInteractionDataParams) ([]b
 	} else {
 		expectedLength += (48 + 8 + len(params.Whitelist)*80) / 8 // fee + whitelist
 	}
-	if params.ExtraInteractionTarget != nullAddress && len(params.ExtraInteractionData) > 0 {
+	if params.ExtraInteractionTarget != constants.ZeroAddress && len(params.ExtraInteractionData) > 0 {
 		expectedLength += 20 + len(params.ExtraInteractionData)
 	}
 
@@ -224,7 +224,7 @@ func BuildOrderExtensionBytes(params *BuildOrderExtensionBytesParams) (string, e
 	}
 
 	feePostInteraction, err := buildFeePostInteractionData(&buildFeePostInteractionDataParams{
-		CustomReceiver:         params.CustomReceiver != "" && params.CustomReceiver != nullAddress,
+		CustomReceiver:         params.CustomReceiver != "" && params.CustomReceiver != constants.ZeroAddress,
 		CustomReceiverAddress:  params.CustomReceiver,
 		IntegratorFee:          params.IntegratorFee,
 		ResolverFee:            params.ResolverFee,

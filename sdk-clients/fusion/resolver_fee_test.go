@@ -5,14 +5,14 @@ import (
 	"testing"
 
 	"github.com/1inch/1inch-sdk-go/common/fusionorder"
-	"github.com/1inch/1inch-sdk-go/internal/addresses"
+	"github.com/1inch/1inch-sdk-go/constants"
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
 )
 
 func TestResolverFeeZero(t *testing.T) {
 	require.NotNil(t, ResolverFeeZero)
-	assert.Equal(t, addresses.ZeroAddress, ResolverFeeZero.Receiver)
+	assert.Equal(t, constants.ZeroAddress, ResolverFeeZero.Receiver)
 	assert.True(t, ResolverFeeZero.Fee.IsZero())
 	assert.True(t, ResolverFeeZero.WhitelistDiscount.IsZero())
 }
@@ -30,7 +30,7 @@ func TestNewResolverFee(t *testing.T) {
 	}{
 		{
 			name:              "Valid - zero fee with zero address",
-			receiver:          addresses.ZeroAddress,
+			receiver:          constants.ZeroAddress,
 			fee:               fusionorder.BpsZero,
 			whitelistDiscount: fusionorder.BpsZero,
 			expectError:       false,
@@ -58,7 +58,7 @@ func TestNewResolverFee(t *testing.T) {
 		},
 		{
 			name:              "Invalid - non-zero fee with zero address",
-			receiver:          addresses.ZeroAddress,
+			receiver:          constants.ZeroAddress,
 			fee:               fusionorder.MustNewBps(big.NewInt(100)),
 			whitelistDiscount: fusionorder.BpsZero,
 			expectError:       true,
@@ -82,7 +82,7 @@ func TestNewResolverFee(t *testing.T) {
 		},
 		{
 			name:              "Invalid - zero fee with non-zero whitelist discount",
-			receiver:          addresses.ZeroAddress,
+			receiver:          constants.ZeroAddress,
 			fee:               fusionorder.BpsZero,
 			whitelistDiscount: fusionorder.MustNewBps(big.NewInt(100)),
 			expectError:       true,

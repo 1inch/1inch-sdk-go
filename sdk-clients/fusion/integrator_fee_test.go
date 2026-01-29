@@ -5,15 +5,15 @@ import (
 	"testing"
 
 	"github.com/1inch/1inch-sdk-go/common/fusionorder"
-	"github.com/1inch/1inch-sdk-go/internal/addresses"
+	"github.com/1inch/1inch-sdk-go/constants"
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
 )
 
 func TestIntegratorFeeZero(t *testing.T) {
 	require.NotNil(t, IntegratorFeeZero)
-	assert.Equal(t, addresses.ZeroAddress, IntegratorFeeZero.Integrator)
-	assert.Equal(t, addresses.ZeroAddress, IntegratorFeeZero.Protocol)
+	assert.Equal(t, constants.ZeroAddress, IntegratorFeeZero.Integrator)
+	assert.Equal(t, constants.ZeroAddress, IntegratorFeeZero.Protocol)
 	assert.True(t, IntegratorFeeZero.Fee.IsZero())
 	assert.True(t, IntegratorFeeZero.Share.IsZero())
 }
@@ -33,8 +33,8 @@ func TestNewIntegratorFee(t *testing.T) {
 	}{
 		{
 			name:        "Valid - zero fee with zero addresses",
-			integrator:  addresses.ZeroAddress,
-			protocol:    addresses.ZeroAddress,
+			integrator:  constants.ZeroAddress,
+			protocol:    constants.ZeroAddress,
 			fee:         fusionorder.BpsZero,
 			share:       fusionorder.BpsZero,
 			expectError: false,
@@ -49,8 +49,8 @@ func TestNewIntegratorFee(t *testing.T) {
 		},
 		{
 			name:        "Invalid - zero fee but non-zero share",
-			integrator:  addresses.ZeroAddress,
-			protocol:    addresses.ZeroAddress,
+			integrator:  constants.ZeroAddress,
+			protocol:    constants.ZeroAddress,
 			fee:         fusionorder.BpsZero,
 			share:       fusionorder.MustNewBps(big.NewInt(100)),
 			expectError: true,
@@ -59,7 +59,7 @@ func TestNewIntegratorFee(t *testing.T) {
 		{
 			name:        "Invalid - zero fee but non-zero integrator",
 			integrator:  validAddress1,
-			protocol:    addresses.ZeroAddress,
+			protocol:    constants.ZeroAddress,
 			fee:         fusionorder.BpsZero,
 			share:       fusionorder.BpsZero,
 			expectError: true,
@@ -67,7 +67,7 @@ func TestNewIntegratorFee(t *testing.T) {
 		},
 		{
 			name:        "Invalid - zero fee but non-zero protocol",
-			integrator:  addresses.ZeroAddress,
+			integrator:  constants.ZeroAddress,
 			protocol:    validAddress2,
 			fee:         fusionorder.BpsZero,
 			share:       fusionorder.BpsZero,
@@ -76,7 +76,7 @@ func TestNewIntegratorFee(t *testing.T) {
 		},
 		{
 			name:        "Invalid - non-zero fee with zero integrator",
-			integrator:  addresses.ZeroAddress,
+			integrator:  constants.ZeroAddress,
 			protocol:    validAddress2,
 			fee:         fusionorder.MustNewBps(big.NewInt(100)),
 			share:       fusionorder.MustNewBps(big.NewInt(5000)),
@@ -86,7 +86,7 @@ func TestNewIntegratorFee(t *testing.T) {
 		{
 			name:        "Invalid - non-zero fee with zero protocol",
 			integrator:  validAddress1,
-			protocol:    addresses.ZeroAddress,
+			protocol:    constants.ZeroAddress,
 			fee:         fusionorder.MustNewBps(big.NewInt(100)),
 			share:       fusionorder.MustNewBps(big.NewInt(5000)),
 			expectError: true,
@@ -94,8 +94,8 @@ func TestNewIntegratorFee(t *testing.T) {
 		},
 		{
 			name:        "Invalid - both addresses zero but fee non-zero",
-			integrator:  addresses.ZeroAddress,
-			protocol:    addresses.ZeroAddress,
+			integrator:  constants.ZeroAddress,
+			protocol:    constants.ZeroAddress,
 			fee:         fusionorder.MustNewBps(big.NewInt(100)),
 			share:       fusionorder.MustNewBps(big.NewInt(5000)),
 			expectError: true,
@@ -140,6 +140,6 @@ func TestIntegratorFee_String(t *testing.T) {
 func TestIntegratorFee_ZeroFeeString(t *testing.T) {
 	result := IntegratorFeeZero.String()
 	assert.Contains(t, result, "IntegratorFee")
-	assert.Contains(t, result, addresses.ZeroAddress)
+	assert.Contains(t, result, constants.ZeroAddress)
 	assert.Contains(t, result, "0")
 }

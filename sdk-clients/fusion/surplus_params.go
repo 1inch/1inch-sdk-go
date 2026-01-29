@@ -5,9 +5,8 @@ import (
 	"math/big"
 
 	"github.com/1inch/1inch-sdk-go/common/fusionorder"
+	"github.com/1inch/1inch-sdk-go/constants"
 )
-
-var Uint256Max = new(big.Int).Sub(new(big.Int).Lsh(big.NewInt(1), 256), big.NewInt(1))
 
 type SurplusParams struct {
 	EstimatedTakerAmount *big.Int
@@ -15,7 +14,7 @@ type SurplusParams struct {
 }
 
 // SurplusParamsNoFee is equivalent to SurplusParams.NO_FEE in TS
-var SurplusParamsNoFee, _ = NewSurplusParams(Uint256Max, fusionorder.BpsZero)
+var SurplusParamsNoFee, _ = NewSurplusParams(constants.Uint256Max, fusionorder.BpsZero)
 
 // NewSurplusParams validates that the protocolFee is in whole percent increments
 func NewSurplusParams(estimatedTakerAmount *big.Int, protocolFee *Bps) (*SurplusParams, error) {

@@ -10,6 +10,7 @@ import (
 	"github.com/stretchr/testify/require"
 
 	"github.com/1inch/1inch-sdk-go/common/fusionorder"
+	"github.com/1inch/1inch-sdk-go/constants"
 	random_number_generation "github.com/1inch/1inch-sdk-go/internal/random-number-generation"
 )
 
@@ -299,17 +300,17 @@ func TestBpsToRatioFormat_Integration(t *testing.T) {
 func TestNativeTokenWrapping_FusionPlus(t *testing.T) {
 	tests := []struct {
 		name     string
-		chainId  fusionorder.NetworkEnum
+		chainId  constants.NetworkEnum
 		expected string
 	}{
-		{"Ethereum WETH", fusionorder.ETHEREUM, "0xC02aaA39b223FE8D0A0e5C4F27eAD9083C756Cc2"},
-		{"Polygon WMATIC", fusionorder.POLYGON, "0x0d500B1d8E8eF31E21C99d1Db9A6444d3ADf1270"},
-		{"Arbitrum WETH", fusionorder.ARBITRUM, "0x82aF49447D8a07e3bd95BD0d56f35241523fBab1"},
+		{"Ethereum WETH", constants.NetworkEthereum, "0xC02aaA39b223FE8D0A0e5C4F27eAD9083C756Cc2"},
+		{"Polygon WMATIC", constants.NetworkPolygon, "0x0d500B1d8E8eF31E21C99d1Db9A6444d3ADf1270"},
+		{"Arbitrum WETH", constants.NetworkArbitrum, "0x82aF49447D8a07e3bd95BD0d56f35241523fBab1"},
 	}
 
 	for _, tc := range tests {
 		t.Run(tc.name, func(t *testing.T) {
-			wrapper, exists := fusionorder.ChainToWrapper[tc.chainId]
+			wrapper, exists := constants.ChainToWrapper[tc.chainId]
 			assert.True(t, exists)
 			assert.Equal(t, common.HexToAddress(tc.expected), wrapper)
 		})

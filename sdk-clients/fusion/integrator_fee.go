@@ -5,7 +5,7 @@ import (
 	"fmt"
 
 	"github.com/1inch/1inch-sdk-go/common/fusionorder"
-	"github.com/1inch/1inch-sdk-go/internal/addresses"
+	"github.com/1inch/1inch-sdk-go/constants"
 )
 
 type IntegratorFee struct {
@@ -17,8 +17,8 @@ type IntegratorFee struct {
 
 // IntegratorFeeZero is a safe default with all zero values
 var IntegratorFeeZero = &IntegratorFee{
-	Integrator: addresses.ZeroAddress,
-	Protocol:   addresses.ZeroAddress,
+	Integrator: constants.ZeroAddress,
+	Protocol:   constants.ZeroAddress,
 	Fee:        fusionorder.BpsZero,
 	Share:      fusionorder.BpsZero,
 }
@@ -29,15 +29,15 @@ func NewIntegratorFee(integrator, protocol string, fee, share *Bps) (*Integrator
 		if !share.IsZero() {
 			return nil, errors.New("zero fee requires zero integrator share")
 		}
-		if integrator != addresses.ZeroAddress {
+		if integrator != constants.ZeroAddress {
 			return nil, errors.New("zero fee requires zero integrator address")
 		}
-		if protocol != addresses.ZeroAddress {
+		if protocol != constants.ZeroAddress {
 			return nil, errors.New("zero fee requires zero protocol address")
 		}
 	}
 
-	if (integrator == addresses.ZeroAddress || protocol == addresses.ZeroAddress) && !fee.IsZero() {
+	if (integrator == constants.ZeroAddress || protocol == constants.ZeroAddress) && !fee.IsZero() {
 		return nil, errors.New("non-zero fee requires non-zero integrator and protocol addresses")
 	}
 

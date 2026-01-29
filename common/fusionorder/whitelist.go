@@ -6,6 +6,7 @@ import (
 	"math/big"
 	"strings"
 
+	"github.com/1inch/1inch-sdk-go/constants"
 	"github.com/ethereum/go-ethereum/common"
 )
 
@@ -60,8 +61,8 @@ func GenerateWhitelist(addresses []string, resolvingStartTime *big.Int) ([]White
 
 		sumDelay.Add(sumDelay, whitelist[i].Delay)
 
-		if whitelist[i].Delay.Cmp(Uint16Max) >= 0 {
-			return nil, fmt.Errorf("whitelist delay %d exceeds maximum %d", whitelist[i].Delay, Uint16Max)
+		if whitelist[i].Delay.Cmp(constants.Uint16Max) >= 0 {
+			return nil, fmt.Errorf("whitelist delay %d exceeds maximum %d", whitelist[i].Delay, constants.Uint16Max)
 		}
 	}
 
@@ -104,8 +105,8 @@ func GenerateWhitelistFromItems(items []AuctionWhitelistItem, resolvingStartTime
 
 		sumDelay.Add(sumDelay, whitelist[i].Delay)
 
-		if whitelist[i].Delay.Cmp(Uint16Max) >= 0 {
-			return nil, fmt.Errorf("whitelist delay %d exceeds maximum %d", whitelist[i].Delay, Uint16Max)
+		if whitelist[i].Delay.Cmp(constants.Uint16Max) >= 0 {
+			return nil, fmt.Errorf("whitelist delay %d exceeds maximum %d", whitelist[i].Delay, constants.Uint16Max)
 		}
 	}
 

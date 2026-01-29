@@ -5,22 +5,14 @@ import (
 	"testing"
 
 	"github.com/1inch/1inch-sdk-go/common/fusionorder"
+	"github.com/1inch/1inch-sdk-go/constants"
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
 )
 
-func TestUint256Max(t *testing.T) {
-	// uint256 max = 2^256 - 1
-	expected := new(big.Int).Sub(new(big.Int).Lsh(big.NewInt(1), 256), big.NewInt(1))
-	assert.Equal(t, 0, Uint256Max.Cmp(expected))
-
-	// Should be 78 digits
-	assert.Equal(t, 78, len(Uint256Max.String()))
-}
-
 func TestSurplusParamsNoFee(t *testing.T) {
 	require.NotNil(t, SurplusParamsNoFee)
-	assert.Equal(t, 0, SurplusParamsNoFee.EstimatedTakerAmount.Cmp(Uint256Max))
+	assert.Equal(t, 0, SurplusParamsNoFee.EstimatedTakerAmount.Cmp(constants.Uint256Max))
 	assert.True(t, SurplusParamsNoFee.ProtocolFee.IsZero())
 }
 
@@ -58,7 +50,7 @@ func TestNewSurplusParams(t *testing.T) {
 		},
 		{
 			name:                 "Valid - uint256 max estimated amount",
-			estimatedTakerAmount: Uint256Max,
+			estimatedTakerAmount: constants.Uint256Max,
 			protocolFee:          fusionorder.BpsZero,
 			expectError:          false,
 		},

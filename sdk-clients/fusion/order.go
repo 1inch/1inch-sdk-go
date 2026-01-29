@@ -6,12 +6,12 @@ import (
 	"math/big"
 
 	"github.com/1inch/1inch-sdk-go/common"
-	"github.com/1inch/1inch-sdk-go/internal/times"
-	geth_common "github.com/ethereum/go-ethereum/common"
-
 	"github.com/1inch/1inch-sdk-go/common/fusionorder"
+	"github.com/1inch/1inch-sdk-go/constants"
 	random_number_generation "github.com/1inch/1inch-sdk-go/internal/random-number-generation"
+	"github.com/1inch/1inch-sdk-go/internal/times"
 	"github.com/1inch/1inch-sdk-go/sdk-clients/orderbook"
+	geth_common "github.com/ethereum/go-ethereum/common"
 )
 
 func CreateFusionOrderData(quote GetQuoteOutputFixed, orderParams OrderParams, wallet common.Wallet, chainId uint64) (*PreparedOrder, *orderbook.Order, error) {
@@ -27,8 +27,8 @@ func CreateFusionOrderData(quote GetQuoteOutputFixed, orderParams OrderParams, w
 	}
 
 	takerAsset := orderParams.ToTokenAddress
-	if takerAsset == fusionorder.NativeToken {
-		takerAssetWrapped, ok := fusionorder.ChainToWrapper[fusionorder.NetworkEnum(chainId)]
+	if takerAsset == constants.NativeToken {
+		takerAssetWrapped, ok := constants.ChainToWrapper[constants.NetworkEnum(chainId)]
 		if !ok {
 			return nil, nil, fmt.Errorf("unsupported network for wrapped token: %d", chainId)
 		}
@@ -50,7 +50,7 @@ func CreateFusionOrderData(quote GetQuoteOutputFixed, orderParams OrderParams, w
 		if orderParams.Nonce != nil {
 			nonce = orderParams.Nonce
 		} else {
-			nonce, err = random_number_generation.BigIntMaxFunc(fusionorder.Uint40Max)
+			nonce, err = random_number_generation.BigIntMaxFunc(constants.Uint40Max)
 			if err != nil {
 				return nil, nil, fmt.Errorf("failed to generate nonce: %w", err)
 			}

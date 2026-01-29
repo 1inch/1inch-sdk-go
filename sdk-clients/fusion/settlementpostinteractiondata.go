@@ -5,7 +5,7 @@ import (
 	"math/big"
 
 	"github.com/1inch/1inch-sdk-go/common/fusionorder"
-	"github.com/1inch/1inch-sdk-go/internal/addresses"
+	"github.com/1inch/1inch-sdk-go/constants"
 	"github.com/1inch/1inch-sdk-go/internal/bytesbuilder"
 	"github.com/ethereum/go-ethereum/common"
 )
@@ -28,22 +28,22 @@ func CreateEncodedPostInteractionData(extension *Extension) (string, error) {
 
 	customReceiver := extension.PostInteractionData.CustomReceiver
 	if customReceiver == (common.Address{}) {
-		customReceiver = common.HexToAddress(addresses.ZeroAddress)
+		customReceiver = common.HexToAddress(constants.ZeroAddress)
 	}
 
 	flags := big.NewInt(0)
-	if customReceiver.Hex() != addresses.ZeroAddress {
+	if customReceiver.Hex() != constants.ZeroAddress {
 		flags.SetBit(flags, customReceiverBitFlag, 1)
 	}
 	builder.AddUint8(uint8(flags.Uint64()))
 
-	integratorReceiver := common.HexToAddress(addresses.ZeroAddress)
-	if extension.PostInteractionData.AuctionFees != nil && extension.PostInteractionData.AuctionFees.Integrator.Integrator != "" && extension.PostInteractionData.AuctionFees.Integrator.Integrator != addresses.ZeroAddress {
+	integratorReceiver := common.HexToAddress(constants.ZeroAddress)
+	if extension.PostInteractionData.AuctionFees != nil && extension.PostInteractionData.AuctionFees.Integrator.Integrator != "" && extension.PostInteractionData.AuctionFees.Integrator.Integrator != constants.ZeroAddress {
 		integratorReceiver = common.HexToAddress(extension.PostInteractionData.AuctionFees.Integrator.Integrator)
 	}
 
-	protocolReceiver := common.HexToAddress(addresses.ZeroAddress)
-	if extension.PostInteractionData.AuctionFees != nil && extension.PostInteractionData.AuctionFees.Integrator.Protocol != "" && extension.PostInteractionData.AuctionFees.Integrator.Protocol != addresses.ZeroAddress {
+	protocolReceiver := common.HexToAddress(constants.ZeroAddress)
+	if extension.PostInteractionData.AuctionFees != nil && extension.PostInteractionData.AuctionFees.Integrator.Protocol != "" && extension.PostInteractionData.AuctionFees.Integrator.Protocol != constants.ZeroAddress {
 		protocolReceiver = common.HexToAddress(extension.PostInteractionData.AuctionFees.Integrator.Protocol)
 	}
 
