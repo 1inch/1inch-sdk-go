@@ -218,6 +218,54 @@ DEV_PORTAL_TOKEN=<1inch-api-key>
 - Tests are in `*_test.go` files alongside source
 - Run with `make test` or `go test -race ./...`
 
+### Table-Driven Tests (Required Pattern)
+
+All tests in this project **must** use the table-driven test pattern. This provides consistent structure, easier maintenance, and clear subtest naming.
+
+```go
+func TestFunctionName(t *testing.T) {
+	tests := []struct {
+		name        string
+		input       InputType
+		expected    OutputType
+		expectError bool
+		errorMsg    string
+	}{
+		{
+			name:     "Valid input",
+			input:    validInput,
+			expected: expectedOutput,
+		},
+		{
+			name:        "Invalid input",
+			input:       invalidInput,
+			expectError: true,
+			errorMsg:    "expected error message",
+		},
+	}
+
+	for _, tc := range tests {
+		t.Run(tc.name, func(t *testing.T) {
+			result, err := FunctionUnderTest(tc.input)
+			if tc.expectError {
+				require.Error(t, err)
+				assert.Contains(t, err.Error(), tc.errorMsg)
+			} else {
+				require.NoError(t, err)
+				assert.Equal(t, tc.expected, result)
+			}
+		})
+	}
+}
+```
+
+Key conventions:
+- Use `tests` as the slice variable name
+- Use `tc` (test case) as the loop variable
+- Always include a `name` field for clear subtest identification
+- Use `t.Run(tc.name, ...)` to create subtests
+- Use `require` for fatal assertions, `assert` for non-fatal
+
 ## CI/CD
 
 - **PR Validation** (`.github/workflows/pr.yml`): Runs tests + golangci-lint on PRs
