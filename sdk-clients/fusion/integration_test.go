@@ -289,11 +289,11 @@ func TestPresetSelection_Integration(t *testing.T) {
 // TestAuctionDetailsCreation_Integration tests auction details creation
 func TestAuctionDetailsCreation_Integration(t *testing.T) {
 	// Mock auction start time for deterministic tests
-	originalCalcAuctionStartTimeFunc := CalcAuctionStartTimeFunc
-	CalcAuctionStartTimeFunc = func(startAuctionIn uint32, additionalWaitPeriod uint32) uint32 {
+	originalCalcAuctionStartTimeFunc := fusionorder.CalcAuctionStartTimeFunc
+	fusionorder.CalcAuctionStartTimeFunc = func(startAuctionIn uint32, additionalWaitPeriod uint32) uint32 {
 		return 1700000000 + startAuctionIn + additionalWaitPeriod
 	}
-	defer func() { CalcAuctionStartTimeFunc = originalCalcAuctionStartTimeFunc }()
+	defer func() { fusionorder.CalcAuctionStartTimeFunc = originalCalcAuctionStartTimeFunc }()
 
 	// Create a preset with gas price that fits in uint32
 	preset := &PresetClassFixed{

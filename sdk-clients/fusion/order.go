@@ -4,7 +4,6 @@ import (
 	"errors"
 	"fmt"
 	"math/big"
-	"strconv"
 
 	"github.com/1inch/1inch-sdk-go/common"
 	"github.com/1inch/1inch-sdk-go/internal/times"
@@ -15,7 +14,6 @@ import (
 	"github.com/1inch/1inch-sdk-go/sdk-clients/orderbook"
 )
 
-var uint40Max = new(big.Int).Sub(new(big.Int).Lsh(big.NewInt(1), 40), big.NewInt(1))
 
 func CreateFusionOrderData(quote GetQuoteOutputFixed, orderParams OrderParams, wallet common.Wallet, chainId uint64) (*PreparedOrder, *orderbook.Order, error) {
 
@@ -53,7 +51,7 @@ func CreateFusionOrderData(quote GetQuoteOutputFixed, orderParams OrderParams, w
 		if orderParams.Nonce != nil {
 			nonce = orderParams.Nonce
 		} else {
-			nonce, err = random_number_generation.BigIntMaxFunc(uint40Max)
+			nonce, err = random_number_generation.BigIntMaxFunc(fusionorder.Uint40Max)
 			if err != nil {
 				return nil, nil, fmt.Errorf("failed to generate nonce: %w", err)
 			}
@@ -204,31 +202,24 @@ var CalcAuctionStartTimeFunc func(uint32, uint32) uint32 = fusionorder.CalcAucti
 var CalcAuctionStartTime = fusionorder.CalcAuctionStartTime
 
 func CreateAuctionDetails(preset *PresetClassFixed, additionalWaitPeriod float32) (*AuctionDetails, error) {
-	pointsFixed := make([]AuctionPointClassFixed, 0)
-	for _, point := range preset.Points {
-		pointsFixed = append(pointsFixed, AuctionPointClassFixed{
-			Coefficient: uint32(point.Coefficient),
-			Delay:       uint16(point.Delay),
-		})
+	points := make([]fusionorder.AuctionPointInput, len(preset.Points))
+	for i, point := range preset.Points {
+		points[i] = fusionorder.AuctionPointInput{
+			Coefficient: point.Coefficient,
+			Delay:       point.Delay,
+		}
 	}
-
-	gasPriceEstimateFixed, err := strconv.ParseUint(preset.GasCost.GasPriceEstimate, 10, 32)
-	if err != nil {
-		return nil, fmt.Errorf("failed to parse gas price estimate: %w", err)
-	}
-
-	gasCostFixed := GasCostConfigClassFixed{
-		GasBumpEstimate:  uint32(preset.GasCost.GasBumpEstimate),
-		GasPriceEstimate: uint32(gasPriceEstimateFixed),
-	}
-
-	return &AuctionDetails{
-		StartTime:       CalcAuctionStartTimeFunc(uint32(preset.StartAuctionIn), uint32(additionalWaitPeriod)),
-		Duration:        uint32(preset.AuctionDuration),
-		InitialRateBump: uint32(preset.InitialRateBump),
-		Points:          pointsFixed,
-		GasCost:         gasCostFixed,
-	}, nil
+	return fusionorder.CreateAuctionDetailsFromParams(fusionorder.CreateAuctionDetailsParams{
+		StartAuctionIn:       preset.StartAuctionIn,
+		AdditionalWaitPeriod: additionalWaitPeriod,
+		AuctionDuration:      preset.AuctionDuration,
+		InitialRateBump:      preset.InitialRateBump,
+		Points:               points,
+		GasCost: fusionorder.GasCostInput{
+			GasBumpEstimate:  preset.GasCost.GasBumpEstimate,
+			GasPriceEstimate: preset.GasCost.GasPriceEstimate,
+		},
+	})
 }
 
 func CreateSettlementPostInteractionData(details Details, whitelist []WhitelistItem, orderInfo FusionOrderV4) (*SettlementPostInteractionData, error) {
@@ -246,33 +237,16 @@ func CreateSettlementPostInteractionData(details Details, whitelist []WhitelistI
 }
 
 func CreateMakerTraits(details Details, extraParams ExtraParams) (*orderbook.MakerTraits, error) {
-	deadline := details.Auction.StartTime + details.Auction.Duration + extraParams.OrderExpirationDelay
-	var nonce int64
-	if extraParams.Nonce == nil {
-		nonce = 0
-	} else {
-		nonce = extraParams.Nonce.Int64()
-	}
-	makerTraitParms := orderbook.MakerTraitsParams{
-		Expiry:             int64(deadline),
-		AllowPartialFills:  extraParams.AllowPartialFills,
-		AllowMultipleFills: extraParams.AllowMultipleFills,
-		HasPostInteraction: true,
-		UnwrapWeth:         extraParams.unwrapWeth,
-		UsePermit2:         extraParams.EnablePermit2,
-		HasExtension:       true,
-		Nonce:              nonce,
-	}
-	makerTraits, err := orderbook.NewMakerTraits(makerTraitParms)
-	if err != nil {
-		return nil, fmt.Errorf("failed to create maker traits: %w", err)
-	}
-	if makerTraits.IsBitInvalidatorMode() {
-		if extraParams.Nonce == nil || extraParams.Nonce.Cmp(big.NewInt(0)) == 0 {
-			return nil, errors.New("nonce required when partial fill or multiple fill disallowed")
-		}
-	}
-	return makerTraits, nil
+	return fusionorder.CreateMakerTraits(fusionorder.MakerTraitsParams{
+		AuctionStartTime:     details.Auction.StartTime,
+		AuctionDuration:      details.Auction.Duration,
+		OrderExpirationDelay: extraParams.OrderExpirationDelay,
+		Nonce:                extraParams.Nonce,
+		AllowPartialFills:    extraParams.AllowPartialFills,
+		AllowMultipleFills:   extraParams.AllowMultipleFills,
+		UnwrapWeth:           extraParams.unwrapWeth,
+		EnablePermit2:        extraParams.EnablePermit2,
+	})
 }
 
 type CreateOrderDataParams struct {

@@ -1,7 +1,6 @@
 package fusionplus
 
 import (
-	"errors"
 	"fmt"
 	"math/big"
 
@@ -12,20 +11,14 @@ import (
 )
 
 func NewExtensionPlus(params ExtensionParamsPlus) (*ExtensionPlus, error) {
-	if !hexadecimal.IsHexBytes(params.SettlementContract) {
-		return nil, fmt.Errorf("invalid settlement contract hex: %s", params.SettlementContract)
-	}
-	if !hexadecimal.IsHexBytes(params.MakerAssetSuffix) {
-		return nil, fmt.Errorf("invalid maker asset suffix hex: %s", params.MakerAssetSuffix)
-	}
-	if !hexadecimal.IsHexBytes(params.TakerAssetSuffix) {
-		return nil, fmt.Errorf("invalid taker asset suffix hex: %s", params.TakerAssetSuffix)
-	}
-	if !hexadecimal.IsHexBytes(params.Predicate) {
-		return nil, fmt.Errorf("invalid predicate hex: %s", params.Predicate)
-	}
-	if params.CustomData != "" {
-		return nil, errors.New("unsupported: custom data")
+	if err := fusionorder.ValidateExtensionHexParams(fusionorder.ExtensionHexParams{
+		SettlementContract: params.SettlementContract,
+		MakerAssetSuffix:   params.MakerAssetSuffix,
+		TakerAssetSuffix:   params.TakerAssetSuffix,
+		Predicate:          params.Predicate,
+		CustomData:         params.CustomData,
+	}); err != nil {
+		return nil, err
 	}
 
 	settlementContractAddress := geth_common.HexToAddress(params.SettlementContract)

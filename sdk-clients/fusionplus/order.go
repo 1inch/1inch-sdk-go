@@ -4,7 +4,6 @@ import (
 	"errors"
 	"fmt"
 	"math/big"
-	"strconv"
 	"time"
 
 	"github.com/1inch/1inch-sdk-go/common"
@@ -14,7 +13,6 @@ import (
 	geth_common "github.com/ethereum/go-ethereum/common"
 )
 
-var uint40Max = new(big.Int).Sub(new(big.Int).Lsh(big.NewInt(1), 40), big.NewInt(1))
 
 func CreateFusionPlusOrderData(quoteParams QuoterControllerGetQuoteParamsFixed, quote *GetQuoteOutputFixed, orderParams OrderParams, wallet common.Wallet, chainId int) (*PreparedOrder, error) {
 
@@ -88,7 +86,7 @@ func CreateFusionPlusOrderData(quoteParams QuoterControllerGetQuoteParamsFixed, 
 		if orderParams.Nonce != nil {
 			nonce = orderParams.Nonce
 		} else {
-			nonce, err = random_number_generation.BigIntMaxFunc(uint40Max)
+			nonce, err = random_number_generation.BigIntMaxFunc(fusionorder.Uint40Max)
 			if err != nil {
 				return nil, fmt.Errorf("failed to generate nonce: %w", err)
 			}
@@ -249,31 +247,24 @@ var CalcAuctionStartTimeFunc func(uint32, uint32) uint32 = fusionorder.CalcAucti
 var CalcAuctionStartTime = fusionorder.CalcAuctionStartTime
 
 func CreateAuctionDetails(preset *Preset, additionalWaitPeriod float32) (*AuctionDetails, error) {
-	pointsFixed := make([]AuctionPointClassFixed, 0)
-	for _, point := range preset.Points {
-		pointsFixed = append(pointsFixed, AuctionPointClassFixed{
-			Coefficient: uint32(point.Coefficient),
-			Delay:       uint16(point.Delay),
-		})
+	points := make([]fusionorder.AuctionPointInput, len(preset.Points))
+	for i, point := range preset.Points {
+		points[i] = fusionorder.AuctionPointInput{
+			Coefficient: point.Coefficient,
+			Delay:       point.Delay,
+		}
 	}
-
-	gasPriceEstimateFixed, err := strconv.ParseUint(preset.GasCost.GasPriceEstimate, 10, 32)
-	if err != nil {
-		return nil, fmt.Errorf("failed to parse gas price estimate: %w", err)
-	}
-
-	gasCostFixed := GasCostConfigClassFixed{
-		GasBumpEstimate:  uint32(preset.GasCost.GasBumpEstimate),
-		GasPriceEstimate: uint32(gasPriceEstimateFixed),
-	}
-
-	return &AuctionDetails{
-		StartTime:       CalcAuctionStartTimeFunc(uint32(preset.StartAuctionIn), uint32(additionalWaitPeriod)),
-		Duration:        uint32(preset.AuctionDuration),
-		InitialRateBump: uint32(preset.InitialRateBump),
-		Points:          pointsFixed,
-		GasCost:         gasCostFixed,
-	}, nil
+	return fusionorder.CreateAuctionDetailsFromParams(fusionorder.CreateAuctionDetailsParams{
+		StartAuctionIn:       preset.StartAuctionIn,
+		AdditionalWaitPeriod: additionalWaitPeriod,
+		AuctionDuration:      preset.AuctionDuration,
+		InitialRateBump:      preset.InitialRateBump,
+		Points:               points,
+		GasCost: fusionorder.GasCostInput{
+			GasBumpEstimate:  preset.GasCost.GasBumpEstimate,
+			GasPriceEstimate: preset.GasCost.GasPriceEstimate,
+		},
+	})
 }
 
 var timeNow func() int64 = GetCurrentTime
@@ -350,56 +341,38 @@ func CreateOrder(params CreateOrderDataParams) (*Order, error) {
 
 
 func CreateAuctionDetailsPlus(preset *PresetClassFixed, additionalWaitPeriod float32) (*AuctionDetails, error) {
-	pointsFixed := make([]AuctionPointClassFixed, 0)
-	for _, point := range preset.Points {
-		pointsFixed = append(pointsFixed, AuctionPointClassFixed{
-			Coefficient: uint32(point.Coefficient),
-			Delay:       uint16(point.Delay),
-		})
+	points := make([]fusionorder.AuctionPointInput, len(preset.Points))
+	for i, point := range preset.Points {
+		points[i] = fusionorder.AuctionPointInput{
+			Coefficient: point.Coefficient,
+			Delay:       point.Delay,
+		}
 	}
-
-	gasPriceEstimateFixed, err := strconv.ParseUint(preset.GasCost.GasPriceEstimate, 10, 32)
-	if err != nil {
-		return nil, fmt.Errorf("failed to parse gas price estimate: %w", err)
-	}
-
-	gasCostFixed := GasCostConfigClassFixed{
-		GasBumpEstimate:  uint32(preset.GasCost.GasBumpEstimate),
-		GasPriceEstimate: uint32(gasPriceEstimateFixed),
-	}
-
-	return &AuctionDetails{
-		StartTime:       CalcAuctionStartTimeFunc(uint32(preset.StartAuctionIn), uint32(additionalWaitPeriod)),
-		Duration:        uint32(preset.AuctionDuration),
-		InitialRateBump: uint32(preset.InitialRateBump),
-		Points:          pointsFixed,
-		GasCost:         gasCostFixed,
-	}, nil
+	return fusionorder.CreateAuctionDetailsFromParams(fusionorder.CreateAuctionDetailsParams{
+		StartAuctionIn:       preset.StartAuctionIn,
+		AdditionalWaitPeriod: additionalWaitPeriod,
+		AuctionDuration:      preset.AuctionDuration,
+		InitialRateBump:      preset.InitialRateBump,
+		Points:               points,
+		GasCost: fusionorder.GasCostInput{
+			GasBumpEstimate:  preset.GasCost.GasBumpEstimate,
+			GasPriceEstimate: preset.GasCost.GasPriceEstimate,
+		},
+	})
 }
 
 // CreateMakerTraits creates MakerTraits from Details and ExtraParams
 func CreateMakerTraits(details Details, extraParams ExtraParams) (*orderbook.MakerTraits, error) {
-	deadline := details.Auction.StartTime + details.Auction.Duration + extraParams.OrderExpirationDelay
-	makerTraitParms := orderbook.MakerTraitsParams{
-		Expiry:             int64(deadline),
-		AllowPartialFills:  extraParams.AllowPartialFills,
-		AllowMultipleFills: extraParams.AllowMultipleFills,
-		HasPostInteraction: true,
-		UnwrapWeth:         extraParams.unwrapWeth,
-		UsePermit2:         extraParams.EnablePermit2,
-		HasExtension:       true,
-		Nonce:              extraParams.Nonce.Int64(),
-	}
-	makerTraits, err := orderbook.NewMakerTraits(makerTraitParms)
-	if err != nil {
-		return nil, fmt.Errorf("failed to create maker traits: %w", err)
-	}
-	if makerTraits.IsBitInvalidatorMode() {
-		if extraParams.Nonce == nil || extraParams.Nonce.Cmp(big.NewInt(0)) == 0 {
-			return nil, errors.New("nonce required when partial fill or multiple fill disallowed")
-		}
-	}
-	return makerTraits, nil
+	return fusionorder.CreateMakerTraits(fusionorder.MakerTraitsParams{
+		AuctionStartTime:     details.Auction.StartTime,
+		AuctionDuration:      details.Auction.Duration,
+		OrderExpirationDelay: extraParams.OrderExpirationDelay,
+		Nonce:                extraParams.Nonce,
+		AllowPartialFills:    extraParams.AllowPartialFills,
+		AllowMultipleFills:   extraParams.AllowMultipleFills,
+		UnwrapWeth:           extraParams.unwrapWeth,
+		EnablePermit2:        extraParams.EnablePermit2,
+	})
 }
 
 // CreateSettlementPostInteractionDataWithFees creates settlement post interaction data with fee information

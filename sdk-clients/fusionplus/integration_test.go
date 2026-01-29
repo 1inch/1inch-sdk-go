@@ -231,11 +231,11 @@ func TestPresetSelection_Integration_FusionPlus(t *testing.T) {
 // TestAuctionDetailsCreation_Integration_FusionPlus tests auction details creation
 func TestAuctionDetailsCreation_Integration_FusionPlus(t *testing.T) {
 	// Mock auction start time
-	originalCalcAuctionStartTimeFunc := CalcAuctionStartTimeFunc
-	CalcAuctionStartTimeFunc = func(startAuctionIn uint32, additionalWaitPeriod uint32) uint32 {
+	originalCalcAuctionStartTimeFunc := fusionorder.CalcAuctionStartTimeFunc
+	fusionorder.CalcAuctionStartTimeFunc = func(startAuctionIn uint32, additionalWaitPeriod uint32) uint32 {
 		return 1700000000 + startAuctionIn + additionalWaitPeriod
 	}
-	defer func() { CalcAuctionStartTimeFunc = originalCalcAuctionStartTimeFunc }()
+	defer func() { fusionorder.CalcAuctionStartTimeFunc = originalCalcAuctionStartTimeFunc }()
 
 	quote := createTestQuoteFusionPlus()
 	preset, err := GetPreset(quote.Presets, Fast)

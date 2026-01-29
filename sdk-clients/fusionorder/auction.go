@@ -5,6 +5,7 @@ import (
 	"encoding/hex"
 	"errors"
 	"fmt"
+	"strconv"
 	"time"
 
 	"github.com/1inch/1inch-sdk-go/internal/bytesiterator"
@@ -192,4 +193,59 @@ func DecodeLegacyAuctionDetails(data string) (*AuctionDetails, error) {
 		GasBumpEstimate:  gasBumpEstimate,
 		GasPriceEstimate: gasPriceEstimate,
 	})
+}
+
+// AuctionPointInput represents an auction point from the API quote response
+type AuctionPointInput struct {
+	Coefficient float32
+	Delay       float32
+}
+
+// GasCostInput represents gas cost configuration from the API quote response
+type GasCostInput struct {
+	GasBumpEstimate  float32
+	GasPriceEstimate string
+}
+
+// CreateAuctionDetailsParams contains parameters to create AuctionDetails from API response
+type CreateAuctionDetailsParams struct {
+	StartAuctionIn       float32
+	AdditionalWaitPeriod float32
+	AuctionDuration      float32
+	InitialRateBump      float32
+	Points               []AuctionPointInput
+	GasCost              GasCostInput
+}
+
+// CalcAuctionStartTimeFunc allows overriding the auction start time calculation for testing
+var CalcAuctionStartTimeFunc func(uint32, uint32) uint32 = CalcAuctionStartTime
+
+// CreateAuctionDetailsFromParams creates AuctionDetails from API response parameters
+// This is shared between fusion and fusionplus packages
+func CreateAuctionDetailsFromParams(params CreateAuctionDetailsParams) (*AuctionDetails, error) {
+	pointsFixed := make([]AuctionPointClassFixed, 0)
+	for _, point := range params.Points {
+		pointsFixed = append(pointsFixed, AuctionPointClassFixed{
+			Coefficient: uint32(point.Coefficient),
+			Delay:       uint16(point.Delay),
+		})
+	}
+
+	gasPriceEstimateFixed, err := strconv.ParseUint(params.GasCost.GasPriceEstimate, 10, 32)
+	if err != nil {
+		return nil, fmt.Errorf("failed to parse gas price estimate: %w", err)
+	}
+
+	gasCostFixed := GasCostConfigClassFixed{
+		GasBumpEstimate:  uint32(params.GasCost.GasBumpEstimate),
+		GasPriceEstimate: uint32(gasPriceEstimateFixed),
+	}
+
+	return &AuctionDetails{
+		StartTime:       CalcAuctionStartTimeFunc(uint32(params.StartAuctionIn), uint32(params.AdditionalWaitPeriod)),
+		Duration:        uint32(params.AuctionDuration),
+		InitialRateBump: uint32(params.InitialRateBump),
+		Points:          pointsFixed,
+		GasCost:         gasCostFixed,
+	}, nil
 }
