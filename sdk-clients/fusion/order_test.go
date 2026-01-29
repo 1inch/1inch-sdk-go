@@ -675,3 +675,217 @@ func TestCreateFusionOrderTdd(t *testing.T) {
 		})
 	}
 }
+
+func TestCreateOrder(t *testing.T) {
+	// Mock random number generation for deterministic tests
+	originalBigIntMaxFunc := random_number_generation.BigIntMaxFunc
+	random_number_generation.BigIntMaxFunc = func(max *big.Int) (*big.Int, error) {
+		return big.NewInt(12345678), nil
+	}
+	defer func() { random_number_generation.BigIntMaxFunc = originalBigIntMaxFunc }()
+
+	settlementAddress := "0x8273f37417da37c4a6c3995e82cf442f87a25d9c"
+
+	whitelist := []WhitelistItem{
+		{AddressHalf: "bb839cbe05303d7705fa", Delay: big.NewInt(0)},
+	}
+
+	postInteractionData := &SettlementPostInteractionData{
+		Whitelist:          whitelist,
+		ResolvingStartTime: big.NewInt(1673548139),
+		CustomReceiver:     common.Address{},
+		AuctionFees:        nil,
+	}
+
+	auctionDetails := &AuctionDetails{
+		StartTime:       1673548149,
+		Duration:        180,
+		InitialRateBump: 50000,
+		Points:          []AuctionPointClassFixed{{Coefficient: 20000, Delay: 12}},
+		GasCost:         GasCostConfigClassFixed{GasBumpEstimate: 10000, GasPriceEstimate: 1000000},
+	}
+
+	extension, err := NewExtension(ExtensionParams{
+		SettlementContract:  settlementAddress,
+		AuctionDetails:      auctionDetails,
+		PostInteractionData: postInteractionData,
+		Asset:               "0xc02aaa39b223fe8d0a0e5c4f27ead9083c756cc2",
+		Surplus:             SurplusParamsNoFee,
+		ResolvingStartTime:  big.NewInt(1673548139),
+	})
+	require.NoError(t, err)
+
+	details := Details{
+		Auction:            auctionDetails,
+		ResolvingStartTime: big.NewInt(1673548139),
+		Whitelist:          []AuctionWhitelistItem{{Address: common.HexToAddress("0x00000000219ab540356cbb839cbe05303d7705fa"), AllowFrom: big.NewInt(0)}},
+	}
+
+	extraParams := ExtraParams{
+		Nonce:                big.NewInt(12345),
+		AllowPartialFills:    true,
+		AllowMultipleFills:   true,
+		OrderExpirationDelay: 12,
+	}
+
+	makerTraits, err := CreateMakerTraits(details, extraParams)
+	require.NoError(t, err)
+
+	orderInfo := FusionOrderV4{
+		Maker:        "0x1234567890123456789012345678901234567890",
+		MakerAsset:   "0xc02aaa39b223fe8d0a0e5c4f27ead9083c756cc2",
+		TakerAsset:   "0xa0b86991c6218b36c1d19d4a2e9eb0ce3606eb48",
+		MakingAmount: "1000000000000000000",
+		TakingAmount: "1420000000",
+		Receiver:     "0x9876543210987654321098765432109876543210",
+	}
+
+	params := CreateOrderDataParams{
+		Extension:           extension,
+		SettlementAddress:   settlementAddress,
+		PostInteractionData: postInteractionData,
+		orderInfo:           orderInfo,
+		Details:             details,
+		ExtraParams:         extraParams,
+		MakerTraits:         makerTraits,
+	}
+
+	order, err := CreateOrder(params)
+	require.NoError(t, err)
+	require.NotNil(t, order)
+
+	// Verify order fields
+	assert.Equal(t, orderInfo.MakerAsset, order.Inner.MakerAsset)
+	assert.Equal(t, orderInfo.TakerAsset, order.Inner.TakerAsset)
+	assert.Equal(t, orderInfo.MakingAmount, order.Inner.MakingAmount)
+	assert.Equal(t, orderInfo.TakingAmount, order.Inner.TakingAmount)
+	assert.Equal(t, orderInfo.Maker, order.Inner.Maker)
+	assert.Equal(t, orderInfo.Receiver, order.Inner.Receiver) // No fees, so receiver is original
+	assert.NotEmpty(t, order.Inner.Salt)
+	assert.NotEmpty(t, order.Inner.Extension)
+	assert.Equal(t, extension, order.FusionExtension)
+	assert.Equal(t, common.HexToAddress(settlementAddress), order.SettlementExtension)
+}
+
+func TestCreateOrder_WithFees(t *testing.T) {
+	// Mock random number generation for deterministic tests
+	originalBigIntMaxFunc := random_number_generation.BigIntMaxFunc
+	random_number_generation.BigIntMaxFunc = func(max *big.Int) (*big.Int, error) {
+		return big.NewInt(12345678), nil
+	}
+	defer func() { random_number_generation.BigIntMaxFunc = originalBigIntMaxFunc }()
+
+	settlementAddress := "0x8273f37417da37c4a6c3995e82cf442f87a25d9c"
+
+	whitelist := []WhitelistItem{
+		{AddressHalf: "bb839cbe05303d7705fa", Delay: big.NewInt(0)},
+	}
+
+	fees := &FeesIntegratorAndResolver{
+		Integrator: IntegratorFee{
+			Integrator: "0x1111111111111111111111111111111111111111",
+			Protocol:   "0x2222222222222222222222222222222222222222",
+		},
+	}
+
+	postInteractionData := &SettlementPostInteractionData{
+		Whitelist:          whitelist,
+		ResolvingStartTime: big.NewInt(1673548139),
+		CustomReceiver:     common.Address{},
+		AuctionFees:        fees,
+	}
+
+	auctionDetails := &AuctionDetails{
+		StartTime:       1673548149,
+		Duration:        180,
+		InitialRateBump: 50000,
+		Points:          []AuctionPointClassFixed{{Coefficient: 20000, Delay: 12}},
+		GasCost:         GasCostConfigClassFixed{GasBumpEstimate: 10000, GasPriceEstimate: 1000000},
+	}
+
+	extension, err := NewExtension(ExtensionParams{
+		SettlementContract:  settlementAddress,
+		AuctionDetails:      auctionDetails,
+		PostInteractionData: postInteractionData,
+		Asset:               "0xc02aaa39b223fe8d0a0e5c4f27ead9083c756cc2",
+		Surplus:             SurplusParamsNoFee,
+		ResolvingStartTime:  big.NewInt(1673548139),
+	})
+	require.NoError(t, err)
+
+	details := Details{
+		Auction:            auctionDetails,
+		ResolvingStartTime: big.NewInt(1673548139),
+		Whitelist:          []AuctionWhitelistItem{{Address: common.HexToAddress("0x00000000219ab540356cbb839cbe05303d7705fa"), AllowFrom: big.NewInt(0)}},
+		FeesIntAndRes:      fees,
+	}
+
+	extraParams := ExtraParams{
+		Nonce:                big.NewInt(12345),
+		AllowPartialFills:    true,
+		AllowMultipleFills:   true,
+		OrderExpirationDelay: 12,
+	}
+
+	makerTraits, err := CreateMakerTraits(details, extraParams)
+	require.NoError(t, err)
+
+	orderInfo := FusionOrderV4{
+		Maker:        "0x1234567890123456789012345678901234567890",
+		MakerAsset:   "0xc02aaa39b223fe8d0a0e5c4f27ead9083c756cc2",
+		TakerAsset:   "0xa0b86991c6218b36c1d19d4a2e9eb0ce3606eb48",
+		MakingAmount: "1000000000000000000",
+		TakingAmount: "1420000000",
+		Receiver:     "0x9876543210987654321098765432109876543210",
+	}
+
+	params := CreateOrderDataParams{
+		Extension:           extension,
+		SettlementAddress:   settlementAddress,
+		PostInteractionData: postInteractionData,
+		orderInfo:           orderInfo,
+		Details:             details,
+		ExtraParams:         extraParams,
+		MakerTraits:         makerTraits,
+	}
+
+	order, err := CreateOrder(params)
+	require.NoError(t, err)
+	require.NotNil(t, order)
+
+	// When fees are present, receiver should be the settlement address
+	assert.Equal(t, settlementAddress, order.Inner.Receiver)
+}
+
+func TestGetReceiver(t *testing.T) {
+	settlementAddress := "0x8273f37417da37c4a6c3995e82cf442f87a25d9c"
+	originalReceiver := "0x9876543210987654321098765432109876543210"
+
+	tests := []struct {
+		name     string
+		fees     *FeesIntegratorAndResolver
+		expected string
+	}{
+		{
+			name:     "No fees - use original receiver",
+			fees:     nil,
+			expected: originalReceiver,
+		},
+		{
+			name: "With fees - use settlement address",
+			fees: &FeesIntegratorAndResolver{
+				Integrator: IntegratorFee{
+					Integrator: "0x1111111111111111111111111111111111111111",
+				},
+			},
+			expected: settlementAddress,
+		},
+	}
+
+	for _, tc := range tests {
+		t.Run(tc.name, func(t *testing.T) {
+			result := getReceiver(tc.fees, settlementAddress, originalReceiver)
+			assert.Equal(t, tc.expected, result)
+		})
+	}
+}

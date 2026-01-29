@@ -23,15 +23,9 @@ func (params *QuoterControllerGetQuoteParamsFixed) Validate() error {
 	return validate.ConsolidateValidationErorrs(validationErrors)
 }
 
-func (params *QuoterControllerGetQuoteWithCustomPresetsParams) Validate() error {
-	var validationErrors []error
-	validationErrors = validate.Parameter(params.FromTokenAddress, "FromTokenAddress", validate.CheckEthereumAddressRequired, validationErrors)
-	validationErrors = validate.Parameter(params.ToTokenAddress, "ToTokenAddress", validate.CheckEthereumAddressRequired, validationErrors)
-	validationErrors = validate.Parameter(params.Amount, "Amount", validate.CheckBigIntRequired, validationErrors)
-	validationErrors = validate.Parameter(params.WalletAddress, "WalletAddress", validate.CheckEthereumAddressRequired, validationErrors)
-	validationErrors = validate.Parameter(params.WalletAddress, "WalletAddress", validate.CheckEthereumAddressRequired, validationErrors)
-	return validate.ConsolidateValidationErorrs(validationErrors)
-}
+// Note: QuoterControllerGetQuoteWithCustomPresetsParams (non-Fixed) intentionally has no Validate() method.
+// The generated type has Amount as float32 which is incorrect for Ethereum uint256 amounts.
+// Users should use QuoterControllerGetQuoteWithCustomPresetsParamsFixed instead.
 
 func (params *QuoterControllerGetQuoteWithCustomPresetsParamsFixed) Validate() error {
 	var validationErrors []error
