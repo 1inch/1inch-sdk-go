@@ -21,7 +21,7 @@ func (w Wallet) Sign(tx *types.Transaction) (*types.Transaction, error) {
 func (w Wallet) SignBytes(bytes []byte) ([]byte, error) {
 	signature, err := crypto.Sign(bytes, w.privateKey)
 	if err != nil {
-		return nil, fmt.Errorf("error signing bytes: %v", err)
+		return nil, fmt.Errorf("failed to sign bytes: %w", err)
 	}
 	return signature, nil
 }
@@ -29,7 +29,7 @@ func (w Wallet) SignBytes(bytes []byte) ([]byte, error) {
 func (w Wallet) BroadcastTransaction(ctx context.Context, tx *types.Transaction) error {
 	err := w.ethClient.SendTransaction(ctx, tx)
 	if err != nil {
-		return fmt.Errorf("failed to broadcast transaction: %v", err)
+		return fmt.Errorf("failed to broadcast transaction: %w", err)
 	}
 	return nil
 }

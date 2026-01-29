@@ -31,16 +31,16 @@ func packFeeParameter(integratorFee *IntegratorFee, resolverFee *ResolverFee) (u
 
 	// Range checks to ensure values fit in their allocated bit space
 	if integratorFeeValue > 0xffff {
-		return 0, fmt.Errorf("integrator fee value must be between 0 and 65535, got %d", integratorFeeValue)
+		return 0, fmt.Errorf("integrator fee %d out of range [0, 65535]", integratorFeeValue)
 	}
 	if integratorShare > 0xff {
-		return 0, fmt.Errorf("integrator share must be between 0 and 255, got %d", integratorShare)
+		return 0, fmt.Errorf("integrator share %d out of range [0, 255]", integratorShare)
 	}
 	if resolverFeeValue > 0xffff {
-		return 0, fmt.Errorf("resolver fee value must be between 0 and 65535, got %d", resolverFeeValue)
+		return 0, fmt.Errorf("resolver fee %d out of range [0, 65535]", resolverFeeValue)
 	}
 	if resolverDiscount > 0xff {
-		return 0, fmt.Errorf("resolver discount must be between 0 and 255, got %d", resolverDiscount)
+		return 0, fmt.Errorf("resolver discount %d out of range [0, 255]", resolverDiscount)
 	}
 
 	packed := (integratorFeeValue << 32) | // bits 47-32 (16 bits)
@@ -59,7 +59,7 @@ func encodeWhitelist(whitelist []string) (*big.Int, error) {
 	}
 
 	if len(whitelist) > 255 {
-		return nil, fmt.Errorf("whitelist can have at most 255 addresses, got %d", len(whitelist))
+		return nil, fmt.Errorf("whitelist exceeds 255 addresses: %d", len(whitelist))
 	}
 
 	encoded := big.NewInt(int64(len(whitelist)))
@@ -73,7 +73,7 @@ func encodeWhitelist(whitelist []string) (*big.Int, error) {
 		addressInt := new(big.Int)
 		_, success := addressInt.SetString(address, 16)
 		if !success {
-			return nil, fmt.Errorf("invalid hex address: %s", address)
+			return nil, fmt.Errorf("invalid whitelist address: %s", address)
 		}
 
 		// Mask to get only lower 80 bits

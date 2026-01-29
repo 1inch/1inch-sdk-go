@@ -2,6 +2,7 @@ package fusionorder
 
 import (
 	"encoding/json"
+	"fmt"
 	"math/big"
 
 	random_number_generation "github.com/1inch/1inch-sdk-go/internal/random-number-generation"
@@ -9,14 +10,14 @@ import (
 )
 
 // Keccak256Hash calculates the Keccak256 hash of any JSON-serializable data
-func Keccak256Hash(data interface{}) *big.Int {
+func Keccak256Hash(data interface{}) (*big.Int, error) {
 	jsonData, err := json.Marshal(data)
 	if err != nil {
-		panic(err)
+		return nil, fmt.Errorf("failed to marshal data for hashing: %w", err)
 	}
 	hash := sha3.New256()
 	hash.Write(jsonData)
-	return new(big.Int).SetBytes(hash.Sum(nil))
+	return new(big.Int).SetBytes(hash.Sum(nil)), nil
 }
 
 // GenerateSaltWithExtension generates a salt value incorporating extension hash

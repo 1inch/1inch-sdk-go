@@ -5,7 +5,7 @@ import "fmt"
 func CheckStringRequired(parameter interface{}, variableName string) error {
 	value, ok := parameter.(string)
 	if !ok {
-		return fmt.Errorf("'%v' must be a string", variableName)
+		return fmt.Errorf("'%s' must be a string", variableName)
 	}
 
 	if value == "" {
@@ -18,7 +18,7 @@ func CheckStringRequired(parameter interface{}, variableName string) error {
 func CheckString(parameter interface{}, variableName string) error {
 	_, ok := parameter.(string)
 	if !ok {
-		return fmt.Errorf("'%v' must be a string", variableName)
+		return fmt.Errorf("'%s' must be a string", variableName)
 	}
 
 	return nil
@@ -27,7 +27,7 @@ func CheckString(parameter interface{}, variableName string) error {
 func CheckBoolean(parameter interface{}, variableName string) error {
 	_, ok := parameter.(bool)
 	if !ok {
-		return fmt.Errorf("for parameter '%v' to be validated as '%v', it must be a boolean", variableName, "Boolean")
+		return fmt.Errorf("'%s' must be a boolean", variableName)
 	}
 
 	return nil

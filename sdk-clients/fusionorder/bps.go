@@ -18,31 +18,61 @@ func GetDefaultBase() *big.Int {
 }
 
 // BpsZero is a zero basis points value
-var BpsZero = NewBps(big.NewInt(0))
+var BpsZero = MustNewBps(big.NewInt(0))
 
-// NewBps creates a new Bps value, panics if value is not in [0, 10000]
-func NewBps(val *big.Int) *Bps {
+// NewBps creates a new Bps value, returns error if value is not in [0, 10000]
+func NewBps(val *big.Int) (*Bps, error) {
 	if val.Cmp(big.NewInt(0)) < 0 || val.Cmp(big.NewInt(10000)) > 0 {
-		panic(fmt.Sprintf("invalid bps %s", val.String()))
+		return nil, fmt.Errorf("bps value %s out of range [0, 10000]", val.String())
 	}
-	return &Bps{value: new(big.Int).Set(val)}
+	return &Bps{value: new(big.Int).Set(val)}, nil
+}
+
+// MustNewBps creates a new Bps value, panics if value is not in [0, 10000]
+// Use this only for known-valid constant values at package initialization
+func MustNewBps(val *big.Int) *Bps {
+	bps, err := NewBps(val)
+	if err != nil {
+		panic(err)
+	}
+	return bps
 }
 
 // FromPercent creates a Bps from a percentage value
 // Example: FromPercent(1, GetDefaultBase()) creates 100 bps (1%)
-func FromPercent(val float64, base *big.Int) *Bps {
+func FromPercent(val float64, base *big.Int) (*Bps, error) {
 	mult := new(big.Float).SetFloat64(100 * val)
 	return fromFloatWithBase(mult, base)
 }
 
+// MustFromPercent creates a Bps from a percentage value, panicking on error.
+// Use this only for known-valid constant values at package initialization or in tests.
+func MustFromPercent(val float64, base *big.Int) *Bps {
+	bps, err := FromPercent(val, base)
+	if err != nil {
+		panic(err)
+	}
+	return bps
+}
+
 // FromFraction creates a Bps from a fraction
 // Example: FromFraction(0.01, GetDefaultBase()) creates 100 bps (1%)
-func FromFraction(val float64, base *big.Int) *Bps {
+func FromFraction(val float64, base *big.Int) (*Bps, error) {
 	mult := new(big.Float).SetFloat64(10000 * val)
 	return fromFloatWithBase(mult, base)
 }
 
-func fromFloatWithBase(f *big.Float, base *big.Int) *Bps {
+// MustFromFraction creates a Bps from a fraction, panicking on error.
+// Use this only for known-valid constant values at package initialization or in tests.
+func MustFromFraction(val float64, base *big.Int) *Bps {
+	bps, err := FromFraction(val, base)
+	if err != nil {
+		panic(err)
+	}
+	return bps
+}
+
+func fromFloatWithBase(f *big.Float, base *big.Int) (*Bps, error) {
 	baseFloat := new(big.Float).SetInt(base)
 	res := new(big.Float).Quo(f, baseFloat)
 

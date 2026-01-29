@@ -18,7 +18,7 @@ type Interaction struct {
 // NewInteraction creates a new Interaction with validated hex data
 func NewInteraction(target common.Address, data string) (*Interaction, error) {
 	if _, err := hexutil.Decode(data); err != nil {
-		return nil, fmt.Errorf("failed to decode interaction data: %v", err)
+		return nil, fmt.Errorf("failed to decode interaction data: %w", err)
 	}
 	return &Interaction{
 		Target: target,
@@ -34,11 +34,11 @@ func (i *Interaction) Encode() string {
 // DecodeInteraction decodes a hex string into an Interaction
 func DecodeInteraction(bytes string) (*Interaction, error) {
 	if !hexadecimal.IsHexBytes(bytes) {
-		return nil, fmt.Errorf("invalid hex bytes: %s", bytes)
+		return nil, fmt.Errorf("invalid interaction hex: %s", bytes)
 	}
 
 	if len(bytes) < 42 {
-		return nil, fmt.Errorf("interaction data too short: %s", bytes)
+		return nil, fmt.Errorf("interaction data too short: requires at least 20 bytes")
 	}
 
 	return &Interaction{

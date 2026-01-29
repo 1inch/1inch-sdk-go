@@ -49,13 +49,13 @@ func (e *EscrowExtension) ConvertToOrderbookExtension() (*orderbook.Extension, e
 	srcSafetyDepositBig := new(big.Int)
 	_, ok := srcSafetyDepositBig.SetString(e.SrcSafetyDeposit, 10)
 	if !ok {
-		return nil, fmt.Errorf("invalid hexadecimal string for source safety deposit: %v", e.SrcSafetyDeposit)
+		return nil, fmt.Errorf("invalid source safety deposit hex: %s", e.SrcSafetyDeposit)
 	}
 
 	dstSafetyDepositBig := new(big.Int)
 	_, ok = dstSafetyDepositBig.SetString(e.DstSafetyDeposit, 10)
 	if !ok {
-		return nil, fmt.Errorf("invalid hexadecimal string for destination safety deposit: %v", e.DstSafetyDeposit)
+		return nil, fmt.Errorf("invalid destination safety deposit hex: %s", e.DstSafetyDeposit)
 	}
 
 	extraDataBytes, err := encodeExtraData(&EscrowExtraData{
@@ -67,7 +67,7 @@ func (e *EscrowExtension) ConvertToOrderbookExtension() (*orderbook.Extension, e
 		TimeLocks:        &e.TimeLocks,
 	})
 	if err != nil {
-		return nil, fmt.Errorf("failed to encode extra data: %v", err) // TODO handle
+		return nil, fmt.Errorf("failed to encode extra data: %w", err)
 	}
 
 	e.PostInteraction += hexadecimal.Trim0x(fmt.Sprintf("%x", extraDataBytes))
@@ -93,31 +93,31 @@ func DecodeEscrowExtension(data []byte) (*EscrowExtension, error) {
 	// Create one extension that will be used for the Escrow extension data
 	orderbookExtensionTruncated, err := orderbook.Decode(data)
 	if err != nil {
-		return nil, fmt.Errorf("error decoding extension: %v", err)
+		return nil, fmt.Errorf("failed to decode extension: %w", err)
 	}
 
 	// Remove the Fusion Plus Extension data before decoding
 	orderbookExtensionTruncated.PostInteraction = orderbookExtensionTruncated.PostInteraction[:len(orderbookExtensionTruncated.PostInteraction)-extraDataCharacterLength]
 	extensionPlus, err := FromLimitOrderExtension(orderbookExtensionTruncated)
 	if err != nil {
-		return &EscrowExtension{}, fmt.Errorf("error decoding escrow extension: %v", err)
+		return &EscrowExtension{}, fmt.Errorf("failed to decode escrow extension: %w", err)
 	}
 
 	// Create a second extension to extract extra data
 	orderbookExtension, err := orderbook.Decode(data)
 	if err != nil {
-		return nil, fmt.Errorf("error decoding extension: %v", err)
+		return nil, fmt.Errorf("failed to decode extension: %w", err)
 	}
 	extraDataRaw := orderbookExtension.PostInteraction[len(orderbookExtension.PostInteraction)-extraDataCharacterLength:]
 	extraDataBytes, err := hex.DecodeString(extraDataRaw)
 	if err != nil {
-		return nil, fmt.Errorf("error decoding escrow extension extra data: %v", err)
+		return nil, fmt.Errorf("failed to decode escrow extension extra data: %w", err)
 	}
 
 	// Send the final 160 bytes of the postInteraction to decodeExtraData
 	extraData, err := decodeExtraData(extraDataBytes)
 	if err != nil {
-		return nil, fmt.Errorf("error decoding escrow extension extra data: %v", err)
+		return nil, fmt.Errorf("failed to decode escrow extension extra data: %w", err)
 	}
 
 	return &EscrowExtension{
@@ -135,24 +135,24 @@ func decodeExtraData(data []byte) (*EscrowExtraData, error) {
 	iter := bytesiterator.New(data)
 	hashlockData, err := iter.NextUint256()
 	if err != nil {
-		return nil, fmt.Errorf("failed to read hashlock: %v", err)
+		return nil, fmt.Errorf("failed to read hashlock: %w", err)
 	}
 
 	dstChainIdData, err := iter.NextUint256()
 	if err != nil {
-		return nil, fmt.Errorf("failed to read destination chain ID: %v", err)
+		return nil, fmt.Errorf("failed to read destination chain ID: %w", err)
 	}
 
 	addressBig, err := iter.NextUint256()
 	if err != nil {
-		return nil, fmt.Errorf("failed to read address: %v", err)
+		return nil, fmt.Errorf("failed to read address: %w", err)
 	}
 
 	addressHex := strings.ToLower(common.BigToAddress(addressBig).Hex())
 
 	safetyDepositData, err := iter.NextUint256()
 	if err != nil {
-		return nil, fmt.Errorf("failed to read safety deposit data: %v", err)
+		return nil, fmt.Errorf("failed to read safety deposit data: %w", err)
 	}
 
 	// Define a 128-bit mask (2^128 - 1)
@@ -164,12 +164,12 @@ func decodeExtraData(data []byte) (*EscrowExtraData, error) {
 
 	timelocksData, err := iter.NextUint256()
 	if err != nil {
-		return nil, fmt.Errorf("failed to read timelocks data: %v", err)
+		return nil, fmt.Errorf("failed to read timelocks data: %w", err)
 	}
 
 	timelocks, err := decodeTimeLocks(timelocksData)
 	if err != nil {
-		return nil, fmt.Errorf("failed to decode timelocks: %v", err)
+		return nil, fmt.Errorf("failed to decode timelocks: %w", err)
 	}
 
 	return &EscrowExtraData{
@@ -228,7 +228,7 @@ func encodeExtraData(data *EscrowExtraData) ([]byte, error) {
 	hashlockData := new(big.Int)
 	_, ok := hashlockData.SetString(hexadecimal.Trim0x(data.HashLock.Value), 16)
 	if !ok {
-		return nil, fmt.Errorf("invalid HashLock value: %s", data.HashLock.Value)
+		return nil, fmt.Errorf("invalid hashlock value: %s", data.HashLock.Value)
 	}
 	err := writeBigIntAsUint256(&buffer, hashlockData)
 	if err != nil {
@@ -294,7 +294,7 @@ func encodeTimeLocks(tl *TimeLocks) (*big.Int, error) {
 func writeBigIntAsUint256(buffer *bytes.Buffer, value *big.Int) error {
 	bytes := value.Bytes()
 	if len(bytes) > 32 {
-		return fmt.Errorf("value too large to fit in uint256")
+		return fmt.Errorf("value exceeds uint256 maximum")
 	}
 	// Pad with leading zeros to make it 32 bytes
 	padded := make([]byte, 32)

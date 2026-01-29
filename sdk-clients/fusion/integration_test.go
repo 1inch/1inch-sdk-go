@@ -512,8 +512,8 @@ func TestFeesIntegration(t *testing.T) {
 		Integrator: IntegratorFee{
 			Integrator: "0x0000000000000000000000000000000000000001",
 			Protocol:   "0x0000000000000000000000000000000000000002",
-			Fee:        fusionorder.FromPercent(1, fusionorder.GetDefaultBase()),
-			Share:      fusionorder.FromPercent(50, fusionorder.GetDefaultBase()),
+			Fee:        fusionorder.MustFromPercent(1, fusionorder.GetDefaultBase()),
+			Share:      fusionorder.MustFromPercent(50, fusionorder.GetDefaultBase()),
 		},
 		Resolver: ResolverFee{},
 	}

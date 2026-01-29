@@ -35,7 +35,8 @@ func TestTakerTraitsEncode(t *testing.T) {
 			require.NoError(t, err)
 
 			takerTraits := NewTakerTraits(tc.takerTraitParams)
-			takerTraitsEnocded := takerTraits.Encode()
+			takerTraitsEnocded, err := takerTraits.Encode()
+			require.NoError(t, err)
 			assert.True(t, expectedTakerTraitsBig.Cmp(takerTraitsEnocded.TraitFlags) == 0, fmt.Sprintf("Expected %x, got %x", expectedTakerTraitsBig, takerTraitsEnocded.TraitFlags))
 
 			expectedTakerArgs := common.FromHex(tc.expectedTakerArgs)

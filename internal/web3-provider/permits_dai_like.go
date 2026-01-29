@@ -82,12 +82,12 @@ func (w Wallet) createPermitSignatureDaiLike(cd *common.ContractPermitDataDaiLik
 
 	challengeHash, _, err := apitypes.TypedDataAndHash(typedData)
 	if err != nil {
-		return "", fmt.Errorf("error using TypedDataAndHash: %v", err)
+		return "", fmt.Errorf("failed to compute typed data hash: %w", err)
 	}
 
 	signature, err := crypto.Sign(challengeHash, w.privateKey)
 	if err != nil {
-		return "", fmt.Errorf("error signing challenge hash: %v", err)
+		return "", fmt.Errorf("failed to sign challenge hash: %w", err)
 	}
 	signature[64] += 27 // Adjust the `v` value
 

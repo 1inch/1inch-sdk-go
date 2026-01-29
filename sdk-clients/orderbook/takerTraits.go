@@ -10,9 +10,9 @@ import (
 
 var (
 	// currently unused masks carried over from the Typescript Limit Order SDK
-	//thresholdMask             = NewBitMask(big.NewInt(0), big.NewInt(185))
-	//argsInteractionLengthMask = NewBitMask(big.NewInt(220), big.NewInt(224))
-	argsExtensionLengthMask = NewBitMask(big.NewInt(224), big.NewInt(248))
+	//thresholdMask             = MustNewBitMask(big.NewInt(0), big.NewInt(185))
+	//argsInteractionLengthMask = MustNewBitMask(big.NewInt(220), big.NewInt(224))
+	argsExtensionLengthMask = MustNewBitMask(big.NewInt(224), big.NewInt(248))
 )
 
 const (
@@ -51,7 +51,7 @@ func NewTakerTraits(params TakerTraitsParams) *TakerTraits {
 	}
 }
 
-func (t *TakerTraits) Encode() *TakerTraitsEncoded {
+func (t *TakerTraits) Encode() (*TakerTraitsEncoded, error) {
 	encodedCalldata := new(big.Int)
 	tmp := new(big.Int)
 
@@ -67,10 +67,10 @@ func (t *TakerTraits) Encode() *TakerTraitsEncoded {
 	traits := fmt.Sprintf("%032x", encodedCalldata)
 	traitsBig, err := hexutil.DecodeBig("0x" + traits)
 	if err != nil {
-		panic(err)
+		return nil, fmt.Errorf("failed to decode taker traits: %w", err)
 	}
 	return &TakerTraitsEncoded{
 		TraitFlags: traitsBig,
 		Args:       common.FromHex(t.Extension),
-	}
+	}, nil
 }

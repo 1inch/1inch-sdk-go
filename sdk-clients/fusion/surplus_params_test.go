@@ -41,19 +41,19 @@ func TestNewSurplusParams(t *testing.T) {
 		{
 			name:                 "Valid - 1% protocol fee (100 bps)",
 			estimatedTakerAmount: big.NewInt(1000000000000000000),
-			protocolFee:          fusionorder.NewBps(big.NewInt(100)),
+			protocolFee:          fusionorder.MustNewBps(big.NewInt(100)),
 			expectError:          false,
 		},
 		{
 			name:                 "Valid - 5% protocol fee (500 bps)",
 			estimatedTakerAmount: big.NewInt(1000000000000000000),
-			protocolFee:          fusionorder.NewBps(big.NewInt(500)),
+			protocolFee:          fusionorder.MustNewBps(big.NewInt(500)),
 			expectError:          false,
 		},
 		{
 			name:                 "Valid - max protocol fee (100% = 10000 bps)",
 			estimatedTakerAmount: big.NewInt(1000000000000000000),
-			protocolFee:          fusionorder.NewBps(big.NewInt(10000)),
+			protocolFee:          fusionorder.MustNewBps(big.NewInt(10000)),
 			expectError:          false,
 		},
 		{
@@ -65,23 +65,23 @@ func TestNewSurplusParams(t *testing.T) {
 		{
 			name:                 "Invalid - 0.5% protocol fee (50 bps) - not whole percent",
 			estimatedTakerAmount: big.NewInt(1000000000000000000),
-			protocolFee:          fusionorder.NewBps(big.NewInt(50)),
+			protocolFee:          fusionorder.MustNewBps(big.NewInt(50)),
 			expectError:          true,
-			errorMsg:             "only integer percent supported",
+			errorMsg:             "protocol fee must be an integer percent",
 		},
 		{
 			name:                 "Invalid - 1.5% protocol fee (150 bps) - not whole percent",
 			estimatedTakerAmount: big.NewInt(1000000000000000000),
-			protocolFee:          fusionorder.NewBps(big.NewInt(150)),
+			protocolFee:          fusionorder.MustNewBps(big.NewInt(150)),
 			expectError:          true,
-			errorMsg:             "only integer percent supported",
+			errorMsg:             "protocol fee must be an integer percent",
 		},
 		{
 			name:                 "Invalid - 0.01% protocol fee (1 bps) - not whole percent",
 			estimatedTakerAmount: big.NewInt(1000000000000000000),
-			protocolFee:          fusionorder.NewBps(big.NewInt(1)),
+			protocolFee:          fusionorder.MustNewBps(big.NewInt(1)),
 			expectError:          true,
-			errorMsg:             "only integer percent supported",
+			errorMsg:             "protocol fee must be an integer percent",
 		},
 	}
 

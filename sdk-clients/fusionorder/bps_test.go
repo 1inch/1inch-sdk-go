@@ -17,52 +17,65 @@ func TestNewBps(t *testing.T) {
 	tests := []struct {
 		name        string
 		value       *big.Int
-		shouldPanic bool
+		shouldError bool
 	}{
 		{
 			name:        "Valid - zero",
 			value:       big.NewInt(0),
-			shouldPanic: false,
+			shouldError: false,
 		},
 		{
 			name:        "Valid - 100 bps (1%)",
 			value:       big.NewInt(100),
-			shouldPanic: false,
+			shouldError: false,
 		},
 		{
 			name:        "Valid - 5000 bps (50%)",
 			value:       big.NewInt(5000),
-			shouldPanic: false,
+			shouldError: false,
 		},
 		{
 			name:        "Valid - 10000 bps (100%)",
 			value:       big.NewInt(10000),
-			shouldPanic: false,
+			shouldError: false,
 		},
 		{
 			name:        "Invalid - negative",
 			value:       big.NewInt(-1),
-			shouldPanic: true,
+			shouldError: true,
 		},
 		{
 			name:        "Invalid - exceeds 10000",
 			value:       big.NewInt(10001),
-			shouldPanic: true,
+			shouldError: true,
 		},
 	}
 
 	for _, tc := range tests {
 		t.Run(tc.name, func(t *testing.T) {
-			if tc.shouldPanic {
-				assert.Panics(t, func() {
-					NewBps(tc.value)
-				})
+			bps, err := NewBps(tc.value)
+			if tc.shouldError {
+				assert.Error(t, err)
+				assert.Nil(t, bps)
 			} else {
-				bps := NewBps(tc.value)
+				require.NoError(t, err)
 				assert.Equal(t, tc.value, bps.Value())
 			}
 		})
 	}
+}
+
+func TestMustNewBps(t *testing.T) {
+	// Valid value should not panic
+	assert.NotPanics(t, func() {
+		bps := MustNewBps(big.NewInt(100))
+		assert.Equal(t, big.NewInt(100), bps.Value())
+	})
+
+	// Invalid value should panic
+	assert.Panics(t, func() {
+		MustNewBps(big.NewInt(-1))
+	})
 }
 
 func TestFromPercent(t *testing.T) {
@@ -106,7 +119,8 @@ func TestFromPercent(t *testing.T) {
 
 	for _, tc := range tests {
 		t.Run(tc.name, func(t *testing.T) {
-			bps := FromPercent(tc.percent, tc.base)
+			bps, err := FromPercent(tc.percent, tc.base)
+			require.NoError(t, err)
 			assert.Equal(t, tc.expected, bps.Value())
 		})
 	}
@@ -147,24 +161,25 @@ func TestFromFraction(t *testing.T) {
 
 	for _, tc := range tests {
 		t.Run(tc.name, func(t *testing.T) {
-			bps := FromFraction(tc.fraction, tc.base)
+			bps, err := FromFraction(tc.fraction, tc.base)
+			require.NoError(t, err)
 			assert.Equal(t, tc.expected, bps.Value())
 		})
 	}
 }
 
 func TestBpsEqual(t *testing.T) {
-	bps1 := NewBps(big.NewInt(100))
-	bps2 := NewBps(big.NewInt(100))
-	bps3 := NewBps(big.NewInt(200))
+	bps1 := MustNewBps(big.NewInt(100))
+	bps2 := MustNewBps(big.NewInt(100))
+	bps3 := MustNewBps(big.NewInt(200))
 
 	assert.True(t, bps1.Equal(bps2))
 	assert.False(t, bps1.Equal(bps3))
 }
 
 func TestBpsIsZero(t *testing.T) {
-	zero := NewBps(big.NewInt(0))
-	nonZero := NewBps(big.NewInt(100))
+	zero := MustNewBps(big.NewInt(0))
+	nonZero := MustNewBps(big.NewInt(100))
 
 	assert.True(t, zero.IsZero())
 	assert.False(t, nonZero.IsZero())
@@ -180,19 +195,19 @@ func TestBpsToPercent(t *testing.T) {
 	}{
 		{
 			name:     "100 bps = 1%",
-			bps:      NewBps(big.NewInt(100)),
+			bps:      MustNewBps(big.NewInt(100)),
 			base:     big.NewInt(1),
 			expected: 1.0,
 		},
 		{
 			name:     "5000 bps = 50%",
-			bps:      NewBps(big.NewInt(5000)),
+			bps:      MustNewBps(big.NewInt(5000)),
 			base:     big.NewInt(1),
 			expected: 50.0,
 		},
 		{
 			name:     "0 bps = 0%",
-			bps:      NewBps(big.NewInt(0)),
+			bps:      MustNewBps(big.NewInt(0)),
 			base:     big.NewInt(1),
 			expected: 0.0,
 		},
@@ -215,13 +230,13 @@ func TestBpsToFraction(t *testing.T) {
 	}{
 		{
 			name:     "100 bps with base 100",
-			bps:      NewBps(big.NewInt(100)),
+			bps:      MustNewBps(big.NewInt(100)),
 			base:     big.NewInt(100),
 			expected: big.NewInt(1), // 100 * 100 / 10000 = 1
 		},
 		{
 			name:     "5000 bps with base 100",
-			bps:      NewBps(big.NewInt(5000)),
+			bps:      MustNewBps(big.NewInt(5000)),
 			base:     big.NewInt(100),
 			expected: big.NewInt(50), // 5000 * 100 / 10000 = 50
 		},
@@ -236,13 +251,13 @@ func TestBpsToFraction(t *testing.T) {
 }
 
 func TestBpsString(t *testing.T) {
-	bps := NewBps(big.NewInt(100))
+	bps := MustNewBps(big.NewInt(100))
 	assert.Equal(t, "100", bps.String())
 }
 
 func TestBpsValue(t *testing.T) {
 	original := big.NewInt(100)
-	bps := NewBps(original)
+	bps := MustNewBps(original)
 	
 	// Value should return a copy, not the original
 	value := bps.Value()

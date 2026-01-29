@@ -39,7 +39,7 @@ func CreateLimitOrderMessage(orderRequest CreateOrderParams, chainId int) (*Orde
 
 	aggregationRouter, err := constants.Get1inchRouterFromChainId(chainId)
 	if err != nil {
-		return nil, fmt.Errorf("failed to get 1inch router address: %v", err)
+		return nil, fmt.Errorf("failed to get 1inch router address: %w", err)
 	}
 
 	// Set up the domain data
@@ -92,11 +92,11 @@ func CreateLimitOrderMessage(orderRequest CreateOrderParams, chainId int) (*Orde
 
 	typedDataHash, err := typedData.HashStruct(typedData.PrimaryType, typedData.Message)
 	if err != nil {
-		return nil, fmt.Errorf("error hashing typed data: %v", err)
+		return nil, fmt.Errorf("failed to hash typed data: %w", err)
 	}
 	domainSeparator, err := typedData.HashStruct("EIP712Domain", typedData.Domain.Map())
 	if err != nil {
-		return nil, fmt.Errorf("error hashing domain separator: %v", err)
+		return nil, fmt.Errorf("failed to hash domain separator: %w", err)
 	}
 
 	// Add required prefix to the message
@@ -110,7 +110,7 @@ func CreateLimitOrderMessage(orderRequest CreateOrderParams, chainId int) (*Orde
 	// Sign the challenge hash
 	signature, err := orderRequest.Wallet.SignBytes(challengeHash.Bytes())
 	if err != nil {
-		return nil, fmt.Errorf("error signing challenge hash: %v", err)
+		return nil, fmt.Errorf("failed to sign challenge hash: %w", err)
 	}
 
 	// add 27 to `v` value (last byte)
@@ -157,7 +157,7 @@ func GenerateSalt(extension string, customBaseSalt *big.Int) (string, error) {
 	if customBaseSalt != nil {
 		prefixBytes = customBaseSalt.Bytes()
 		if len(prefixBytes) > 12 {
-			return "", fmt.Errorf("custom base salt cannot be larger than 96 bits")
+			return "", fmt.Errorf("custom base salt exceeds 96 bits")
 		}
 		if len(prefixBytes) < 12 {
 			pad := make([]byte, 12-len(prefixBytes))

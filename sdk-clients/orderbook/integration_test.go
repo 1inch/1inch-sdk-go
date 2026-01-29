@@ -320,7 +320,8 @@ func TestCreateOrderResponse_Serialization(t *testing.T) {
 
 // TestBitmaskOperations tests bitmask operations used in traits
 func TestBitmaskOperations(t *testing.T) {
-	bm := NewBitMask(big.NewInt(0), big.NewInt(8))
+	bm, err := NewBitMask(big.NewInt(0), big.NewInt(8))
+	require.NoError(t, err)
 	require.NotNil(t, bm)
 
 	// BitMask stores offset and mask

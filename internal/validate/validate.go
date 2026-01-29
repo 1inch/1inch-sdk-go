@@ -14,7 +14,7 @@ import (
 func CheckEthereumAddressRequired(parameter interface{}, variableName string) error {
 	value, ok := parameter.(string)
 	if !ok {
-		return fmt.Errorf("for parameter '%v' to be validated as '%v', it must be a string", variableName, "EthereumAddress")
+		return fmt.Errorf("'%s' must be a string", variableName)
 	}
 
 	if value == "" {
@@ -27,7 +27,7 @@ func CheckEthereumAddressRequired(parameter interface{}, variableName string) er
 func CheckEthereumAddress(parameter interface{}, variableName string) error {
 	value, ok := parameter.(string)
 	if !ok {
-		return fmt.Errorf("for parameter '%v' to be validated as '%v', it must be a string", variableName, "EthereumAddress")
+		return fmt.Errorf("'%s' must be a string", variableName)
 	}
 	if value == "" {
 		return nil
@@ -43,7 +43,7 @@ func CheckEthereumAddress(parameter interface{}, variableName string) error {
 func CheckEthereumAddressListRequired(parameter interface{}, variableName string) error {
 	addresses, ok := parameter.([]string)
 	if !ok {
-		return fmt.Errorf("for parameter '%v' to be validated as '%v', it must be a list of strings", variableName, "EthereumAddressList")
+		return fmt.Errorf("'%s' must be a list of strings", variableName)
 	}
 	if len(addresses) == 0 {
 		return NewParameterMissingError(variableName)
@@ -68,7 +68,7 @@ var bigIntZero = big.NewInt(0)
 func CheckBigIntRequired(parameter interface{}, variableName string) error {
 	value, ok := parameter.(string)
 	if !ok {
-		return fmt.Errorf("for parameter '%v' to be validated as '%v', it must be a string", variableName, "BigInt")
+		return fmt.Errorf("'%s' must be a string", variableName)
 	}
 
 	if value == "" {
@@ -80,7 +80,7 @@ func CheckBigIntRequired(parameter interface{}, variableName string) error {
 func CheckBigInt(parameter interface{}, variableName string) error {
 	value, ok := parameter.(string)
 	if !ok {
-		return fmt.Errorf("for parameter '%v' to be validated as '%v', it must be a string", variableName, "BigInt")
+		return fmt.Errorf("'%s' must be a string", variableName)
 	}
 
 	if value == "" {
@@ -103,7 +103,7 @@ func CheckBigInt(parameter interface{}, variableName string) error {
 func CheckChainIdIntRequired(parameter interface{}, variableName string) error {
 	value, ok := parameter.(int)
 	if !ok {
-		return fmt.Errorf("for parameter '%v' to be validated as '%v', it must be an int", variableName, "ChainIdInt")
+		return fmt.Errorf("'%s' must be an int", variableName)
 	}
 
 	if value == 0 {
@@ -116,7 +116,7 @@ func CheckChainIdIntRequired(parameter interface{}, variableName string) error {
 func CheckChainIdInt(parameter interface{}, variableName string) error {
 	value, ok := parameter.(int)
 	if !ok {
-		return fmt.Errorf("for parameter '%v' to be validated as '%v', it must be an int", variableName, "ChainIdInt")
+		return fmt.Errorf("'%s' must be an int", variableName)
 	}
 	if value == 0 {
 		return nil
@@ -131,7 +131,7 @@ func CheckChainIdInt(parameter interface{}, variableName string) error {
 func CheckChainIdFloat32Required(parameter interface{}, variableName string) error {
 	value, ok := parameter.(float32)
 	if !ok {
-		return fmt.Errorf("for parameter '%v' to be validated as '%v', it must be a float32", variableName, "ChainIdFloat32")
+		return fmt.Errorf("'%s' must be a float32", variableName)
 	}
 
 	if value == 0 {
@@ -144,7 +144,7 @@ func CheckChainIdFloat32Required(parameter interface{}, variableName string) err
 func CheckChainIdFloat32(parameter interface{}, variableName string) error {
 	value, ok := parameter.(float32)
 	if !ok {
-		return fmt.Errorf("for parameter '%v' to be validated as '%v', it must be a float32", variableName, "ChainIdFloat32")
+		return fmt.Errorf("'%s' must be a float32", variableName)
 	}
 	if value == 0 {
 		return nil
@@ -159,7 +159,7 @@ func CheckChainIdFloat32(parameter interface{}, variableName string) error {
 func CheckPrivateKeyRequired(parameter interface{}, variableName string) error {
 	address, ok := parameter.(string)
 	if !ok {
-		return fmt.Errorf("for parameter '%v' to be validated as '%v', it must be a string", variableName, "PrivateKey")
+		return fmt.Errorf("'%s' must be a string", variableName)
 	}
 
 	if address == "" {
@@ -172,7 +172,7 @@ func CheckPrivateKeyRequired(parameter interface{}, variableName string) error {
 func CheckPrivateKey(parameter interface{}, variableName string) error {
 	address, ok := parameter.(string)
 	if !ok {
-		return fmt.Errorf("for parameter '%v' to be validated as '%v', it must be a string", variableName, "PrivateKey")
+		return fmt.Errorf("'%s' must be a string", variableName)
 	}
 
 	if address == "" {
@@ -189,7 +189,7 @@ func CheckPrivateKey(parameter interface{}, variableName string) error {
 func CheckApprovalType(parameter interface{}, variableName string) error {
 	value, ok := parameter.(int)
 	if !ok {
-		return fmt.Errorf("for parameter '%v' to be validated as '%v', it must be an int", variableName, "ApprovalType")
+		return fmt.Errorf("'%s' must be an int", variableName)
 	}
 
 	if value == 0 {
@@ -205,7 +205,7 @@ func CheckApprovalType(parameter interface{}, variableName string) error {
 func CheckSlippageRequired(parameter interface{}, variableName string) error {
 	value, ok := parameter.(float32)
 	if !ok {
-		return fmt.Errorf("for parameter '%v' to be validated as '%v', it must be a float32", variableName, "Slippage")
+		return fmt.Errorf("'%s' must be a float32", variableName)
 	}
 	if value == 0 {
 		return NewParameterMissingError(variableName)
@@ -216,7 +216,7 @@ func CheckSlippageRequired(parameter interface{}, variableName string) error {
 func CheckSlippage(parameter interface{}, variableName string) error {
 	value, ok := parameter.(float32)
 	if !ok {
-		return fmt.Errorf("for parameter '%v' to be validated as '%v', it must be a float32", variableName, "Slippage")
+		return fmt.Errorf("'%s' must be a float32", variableName)
 	}
 	if value == 0 {
 		return nil
@@ -230,7 +230,7 @@ func CheckSlippage(parameter interface{}, variableName string) error {
 func CheckPage(parameter interface{}, variableName string) error {
 	value, ok := parameter.(float32)
 	if !ok {
-		return fmt.Errorf("for parameter '%v' to be validated as '%v', it must be a float32", variableName, "Page")
+		return fmt.Errorf("'%s' must be a float32", variableName)
 	}
 	if value == 0 {
 		return nil
@@ -245,7 +245,7 @@ func CheckPage(parameter interface{}, variableName string) error {
 func CheckLimit(parameter interface{}, variableName string) error {
 	value, ok := parameter.(float32)
 	if !ok {
-		return fmt.Errorf("for parameter '%v' to be validated as '%v', it must be a float32", variableName, "Limit")
+		return fmt.Errorf("'%s' must be a float32", variableName)
 	}
 	if value == 0 {
 		return nil
@@ -260,7 +260,7 @@ func CheckLimit(parameter interface{}, variableName string) error {
 func CheckStatusesInts(parameter interface{}, variableName string) error {
 	value, ok := parameter.([]float32)
 	if !ok {
-		return fmt.Errorf("for parameter '%v' to be validated as '%v', it must be a []float32", variableName, "StatusesInts")
+		return fmt.Errorf("'%s' must be a []float32", variableName)
 	}
 
 	if value == nil {
@@ -280,7 +280,7 @@ func CheckStatusesInts(parameter interface{}, variableName string) error {
 func CheckStatusesStrings(parameter interface{}, variableName string) error {
 	value, ok := parameter.([]string)
 	if !ok {
-		return fmt.Errorf("for parameter '%v' to be validated as '%v', it must be a []string", variableName, "StatusesStrings")
+		return fmt.Errorf("'%s' must be a []string", variableName)
 	}
 
 	if HasDuplicates(value) {
@@ -296,7 +296,7 @@ func CheckStatusesStrings(parameter interface{}, variableName string) error {
 func CheckStatusesOrderStatus(parameter interface{}, variableName string) error {
 	value, ok := parameter.([]int)
 	if !ok {
-		return fmt.Errorf("for parameter '%v' to be validated as '%v', it must be a []int", variableName, "StatusesOrderStatus")
+		return fmt.Errorf("'%s' must be a []int", variableName)
 	}
 
 	if value == nil {
@@ -316,7 +316,7 @@ func CheckStatusesOrderStatus(parameter interface{}, variableName string) error 
 func CheckSortBy(parameter interface{}, variableName string) error {
 	value, ok := parameter.(string)
 	if !ok {
-		return fmt.Errorf("for parameter '%v' to be validated as '%v', it must be a string", variableName, "SortBy")
+		return fmt.Errorf("'%s' must be a string", variableName)
 	}
 
 	if value == "" {
@@ -333,7 +333,7 @@ func CheckSortBy(parameter interface{}, variableName string) error {
 func CheckOrderHashRequired(parameter interface{}, variableName string) error {
 	value, ok := parameter.(string)
 	if !ok {
-		return fmt.Errorf("for parameter '%v' to be validated as '%v', it must be a string", variableName, "OrderHash")
+		return fmt.Errorf("'%s' must be a string", variableName)
 	}
 
 	if value == "" {
@@ -345,7 +345,7 @@ func CheckOrderHashRequired(parameter interface{}, variableName string) error {
 func CheckOrderHash(parameter interface{}, variableName string) error {
 	value, ok := parameter.(string)
 	if !ok {
-		return fmt.Errorf("for parameter '%v' to be validated as '%v', it must be a string", variableName, "OrderHash")
+		return fmt.Errorf("'%s' must be a string", variableName)
 	}
 
 	if value == "" {
@@ -358,7 +358,7 @@ func CheckOrderHash(parameter interface{}, variableName string) error {
 func CheckProtocols(parameter interface{}, variableName string) error {
 	value, ok := parameter.(string)
 	if !ok {
-		return fmt.Errorf("for parameter '%v' to be validated as '%v', it must be a string", variableName, "Protocols")
+		return fmt.Errorf("'%s' must be a string", variableName)
 	}
 
 	if value == "" {
@@ -392,7 +392,7 @@ func CheckProtocols(parameter interface{}, variableName string) error {
 func CheckFee(parameter interface{}, variableName string) error {
 	value, ok := parameter.(float32)
 	if !ok {
-		return fmt.Errorf("for parameter '%v' to be validated as '%v', it must be a string", variableName, "Fee")
+		return fmt.Errorf("'%s' must be a string", variableName)
 	}
 
 	if value < 0 {
@@ -411,7 +411,7 @@ func CheckFee(parameter interface{}, variableName string) error {
 func CheckFloat32NonNegativeWhole(parameter interface{}, variableName string) error {
 	value, ok := parameter.(float32)
 	if !ok {
-		return fmt.Errorf("for parameter '%v' to be validated as '%v', it must be a string", variableName, "Float32NonNegativeWhole")
+		return fmt.Errorf("'%s' must be a string", variableName)
 	}
 
 	if value < 0 {
@@ -429,7 +429,7 @@ func CheckFloat32NonNegativeWhole(parameter interface{}, variableName string) er
 func CheckConnectorTokens(parameter interface{}, variableName string) error {
 	value, ok := parameter.(string)
 	if !ok {
-		return fmt.Errorf("for parameter '%v' to be validated as '%v', it must be a string", variableName, "ConnectorTokens")
+		return fmt.Errorf("'%s' must be a string", variableName)
 	}
 
 	if value == "" {
@@ -466,7 +466,7 @@ func CheckConnectorTokens(parameter interface{}, variableName string) error {
 func CheckPermitHash(parameter interface{}, variableName string) error {
 	value, ok := parameter.(string)
 	if !ok {
-		return fmt.Errorf("for parameter '%v' to be validated as '%v', it must be a string", variableName, "PermitHash")
+		return fmt.Errorf("'%s' must be a string", variableName)
 	}
 	if value == "" {
 		return nil
@@ -482,7 +482,7 @@ func CheckPermitHash(parameter interface{}, variableName string) error {
 func CheckFiatCurrency(parameter interface{}, variableName string) error {
 	value, ok := parameter.(string)
 	if !ok {
-		return fmt.Errorf("for parameter '%v' to be validated as '%v', it must be a string", variableName, "FiatCurrency")
+		return fmt.Errorf("'%s' must be a string", variableName)
 	}
 
 	if len(value) != 3 {
@@ -495,7 +495,7 @@ func CheckFiatCurrency(parameter interface{}, variableName string) error {
 func CheckTimerange(parameter interface{}, variableName string) error {
 	value, ok := parameter.(string)
 	if !ok {
-		return fmt.Errorf("for parameter '%v' to be validated as '%v', it must be a string", variableName, "Timerange")
+		return fmt.Errorf("'%s' must be a string", variableName)
 	}
 
 	validTimerangeValues := []string{"1day", "1week", "1month", "1year", "3years"}
@@ -508,7 +508,7 @@ func CheckTimerange(parameter interface{}, variableName string) error {
 func CheckJsonRpcVersionRequired(parameter interface{}, variableName string) error {
 	value, ok := parameter.(string)
 	if !ok {
-		return fmt.Errorf("for parameter '%v' to be validated as '%v', it must be a string", variableName, "JsonRpcVersion")
+		return fmt.Errorf("'%s' must be a string", variableName)
 	}
 
 	if value == "" {
@@ -521,7 +521,7 @@ func CheckJsonRpcVersionRequired(parameter interface{}, variableName string) err
 func CheckJsonRpcVersion(parameter interface{}, variableName string) error {
 	value, ok := parameter.(string)
 	if !ok {
-		return fmt.Errorf("for parameter '%v' to be validated as '%v', it must be a string", variableName, "JsonRpcVersion")
+		return fmt.Errorf("'%s' must be a string", variableName)
 	}
 
 	validJsonRpcValues := []string{"1.0", "2.0"}
@@ -534,7 +534,7 @@ func CheckJsonRpcVersion(parameter interface{}, variableName string) error {
 func CheckNodeType(parameter interface{}, variableName string) error {
 	value, ok := parameter.(string)
 	if !ok {
-		return fmt.Errorf("for parameter '%v' to be validated as '%v', it must be a string", variableName, "NodeType")
+		return fmt.Errorf("'%s' must be a string", variableName)
 	}
 
 	validJsonRpcValues := []string{"1.0", "2.0"}

@@ -51,16 +51,16 @@ func (c *Client) ExecuteRequest(ctx context.Context, payload common.RequestPaylo
 
 	req, err := c.prepareRequest(ctx, payload.Method, fullURL, payload.Body)
 	if err != nil {
-		return fmt.Errorf("preparing request failed: %w", err)
+		return fmt.Errorf("failed to prepare request: %w", err)
 	}
 
 	resp, err := c.httpClient.Do(req)
 	if err != nil {
-		return fmt.Errorf("executing request failed: %w", err)
+		return fmt.Errorf("failed to execute request: %w", err)
 	}
 
 	if err = c.processResponse(resp, v); err != nil {
-		return fmt.Errorf("processing response failed: %w", err)
+		return fmt.Errorf("failed to process response: %w", err)
 	}
 
 	return nil
@@ -108,18 +108,18 @@ func (c *Client) processResponse(resp *http.Response, v interface{}) error {
 func (c *Client) handleErrorResponse(resp *http.Response) error {
 	body, err := io.ReadAll(resp.Body)
 	if err != nil {
-		return fmt.Errorf("reading error response body failed: %v", err)
+		return fmt.Errorf("failed to read error response body: %w", err)
 	}
 
 	var errorMessageMap map[string]interface{}
 	err = json.Unmarshal(body, &errorMessageMap)
 	if err != nil {
-		return fmt.Errorf("failed to unmarshal error response body: %v", err)
+		return fmt.Errorf("failed to unmarshal error response body: %w", err)
 	}
 
 	errFormatted, err := json.MarshalIndent(errorMessageMap, "", "    ")
 	if err != nil {
-		return fmt.Errorf("failed to format error response body: %v", err)
+		return fmt.Errorf("failed to format error response body: %w", err)
 	}
 
 	return fmt.Errorf("%s", errFormatted)
@@ -147,7 +147,7 @@ func addQueryParameters(s string, params interface{}) (string, error) {
 		if isScientificNotation(v[0]) {
 			expanded, err := expandScientificNotation(v[0])
 			if err != nil {
-				return "", fmt.Errorf("failed to expand scientific notation for parameter %v with a value of %v: %v", k, v, err)
+				return "", fmt.Errorf("failed to expand scientific notation for %v: %w", k, err)
 			}
 			v[0] = expanded
 		}

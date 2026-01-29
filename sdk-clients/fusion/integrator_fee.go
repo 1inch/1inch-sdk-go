@@ -27,18 +27,18 @@ var IntegratorFeeZero = &IntegratorFee{
 func NewIntegratorFee(integrator, protocol string, fee, share *Bps) (*IntegratorFee, error) {
 	if fee.IsZero() {
 		if !share.IsZero() {
-			return nil, errors.New("integrator share must be zero if fee is zero")
+			return nil, errors.New("zero fee requires zero integrator share")
 		}
 		if integrator != addresses.ZeroAddress {
-			return nil, errors.New("integrator address must be zero if fee is zero")
+			return nil, errors.New("zero fee requires zero integrator address")
 		}
 		if protocol != addresses.ZeroAddress {
-			return nil, errors.New("protocol address must be zero if fee is zero")
+			return nil, errors.New("zero fee requires zero protocol address")
 		}
 	}
 
 	if (integrator == addresses.ZeroAddress || protocol == addresses.ZeroAddress) && !fee.IsZero() {
-		return nil, errors.New("fee must be zero if integrator or protocol is zero address")
+		return nil, errors.New("non-zero fee requires non-zero integrator and protocol addresses")
 	}
 
 	return &IntegratorFee{

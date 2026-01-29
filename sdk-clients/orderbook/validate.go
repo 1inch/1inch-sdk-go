@@ -20,7 +20,7 @@ func (params *CreateOrderParams) Validate() error {
 		validationErrors = append(validationErrors, validate.NewParameterCustomError("maker asset and taker asset cannot be the same"))
 	}
 	if strings.EqualFold(params.MakerAsset, constants.NativeToken) || strings.EqualFold(params.TakerAsset, constants.NativeToken) {
-		validationErrors = append(validationErrors, validate.NewParameterCustomError("native gas token is not supported as maker or taker asset"))
+		validationErrors = append(validationErrors, validate.NewParameterCustomError("unsupported: native gas token as maker or taker asset"))
 	}
 
 	//TODO if an extension is present, then MakerTraits must also be marked for an extension in the order. Will be easy to do if Extension is changed to a pointer type

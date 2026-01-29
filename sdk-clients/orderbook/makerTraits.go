@@ -81,15 +81,15 @@ func NewMakerTraitsDefault() *MakerTraits {
 func NewMakerTraits(params MakerTraitsParams) (*MakerTraits, error) {
 
 	if params.AllowPartialFills && !params.AllowMultipleFills {
-		return nil, errors.New("AllowPartialFills must be false if AllowMultipleFills is false")
+		return nil, errors.New("allow partial fills must be false when allow multiple fills is false")
 	}
 
 	if !params.AllowPartialFills && params.AllowMultipleFills {
-		return nil, errors.New("AllowMultipleFills must be false if AllowPartialFills is false")
+		return nil, errors.New("allow multiple fills requires allow partial fills")
 	}
 
 	if !params.HasPostInteraction {
-		return nil, errors.New("in the current iteration of Limit Order Protocol, HasPostInteraction must be true")
+		return nil, errors.New("post interaction required")
 	}
 
 	return &MakerTraits{

@@ -410,8 +410,8 @@ func TestCreateSettlementPostInteractionData(t *testing.T) {
 					Integrator: IntegratorFee{
 						Integrator: "0x0000000000000000000000000000000000000001",
 						Protocol:   "0x0000000000000000000000000000000000000002",
-						Fee:        fusionorder.FromPercent(1, fusionorder.GetDefaultBase()),
-						Share:      fusionorder.FromPercent(50, fusionorder.GetDefaultBase()),
+						Fee:        fusionorder.MustFromPercent(1, fusionorder.GetDefaultBase()),
+						Share:      fusionorder.MustFromPercent(50, fusionorder.GetDefaultBase()),
 					},
 				},
 				Whitelist: []AuctionWhitelistItem{
@@ -435,8 +435,8 @@ func TestCreateSettlementPostInteractionData(t *testing.T) {
 					Integrator: IntegratorFee{
 						Integrator: "0x0000000000000000000000000000000000000001",
 						Protocol:   "0x0000000000000000000000000000000000000002",
-						Fee:        fusionorder.FromPercent(1, fusionorder.GetDefaultBase()),
-						Share:      fusionorder.FromPercent(50, fusionorder.GetDefaultBase()),
+						Fee:        fusionorder.MustFromPercent(1, fusionorder.GetDefaultBase()),
+						Share:      fusionorder.MustFromPercent(50, fusionorder.GetDefaultBase()),
 					},
 				},
 				ResolvingStartTime: big.NewInt(1622548800),
@@ -452,8 +452,8 @@ func TestCreateSettlementPostInteractionData(t *testing.T) {
 					Integrator: IntegratorFee{
 						Integrator: "0x0000000000000000000000000000000000000001",
 						Protocol:   "0x0000000000000000000000000000000000000002",
-						Fee:        fusionorder.FromPercent(1, fusionorder.GetDefaultBase()),
-						Share:      fusionorder.FromPercent(50, fusionorder.GetDefaultBase()),
+						Fee:        fusionorder.MustFromPercent(1, fusionorder.GetDefaultBase()),
+						Share:      fusionorder.MustFromPercent(50, fusionorder.GetDefaultBase()),
 					},
 				},
 				Whitelist: []AuctionWhitelistItem{
@@ -477,8 +477,8 @@ func TestCreateSettlementPostInteractionData(t *testing.T) {
 					Integrator: IntegratorFee{
 						Integrator: "0x0000000000000000000000000000000000000001",
 						Protocol:   "0x0000000000000000000000000000000000000002",
-						Fee:        fusionorder.FromPercent(1, fusionorder.GetDefaultBase()),
-						Share:      fusionorder.FromPercent(50, fusionorder.GetDefaultBase()),
+						Fee:        fusionorder.MustFromPercent(1, fusionorder.GetDefaultBase()),
+						Share:      fusionorder.MustFromPercent(50, fusionorder.GetDefaultBase()),
 					},
 				},
 				ResolvingStartTime: nil, // Will be dynamically set
@@ -566,8 +566,8 @@ func TestCreateFusionOrderTdd(t *testing.T) {
 					Integrator: IntegratorFee{
 						Integrator: "0x0000000000000000000000000000000000000001",
 						Protocol:   "0x0000000000000000000000000000000000000002",
-						Fee:        fusionorder.FromPercent(1, fusionorder.GetDefaultBase()),
-						Share:      fusionorder.FromPercent(50, fusionorder.GetDefaultBase()),
+						Fee:        fusionorder.MustFromPercent(1, fusionorder.GetDefaultBase()),
+						Share:      fusionorder.MustFromPercent(50, fusionorder.GetDefaultBase()),
 					},
 				},
 				Whitelist: []AuctionWhitelistItem{

@@ -35,7 +35,7 @@ type GasCostConfigClassFixed struct {
 func NewAuctionDetails(startTime, duration, initialRateBump uint32, points []AuctionPointClassFixed, gasCost GasCostConfigClassFixed) (*AuctionDetails, error) {
 	if gasCost.GasBumpEstimate > Uint24Max || gasCost.GasPriceEstimate > Uint32Max ||
 		startTime > Uint32Max || duration > Uint24Max || initialRateBump > Uint24Max {
-		return nil, errors.New("values exceed their respective limits")
+		return nil, errors.New("values exceed limits")
 	}
 
 	return &AuctionDetails{
@@ -57,40 +57,40 @@ func CalcAuctionStartTime(startAuctionIn uint32, additionalWaitPeriod uint32) ui
 func DecodeAuctionDetails(data string) (*AuctionDetails, error) {
 	rawBytes, err := hex.DecodeString(data)
 	if err != nil {
-		return nil, errors.New("invalid hex data")
+		return nil, fmt.Errorf("invalid hex data: %w", err)
 	}
 
 	if len(rawBytes) < 17 {
-		return nil, errors.New("data too short for mandatory fields")
+		return nil, errors.New("data too short: minimum 17 bytes required")
 	}
 
 	iter := bytesiterator.New(rawBytes)
 
 	gasBumpEstimate, err := iter.NextUint24()
 	if err != nil {
-		return nil, fmt.Errorf("failed reading gasBumpEstimate: %w", err)
+		return nil, fmt.Errorf("failed to read gas bump estimate: %w", err)
 	}
 
 	gasPriceEstimateBI, err := iter.NextUint32()
 	if err != nil {
-		return nil, fmt.Errorf("failed reading gasPriceEstimate: %w", err)
+		return nil, fmt.Errorf("failed to read gas price estimate: %w", err)
 	}
 	gasPriceEstimate := uint32(gasPriceEstimateBI.Uint64())
 
 	startTimeBI, err := iter.NextUint32()
 	if err != nil {
-		return nil, fmt.Errorf("failed reading startTime: %w", err)
+		return nil, fmt.Errorf("failed to read start time: %w", err)
 	}
 	startTime := uint32(startTimeBI.Uint64())
 
 	duration, err := iter.NextUint24()
 	if err != nil {
-		return nil, fmt.Errorf("failed reading duration: %w", err)
+		return nil, fmt.Errorf("failed to read duration: %w", err)
 	}
 
 	initialRateBump, err := iter.NextUint24()
 	if err != nil {
-		return nil, fmt.Errorf("failed reading initialRateBump: %w", err)
+		return nil, fmt.Errorf("failed to read initial rate bump: %w", err)
 	}
 
 	var points []AuctionPointClassFixed
@@ -101,12 +101,12 @@ func DecodeAuctionDetails(data string) (*AuctionDetails, error) {
 
 		coeff, err := iter.NextUint24()
 		if err != nil {
-			return nil, fmt.Errorf("failed reading Coefficient in points: %w", err)
+			return nil, fmt.Errorf("failed to read coefficient in points: %w", err)
 		}
 
 		delayBI, err := iter.NextUint16()
 		if err != nil {
-			return nil, fmt.Errorf("failed reading Delay in points: %w", err)
+			return nil, fmt.Errorf("failed to read delay in points: %w", err)
 		}
 		delay := uint16(delayBI.Uint64())
 
@@ -167,11 +167,11 @@ func (ad *AuctionDetails) EncodeWithoutPointCount() string {
 func DecodeLegacyAuctionDetails(data string) (*AuctionDetails, error) {
 	bytes, err := hex.DecodeString(data)
 	if err != nil {
-		return nil, errors.New("invalid hex data")
+		return nil, fmt.Errorf("invalid hex data: %w", err)
 	}
 
 	if len(bytes) < 15 {
-		return nil, errors.New("data too short")
+		return nil, errors.New("data too short: minimum 15 bytes required")
 	}
 
 	gasBumpEstimate := binary.BigEndian.Uint32(append([]byte{0x00}, bytes[0:3]...))

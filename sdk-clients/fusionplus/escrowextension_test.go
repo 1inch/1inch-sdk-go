@@ -133,7 +133,7 @@ func TestNewExtension(t *testing.T) {
 				},
 			},
 			expectErr: true,
-			errMsg:    "MakerAssetSuffix must be valid hex string",
+			errMsg:    "invalid maker asset suffix hex: invalid",
 		},
 		{
 			name: "Invalid TakerAssetSuffix",
@@ -147,7 +147,7 @@ func TestNewExtension(t *testing.T) {
 				},
 			},
 			expectErr: true,
-			errMsg:    "TakerAssetSuffix must be valid hex string",
+			errMsg:    "invalid taker asset suffix hex: invalid",
 		},
 		{
 			name: "Invalid Predicate",
@@ -161,7 +161,7 @@ func TestNewExtension(t *testing.T) {
 				},
 			},
 			expectErr: true,
-			errMsg:    "Predicate must be valid hex string",
+			errMsg:    "invalid predicate hex: invalid",
 		},
 		{
 			name: "CustomData not supported",
@@ -176,7 +176,7 @@ func TestNewExtension(t *testing.T) {
 				},
 			},
 			expectErr: true,
-			errMsg:    "CustomData is not currently supported",
+			errMsg:    "unsupported: custom data",
 		},
 	}
 

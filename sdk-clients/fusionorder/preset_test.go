@@ -44,77 +44,77 @@ func TestCustomPresetValidate(t *testing.T) {
 				AuctionEndAmount:   "900000000000000000",
 			},
 			expectError: true,
-			errorMsg:    "invalid auctionStartAmount",
+		errorMsg:    "invalid auction start amount",
+	},
+	{
+		name: "Invalid auction end amount",
+		preset: CustomPreset{
+			AuctionDuration:    180,
+			AuctionStartAmount: "1000000000000000000",
+			AuctionEndAmount:   "not-a-number",
 		},
-		{
-			name: "Invalid auction end amount",
-			preset: CustomPreset{
-				AuctionDuration:    180,
-				AuctionStartAmount: "1000000000000000000",
-				AuctionEndAmount:   "not-a-number",
+		expectError: true,
+		errorMsg:    "invalid auction end amount",
+	},
+	{
+		name: "Zero duration",
+		preset: CustomPreset{
+			AuctionDuration:    0,
+			AuctionStartAmount: "1000000000000000000",
+			AuctionEndAmount:   "900000000000000000",
+		},
+		expectError: true,
+		errorMsg:    "invalid auction duration: expected positive integer",
+	},
+	{
+		name: "Negative duration",
+		preset: CustomPreset{
+			AuctionDuration:    -1,
+			AuctionStartAmount: "1000000000000000000",
+			AuctionEndAmount:   "900000000000000000",
+		},
+		expectError: true,
+		errorMsg:    "invalid auction duration: expected positive integer",
+	},
+	{
+		name: "Point amount above start amount",
+		preset: CustomPreset{
+			AuctionDuration:    180,
+			AuctionStartAmount: "1000000000000000000",
+			AuctionEndAmount:   "900000000000000000",
+			Points: []CustomPresetPoint{
+				{ToTokenAmount: "1100000000000000000", Delay: 60}, // Above start
 			},
-			expectError: true,
-			errorMsg:    "invalid auctionEndAmount",
 		},
-		{
-			name: "Zero duration",
-			preset: CustomPreset{
-				AuctionDuration:    0,
-				AuctionStartAmount: "1000000000000000000",
-				AuctionEndAmount:   "900000000000000000",
+		expectError: true,
+		errorMsg:    "out of auction range",
+	},
+	{
+		name: "Point amount below end amount",
+		preset: CustomPreset{
+			AuctionDuration:    180,
+			AuctionStartAmount: "1000000000000000000",
+			AuctionEndAmount:   "900000000000000000",
+			Points: []CustomPresetPoint{
+				{ToTokenAmount: "800000000000000000", Delay: 60}, // Below end
 			},
-			expectError: true,
-			errorMsg:    "auctionDuration should be integer",
 		},
-		{
-			name: "Negative duration",
-			preset: CustomPreset{
-				AuctionDuration:    -1,
-				AuctionStartAmount: "1000000000000000000",
-				AuctionEndAmount:   "900000000000000000",
+		expectError: true,
+		errorMsg:    "out of auction range",
+	},
+	{
+		name: "Invalid point amount",
+		preset: CustomPreset{
+			AuctionDuration:    180,
+			AuctionStartAmount: "1000000000000000000",
+			AuctionEndAmount:   "900000000000000000",
+			Points: []CustomPresetPoint{
+				{ToTokenAmount: "not-a-number", Delay: 60},
 			},
-			expectError: true,
-			errorMsg:    "auctionDuration should be integer",
 		},
-		{
-			name: "Point amount above start amount",
-			preset: CustomPreset{
-				AuctionDuration:    180,
-				AuctionStartAmount: "1000000000000000000",
-				AuctionEndAmount:   "900000000000000000",
-				Points: []CustomPresetPoint{
-					{ToTokenAmount: "1100000000000000000", Delay: 60}, // Above start
-				},
-			},
-			expectError: true,
-			errorMsg:    "points should be in range of auction",
-		},
-		{
-			name: "Point amount below end amount",
-			preset: CustomPreset{
-				AuctionDuration:    180,
-				AuctionStartAmount: "1000000000000000000",
-				AuctionEndAmount:   "900000000000000000",
-				Points: []CustomPresetPoint{
-					{ToTokenAmount: "800000000000000000", Delay: 60}, // Below end
-				},
-			},
-			expectError: true,
-			errorMsg:    "points should be in range of auction",
-		},
-		{
-			name: "Invalid point amount",
-			preset: CustomPreset{
-				AuctionDuration:    180,
-				AuctionStartAmount: "1000000000000000000",
-				AuctionEndAmount:   "900000000000000000",
-				Points: []CustomPresetPoint{
-					{ToTokenAmount: "not-a-number", Delay: 60},
-				},
-			},
-			expectError: true,
-			errorMsg:    "points should be an array of valid amounts",
-		},
+		expectError: true,
+		errorMsg:    "invalid point amount",
+	},
 		{
 			name: "Multiple valid points",
 			preset: CustomPreset{

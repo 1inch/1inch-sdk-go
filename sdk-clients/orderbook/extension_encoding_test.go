@@ -43,22 +43,22 @@ func TestNewExtension(t *testing.T) {
 			},
 			expectError: false,
 		},
-		{
-			name: "Invalid - Permit without MakerAsset",
-			params: ExtensionParams{
-				Permit: "0x1234",
-			},
-			expectError: true,
-			errorMsg:    "MakerAsset",
+	{
+		name: "Invalid - Permit without MakerAsset",
+		params: ExtensionParams{
+			Permit: "0x1234",
 		},
-		{
-			name: "Invalid - MakerAsset without Permit",
-			params: ExtensionParams{
-				MakerAsset: "0x6B175474E89094C44Da98b954EedeAC495271d0F",
-			},
-			expectError: true,
-			errorMsg:    "Permit",
+		expectError: true,
+		errorMsg:    "permit requires maker asset",
+	},
+	{
+		name: "Invalid - MakerAsset without Permit",
+		params: ExtensionParams{
+			MakerAsset: "0x6B175474E89094C44Da98b954EedeAC495271d0F",
 		},
+		expectError: true,
+		errorMsg:    "maker asset requires permit",
+	},
 	}
 
 	for _, tc := range tests {

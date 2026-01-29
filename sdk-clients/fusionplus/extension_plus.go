@@ -13,19 +13,19 @@ import (
 
 func NewExtensionPlus(params ExtensionParamsPlus) (*ExtensionPlus, error) {
 	if !hexadecimal.IsHexBytes(params.SettlementContract) {
-		return nil, errors.New("Settlement contract must be valid hex string")
+		return nil, fmt.Errorf("invalid settlement contract hex: %s", params.SettlementContract)
 	}
 	if !hexadecimal.IsHexBytes(params.MakerAssetSuffix) {
-		return nil, errors.New("MakerAssetSuffix must be valid hex string")
+		return nil, fmt.Errorf("invalid maker asset suffix hex: %s", params.MakerAssetSuffix)
 	}
 	if !hexadecimal.IsHexBytes(params.TakerAssetSuffix) {
-		return nil, errors.New("TakerAssetSuffix must be valid hex string")
+		return nil, fmt.Errorf("invalid taker asset suffix hex: %s", params.TakerAssetSuffix)
 	}
 	if !hexadecimal.IsHexBytes(params.Predicate) {
-		return nil, errors.New("Predicate must be valid hex string")
+		return nil, fmt.Errorf("invalid predicate hex: %s", params.Predicate)
 	}
 	if params.CustomData != "" {
-		return nil, errors.New("CustomData is not currently supported")
+		return nil, errors.New("unsupported: custom data")
 	}
 
 	settlementContractAddress := geth_common.HexToAddress(params.SettlementContract)
@@ -50,11 +50,11 @@ func NewExtensionPlus(params ExtensionParamsPlus) (*ExtensionPlus, error) {
 
 	postInteractionDataEncoded, err := params.PostInteractionData.Encode()
 	if err != nil {
-		return nil, fmt.Errorf("failed to encode post interaction data: %v", err)
+		return nil, fmt.Errorf("failed to encode post interaction data: %w", err)
 	}
 	postInteraction, err := fusionorder.NewInteraction(settlementContractAddress, postInteractionDataEncoded)
 	if err != nil {
-		return nil, fmt.Errorf("failed to create post interaction: %v", err)
+		return nil, fmt.Errorf("failed to create post interaction: %w", err)
 	}
 	extensionPlus.PostInteraction = postInteraction.Encode()
 
@@ -70,7 +70,7 @@ func NewExtensionPlus(params ExtensionParamsPlus) (*ExtensionPlus, error) {
 }
 
 // Keccak256 calculates the Keccak256 hash of the extension data
-func (e *ExtensionPlus) Keccak256() *big.Int {
+func (e *ExtensionPlus) Keccak256() (*big.Int, error) {
 	return fusionorder.Keccak256Hash(e)
 }
 
@@ -89,7 +89,11 @@ func (e *ExtensionPlus) ConvertToOrderbookExtension() *orderbook.Extension {
 }
 
 func (e *ExtensionPlus) GenerateSalt() (*big.Int, error) {
-	return fusionorder.GenerateSaltWithExtension(e.Keccak256(), e.isEmpty())
+	hash, err := e.Keccak256()
+	if err != nil {
+		return nil, fmt.Errorf("failed to calculate extension hash: %w", err)
+	}
+	return fusionorder.GenerateSaltWithExtension(hash, e.isEmpty())
 }
 
 // isEmpty checks if the extension data is empty
@@ -100,12 +104,12 @@ func (e *ExtensionPlus) isEmpty() bool {
 func DecodeExtension(data []byte) (*ExtensionPlus, error) {
 	orderbookExtension, err := orderbook.Decode(data)
 	if err != nil {
-		return &ExtensionPlus{}, fmt.Errorf("error decoding extension: %v", err)
+		return &ExtensionPlus{}, fmt.Errorf("failed to decode extension: %w", err)
 	}
 
 	extensionPlus, err := FromLimitOrderExtension(orderbookExtension)
 	if err != nil {
-		return nil, fmt.Errorf("failed to convert orderbook extension to fusionplus extension: %v", err)
+		return nil, fmt.Errorf("failed to convert orderbook extension to fusionplus extension: %w", err)
 	}
 
 	return &ExtensionPlus{
@@ -131,20 +135,20 @@ func FromLimitOrderExtension(extension *orderbook.Extension) (*ExtensionPlus, er
 	settlementContractAddress := extension.MakingAmountData[:42]
 
 	if settlementContractAddress != extension.TakingAmountData[:42] {
-		return nil, fmt.Errorf("malfomed extension: settlement contract address should be the same in making and taking amount data")
+		return nil, fmt.Errorf("malformed extension: mismatched settlement contract in making and taking amount data")
 	}
 	if settlementContractAddress != extension.PostInteraction[:42] {
-		return nil, fmt.Errorf("malfomed extension: settlement contract address should be the same in making and post interaction")
+		return nil, fmt.Errorf("malformed extension: mismatched settlement contract in making and post interaction")
 	}
 
 	auctionDetails, err := fusionorder.DecodeAuctionDetails(extension.MakingAmountData[42:])
 	if err != nil {
-		return nil, fmt.Errorf("failed to decode auction details: %v", err)
+		return nil, fmt.Errorf("failed to decode auction details: %w", err)
 	}
 
 	postInteractionData, err := DecodeSettlementPostInteractionData(extension.PostInteraction[42:])
 	if err != nil {
-		return nil, fmt.Errorf("failed to decode post interaction data: %v", err)
+		return nil, fmt.Errorf("failed to decode post interaction data: %w", err)
 	}
 
 	extensionPlus := &ExtensionPlus{
@@ -166,7 +170,7 @@ func FromLimitOrderExtension(extension *orderbook.Extension) (*ExtensionPlus, er
 	if extension.MakerPermit != "" && extension.MakerPermit != "0x" {
 		permitInteraction, err = fusionorder.DecodeInteraction(extension.MakerPermit)
 		if err != nil {
-			return nil, fmt.Errorf("failed to decode permit interaction: %v", err)
+			return nil, fmt.Errorf("failed to decode permit interaction: %w", err)
 		}
 
 		extensionPlus.Asset = permitInteraction.Target.String()

@@ -11,7 +11,7 @@ import (
 func (api *api) GetGasPriceEIP1559(ctx context.Context) (*Eip1559GasPriceResponse, error) {
 	u := fmt.Sprintf("/gas-price/v1.5/%d", api.chainId)
 	if !isEIP1559Applicable(api.chainId) {
-		return nil, fmt.Errorf("chain id %d does not support eip1559", api.chainId)
+		return nil, fmt.Errorf("unsupported: EIP-1559 on chain %d", api.chainId)
 	}
 	payload := common.RequestPayload{
 		Method: "GET",
@@ -33,7 +33,7 @@ func (api *api) GetGasPriceEIP1559(ctx context.Context) (*Eip1559GasPriceRespons
 func (api *api) GetGasPriceLegacy(ctx context.Context) (*GetGasPriceLegacyResponse, error) {
 	u := fmt.Sprintf("/gas-price/v1.5/%d", api.chainId)
 	if isEIP1559Applicable(api.chainId) {
-		return nil, fmt.Errorf("chain id %d does not support legacy gas price method", api.chainId)
+		return nil, fmt.Errorf("unsupported: legacy gas price on chain %d", api.chainId)
 	}
 	payload := common.RequestPayload{
 		Method: "GET",

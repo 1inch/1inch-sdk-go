@@ -115,22 +115,30 @@ func TestGetProof_IndexOutOfBounds(t *testing.T) {
 
 func TestGetSiblingIndex(t *testing.T) {
 	// Index 1 (left child of root) -> sibling is 2
-	assert.Equal(t, 2, getSiblingIndex(1))
+	idx, err := getSiblingIndex(1)
+	require.NoError(t, err)
+	assert.Equal(t, 2, idx)
 
 	// Index 2 (right child of root) -> sibling is 1
-	assert.Equal(t, 1, getSiblingIndex(2))
+	idx, err = getSiblingIndex(2)
+	require.NoError(t, err)
+	assert.Equal(t, 1, idx)
 
 	// Index 3 -> sibling is 4
-	assert.Equal(t, 4, getSiblingIndex(3))
+	idx, err = getSiblingIndex(3)
+	require.NoError(t, err)
+	assert.Equal(t, 4, idx)
 
 	// Index 4 -> sibling is 3
-	assert.Equal(t, 3, getSiblingIndex(4))
+	idx, err = getSiblingIndex(4)
+	require.NoError(t, err)
+	assert.Equal(t, 3, idx)
 }
 
-func TestGetSiblingIndex_Root_Panics(t *testing.T) {
-	assert.Panics(t, func() {
-		getSiblingIndex(0)
-	})
+func TestGetSiblingIndex_Root_ReturnsError(t *testing.T) {
+	_, err := getSiblingIndex(0)
+	assert.Error(t, err)
+	assert.Contains(t, err.Error(), "root has no siblings")
 }
 
 func TestParentIndex(t *testing.T) {

@@ -33,12 +33,12 @@ const SeriesNonceManagerPolygon = "0xa5eb255EF45dFb48B5d133d08833DEF69871691D"
 func Get1inchRouterFromChainId(chainId int) (string, error) {
 	if slice_utils.Contains(chainId, ValidChainIds) {
 		if chainId == ZkSyncEraChainId {
-			return "", fmt.Errorf("zksync not supported: %d", chainId)
+			return "", fmt.Errorf("unsupported: zkSync for chain %d", chainId)
 		} else {
 			return AggregationRouterV6, nil
 		}
 	} else {
-		return "", fmt.Errorf("unrecognized chain id: %d", chainId)
+		return "", fmt.Errorf("unsupported chain ID: %d", chainId)
 	}
 }
 
@@ -67,8 +67,8 @@ func GetSeriesNonceManagerFromChainId(chainId int) (string, error) {
 	case PolygonChainId:
 		return SeriesNonceManagerPolygon, nil
 	case ZkSyncEraChainId:
-		return "", fmt.Errorf("zksync contract unknown") // TODO get this contract
+		return "", fmt.Errorf("unknown zkSync contract address") // TODO get this contract
 	default:
-		return "", fmt.Errorf("unrecognized chain id: %d", chainId)
+		return "", fmt.Errorf("unsupported chain ID: %d", chainId)
 	}
 }

@@ -54,7 +54,7 @@ func TestCreateOrderParams_Validate(t *testing.T) {
 				Taker:        "0x1234567890abcdef1234567890abcdef12345678",
 			},
 			expectErrors: []string{
-				"native gas token is not supported as maker or taker asset",
+				"unsupported: native gas token as maker or taker asset",
 			},
 		},
 		{
@@ -69,7 +69,7 @@ func TestCreateOrderParams_Validate(t *testing.T) {
 				Taker:        "0x1234567890abcdef1234567890abcdef12345678",
 			},
 			expectErrors: []string{
-				"native gas token is not supported as maker or taker asset",
+				"unsupported: native gas token as maker or taker asset",
 			},
 		},
 	}

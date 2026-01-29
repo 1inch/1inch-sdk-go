@@ -3,7 +3,6 @@ package orderbook
 import (
 	"context"
 	"fmt"
-	"log"
 	"math/big"
 
 	gethCommon "github.com/ethereum/go-ethereum/common"
@@ -15,7 +14,7 @@ func (c *Client) GetSeriesNonce(ctx context.Context, publicAddress gethCommon.Ad
 
 	seriesNonceManager, err := constants.GetSeriesNonceManagerFromChainId(int(c.Wallet.ChainId()))
 	if err != nil {
-		log.Fatal(fmt.Errorf("failed to get series nonce manager address: %v", err))
+		return nil, fmt.Errorf("failed to get series nonce manager address: %w", err)
 	}
 
 	function := "nonce"
@@ -46,7 +45,7 @@ func (c *Client) GetFillOrderCalldata(order *GetOrderByHashResponseExtended, tak
 		function = "fillOrder"
 	} else {
 		if takerTraits == nil {
-			return nil, fmt.Errorf("this order has extension data, but no taker traits were provided")
+			return nil, fmt.Errorf("taker traits required for order with extension data")
 		}
 
 		function = "fillOrderArgs"
@@ -76,7 +75,10 @@ func (c *Client) GetFillOrderCalldata(order *GetOrderByHashResponseExtended, tak
 			return nil, err
 		}
 	case "fillOrderArgs":
-		takerTraitsEncoded := takerTraits.Encode()
+		takerTraitsEncoded, err := takerTraits.Encode()
+		if err != nil {
+			return nil, fmt.Errorf("failed to encode taker traits: %w", err)
+		}
 		fillOrderData, err = c.AggregationRouterV6.Pack(function, order.LimitOrderDataNormalized, rCompressed, vsCompressed, order.LimitOrderDataNormalized.TakingAmount, takerTraitsEncoded.TraitFlags, takerTraitsEncoded.Args)
 		if err != nil {
 			return nil, err
@@ -92,7 +94,7 @@ func bytesToBytes32(b []byte) (*[32]byte, error) {
 	var arr [32]byte
 	if len(b) > 32 {
 		// If b is longer than 32 bytes, error out to avoid losing data
-		return nil, fmt.Errorf("input is longer than 32 bytes")
+		return nil, fmt.Errorf("input exceeds 32 bytes")
 	} else {
 		// If b is shorter than 32 bytes, copy it as is and leave the rest zeroed
 		copy(arr[:], b)

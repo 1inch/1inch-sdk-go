@@ -6,7 +6,6 @@ import (
 	"encoding/hex"
 	"errors"
 	"fmt"
-	"log"
 	"math/big"
 
 	"github.com/1inch/1inch-sdk-go/internal/hexadecimal"
@@ -33,7 +32,7 @@ func ForSingleFill(secret string) (*HashLock, error) {
 func ForMultipleFills(leaves []string) (*HashLock, error) {
 	// Assertion to check the number of leaves
 	if len(leaves) <= 2 {
-		return nil, errors.New("leaves array must be greater than 2. Or use HashLock.forSingleFill")
+		return nil, errors.New("leaves array requires more than 2 elements")
 	}
 
 	tree := MakeTree(leaves)
@@ -150,12 +149,12 @@ func getBytesCount(hex string) int {
 
 func HashSecret(secret string) (string, error) {
 	if !hexadecimal.IsHexBytes(secret) || getBytesCount(secret) != 32 {
-		return "", fmt.Errorf("secret length must be 32 bytes hex encoded. Got %s", secret)
+		return "", fmt.Errorf("invalid secret length: expected 32 bytes hex encoded, got %s", secret)
 	}
 
 	hexBytes, err := hexutil.Decode(secret)
 	if err != nil {
-		log.Fatalf("Failed to decode hex string: %v", err)
+		return "", fmt.Errorf("failed to decode hex string: %w", err)
 	}
 
 	return keccak.Keccak256Legacy(hexBytes), nil
@@ -175,7 +174,7 @@ func concat(datas [][]byte) []byte {
 
 func solidityPacked(types []string, values []interface{}) ([]byte, error) {
 	if len(types) != len(values) {
-		return nil, fmt.Errorf("wrong number of values; expected %d", len(types))
+		return nil, fmt.Errorf("value count mismatch: expected %d", len(types))
 	}
 
 	var tight [][]byte
@@ -209,7 +208,7 @@ func pack(typ string, value interface{}) ([]byte, error) {
 		// Pack uint64 as big-endian 8-byte array
 		v, ok := value.(int)
 		if !ok {
-			return nil, fmt.Errorf("expected int for uint64 type, got %T", value)
+			return nil, fmt.Errorf("invalid uint64 type: expected int, got %T", value)
 		}
 		bigInt := big.NewInt(int64(v))
 		packed := bigInt.FillBytes(make([]byte, 8))
@@ -219,14 +218,14 @@ func pack(typ string, value interface{}) ([]byte, error) {
 		// Pack bytes32 as exactly 32 bytes
 		s, ok := value.(string)
 		if !ok {
-			return nil, fmt.Errorf("expected string for bytes32 type, got %T", value)
+			return nil, fmt.Errorf("invalid bytes32 type: expected string, got %T", value)
 		}
 		bytes, err := hexutil.Decode(s)
 		if err != nil {
 			return nil, err
 		}
 		if len(bytes) != 32 {
-			return nil, fmt.Errorf("bytes32 value must be 32 bytes, got %d bytes", len(bytes))
+			return nil, fmt.Errorf("invalid bytes32 length: expected 32 bytes, got %d", len(bytes))
 		}
 		return bytes, nil
 

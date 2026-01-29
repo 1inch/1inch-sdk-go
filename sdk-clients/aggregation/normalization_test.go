@@ -54,7 +54,7 @@ func TestNormalizeSwapResponse(t *testing.T) {
 				},
 			},
 			expectError: true,
-			errorMsg:    "invalid 'To' address",
+			errorMsg:    "invalid to address",
 		},
 		{
 			name: "Invalid GasPrice - not a number",
@@ -68,7 +68,7 @@ func TestNormalizeSwapResponse(t *testing.T) {
 				},
 			},
 			expectError: true,
-			errorMsg:    "invalid 'GasPrice' value",
+			errorMsg:    "invalid gas price",
 		},
 		{
 			name: "Invalid Value - not a number",
@@ -82,7 +82,7 @@ func TestNormalizeSwapResponse(t *testing.T) {
 				},
 			},
 			expectError: true,
-			errorMsg:    "invalid 'Value' value",
+			errorMsg:    "invalid tx value",
 		},
 		{
 			name: "Invalid Data - not hex",
@@ -96,7 +96,7 @@ func TestNormalizeSwapResponse(t *testing.T) {
 				},
 			},
 			expectError: true,
-			errorMsg:    "invalid 'Data' value",
+			errorMsg:    "invalid tx data",
 		},
 	}
 
@@ -170,7 +170,7 @@ func TestNormalizeApproveCallDataResponse(t *testing.T) {
 				Data:     "0x",
 			},
 			expectError: true,
-			errorMsg:    "invalid 'To' address",
+			errorMsg:    "invalid to address",
 		},
 		{
 			name: "Invalid GasPrice",
@@ -181,7 +181,7 @@ func TestNormalizeApproveCallDataResponse(t *testing.T) {
 				Data:     "0x",
 			},
 			expectError: true,
-			errorMsg:    "invalid 'GasPrice' value",
+			errorMsg:    "invalid gas price",
 		},
 		{
 			name: "Invalid Value",
@@ -192,7 +192,7 @@ func TestNormalizeApproveCallDataResponse(t *testing.T) {
 				Data:     "0x",
 			},
 			expectError: true,
-			errorMsg:    "invalid 'Value' value",
+			errorMsg:    "invalid value",
 		},
 		{
 			name: "Invalid Data",
@@ -203,7 +203,7 @@ func TestNormalizeApproveCallDataResponse(t *testing.T) {
 				Data:     "not-hex",
 			},
 			expectError: true,
-			errorMsg:    "invalid 'Data' value",
+			errorMsg:    "invalid data",
 		},
 	}
 

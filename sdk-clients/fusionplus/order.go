@@ -21,7 +21,7 @@ func CreateFusionPlusOrderData(quoteParams QuoterControllerGetQuoteParamsFixed, 
 	// TODO preset is already gotten earlier for the secret count
 	preset, err := GetPreset(quote.Presets, orderParams.Preset)
 	if err != nil {
-		return nil, fmt.Errorf("error getting preset: %v", err)
+		return nil, fmt.Errorf("failed to get preset: %w", err)
 	}
 
 	auctionPointsPlus := make([]AuctionPointClass, 0)
@@ -48,14 +48,14 @@ func CreateFusionPlusOrderData(quoteParams QuoterControllerGetQuoteParamsFixed, 
 
 	auctionDetailsPlus, err := CreateAuctionDetailsPlus(presetPlus, 0)
 	if err != nil {
-		return nil, fmt.Errorf("error creating auction details: %v", err)
+		return nil, fmt.Errorf("failed to create auction details: %w", err)
 	}
 
 	takerAsset := quoteParams.DstTokenAddress
 	if takerAsset == fusionorder.NativeToken {
 		takerAssetWrapped, ok := fusionorder.ChainToWrapper[fusionorder.NetworkEnum(chainId)]
 		if !ok {
-			return nil, fmt.Errorf("unable to get address for taker asset's wrapped token. unrecognized network: %v", chainId)
+			return nil, fmt.Errorf("unsupported network for wrapped token: %d", chainId)
 		}
 		takerAsset = takerAssetWrapped.Hex()
 	}
@@ -90,7 +90,7 @@ func CreateFusionPlusOrderData(quoteParams QuoterControllerGetQuoteParamsFixed, 
 		} else {
 			nonce, err = random_number_generation.BigIntMaxFunc(uint40Max)
 			if err != nil {
-				return nil, fmt.Errorf("error generating nonce: %v\n", err)
+				return nil, fmt.Errorf("failed to generate nonce: %w", err)
 			}
 		}
 	} else {
@@ -114,7 +114,7 @@ func CreateFusionPlusOrderData(quoteParams QuoterControllerGetQuoteParamsFixed, 
 
 	makerTraits, err := CreateMakerTraits(details, extraParams)
 	if err != nil {
-		return nil, fmt.Errorf("error creating maker traits: %v", err)
+		return nil, fmt.Errorf("failed to create maker traits: %w", err)
 	}
 
 	orderInfo := CrossChainOrderDto{
@@ -144,12 +144,12 @@ func CreateFusionPlusOrderData(quoteParams QuoterControllerGetQuoteParamsFixed, 
 
 	postInteractionData, err := CreateSettlementPostInteractionData(details, orderInfo)
 	if err != nil {
-		return nil, fmt.Errorf("error creating post interaction data: %v", err)
+		return nil, fmt.Errorf("failed to create post interaction data: %w", err)
 	}
 
 	postInteractionDataWithFees, err := CreateSettlementPostInteractionDataWithFees(details, orderInfo)
 	if err != nil {
-		return nil, fmt.Errorf("error creating post interaction data with fees: %v", err)
+		return nil, fmt.Errorf("failed to create post interaction data with fees: %w", err)
 	}
 
 	extension, err := NewEscrowExtension(EscrowExtensionParams{
@@ -168,7 +168,7 @@ func CreateFusionPlusOrderData(quoteParams QuoterControllerGetQuoteParamsFixed, 
 		TimeLocks:        escrowParams.TimeLocks,
 	})
 	if err != nil {
-		return nil, fmt.Errorf("error creating extension: %v", err)
+		return nil, fmt.Errorf("failed to create extension: %w", err)
 	}
 
 	fusionPlusOrder, err := CreateOrder(CreateOrderDataParams{
@@ -182,22 +182,22 @@ func CreateFusionPlusOrderData(quoteParams QuoterControllerGetQuoteParamsFixed, 
 		postInteractionData: postInteractionData,
 	})
 	if err != nil {
-		return nil, fmt.Errorf("error creating fusion order: %v", err)
+		return nil, fmt.Errorf("failed to create fusion order: %w", err)
 	}
 
 	extensionOrderbook, err := extension.ConvertToOrderbookExtension()
 	if err != nil {
-		return nil, fmt.Errorf("error converting extension to orderbook extension: %v", err)
+		return nil, fmt.Errorf("failed to convert extension to orderbook extension: %w", err)
 	}
 
 	extensionEncoded, err := extensionOrderbook.Encode()
 	if err != nil {
-		return nil, fmt.Errorf("error encoding extension: %v", err)
+		return nil, fmt.Errorf("failed to encode extension: %w", err)
 	}
 
 	salt, err := orderbook.GenerateSalt(extensionEncoded, nil)
 	if err != nil {
-		return nil, fmt.Errorf("error generating salt: %v", err)
+		return nil, fmt.Errorf("failed to generate salt: %w", err)
 	}
 
 	limitOrder, err := orderbook.CreateLimitOrderMessage(orderbook.CreateOrderParams{
@@ -214,7 +214,7 @@ func CreateFusionPlusOrderData(quoteParams QuoterControllerGetQuoteParamsFixed, 
 		Taker:            orderInfo.Receiver,
 	}, chainId)
 	if err != nil {
-		return nil, fmt.Errorf("error creating limit order message: %v", err)
+		return nil, fmt.Errorf("failed to create limit order message: %w", err)
 	}
 
 	return &PreparedOrder{
@@ -229,7 +229,7 @@ func GetPreset(presets QuotePresets, presetType GetQuoteOutputRecommendedPreset)
 	switch presetType {
 	case Custom:
 		if presets.Custom == nil {
-			return nil, errors.New("custom preset is not available")
+			return nil, errors.New("custom preset unavailable")
 		}
 		return presets.Custom, nil
 	case Fast:
@@ -239,7 +239,7 @@ func GetPreset(presets QuotePresets, presetType GetQuoteOutputRecommendedPreset)
 	case Slow:
 		return &presets.Slow, nil
 	}
-	return nil, fmt.Errorf("unknown preset type: %v", presetType)
+	return nil, fmt.Errorf("unsupported preset type: %v", presetType)
 }
 
 // CalcAuctionStartTimeFunc allows overriding the auction start time calculation for testing
@@ -259,7 +259,7 @@ func CreateAuctionDetails(preset *Preset, additionalWaitPeriod float32) (*Auctio
 
 	gasPriceEstimateFixed, err := strconv.ParseUint(preset.GasCost.GasPriceEstimate, 10, 32)
 	if err != nil {
-		return nil, fmt.Errorf("error parsing gas price estimate: %v", err)
+		return nil, fmt.Errorf("failed to parse gas price estimate: %w", err)
 	}
 
 	gasCostFixed := GasCostConfigClassFixed{
@@ -311,7 +311,12 @@ func CreateOrder(params CreateOrderDataParams) (*Order, error) {
 
 	salt, err := params.extension.GenerateSalt()
 	if err != nil {
-		return nil, fmt.Errorf("error generating salt: %v", err)
+		return nil, fmt.Errorf("failed to generate salt: %w", err)
+	}
+
+	extensionHash, err := params.extension.Keccak256()
+	if err != nil {
+		return nil, fmt.Errorf("failed to calculate extension hash: %w", err)
 	}
 
 	return &Order{
@@ -325,7 +330,7 @@ func CreateOrder(params CreateOrderDataParams) (*Order, error) {
 			Maker:        params.orderInfo.Maker,
 			Receiver:     params.orderInfo.Receiver,
 			MakerTraits:  params.makerTraits.Encode(),
-			Extension:    fmt.Sprintf("%x", params.extension.Keccak256()),
+			Extension:    fmt.Sprintf("%x", extensionHash),
 		},
 		OrderInfo:           params.orderInfo,
 		AuctionDetails:      params.details.Auction,
@@ -355,7 +360,7 @@ func CreateAuctionDetailsPlus(preset *PresetClassFixed, additionalWaitPeriod flo
 
 	gasPriceEstimateFixed, err := strconv.ParseUint(preset.GasCost.GasPriceEstimate, 10, 32)
 	if err != nil {
-		return nil, fmt.Errorf("error parsing gas price estimate: %v", err)
+		return nil, fmt.Errorf("failed to parse gas price estimate: %w", err)
 	}
 
 	gasCostFixed := GasCostConfigClassFixed{
@@ -387,7 +392,7 @@ func CreateMakerTraits(details Details, extraParams ExtraParams) (*orderbook.Mak
 	}
 	makerTraits, err := orderbook.NewMakerTraits(makerTraitParms)
 	if err != nil {
-		return nil, fmt.Errorf("error creating maker traits: %v", err)
+		return nil, fmt.Errorf("failed to create maker traits: %w", err)
 	}
 	if makerTraits.IsBitInvalidatorMode() {
 		if extraParams.Nonce == nil || extraParams.Nonce.Cmp(big.NewInt(0)) == 0 {

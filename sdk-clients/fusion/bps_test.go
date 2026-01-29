@@ -19,48 +19,48 @@ func TestNewBps(t *testing.T) {
 	tests := []struct {
 		name        string
 		value       *big.Int
-		expectPanic bool
+		expectError bool
 	}{
 		{
 			name:        "Valid - zero",
 			value:       big.NewInt(0),
-			expectPanic: false,
+			expectError: false,
 		},
 		{
 			name:        "Valid - 100 bps (1%)",
 			value:       big.NewInt(100),
-			expectPanic: false,
+			expectError: false,
 		},
 		{
 			name:        "Valid - 5000 bps (50%)",
 			value:       big.NewInt(5000),
-			expectPanic: false,
+			expectError: false,
 		},
 		{
 			name:        "Valid - 10000 bps (100%)",
 			value:       big.NewInt(10000),
-			expectPanic: false,
+			expectError: false,
 		},
 		{
 			name:        "Invalid - negative",
 			value:       big.NewInt(-1),
-			expectPanic: true,
+			expectError: true,
 		},
 		{
 			name:        "Invalid - exceeds 10000",
 			value:       big.NewInt(10001),
-			expectPanic: true,
+			expectError: true,
 		},
 	}
 
 	for _, tc := range tests {
 		t.Run(tc.name, func(t *testing.T) {
-			if tc.expectPanic {
-				assert.Panics(t, func() {
-					fusionorder.NewBps(tc.value)
-				})
+			bps, err := fusionorder.NewBps(tc.value)
+			if tc.expectError {
+				assert.Error(t, err)
+				assert.Nil(t, bps)
 			} else {
-				bps := fusionorder.NewBps(tc.value)
+				require.NoError(t, err)
 				require.NotNil(t, bps)
 				assert.Equal(t, tc.value.String(), bps.String())
 			}
@@ -121,7 +121,8 @@ func TestFromPercent(t *testing.T) {
 
 	for _, tc := range tests {
 		t.Run(tc.name, func(t *testing.T) {
-			bps := fusionorder.FromPercent(tc.percent, tc.base)
+			bps, err := fusionorder.FromPercent(tc.percent, tc.base)
+			require.NoError(t, err)
 			require.NotNil(t, bps)
 			assert.Equal(t, tc.expected, bps.String())
 		})
@@ -175,7 +176,8 @@ func TestFromFraction(t *testing.T) {
 
 	for _, tc := range tests {
 		t.Run(tc.name, func(t *testing.T) {
-			bps := fusionorder.FromFraction(tc.fraction, tc.base)
+			bps, err := fusionorder.FromFraction(tc.fraction, tc.base)
+			require.NoError(t, err)
 			require.NotNil(t, bps)
 			assert.Equal(t, tc.expected, bps.String())
 		})
@@ -191,26 +193,26 @@ func TestBps_Equal(t *testing.T) {
 	}{
 		{
 			name:     "Equal - both zero",
-			bps1:     fusionorder.NewBps(big.NewInt(0)),
-			bps2:     fusionorder.NewBps(big.NewInt(0)),
+			bps1:     fusionorder.MustNewBps(big.NewInt(0)),
+			bps2:     fusionorder.MustNewBps(big.NewInt(0)),
 			expected: true,
 		},
 		{
 			name:     "Equal - same non-zero value",
-			bps1:     fusionorder.NewBps(big.NewInt(100)),
-			bps2:     fusionorder.NewBps(big.NewInt(100)),
+			bps1:     fusionorder.MustNewBps(big.NewInt(100)),
+			bps2:     fusionorder.MustNewBps(big.NewInt(100)),
 			expected: true,
 		},
 		{
 			name:     "Not equal - different values",
-			bps1:     fusionorder.NewBps(big.NewInt(100)),
-			bps2:     fusionorder.NewBps(big.NewInt(200)),
+			bps1:     fusionorder.MustNewBps(big.NewInt(100)),
+			bps2:     fusionorder.MustNewBps(big.NewInt(200)),
 			expected: false,
 		},
 		{
 			name:     "Not equal - zero vs non-zero",
-			bps1:     fusionorder.NewBps(big.NewInt(0)),
-			bps2:     fusionorder.NewBps(big.NewInt(100)),
+			bps1:     fusionorder.MustNewBps(big.NewInt(0)),
+			bps2:     fusionorder.MustNewBps(big.NewInt(100)),
 			expected: false,
 		},
 	}
@@ -231,17 +233,17 @@ func TestBps_IsZero(t *testing.T) {
 	}{
 		{
 			name:     "Is zero",
-			bps:      fusionorder.NewBps(big.NewInt(0)),
+			bps:      fusionorder.MustNewBps(big.NewInt(0)),
 			expected: true,
 		},
 		{
 			name:     "Is not zero - small value",
-			bps:      fusionorder.NewBps(big.NewInt(1)),
+			bps:      fusionorder.MustNewBps(big.NewInt(1)),
 			expected: false,
 		},
 		{
 			name:     "Is not zero - large value",
-			bps:      fusionorder.NewBps(big.NewInt(10000)),
+			bps:      fusionorder.MustNewBps(big.NewInt(10000)),
 			expected: false,
 		},
 	}
@@ -263,31 +265,31 @@ func TestBps_ToPercent(t *testing.T) {
 	}{
 		{
 			name:     "0 bps to percent",
-			bps:      fusionorder.NewBps(big.NewInt(0)),
+			bps:      fusionorder.MustNewBps(big.NewInt(0)),
 			base:     big.NewInt(1),
 			expected: 0,
 		},
 		{
 			name:     "100 bps (1%) to percent",
-			bps:      fusionorder.NewBps(big.NewInt(100)),
+			bps:      fusionorder.MustNewBps(big.NewInt(100)),
 			base:     big.NewInt(1),
 			expected: 1,
 		},
 		{
 			name:     "5000 bps (50%) to percent",
-			bps:      fusionorder.NewBps(big.NewInt(5000)),
+			bps:      fusionorder.MustNewBps(big.NewInt(5000)),
 			base:     big.NewInt(1),
 			expected: 50,
 		},
 		{
 			name:     "10000 bps (100%) to percent",
-			bps:      fusionorder.NewBps(big.NewInt(10000)),
+			bps:      fusionorder.MustNewBps(big.NewInt(10000)),
 			base:     big.NewInt(1),
 			expected: 100,
 		},
 		{
 			name:     "100 bps with base 2",
-			bps:      fusionorder.NewBps(big.NewInt(100)),
+			bps:      fusionorder.MustNewBps(big.NewInt(100)),
 			base:     big.NewInt(2),
 			expected: 2,
 		},
@@ -310,25 +312,25 @@ func TestBps_ToFraction(t *testing.T) {
 	}{
 		{
 			name:     "0 bps to fraction",
-			bps:      fusionorder.NewBps(big.NewInt(0)),
+			bps:      fusionorder.MustNewBps(big.NewInt(0)),
 			base:     big.NewInt(1),
 			expected: big.NewInt(0),
 		},
 		{
 			name:     "10000 bps (100%) to fraction",
-			bps:      fusionorder.NewBps(big.NewInt(10000)),
+			bps:      fusionorder.MustNewBps(big.NewInt(10000)),
 			base:     big.NewInt(1),
 			expected: big.NewInt(1),
 		},
 		{
 			name:     "5000 bps (50%) to fraction with base 2",
-			bps:      fusionorder.NewBps(big.NewInt(5000)),
+			bps:      fusionorder.MustNewBps(big.NewInt(5000)),
 			base:     big.NewInt(2),
 			expected: big.NewInt(1), // 5000 * 2 / 10000 = 1
 		},
 		{
 			name:     "100 bps (1%) to fraction with large base",
-			bps:      fusionorder.NewBps(big.NewInt(100)),
+			bps:      fusionorder.MustNewBps(big.NewInt(100)),
 			base:     big.NewInt(10000),
 			expected: big.NewInt(100), // 100 * 10000 / 10000 = 100
 		},
@@ -350,17 +352,17 @@ func TestBps_String(t *testing.T) {
 	}{
 		{
 			name:     "Zero",
-			bps:      fusionorder.NewBps(big.NewInt(0)),
+			bps:      fusionorder.MustNewBps(big.NewInt(0)),
 			expected: "0",
 		},
 		{
 			name:     "100 bps",
-			bps:      fusionorder.NewBps(big.NewInt(100)),
+			bps:      fusionorder.MustNewBps(big.NewInt(100)),
 			expected: "100",
 		},
 		{
 			name:     "10000 bps",
-			bps:      fusionorder.NewBps(big.NewInt(10000)),
+			bps:      fusionorder.MustNewBps(big.NewInt(10000)),
 			expected: "10000",
 		},
 	}

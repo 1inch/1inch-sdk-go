@@ -2,7 +2,6 @@ package fusionplus
 
 import (
 	"encoding/hex"
-	"errors"
 	"fmt"
 	"math/big"
 
@@ -100,7 +99,7 @@ func (spid SettlementPostInteractionData) Encode() (string, error) {
 func DecodeSettlementPostInteractionData(data string) (*SettlementPostInteractionData, error) {
 	bytes, err := hexutil.Decode(data)
 	if err != nil {
-		return nil, errors.New("invalid hex string")
+		return nil, fmt.Errorf("invalid hex string: %w", err)
 	}
 
 	flags := big.NewInt(int64(bytes[len(bytes)-1]))

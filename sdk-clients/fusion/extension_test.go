@@ -105,7 +105,7 @@ func TestNewExtension(t *testing.T) {
 
 				Surplus: &SurplusParams{
 					EstimatedTakerAmount: big.NewInt(1),
-					ProtocolFee:          fusionorder.FromPercent(1, fusionorder.GetDefaultBase()),
+					ProtocolFee:          fusionorder.MustFromPercent(1, fusionorder.GetDefaultBase()),
 				},
 
 				ResolvingStartTime: big.NewInt(0),
@@ -152,7 +152,7 @@ func TestNewExtension(t *testing.T) {
 
 				Surplus: &SurplusParams{
 					EstimatedTakerAmount: big.NewInt(1),
-					ProtocolFee:          fusionorder.FromPercent(1, fusionorder.GetDefaultBase()),
+					ProtocolFee:          fusionorder.MustFromPercent(1, fusionorder.GetDefaultBase()),
 				},
 
 				ResolvingStartTime: big.NewInt(0),
@@ -179,7 +179,7 @@ func TestNewExtension(t *testing.T) {
 				PreInteraction:     "0x5678",
 			},
 			expectErr: true,
-			errMsg:    "Settlement contract must be valid hex string",
+			errMsg:    "invalid settlement contract hex: invalid",
 		},
 		{
 			name: "Invalid MakerAssetSuffix",
@@ -191,7 +191,7 @@ func TestNewExtension(t *testing.T) {
 				PreInteraction:     "0x5678",
 			},
 			expectErr: true,
-			errMsg:    "MakerAssetSuffix must be valid hex string",
+			errMsg:    "invalid maker asset suffix hex: invalid",
 		},
 		{
 			name: "Invalid TakerAssetSuffix",
@@ -203,7 +203,7 @@ func TestNewExtension(t *testing.T) {
 				PreInteraction:     "0x5678",
 			},
 			expectErr: true,
-			errMsg:    "TakerAssetSuffix must be valid hex string",
+			errMsg:    "invalid taker asset suffix hex: invalid",
 		},
 		{
 			name: "Invalid Predicate",
@@ -215,7 +215,7 @@ func TestNewExtension(t *testing.T) {
 				PreInteraction:     "0x5678",
 			},
 			expectErr: true,
-			errMsg:    "Predicate must be valid hex string",
+			errMsg:    "invalid predicate hex: invalid",
 		},
 		{
 			name: "CustomData not supported",
@@ -228,7 +228,7 @@ func TestNewExtension(t *testing.T) {
 				CustomData:         "0x1234",
 			},
 			expectErr: true,
-			errMsg:    "CustomData is not currently supported",
+			errMsg:    "unsupported: custom data",
 		},
 	}
 
@@ -384,8 +384,8 @@ func TestBuildAmountGetterData(t *testing.T) {
 					Integrator: IntegratorFee{
 						Integrator: "0x0000000000000000000000000000000000000001",
 						Protocol:   "0x0000000000000000000000000000000000000002",
-						Fee:        fusionorder.FromPercent(1, fusionorder.GetDefaultBase()),
-						Share:      fusionorder.FromPercent(50, fusionorder.GetDefaultBase()),
+						Fee:        fusionorder.MustFromPercent(1, fusionorder.GetDefaultBase()),
+						Share:      fusionorder.MustFromPercent(50, fusionorder.GetDefaultBase()),
 					},
 				},
 				Whitelist: []AuctionWhitelistItem{

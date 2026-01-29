@@ -61,7 +61,7 @@ func GenerateWhitelist(addresses []string, resolvingStartTime *big.Int) ([]White
 		sumDelay.Add(sumDelay, whitelist[i].Delay)
 
 		if whitelist[i].Delay.Cmp(Uint16Max) >= 0 {
-			return nil, fmt.Errorf("delay too big - %d must be less than %d", whitelist[i].Delay, Uint16Max)
+			return nil, fmt.Errorf("whitelist delay %d exceeds maximum %d", whitelist[i].Delay, Uint16Max)
 		}
 	}
 
@@ -105,7 +105,7 @@ func GenerateWhitelistFromItems(items []AuctionWhitelistItem, resolvingStartTime
 		sumDelay.Add(sumDelay, whitelist[i].Delay)
 
 		if whitelist[i].Delay.Cmp(Uint16Max) >= 0 {
-			return nil, fmt.Errorf("delay too big - %d must be less than %d", whitelist[i].Delay, Uint16Max)
+			return nil, fmt.Errorf("whitelist delay %d exceeds maximum %d", whitelist[i].Delay, Uint16Max)
 		}
 	}
 

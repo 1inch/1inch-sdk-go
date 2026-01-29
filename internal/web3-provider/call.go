@@ -15,7 +15,7 @@ func (w Wallet) Call(ctx context.Context, contractAddress gethCommon.Address, ca
 	}
 	resp, err := w.ethClient.CallContract(ctx, nodeMsg, nil)
 	if err != nil {
-		return nil, fmt.Errorf("failed to call contract: error: %s", err)
+		return nil, fmt.Errorf("failed to call contract: %w", err)
 	}
 
 	return resp, nil

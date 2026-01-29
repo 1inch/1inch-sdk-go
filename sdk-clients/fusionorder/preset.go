@@ -1,7 +1,6 @@
 package fusionorder
 
 import (
-	"errors"
 	"fmt"
 	"strconv"
 
@@ -25,11 +24,11 @@ type CustomPresetPoint struct {
 // Validate validates the custom preset
 func (q *CustomPreset) Validate() error {
 	if !isValidAmount(q.AuctionStartAmount) {
-		return fmt.Errorf("invalid auctionStartAmount: %s", q.AuctionStartAmount)
+		return fmt.Errorf("invalid auction start amount: %s", q.AuctionStartAmount)
 	}
 
 	if !isValidAmount(q.AuctionEndAmount) {
-		return fmt.Errorf("invalid auctionEndAmount: %s", q.AuctionEndAmount)
+		return fmt.Errorf("invalid auction end amount: %s", q.AuctionEndAmount)
 	}
 
 	if err := q.validateAuctionDuration(q.AuctionDuration); err != nil {
@@ -45,7 +44,7 @@ func (q *CustomPreset) Validate() error {
 
 func (q *CustomPreset) validateAuctionDuration(duration int) error {
 	if duration <= 0 {
-		return fmt.Errorf("auctionDuration should be integer, got: %d", duration)
+		return fmt.Errorf("invalid auction duration: expected positive integer, got %d", duration)
 	}
 	return nil
 }
@@ -57,22 +56,22 @@ func (q *CustomPreset) validatePoints(points []CustomPresetPoint, auctionStartAm
 
 	startAmount, err := bigint.FromString(auctionStartAmount)
 	if err != nil {
-		return fmt.Errorf("invalid auctionStartAmount: %s", auctionStartAmount)
+		return fmt.Errorf("invalid auction start amount: %s", auctionStartAmount)
 	}
 
 	endAmount, err := bigint.FromString(auctionEndAmount)
 	if err != nil {
-		return fmt.Errorf("invalid auctionEndAmount: %s", auctionEndAmount)
+		return fmt.Errorf("invalid auction end amount: %s", auctionEndAmount)
 	}
 
 	for i, point := range points {
 		tokenAmount, err := bigint.FromString(point.ToTokenAmount)
 		if err != nil {
-			return fmt.Errorf("points should be an array of valid amounts, invalid value at index %d: %s", i, point.ToTokenAmount)
+			return fmt.Errorf("invalid point amount at index %d: %s", i, point.ToTokenAmount)
 		}
 
 		if tokenAmount.Cmp(startAmount) > 0 || tokenAmount.Cmp(endAmount) < 0 {
-			return fmt.Errorf("points should be in range of auction (between %s and %s), invalid value at index %d: %s", auctionEndAmount, auctionStartAmount, i, point.ToTokenAmount)
+			return fmt.Errorf("point at index %d out of auction range [%s, %s]: %s", i, auctionEndAmount, auctionStartAmount, point.ToTokenAmount)
 		}
 	}
 
@@ -136,7 +135,7 @@ func ParseGasPriceEstimate(estimate string) (uint32, error) {
 	}
 	val, err := strconv.ParseUint(estimate, 10, 32)
 	if err != nil {
-		return 0, errors.New("invalid gas price estimate")
+		return 0, fmt.Errorf("invalid gas price estimate: %w", err)
 	}
 	return uint32(val), nil
 }

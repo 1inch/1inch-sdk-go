@@ -36,22 +36,26 @@ func TestKeccak256Hash(t *testing.T) {
 
 	for _, tc := range tests {
 		t.Run(tc.name, func(t *testing.T) {
-			result := Keccak256Hash(tc.data)
+			result, err := Keccak256Hash(tc.data)
+			require.NoError(t, err)
 			
 			// Result should be a 256-bit (32 byte) hash
 			require.NotNil(t, result)
 			assert.Equal(t, 32, len(result.Bytes()), "Hash should be 32 bytes")
 			
 			// Same input should produce same output
-			result2 := Keccak256Hash(tc.data)
+			result2, err := Keccak256Hash(tc.data)
+			require.NoError(t, err)
 			assert.Equal(t, result, result2)
 		})
 	}
 }
 
 func TestKeccak256HashDifferentInputs(t *testing.T) {
-	hash1 := Keccak256Hash("hello")
-	hash2 := Keccak256Hash("world")
+	hash1, err := Keccak256Hash("hello")
+	require.NoError(t, err)
+	hash2, err := Keccak256Hash("world")
+	require.NoError(t, err)
 	
 	assert.NotEqual(t, hash1, hash2, "Different inputs should produce different hashes")
 }

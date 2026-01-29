@@ -60,19 +60,19 @@ type ExtensionParams struct {
 
 func NewExtension(params ExtensionParams) (*Extension, error) {
 	if !hexadecimal.IsHexBytes(params.SettlementContract) {
-		return nil, errors.New("Settlement contract must be valid hex string")
+		return nil, fmt.Errorf("invalid settlement contract hex: %s", params.SettlementContract)
 	}
 	if !hexadecimal.IsHexBytes(params.MakerAssetSuffix) {
-		return nil, errors.New("MakerAssetSuffix must be valid hex string")
+		return nil, fmt.Errorf("invalid maker asset suffix hex: %s", params.MakerAssetSuffix)
 	}
 	if !hexadecimal.IsHexBytes(params.TakerAssetSuffix) {
-		return nil, errors.New("TakerAssetSuffix must be valid hex string")
+		return nil, fmt.Errorf("invalid taker asset suffix hex: %s", params.TakerAssetSuffix)
 	}
 	if !hexadecimal.IsHexBytes(params.Predicate) {
-		return nil, errors.New("Predicate must be valid hex string")
+		return nil, fmt.Errorf("invalid predicate hex: %s", params.Predicate)
 	}
 	if params.CustomData != "" {
-		return nil, errors.New("CustomData is not currently supported")
+		return nil, errors.New("unsupported: custom data")
 	}
 
 	var resolvingStartTime *big.Int
@@ -90,7 +90,7 @@ func NewExtension(params ExtensionParams) (*Extension, error) {
 
 	amountData, err := BuildAmountGetterData(bagdParams, true)
 	if err != nil {
-		return nil, fmt.Errorf("failed to build amount getter data: %v", err)
+		return nil, fmt.Errorf("failed to build amount getter data: %w", err)
 	}
 
 	settlementContractAddress := geth_common.HexToAddress(params.SettlementContract)
@@ -117,12 +117,12 @@ func NewExtension(params ExtensionParams) (*Extension, error) {
 
 	postInteractionDataEncoded, err := CreateEncodedPostInteractionData(fusionExtension)
 	if err != nil {
-		return nil, fmt.Errorf("failed to create encoded post interaction data: %v", err)
+		return nil, fmt.Errorf("failed to create encoded post interaction data: %w", err)
 	}
 
 	interaction, err := fusionorder.NewInteraction(settlementContractAddress, postInteractionDataEncoded)
 	if err != nil {
-		return nil, fmt.Errorf("failed to create interaction: %v", err)
+		return nil, fmt.Errorf("failed to create interaction: %w", err)
 	}
 	fusionExtension.PostInteraction = interaction.Encode()
 
@@ -138,7 +138,7 @@ func NewExtension(params ExtensionParams) (*Extension, error) {
 }
 
 // Keccak256 calculates the Keccak256 hash of the extension data
-func (e *Extension) Keccak256() *big.Int {
+func (e *Extension) Keccak256() (*big.Int, error) {
 	return fusionorder.Keccak256Hash(e)
 }
 
@@ -157,7 +157,11 @@ func (e *Extension) ConvertToOrderbookExtension() *orderbook.Extension {
 }
 
 func (e *Extension) GenerateSalt() (*big.Int, error) {
-	return fusionorder.GenerateSaltWithExtension(e.Keccak256(), e.isEmpty())
+	hash, err := e.Keccak256()
+	if err != nil {
+		return nil, fmt.Errorf("failed to calculate extension hash: %w", err)
+	}
+	return fusionorder.GenerateSaltWithExtension(hash, e.isEmpty())
 }
 
 // isEmpty checks if the extension data is empty
@@ -177,7 +181,7 @@ func BuildAmountGetterData(params *BuildAmountGetterDataParams, forAmountGetters
 	if forAmountGetters {
 		err := bytes.AddBytes(params.AuctionDetails.Encode())
 		if err != nil {
-			return "", fmt.Errorf("failed to add auction details: %v", err)
+			return "", fmt.Errorf("failed to add auction details: %w", err)
 		}
 	}
 
@@ -216,7 +220,7 @@ func BuildAmountGetterData(params *BuildAmountGetterDataParams, forAmountGetters
 		for _, entry := range params.PostInteractionData.Whitelist {
 			err := bytes.AddBytes(entry.AddressHalf)
 			if err != nil {
-				return "", fmt.Errorf("failed to add whitelist address half: %v", err)
+				return "", fmt.Errorf("failed to add whitelist address half: %w", err)
 			}
 		}
 	} else {
@@ -224,7 +228,7 @@ func BuildAmountGetterData(params *BuildAmountGetterDataParams, forAmountGetters
 		bytes.AddUint8(uint8(len(params.PostInteractionData.Whitelist)))
 		for _, entry := range params.PostInteractionData.Whitelist {
 			if err := bytes.AddBytes(fmt.Sprintf("0x%s", entry.AddressHalf)); err != nil {
-				return "", fmt.Errorf("failed to add addressHalf: %w", err)
+				return "", fmt.Errorf("failed to add address half: %w", err)
 			}
 			bytes.AddUint16(entry.Delay)
 		}

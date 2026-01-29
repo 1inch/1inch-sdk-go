@@ -127,7 +127,7 @@ func TestExecuteRequest_ServerErrorPOST(t *testing.T) {
 		t.Fatalf("Expected an error, got nil")
 	}
 
-	expectedErrorMessage := `processing response failed: {
+	expectedErrorMessage := `failed to process response: {
 	"message": "internal server error"
 }`
 

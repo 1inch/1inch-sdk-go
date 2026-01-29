@@ -43,8 +43,8 @@ func TestNewIntegratorFee(t *testing.T) {
 			name:        "Valid - non-zero fee with valid addresses",
 			integrator:  validAddress1,
 			protocol:    validAddress2,
-			fee:         fusionorder.NewBps(big.NewInt(100)),
-			share:       fusionorder.NewBps(big.NewInt(5000)),
+			fee:         fusionorder.MustNewBps(big.NewInt(100)),
+			share:       fusionorder.MustNewBps(big.NewInt(5000)),
 			expectError: false,
 		},
 		{
@@ -52,9 +52,9 @@ func TestNewIntegratorFee(t *testing.T) {
 			integrator:  addresses.ZeroAddress,
 			protocol:    addresses.ZeroAddress,
 			fee:         fusionorder.BpsZero,
-			share:       fusionorder.NewBps(big.NewInt(100)),
+			share:       fusionorder.MustNewBps(big.NewInt(100)),
 			expectError: true,
-			errorMsg:    "integrator share must be zero if fee is zero",
+			errorMsg:    "zero fee requires zero integrator share",
 		},
 		{
 			name:        "Invalid - zero fee but non-zero integrator",
@@ -63,7 +63,7 @@ func TestNewIntegratorFee(t *testing.T) {
 			fee:         fusionorder.BpsZero,
 			share:       fusionorder.BpsZero,
 			expectError: true,
-			errorMsg:    "integrator address must be zero if fee is zero",
+			errorMsg:    "zero fee requires zero integrator address",
 		},
 		{
 			name:        "Invalid - zero fee but non-zero protocol",
@@ -72,34 +72,34 @@ func TestNewIntegratorFee(t *testing.T) {
 			fee:         fusionorder.BpsZero,
 			share:       fusionorder.BpsZero,
 			expectError: true,
-			errorMsg:    "protocol address must be zero if fee is zero",
+			errorMsg:    "zero fee requires zero protocol address",
 		},
 		{
 			name:        "Invalid - non-zero fee with zero integrator",
 			integrator:  addresses.ZeroAddress,
 			protocol:    validAddress2,
-			fee:         fusionorder.NewBps(big.NewInt(100)),
-			share:       fusionorder.NewBps(big.NewInt(5000)),
+			fee:         fusionorder.MustNewBps(big.NewInt(100)),
+			share:       fusionorder.MustNewBps(big.NewInt(5000)),
 			expectError: true,
-			errorMsg:    "fee must be zero if integrator or protocol is zero address",
+			errorMsg:    "non-zero fee requires non-zero integrator and protocol addresses",
 		},
 		{
 			name:        "Invalid - non-zero fee with zero protocol",
 			integrator:  validAddress1,
 			protocol:    addresses.ZeroAddress,
-			fee:         fusionorder.NewBps(big.NewInt(100)),
-			share:       fusionorder.NewBps(big.NewInt(5000)),
+			fee:         fusionorder.MustNewBps(big.NewInt(100)),
+			share:       fusionorder.MustNewBps(big.NewInt(5000)),
 			expectError: true,
-			errorMsg:    "fee must be zero if integrator or protocol is zero address",
+			errorMsg:    "non-zero fee requires non-zero integrator and protocol addresses",
 		},
 		{
 			name:        "Invalid - both addresses zero but fee non-zero",
 			integrator:  addresses.ZeroAddress,
 			protocol:    addresses.ZeroAddress,
-			fee:         fusionorder.NewBps(big.NewInt(100)),
-			share:       fusionorder.NewBps(big.NewInt(5000)),
+			fee:         fusionorder.MustNewBps(big.NewInt(100)),
+			share:       fusionorder.MustNewBps(big.NewInt(5000)),
 			expectError: true,
-			errorMsg:    "fee must be zero if integrator or protocol is zero address",
+			errorMsg:    "non-zero fee requires non-zero integrator and protocol addresses",
 		},
 	}
 
@@ -126,7 +126,7 @@ func TestIntegratorFee_String(t *testing.T) {
 	validAddress1 := "0x6B175474E89094C44Da98b954EedeAC495271d0F"
 	validAddress2 := "0xC02aaA39b223FE8D0A0e5C4F27eAD9083C756Cc2"
 
-	fee, err := NewIntegratorFee(validAddress1, validAddress2, fusionorder.NewBps(big.NewInt(100)), fusionorder.NewBps(big.NewInt(5000)))
+	fee, err := NewIntegratorFee(validAddress1, validAddress2, fusionorder.MustNewBps(big.NewInt(100)), fusionorder.MustNewBps(big.NewInt(5000)))
 	require.NoError(t, err)
 
 	result := fee.String()

@@ -84,7 +84,7 @@ func (t *TransactionBuilder) SetGasFeeCap(g *big.Int) common.TransactionBuilder 
 
 func (t *TransactionBuilder) BuildLegacyTx(ctx context.Context) (*types.Transaction, error) {
 	if t.to == nil && t.data == nil {
-		return nil, fmt.Errorf("transaction without data and to params is invalid, specify the params")
+		return nil, fmt.Errorf("transaction requires data or to address")
 	}
 
 	if t.nonce == nil {
@@ -115,11 +115,11 @@ func (t *TransactionBuilder) BuildLegacyTx(ctx context.Context) (*types.Transact
 
 func (t *TransactionBuilder) BuildDynamicTx(ctx context.Context) (*types.Transaction, error) {
 	if !t.wallet.IsEIP1559Applicable() {
-		return nil, fmt.Errorf("current chainId is not supported for dynamic tx")
+		return nil, fmt.Errorf("unsupported: dynamic transactions on this chain")
 	}
 
 	if t.to == nil && t.data == nil {
-		return nil, fmt.Errorf("transaction without data and to params is invalid, specify the params")
+		return nil, fmt.Errorf("transaction requires data or to address")
 	}
 
 	if t.nonce == nil {

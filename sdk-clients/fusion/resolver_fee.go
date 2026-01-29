@@ -23,18 +23,18 @@ var ResolverFeeZero = &ResolverFee{
 
 func NewResolverFee(receiver string, fee *Bps, whitelistDiscount *Bps) (*ResolverFee, error) {
 	if (receiver == "" || receiver == addresses.ZeroAddress) && !fee.IsZero() {
-		return nil, errors.New("fee must be zero if receiver is zero address")
+		return nil, errors.New("fee requires non-zero receiver address")
 	}
 	if !(receiver == "" || receiver == addresses.ZeroAddress) && fee.IsZero() {
-		return nil, errors.New("receiver must be zero address if fee is zero")
+		return nil, errors.New("zero fee requires zero receiver address")
 	}
 	if fee.IsZero() && !whitelistDiscount.IsZero() {
-		return nil, errors.New("whitelist discount must be zero if fee is zero")
+		return nil, errors.New("zero fee requires zero whitelist discount")
 	}
 
 	// Check percent precision: must be divisible by 100 (i.e. 1%)
 	if new(big.Int).Rem(whitelistDiscount.Value(), big.NewInt(100)).Sign() != 0 {
-		return nil, errors.New("whitelist discount must have percent precision: 1%, 2% and so on")
+		return nil, errors.New("whitelist discount must be an integer percent")
 	}
 
 	return &ResolverFee{
