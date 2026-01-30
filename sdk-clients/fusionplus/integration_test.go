@@ -325,7 +325,7 @@ func TestSettlementPostInteractionData_Integration_FusionPlus(t *testing.T) {
 	defer func() { timeNow = originalTimeNow }()
 
 	details := Details{
-		Auction: &AuctionDetails{
+		Auction: &fusionorder.AuctionDetails{
 			StartTime: 1700000000,
 			Duration:  180,
 		},
@@ -336,7 +336,7 @@ func TestSettlementPostInteractionData_Integration_FusionPlus(t *testing.T) {
 			},
 			BankFee: big.NewInt(0),
 		},
-		Whitelist: []AuctionWhitelistItem{
+		Whitelist: []fusionorder.AuctionWhitelistItem{
 			{
 				Address:   common.HexToAddress("0x00000000219ab540356cbb839cbe05303d7705fa"),
 				AllowFrom: big.NewInt(0),

@@ -52,7 +52,7 @@ func NewExtensionPlus(params ExtensionParamsPlus) (*ExtensionPlus, error) {
 	extensionPlus.PostInteraction = postInteraction.Encode()
 
 	if params.Permit != "" {
-		permitInteraction := &Interaction{
+		permitInteraction := &fusionorder.Interaction{
 			Target: geth_common.HexToAddress(params.Asset),
 			Data:   params.Permit,
 		}
@@ -159,7 +159,7 @@ func FromLimitOrderExtension(extension *orderbook.Extension) (*ExtensionPlus, er
 		PostInteraction:  extension.PostInteraction,
 	}
 
-	var permitInteraction *Interaction
+	var permitInteraction *fusionorder.Interaction
 	if extension.MakerPermit != "" && extension.MakerPermit != "0x" {
 		permitInteraction, err = fusionorder.DecodeInteraction(extension.MakerPermit)
 		if err != nil {

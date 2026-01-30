@@ -4,6 +4,7 @@ import (
 	"math/big"
 	"testing"
 
+	"github.com/1inch/1inch-sdk-go/common/fusionorder"
 	"github.com/ethereum/go-ethereum/common"
 	"github.com/stretchr/testify/assert"
 )
@@ -14,7 +15,7 @@ func TestSettlementPostInteractionData_CanExecuteAt(t *testing.T) {
 	resolver2 := common.HexToAddress("0xabcdefabcdefabcdefabcdefabcdefabcdefabcd")
 	resolvingStartTime := big.NewInt(1000)
 
-	whitelist := []WhitelistItem{
+	whitelist := []fusionorder.WhitelistItem{
 		{
 			AddressHalf: "12345678901234567890", // last 20 chars of resolver1
 			Delay:       big.NewInt(0),
@@ -74,7 +75,7 @@ func TestSettlementPostInteractionData_IsExclusiveResolver(t *testing.T) {
 	resolver1 := common.HexToAddress("0x1234567890123456789012345678901234567890")
 	resolver2 := common.HexToAddress("0xabcdefabcdefabcdefabcdefabcdefabcdefabcd")
 
-	whitelist := []WhitelistItem{
+	whitelist := []fusionorder.WhitelistItem{
 		{
 			AddressHalf: "12345678901234567890", // last 20 chars of resolver1
 			Delay:       big.NewInt(0),          // exclusive (delay = 0)

@@ -5,6 +5,7 @@ import (
 	"strings"
 	"testing"
 
+	"github.com/1inch/1inch-sdk-go/common/fusionorder"
 	random_number_generation "github.com/1inch/1inch-sdk-go/internal/random-number-generation"
 	"github.com/1inch/1inch-sdk-go/sdk-clients/orderbook"
 	"github.com/ethereum/go-ethereum/common"
@@ -24,7 +25,7 @@ func TestMakerTraitsEncoding_KnownValues(t *testing.T) {
 		{
 			name: "Standard fusionplus order - partial and multiple fills allowed",
 			details: Details{
-				Auction: &AuctionDetails{
+				Auction: &fusionorder.AuctionDetails{
 					StartTime: 1673548149,
 					Duration:  180,
 				},
@@ -40,7 +41,7 @@ func TestMakerTraitsEncoding_KnownValues(t *testing.T) {
 		{
 			name: "No partial fills - requires nonce",
 			details: Details{
-				Auction: &AuctionDetails{
+				Auction: &fusionorder.AuctionDetails{
 					StartTime: 1673548149,
 					Duration:  180,
 				},
@@ -56,7 +57,7 @@ func TestMakerTraitsEncoding_KnownValues(t *testing.T) {
 		{
 			name: "With permit2 flag",
 			details: Details{
-				Auction: &AuctionDetails{
+				Auction: &fusionorder.AuctionDetails{
 					StartTime: 1673548149,
 					Duration:  180,
 				},
@@ -72,7 +73,7 @@ func TestMakerTraitsEncoding_KnownValues(t *testing.T) {
 		{
 			name: "Different deadline - longer duration",
 			details: Details{
-				Auction: &AuctionDetails{
+				Auction: &fusionorder.AuctionDetails{
 					StartTime: 1673548149,
 					Duration:  3600,
 				},
@@ -103,7 +104,7 @@ func TestMakerTraitsEncoding_KnownValues(t *testing.T) {
 // TestMakerTraitsEncoding_FlagVariations verifies different flag combinations produce different encodings
 func TestMakerTraitsEncoding_FlagVariations(t *testing.T) {
 	baseDetails := Details{
-		Auction: &AuctionDetails{
+		Auction: &fusionorder.AuctionDetails{
 			StartTime: 1673548149,
 			Duration:  180,
 		},
@@ -159,31 +160,31 @@ func TestMakerTraitsEncoding_FlagVariations(t *testing.T) {
 func TestAuctionDetailsEncoding_FusionPlus_KnownValues(t *testing.T) {
 	tests := []struct {
 		name           string
-		auctionDetails *AuctionDetails
+		auctionDetails *fusionorder.AuctionDetails
 		expectedEncode string
 	}{
 		{
 			name: "Standard auction - no gas cost",
-			auctionDetails: &AuctionDetails{
+			auctionDetails: &fusionorder.AuctionDetails{
 				StartTime:       1673548149,
 				Duration:        180,
 				InitialRateBump: 50000,
-				Points:          []AuctionPointClassFixed{{Coefficient: 20000, Delay: 12}},
-				GasCost:         GasCostConfigClassFixed{GasBumpEstimate: 0, GasPriceEstimate: 0},
+				Points:          []fusionorder.AuctionPointClassFixed{{Coefficient: 20000, Delay: 12}},
+				GasCost:         fusionorder.GasCostConfigClassFixed{GasBumpEstimate: 0, GasPriceEstimate: 0},
 			},
 			expectedEncode: "0000000000000063c051750000b400c350004e20000c",
 		},
 		{
 			name: "With multiple points",
-			auctionDetails: &AuctionDetails{
+			auctionDetails: &fusionorder.AuctionDetails{
 				StartTime:       1673548149,
 				Duration:        180,
 				InitialRateBump: 50000,
-				Points: []AuctionPointClassFixed{
+				Points: []fusionorder.AuctionPointClassFixed{
 					{Coefficient: 10000, Delay: 10},
 					{Coefficient: 5000, Delay: 20},
 				},
-				GasCost: GasCostConfigClassFixed{GasBumpEstimate: 0, GasPriceEstimate: 0},
+				GasCost: fusionorder.GasCostConfigClassFixed{GasBumpEstimate: 0, GasPriceEstimate: 0},
 			},
 			expectedEncode: "0000000000000063c051750000b400c350002710000a0013880014",
 		},
@@ -192,10 +193,10 @@ func TestAuctionDetailsEncoding_FusionPlus_KnownValues(t *testing.T) {
 	for _, tc := range tests {
 		t.Run(tc.name, func(t *testing.T) {
 			encoded := tc.auctionDetails.EncodeWithoutPointCount()
-			assert.Equal(t, tc.expectedEncode, encoded, "AuctionDetails encoding mismatch")
+			assert.Equal(t, tc.expectedEncode, encoded, "fusionorder.AuctionDetails encoding mismatch")
 
 			encoded2 := tc.auctionDetails.EncodeWithoutPointCount()
-			assert.Equal(t, encoded, encoded2, "AuctionDetails encoding should be deterministic")
+			assert.Equal(t, encoded, encoded2, "fusionorder.AuctionDetails encoding should be deterministic")
 		})
 	}
 }
@@ -517,15 +518,15 @@ func TestEscrowExtension_KnownFields(t *testing.T) {
 			params: EscrowExtensionParams{
 				ExtensionParamsPlus: ExtensionParamsPlus{
 					SettlementContract: "0x5678",
-					AuctionDetails: &AuctionDetails{
+					AuctionDetails: &fusionorder.AuctionDetails{
 						StartTime:       0,
 						Duration:        0,
 						InitialRateBump: 0,
 						Points:          nil,
-						GasCost:         GasCostConfigClassFixed{},
+						GasCost:         fusionorder.GasCostConfigClassFixed{},
 					},
 					PostInteractionData: &SettlementPostInteractionData{
-						Whitelist: []WhitelistItem{},
+						Whitelist: []fusionorder.WhitelistItem{},
 						IntegratorFee: &IntegratorFee{
 							Ratio:    big.NewInt(0),
 							Receiver: common.Address{},

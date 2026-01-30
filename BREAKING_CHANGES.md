@@ -82,16 +82,9 @@ Only type aliases needed by users at the public API level remain:
 - `fusion.CustomPresetPoint` = `fusionorder.CustomPresetPoint` (used in `CustomPreset.Points`)
 
 **In `fusionplus`:**
-- `fusionplus.TakingFeeInfo` = `fusionorder.TakingFeeInfo`
-- `fusionplus.CustomPreset` = `fusionorder.CustomPreset`
-- `fusionplus.CustomPresetPoint` = `fusionorder.CustomPresetPoint`
-- `fusionplus.Interaction` = `fusionorder.Interaction`
-- `fusionplus.AuctionDetails` = `fusionorder.AuctionDetails`
-- `fusionplus.AuctionPointClassFixed` = `fusionorder.AuctionPointClassFixed`
-- `fusionplus.GasCostConfigClassFixed` = `fusionorder.GasCostConfigClassFixed`
-- `fusionplus.WhitelistItem` = `fusionorder.WhitelistItem`
-- `fusionplus.ExtraData` = `fusionorder.ExtraData`
-- `fusionplus.AuctionWhitelistItem` = `fusionorder.AuctionWhitelistItem`
+- `fusionplus.TakingFeeInfo` = `fusionorder.TakingFeeInfo` (used in `OrderParams.Fee`)
+- `fusionplus.CustomPreset` = `fusionorder.CustomPreset` (used in `OrderParams.CustomPreset`)
+- `fusionplus.CustomPresetPoint` = `fusionorder.CustomPresetPoint` (used in `CustomPreset.Points`)
 
 #### Type Aliases Removed (Internal-only types)
 
@@ -107,6 +100,18 @@ The following type aliases have been removed from `fusion` - use `fusionorder.*`
 | `fusion.ExtraData` | `fusionorder.ExtraData` |
 | `fusion.Bps` | `fusionorder.Bps` |
 | `fusion.Interaction` | `fusionorder.Interaction` |
+
+**Removed from `fusionplus`:**
+
+| Removed Alias | Use Instead |
+|---------------|-------------|
+| `fusionplus.Interaction` | `fusionorder.Interaction` |
+| `fusionplus.AuctionDetails` | `fusionorder.AuctionDetails` |
+| `fusionplus.AuctionPointClassFixed` | `fusionorder.AuctionPointClassFixed` |
+| `fusionplus.GasCostConfigClassFixed` | `fusionorder.GasCostConfigClassFixed` |
+| `fusionplus.WhitelistItem` | `fusionorder.WhitelistItem` |
+| `fusionplus.AuctionWhitelistItem` | `fusionorder.AuctionWhitelistItem` |
+| `fusionplus.ExtraData` | `fusionorder.ExtraData` |
 
 These types are only used internally by the SDK and users do not need to construct them directly.
 

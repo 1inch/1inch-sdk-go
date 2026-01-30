@@ -15,7 +15,7 @@ import (
 // SettlementPostInteractionData represents post interaction data for FusionPlus orders.
 // The IntegratorFee and BankFee fields are optional - when nil, they are not encoded.
 type SettlementPostInteractionData struct {
-	Whitelist          []WhitelistItem
+	Whitelist          []fusionorder.WhitelistItem
 	IntegratorFee      *IntegratorFee // Optional: only used in extension encoding
 	BankFee            *big.Int       // Optional: only used in extension encoding
 	ResolvingStartTime *big.Int
@@ -147,7 +147,7 @@ func DecodeSettlementPostInteractionData(data string) (*SettlementPostInteractio
 		return nil, err
 	}
 
-	var whitelist []WhitelistItem
+	var whitelist []fusionorder.WhitelistItem
 	for !iter.IsEmpty() {
 		addressHalfRaw, err := iter.NextBytes(10)
 		if err != nil {
@@ -158,7 +158,7 @@ func DecodeSettlementPostInteractionData(data string) (*SettlementPostInteractio
 		if err != nil {
 			return nil, err
 		}
-		whitelist = append(whitelist, WhitelistItem{
+		whitelist = append(whitelist, fusionorder.WhitelistItem{
 			AddressHalf: addressHalf,
 			Delay:       delay,
 		})

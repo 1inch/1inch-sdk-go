@@ -73,9 +73,9 @@ func CreateFusionPlusOrderData(quoteParams QuoterControllerGetQuoteParamsFixed, 
 		BankFee: big.NewInt(0),
 	}
 
-	whitelistAddresses := make([]AuctionWhitelistItem, 0)
+	whitelistAddresses := make([]fusionorder.AuctionWhitelistItem, 0)
 	for _, address := range quote.Whitelist {
-		whitelistAddresses = append(whitelistAddresses, AuctionWhitelistItem{
+		whitelistAddresses = append(whitelistAddresses, fusionorder.AuctionWhitelistItem{
 			Address:   geth_common.HexToAddress(address),
 			AllowFrom: big.NewInt(0), // TODO generating the correct list here requires checking for an exclusive resolver. This needs to be checked for later. The generated object does not see exclusive resolver correctly
 		})
@@ -240,7 +240,7 @@ func GetPreset(presets QuotePresets, presetType GetQuoteOutputRecommendedPreset)
 	return nil, fmt.Errorf("unsupported preset type: %v", presetType)
 }
 
-func CreateAuctionDetails(preset *Preset, additionalWaitPeriod float32) (*AuctionDetails, error) {
+func CreateAuctionDetails(preset *Preset, additionalWaitPeriod float32) (*fusionorder.AuctionDetails, error) {
 	points := make([]fusionorder.AuctionPointInput, len(preset.Points))
 	for i, point := range preset.Points {
 		points[i] = fusionorder.AuctionPointInput{
@@ -320,7 +320,7 @@ func CreateOrder(params CreateOrderDataParams) (*Order, error) {
 		OrderInfo:           params.orderInfo,
 		AuctionDetails:      params.details.Auction,
 		PostInteractionData: params.postInteractionData,
-		Extra: ExtraData{
+		Extra: fusionorder.ExtraData{
 			UnwrapWETH:           params.extraParams.unwrapWeth,
 			Nonce:                params.extraParams.Nonce,
 			Permit:               params.extraParams.Permit,
@@ -333,7 +333,7 @@ func CreateOrder(params CreateOrderDataParams) (*Order, error) {
 	}, nil
 }
 
-func CreateAuctionDetailsPlus(preset *PresetClassFixed, additionalWaitPeriod float32) (*AuctionDetails, error) {
+func CreateAuctionDetailsPlus(preset *PresetClassFixed, additionalWaitPeriod float32) (*fusionorder.AuctionDetails, error) {
 	points := make([]fusionorder.AuctionPointInput, len(preset.Points))
 	for i, point := range preset.Points {
 		points[i] = fusionorder.AuctionPointInput{

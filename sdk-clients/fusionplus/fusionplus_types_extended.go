@@ -9,10 +9,6 @@ import (
 	"github.com/ethereum/go-ethereum/common"
 )
 
-// Type alias for internal use - this type is now in fusionorder
-// Users should import from fusionorder directly for new code
-type Interaction = fusionorder.Interaction
-
 type GetOrderByOrderHashParams struct {
 	Hash string `url:"hash" json:"hash"`
 }
@@ -165,9 +161,9 @@ type Order struct {
 	Inner               orderbook.OrderData
 	SettlementExtension common.Address
 	OrderInfo           CrossChainOrderDto
-	AuctionDetails      *AuctionDetails
+	AuctionDetails      *fusionorder.AuctionDetails
 	PostInteractionData *SettlementPostInteractionData
-	Extra               ExtraData
+	Extra               fusionorder.ExtraData
 }
 
 type EscrowExtensionParams struct {
@@ -220,15 +216,6 @@ type CustomPreset = fusionorder.CustomPreset
 // CustomPresetPoint is an alias for the shared fusionorder.CustomPresetPoint type
 type CustomPresetPoint = fusionorder.CustomPresetPoint
 
-// AuctionDetails is an alias for the shared fusionorder.AuctionDetails type
-type AuctionDetails = fusionorder.AuctionDetails
-
-// AuctionPointClassFixed is an alias for the shared fusionorder.AuctionPointClassFixed type
-type AuctionPointClassFixed = fusionorder.AuctionPointClassFixed
-
-// GasCostConfigClassFixed is an alias for the shared fusionorder.GasCostConfigClassFixed type
-type GasCostConfigClassFixed = fusionorder.GasCostConfigClassFixed
-
 type PreparedOrder struct {
 	Order      Order  `json:"order"`
 	Hash       string `json:"hash"`
@@ -243,9 +230,9 @@ type AdditionalParams struct {
 }
 
 type Details struct {
-	Auction            *AuctionDetails `json:"auction"`
-	Fees               Fees            `json:"fees"`
-	Whitelist          []AuctionWhitelistItem
+	Auction            *fusionorder.AuctionDetails `json:"auction"`
+	Fees               Fees                        `json:"fees"`
+	Whitelist          []fusionorder.AuctionWhitelistItem
 	ResolvingStartTime *big.Int
 }
 
@@ -259,9 +246,6 @@ type IntegratorFee struct {
 	Receiver common.Address
 }
 
-// AuctionWhitelistItem is an alias for the shared fusionorder.AuctionWhitelistItem type
-type AuctionWhitelistItem = fusionorder.AuctionWhitelistItem
-
 type ExtraParams struct {
 	Nonce                *big.Int
 	Permit               string
@@ -274,18 +258,12 @@ type ExtraParams struct {
 }
 
 type SettlementSuffixData struct {
-	Whitelist          []AuctionWhitelistItem
+	Whitelist          []fusionorder.AuctionWhitelistItem
 	IntegratorFee      *IntegratorFee
 	BankFee            *big.Int
 	ResolvingStartTime *big.Int
 	CustomReceiver     common.Address
 }
-
-// WhitelistItem is an alias for the shared fusionorder.WhitelistItem type
-type WhitelistItem = fusionorder.WhitelistItem
-
-// ExtraData is an alias for the shared fusionorder.ExtraData type
-type ExtraData = fusionorder.ExtraData
 
 // PresetClassFixed defines model for PresetClass.
 type PresetClassFixed struct {
@@ -345,7 +323,7 @@ type FusionOrderV4 struct {
 
 type ExtensionParamsPlus struct {
 	SettlementContract  string
-	AuctionDetails      *AuctionDetails
+	AuctionDetails      *fusionorder.AuctionDetails
 	PostInteractionData *SettlementPostInteractionData
 	Asset               string
 	Permit              string
@@ -362,7 +340,7 @@ type ExtensionParamsPlus struct {
 type ExtensionPlus struct {
 	// Raw unencoded data
 	SettlementContract  string
-	AuctionDetails      *AuctionDetails
+	AuctionDetails      *fusionorder.AuctionDetails
 	PostInteractionData *SettlementPostInteractionData
 	Asset               string
 	Permit              string
