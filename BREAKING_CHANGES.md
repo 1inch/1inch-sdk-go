@@ -327,3 +327,24 @@ All non-generated code now uses `any` instead of `interface{}` (Go 1.18+ idiomat
 - `constants/abi/aggregationRouterV5.abi.json` - unused V5 ABI file
 - `internal/slice_utils/` - entire package removed (replaced with stdlib `slices`)
 - `validate.ValidationFunc` type alias - removed (replaced with generic inline func type)
+- `SDK_EVALUATION.md` - removed stale code audit document
+- `TEST_COVERAGE_ANALYSIS.md` - removed stale test coverage document
+
+### Bug Fixes
+
+- **`fusion.PlaceOrders`**: Fixed HTTP method from `GET` to `POST`. Sending a request body with `GET` is semantically incorrect and may be rejected by some HTTP servers/proxies.
+- **`fusion` validation**: Removed duplicate `WalletAddress` validation in `QuoterControllerGetQuoteWithCustomPresetsParamsFixed.Validate()` (same check was running twice).
+
+### Renamed Files
+
+| Old Name | New Name | Reason |
+|----------|----------|--------|
+| `aggregation/aggregation_teyps_extended.gen.go` | `aggregation/aggregation_types_extended.gen.go` | Typo fix (`teyps` → `types`) |
+| `gasprices/spotprices_types_extended.go` | `gasprices/gasprices_types_extended.go` | Wrong package prefix (`spotprices` → `gasprices`) |
+
+### Version Bump
+
+All version references updated from `v2.0.0` to `v3.0.0`:
+- `User-Agent` header in HTTP client
+- `CLAUDE.md` project version
+- `BREAKING_CHANGES.md` version header

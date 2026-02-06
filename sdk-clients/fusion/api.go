@@ -174,7 +174,7 @@ func (api *api) PlaceOrders(ctx context.Context, body []PlaceOrderBody) (*GetQuo
 	}
 
 	payload := common.RequestPayload{
-		Method: "GET",
+		Method: "POST",
 		Params: nil,
 		U:      u,
 		Body:   bodyMarshaled,
