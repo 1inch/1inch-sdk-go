@@ -2,7 +2,7 @@
 
 This document tracks breaking changes introduced in each version of the SDK.
 
-## Version 2.0.0 (Upcoming)
+## Version 3.0.0 (Upcoming)
 
 ### Architectural Refactoring: Shared `fusionorder` Package
 

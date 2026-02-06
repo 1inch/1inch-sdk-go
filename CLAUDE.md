@@ -7,7 +7,7 @@ This is the official Go SDK for interacting with 1inch Network APIs. It provides
 **Module**: `github.com/1inch/1inch-sdk-go`  
 **Go Version**: 1.22+ (toolchain 1.23.0)  
 **License**: MIT  
-**Current Version**: v2.0.0
+**Current Version**: v3.0.0
 
 ## Project Structure
 
@@ -122,7 +122,7 @@ quote, err := client.GetQuote(ctx, aggregation.GetQuoteParams{...})
 ```go
 // HttpExecutor - HTTP request execution
 type HttpExecutor interface {
-    ExecuteRequest(ctx context.Context, payload RequestPayload, v interface{}) error
+    ExecuteRequest(ctx context.Context, payload RequestPayload, v any) error
 }
 
 // Wallet - Ethereum wallet operations
@@ -148,23 +148,25 @@ type TransactionBuilder interface {
 ```
 
 ### Validation Pattern
-Each API client has a `validation.go` with `Validate()` methods on params:
+Each API client has a `validation.go` with `Validate()` methods on params. The validation framework uses Go generics for compile-time type safety:
 
 ```go
 func (params *GetSwapParams) Validate() error {
     var validationErrors []error
     validationErrors = validate.Parameter(params.Src, "src", validate.CheckEthereumAddressRequired, validationErrors)
     // ... more validations
-    return validate.ConsolidateValidationErorrs(validationErrors)
+    return validate.ConsolidateValidationErrors(validationErrors)
 }
 ```
 
+`validate.Parameter[T]` is generic — the compiler infers the type from the parameter and ensures the check function signature matches. Check functions take typed parameters (e.g., `CheckEthereumAddress(value string, ...)`) rather than `interface{}`.
+
 Common validators in `internal/validate/`:
-- `CheckEthereumAddressRequired` / `CheckEthereumAddress`
-- `CheckBigIntRequired` / `CheckBigInt`
-- `CheckSlippageRequired` (0.01-50 range)
-- `CheckPrivateKeyRequired` (64 hex chars)
-- `CheckChainIdIntRequired`
+- `CheckEthereumAddressRequired` / `CheckEthereumAddress` (string)
+- `CheckBigIntRequired` / `CheckBigInt` (string)
+- `CheckSlippageRequired` / `CheckSlippage` (float32, 0.01-50 range)
+- `CheckPrivateKeyRequired` / `CheckPrivateKey` (string, 64 hex chars)
+- `CheckChainIdIntRequired` / `CheckChainIdInt` (int)
 
 ## Type Generation
 
@@ -397,13 +399,9 @@ type WhitelistItem = fusionorder.WhitelistItem
 - In `fusion`: `fusionExtension`, `fusionOrder`
 - In `fusionplus`: `extensionPlus`, `auctionDetailsPlus`, `presetPlus`
 
-### Function Aliasing Pattern
+### Shared Functions
 
-When a function is shared, create an alias rather than duplicating code:
-```go
-// In fusion/settlementpostinteractiondata.go
-var GenerateWhitelist = fusionorder.GenerateWhitelist
-```
+When a function is shared across `fusion` and `fusionplus`, it lives in `fusionorder`. Import it directly from there — do not create re-export aliases in the leaf packages.
 
 ### Encoding Differences
 
