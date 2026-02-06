@@ -207,13 +207,13 @@ type OrderParams struct {
 	CustomPreset      CustomPreset
 }
 
-// TakingFeeInfo is an alias for the shared fusionorder.TakingFeeInfo type
+// Deprecated: Use fusionorder.TakingFeeInfo directly instead.
 type TakingFeeInfo = fusionorder.TakingFeeInfo
 
-// CustomPreset is an alias for the shared fusionorder.CustomPreset type
+// Deprecated: Use fusionorder.CustomPreset directly instead.
 type CustomPreset = fusionorder.CustomPreset
 
-// CustomPresetPoint is an alias for the shared fusionorder.CustomPresetPoint type
+// Deprecated: Use fusionorder.CustomPresetPoint directly instead.
 type CustomPresetPoint = fusionorder.CustomPresetPoint
 
 type PreparedOrder struct {
