@@ -6,6 +6,7 @@ import (
 	"math/big"
 
 	"github.com/1inch/1inch-sdk-go/common/fusionorder"
+	"github.com/1inch/1inch-sdk-go/constants"
 	"github.com/1inch/1inch-sdk-go/internal/bytesbuilder"
 	"github.com/1inch/1inch-sdk-go/internal/bytesiterator"
 	"github.com/ethereum/go-ethereum/common"
@@ -73,7 +74,7 @@ func (spid SettlementPostInteractionData) Encode() (string, error) {
 		bytes.AddUint16(spid.IntegratorFee.Ratio)
 		bytes.AddAddress(spid.IntegratorFee.Receiver)
 
-		if spid.CustomReceiver.Hex() != "0x0000000000000000000000000000000000000000" {
+		if spid.CustomReceiver.Hex() != constants.ZeroAddress {
 			bitMask.SetBit(bitMask, 2, 1)
 			bytes.AddAddress(spid.CustomReceiver)
 		}

@@ -1,7 +1,6 @@
 package orderbook
 
 import (
-	"bytes"
 	"encoding/binary"
 	"encoding/hex"
 	"fmt"
@@ -138,11 +137,6 @@ func Decode(data []byte) (*Extension, error) {
 	return &ext, nil
 }
 
-// contains checks if the substring is present in the string.
-func contains(s, substr string) bool {
-	return bytes.Contains([]byte(s), []byte(substr))
-}
-
 // Encode encodes the Extension struct into a hex string with offsets.
 func (ext *Extension) Encode() (string, error) {
 	fields := []string{
@@ -162,7 +156,6 @@ func (ext *Extension) Encode() (string, error) {
 	// Decode each field and collect byte counts
 	for _, field := range fields {
 		fieldStr := hexadecimal.Trim0x(field)
-		fieldStr = hexadecimal.Trim0x(fieldStr)
 
 		// Ensure even length for hex decoding
 		if len(fieldStr)%2 != 0 {

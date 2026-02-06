@@ -22,11 +22,11 @@ func main() {
 		devPortalToken,
 	)
 	if err != nil {
-		log.Fatalf("Failed to create configuration: %v\n", err)
+		log.Fatalf("Failed to create configuration: %v", err)
 	}
 	client, err := aggregation.NewClientOnlyAPI(config) // A light-weight client that is not capable of signing transactions
 	if err != nil {
-		log.Fatalf("Failed to create client: %v\n", err)
+		log.Fatalf("Failed to create client: %v", err)
 	}
 	ctx := context.Background()
 
@@ -39,12 +39,12 @@ func main() {
 		DisableEstimate: true, // This stops the 1inch API from checking if the wallet is not able to make the swap
 	})
 	if err != nil {
-		log.Fatalf("Failed to get swap data: %v\n", err)
+		log.Fatalf("Failed to get swap data: %v", err)
 	}
 
 	output, err := json.MarshalIndent(swapData, "", "  ")
 	if err != nil {
-		log.Fatalf("Failed to marshal swap data: %v\n", err)
+		log.Fatalf("Failed to marshal swap data: %v", err)
 	}
 	fmt.Printf("%s\n", string(output))
 }

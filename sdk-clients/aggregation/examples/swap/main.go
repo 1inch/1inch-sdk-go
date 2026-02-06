@@ -39,11 +39,11 @@ func main() {
 		ApiKey:     devPortalToken,
 	})
 	if err != nil {
-		log.Fatalf("Failed to create configuration: %v\n", err)
+		log.Fatalf("Failed to create configuration: %v", err)
 	}
 	client, err := aggregation.NewClient(config)
 	if err != nil {
-		log.Fatalf("Failed to create client: %v\n", err)
+		log.Fatalf("Failed to create client: %v", err)
 	}
 	ctx := context.Background()
 
@@ -55,21 +55,21 @@ func main() {
 		Slippage: 1,
 	})
 	if err != nil {
-		log.Fatalf("Failed to get swap data: %v\n", err)
+		log.Fatalf("Failed to get swap data: %v", err)
 	}
 
 	tx, err := client.TxBuilder.New().SetData(swapData.TxNormalized.Data).SetTo(&swapData.TxNormalized.To).SetGas(swapData.TxNormalized.Gas).SetValue(swapData.TxNormalized.Value).Build(ctx)
 	if err != nil {
-		log.Fatalf("Failed to build transaction: %v\n", err)
+		log.Fatalf("Failed to build transaction: %v", err)
 	}
 	signedTx, err := client.Wallet.Sign(tx)
 	if err != nil {
-		log.Fatalf("Failed to sign transaction: %v\n", err)
+		log.Fatalf("Failed to sign transaction: %v", err)
 	}
 
 	err = client.Wallet.BroadcastTransaction(ctx, signedTx)
 	if err != nil {
-		log.Fatalf("Failed to broadcast transaction: %v\n", err)
+		log.Fatalf("Failed to broadcast transaction: %v", err)
 	}
 
 	// Waiting for transaction, just an example of it

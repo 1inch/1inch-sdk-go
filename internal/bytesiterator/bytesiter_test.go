@@ -25,7 +25,7 @@ func uint32FromHex(hexStr string) (uint32, error) {
 		return 0, err
 	}
 	if len(b) > 4 {
-		return 0, fmt.Errorf("more than 4 bytes: %v\n", hexStr)
+		return 0, fmt.Errorf("more than 4 bytes: %v", hexStr)
 	}
 	var val uint32
 	for _, bb := range b {
@@ -121,7 +121,6 @@ func TestUint32FromHex(t *testing.T) {
 	}
 
 	for _, tt := range tests {
-		tt := tt
 		t.Run(tt.name, func(t *testing.T) {
 			val, err := uint32FromHex(tt.hexStr)
 			if tt.expectError {
@@ -165,7 +164,6 @@ func TestBytesIter_NextByte(t *testing.T) {
 	}
 
 	for _, tt := range tests {
-		tt := tt
 		t.Run(tt.name, func(t *testing.T) {
 			data, err := hexutil.Decode(tt.hexData)
 			require.NoError(t, err)
@@ -215,7 +213,6 @@ func TestBytesIter_NextUint16(t *testing.T) {
 	}
 
 	for _, tt := range tests {
-		tt := tt
 		t.Run(tt.name, func(t *testing.T) {
 			data, err := hexutil.Decode(tt.hexData)
 			require.NoError(t, err)
@@ -256,7 +253,6 @@ func TestBytesIter_NextUint24(t *testing.T) {
 	}
 
 	for _, tt := range tests {
-		tt := tt
 		t.Run(tt.name, func(t *testing.T) {
 			data, err := hexutil.Decode(tt.hexData)
 			require.NoError(t, err)
@@ -297,7 +293,6 @@ func TestBytesIter_NextUint32(t *testing.T) {
 	}
 
 	for _, tt := range tests {
-		tt := tt
 		t.Run(tt.name, func(t *testing.T) {
 			data, err := hexutil.Decode(tt.hexData)
 			require.NoError(t, err)
@@ -336,7 +331,6 @@ func TestBytesIter_NextUint160(t *testing.T) {
 	}
 
 	for _, tt := range tests {
-		tt := tt
 		t.Run(tt.name, func(t *testing.T) {
 			data, err := hexutil.Decode(tt.hexData)
 			require.NoError(t, err)
@@ -374,7 +368,6 @@ func TestBytesIter_NextUint256(t *testing.T) {
 	}
 
 	for _, tt := range tests {
-		tt := tt
 		t.Run(tt.name, func(t *testing.T) {
 			data, err := hexutil.Decode(tt.hexData)
 			require.NoError(t, err)
@@ -430,7 +423,6 @@ func TestBytesIter_NextBytes(t *testing.T) {
 	}
 
 	for _, tt := range tests {
-		tt := tt
 		t.Run(tt.name, func(t *testing.T) {
 			data, err := hexutil.Decode(tt.hexData)
 			require.NoError(t, err)
@@ -488,7 +480,6 @@ func TestBytesIter_NextString(t *testing.T) {
 	}
 
 	for _, tt := range tests {
-		tt := tt
 		t.Run(tt.name, func(t *testing.T) {
 			data, err := hexutil.Decode(tt.hexData)
 			require.NoError(t, err)
@@ -537,7 +528,6 @@ func TestBytesIter_Rest(t *testing.T) {
 	}
 
 	for _, tt := range tests {
-		tt := tt
 		t.Run(tt.name, func(t *testing.T) {
 			data, err := hexutil.Decode(tt.hexData)
 			require.NoError(t, err)
@@ -601,7 +591,6 @@ func TestBytesIter_IsEmpty(t *testing.T) {
 	}
 
 	for _, tt := range tests {
-		tt := tt
 		t.Run(tt.name, func(t *testing.T) {
 			data, err := hexutil.Decode(tt.hexData)
 			require.NoError(t, err)

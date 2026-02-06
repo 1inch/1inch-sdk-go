@@ -11,6 +11,7 @@ import (
 
 	"github.com/ethereum/go-ethereum/crypto"
 
+	"github.com/1inch/1inch-sdk-go/constants"
 	"github.com/1inch/1inch-sdk-go/sdk-clients/orderbook"
 )
 
@@ -23,10 +24,9 @@ var (
 const (
 	wmatic      = "0x0d500B1d8E8eF31E21C99d1Db9A6444d3ADf1270"
 	usdc        = "0x3c499c542cEF5E3811e1192ce70d8cC03d5c3359"
-	ten18       = "1000000000000000000"
-	ten8        = "100000000"
-	zeroAddress = "0x0000000000000000000000000000000000000000"
-	chainId     = 137
+	ten18   = "1000000000000000000"
+	ten8    = "100000000"
+	chainId = 137
 )
 
 var (
@@ -47,11 +47,11 @@ func main() {
 		ApiKey:     devPortalToken,
 	})
 	if err != nil {
-		log.Fatal(err)
+		log.Fatalf("Failed to create configuration: %v", err)
 	}
 	client, err := orderbook.NewClient(config)
 	if err != nil {
-		log.Fatalf("Failed to create client: %v\n", err)
+		log.Fatalf("Failed to create client: %v", err)
 	}
 
 	ecdsaPrivateKey, err := crypto.HexToECDSA(privateKey)
@@ -74,8 +74,8 @@ func main() {
 	buildOrderExtensionBytesParams := &orderbook.BuildOrderExtensionBytesParams{
 		ExtensionTarget: feeInfo.ExtensionAddress,
 		IntegratorFee: &orderbook.IntegratorFee{
-			Integrator: zeroAddress,
-			Protocol:   zeroAddress,
+			Integrator: constants.ZeroAddress,
+			Protocol:   constants.ZeroAddress,
 			Fee:        0,
 			Share:      0,
 		},
@@ -90,7 +90,7 @@ func main() {
 
 	extensionEncoded, err := orderbook.BuildOrderExtensionBytes(buildOrderExtensionBytesParams)
 	if err != nil {
-		log.Fatalf("Failed to create extension: %v\n", err)
+		log.Fatalf("Failed to create extension: %v", err)
 	}
 
 	salt, err := orderbook.GenerateSaltWithFees(&orderbook.GetSaltParams{
@@ -118,7 +118,7 @@ func main() {
 		log.Fatalf("Failed to create order: %v", err)
 	}
 	if !createOrderResponse.Success {
-		log.Fatalf("Request completed, but order creation status was a failure: %v\n", createOrderResponse)
+		log.Fatalf("Request completed, but order creation status was a failure: %v", createOrderResponse)
 	}
 
 	// Sleep to accommodate free-tier API keys

@@ -122,7 +122,7 @@ func TestDecodeExtension(t *testing.T) {
 			if tt.expectingErr {
 				if err == nil {
 					t.Errorf("Expected error but got none")
-				} else if tt.errorContains != "" && !contains(err.Error(), tt.errorContains) {
+				} else if tt.errorContains != "" && !strings.Contains(err.Error(), tt.errorContains) {
 					t.Errorf("Expected error to contain '%s' but got '%s'", tt.errorContains, err.Error())
 				}
 			} else {

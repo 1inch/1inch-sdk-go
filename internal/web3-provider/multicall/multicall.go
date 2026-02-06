@@ -75,7 +75,7 @@ func NewMulticall(client *ethclient.Client, chainId uint64) (*Client, error) {
 	}
 
 	helperContractAddress := common.HexToAddress(addressRaw)
-	contractABI, err := abi.JSON(strings.NewReader(Multicallv2abiABI)) // Make a generic version of this ABI
+	contractABI, err := abi.JSON(strings.NewReader(Multicallv2abiABI))
 	if err != nil {
 		return nil, fmt.Errorf("failed to parse abi: %w", err)
 	}

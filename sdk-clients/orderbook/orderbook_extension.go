@@ -14,10 +14,10 @@ import (
 // packFeeParameter encodes integrator and resolver fee details into a single 48-bit value with error checks on input ranges.
 // Returns the packed 48-bit value and an error if any input values exceed their allowed ranges.
 func packFeeParameter(integratorFee *IntegratorFee, resolverFee *ResolverFee) (uint64, error) {
-	var integratorFeeValue uint64 = 0
-	var integratorShare uint64 = 0
-	var resolverFeeValue uint64 = 0
-	var resolverDiscount uint64 = 0
+	var integratorFeeValue uint64
+	var integratorShare uint64
+	var resolverFeeValue uint64
+	var resolverDiscount uint64
 
 	if integratorFee != nil {
 		integratorFeeValue = uint64(integratorFee.Fee * 10) // Convert to basis points * 10
@@ -143,7 +143,9 @@ func buildFeePostInteractionData(params *buildFeePostInteractionDataParams) ([]b
 		integratorAddress = params.IntegratorFee.Integrator
 	}
 	integratorInt := new(big.Int)
-	integratorInt.SetString(strings.TrimPrefix(integratorAddress, "0x"), 16)
+	if _, ok := integratorInt.SetString(strings.TrimPrefix(integratorAddress, "0x"), 16); !ok {
+		return nil, fmt.Errorf("invalid integrator address: %s", integratorAddress)
+	}
 	postInteraction.Or(postInteraction, integratorInt)
 
 	// Add resolver/protocol fee receiver address (20 bytes = 160 bits)
@@ -152,14 +154,18 @@ func buildFeePostInteractionData(params *buildFeePostInteractionDataParams) ([]b
 		resolverAddress = params.ResolverFee.Receiver
 	}
 	resolverInt := new(big.Int)
-	resolverInt.SetString(strings.TrimPrefix(resolverAddress, "0x"), 16)
+	if _, ok := resolverInt.SetString(strings.TrimPrefix(resolverAddress, "0x"), 16); !ok {
+		return nil, fmt.Errorf("invalid resolver address: %s", resolverAddress)
+	}
 	postInteraction.Lsh(postInteraction, 160)
 	postInteraction.Or(postInteraction, resolverInt)
 
 	// Add custom receiver if present (20 bytes = 160 bits)
 	if params.CustomReceiver && params.CustomReceiverAddress != constants.ZeroAddress {
 		receiverInt := new(big.Int)
-		receiverInt.SetString(strings.TrimPrefix(params.CustomReceiverAddress, "0x"), 16)
+		if _, ok := receiverInt.SetString(strings.TrimPrefix(params.CustomReceiverAddress, "0x"), 16); !ok {
+			return nil, fmt.Errorf("invalid custom receiver address: %s", params.CustomReceiverAddress)
+		}
 		postInteraction.Lsh(postInteraction, 160)
 		postInteraction.Or(postInteraction, receiverInt)
 	}
@@ -175,7 +181,9 @@ func buildFeePostInteractionData(params *buildFeePostInteractionDataParams) ([]b
 	// Add extra interaction if present
 	if params.ExtraInteractionTarget != constants.ZeroAddress && len(params.ExtraInteractionData) > 0 {
 		targetInt := new(big.Int)
-		targetInt.SetString(strings.TrimPrefix(params.ExtraInteractionTarget, "0x"), 16)
+		if _, ok := targetInt.SetString(strings.TrimPrefix(params.ExtraInteractionTarget, "0x"), 16); !ok {
+			return nil, fmt.Errorf("invalid extra interaction target address: %s", params.ExtraInteractionTarget)
+		}
 		postInteraction.Lsh(postInteraction, 160)
 		postInteraction.Or(postInteraction, targetInt)
 
@@ -217,18 +225,18 @@ func buildFeePostInteractionData(params *buildFeePostInteractionDataParams) ([]b
 // Returns the encoded extension as a hex string
 func BuildOrderExtensionBytes(params *BuildOrderExtensionBytesParams) (string, error) {
 
-	var whiteListResolvers []string
+	whitelistResolvers := make([]string, 0, len(params.Whitelist))
 	for _, value := range params.Whitelist {
-		whiteListResolvers = append(whiteListResolvers, value)
-		sort.Strings(whiteListResolvers) // Sorting the final list to ensure a deterministic order
+		whitelistResolvers = append(whitelistResolvers, value)
 	}
+	sort.Strings(whitelistResolvers) // Sorting to ensure a deterministic order
 
 	feePostInteraction, err := buildFeePostInteractionData(&buildFeePostInteractionDataParams{
 		CustomReceiver:         params.CustomReceiver != "" && params.CustomReceiver != constants.ZeroAddress,
 		CustomReceiverAddress:  params.CustomReceiver,
 		IntegratorFee:          params.IntegratorFee,
 		ResolverFee:            params.ResolverFee,
-		Whitelist:              whiteListResolvers,
+		Whitelist:              whitelistResolvers,
 		ExtraInteractionTarget: params.ExtensionTarget,
 		ExtraInteractionData:   params.ExtraInteraction,
 	})
@@ -236,14 +244,16 @@ func BuildOrderExtensionBytes(params *BuildOrderExtensionBytesParams) (string, e
 		return "", err
 	}
 
-	makingTakingAmountData, makingTakingAmountDataLength, err := concatFeeAndWhitelist(whiteListResolvers, params.IntegratorFee, params.ResolverFee)
+	makingTakingAmountData, makingTakingAmountDataLength, err := concatFeeAndWhitelist(whitelistResolvers, params.IntegratorFee, params.ResolverFee)
 	if err != nil {
 		return "", err
 	}
 
 	extensionTargetBytes := make([]byte, 20)
 	targetInt := new(big.Int)
-	targetInt.SetString(strings.TrimPrefix(params.ExtensionTarget, "0x"), 16)
+	if _, ok := targetInt.SetString(strings.TrimPrefix(params.ExtensionTarget, "0x"), 16); !ok {
+		return "", fmt.Errorf("invalid extension target address: %s", params.ExtensionTarget)
+	}
 	targetBytes := targetInt.Bytes()
 	copy(extensionTargetBytes[20-len(targetBytes):], targetBytes)
 

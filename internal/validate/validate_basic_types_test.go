@@ -6,49 +6,26 @@ import (
 	"github.com/stretchr/testify/require"
 )
 
-func TestCheckString(t *testing.T) {
-	testCases := []struct {
-		description string
-		input       interface{}
+func TestCheckStringRequired(t *testing.T) {
+	tests := []struct {
+		name        string
+		input       string
 		expectError bool
 	}{
 		{
-			description: "True",
-			input:       "a",
+			name:  "Non-empty string",
+			input: "hello",
 		},
 		{
-			description: "True 2",
-			input:       "12",
-		},
-		{
-			description: "Must fail",
-			input:       nil,
-			expectError: true,
-		},
-		{
-			description: "Must fail 2",
-			input: struct {
-				A string
-			}{
-				A: "a",
-			},
-			expectError: true,
-		},
-		{
-			description: "Must fail 3",
-			input:       []string{"1", "2"},
-			expectError: true,
-		},
-		{
-			description: "Must fail 4",
-			input:       12,
+			name:        "Empty string",
+			input:       "",
 			expectError: true,
 		},
 	}
 
-	for _, tc := range testCases {
-		t.Run(tc.description, func(t *testing.T) {
-			err := CheckString(tc.input, "testValue")
+	for _, tc := range tests {
+		t.Run(tc.name, func(t *testing.T) {
+			err := CheckStringRequired(tc.input, "testValue")
 			if tc.expectError {
 				require.Error(t, err)
 			} else {
@@ -58,54 +35,48 @@ func TestCheckString(t *testing.T) {
 	}
 }
 
-func TestCheckBoolean(t *testing.T) {
-	testCases := []struct {
-		description string
-		input       interface{}
-		expectError bool
+func TestCheckString(t *testing.T) {
+	tests := []struct {
+		name  string
+		input string
 	}{
 		{
-			description: "True",
-			input:       true,
+			name:  "Non-empty string",
+			input: "hello",
 		},
 		{
-			description: "False",
-			input:       false,
-		},
-		{
-			description: "Must fail",
-			input:       nil,
-			expectError: true,
-		},
-		{
-			description: "Must fail 2",
-			input: struct {
-				A string
-			}{
-				A: "a",
-			},
-			expectError: true,
-		},
-		{
-			description: "Must fail 3",
-			input:       []string{"1", "2"},
-			expectError: true,
-		},
-		{
-			description: "Must fail 4",
-			input:       12,
-			expectError: true,
+			name:  "Empty string",
+			input: "",
 		},
 	}
 
-	for _, tc := range testCases {
-		t.Run(tc.description, func(t *testing.T) {
+	for _, tc := range tests {
+		t.Run(tc.name, func(t *testing.T) {
+			err := CheckString(tc.input, "testValue")
+			require.NoError(t, err)
+		})
+	}
+}
+
+func TestCheckBoolean(t *testing.T) {
+	tests := []struct {
+		name  string
+		input bool
+	}{
+		{
+			name:  "True",
+			input: true,
+		},
+		{
+			name:  "False",
+			input: false,
+		},
+	}
+
+	for _, tc := range tests {
+		t.Run(tc.name, func(t *testing.T) {
 			err := CheckBoolean(tc.input, "testValue")
-			if tc.expectError {
-				require.Error(t, err)
-			} else {
-				require.NoError(t, err)
-			}
+			require.NoError(t, err)
 		})
 	}
 }

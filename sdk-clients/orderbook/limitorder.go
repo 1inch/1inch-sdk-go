@@ -31,7 +31,7 @@ func CreateLimitOrderMessage(orderRequest CreateOrderParams, chainId int) (*Orde
 		TakingAmount:  orderRequest.TakingAmount,
 		Salt:          orderRequest.Salt,
 		Maker:         orderRequest.Maker,
-		AllowedSender: "0x0000000000000000000000000000000000000000",
+		AllowedSender: constants.ZeroAddress,
 		Receiver:      orderRequest.Taker,
 		MakerTraits:   makerTraitsEncoded,
 		Extension:     orderRequest.ExtensionEncoded,

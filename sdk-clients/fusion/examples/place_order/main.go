@@ -8,6 +8,7 @@ import (
 	"os"
 	"time"
 
+	"github.com/1inch/1inch-sdk-go/constants"
 	"github.com/1inch/1inch-sdk-go/sdk-clients/fusion"
 )
 
@@ -58,7 +59,7 @@ func main() {
 
 	output, err := json.MarshalIndent(response, "", "  ")
 	if err != nil {
-		log.Fatalf("Failed to marshal response: %v\n", err)
+		log.Fatalf("Failed to marshal response: %v", err)
 	}
 	fmt.Printf("Response: %s\n", string(output))
 
@@ -67,7 +68,7 @@ func main() {
 		FromTokenAddress: fromToken,
 		ToTokenAddress:   toToken,
 		Amount:           amount,
-		Receiver:         "0x0000000000000000000000000000000000000000",
+		Receiver:         constants.ZeroAddress,
 		Preset:           fusion.Fast,
 	}
 

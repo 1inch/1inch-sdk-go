@@ -40,7 +40,7 @@ type Client struct {
 	apiKey string
 }
 
-func (c *Client) ExecuteRequest(ctx context.Context, payload common.RequestPayload, v interface{}) error {
+func (c *Client) ExecuteRequest(ctx context.Context, payload common.RequestPayload, v any) error {
 	u, err := addQueryParameters(payload.U, payload.Params)
 	if err != nil {
 		return err
@@ -83,7 +83,7 @@ func (c *Client) prepareRequest(ctx context.Context, method string, fullURL *url
 	return req, nil
 }
 
-func (c *Client) processResponse(resp *http.Response, v interface{}) error {
+func (c *Client) processResponse(resp *http.Response, v any) error {
 	defer resp.Body.Close()
 
 	if resp.StatusCode < http.StatusOK || resp.StatusCode >= http.StatusMultipleChoices {
@@ -113,7 +113,7 @@ func (c *Client) handleErrorResponse(resp *http.Response) error {
 		return fmt.Errorf("failed to read error response body: %w", err)
 	}
 
-	var errorMessageMap map[string]interface{}
+	var errorMessageMap map[string]any
 	err = json.Unmarshal(body, &errorMessageMap)
 	if err != nil {
 		return fmt.Errorf("failed to unmarshal error response body: %w", err)
@@ -129,7 +129,7 @@ func (c *Client) handleErrorResponse(resp *http.Response) error {
 
 // addQueryParameters adds the parameters in the struct params as URL query parameters to s.
 // params must be a struct whose fields may contain "url" tags.
-func addQueryParameters(s string, params interface{}) (string, error) {
+func addQueryParameters(s string, params any) (string, error) {
 	v := reflect.ValueOf(params)
 	if v.Kind() == reflect.Ptr && v.IsNil() {
 		return s, nil

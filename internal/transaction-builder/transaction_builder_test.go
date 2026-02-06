@@ -30,7 +30,7 @@ func TestTransactionBuilder_Build(t *testing.T) {
 		gasFee         *big.Int
 		gasTip         *big.Int
 		expectError    bool
-		expectedValues map[string]interface{}
+		expectedValues map[string]any
 	}{
 		{
 			name:        "All fields set",
@@ -41,7 +41,7 @@ func TestTransactionBuilder_Build(t *testing.T) {
 			gasFee:      big.NewInt(25),
 			gasTip:      big.NewInt(10000),
 			expectError: false,
-			expectedValues: map[string]interface{}{
+			expectedValues: map[string]any{
 				"Nonce":     uint64(1),
 				"To":        gethCommon.HexToAddress("0x000000000000000000000000000000000000dead"),
 				"Value":     big.NewInt(100000),
@@ -60,7 +60,7 @@ func TestTransactionBuilder_Build(t *testing.T) {
 			gasFee:      nil,
 			gasTip:      nil,
 			expectError: false,
-			expectedValues: map[string]interface{}{
+			expectedValues: map[string]any{
 				"Nonce":     uint64(2),
 				"To":        to,
 				"Value":     big.NewInt(200000),
@@ -79,7 +79,7 @@ func TestTransactionBuilder_Build(t *testing.T) {
 			gasTip:      nil,
 			to:          &to,
 			expectError: false,
-			expectedValues: map[string]interface{}{
+			expectedValues: map[string]any{
 				"Nonce":     uint64(44),
 				"To":        to,
 				"Value":     big.NewInt(200000),
@@ -98,7 +98,7 @@ func TestTransactionBuilder_Build(t *testing.T) {
 			gasTip:      nil,
 			to:          nil,
 			expectError: true,
-			expectedValues: map[string]interface{}{
+			expectedValues: map[string]any{
 				"To": nil,
 			},
 		},

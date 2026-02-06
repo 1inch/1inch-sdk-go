@@ -4,12 +4,13 @@ import (
 	"fmt"
 	"testing"
 
+	"slices"
+
 	"github.com/1inch/1inch-sdk-go/internal/bigint"
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
 
 	"github.com/1inch/1inch-sdk-go/constants"
-	"github.com/1inch/1inch-sdk-go/internal/slice_utils"
 )
 
 func TestIsEthereumAddressRequired(t *testing.T) {
@@ -982,39 +983,30 @@ func TestIsBigInt(t *testing.T) {
 func TestCheckFiatCurrency(t *testing.T) {
 	testCases := []struct {
 		description string
-		input       interface{}
+		input       string
 		expectError bool
 	}{
 		{
-			description: "True",
+			description: "Valid - USD",
 			input:       "USD",
 		},
 		{
-			description: "True",
+			description: "Valid - EUR",
 			input:       "EUR",
 		},
 		{
-			description: "Must fail",
-			input:       nil,
-			expectError: true,
-		},
-		{
-			description: "Must fail 2",
-			input: struct {
-				A string
-			}{
-				A: "a",
-			},
-			expectError: true,
-		},
-		{
-			description: "Must fail 3",
+			description: "Invalid - too long",
 			input:       "ANDA",
 			expectError: true,
 		},
 		{
-			description: "Must fail 4",
-			input:       12,
+			description: "Invalid - too short",
+			input:       "US",
+			expectError: true,
+		},
+		{
+			description: "Invalid - empty",
+			input:       "",
 			expectError: true,
 		},
 	}
@@ -1139,7 +1131,7 @@ func TestContains(t *testing.T) {
 
 	for _, tc := range testCases {
 		t.Run(tc.description, func(t *testing.T) {
-			result := slice_utils.Contains(tc.value, tc.slice)
+			result := slices.Contains(tc.slice, tc.value)
 			assert.Equal(t, tc.expected, result, fmt.Sprintf("%v: expected %v, got %v", tc.description, tc.expected, result))
 		})
 	}

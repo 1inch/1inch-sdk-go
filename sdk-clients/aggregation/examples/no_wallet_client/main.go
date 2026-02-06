@@ -22,11 +22,11 @@ const (
 func main() {
 	config, err := aggregation.NewConfigurationAPI(constants.PolygonChainId, "https://api.1inch.dev", devPortalToken)
 	if err != nil {
-		log.Fatalf("Failed to create configuration: %v\n", err)
+		log.Fatalf("Failed to create configuration: %v", err)
 	}
 	client, err := aggregation.NewClientOnlyAPI(config)
 	if err != nil {
-		log.Fatalf("Failed to create client: %v\n", err)
+		log.Fatalf("Failed to create client: %v", err)
 	}
 	ctx := context.Background()
 
@@ -37,7 +37,7 @@ func main() {
 	})
 
 	if err != nil {
-		log.Fatalf("Failed to get quote: %v\n", err)
+		log.Fatalf("Failed to get quote: %v", err)
 	}
 
 	fmt.Printf("Quote Amount: %+v\n", quote.DstAmount)

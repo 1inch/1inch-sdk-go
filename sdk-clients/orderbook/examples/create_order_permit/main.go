@@ -27,11 +27,10 @@ var (
 const (
 	PolygonFRAX = "0x45c32fa6df82ead1e2ef74d17b76547eddfaff89"
 	PolygonUsdc = "0x3c499c542cEF5E3811e1192ce70d8cC03d5c3359"
-	ten16       = "10000000000000000"
-	ten6        = "1000000"
-	ten4        = "10000"
-	zeroAddress = "0x0000000000000000000000000000000000000000"
-	chainId     = 137
+	ten16   = "10000000000000000"
+	ten6    = "1000000"
+	ten4    = "10000"
+	chainId = 137
 )
 
 var (
@@ -52,11 +51,11 @@ func main() {
 		ApiKey:     devPortalToken,
 	})
 	if err != nil {
-		log.Fatal(err)
+		log.Fatalf("Failed to create configuration: %v", err)
 	}
 	client, err := orderbook.NewClient(config)
 	if err != nil {
-		log.Fatalf("Failed to create client: %v\n", err)
+		log.Fatalf("Failed to create client: %v", err)
 	}
 
 	ecdsaPrivateKey, err := crypto.HexToECDSA(privateKey)
@@ -87,7 +86,7 @@ func main() {
 		log.Fatalf("Failed to get permit: %v", err)
 	}
 
-	fmt.Printf("Permit: %v\n", permit)
+	fmt.Printf("Permit: %v", permit)
 
 	feeInfo, err := client.GetFeeInfo(ctx, orderbook.GetFeeInfoParams{
 		MakerAsset:  makerAsset,
@@ -102,8 +101,8 @@ func main() {
 	buildOrderExtensionBytesParams := &orderbook.BuildOrderExtensionBytesParams{
 		ExtensionTarget: feeInfo.ExtensionAddress,
 		IntegratorFee: &orderbook.IntegratorFee{
-			Integrator: zeroAddress,
-			Protocol:   zeroAddress,
+			Integrator: constants.ZeroAddress,
+			Protocol:   constants.ZeroAddress,
 			Fee:        0,
 			Share:      0,
 		},
@@ -119,7 +118,7 @@ func main() {
 
 	extensionEncoded, err := orderbook.BuildOrderExtensionBytes(buildOrderExtensionBytesParams)
 	if err != nil {
-		log.Fatalf("Failed to create extension: %v\n", err)
+		log.Fatalf("Failed to create extension: %v", err)
 	}
 
 	salt, err := orderbook.GenerateSaltWithFees(&orderbook.GetSaltParams{
@@ -147,7 +146,7 @@ func main() {
 		log.Fatalf("Failed to create order: %v", err)
 	}
 	if !createOrderResponse.Success {
-		log.Fatalf("Request completed, but order creation status was a failure: %v\n", createOrderResponse)
+		log.Fatalf("Request completed, but order creation status was a failure: %v", createOrderResponse)
 	}
 
 	// Sleep to accommodate free-tier API keys

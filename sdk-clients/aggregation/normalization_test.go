@@ -217,8 +217,8 @@ func TestNormalizeApproveCallDataResponse(t *testing.T) {
 			} else {
 				require.NoError(t, err)
 				require.NotNil(t, result)
-				// Verify the gas is set to ERC20_APPROVE_GAS constant
-				assert.Equal(t, uint64(constants.ERC20_APPROVE_GAS), result.TxNormalized.Gas)
+				// Verify the gas is set to Erc20ApproveGas constant
+				assert.Equal(t, uint64(constants.Erc20ApproveGas), result.TxNormalized.Gas)
 			}
 		})
 	}
@@ -235,6 +235,6 @@ func TestNormalizeApproveCallDataResponse_UsesConstantGas(t *testing.T) {
 	result, err := normalizeApproveCallDataResponse(resp)
 	require.NoError(t, err)
 
-	// Gas should always be the ERC20_APPROVE_GAS constant
-	assert.Equal(t, uint64(constants.ERC20_APPROVE_GAS), result.TxNormalized.Gas)
+	// Gas should always be the Erc20ApproveGas constant
+	assert.Equal(t, uint64(constants.Erc20ApproveGas), result.TxNormalized.Gas)
 }

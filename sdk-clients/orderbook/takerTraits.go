@@ -8,12 +8,7 @@ import (
 	"github.com/ethereum/go-ethereum/common/hexutil"
 )
 
-var (
-	// currently unused masks carried over from the Typescript Limit Order SDK
-	//thresholdMask             = MustNewBitMask(big.NewInt(0), big.NewInt(185))
-	//argsInteractionLengthMask = MustNewBitMask(big.NewInt(220), big.NewInt(224))
-	argsExtensionLengthMask = MustNewBitMask(big.NewInt(224), big.NewInt(248))
-)
+var argsExtensionLengthMask = MustNewBitMask(big.NewInt(224), big.NewInt(248))
 
 const (
 	MakerAmountFlag     = 255
@@ -30,7 +25,7 @@ type TakerTraitsEncoded struct {
 
 type TakerTraits struct {
 	Receiver  *common.Address
-	Extension string // Assuming extension related functions are defined elsewhere
+	Extension string
 
 	MakerAmount     bool
 	UnwrapWETH      bool

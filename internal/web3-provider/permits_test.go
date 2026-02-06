@@ -16,7 +16,7 @@ import (
 )
 
 func Test_createPermitSignature(t *testing.T) {
-	erc20ABI, err := abi.JSON(strings.NewReader(constants.Erc20ABI)) // Make a generic version of this ABI
+	erc20ABI, err := abi.JSON(strings.NewReader(constants.Erc20ABI))
 	require.NoError(t, err)
 
 	privateKey, err := crypto.HexToECDSA("ad21c0552a3b52e94520da713455cc347e4e89628a334be24d85b8083848434f")
@@ -85,7 +85,7 @@ func Test_createPermitSignature(t *testing.T) {
 }
 
 func Test_createPermitSignature2(t *testing.T) {
-	erc20ABI, err := abi.JSON(strings.NewReader(constants.Erc20ABI)) // Make a generic version of this ABI
+	erc20ABI, err := abi.JSON(strings.NewReader(constants.Erc20ABI))
 	require.NoError(t, err)
 
 	privateKey, err := crypto.HexToECDSA("965e092fdfc08940d2bd05c7b5c7e1c51e283e92c7f52bbf1408973ae9a9acb7")
@@ -152,7 +152,7 @@ func Test_createPermitSignature2(t *testing.T) {
 }
 
 func TestTokenPermit(t *testing.T) {
-	erc20ABI, err := abi.JSON(strings.NewReader(constants.Erc20ABI)) // Make a generic version of this ABI
+	erc20ABI, err := abi.JSON(strings.NewReader(constants.Erc20ABI))
 	require.NoError(t, err)
 
 	privateKey, err := crypto.HexToECDSA("965e092fdfc08940d2bd05c7b5c7e1c51e283e92c7f52bbf1408973ae9a9acb7")

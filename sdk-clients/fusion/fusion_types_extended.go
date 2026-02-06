@@ -243,7 +243,7 @@ type PresetClassFixed struct {
 	AuctionStartAmount string              `json:"auctionStartAmount"`
 	BankFee            string              `json:"bankFee"`
 	EstP               float32             `json:"estP"`
-	ExclusiveResolver  string              `json:"exclusiveResolver"` // This was changed to a string from a map[string]interface{}
+	ExclusiveResolver  string              `json:"exclusiveResolver"` // This was changed to a string from a map[string]any
 	GasCost            GasCostConfigClass  `json:"gasCost"`
 	InitialRateBump    float32             `json:"initialRateBump"`
 	Points             []AuctionPointClass `json:"points"`

@@ -16,10 +16,10 @@ import (
 type MockHttpExecutor struct {
 	Called      bool
 	ExecuteErr  error
-	ResponseObj interface{}
+	ResponseObj any
 }
 
-func (m *MockHttpExecutor) ExecuteRequest(ctx context.Context, payload common.RequestPayload, v interface{}) error {
+func (m *MockHttpExecutor) ExecuteRequest(ctx context.Context, payload common.RequestPayload, v any) error {
 	m.Called = true
 	if m.ExecuteErr != nil {
 		return m.ExecuteErr

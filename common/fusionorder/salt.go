@@ -10,7 +10,7 @@ import (
 )
 
 // Keccak256Hash calculates the Keccak256 hash of any JSON-serializable data
-func Keccak256Hash(data interface{}) (*big.Int, error) {
+func Keccak256Hash(data any) (*big.Int, error) {
 	jsonData, err := json.Marshal(data)
 	if err != nil {
 		return nil, fmt.Errorf("failed to marshal data for hashing: %w", err)

@@ -41,7 +41,7 @@ func main() {
 
 	output, err := json.MarshalIndent(response, "", "  ")
 	if err != nil {
-		log.Fatalf("Failed to marshal response: %v\n", err)
+		log.Fatalf("Failed to marshal response: %v", err)
 	}
 	fmt.Printf("Response: %s\n", string(output))
 }

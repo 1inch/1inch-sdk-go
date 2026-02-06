@@ -22,11 +22,11 @@ func main() {
 
 	config, err := orderbook.NewConfigurationAPI(chainId, "https://api.1inch.dev", devPortalToken)
 	if err != nil {
-		log.Fatal(err)
+		log.Fatalf("Failed to create configuration: %v", err)
 	}
 	client, err := orderbook.NewClientOnlyAPI(config)
 	if err != nil {
-		log.Fatal(err)
+		log.Fatalf("Failed to create client: %v", err)
 	}
 
 	orderCount, err := client.GetOrderCount(ctx, orderbook.GetOrderCountParams{

@@ -26,7 +26,7 @@ type GetOrderFillsByHashOutputFixed struct {
 
 	// AuctionStartDate Unix timestamp in milliseconds
 	AuctionStartDate float32                `json:"auctionStartDate"`
-	CancelTx         map[string]interface{} `json:"cancelTx"`
+	CancelTx         map[string]any `json:"cancelTx"`
 
 	// Cancelable Is order cancelable
 	Cancelable bool `json:"cancelable"`
@@ -140,7 +140,7 @@ type GetQuoteOutputFixed struct {
 	Prices           PairCurrency `json:"prices"`
 
 	// QuoteId Current generated quote id, should be passed with order
-	QuoteId string `json:"quoteId"` // This is changed from map[string]interface{} to string
+	QuoteId string `json:"quoteId"` // This is changed from map[string]any to string
 
 	// RecommendedPreset suggested preset
 	RecommendedPreset GetQuoteOutputRecommendedPreset `json:"recommendedPreset"`
@@ -274,7 +274,7 @@ type PresetClassFixed struct {
 	AuctionStartAmount string              `json:"auctionStartAmount"`
 	BankFee            string              `json:"bankFee"`
 	EstP               float32             `json:"estP"`
-	ExclusiveResolver  string              `json:"exclusiveResolver"` // This was changed to a string from a map[string]interface{}
+	ExclusiveResolver  string              `json:"exclusiveResolver"` // This was changed to a string from a map[string]any
 	GasCost            GasCostConfigClass  `json:"gasCost"`
 	InitialRateBump    float32             `json:"initialRateBump"`
 	Points             []AuctionPointClass `json:"points"`

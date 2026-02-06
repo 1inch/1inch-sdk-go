@@ -58,17 +58,17 @@ func CreateFusionPlusOrderData(quoteParams QuoterControllerGetQuoteParamsFixed, 
 		takerAsset = takerAssetWrapped.Hex()
 	}
 
-	var takingFreeReceiver geth_common.Address
+	var takingFeeReceiver geth_common.Address
 	if orderParams.TakingFeeReceiver == "" {
-		takingFreeReceiver = geth_common.HexToAddress("0x0000000000000000000000000000000000000000")
+		takingFeeReceiver = geth_common.HexToAddress(constants.ZeroAddress)
 	} else {
-		takingFreeReceiver = geth_common.HexToAddress(orderParams.TakingFeeReceiver)
+		takingFeeReceiver = geth_common.HexToAddress(orderParams.TakingFeeReceiver)
 	}
 
 	fees := Fees{
 		IntFee: IntegratorFee{
 			Ratio:    fusionorder.BpsToRatioFormat(quoteParams.Fee),
-			Receiver: takingFreeReceiver,
+			Receiver: takingFeeReceiver,
 		},
 		BankFee: big.NewInt(0),
 	}

@@ -2,15 +2,14 @@ package constants
 
 import (
 	"fmt"
-
-	"github.com/1inch/1inch-sdk-go/internal/slice_utils"
+	"slices"
 )
 
 const AggregationRouterV6 = "0x111111125421cA6dc452d289314280a0f8842A65" // Contract address is identical for all chains except zkSync
 const AggregationRouterV6Name = "1inch Aggregation Router"
 const AggregationRouterV6VersionNumber = "6"
 
-const ERC20_APPROVE_GAS = 45_000
+const Erc20ApproveGas = 45_000
 
 // Series Nonce Manager contract addresses are taken from limit-order-protocol/deployments
 
@@ -27,7 +26,7 @@ const SeriesNonceManagerOptimism = "0x32d12a25f539E341089050E2d26794F041fC9dF8"
 const SeriesNonceManagerPolygon = "0xa5eb255EF45dFb48B5d133d08833DEF69871691D"
 
 func Get1inchRouterFromChainId(chainId int) (string, error) {
-	if !slice_utils.Contains(chainId, ValidChainIds) {
+	if !slices.Contains(ValidChainIds, chainId) {
 		return "", fmt.Errorf("unsupported chain ID: %d", chainId)
 	}
 	if chainId == ZkSyncEraChainId {

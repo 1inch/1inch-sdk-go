@@ -223,3 +223,107 @@ Token and network constants have been moved to the top-level `constants` package
 | `Uint16Max`, `Uint24Max`, `Uint32Max`, `Uint40Max`, `Uint256Max` | `constants.Uint16Max`, etc. |
 
 The `internal/addresses` package has been removed; use `constants.ZeroAddress` instead.
+
+### Constant Naming: Go Convention
+
+Renamed constants to follow Go naming conventions (no SCREAMING_SNAKE_CASE):
+
+| Old Name | New Name |
+|----------|----------|
+| `constants.ERC20_APPROVE_GAS` | `constants.Erc20ApproveGas` |
+
+### Removed `internal/slice_utils` Package
+
+The `internal/slice_utils` package has been deleted. All usages have been replaced with Go's standard library `slices.Contains()` (available since Go 1.21).
+
+**Migration:** If you were importing `slice_utils.Contains(value, slice)`, replace with `slices.Contains(slice, value)` (note: argument order is reversed).
+
+### Validation Framework: Type-Safe Generic `Parameter[T]`
+
+The validation framework has been refactored to use Go generics, providing compile-time type safety:
+
+**Before:**
+```go
+// parameter.go
+type ValidationFunc func(parameter interface{}, variableName string) error
+
+func Parameter(parameter interface{}, variableName string, validationFunc ValidationFunc, validationErrors []error) []error
+```
+
+**After:**
+```go
+// parameter.go (no more ValidationFunc type alias)
+func Parameter[T any](parameter T, variableName string, validationFunc func(T, string) error, validationErrors []error) []error
+```
+
+All `Check*` functions now take typed parameters instead of `interface{}`:
+
+| Function | Old Signature | New Signature |
+|----------|--------------|---------------|
+| `CheckEthereumAddressRequired` | `(parameter interface{}, ...) error` | `(value string, ...) error` |
+| `CheckEthereumAddress` | `(parameter interface{}, ...) error` | `(value string, ...) error` |
+| `CheckEthereumAddressListRequired` | `(parameter interface{}, ...) error` | `(addresses []string, ...) error` |
+| `CheckBigIntRequired` | `(parameter interface{}, ...) error` | `(value string, ...) error` |
+| `CheckBigInt` | `(parameter interface{}, ...) error` | `(value string, ...) error` |
+| `CheckChainIdIntRequired` | `(parameter interface{}, ...) error` | `(value int, ...) error` |
+| `CheckChainIdInt` | `(parameter interface{}, ...) error` | `(value int, ...) error` |
+| `CheckChainIdFloat32Required` | `(parameter interface{}, ...) error` | `(value float32, ...) error` |
+| `CheckChainIdFloat32` | `(parameter interface{}, ...) error` | `(value float32, ...) error` |
+| `CheckPrivateKeyRequired` | `(parameter interface{}, ...) error` | `(value string, ...) error` |
+| `CheckPrivateKey` | `(parameter interface{}, ...) error` | `(value string, ...) error` |
+| `CheckApprovalType` | `(parameter interface{}, ...) error` | `(value int, ...) error` |
+| `CheckSlippageRequired` | `(parameter interface{}, ...) error` | `(value float32, ...) error` |
+| `CheckSlippage` | `(parameter interface{}, ...) error` | `(value float32, ...) error` |
+| `CheckPage` | `(parameter interface{}, ...) error` | `(value float32, ...) error` |
+| `CheckLimit` | `(parameter interface{}, ...) error` | `(value float32, ...) error` |
+| `CheckStatusesInts` | `(parameter interface{}, ...) error` | `(value []float32, ...) error` |
+| `CheckStatusesStrings` | `(parameter interface{}, ...) error` | `(value []string, ...) error` |
+| `CheckStatusesOrderStatus` | `(parameter interface{}, ...) error` | `(value []int, ...) error` |
+| `CheckSortBy` | `(parameter interface{}, ...) error` | `(value string, ...) error` |
+| `CheckOrderHashRequired` | `(parameter interface{}, ...) error` | `(value string, ...) error` |
+| `CheckOrderHash` | `(parameter interface{}, ...) error` | `(value string, ...) error` |
+| `CheckProtocols` | `(parameter interface{}, ...) error` | `(value string, ...) error` |
+| `CheckFee` | `(parameter interface{}, ...) error` | `(value float32, ...) error` |
+| `CheckFloat32NonNegativeWhole` | `(parameter interface{}, ...) error` | `(value float32, ...) error` |
+| `CheckConnectorTokens` | `(parameter interface{}, ...) error` | `(value string, ...) error` |
+| `CheckPermitHash` | `(parameter interface{}, ...) error` | `(value string, ...) error` |
+| `CheckFiatCurrency` | `(parameter interface{}, ...) error` | `(value string, ...) error` |
+| `CheckTimerange` | `(parameter interface{}, ...) error` | `(value string, ...) error` |
+| `CheckJsonRpcVersionRequired` | `(parameter interface{}, ...) error` | `(value string, ...) error` |
+| `CheckJsonRpcVersion` | `(parameter interface{}, ...) error` | `(value string, ...) error` |
+| `CheckNodeType` | `(parameter interface{}, ...) error` | `(value string, ...) error` |
+| `CheckStringRequired` | `(parameter interface{}, ...) error` | `(value string, ...) error` |
+| `CheckString` | `(parameter interface{}, ...) error` | `(value string, ...) error` |
+| `CheckBoolean` | `(parameter interface{}, ...) error` | `(value bool, ...) error` |
+
+**Removed type:** `validate.ValidationFunc` - use `func(T, string) error` directly with the generic `Parameter[T]`.
+
+**Impact:** Callers using `validate.Parameter()` with concrete types (the normal usage) require no changes. Code that previously passed `interface{}` values directly to `Check*` functions must now pass the correct concrete type.
+
+### Replaced `interface{}` with `any`
+
+All non-generated code now uses `any` instead of `interface{}` (Go 1.18+ idiomatic). This affects:
+
+| Package | Changed Type |
+|---------|-------------|
+| `common.RequestPayload` | `Params any` (was `interface{}`) |
+| `common.HttpExecutor` | `ExecuteRequest(ctx, payload, v any) error` |
+| `fusionorder.Keccak256Hash` | `data any` (was `interface{}`) |
+| `fusionplus` types | `CancelTx map[string]any`, etc. |
+| `fusion` types | `ExclusiveResolver string` (already was, comments updated) |
+| `web3.PerformRpcCall*` | Returns `map[string]any` (was `map[string]interface{}`) |
+
+### Renamed Exported Symbols
+
+| Old Name | New Name | Package |
+|----------|----------|---------|
+| `ConsolidateValidationErorrs` | `ConsolidateValidationErrors` | `validate` |
+| `BitMask.ToString()` | `BitMask.String()` | `orderbook` |
+
+### Removed Dead Code
+
+- `constants.AggregationRouterV5`, `AggregationV5RouterZkSyncEra`, `AggregationRouterV5Name`, `AggregationRouterV5VersionNumber` - unused V5 router constants
+- `constants.AggregationRouterV5ABI` - unused V5 ABI variable
+- `constants/abi/aggregationRouterV5.abi.json` - unused V5 ABI file
+- `internal/slice_utils/` - entire package removed (replaced with stdlib `slices`)
+- `validate.ValidationFunc` type alias - removed (replaced with generic inline func type)

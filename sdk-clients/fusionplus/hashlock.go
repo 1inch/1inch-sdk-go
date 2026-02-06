@@ -81,7 +81,7 @@ func GetMerkleLeaves(secrets []string) ([]string, error) {
 func GetMerkleLeavesFromSecretHashes(secretHashes []string) ([]string, error) {
 	var leaves []string
 	for idx, s := range secretHashes {
-		hash, err := solidityPackedKeccak256([]string{"uint64", "bytes32"}, []interface{}{idx, s})
+		hash, err := solidityPackedKeccak256([]string{"uint64", "bytes32"}, []any{idx, s})
 		if err != nil {
 			return nil, err
 		}
@@ -172,7 +172,7 @@ func concat(datas [][]byte) []byte {
 	return result
 }
 
-func solidityPacked(types []string, values []interface{}) ([]byte, error) {
+func solidityPacked(types []string, values []any) ([]byte, error) {
 	if len(types) != len(values) {
 		return nil, fmt.Errorf("value count mismatch: expected %d", len(types))
 	}
@@ -189,7 +189,7 @@ func solidityPacked(types []string, values []interface{}) ([]byte, error) {
 	return concat(tight), nil
 }
 
-func solidityPackedKeccak256(types []string, values []interface{}) (string, error) {
+func solidityPackedKeccak256(types []string, values []any) (string, error) {
 	packed, err := solidityPacked(types, values)
 	if err != nil {
 		return "", err
@@ -202,7 +202,7 @@ func solidityPackedKeccak256(types []string, values []interface{}) (string, erro
 	return hexlify(hashed), nil
 }
 
-func pack(typ string, value interface{}) ([]byte, error) {
+func pack(typ string, value any) ([]byte, error) {
 	switch typ {
 	case "uint64":
 		// Pack uint64 as big-endian 8-byte array

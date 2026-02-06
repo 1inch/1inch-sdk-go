@@ -11,10 +11,10 @@ import (
 )
 
 func normalizeSwapResponse(resp SwapResponse) (*SwapResponseExtended, error) {
-	toAddress := common.HexToAddress(resp.Tx.To)
 	if !common.IsHexAddress(resp.Tx.To) {
 		return nil, fmt.Errorf("invalid to address: %s", resp.Tx.To)
 	}
+	toAddress := common.HexToAddress(resp.Tx.To)
 
 	gas := uint64(resp.Tx.Gas)
 
@@ -52,10 +52,10 @@ func normalizeSwapResponse(resp SwapResponse) (*SwapResponseExtended, error) {
 }
 
 func normalizeApproveCallDataResponse(resp ApproveCallDataResponse) (*ApproveCallDataResponseExtended, error) {
-	toAddress := common.HexToAddress(resp.To)
 	if !common.IsHexAddress(resp.To) {
 		return nil, fmt.Errorf("invalid to address: %s", resp.To)
 	}
+	toAddress := common.HexToAddress(resp.To)
 
 	gasPrice := big.NewInt(0)
 	_, ok := gasPrice.SetString(resp.GasPrice, 10)
@@ -76,7 +76,7 @@ func normalizeApproveCallDataResponse(resp ApproveCallDataResponse) (*ApproveCal
 
 	normalizedTx := NormalizedTransactionData{
 		Data:     data,
-		Gas:      constants.ERC20_APPROVE_GAS,
+		Gas:      constants.Erc20ApproveGas,
 		GasPrice: gasPrice,
 		To:       toAddress,
 		Value:    value,

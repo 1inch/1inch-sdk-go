@@ -26,11 +26,11 @@ type Wallet struct {
 }
 
 func DefaultWalletProvider(pk string, nodeURL string, chainId uint64) (*Wallet, error) {
-	erc20ABI, err := abi.JSON(strings.NewReader(constants.Erc20ABI)) // Make a generic version of this ABI
+	erc20ABI, err := abi.JSON(strings.NewReader(constants.Erc20ABI))
 	if err != nil {
 		return nil, err
 	}
-	seriesNonceManagerABI, err := abi.JSON(strings.NewReader(constants.SeriesNonceManagerABI)) // Make a generic version of this ABI
+	seriesNonceManagerABI, err := abi.JSON(strings.NewReader(constants.SeriesNonceManagerABI))
 	if err != nil {
 		return nil, err
 	}
