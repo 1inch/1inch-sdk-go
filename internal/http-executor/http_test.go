@@ -121,13 +121,13 @@ func TestExecuteRequest_ServerErrorPOST(t *testing.T) {
 		Body:   []byte(`{"key":"value"}`),
 	}
 
-	var response map[string]interface{} // Using interface{} to potentially capture any structure of response
+	var response map[string]any // Using any to potentially capture any structure of response
 	err := client.ExecuteRequest(context.Background(), payload, &response)
 	if err == nil {
 		t.Fatalf("Expected an error, got nil")
 	}
 
-	expectedErrorMessage := `processing response failed: {
+	expectedErrorMessage := `failed to process response: {
 	"message": "internal server error"
 }`
 
@@ -166,7 +166,7 @@ func TestAuthorizationKey(t *testing.T) {
 		U:      "/",
 	}
 
-	var response interface{}
+	var response any
 
 	err := client.ExecuteRequest(context.Background(), payload, &response)
 	if err != nil {

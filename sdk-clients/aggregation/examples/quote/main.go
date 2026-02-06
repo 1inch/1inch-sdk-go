@@ -12,7 +12,7 @@ import (
 )
 
 /*
-This example demonstrates how to swap tokens on the PolygonChainId network using the 1inch SDK.
+This example demonstrates how to get a swap quote on the Polygon network using the 1inch SDK.
 The only thing you need to provide is your wallet address, wallet key, and dev portal token.
 This can be done through your environment, or you can directly set them in the variables below
 */
@@ -32,11 +32,11 @@ func main() {
 		ApiKey:     devPortalToken,
 	})
 	if err != nil {
-		log.Fatalf("Failed to create configuration: %v\n", err)
+		log.Fatalf("Failed to create configuration: %v", err)
 	}
 	client, err := aggregation.NewClient(config)
 	if err != nil {
-		log.Fatalf("Failed to create client: %v\n", err)
+		log.Fatalf("Failed to create client: %v", err)
 	}
 	ctx := context.Background()
 
@@ -48,12 +48,12 @@ func main() {
 		Slippage: 1,
 	})
 	if err != nil {
-		log.Fatalf("Failed to get swap data: %v\n", err)
+		log.Fatalf("Failed to get swap data: %v", err)
 	}
 
 	output, err := json.MarshalIndent(swapData, "", "  ")
 	if err != nil {
-		log.Fatalf("Failed to marshal swap data: %v\n", err)
+		log.Fatalf("Failed to marshal swap data: %v", err)
 	}
 	fmt.Printf("%s\n", string(output))
 }

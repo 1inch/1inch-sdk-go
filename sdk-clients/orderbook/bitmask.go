@@ -11,9 +11,9 @@ type BitMask struct {
 }
 
 // NewBitMask creates a new BitMask with the given start and end bit positions.
-func NewBitMask(startBit, endBit *big.Int) *BitMask {
+func NewBitMask(startBit, endBit *big.Int) (*BitMask, error) {
 	if startBit.Cmp(endBit) >= 0 {
-		panic("BitMask: startBit must be less than endBit")
+		return nil, fmt.Errorf("bitmask start bit (%s) must be less than end bit (%s)", startBit.String(), endBit.String())
 	}
 
 	bitCount := new(big.Int).Sub(endBit, startBit)                                                    // endBit - startBit
@@ -22,7 +22,17 @@ func NewBitMask(startBit, endBit *big.Int) *BitMask {
 	return &BitMask{
 		Offset: startBit,
 		Mask:   mask,
+	}, nil
+}
+
+// MustNewBitMask creates a new BitMask, panicking if the parameters are invalid.
+// Use this only for known-valid constant values at package initialization.
+func MustNewBitMask(startBit, endBit *big.Int) *BitMask {
+	bm, err := NewBitMask(startBit, endBit)
+	if err != nil {
+		panic(err)
 	}
+	return bm
 }
 
 func (b *BitMask) SetBits(value, bits *big.Int) *big.Int {
@@ -37,8 +47,8 @@ func (b *BitMask) SetBits(value, bits *big.Int) *big.Int {
 	return value
 }
 
-// ToString returns the string representation of the mask shifted by the offset.
-func (b *BitMask) ToString() string {
+// String returns the string representation of the mask shifted by the offset.
+func (b *BitMask) String() string {
 	shiftedMask := new(big.Int).Lsh(b.Mask, uint(b.Offset.Uint64()))
 	return fmt.Sprintf("0x%x", shiftedMask)
 }

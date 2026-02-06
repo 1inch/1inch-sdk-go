@@ -4,6 +4,7 @@ import (
 	"math/big"
 	"testing"
 
+	"github.com/1inch/1inch-sdk-go/common/fusionorder"
 	"github.com/1inch/1inch-sdk-go/internal/times"
 	"github.com/stretchr/testify/assert"
 )
@@ -143,7 +144,7 @@ func TestCreateAuctionDetails(t *testing.T) {
 		name                 string
 		preset               *Preset
 		additionalWaitPeriod float32
-		expected             *AuctionDetails
+		expected             *fusionorder.AuctionDetails
 		expectErr            bool
 	}{
 		{
@@ -164,15 +165,15 @@ func TestCreateAuctionDetails(t *testing.T) {
 				StartAuctionIn:     5,
 			},
 			additionalWaitPeriod: 2,
-			expected: &AuctionDetails{
+			expected: &fusionorder.AuctionDetails{
 				StartTime:       times.CalculateAuctionStartTime(5, 2),
 				Duration:        300,
 				InitialRateBump: 1,
-				Points: []AuctionPointClassFixed{
+				Points: []fusionorder.AuctionPointClassFixed{
 					{Coefficient: 100, Delay: 10},
 					{Coefficient: 200, Delay: 20},
 				},
-				GasCost: GasCostConfigClassFixed{
+				GasCost: fusionorder.GasCostConfigClassFixed{
 					GasBumpEstimate:  1,
 					GasPriceEstimate: 100,
 				},
@@ -214,12 +215,12 @@ func TestCreateAuctionDetails(t *testing.T) {
 				StartAuctionIn:     5,
 			},
 			additionalWaitPeriod: 2,
-			expected: &AuctionDetails{
+			expected: &fusionorder.AuctionDetails{
 				StartTime:       times.CalculateAuctionStartTime(5, 2),
 				Duration:        300,
 				InitialRateBump: 1,
-				Points:          []AuctionPointClassFixed{},
-				GasCost: GasCostConfigClassFixed{
+				Points:          []fusionorder.AuctionPointClassFixed{},
+				GasCost: fusionorder.GasCostConfigClassFixed{
 					GasBumpEstimate:  1,
 					GasPriceEstimate: 100,
 				},
@@ -276,7 +277,7 @@ func TestIsNonceRequired(t *testing.T) {
 
 	for _, tc := range tests {
 		t.Run(tc.name, func(t *testing.T) {
-			result := isNonceRequired(tc.allowPartialFills, tc.allowMultipleFills)
+			result := fusionorder.IsNonceRequired(tc.allowPartialFills, tc.allowMultipleFills)
 			assert.Equal(t, tc.expected, result)
 		})
 	}
@@ -312,7 +313,7 @@ func TestBpsToRatioFormat(t *testing.T) {
 
 	for _, tc := range tests {
 		t.Run(tc.name, func(t *testing.T) {
-			result := bpsToRatioFormat(tc.bps)
+			result := fusionorder.BpsToRatioFormat(tc.bps)
 			assert.Equal(t, tc.expected, result)
 		})
 	}

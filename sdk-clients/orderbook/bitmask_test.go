@@ -5,6 +5,7 @@ import (
 	"testing"
 
 	"github.com/stretchr/testify/assert"
+	"github.com/stretchr/testify/require"
 )
 
 func TestBitMask(t *testing.T) {
@@ -58,11 +59,36 @@ func TestBitMask(t *testing.T) {
 			inputBits := bitStringToBigInt(tc.inputBits)
 			expectedOutputBits := bitStringToBigInt(tc.expectedOutputBits)
 
-			bitmask := NewBitMask(startBit, endBit)
+			bitmask, err := NewBitMask(startBit, endBit)
+			require.NoError(t, err)
 			result := bitmask.SetBits(valueToUpdate, inputBits)
 			assert.Equal(t, expectedOutputBits, result)
 		})
 	}
+}
+
+func TestNewBitMaskError(t *testing.T) {
+	// Test that invalid parameters return an error
+	_, err := NewBitMask(big.NewInt(10), big.NewInt(5))
+	assert.Error(t, err)
+	assert.Contains(t, err.Error(), "start bit")
+
+	// Test that equal values return an error
+	_, err = NewBitMask(big.NewInt(5), big.NewInt(5))
+	assert.Error(t, err)
+}
+
+func TestMustNewBitMask(t *testing.T) {
+	// Valid parameters should not panic
+	assert.NotPanics(t, func() {
+		bm := MustNewBitMask(big.NewInt(0), big.NewInt(8))
+		assert.NotNil(t, bm)
+	})
+
+	// Invalid parameters should panic
+	assert.Panics(t, func() {
+		MustNewBitMask(big.NewInt(10), big.NewInt(5))
+	})
 }
 
 func TestBitMaskToString(t *testing.T) {
@@ -94,8 +120,9 @@ func TestBitMaskToString(t *testing.T) {
 
 	for _, tc := range tests {
 		t.Run(tc.name, func(t *testing.T) {
-			bitmask := NewBitMask(big.NewInt(tc.startBit), big.NewInt(tc.endBit))
-			assert.Equal(t, tc.expectedString, bitmask.ToString())
+			bitmask, err := NewBitMask(big.NewInt(tc.startBit), big.NewInt(tc.endBit))
+			require.NoError(t, err)
+			assert.Equal(t, tc.expectedString, bitmask.String())
 		})
 	}
 }
@@ -129,7 +156,8 @@ func TestBitMaskToBigInt(t *testing.T) {
 
 	for _, tc := range tests {
 		t.Run(tc.name, func(t *testing.T) {
-			bitmask := NewBitMask(big.NewInt(tc.startBit), big.NewInt(tc.endBit))
+			bitmask, err := NewBitMask(big.NewInt(tc.startBit), big.NewInt(tc.endBit))
+			require.NoError(t, err)
 			assert.Equal(t, tc.expectedBigInt, bitmask.ToBigInt())
 		})
 	}

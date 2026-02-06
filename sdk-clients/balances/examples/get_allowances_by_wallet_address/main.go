@@ -27,12 +27,12 @@ func main() {
 		ApiKey:  devPortalToken,
 	})
 	if err != nil {
-		log.Fatalf("Failed to create configuration: %v\n", err)
+		log.Fatalf("Failed to create configuration: %v", err)
 	}
 
 	client, err := balances.NewClient(config)
 	if err != nil {
-		log.Fatalf("Failed to create client: %v\n", err)
+		log.Fatalf("Failed to create client: %v", err)
 	}
 
 	ctx := context.Background()
@@ -42,7 +42,7 @@ func main() {
 		Spender: spender,
 	})
 	if err != nil {
-		log.Fatalf("Failed to get allowances by wallet address: %v\n", err)
+		log.Fatalf("Failed to get allowances by wallet address: %v", err)
 	}
 
 	responseIndented, err := json.MarshalIndent(response, "", "  ")

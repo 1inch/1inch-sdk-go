@@ -17,6 +17,8 @@ import (
 	"github.com/1inch/1inch-sdk-go/common"
 )
 
+var scientificNotationRegex = regexp.MustCompile(`^[+-]?\d+(\.\d+)?[eE][+-]?\d+$`)
+
 func DefaultHttpClient(apiUrl string, apiKey string) (*Client, error) {
 	baseURL, err := url.Parse(apiUrl)
 	if err != nil {
@@ -38,7 +40,7 @@ type Client struct {
 	apiKey string
 }
 
-func (c *Client) ExecuteRequest(ctx context.Context, payload common.RequestPayload, v interface{}) error {
+func (c *Client) ExecuteRequest(ctx context.Context, payload common.RequestPayload, v any) error {
 	u, err := addQueryParameters(payload.U, payload.Params)
 	if err != nil {
 		return err
@@ -51,16 +53,16 @@ func (c *Client) ExecuteRequest(ctx context.Context, payload common.RequestPaylo
 
 	req, err := c.prepareRequest(ctx, payload.Method, fullURL, payload.Body)
 	if err != nil {
-		return fmt.Errorf("preparing request failed: %w", err)
+		return fmt.Errorf("failed to prepare request: %w", err)
 	}
 
 	resp, err := c.httpClient.Do(req)
 	if err != nil {
-		return fmt.Errorf("executing request failed: %w", err)
+		return fmt.Errorf("failed to execute request: %w", err)
 	}
 
 	if err = c.processResponse(resp, v); err != nil {
-		return fmt.Errorf("processing response failed: %w", err)
+		return fmt.Errorf("failed to process response: %w", err)
 	}
 
 	return nil
@@ -72,7 +74,7 @@ func (c *Client) prepareRequest(ctx context.Context, method string, fullURL *url
 		return nil, err
 	}
 
-	req.Header.Set("User-Agent", "1inch-dev-portal-client-go:v1.0.0-beta.2")
+	req.Header.Set("User-Agent", "1inch-dev-portal-client-go:v3.0.0")
 	req.Header.Set("Authorization", fmt.Sprintf("Bearer %s", c.apiKey))
 	if len(body) > 0 {
 		req.Header.Set("Content-Type", "application/json")
@@ -81,7 +83,7 @@ func (c *Client) prepareRequest(ctx context.Context, method string, fullURL *url
 	return req, nil
 }
 
-func (c *Client) processResponse(resp *http.Response, v interface{}) error {
+func (c *Client) processResponse(resp *http.Response, v any) error {
 	defer resp.Body.Close()
 
 	if resp.StatusCode < http.StatusOK || resp.StatusCode >= http.StatusMultipleChoices {
@@ -108,18 +110,18 @@ func (c *Client) processResponse(resp *http.Response, v interface{}) error {
 func (c *Client) handleErrorResponse(resp *http.Response) error {
 	body, err := io.ReadAll(resp.Body)
 	if err != nil {
-		return fmt.Errorf("reading error response body failed: %v", err)
+		return fmt.Errorf("failed to read error response body: %w", err)
 	}
 
-	var errorMessageMap map[string]interface{}
+	var errorMessageMap map[string]any
 	err = json.Unmarshal(body, &errorMessageMap)
 	if err != nil {
-		return fmt.Errorf("failed to unmarshal error response body: %v", err)
+		return fmt.Errorf("failed to unmarshal error response body: %w", err)
 	}
 
 	errFormatted, err := json.MarshalIndent(errorMessageMap, "", "    ")
 	if err != nil {
-		return fmt.Errorf("failed to format error response body: %v", err)
+		return fmt.Errorf("failed to format error response body: %w", err)
 	}
 
 	return fmt.Errorf("%s", errFormatted)
@@ -127,7 +129,7 @@ func (c *Client) handleErrorResponse(resp *http.Response) error {
 
 // addQueryParameters adds the parameters in the struct params as URL query parameters to s.
 // params must be a struct whose fields may contain "url" tags.
-func addQueryParameters(s string, params interface{}) (string, error) {
+func addQueryParameters(s string, params any) (string, error) {
 	v := reflect.ValueOf(params)
 	if v.Kind() == reflect.Ptr && v.IsNil() {
 		return s, nil
@@ -147,7 +149,7 @@ func addQueryParameters(s string, params interface{}) (string, error) {
 		if isScientificNotation(v[0]) {
 			expanded, err := expandScientificNotation(v[0])
 			if err != nil {
-				return "", fmt.Errorf("failed to expand scientific notation for parameter %v with a value of %v: %v", k, v, err)
+				return "", fmt.Errorf("failed to expand scientific notation for %v: %w", k, err)
 			}
 			v[0] = expanded
 		}
@@ -159,9 +161,7 @@ func addQueryParameters(s string, params interface{}) (string, error) {
 
 // isScientificNotation checks if the string is in scientific notation (like 1e+18).
 func isScientificNotation(s string) bool {
-	// This regular expression matches strings in the format of "1e+18", "2.3e-4", etc.
-	re := regexp.MustCompile(`^[+-]?\d+(\.\d+)?[eE][+-]?\d+$`)
-	return re.MatchString(s)
+	return scientificNotationRegex.MatchString(s)
 }
 
 func expandScientificNotation(s string) (string, error) {

@@ -189,10 +189,10 @@ func (w *MyWallet) ChainId() int64 {
 type mockHttpExecutor struct {
 	Called      bool
 	ExecuteErr  error
-	ResponseObj interface{}
+	ResponseObj any
 }
 
-func (m *mockHttpExecutor) ExecuteRequest(ctx context.Context, payload common.RequestPayload, v interface{}) error {
+func (m *mockHttpExecutor) ExecuteRequest(ctx context.Context, payload common.RequestPayload, v any) error {
 	m.Called = true
 	if m.ExecuteErr != nil {
 		return m.ExecuteErr

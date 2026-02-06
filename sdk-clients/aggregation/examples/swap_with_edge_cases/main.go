@@ -11,7 +11,7 @@ import (
 )
 
 /*
-This example demonstrates how to swap tokens on the PolygonChainId network using the 1inch SDK.
+This example demonstrates how to swap tokens on the Ethereum network using the 1inch SDK.
 The only thing you need to provide is your wallet address, wallet key, and dev portal token.
 This can be done through your environment, or you can directly set them in the variables below
 */
@@ -73,11 +73,11 @@ func SwapWithCustomConnectorTokens(chain uint64, src string, dst string, connect
 		ApiKey:     devPortalToken,
 	})
 	if err != nil {
-		log.Fatalf("Failed to create configuration: %v\n", err)
+		log.Fatalf("Failed to create configuration: %v", err)
 	}
 	client, err := aggregation.NewClient(config)
 	if err != nil {
-		log.Fatalf("Failed to create client: %v\n", err)
+		log.Fatalf("Failed to create client: %v", err)
 	}
 	ctx := context.Background()
 
@@ -91,16 +91,16 @@ func SwapWithCustomConnectorTokens(chain uint64, src string, dst string, connect
 		DisableEstimate: true,
 	})
 	if err != nil {
-		log.Fatalf("Failed to get swap data: %v\n", err)
+		log.Fatalf("Failed to get swap data: %v", err)
 	}
 
 	tx, err := client.TxBuilder.New().SetData(swapData.TxNormalized.Data).SetTo(&swapData.TxNormalized.To).SetGas(swapData.TxNormalized.Gas).SetValue(swapData.TxNormalized.Value).Build(ctx)
 	if err != nil {
-		log.Fatalf("Failed to build transaction: %v\n", err)
+		log.Fatalf("Failed to build transaction: %v", err)
 	}
 	signedTx, err := client.Wallet.Sign(tx)
 	if err != nil {
-		log.Fatalf("Failed to sign transaction: %v\n", err)
+		log.Fatalf("Failed to sign transaction: %v", err)
 	}
 	if signedTx != nil {
 		fmt.Println("Signed transaction: ", signedTx.Hash().Hex())
@@ -116,11 +116,11 @@ func SwapWithCustomSlippage(chain uint64, src string, dst string, amount string,
 		ApiKey:     devPortalToken,
 	})
 	if err != nil {
-		log.Fatalf("Failed to create configuration: %v\n", err)
+		log.Fatalf("Failed to create configuration: %v", err)
 	}
 	client, err := aggregation.NewClient(config)
 	if err != nil {
-		log.Fatalf("Failed to create client: %v\n", err)
+		log.Fatalf("Failed to create client: %v", err)
 	}
 	ctx := context.Background()
 
@@ -133,16 +133,16 @@ func SwapWithCustomSlippage(chain uint64, src string, dst string, amount string,
 		DisableEstimate: true,
 	})
 	if err != nil {
-		log.Fatalf("Failed to get swap data: %v\n", err)
+		log.Fatalf("Failed to get swap data: %v", err)
 	}
 
 	tx, err := client.TxBuilder.New().SetData(swapData.TxNormalized.Data).SetTo(&swapData.TxNormalized.To).SetGas(swapData.TxNormalized.Gas).SetValue(swapData.TxNormalized.Value).Build(ctx)
 	if err != nil {
-		log.Fatalf("Failed to build transaction: %v\n", err)
+		log.Fatalf("Failed to build transaction: %v", err)
 	}
 	signedTx, err := client.Wallet.Sign(tx)
 	if err != nil {
-		log.Fatalf("Failed to sign transaction: %v\n", err)
+		log.Fatalf("Failed to sign transaction: %v", err)
 	}
 	if signedTx != nil {
 		fmt.Println("Signed transaction: ", signedTx.Hash().Hex())
@@ -158,11 +158,11 @@ func SwapWithCustomProtocols(chain uint64, src string, dst string, amount string
 		ApiKey:     devPortalToken,
 	})
 	if err != nil {
-		log.Fatalf("Failed to create configuration: %v\n", err)
+		log.Fatalf("Failed to create configuration: %v", err)
 	}
 	client, err := aggregation.NewClient(config)
 	if err != nil {
-		log.Fatalf("Failed to create client: %v\n", err)
+		log.Fatalf("Failed to create client: %v", err)
 	}
 
 	ctx := context.Background()
@@ -176,16 +176,16 @@ func SwapWithCustomProtocols(chain uint64, src string, dst string, amount string
 		DisableEstimate: true,
 	})
 	if err != nil {
-		log.Fatalf("Failed to get swap data: %v\n", err)
+		log.Fatalf("Failed to get swap data: %v", err)
 	}
 
 	tx, err := client.TxBuilder.New().SetData(swapData.TxNormalized.Data).SetTo(&swapData.TxNormalized.To).SetGas(swapData.TxNormalized.Gas).SetValue(swapData.TxNormalized.Value).Build(ctx)
 	if err != nil {
-		log.Fatalf("Failed to build transaction: %v\n", err)
+		log.Fatalf("Failed to build transaction: %v", err)
 	}
 	signedTx, err := client.Wallet.Sign(tx)
 	if err != nil {
-		log.Fatalf("Failed to sign transaction: %v\n", err)
+		log.Fatalf("Failed to sign transaction: %v", err)
 	}
 	if signedTx != nil {
 		fmt.Println("Signed transaction: ", signedTx.Hash().Hex())
@@ -201,11 +201,11 @@ func SwapWithCustomReceiver(chain uint64, src string, dst string, amount string,
 		ApiKey:     devPortalToken,
 	})
 	if err != nil {
-		log.Fatalf("Failed to create configuration: %v\n", err)
+		log.Fatalf("Failed to create configuration: %v", err)
 	}
 	client, err := aggregation.NewClient(config)
 	if err != nil {
-		log.Fatalf("Failed to create client: %v\n", err)
+		log.Fatalf("Failed to create client: %v", err)
 	}
 
 	ctx := context.Background()
@@ -219,16 +219,16 @@ func SwapWithCustomReceiver(chain uint64, src string, dst string, amount string,
 		DisableEstimate: true,
 	})
 	if err != nil {
-		log.Fatalf("Failed to get swap data: %v\n", err)
+		log.Fatalf("Failed to get swap data: %v", err)
 	}
 
 	tx, err := client.TxBuilder.New().SetData(swapData.TxNormalized.Data).SetTo(&swapData.TxNormalized.To).SetGas(swapData.TxNormalized.Gas).SetValue(swapData.TxNormalized.Value).Build(ctx)
 	if err != nil {
-		log.Fatalf("Failed to build transaction: %v\n", err)
+		log.Fatalf("Failed to build transaction: %v", err)
 	}
 	signedTx, err := client.Wallet.Sign(tx)
 	if err != nil {
-		log.Fatalf("Failed to sign transaction: %v\n", err)
+		log.Fatalf("Failed to sign transaction: %v", err)
 	}
 	if signedTx != nil {
 		fmt.Println("Signed transaction: ", signedTx.Hash().Hex())
@@ -245,11 +245,11 @@ func SwapWithCustomFeeAndReferrer(chain uint64, src string, dst string, amount s
 		ApiKey:     devPortalToken,
 	})
 	if err != nil {
-		log.Fatalf("Failed to create configuration: %v\n", err)
+		log.Fatalf("Failed to create configuration: %v", err)
 	}
 	client, err := aggregation.NewClient(config)
 	if err != nil {
-		log.Fatalf("Failed to create client: %v\n", err)
+		log.Fatalf("Failed to create client: %v", err)
 	}
 	ctx := context.Background()
 
@@ -264,16 +264,16 @@ func SwapWithCustomFeeAndReferrer(chain uint64, src string, dst string, amount s
 		DisableEstimate: true,
 	})
 	if err != nil {
-		log.Fatalf("Failed to get swap data: %v\n", err)
+		log.Fatalf("Failed to get swap data: %v", err)
 	}
 
 	tx, err := client.TxBuilder.New().SetData(swapData.TxNormalized.Data).SetTo(&swapData.TxNormalized.To).SetGas(swapData.TxNormalized.Gas).SetValue(swapData.TxNormalized.Value).Build(ctx)
 	if err != nil {
-		log.Fatalf("Failed to build transaction: %v\n", err)
+		log.Fatalf("Failed to build transaction: %v", err)
 	}
 	signedTx, err := client.Wallet.Sign(tx)
 	if err != nil {
-		log.Fatalf("Failed to sign transaction: %v\n", err)
+		log.Fatalf("Failed to sign transaction: %v", err)
 	}
 	if signedTx != nil {
 		fmt.Println("Signed transaction: ", signedTx.Hash().Hex())

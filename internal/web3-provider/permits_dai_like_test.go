@@ -16,7 +16,7 @@ import (
 )
 
 func Test_createPermitSignatureDaiLike(t *testing.T) {
-	erc20ABI, err := abi.JSON(strings.NewReader(constants.Erc20ABI)) // Make a generic version of this ABI
+	erc20ABI, err := abi.JSON(strings.NewReader(constants.Erc20ABI))
 	require.NoError(t, err)
 
 	privateKey, err := crypto.HexToECDSA("965e092fdfc08940d2bd05c7b5c7e1c51e283e92c7f52bbf1408973ae9a9acb7")
@@ -84,7 +84,7 @@ func Test_createPermitSignatureDaiLike(t *testing.T) {
 }
 
 func TestTokenPermitDaiLike(t *testing.T) {
-	erc20ABI, err := abi.JSON(strings.NewReader(constants.Erc20ABI)) // Make a generic version of this ABI
+	erc20ABI, err := abi.JSON(strings.NewReader(constants.Erc20ABI))
 	require.NoError(t, err)
 
 	privateKey, err := crypto.HexToECDSA("965e092fdfc08940d2bd05c7b5c7e1c51e283e92c7f52bbf1408973ae9a9acb7")

@@ -1,34 +1,25 @@
 package validate
 
-import "fmt"
-
-func CheckStringRequired(parameter interface{}, variableName string) error {
-	value, ok := parameter.(string)
-	if !ok {
-		return fmt.Errorf("'%v' must be a string", variableName)
-	}
-
+func CheckStringRequired(value string, variableName string) error {
 	if value == "" {
 		return NewParameterMissingError(variableName)
-	}
-
-	return CheckString(value, variableName)
-}
-
-func CheckString(parameter interface{}, variableName string) error {
-	_, ok := parameter.(string)
-	if !ok {
-		return fmt.Errorf("'%v' must be a string", variableName)
 	}
 
 	return nil
 }
 
-func CheckBoolean(parameter interface{}, variableName string) error {
-	_, ok := parameter.(bool)
-	if !ok {
-		return fmt.Errorf("for parameter '%v' to be validated as '%v', it must be a boolean", variableName, "Boolean")
-	}
+// CheckString is a no-op validator. Type safety is now enforced at compile time
+// via the generic Parameter[T] function. This function exists for use with the
+// validation framework when a string field needs to be included in validation
+// chains but has no additional constraints.
+func CheckString(_ string, _ string) error {
+	return nil
+}
 
+// CheckBoolean is a no-op validator. Type safety is now enforced at compile time
+// via the generic Parameter[T] function. This function exists for use with the
+// validation framework when a bool field needs to be included in validation
+// chains but has no additional constraints.
+func CheckBoolean(_ bool, _ string) error {
 	return nil
 }

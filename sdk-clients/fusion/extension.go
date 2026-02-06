@@ -1,21 +1,17 @@
 package fusion
 
 import (
-	"encoding/json"
-	"errors"
 	"fmt"
 	"math/big"
 	"strings"
 
+	"github.com/1inch/1inch-sdk-go/common/fusionorder"
 	"github.com/1inch/1inch-sdk-go/internal/bigint"
 	"github.com/1inch/1inch-sdk-go/internal/bytesbuilder"
 	"github.com/1inch/1inch-sdk-go/internal/hexadecimal"
 	"github.com/1inch/1inch-sdk-go/internal/times"
-	geth_common "github.com/ethereum/go-ethereum/common"
-	"golang.org/x/crypto/sha3"
-
-	random_number_generation "github.com/1inch/1inch-sdk-go/internal/random-number-generation"
 	"github.com/1inch/1inch-sdk-go/sdk-clients/orderbook"
+	geth_common "github.com/ethereum/go-ethereum/common"
 )
 
 // Extension represents the extension data for the Fusion order
@@ -23,7 +19,7 @@ import (
 type Extension struct {
 	// Raw unencoded data
 	SettlementContract         string
-	AuctionDetails             *AuctionDetails
+	AuctionDetails             *fusionorder.AuctionDetails
 	PostInteractionData        *SettlementPostInteractionData
 	PostInteractionDataEncoded string
 	Asset                      string
@@ -46,7 +42,7 @@ type Extension struct {
 
 type ExtensionParams struct {
 	SettlementContract         string
-	AuctionDetails             *AuctionDetails
+	AuctionDetails             *fusionorder.AuctionDetails
 	PostInteractionData        *SettlementPostInteractionData
 	PostInteractionDataEncoded string
 	Asset                      string
@@ -61,28 +57,15 @@ type ExtensionParams struct {
 	CustomData       string
 }
 
-func prefix0x(value string) string {
-	if len(value) >= 2 && value[:2] == "0x" {
-		return value
-	}
-	return "0x" + value
-}
-
 func NewExtension(params ExtensionParams) (*Extension, error) {
-	if !hexadecimal.IsHexBytes(params.SettlementContract) {
-		return nil, errors.New("Settlement contract must be valid hex string")
-	}
-	if !hexadecimal.IsHexBytes(params.MakerAssetSuffix) {
-		return nil, errors.New("MakerAssetSuffix must be valid hex string")
-	}
-	if !hexadecimal.IsHexBytes(params.TakerAssetSuffix) {
-		return nil, errors.New("TakerAssetSuffix must be valid hex string")
-	}
-	if !hexadecimal.IsHexBytes(params.Predicate) {
-		return nil, errors.New("Predicate must be valid hex string")
-	}
-	if params.CustomData != "" {
-		return nil, errors.New("CustomData is not currently supported")
+	if err := fusionorder.ValidateExtensionHexParams(fusionorder.ExtensionHexParams{
+		SettlementContract: params.SettlementContract,
+		MakerAssetSuffix:   params.MakerAssetSuffix,
+		TakerAssetSuffix:   params.TakerAssetSuffix,
+		Predicate:          params.Predicate,
+		CustomData:         params.CustomData,
+	}); err != nil {
+		return nil, err
 	}
 
 	var resolvingStartTime *big.Int
@@ -100,7 +83,7 @@ func NewExtension(params ExtensionParams) (*Extension, error) {
 
 	amountData, err := BuildAmountGetterData(bagdParams, true)
 	if err != nil {
-		return nil, fmt.Errorf("failed to build amount getter data: %v", err)
+		return nil, fmt.Errorf("failed to build amount getter data: %w", err)
 	}
 
 	settlementContractAddress := geth_common.HexToAddress(params.SettlementContract)
@@ -115,24 +98,24 @@ func NewExtension(params ExtensionParams) (*Extension, error) {
 		Surplus:             params.Surplus,
 		ResolvingStartTime:  resolvingStartTime,
 
-		MakerAssetSuffix: prefix0x(params.MakerAssetSuffix),
-		TakerAssetSuffix: prefix0x(params.TakerAssetSuffix),
-		MakingAmountData: prefix0x(makingAndTakingAmountData),
-		TakingAmountData: prefix0x(makingAndTakingAmountData),
-		Predicate:        prefix0x(params.Predicate),
-		MakerPermit:      prefix0x(params.Permit),
-		PreInteraction:   prefix0x(params.PreInteraction),
-		CustomData:       prefix0x(params.CustomData),
+		MakerAssetSuffix: fusionorder.Prefix0x(params.MakerAssetSuffix),
+		TakerAssetSuffix: fusionorder.Prefix0x(params.TakerAssetSuffix),
+		MakingAmountData: fusionorder.Prefix0x(makingAndTakingAmountData),
+		TakingAmountData: fusionorder.Prefix0x(makingAndTakingAmountData),
+		Predicate:        fusionorder.Prefix0x(params.Predicate),
+		MakerPermit:      fusionorder.Prefix0x(params.Permit),
+		PreInteraction:   fusionorder.Prefix0x(params.PreInteraction),
+		CustomData:       fusionorder.Prefix0x(params.CustomData),
 	}
 
 	postInteractionDataEncoded, err := CreateEncodedPostInteractionData(fusionExtension)
 	if err != nil {
-		return nil, fmt.Errorf("failed to create encoded post interaction data: %v", err)
+		return nil, fmt.Errorf("failed to create encoded post interaction data: %w", err)
 	}
 
-	interaction, err := NewInteraction(settlementContractAddress, postInteractionDataEncoded)
+	interaction, err := fusionorder.NewInteraction(settlementContractAddress, postInteractionDataEncoded)
 	if err != nil {
-		return nil, fmt.Errorf("failed to create interaction: %v", err)
+		return nil, fmt.Errorf("failed to create interaction: %w", err)
 	}
 	fusionExtension.PostInteraction = interaction.Encode()
 
@@ -148,14 +131,8 @@ func NewExtension(params ExtensionParams) (*Extension, error) {
 }
 
 // Keccak256 calculates the Keccak256 hash of the extension data
-func (e *Extension) Keccak256() *big.Int {
-	jsonData, err := json.Marshal(e)
-	if err != nil {
-		panic(err)
-	}
-	hash := sha3.New256()
-	hash.Write(jsonData)
-	return new(big.Int).SetBytes(hash.Sum(nil))
+func (e *Extension) Keccak256() (*big.Int, error) {
+	return fusionorder.Keccak256Hash(e)
 }
 
 func (e *Extension) ConvertToOrderbookExtension() *orderbook.Extension {
@@ -173,27 +150,11 @@ func (e *Extension) ConvertToOrderbookExtension() *orderbook.Extension {
 }
 
 func (e *Extension) GenerateSalt() (*big.Int, error) {
-
-	// Define the maximum value (2^96 - 1)
-	maxValue := new(big.Int).Sub(new(big.Int).Lsh(big.NewInt(1), 96), big.NewInt(1))
-
-	// Generate a random big.Int within the range [0, 2^96 - 1]
-	baseSalt, err := random_number_generation.BigIntMaxFunc(maxValue)
+	hash, err := e.Keccak256()
 	if err != nil {
-		return nil, err
+		return nil, fmt.Errorf("failed to calculate extension hash: %w", err)
 	}
-
-	if e.isEmpty() {
-		return baseSalt, nil
-	}
-
-	uint160Max := new(big.Int).Sub(new(big.Int).Lsh(big.NewInt(1), 160), big.NewInt(1))
-
-	extensionHash := e.Keccak256()
-	salt := new(big.Int).Lsh(baseSalt, 160)
-	salt.Or(salt, new(big.Int).And(extensionHash, uint160Max))
-
-	return salt, nil
+	return fusionorder.GenerateSaltWithExtension(hash, e.isEmpty())
 }
 
 // isEmpty checks if the extension data is empty
@@ -202,7 +163,7 @@ func (e *Extension) isEmpty() bool {
 }
 
 type BuildAmountGetterDataParams struct {
-	AuctionDetails      *AuctionDetails
+	AuctionDetails      *fusionorder.AuctionDetails
 	PostInteractionData *SettlementPostInteractionData
 	ResolvingStartTime  *big.Int
 }
@@ -213,7 +174,7 @@ func BuildAmountGetterData(params *BuildAmountGetterDataParams, forAmountGetters
 	if forAmountGetters {
 		err := bytes.AddBytes(params.AuctionDetails.Encode())
 		if err != nil {
-			return "", fmt.Errorf("failed to add auction details: %v", err)
+			return "", fmt.Errorf("failed to add auction details: %w", err)
 		}
 	}
 
@@ -235,7 +196,7 @@ func BuildAmountGetterData(params *BuildAmountGetterDataParams, forAmountGetters
 	}
 	bytes.AddUint16(resolverFee)
 
-	whitelistDiscount := BpsZero
+	whitelistDiscount := fusionorder.BpsZero
 	if params.PostInteractionData.AuctionFees != nil && params.PostInteractionData.AuctionFees.Resolver.Fee != nil && !params.PostInteractionData.AuctionFees.Resolver.Fee.IsZero() {
 		whitelistDiscount = params.PostInteractionData.AuctionFees.Resolver.WhitelistDiscount
 	}
@@ -252,7 +213,7 @@ func BuildAmountGetterData(params *BuildAmountGetterDataParams, forAmountGetters
 		for _, entry := range params.PostInteractionData.Whitelist {
 			err := bytes.AddBytes(entry.AddressHalf)
 			if err != nil {
-				return "", fmt.Errorf("failed to add whitelist address half: %v", err)
+				return "", fmt.Errorf("failed to add whitelist address half: %w", err)
 			}
 		}
 	} else {
@@ -260,7 +221,7 @@ func BuildAmountGetterData(params *BuildAmountGetterDataParams, forAmountGetters
 		bytes.AddUint8(uint8(len(params.PostInteractionData.Whitelist)))
 		for _, entry := range params.PostInteractionData.Whitelist {
 			if err := bytes.AddBytes(fmt.Sprintf("0x%s", entry.AddressHalf)); err != nil {
-				return "", fmt.Errorf("failed to add addressHalf: %w", err)
+				return "", fmt.Errorf("failed to add address half: %w", err)
 			}
 			bytes.AddUint16(entry.Delay)
 		}

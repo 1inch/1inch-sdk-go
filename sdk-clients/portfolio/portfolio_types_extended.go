@@ -60,7 +60,7 @@ type GetProtocolsDetailsResponse struct {
 		Info         struct {
 			Amount                    float64     `json:"amount"`
 			UnderlyingContractAddress float64     `json:"underlying_contract_address"`
-			PositionStartTimestamp    interface{} `json:"position_start_timestamp"`
+			PositionStartTimestamp    any `json:"position_start_timestamp"`
 			TimeIntervalSec           int         `json:"time_interval_sec,omitempty"`
 			PriceToUsd                float64     `json:"price_to_usd"`
 			ValueUsd                  float64     `json:"value_usd"`

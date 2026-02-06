@@ -71,13 +71,13 @@ func NewMulticall(client *ethclient.Client, chainId uint64) (*Client, error) {
 	case constants.BaseChainId:
 		addressRaw = multicallContractBase
 	default:
-		return nil, fmt.Errorf("chain %d is not supported", chainId)
+		return nil, fmt.Errorf("unsupported chain ID: %d", chainId)
 	}
 
 	helperContractAddress := common.HexToAddress(addressRaw)
-	contractABI, err := abi.JSON(strings.NewReader(Multicallv2abiABI)) // Make a generic version of this ABI
+	contractABI, err := abi.JSON(strings.NewReader(Multicallv2abiABI))
 	if err != nil {
-		return nil, fmt.Errorf("failed to parse abi error: %s", err)
+		return nil, fmt.Errorf("failed to parse abi: %w", err)
 	}
 	return &Client{
 		client:          client,
@@ -110,7 +110,7 @@ func (m Client) Execute(ctx context.Context, callData []CallData) ([][]byte, err
 		requests,
 	)
 	if err != nil {
-		return nil, fmt.Errorf("failed to pack msg error: %s", err)
+		return nil, fmt.Errorf("failed to pack message: %w", err)
 	}
 
 	nodeMsg := ethereum.CallMsg{
@@ -119,7 +119,7 @@ func (m Client) Execute(ctx context.Context, callData []CallData) ([][]byte, err
 	}
 	resp, err := m.client.CallContract(ctx, nodeMsg, nil)
 	if err != nil {
-		return nil, fmt.Errorf("failed to call contract: error: %s", err)
+		return nil, fmt.Errorf("failed to call contract: %w", err)
 	}
 
 	if len(resp) == 0 {

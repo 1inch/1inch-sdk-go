@@ -4,13 +4,13 @@ import (
 	"math/big"
 	"testing"
 
+	"github.com/1inch/1inch-sdk-go/common/fusionorder"
 	"github.com/1inch/1inch-sdk-go/internal/bigint"
+	random_number_generation "github.com/1inch/1inch-sdk-go/internal/random-number-generation"
 	"github.com/1inch/1inch-sdk-go/sdk-clients/orderbook"
 	"github.com/ethereum/go-ethereum/common"
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
-
-	random_number_generation "github.com/1inch/1inch-sdk-go/internal/random-number-generation"
 )
 
 func TestGenerateSalt(t *testing.T) {
@@ -79,15 +79,15 @@ func TestNewExtension(t *testing.T) {
 			name: "Valid parameters",
 			params: ExtensionParams{
 				SettlementContract: "0x5678",
-				AuctionDetails: &AuctionDetails{
+				AuctionDetails: &fusionorder.AuctionDetails{
 					StartTime:       0,
 					Duration:        0,
 					InitialRateBump: 0,
 					Points:          nil,
-					GasCost:         GasCostConfigClassFixed{},
+					GasCost:         fusionorder.GasCostConfigClassFixed{},
 				},
 				PostInteractionData: &SettlementPostInteractionData{
-					Whitelist: []WhitelistItem{},
+					Whitelist: []fusionorder.WhitelistItem{},
 					AuctionFees: &FeesIntegratorAndResolver{
 						Resolver:   ResolverFee{},
 						Integrator: IntegratorFee{},
@@ -105,7 +105,7 @@ func TestNewExtension(t *testing.T) {
 
 				Surplus: &SurplusParams{
 					EstimatedTakerAmount: big.NewInt(1),
-					ProtocolFee:          FromPercent(1, GetDefaultBase()),
+					ProtocolFee:          fusionorder.MustFromPercent(1, fusionorder.GetDefaultBase()),
 				},
 
 				ResolvingStartTime: big.NewInt(0),
@@ -126,15 +126,15 @@ func TestNewExtension(t *testing.T) {
 			name: "Valid parameters 2",
 			params: ExtensionParams{
 				SettlementContract: "0x0500000000000000000000000000000000000000",
-				AuctionDetails: &AuctionDetails{
+				AuctionDetails: &fusionorder.AuctionDetails{
 					StartTime:       0,
 					Duration:        0,
 					InitialRateBump: 0,
 					Points:          nil,
-					GasCost:         GasCostConfigClassFixed{},
+					GasCost:         fusionorder.GasCostConfigClassFixed{},
 				},
 				PostInteractionData: &SettlementPostInteractionData{
-					Whitelist: []WhitelistItem{},
+					Whitelist: []fusionorder.WhitelistItem{},
 					AuctionFees: &FeesIntegratorAndResolver{
 						Resolver:   ResolverFee{},
 						Integrator: IntegratorFee{},
@@ -152,7 +152,7 @@ func TestNewExtension(t *testing.T) {
 
 				Surplus: &SurplusParams{
 					EstimatedTakerAmount: big.NewInt(1),
-					ProtocolFee:          FromPercent(1, GetDefaultBase()),
+					ProtocolFee:          fusionorder.MustFromPercent(1, fusionorder.GetDefaultBase()),
 				},
 
 				ResolvingStartTime: big.NewInt(0),
@@ -179,7 +179,7 @@ func TestNewExtension(t *testing.T) {
 				PreInteraction:     "0x5678",
 			},
 			expectErr: true,
-			errMsg:    "Settlement contract must be valid hex string",
+			errMsg:    "invalid settlement contract hex: invalid",
 		},
 		{
 			name: "Invalid MakerAssetSuffix",
@@ -191,7 +191,7 @@ func TestNewExtension(t *testing.T) {
 				PreInteraction:     "0x5678",
 			},
 			expectErr: true,
-			errMsg:    "MakerAssetSuffix must be valid hex string",
+			errMsg:    "invalid maker asset suffix hex: invalid",
 		},
 		{
 			name: "Invalid TakerAssetSuffix",
@@ -203,7 +203,7 @@ func TestNewExtension(t *testing.T) {
 				PreInteraction:     "0x5678",
 			},
 			expectErr: true,
-			errMsg:    "TakerAssetSuffix must be valid hex string",
+			errMsg:    "invalid taker asset suffix hex: invalid",
 		},
 		{
 			name: "Invalid Predicate",
@@ -215,7 +215,7 @@ func TestNewExtension(t *testing.T) {
 				PreInteraction:     "0x5678",
 			},
 			expectErr: true,
-			errMsg:    "Predicate must be valid hex string",
+			errMsg:    "invalid predicate hex: invalid",
 		},
 		{
 			name: "CustomData not supported",
@@ -228,7 +228,7 @@ func TestNewExtension(t *testing.T) {
 				CustomData:         "0x1234",
 			},
 			expectErr: true,
-			errMsg:    "CustomData is not currently supported",
+			errMsg:    "unsupported: custom data",
 		},
 	}
 
@@ -307,24 +307,24 @@ func TestConvertToOrderbookExtension(t *testing.T) {
 func TestBuildAmountGetterData(t *testing.T) {
 	tests := []struct {
 		name             string
-		details          *AuctionDetails
+		details          *fusionorder.AuctionDetails
 		detailsFull      *Details
-		whitelist        []WhitelistItem
+		whitelist        []fusionorder.WhitelistItem
 		forAmountGetters bool
 		expected         string
 	}{
 		{
 			name: "basic auction details with forAmountGetters true",
 			detailsFull: &Details{
-				Auction: &AuctionDetails{
-					GasCost: GasCostConfigClassFixed{
+				Auction: &fusionorder.AuctionDetails{
+					GasCost: fusionorder.GasCostConfigClassFixed{
 						GasBumpEstimate:  0,
 						GasPriceEstimate: 0,
 					},
 					StartTime:       1673548149,
 					Duration:        180,
 					InitialRateBump: 50000,
-					Points: []AuctionPointClassFixed{
+					Points: []fusionorder.AuctionPointClassFixed{
 						{
 							Delay:       12,
 							Coefficient: 20000,
@@ -333,7 +333,7 @@ func TestBuildAmountGetterData(t *testing.T) {
 				},
 				ResolvingStartTime: big.NewInt(1673548139),
 			},
-			whitelist: []WhitelistItem{
+			whitelist: []fusionorder.WhitelistItem{
 				{
 					AddressHalf: "bb839cbe05303d7705fa",
 					Delay:       big.NewInt(0),
@@ -345,15 +345,15 @@ func TestBuildAmountGetterData(t *testing.T) {
 		{
 			name: "basic auction details with forAmountGetters false",
 			detailsFull: &Details{
-				Auction: &AuctionDetails{
-					GasCost: GasCostConfigClassFixed{
+				Auction: &fusionorder.AuctionDetails{
+					GasCost: fusionorder.GasCostConfigClassFixed{
 						GasBumpEstimate:  0,
 						GasPriceEstimate: 0,
 					},
 					StartTime:       1673548149,
 					Duration:        180,
 					InitialRateBump: 50000,
-					Points: []AuctionPointClassFixed{
+					Points: []fusionorder.AuctionPointClassFixed{
 						{
 							Delay:       12,
 							Coefficient: 20000,
@@ -362,7 +362,7 @@ func TestBuildAmountGetterData(t *testing.T) {
 				},
 				ResolvingStartTime: big.NewInt(1673548139),
 			},
-			whitelist: []WhitelistItem{
+			whitelist: []fusionorder.WhitelistItem{
 				{
 					AddressHalf: "bb839cbe05303d7705fa",
 					Delay:       big.NewInt(0),
@@ -374,26 +374,26 @@ func TestBuildAmountGetterData(t *testing.T) {
 		{
 			name: "with fees",
 			detailsFull: &Details{
-				Auction: &AuctionDetails{
+				Auction: &fusionorder.AuctionDetails{
 					StartTime:       1673548149,
 					Duration:        180,
 					InitialRateBump: 50000,
-					Points:          []AuctionPointClassFixed{{Coefficient: 20000, Delay: 12}},
+					Points:          []fusionorder.AuctionPointClassFixed{{Coefficient: 20000, Delay: 12}},
 				},
 				FeesIntAndRes: &FeesIntegratorAndResolver{
 					Integrator: IntegratorFee{
 						Integrator: "0x0000000000000000000000000000000000000001",
 						Protocol:   "0x0000000000000000000000000000000000000002",
-						Fee:        FromPercent(1, GetDefaultBase()),
-						Share:      FromPercent(50, GetDefaultBase()),
+						Fee:        fusionorder.MustFromPercent(1, fusionorder.GetDefaultBase()),
+						Share:      fusionorder.MustFromPercent(50, fusionorder.GetDefaultBase()),
 					},
 				},
-				Whitelist: []AuctionWhitelistItem{
+				Whitelist: []fusionorder.AuctionWhitelistItem{
 					{Address: common.HexToAddress("0x00000000219ab540356cbb839cbe05303d7705fa"), AllowFrom: big.NewInt(0)},
 				},
 				ResolvingStartTime: big.NewInt(1673548139),
 			},
-			whitelist: []WhitelistItem{
+			whitelist: []fusionorder.WhitelistItem{
 				{
 					AddressHalf: "bb839cbe05303d7705fa",
 					Delay:       big.NewInt(0),

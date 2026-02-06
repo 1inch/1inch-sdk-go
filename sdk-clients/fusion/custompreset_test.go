@@ -23,7 +23,7 @@ func TestQuoterCustomPresetRequest_Validate(t *testing.T) {
 					{ToTokenAmount: "110000", Delay: 40},
 				},
 			},
-			expectedErr: "invalid auctionStartAmount: ama bad string",
+			expectedErr: "invalid auction start amount: ama bad string",
 		},
 		{
 			name: "auctionEndAmount should be valid",
@@ -36,7 +36,7 @@ func TestQuoterCustomPresetRequest_Validate(t *testing.T) {
 					{ToTokenAmount: "110000", Delay: 40},
 				},
 			},
-			expectedErr: "invalid auctionEndAmount: ama bad string",
+			expectedErr: "invalid auction end amount: ama bad string",
 		},
 		{
 			name: "auctionDuration should be valid",
@@ -49,7 +49,7 @@ func TestQuoterCustomPresetRequest_Validate(t *testing.T) {
 					{ToTokenAmount: "110000", Delay: 40},
 				},
 			},
-			expectedErr: "auctionDuration should be integer, got: 0",
+			expectedErr: "invalid auction duration: expected positive integer, got 0",
 		},
 		{
 			name: "points should be in range",
@@ -62,7 +62,7 @@ func TestQuoterCustomPresetRequest_Validate(t *testing.T) {
 					{ToTokenAmount: "110000", Delay: 40},
 				},
 			},
-			expectedErr: "points should be in range of auction (between 50000 and 100000), invalid value at index 1: 110000",
+			expectedErr: "point at index 1 out of auction range [50000, 100000]: 110000",
 		},
 		{
 			name: "points should be in range (below minimum)",
@@ -75,7 +75,7 @@ func TestQuoterCustomPresetRequest_Validate(t *testing.T) {
 					{ToTokenAmount: "70000", Delay: 40},
 				},
 			},
-			expectedErr: "points should be in range of auction (between 50000 and 100000), invalid value at index 0: 40000",
+			expectedErr: "point at index 0 out of auction range [50000, 100000]: 40000",
 		},
 		{
 			name: "points should be an array of valid amounts",
@@ -88,7 +88,7 @@ func TestQuoterCustomPresetRequest_Validate(t *testing.T) {
 					{ToTokenAmount: "70000", Delay: 40},
 				},
 			},
-			expectedErr: "points should be an array of valid amounts, invalid value at index 0: ama bad string",
+			expectedErr: "invalid point amount at index 0: ama bad string",
 		},
 		{
 			name: "valid custom preset",

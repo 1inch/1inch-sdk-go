@@ -21,7 +21,7 @@ func main() {
 		ApiKey: devPortalToken,
 	})
 	if err != nil {
-		log.Fatal("failed to create configuration: %w", err)
+		log.Fatalf("failed to create configuration: %v", err)
 	}
 	client, err := history.NewClient(config)
 	if err != nil {

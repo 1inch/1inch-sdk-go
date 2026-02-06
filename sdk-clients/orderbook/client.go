@@ -33,7 +33,7 @@ func NewClient(cfg *Configuration) (*Client, error) {
 		return nil, err
 	}
 
-	seriesNonceManagerABI, err := abi.JSON(strings.NewReader(constants.SeriesNonceManagerABI)) // Make a generic version of this ABI
+	seriesNonceManagerABI, err := abi.JSON(strings.NewReader(constants.SeriesNonceManagerABI))
 	if err != nil {
 		return nil, err
 	}

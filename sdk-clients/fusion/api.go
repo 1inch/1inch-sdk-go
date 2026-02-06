@@ -55,7 +55,7 @@ func (api *api) GetQuote(ctx context.Context, params QuoterControllerGetQuotePar
 	}
 
 	if !params.Surplus {
-		return nil, fmt.Errorf("surplus query parameter must be true to get quote")
+		return nil, fmt.Errorf("surplus parameter required for quote")
 	}
 
 	payload := common.RequestPayload{
@@ -119,7 +119,7 @@ func (api *api) PlaceOrder(ctx context.Context, fusionQuote GetQuoteOutputFixed,
 
 	_, limitOrder, err := CreateFusionOrderData(fusionQuote, orderParams, wallet, api.chainId)
 	if err != nil {
-		return "", fmt.Errorf("failed to create order: %v", err)
+		return "", fmt.Errorf("failed to create order: %w", err)
 	}
 
 	signedOrder := SignedOrderInput{
@@ -174,7 +174,7 @@ func (api *api) PlaceOrders(ctx context.Context, body []PlaceOrderBody) (*GetQuo
 	}
 
 	payload := common.RequestPayload{
-		Method: "GET",
+		Method: "POST",
 		Params: nil,
 		U:      u,
 		Body:   bodyMarshaled,

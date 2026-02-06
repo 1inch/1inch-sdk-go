@@ -8,6 +8,7 @@ import (
 	"os"
 	"time"
 
+	"github.com/1inch/1inch-sdk-go/constants"
 	"github.com/1inch/1inch-sdk-go/sdk-clients/fusionplus"
 )
 
@@ -98,7 +99,7 @@ func main() {
 	orderParams := fusionplus.OrderParams{
 		HashLock:     hashLock,
 		SecretHashes: secretHashes,
-		Receiver:     "0x0000000000000000000000000000000000000000",
+		Receiver:     constants.ZeroAddress,
 		Preset:       quote.RecommendedPreset,
 	}
 
@@ -116,7 +117,7 @@ func main() {
 
 	orderQuickLookIndented, err := json.MarshalIndent(order, "", "  ")
 	if err != nil {
-		log.Fatalf("Failed to marshal response: %v\n", err)
+		log.Fatalf("Failed to marshal response: %v", err)
 	}
 	fmt.Printf("Order: %s\n", string(orderQuickLookIndented))
 
@@ -152,7 +153,7 @@ func main() {
 		}
 
 		if len(fills.Fills) > 0 {
-			// TODO the secret index needs to match the index of the fill object, but this is not important for single-secre orders
+			// TODO the secret index needs to match the index of the fill object, but this is not important for single-secret orders
 			err = client.SubmitSecret(ctx, fusionplus.SecretInput{
 				OrderHash: orderHash,
 				Secret:    secrets[0],

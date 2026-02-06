@@ -60,7 +60,7 @@ func NewConfiguration(params ConfigurationParams) (*Configuration, error) {
 
 func NewConfigurationWallet(privateKey string, chainId uint64) (*ConfigurationWallet, error) {
 	if privateKey == "" {
-		return nil, fmt.Errorf("private key cannot be empty")
+		return nil, fmt.Errorf("private key is required")
 	}
 	w, err := web3_provider.DefaultWalletOnlyProvider(privateKey, chainId)
 	if err != nil {

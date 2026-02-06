@@ -34,11 +34,11 @@ func main() {
 		ApiKey:     devPortalToken,
 	})
 	if err != nil {
-		log.Fatalf("Failed to create configuration: %v\n", err)
+		log.Fatalf("Failed to create configuration: %v", err)
 	}
 	client, err := aggregation.NewClient(config)
 	if err != nil {
-		log.Fatalf("Failed to create client: %v\n", err)
+		log.Fatalf("Failed to create client: %v", err)
 	}
 	ctx := context.Background()
 
@@ -48,9 +48,14 @@ func main() {
 		TokenAddress:  PolygonWeth,
 		WalletAddress: client.Wallet.Address().Hex(),
 	})
+	if err != nil {
+		log.Fatalf("Failed to get allowance: %v", err)
+	}
 
 	allowance := new(big.Int)
-	allowance.SetString(allowanceData.Allowance, 10)
+	if _, ok := allowance.SetString(allowanceData.Allowance, 10); !ok {
+		log.Fatalf("Failed to parse allowance: %s", allowanceData.Allowance)
+	}
 
 	cmp := amountToSwap.Cmp(allowance)
 
@@ -60,31 +65,31 @@ func main() {
 			Amount:       amountToSwap.String(),
 		})
 		if err != nil {
-			log.Fatalf("Failed to get approve data: %v\n", err)
+			log.Fatalf("Failed to get approve data: %v", err)
 		}
 		data, err := hexutil.Decode(approveData.Data)
 		if err != nil {
-			log.Fatalf("Failed to decode approve data: %v\n", err)
+			log.Fatalf("Failed to decode approve data: %v", err)
 		}
 
 		to := common.HexToAddress(approveData.To)
 
 		tx, err := client.TxBuilder.New().SetData(data).SetTo(&to).Build(ctx)
 		if err != nil {
-			log.Fatalf("Failed to build approve transaction: %v\n", err)
+			log.Fatalf("Failed to build approve transaction: %v", err)
 		}
 
 		signedTx, err := client.Wallet.Sign(tx)
 		if err != nil {
-			log.Fatalf("Failed to sign approve transaction: %v\n", err)
+			log.Fatalf("Failed to sign approve transaction: %v", err)
 		}
 
 		err = client.Wallet.BroadcastTransaction(ctx, signedTx)
 		if err != nil {
-			log.Fatalf("Failed to broadcast approve transaction: %v\n", err)
+			log.Fatalf("Failed to broadcast approve transaction: %v", err)
 		}
 
-		fmt.Printf("Transaction has been broadcast. View it on Polygonscan here: %v\n", fmt.Sprintf("https://polygonscan.com/tx/%v", signedTx.Hash().Hex()))
+		fmt.Printf("Transaction has been broadcast. View it on Polygonscan here: https://polygonscan.com/tx/%s\n", signedTx.Hash().Hex())
 		for {
 			receipt, err := client.Wallet.TransactionReceipt(ctx, signedTx.Hash())
 			if receipt != nil {

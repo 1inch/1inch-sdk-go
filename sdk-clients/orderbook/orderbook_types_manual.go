@@ -90,7 +90,7 @@ type OrderResponse struct {
 	MakerRate            string      `json:"makerRate"`
 	TakerRate            string      `json:"takerRate"`
 	IsMakerContract      bool        `json:"isMakerContract"`
-	OrderInvalidReason   interface{} `json:"orderInvalidReason"`
+	OrderInvalidReason   any `json:"orderInvalidReason"`
 }
 
 type OrderResponseExtended struct {

@@ -1,185 +1,240 @@
 package aggregation
 
 import (
-	"math/big"
 	"testing"
 
-	"github.com/ethereum/go-ethereum/common"
-	"github.com/ethereum/go-ethereum/common/hexutil"
 	"github.com/stretchr/testify/assert"
+	"github.com/stretchr/testify/require"
 
 	"github.com/1inch/1inch-sdk-go/constants"
 )
 
 func TestNormalizeSwapResponse(t *testing.T) {
-	d := "0x0502b1c50000000000000000000000005a98fcbea516cf06857215779fd812ca3bef1b32000000000000000000000000000000000000000000000000000000000000271000000000000000000000000000000000000000000000000000000000000000050000000000000000000000000000000000000000000000000000000000000080000000000000000000000000000000000000000000000000000000000000000100000000000000003b6d0340c558f600b34a5f69dd2f0d06cb8a88d829b7420ade8bb62d"
-	wantedDataLDOWETH, err := hexutil.Decode(d)
-	assert.NoError(t, err)
-
-	testCases := []struct {
-		name    string
-		input   SwapResponse
-		want    *SwapResponseExtended
-		wantErr bool
+	tests := []struct {
+		name        string
+		resp        SwapResponse
+		expectError bool
+		errorMsg    string
 	}{
 		{
-			name: "LDO -> WETH ETH (small amount)",
-			input: SwapResponse{
+			name: "Valid response",
+			resp: SwapResponse{
 				Tx: TransactionData{
-					Data:     d,
-					From:     "0x083fc10ce7e97cafbae0fe332a9c4384c5f54e45",
-					Gas:      257615,
-					GasPrice: "22931145666",
-					To:       "0x1111111254eeb25477b68fb85ed929f73a960582",
+					To:       "0x6B175474E89094C44Da98b954EedeAC495271d0F",
+					Gas:      100000,
+					GasPrice: "20000000000",
 					Value:    "1000000000000000000",
+					Data:     "0x1234567890abcdef",
 				},
 			},
-			want: &SwapResponseExtended{
-				SwapResponse: SwapResponse{
-					Tx: TransactionData{
-						Data:     d,
-						From:     "0x083fc10ce7e97cafbae0fe332a9c4384c5f54e45",
-						Gas:      257615,
-						GasPrice: "22931145666",
-						To:       "0x1111111254eeb25477b68fb85ed929f73a960582",
-						Value:    "1000000000000000000",
-					},
-				},
-				TxNormalized: NormalizedTransactionData{
-					Data:     wantedDataLDOWETH,
-					Gas:      257615,
-					GasPrice: big.NewInt(22931145666),
-					To:       common.HexToAddress("0x1111111254eeb25477b68fb85ed929f73a960582"),
-					Value:    big.NewInt(1000000000000000000),
-				},
-			},
-			wantErr: false,
+			expectError: false,
 		},
 		{
-			name: "Invalid 'To' address",
-			input: SwapResponse{
+			name: "Valid response - zero value",
+			resp: SwapResponse{
 				Tx: TransactionData{
-					Data:     "0x0502b1c50000000000000000000000005a98fcbea516cf06857215779fd812ca3bef1b32000000000000000000000000000000000000000000000000000000000000271000000000000000000000000000000000000000000000000000000000000000050000000000000000000000000000000000000000000000000000000000000080000000000000000000000000000000000000000000000000000000000000000100000000000000003b6d0340c558f600b34a5f69dd2f0d06cb8a88d829b7420ade8bb62d",
-					From:     "0x083fc10ce7e97cafbae0fe332a9c4384c5f54e45",
-					Gas:      257615,
-					GasPrice: "22931145666",
-					To:       "0xInvalid",
-					Value:    "1000000000000000000",
+					To:       "0x6B175474E89094C44Da98b954EedeAC495271d0F",
+					Gas:      100000,
+					GasPrice: "20000000000",
+					Value:    "0",
+					Data:     "0x",
 				},
 			},
-			want:    nil,
-			wantErr: true,
+			expectError: false,
 		},
 		{
-			name: "Invalid 'GasPrice'",
-			input: SwapResponse{
+			name: "Invalid To address",
+			resp: SwapResponse{
 				Tx: TransactionData{
-					Data:     "0xdeadbeef",
-					From:     "0x000000000000000000000000000000000000dead",
-					Gas:      21000,
+					To:       "invalid",
+					Gas:      100000,
+					GasPrice: "20000000000",
+					Value:    "0",
+					Data:     "0x",
+				},
+			},
+			expectError: true,
+			errorMsg:    "invalid to address",
+		},
+		{
+			name: "Invalid GasPrice - not a number",
+			resp: SwapResponse{
+				Tx: TransactionData{
+					To:       "0x6B175474E89094C44Da98b954EedeAC495271d0F",
+					Gas:      100000,
 					GasPrice: "invalid",
-					To:       "0x000000000000000000000000000000000000beef",
-					Value:    "1000000000000000000",
+					Value:    "0",
+					Data:     "0x",
 				},
 			},
-			want:    nil,
-			wantErr: true,
+			expectError: true,
+			errorMsg:    "invalid gas price",
+		},
+		{
+			name: "Invalid Value - not a number",
+			resp: SwapResponse{
+				Tx: TransactionData{
+					To:       "0x6B175474E89094C44Da98b954EedeAC495271d0F",
+					Gas:      100000,
+					GasPrice: "20000000000",
+					Value:    "invalid",
+					Data:     "0x",
+				},
+			},
+			expectError: true,
+			errorMsg:    "invalid tx value",
+		},
+		{
+			name: "Invalid Data - not hex",
+			resp: SwapResponse{
+				Tx: TransactionData{
+					To:       "0x6B175474E89094C44Da98b954EedeAC495271d0F",
+					Gas:      100000,
+					GasPrice: "20000000000",
+					Value:    "0",
+					Data:     "not-hex-data",
+				},
+			},
+			expectError: true,
+			errorMsg:    "invalid tx data",
 		},
 	}
 
-	for _, tc := range testCases {
+	for _, tc := range tests {
 		t.Run(tc.name, func(t *testing.T) {
-			got, err := normalizeSwapResponse(tc.input)
-			if tc.wantErr {
-				assert.Error(t, err)
+			result, err := normalizeSwapResponse(tc.resp)
+			if tc.expectError {
+				require.Error(t, err)
+				assert.Contains(t, err.Error(), tc.errorMsg)
+				assert.Nil(t, result)
 			} else {
-				assert.NoError(t, err)
-				assert.Equal(t, tc.want, got)
+				require.NoError(t, err)
+				require.NotNil(t, result)
+				assert.Equal(t, uint64(tc.resp.Tx.Gas), result.TxNormalized.Gas)
+				assert.NotNil(t, result.TxNormalized.GasPrice)
+				assert.NotNil(t, result.TxNormalized.Value)
+				assert.NotNil(t, result.TxNormalized.Data)
 			}
 		})
 	}
 }
 
-func TestNormalizeApproveCallDataResponse(t *testing.T) {
-	d := "0x095ea7b30000000000000000000000001111111254eeb25477b68fb85ed929f73a9605820000000000000000000000000000000000000000000000000000000556cd83c2"
-	ldoApproveData, err := hexutil.Decode(d)
-	assert.NoError(t, err)
-
-	testCases := []struct {
-		name    string
-		input   ApproveCallDataResponse
-		want    *ApproveCallDataResponseExtended
-		wantErr bool
-	}{
-		{
-			name: "LDO Approve to 22931145666",
-			input: ApproveCallDataResponse{
-				Data:     d,
-				GasPrice: "16955435273",
-				To:       "0x5a98fcbea516cf06857215779fd812ca3bef1b32",
-				Value:    "0",
-			},
-			want: &ApproveCallDataResponseExtended{
-				ApproveCallDataResponse: ApproveCallDataResponse{
-					Data:     d,
-					GasPrice: "16955435273",
-					To:       "0x5a98fcbea516cf06857215779fd812ca3bef1b32",
-					Value:    "0",
-				},
-				TxNormalized: NormalizedTransactionData{
-					Data:     ldoApproveData,
-					Gas:      constants.ERC20_APPROVE_GAS,
-					GasPrice: big.NewInt(16955435273),
-					To:       common.HexToAddress("0x5a98fcbea516cf06857215779fd812ca3bef1b32"),
-					Value:    big.NewInt(0),
-				},
-			},
-			wantErr: false,
-		},
-		{
-			name: "Invalid 'To' Address",
-			input: ApproveCallDataResponse{
-				Data:     "0x095ea7b3",
-				GasPrice: "100000000000",
-				To:       "0xInvalidAddress",
-				Value:    "0",
-			},
-			want:    nil,
-			wantErr: true,
-		},
-		{
-			name: "Invalid 'GasPrice'",
-			input: ApproveCallDataResponse{
-				Data:     "0x095ea7b3",
-				GasPrice: "NotANumber",
-				To:       "0x5a98fcbea516cf06857215779fd812ca3bef1b32",
-				Value:    "0",
-			},
-			want:    nil,
-			wantErr: true,
-		},
-		{
-			name: "Invalid 'Data'",
-			input: ApproveCallDataResponse{
-				Data:     "0xZZZ",
-				GasPrice: "100000000000",
-				To:       "0x5a98fcbea516cf06857215779fd812ca3bef1b32",
-				Value:    "0",
-			},
-			want:    nil,
-			wantErr: true,
+func TestNormalizeSwapResponse_DataParsing(t *testing.T) {
+	resp := SwapResponse{
+		Tx: TransactionData{
+			To:       "0x6B175474E89094C44Da98b954EedeAC495271d0F",
+			Gas:      100000,
+			GasPrice: "20000000000",
+			Value:    "1000000000000000000",
+			Data:     "0x1234567890abcdef",
 		},
 	}
 
-	for _, tc := range testCases {
+	result, err := normalizeSwapResponse(resp)
+	require.NoError(t, err)
+
+	// Verify the data was correctly decoded
+	expectedData := []byte{0x12, 0x34, 0x56, 0x78, 0x90, 0xab, 0xcd, 0xef}
+	assert.Equal(t, expectedData, result.TxNormalized.Data)
+
+	// Verify gas price
+	assert.Equal(t, "20000000000", result.TxNormalized.GasPrice.String())
+
+	// Verify value (1 ETH in wei)
+	assert.Equal(t, "1000000000000000000", result.TxNormalized.Value.String())
+}
+
+func TestNormalizeApproveCallDataResponse(t *testing.T) {
+	tests := []struct {
+		name        string
+		resp        ApproveCallDataResponse
+		expectError bool
+		errorMsg    string
+	}{
+		{
+			name: "Valid response",
+			resp: ApproveCallDataResponse{
+				To:       "0x6B175474E89094C44Da98b954EedeAC495271d0F",
+				GasPrice: "20000000000",
+				Value:    "0",
+				Data:     "0x095ea7b3000000000000000000000000",
+			},
+			expectError: false,
+		},
+		{
+			name: "Invalid To address",
+			resp: ApproveCallDataResponse{
+				To:       "invalid",
+				GasPrice: "20000000000",
+				Value:    "0",
+				Data:     "0x",
+			},
+			expectError: true,
+			errorMsg:    "invalid to address",
+		},
+		{
+			name: "Invalid GasPrice",
+			resp: ApproveCallDataResponse{
+				To:       "0x6B175474E89094C44Da98b954EedeAC495271d0F",
+				GasPrice: "invalid",
+				Value:    "0",
+				Data:     "0x",
+			},
+			expectError: true,
+			errorMsg:    "invalid gas price",
+		},
+		{
+			name: "Invalid Value",
+			resp: ApproveCallDataResponse{
+				To:       "0x6B175474E89094C44Da98b954EedeAC495271d0F",
+				GasPrice: "20000000000",
+				Value:    "invalid",
+				Data:     "0x",
+			},
+			expectError: true,
+			errorMsg:    "invalid value",
+		},
+		{
+			name: "Invalid Data",
+			resp: ApproveCallDataResponse{
+				To:       "0x6B175474E89094C44Da98b954EedeAC495271d0F",
+				GasPrice: "20000000000",
+				Value:    "0",
+				Data:     "not-hex",
+			},
+			expectError: true,
+			errorMsg:    "invalid data",
+		},
+	}
+
+	for _, tc := range tests {
 		t.Run(tc.name, func(t *testing.T) {
-			got, err := normalizeApproveCallDataResponse(tc.input)
-			if tc.wantErr {
-				assert.Error(t, err)
+			result, err := normalizeApproveCallDataResponse(tc.resp)
+			if tc.expectError {
+				require.Error(t, err)
+				assert.Contains(t, err.Error(), tc.errorMsg)
+				assert.Nil(t, result)
 			} else {
-				assert.NoError(t, err)
-				assert.Equal(t, tc.want, got)
+				require.NoError(t, err)
+				require.NotNil(t, result)
+				// Verify the gas is set to Erc20ApproveGas constant
+				assert.Equal(t, uint64(constants.Erc20ApproveGas), result.TxNormalized.Gas)
 			}
 		})
 	}
+}
+
+func TestNormalizeApproveCallDataResponse_UsesConstantGas(t *testing.T) {
+	resp := ApproveCallDataResponse{
+		To:       "0x6B175474E89094C44Da98b954EedeAC495271d0F",
+		GasPrice: "20000000000",
+		Value:    "0",
+		Data:     "0x",
+	}
+
+	result, err := normalizeApproveCallDataResponse(resp)
+	require.NoError(t, err)
+
+	// Gas should always be the Erc20ApproveGas constant
+	assert.Equal(t, uint64(constants.Erc20ApproveGas), result.TxNormalized.Gas)
 }

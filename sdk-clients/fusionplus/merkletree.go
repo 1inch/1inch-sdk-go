@@ -70,7 +70,7 @@ func GetProof(leaves []string, index int) ([]string, error) {
 		}
 	}
 	if !foundLeaf {
-		panic("Leaf not found in tree")
+		return nil, errors.New("leaf not found in tree")
 	}
 
 	currentIndex := leafIndexInTree
@@ -78,7 +78,10 @@ func GetProof(leaves []string, index int) ([]string, error) {
 
 	// Traverse up the tree to build the proof.
 	for currentIndex > 0 {
-		siblingIndex := getSiblingIndex(currentIndex)
+		siblingIndex, err := getSiblingIndex(currentIndex)
+		if err != nil {
+			return nil, err
+		}
 
 		// Add the sibling hash to the proof.
 		if siblingIndex < len(tree.tree) {
@@ -87,7 +90,6 @@ func GetProof(leaves []string, index int) ([]string, error) {
 		}
 
 		// Move to the parent index.
-		var err error
 		currentIndex, err = ParentIndex(currentIndex)
 		if err != nil {
 			return nil, err
@@ -97,11 +99,11 @@ func GetProof(leaves []string, index int) ([]string, error) {
 	return proof, nil
 }
 
-func getSiblingIndex(i int) int {
+func getSiblingIndex(i int) (int, error) {
 	if i <= 0 {
-		panic("Root has no siblings")
+		return 0, errors.New("root has no siblings")
 	}
-	return i - int(math.Pow(-1, float64(i%2)))
+	return i - int(math.Pow(-1, float64(i%2))), nil
 }
 
 // ParentIndex returns the parent index of a given index in the tree.

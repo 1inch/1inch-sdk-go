@@ -7,18 +7,18 @@ import (
 )
 
 func NewParameterValidationError(variableName string, errMessage string) error {
-	return fmt.Errorf("config validation error '%s': %s", variableName, errMessage)
+	return fmt.Errorf("validation error for '%s': %s", variableName, errMessage)
 }
 
 func NewParameterMissingError(variableName string) error {
-	return fmt.Errorf("config validation error '%s' is required in the request config", variableName)
+	return fmt.Errorf("'%s' is required", variableName)
 }
 
 func NewParameterCustomError(errorMessage string) error {
-	return fmt.Errorf("config validation error: %s", errorMessage)
+	return fmt.Errorf("validation error: %s", errorMessage)
 }
 
-func ConsolidateValidationErorrs(validationErrors []error) error {
+func ConsolidateValidationErrors(validationErrors []error) error {
 	if len(validationErrors) == 0 {
 		return nil
 	}

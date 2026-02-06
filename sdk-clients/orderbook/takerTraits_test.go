@@ -35,12 +35,13 @@ func TestTakerTraitsEncode(t *testing.T) {
 			require.NoError(t, err)
 
 			takerTraits := NewTakerTraits(tc.takerTraitParams)
-			takerTraitsEnocded := takerTraits.Encode()
-			assert.True(t, expectedTakerTraitsBig.Cmp(takerTraitsEnocded.TraitFlags) == 0, fmt.Sprintf("Expected %x, got %x", expectedTakerTraitsBig, takerTraitsEnocded.TraitFlags))
+			takerTraitsEncoded, err := takerTraits.Encode()
+			require.NoError(t, err)
+			assert.True(t, expectedTakerTraitsBig.Cmp(takerTraitsEncoded.TraitFlags) == 0, fmt.Sprintf("Expected %x, got %x", expectedTakerTraitsBig, takerTraitsEncoded.TraitFlags))
 
 			expectedTakerArgs := common.FromHex(tc.expectedTakerArgs)
 			require.NoError(t, err)
-			assert.Equal(t, expectedTakerArgs, takerTraitsEnocded.Args)
+			assert.Equal(t, expectedTakerArgs, takerTraitsEncoded.Args)
 		})
 	}
 }

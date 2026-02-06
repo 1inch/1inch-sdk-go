@@ -4,6 +4,35 @@ All notable changes to this project will be documented in this file.
 
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/), and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html) starting with the *v1.0.0-beta.1* release.
 
+## [v3.0.0] - 2026-02-06
+
+### Breaking Changes
+- **New `fusionorder` package**: Common types and functions from `fusion` and `fusionplus` have been consolidated into `common/fusionorder/`. Types like `Bps`, `Interaction`, `AuctionDetails`, `WhitelistItem` and functions like `NewBps()`, `CalcAuctionStartTime()`, `GenerateWhitelist()` are now in `fusionorder`.
+- **Constants consolidated**: `NativeToken`, `NetworkEnum`, `ETHEREUM`/`POLYGON`/etc. moved from `fusion`/`fusionplus` to `constants`. Network constants renamed to Go conventions (e.g., `ETHEREUM` → `NetworkEthereum`).
+- **Renamed types in `fusionplus`**: Types with `Fusion` suffix renamed to `Plus` suffix (e.g., `ExtensionFusion` → `ExtensionPlus`). Redundant types like `FeesFusion`, `DetailsFusion` removed.
+- **Merged types in `fusionplus`**: `SettlementPostInteractionDataFusion` merged into `SettlementPostInteractionData`. `DecodeFusion()` → `DecodeSettlementPostInteractionData()`.
+- **`interface{}` replaced with `any`**: Affects public types including `common.RequestPayload`, `common.HttpExecutor`, and `web3` return types.
+- **Constant renamed**: `constants.ERC20_APPROVE_GAS` → `constants.Erc20ApproveGas`.
+- **Removed V5 router constants**: `AggregationRouterV5`, `AggregationV5RouterZkSyncEra`, and related V5 constants/ABI removed.
+- **`BitMask.ToString()`** renamed to `BitMask.String()` in `orderbook`.
+- **Signature changes**: Several functions now return errors — `Extension.Keccak256()`, `FromPercent()`, `FromFraction()`, `orderbook.NewBitMask()`, `orderbook.TakerTraits.Encode()`. `Must*` panic variants added where appropriate.
+- **Deprecated type aliases**: `fusion.TakingFeeInfo`, `fusion.CustomPreset`, `fusion.CustomPresetPoint` (and `fusionplus` equivalents) still work but are deprecated in favor of `fusionorder.*`.
+- See `BREAKING_CHANGES.md` for full migration guide with tables.
+
+### Added
+- New `fusionorder` package with shared types and functions for `fusion` and `fusionplus`
+- New public constants: `constants.ChainToWrapper`, `constants.GetWrappedToken()`, `constants.ZeroAddress`, `constants.Uint16Max`/`Uint24Max`/`Uint32Max`/`Uint40Max`/`Uint256Max`
+- `Must*` panic variants: `MustNewBps()`, `MustFromPercent()`, `MustFromFraction()`, `MustNewBitMask()`
+
+### Fixed
+- **`fusion.PlaceOrders`**: HTTP method changed from `GET` to `POST` (sending a body with `GET` is semantically incorrect).
+- **`fusion` validation**: Removed duplicate `WalletAddress` check in `QuoterControllerGetQuoteWithCustomPresetsParamsFixed.Validate()`.
+- **`fusionplus`**: Replaced `log.Fatalf` calls with proper error returns (library no longer terminates the calling process on decode errors).
+- **Error wrapping**: Standardized `%v` to `%w` in `fmt.Errorf` calls for proper `errors.Is`/`errors.As` support.
+
+### Changed
+- Eliminated code duplication between `fusion` and `fusionplus` packages
+
 ## [v2.0.0] - 2025-11-05
 [v2.0.0 release page](https://github.com/1inch/1inch-sdk-go/releases/tag/v2.0.0)
 

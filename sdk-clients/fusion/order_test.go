@@ -5,12 +5,13 @@ import (
 	"math/big"
 	"testing"
 
+	"github.com/1inch/1inch-sdk-go/common/fusionorder"
 	random_number_generation "github.com/1inch/1inch-sdk-go/internal/random-number-generation"
+	"github.com/1inch/1inch-sdk-go/internal/times"
+	"github.com/1inch/1inch-sdk-go/sdk-clients/orderbook"
 	"github.com/ethereum/go-ethereum/common"
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
-
-	"github.com/1inch/1inch-sdk-go/sdk-clients/orderbook"
 )
 
 func TestGetPreset(t *testing.T) {
@@ -161,7 +162,7 @@ func TestCreateAuctionDetails(t *testing.T) {
 		name                 string
 		preset               *PresetClassFixed
 		additionalWaitPeriod float32
-		expected             *AuctionDetails
+		expected             *fusionorder.AuctionDetails
 		expectErr            bool
 	}{
 		{
@@ -187,14 +188,14 @@ func TestCreateAuctionDetails(t *testing.T) {
 				TokenFee:       "1",
 			},
 			additionalWaitPeriod: 10.0,
-			expected: &AuctionDetails{
-				StartTime:       CalcAuctionStartTimeFunc(5, 10),
+			expected: &fusionorder.AuctionDetails{
+				StartTime:       fusionorder.CalcAuctionStartTimeFunc(5, 10),
 				Duration:        60,
 				InitialRateBump: 2,
-				Points: []AuctionPointClassFixed{
+				Points: []fusionorder.AuctionPointClassFixed{
 					{Coefficient: 1, Delay: 2},
 				},
-				GasCost: GasCostConfigClassFixed{
+				GasCost: fusionorder.GasCostConfigClassFixed{
 					GasBumpEstimate:  1,
 					GasPriceEstimate: 100,
 				},
@@ -277,7 +278,7 @@ func TestBpsToRatioFormat(t *testing.T) {
 
 	for _, tc := range tests {
 		t.Run(tc.name, func(t *testing.T) {
-			result := bpsToRatioFormat(tc.input)
+			result := fusionorder.BpsToRatioFormat(tc.input)
 			require.NotNil(t, result)
 			assert.Equal(t, tc.expected, result)
 		})
@@ -296,7 +297,7 @@ func TestCreateMakerTraits(t *testing.T) {
 		{
 			name: "Valid Maker Traits",
 			details: Details{
-				Auction: &AuctionDetails{
+				Auction: &fusionorder.AuctionDetails{
 					StartTime: 1000,
 					Duration:  2000,
 				},
@@ -331,7 +332,7 @@ func TestCreateMakerTraits(t *testing.T) {
 		{
 			name: "Invalid Maker Traits - No Nonce",
 			details: Details{
-				Auction: &AuctionDetails{
+				Auction: &fusionorder.AuctionDetails{
 					StartTime: 1000,
 					Duration:  2000,
 				},
@@ -379,7 +380,7 @@ func TestCreateSettlementPostInteractionData(t *testing.T) {
 			name: "Valid Details and Order Info with Resolving Start Time",
 			details: Details{
 				ResolvingStartTime: big.NewInt(1622548800), // Example timestamp
-				Whitelist: []AuctionWhitelistItem{
+				Whitelist: []fusionorder.AuctionWhitelistItem{
 					{
 						Address:   common.HexToAddress("0x0000000000000000000000000000000000000002"),
 						AllowFrom: big.NewInt(1622548800),
@@ -390,7 +391,7 @@ func TestCreateSettlementPostInteractionData(t *testing.T) {
 				Receiver: "0x0000000000000000000000000000000000000003",
 			},
 			expected: &SettlementPostInteractionData{
-				Whitelist: []WhitelistItem{
+				Whitelist: []fusionorder.WhitelistItem{
 					{
 						AddressHalf: "00000000000000000002",
 						Delay:       big.NewInt(0),
@@ -401,140 +402,90 @@ func TestCreateSettlementPostInteractionData(t *testing.T) {
 			},
 			expectErr: false,
 		},
-		//{
-		//	name: "Valid Details and Order Info with non-zero Delay",
-		//	details: Details{
-		//		ResolvingStartTime: big.NewInt(1622548800), // Example timestamp
-		//		Fees: FeesOld{
-		//			IntFee: IntegratorFee{
-		//				Ratio:    big.NewInt(100),
-		//				Receiver: common.HexToAddress("0x0000000000000000000000000000000000000001"),
-		//			},
-		//			BankFee: big.NewInt(200),
-		//		},
-		//		Whitelist: []AuctionWhitelistItem{
-		//			{
-		//				Address:   common.HexToAddress("0x0000000000000000000000000000000000000002"),
-		//				AllowFrom: big.NewInt(1622549800),
-		//			},
-		//		},
-		//	},
-		//	orderInfo: FusionOrderV4{
-		//		Receiver: "0x0000000000000000000000000000000000000003",
-		//	},
-		//	expected: &SettlementPostInteractionData{
-		//		Whitelist: []WhitelistItem{
-		//			{
-		//				AddressHalf: "00000000000000000002",
-		//				Delay:       big.NewInt(1000),
-		//			},
-		//		},
-		//		IntegratorFee: &IntegratorFee{
-		//			Ratio:    big.NewInt(100),
-		//			Receiver: common.HexToAddress("0x0000000000000000000000000000000000000001"),
-		//		},
-		//		BankFee:            big.NewInt(200),
-		//		ResolvingStartTime: big.NewInt(1622548800),
-		//		CustomReceiver:     common.HexToAddress("0x0000000000000000000000000000000000000003"),
-		//	},
-		//	expectErr: false,
-		//},
-		//{
-		//	name: "Valid Details and Order Info without Resolving Start Time",
-		//	details: Details{
-		//		ResolvingStartTime: nil,
-		//		Fees: FeesOld{
-		//			IntFee: IntegratorFee{
-		//				Ratio:    big.NewInt(100),
-		//				Receiver: common.HexToAddress("0x0000000000000000000000000000000000000001"),
-		//			},
-		//			BankFee: big.NewInt(200),
-		//		},
-		//		Whitelist: []AuctionWhitelistItem{
-		//			{
-		//				Address:   common.HexToAddress("0x0000000000000000000000000000000000000002"),
-		//				AllowFrom: big.NewInt(1622548800),
-		//			},
-		//		},
-		//	},
-		//	orderInfo: FusionOrderV4{
-		//		Receiver: "0x0000000000000000000000000000000000000003",
-		//	},
-		//	expected: &SettlementPostInteractionData{
-		//		Whitelist: []WhitelistItem{
-		//			{
-		//				AddressHalf: "00000000000000000002",
-		//				Delay:       big.NewInt(0),
-		//			},
-		//		},
-		//		IntegratorFee: &IntegratorFee{
-		//			Ratio:    big.NewInt(100),
-		//			Receiver: common.HexToAddress("0x0000000000000000000000000000000000000001"),
-		//		},
-		//		BankFee:            big.NewInt(200),
-		//		ResolvingStartTime: big.NewInt(timeNow()), // This will be dynamically set
-		//		CustomReceiver:     common.HexToAddress("0x0000000000000000000000000000000000000003"),
-		//	},
-		//	expectErr: false,
-		//},
-		//{
-		//	name: "Delay too large",
-		//	details: Details{
-		//		ResolvingStartTime: big.NewInt(1622548800), // Example timestamp
-		//		Fees: FeesOld{
-		//			IntFee: IntegratorFee{
-		//				Ratio:    big.NewInt(100),
-		//				Receiver: common.HexToAddress("0x0000000000000000000000000000000000000001"),
-		//			},
-		//			BankFee: big.NewInt(200),
-		//		},
-		//		Whitelist: []AuctionWhitelistItem{
-		//			{
-		//				Address:   common.HexToAddress("0x0000000000000000000000000000000000000002"),
-		//				AllowFrom: big.NewInt(1622649800),
-		//			},
-		//		},
-		//	},
-		//	orderInfo: FusionOrderV4{
-		//		Receiver: "0x0000000000000000000000000000000000000003",
-		//	},
-		//	expected: &SettlementPostInteractionData{
-		//		Whitelist: []WhitelistItem{
-		//			{
-		//				AddressHalf: "00000000000000000002",
-		//				Delay:       big.NewInt(1000),
-		//			},
-		//		},
-		//		IntegratorFee: &IntegratorFee{
-		//			Ratio:    big.NewInt(100),
-		//			Receiver: common.HexToAddress("0x0000000000000000000000000000000000000001"),
-		//		},
-		//		BankFee:            big.NewInt(200),
-		//		ResolvingStartTime: big.NewInt(1622548800),
-		//		CustomReceiver:     common.HexToAddress("0x0000000000000000000000000000000000000003"),
-		//	},
-		//	expectErr:   true,
-		//	expectedErr: fmt.Errorf("delay too big - %d must be less than %d", 101000, uint16Max),
-		//},
-		//{
-		//	name: "Whitelist empty",
-		//	details: Details{
-		//		ResolvingStartTime: nil,
-		//		Fees: FeesOld{
-		//			IntFee: IntegratorFee{
-		//				Ratio:    big.NewInt(100),
-		//				Receiver: common.HexToAddress("0x0000000000000000000000000000000000000001"),
-		//			},
-		//			BankFee: big.NewInt(200),
-		//		},
-		//		Whitelist: []AuctionWhitelistItem{},
-		//	},
-		//	orderInfo: FusionOrderV4{
-		//		Receiver: "0x0000000000000000000000000000000000000003",
-		//	},
-		//	expectErr:   true,
-		//	expectedErr: errors.New("whitelist cannot be empty"),
-		//},
+		{
+			name: "Valid Details and Order Info with Integrator Fees",
+			details: Details{
+				ResolvingStartTime: big.NewInt(1622548800),
+				FeesIntAndRes: &FeesIntegratorAndResolver{
+					Integrator: IntegratorFee{
+						Integrator: "0x0000000000000000000000000000000000000001",
+						Protocol:   "0x0000000000000000000000000000000000000002",
+						Fee:        fusionorder.MustFromPercent(1, fusionorder.GetDefaultBase()),
+						Share:      fusionorder.MustFromPercent(50, fusionorder.GetDefaultBase()),
+					},
+				},
+				Whitelist: []fusionorder.AuctionWhitelistItem{
+					{
+						Address:   common.HexToAddress("0x0000000000000000000000000000000000000002"),
+						AllowFrom: big.NewInt(1622548800),
+					},
+				},
+			},
+			orderInfo: FusionOrderV4{
+				Receiver: "0x0000000000000000000000000000000000000003",
+			},
+			expected: &SettlementPostInteractionData{
+				Whitelist: []fusionorder.WhitelistItem{
+					{
+						AddressHalf: "00000000000000000002",
+						Delay:       big.NewInt(0),
+					},
+				},
+				AuctionFees: &FeesIntegratorAndResolver{
+					Integrator: IntegratorFee{
+						Integrator: "0x0000000000000000000000000000000000000001",
+						Protocol:   "0x0000000000000000000000000000000000000002",
+						Fee:        fusionorder.MustFromPercent(1, fusionorder.GetDefaultBase()),
+						Share:      fusionorder.MustFromPercent(50, fusionorder.GetDefaultBase()),
+					},
+				},
+				ResolvingStartTime: big.NewInt(1622548800),
+				CustomReceiver:     common.HexToAddress("0x0000000000000000000000000000000000000003"),
+			},
+			expectErr: false,
+		},
+		{
+			name: "Valid Details and Order Info without Resolving Start Time",
+			details: Details{
+				ResolvingStartTime: nil,
+				FeesIntAndRes: &FeesIntegratorAndResolver{
+					Integrator: IntegratorFee{
+						Integrator: "0x0000000000000000000000000000000000000001",
+						Protocol:   "0x0000000000000000000000000000000000000002",
+						Fee:        fusionorder.MustFromPercent(1, fusionorder.GetDefaultBase()),
+						Share:      fusionorder.MustFromPercent(50, fusionorder.GetDefaultBase()),
+					},
+				},
+				Whitelist: []fusionorder.AuctionWhitelistItem{
+					{
+						Address:   common.HexToAddress("0x0000000000000000000000000000000000000002"),
+						AllowFrom: big.NewInt(1622548800),
+					},
+				},
+			},
+			orderInfo: FusionOrderV4{
+				Receiver: "0x0000000000000000000000000000000000000003",
+			},
+			expected: &SettlementPostInteractionData{
+				Whitelist: []fusionorder.WhitelistItem{
+					{
+						AddressHalf: "00000000000000000002",
+						Delay:       big.NewInt(0),
+					},
+				},
+				AuctionFees: &FeesIntegratorAndResolver{
+					Integrator: IntegratorFee{
+						Integrator: "0x0000000000000000000000000000000000000001",
+						Protocol:   "0x0000000000000000000000000000000000000002",
+						Fee:        fusionorder.MustFromPercent(1, fusionorder.GetDefaultBase()),
+						Share:      fusionorder.MustFromPercent(50, fusionorder.GetDefaultBase()),
+					},
+				},
+				ResolvingStartTime: nil, // Will be dynamically set
+				CustomReceiver:     common.HexToAddress("0x0000000000000000000000000000000000000003"),
+			},
+			expectErr: false,
+		},
 	}
 
 	for _, tc := range tests {
@@ -545,8 +496,13 @@ func TestCreateSettlementPostInteractionData(t *testing.T) {
 				whitelistStrings = append(whitelistStrings, whitelistItem.Address.Hex())
 			}
 
-			// TODO this does not track AllowFrom anymore. Need to refactor these tests
-			whitelist, err := GenerateWhitelist(whitelistStrings, tc.details.ResolvingStartTime)
+			// Handle nil ResolvingStartTime the same way CreateSettlementPostInteractionData does
+			resolvingStartTimeForWhitelist := tc.details.ResolvingStartTime
+			if resolvingStartTimeForWhitelist == nil || resolvingStartTimeForWhitelist.Cmp(big.NewInt(0)) == 0 {
+				resolvingStartTimeForWhitelist = big.NewInt(times.Now())
+			}
+
+			whitelist, err := fusionorder.GenerateWhitelist(whitelistStrings, resolvingStartTimeForWhitelist)
 			require.NoError(t, err)
 
 			result, err := CreateSettlementPostInteractionData(tc.details, whitelist, tc.orderInfo)
@@ -576,13 +532,13 @@ func TestCreateFusionOrderTdd(t *testing.T) {
 		{
 			name: "basic fusion order (no fees)",
 			details: Details{
-				Auction: &AuctionDetails{
+				Auction: &fusionorder.AuctionDetails{
 					StartTime:       1673548149,
 					Duration:        180,
 					InitialRateBump: 50000,
-					Points:          []AuctionPointClassFixed{{Coefficient: 20000, Delay: 12}},
+					Points:          []fusionorder.AuctionPointClassFixed{{Coefficient: 20000, Delay: 12}},
 				},
-				Whitelist:          []AuctionWhitelistItem{{Address: common.HexToAddress("0x00000000219ab540356cbb839cbe05303d7705fa"), AllowFrom: big.NewInt(0)}},
+				Whitelist:          []fusionorder.AuctionWhitelistItem{{Address: common.HexToAddress("0x00000000219ab540356cbb839cbe05303d7705fa"), AllowFrom: big.NewInt(0)}},
 				ResolvingStartTime: big.NewInt(1673548139),
 			},
 			expected: FusionOrderV4{
@@ -600,21 +556,21 @@ func TestCreateFusionOrderTdd(t *testing.T) {
 		{
 			name: "fusion order with integrator fees",
 			details: Details{
-				Auction: &AuctionDetails{
+				Auction: &fusionorder.AuctionDetails{
 					StartTime:       1673548149,
 					Duration:        180,
 					InitialRateBump: 50000,
-					Points:          []AuctionPointClassFixed{{Coefficient: 20000, Delay: 12}},
+					Points:          []fusionorder.AuctionPointClassFixed{{Coefficient: 20000, Delay: 12}},
 				},
 				FeesIntAndRes: &FeesIntegratorAndResolver{
 					Integrator: IntegratorFee{
 						Integrator: "0x0000000000000000000000000000000000000001",
 						Protocol:   "0x0000000000000000000000000000000000000002",
-						Fee:        FromPercent(1, GetDefaultBase()),
-						Share:      FromPercent(50, GetDefaultBase()),
+						Fee:        fusionorder.MustFromPercent(1, fusionorder.GetDefaultBase()),
+						Share:      fusionorder.MustFromPercent(50, fusionorder.GetDefaultBase()),
 					},
 				},
-				Whitelist: []AuctionWhitelistItem{
+				Whitelist: []fusionorder.AuctionWhitelistItem{
 					{Address: common.HexToAddress("0x00000000219ab540356cbb839cbe05303d7705fa"), AllowFrom: big.NewInt(0)},
 				},
 				ResolvingStartTime: big.NewInt(1673548139),
@@ -640,7 +596,7 @@ func TestCreateFusionOrderTdd(t *testing.T) {
 				whitelistStrings = append(whitelistStrings, whitelistItem.Address.Hex())
 			}
 
-			whitelist, err := GenerateWhitelist(whitelistStrings, tt.details.ResolvingStartTime)
+			whitelist, err := fusionorder.GenerateWhitelist(whitelistStrings, tt.details.ResolvingStartTime)
 			require.NoError(t, err)
 
 			extra := ExtraParams{
@@ -716,6 +672,220 @@ func TestCreateFusionOrderTdd(t *testing.T) {
 			assert.Equal(t, tt.expected.MakerTraits, order.MakerTraits)
 			assert.Equal(t, tt.expected.Salt, order.Salt)
 			assert.Equal(t, tt.expectedPostInteraction, extension.PostInteraction)
+		})
+	}
+}
+
+func TestCreateOrder(t *testing.T) {
+	// Mock random number generation for deterministic tests
+	originalBigIntMaxFunc := random_number_generation.BigIntMaxFunc
+	random_number_generation.BigIntMaxFunc = func(max *big.Int) (*big.Int, error) {
+		return big.NewInt(12345678), nil
+	}
+	defer func() { random_number_generation.BigIntMaxFunc = originalBigIntMaxFunc }()
+
+	settlementAddress := "0x8273f37417da37c4a6c3995e82cf442f87a25d9c"
+
+	whitelist := []fusionorder.WhitelistItem{
+		{AddressHalf: "bb839cbe05303d7705fa", Delay: big.NewInt(0)},
+	}
+
+	postInteractionData := &SettlementPostInteractionData{
+		Whitelist:          whitelist,
+		ResolvingStartTime: big.NewInt(1673548139),
+		CustomReceiver:     common.Address{},
+		AuctionFees:        nil,
+	}
+
+	auctionDetails := &fusionorder.AuctionDetails{
+		StartTime:       1673548149,
+		Duration:        180,
+		InitialRateBump: 50000,
+		Points:          []fusionorder.AuctionPointClassFixed{{Coefficient: 20000, Delay: 12}},
+		GasCost:         fusionorder.GasCostConfigClassFixed{GasBumpEstimate: 10000, GasPriceEstimate: 1000000},
+	}
+
+	extension, err := NewExtension(ExtensionParams{
+		SettlementContract:  settlementAddress,
+		AuctionDetails:      auctionDetails,
+		PostInteractionData: postInteractionData,
+		Asset:               "0xc02aaa39b223fe8d0a0e5c4f27ead9083c756cc2",
+		Surplus:             SurplusParamsNoFee,
+		ResolvingStartTime:  big.NewInt(1673548139),
+	})
+	require.NoError(t, err)
+
+	details := Details{
+		Auction:            auctionDetails,
+		ResolvingStartTime: big.NewInt(1673548139),
+		Whitelist:          []fusionorder.AuctionWhitelistItem{{Address: common.HexToAddress("0x00000000219ab540356cbb839cbe05303d7705fa"), AllowFrom: big.NewInt(0)}},
+	}
+
+	extraParams := ExtraParams{
+		Nonce:                big.NewInt(12345),
+		AllowPartialFills:    true,
+		AllowMultipleFills:   true,
+		OrderExpirationDelay: 12,
+	}
+
+	makerTraits, err := CreateMakerTraits(details, extraParams)
+	require.NoError(t, err)
+
+	orderInfo := FusionOrderV4{
+		Maker:        "0x1234567890123456789012345678901234567890",
+		MakerAsset:   "0xc02aaa39b223fe8d0a0e5c4f27ead9083c756cc2",
+		TakerAsset:   "0xa0b86991c6218b36c1d19d4a2e9eb0ce3606eb48",
+		MakingAmount: "1000000000000000000",
+		TakingAmount: "1420000000",
+		Receiver:     "0x9876543210987654321098765432109876543210",
+	}
+
+	params := CreateOrderDataParams{
+		Extension:           extension,
+		SettlementAddress:   settlementAddress,
+		PostInteractionData: postInteractionData,
+		orderInfo:           orderInfo,
+		Details:             details,
+		ExtraParams:         extraParams,
+		MakerTraits:         makerTraits,
+	}
+
+	order, err := CreateOrder(params)
+	require.NoError(t, err)
+	require.NotNil(t, order)
+
+	// Verify order fields
+	assert.Equal(t, orderInfo.MakerAsset, order.Inner.MakerAsset)
+	assert.Equal(t, orderInfo.TakerAsset, order.Inner.TakerAsset)
+	assert.Equal(t, orderInfo.MakingAmount, order.Inner.MakingAmount)
+	assert.Equal(t, orderInfo.TakingAmount, order.Inner.TakingAmount)
+	assert.Equal(t, orderInfo.Maker, order.Inner.Maker)
+	assert.Equal(t, orderInfo.Receiver, order.Inner.Receiver) // No fees, so receiver is original
+	assert.NotEmpty(t, order.Inner.Salt)
+	assert.NotEmpty(t, order.Inner.Extension)
+	assert.Equal(t, extension, order.FusionExtension)
+	assert.Equal(t, common.HexToAddress(settlementAddress), order.SettlementExtension)
+}
+
+func TestCreateOrder_WithFees(t *testing.T) {
+	// Mock random number generation for deterministic tests
+	originalBigIntMaxFunc := random_number_generation.BigIntMaxFunc
+	random_number_generation.BigIntMaxFunc = func(max *big.Int) (*big.Int, error) {
+		return big.NewInt(12345678), nil
+	}
+	defer func() { random_number_generation.BigIntMaxFunc = originalBigIntMaxFunc }()
+
+	settlementAddress := "0x8273f37417da37c4a6c3995e82cf442f87a25d9c"
+
+	whitelist := []fusionorder.WhitelistItem{
+		{AddressHalf: "bb839cbe05303d7705fa", Delay: big.NewInt(0)},
+	}
+
+	fees := &FeesIntegratorAndResolver{
+		Integrator: IntegratorFee{
+			Integrator: "0x1111111111111111111111111111111111111111",
+			Protocol:   "0x2222222222222222222222222222222222222222",
+		},
+	}
+
+	postInteractionData := &SettlementPostInteractionData{
+		Whitelist:          whitelist,
+		ResolvingStartTime: big.NewInt(1673548139),
+		CustomReceiver:     common.Address{},
+		AuctionFees:        fees,
+	}
+
+	auctionDetails := &fusionorder.AuctionDetails{
+		StartTime:       1673548149,
+		Duration:        180,
+		InitialRateBump: 50000,
+		Points:          []fusionorder.AuctionPointClassFixed{{Coefficient: 20000, Delay: 12}},
+		GasCost:         fusionorder.GasCostConfigClassFixed{GasBumpEstimate: 10000, GasPriceEstimate: 1000000},
+	}
+
+	extension, err := NewExtension(ExtensionParams{
+		SettlementContract:  settlementAddress,
+		AuctionDetails:      auctionDetails,
+		PostInteractionData: postInteractionData,
+		Asset:               "0xc02aaa39b223fe8d0a0e5c4f27ead9083c756cc2",
+		Surplus:             SurplusParamsNoFee,
+		ResolvingStartTime:  big.NewInt(1673548139),
+	})
+	require.NoError(t, err)
+
+	details := Details{
+		Auction:            auctionDetails,
+		ResolvingStartTime: big.NewInt(1673548139),
+		Whitelist:          []fusionorder.AuctionWhitelistItem{{Address: common.HexToAddress("0x00000000219ab540356cbb839cbe05303d7705fa"), AllowFrom: big.NewInt(0)}},
+		FeesIntAndRes:      fees,
+	}
+
+	extraParams := ExtraParams{
+		Nonce:                big.NewInt(12345),
+		AllowPartialFills:    true,
+		AllowMultipleFills:   true,
+		OrderExpirationDelay: 12,
+	}
+
+	makerTraits, err := CreateMakerTraits(details, extraParams)
+	require.NoError(t, err)
+
+	orderInfo := FusionOrderV4{
+		Maker:        "0x1234567890123456789012345678901234567890",
+		MakerAsset:   "0xc02aaa39b223fe8d0a0e5c4f27ead9083c756cc2",
+		TakerAsset:   "0xa0b86991c6218b36c1d19d4a2e9eb0ce3606eb48",
+		MakingAmount: "1000000000000000000",
+		TakingAmount: "1420000000",
+		Receiver:     "0x9876543210987654321098765432109876543210",
+	}
+
+	params := CreateOrderDataParams{
+		Extension:           extension,
+		SettlementAddress:   settlementAddress,
+		PostInteractionData: postInteractionData,
+		orderInfo:           orderInfo,
+		Details:             details,
+		ExtraParams:         extraParams,
+		MakerTraits:         makerTraits,
+	}
+
+	order, err := CreateOrder(params)
+	require.NoError(t, err)
+	require.NotNil(t, order)
+
+	// When fees are present, receiver should be the settlement address
+	assert.Equal(t, settlementAddress, order.Inner.Receiver)
+}
+
+func TestGetReceiver(t *testing.T) {
+	settlementAddress := "0x8273f37417da37c4a6c3995e82cf442f87a25d9c"
+	originalReceiver := "0x9876543210987654321098765432109876543210"
+
+	tests := []struct {
+		name     string
+		fees     *FeesIntegratorAndResolver
+		expected string
+	}{
+		{
+			name:     "No fees - use original receiver",
+			fees:     nil,
+			expected: originalReceiver,
+		},
+		{
+			name: "With fees - use settlement address",
+			fees: &FeesIntegratorAndResolver{
+				Integrator: IntegratorFee{
+					Integrator: "0x1111111111111111111111111111111111111111",
+				},
+			},
+			expected: settlementAddress,
+		},
+	}
+
+	for _, tc := range tests {
+		t.Run(tc.name, func(t *testing.T) {
+			result := getReceiver(tc.fees, settlementAddress, originalReceiver)
+			assert.Equal(t, tc.expected, result)
 		})
 	}
 }

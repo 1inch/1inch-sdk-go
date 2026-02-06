@@ -20,7 +20,7 @@ func (api *api) CreateOrder(ctx context.Context, params CreateOrderParams) (*Cre
 	}
 
 	if !params.MakerTraits.AllowMultipleFills || !params.MakerTraits.AllowPartialFills {
-		return nil, errors.New("allowMultipleFills and allowPartialFills must be true")
+		return nil, errors.New("both allow multiple fills and allow partial fills must be true")
 	}
 
 	order, err := CreateLimitOrderMessage(params, int(api.chainId))

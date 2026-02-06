@@ -20,18 +20,18 @@ func main() {
 		devPortalToken,
 	)
 	if err != nil {
-		log.Fatalf("Failed to create configuration: %v\n", err)
+		log.Fatalf("Failed to create configuration: %v", err)
 	}
 	client, err := aggregation.NewClientOnlyAPI(config)
 	if err != nil {
-		log.Fatalf("Failed to create client: %v\n", err)
+		log.Fatalf("Failed to create client: %v", err)
 	}
 	ctx := context.Background()
 
 	response, err := client.GetApproveSpender(ctx)
 	if err != nil {
-		log.Fatalf("Failed to get tokens: %v\n", err)
+		log.Fatalf("Failed to get approve allowance: %v", err)
 	}
 
-	log.Printf("1inch router: %v\n", response.Address)
+	log.Printf("1inch router: %v", response.Address)
 }

@@ -31,7 +31,7 @@ func CreateLimitOrderMessage(orderRequest CreateOrderParams, chainId int) (*Orde
 		TakingAmount:  orderRequest.TakingAmount,
 		Salt:          orderRequest.Salt,
 		Maker:         orderRequest.Maker,
-		AllowedSender: "0x0000000000000000000000000000000000000000",
+		AllowedSender: constants.ZeroAddress,
 		Receiver:      orderRequest.Taker,
 		MakerTraits:   makerTraitsEncoded,
 		Extension:     orderRequest.ExtensionEncoded,
@@ -39,7 +39,7 @@ func CreateLimitOrderMessage(orderRequest CreateOrderParams, chainId int) (*Orde
 
 	aggregationRouter, err := constants.Get1inchRouterFromChainId(chainId)
 	if err != nil {
-		return nil, fmt.Errorf("failed to get 1inch router address: %v", err)
+		return nil, fmt.Errorf("failed to get 1inch router address: %w", err)
 	}
 
 	// Set up the domain data
@@ -92,11 +92,11 @@ func CreateLimitOrderMessage(orderRequest CreateOrderParams, chainId int) (*Orde
 
 	typedDataHash, err := typedData.HashStruct(typedData.PrimaryType, typedData.Message)
 	if err != nil {
-		return nil, fmt.Errorf("error hashing typed data: %v", err)
+		return nil, fmt.Errorf("failed to hash typed data: %w", err)
 	}
 	domainSeparator, err := typedData.HashStruct("EIP712Domain", typedData.Domain.Map())
 	if err != nil {
-		return nil, fmt.Errorf("error hashing domain separator: %v", err)
+		return nil, fmt.Errorf("failed to hash domain separator: %w", err)
 	}
 
 	// Add required prefix to the message
@@ -110,7 +110,7 @@ func CreateLimitOrderMessage(orderRequest CreateOrderParams, chainId int) (*Orde
 	// Sign the challenge hash
 	signature, err := orderRequest.Wallet.SignBytes(challengeHash.Bytes())
 	if err != nil {
-		return nil, fmt.Errorf("error signing challenge hash: %v", err)
+		return nil, fmt.Errorf("failed to sign challenge hash: %w", err)
 	}
 
 	// add 27 to `v` value (last byte)
@@ -123,8 +123,10 @@ func CreateLimitOrderMessage(orderRequest CreateOrderParams, chainId int) (*Orde
 		OrderHash: challengeHashHex,
 		Signature: signatureHex,
 		Data:      orderData,
-	}, err
+	}, nil
 }
+
+var uint160Max = new(big.Int).Sub(new(big.Int).Lsh(big.NewInt(1), 160), big.NewInt(1))
 
 var timeNow = func() int64 {
 	return time.Now().UnixNano()
@@ -143,7 +145,6 @@ func GenerateSalt(extension string, customBaseSalt *big.Int) (string, error) {
 	keccakHash := crypto.Keccak256Hash(byteConverted)
 	salt := new(big.Int).SetBytes(keccakHash.Bytes())
 	// We need to keccak256 the extension and then bitwise & it with uint_160_max
-	var uint160Max = new(big.Int).Sub(new(big.Int).Lsh(big.NewInt(1), 160), big.NewInt(1))
 	salt.And(salt, uint160Max)
 
 	// Convert salt (20 bytes) to byte slice
@@ -157,7 +158,7 @@ func GenerateSalt(extension string, customBaseSalt *big.Int) (string, error) {
 	if customBaseSalt != nil {
 		prefixBytes = customBaseSalt.Bytes()
 		if len(prefixBytes) > 12 {
-			return "", fmt.Errorf("custom base salt cannot be larger than 96 bits")
+			return "", fmt.Errorf("custom base salt exceeds 96 bits")
 		}
 		if len(prefixBytes) < 12 {
 			pad := make([]byte, 12-len(prefixBytes))

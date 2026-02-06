@@ -3,6 +3,7 @@ package fusion
 import (
 	"testing"
 
+	"github.com/1inch/1inch-sdk-go/common/fusionorder"
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
 )
@@ -10,15 +11,15 @@ import (
 func TestDecodeAuctionDetails(t *testing.T) {
 	tests := []struct {
 		name    string
-		details AuctionDetails
+		details fusionorder.AuctionDetails
 	}{
 		{
 			name: "Encode/Decode AuctionDetails",
-			details: AuctionDetails{
+			details: fusionorder.AuctionDetails{
 				Duration:        180,
 				StartTime:       1673548149,
 				InitialRateBump: 50000,
-				Points: []AuctionPointClassFixed{
+				Points: []fusionorder.AuctionPointClassFixed{
 					{
 						Delay:       10,
 						Coefficient: 10000,
@@ -35,7 +36,7 @@ func TestDecodeAuctionDetails(t *testing.T) {
 	for _, tc := range tests {
 		t.Run(tc.name, func(t *testing.T) {
 			encoded := tc.details.Encode()
-			decoded, err := DecodeAuctionDetails(encoded)
+			decoded, err := fusionorder.DecodeLegacyAuctionDetails(encoded)
 			require.NoError(t, err)
 			assert.Equal(t, tc.details, *decoded)
 		})
@@ -45,20 +46,20 @@ func TestDecodeAuctionDetails(t *testing.T) {
 func TestEncodeAuctionDetails(t *testing.T) {
 	tests := []struct {
 		name     string
-		details  AuctionDetails
+		details  fusionorder.AuctionDetails
 		expected string
 	}{
 		{
-			name: "Encode AuctionDetails",
-			details: AuctionDetails{
-				GasCost: GasCostConfigClassFixed{
+			name: "Encode fusionorder.AuctionDetails",
+			details: fusionorder.AuctionDetails{
+				GasCost: fusionorder.GasCostConfigClassFixed{
 					GasBumpEstimate:  0,
 					GasPriceEstimate: 0,
 				},
 				StartTime:       1673548149,
 				Duration:        180,
 				InitialRateBump: 50000,
-				Points: []AuctionPointClassFixed{
+				Points: []fusionorder.AuctionPointClassFixed{
 					{
 						Delay:       12,
 						Coefficient: 20000,
@@ -112,7 +113,7 @@ func TestIsNonceRequired(t *testing.T) {
 
 	for _, tc := range tests {
 		t.Run(tc.name, func(t *testing.T) {
-			result := isNonceRequired(tc.allowPartialFills, tc.allowMultipleFills)
+			result := fusionorder.IsNonceRequired(tc.allowPartialFills, tc.allowMultipleFills)
 			assert.Equal(t, tc.expectedNonceResult, result)
 		})
 	}

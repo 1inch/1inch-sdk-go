@@ -12,7 +12,7 @@ var BigIntMaxFunc func(*big.Int) (*big.Int, error) = BigIntMax
 func BigIntMax(max *big.Int) (*big.Int, error) {
 	n, err := rand.Int(rand.Reader, max)
 	if err != nil {
-		return nil, fmt.Errorf("error generating random number: %v", err)
+		return nil, fmt.Errorf("failed to generate random number: %w", err)
 	}
 	return n, nil
 }

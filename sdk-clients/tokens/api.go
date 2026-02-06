@@ -32,7 +32,7 @@ func (api *api) SearchTokenAllChains(ctx context.Context, params SearchControlle
 	return response, nil
 }
 
-// SearchTokenSingleChain Get Tokens that match the provided search criteria on a specfic chain
+// SearchTokenSingleChain Get Tokens that match the provided search criteria on a specific chain
 func (api *api) SearchTokenSingleChain(ctx context.Context, params SearchControllerSearchSingleChainParams) ([]ProviderTokenDtoFixed, error) {
 	u := fmt.Sprintf("/token/v1.2/%d/search", api.chainId)
 

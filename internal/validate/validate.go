@@ -4,19 +4,23 @@ import (
 	"fmt"
 	"math/big"
 	"regexp"
+	"slices"
 	"strings"
 
 	"github.com/1inch/1inch-sdk-go/constants"
 	"github.com/1inch/1inch-sdk-go/internal/bigint"
-	"github.com/1inch/1inch-sdk-go/internal/slice_utils"
 )
 
-func CheckEthereumAddressRequired(parameter interface{}, variableName string) error {
-	value, ok := parameter.(string)
-	if !ok {
-		return fmt.Errorf("for parameter '%v' to be validated as '%v', it must be a string", variableName, "EthereumAddress")
-	}
+// Pre-compiled regexes to avoid recompilation on every validation call
+var (
+	ethAddressRegex      = regexp.MustCompile(`^0x[a-fA-F0-9]{40}$`)
+	privateKeyRegex      = regexp.MustCompile(`^[a-fA-F0-9]{64}$`)
+	protocolsRegex       = regexp.MustCompile(`^[a-zA-Z0-9_]+(,[a-zA-Z0-9_]+)*$`)
+	connectorTokensRegex = regexp.MustCompile(`^0x[a-fA-F0-9]{40}(,0x[a-fA-F0-9]{40})*$`)
+	permitHashRegex      = regexp.MustCompile(`^0x[a-fA-F0-9]*$`)
+)
 
+func CheckEthereumAddressRequired(value string, variableName string) error {
 	if value == "" {
 		return NewParameterMissingError(variableName)
 	}
@@ -24,27 +28,18 @@ func CheckEthereumAddressRequired(parameter interface{}, variableName string) er
 	return CheckEthereumAddress(value, variableName)
 }
 
-func CheckEthereumAddress(parameter interface{}, variableName string) error {
-	value, ok := parameter.(string)
-	if !ok {
-		return fmt.Errorf("for parameter '%v' to be validated as '%v', it must be a string", variableName, "EthereumAddress")
-	}
+func CheckEthereumAddress(value string, variableName string) error {
 	if value == "" {
 		return nil
 	}
 
-	re := regexp.MustCompile(`^0x[a-fA-F0-9]{40}$`)
-	if !re.MatchString(value) {
+	if !ethAddressRegex.MatchString(value) {
 		return NewParameterValidationError(variableName, "not a valid Ethereum address")
 	}
 	return nil
 }
 
-func CheckEthereumAddressListRequired(parameter interface{}, variableName string) error {
-	addresses, ok := parameter.([]string)
-	if !ok {
-		return fmt.Errorf("for parameter '%v' to be validated as '%v', it must be a list of strings", variableName, "EthereumAddressList")
-	}
+func CheckEthereumAddressListRequired(addresses []string, variableName string) error {
 	if len(addresses) == 0 {
 		return NewParameterMissingError(variableName)
 	}
@@ -53,8 +48,7 @@ func CheckEthereumAddressListRequired(parameter interface{}, variableName string
 		if address == "" {
 			return NewParameterMissingError(variableName)
 		}
-		re := regexp.MustCompile(`^0x[a-fA-F0-9]{40}$`)
-		if !re.MatchString(address) {
+		if !ethAddressRegex.MatchString(address) {
 			return NewParameterValidationError(variableName, "not a valid Ethereum address")
 		}
 	}
@@ -65,24 +59,14 @@ func CheckEthereumAddressListRequired(parameter interface{}, variableName string
 var bigIntMax, _ = bigint.FromString("115792089237316195423570985008687907853269984665640564039457584007913129639935")
 var bigIntZero = big.NewInt(0)
 
-func CheckBigIntRequired(parameter interface{}, variableName string) error {
-	value, ok := parameter.(string)
-	if !ok {
-		return fmt.Errorf("for parameter '%v' to be validated as '%v', it must be a string", variableName, "BigInt")
-	}
-
+func CheckBigIntRequired(value string, variableName string) error {
 	if value == "" {
 		return NewParameterMissingError(variableName)
 	}
 
 	return CheckBigInt(value, variableName)
 }
-func CheckBigInt(parameter interface{}, variableName string) error {
-	value, ok := parameter.(string)
-	if !ok {
-		return fmt.Errorf("for parameter '%v' to be validated as '%v', it must be a string", variableName, "BigInt")
-	}
-
+func CheckBigInt(value string, variableName string) error {
 	if value == "" {
 		return nil
 	}
@@ -100,12 +84,7 @@ func CheckBigInt(parameter interface{}, variableName string) error {
 	return nil
 }
 
-func CheckChainIdIntRequired(parameter interface{}, variableName string) error {
-	value, ok := parameter.(int)
-	if !ok {
-		return fmt.Errorf("for parameter '%v' to be validated as '%v', it must be an int", variableName, "ChainIdInt")
-	}
-
+func CheckChainIdIntRequired(value int, variableName string) error {
 	if value == 0 {
 		return NewParameterMissingError(variableName)
 	}
@@ -113,27 +92,18 @@ func CheckChainIdIntRequired(parameter interface{}, variableName string) error {
 	return CheckChainIdInt(value, variableName)
 }
 
-func CheckChainIdInt(parameter interface{}, variableName string) error {
-	value, ok := parameter.(int)
-	if !ok {
-		return fmt.Errorf("for parameter '%v' to be validated as '%v', it must be an int", variableName, "ChainIdInt")
-	}
+func CheckChainIdInt(value int, variableName string) error {
 	if value == 0 {
 		return nil
 	}
 
-	if !slice_utils.Contains(value, constants.ValidChainIds) {
+	if !slices.Contains(constants.ValidChainIds, value) {
 		return NewParameterValidationError(variableName, fmt.Sprintf("is invalid, valid chain ids are: %v", constants.ValidChainIds))
 	}
 	return nil
 }
 
-func CheckChainIdFloat32Required(parameter interface{}, variableName string) error {
-	value, ok := parameter.(float32)
-	if !ok {
-		return fmt.Errorf("for parameter '%v' to be validated as '%v', it must be a float32", variableName, "ChainIdFloat32")
-	}
-
+func CheckChainIdFloat32Required(value float32, variableName string) error {
 	if value == 0 {
 		return NewParameterMissingError(variableName)
 	}
@@ -141,83 +111,55 @@ func CheckChainIdFloat32Required(parameter interface{}, variableName string) err
 	return CheckChainIdFloat32(value, variableName)
 }
 
-func CheckChainIdFloat32(parameter interface{}, variableName string) error {
-	value, ok := parameter.(float32)
-	if !ok {
-		return fmt.Errorf("for parameter '%v' to be validated as '%v', it must be a float32", variableName, "ChainIdFloat32")
-	}
+func CheckChainIdFloat32(value float32, variableName string) error {
 	if value == 0 {
 		return nil
 	}
 
-	if !slice_utils.Contains(int(value), constants.ValidChainIds) {
+	if !slices.Contains(constants.ValidChainIds, int(value)) {
 		return NewParameterValidationError(variableName, fmt.Sprintf("is invalid, valid chain ids are: %v", constants.ValidChainIds))
 	}
 	return nil
 }
 
-func CheckPrivateKeyRequired(parameter interface{}, variableName string) error {
-	address, ok := parameter.(string)
-	if !ok {
-		return fmt.Errorf("for parameter '%v' to be validated as '%v', it must be a string", variableName, "PrivateKey")
-	}
-
-	if address == "" {
+func CheckPrivateKeyRequired(value string, variableName string) error {
+	if value == "" {
 		return NewParameterMissingError(variableName)
 	}
 
-	return CheckPrivateKey(address, variableName)
+	return CheckPrivateKey(value, variableName)
 }
 
-func CheckPrivateKey(parameter interface{}, variableName string) error {
-	address, ok := parameter.(string)
-	if !ok {
-		return fmt.Errorf("for parameter '%v' to be validated as '%v', it must be a string", variableName, "PrivateKey")
-	}
-
-	if address == "" {
+func CheckPrivateKey(value string, variableName string) error {
+	if value == "" {
 		return nil
 	}
 
-	re := regexp.MustCompile(`^[a-fA-F0-9]{64}$`)
-	if !re.MatchString(address) {
+	if !privateKeyRegex.MatchString(value) {
 		return NewParameterValidationError(variableName, "not a valid private key")
 	}
 	return nil
 }
 
-func CheckApprovalType(parameter interface{}, variableName string) error {
-	value, ok := parameter.(int)
-	if !ok {
-		return fmt.Errorf("for parameter '%v' to be validated as '%v', it must be an int", variableName, "ApprovalType")
-	}
-
+func CheckApprovalType(value int, variableName string) error {
 	if value == 0 {
 		return nil
 	}
 
-	if !slice_utils.Contains(value, []int{0, 1, 2}) {
+	if !slices.Contains([]int{0, 1, 2}, value) {
 		return NewParameterValidationError(variableName, "invalid approval type")
 	}
 	return nil
 }
 
-func CheckSlippageRequired(parameter interface{}, variableName string) error {
-	value, ok := parameter.(float32)
-	if !ok {
-		return fmt.Errorf("for parameter '%v' to be validated as '%v', it must be a float32", variableName, "Slippage")
-	}
+func CheckSlippageRequired(value float32, variableName string) error {
 	if value == 0 {
 		return NewParameterMissingError(variableName)
 	}
 	return CheckSlippage(value, variableName)
 }
 
-func CheckSlippage(parameter interface{}, variableName string) error {
-	value, ok := parameter.(float32)
-	if !ok {
-		return fmt.Errorf("for parameter '%v' to be validated as '%v', it must be a float32", variableName, "Slippage")
-	}
+func CheckSlippage(value float32, variableName string) error {
 	if value == 0 {
 		return nil
 	}
@@ -227,11 +169,7 @@ func CheckSlippage(parameter interface{}, variableName string) error {
 	return nil
 }
 
-func CheckPage(parameter interface{}, variableName string) error {
-	value, ok := parameter.(float32)
-	if !ok {
-		return fmt.Errorf("for parameter '%v' to be validated as '%v', it must be a float32", variableName, "Page")
-	}
+func CheckPage(value float32, variableName string) error {
 	if value == 0 {
 		return nil
 	}
@@ -242,11 +180,7 @@ func CheckPage(parameter interface{}, variableName string) error {
 	return nil
 }
 
-func CheckLimit(parameter interface{}, variableName string) error {
-	value, ok := parameter.(float32)
-	if !ok {
-		return fmt.Errorf("for parameter '%v' to be validated as '%v', it must be a float32", variableName, "Limit")
-	}
+func CheckLimit(value float32, variableName string) error {
 	if value == 0 {
 		return nil
 	}
@@ -257,12 +191,7 @@ func CheckLimit(parameter interface{}, variableName string) error {
 	return nil
 }
 
-func CheckStatusesInts(parameter interface{}, variableName string) error {
-	value, ok := parameter.([]float32)
-	if !ok {
-		return fmt.Errorf("for parameter '%v' to be validated as '%v', it must be a []float32", variableName, "StatusesInts")
-	}
-
+func CheckStatusesInts(value []float32, variableName string) error {
 	if value == nil {
 		return nil
 	}
@@ -277,12 +206,7 @@ func CheckStatusesInts(parameter interface{}, variableName string) error {
 	return nil
 }
 
-func CheckStatusesStrings(parameter interface{}, variableName string) error {
-	value, ok := parameter.([]string)
-	if !ok {
-		return fmt.Errorf("for parameter '%v' to be validated as '%v', it must be a []string", variableName, "StatusesStrings")
-	}
-
+func CheckStatusesStrings(value []string, variableName string) error {
 	if HasDuplicates(value) {
 		return NewParameterValidationError(variableName, "must not contain duplicates")
 	}
@@ -293,41 +217,41 @@ func CheckStatusesStrings(parameter interface{}, variableName string) error {
 	return nil
 }
 
-func CheckSortBy(parameter interface{}, variableName string) error {
-	value, ok := parameter.(string)
-	if !ok {
-		return fmt.Errorf("for parameter '%v' to be validated as '%v', it must be a string", variableName, "SortBy")
+func CheckStatusesOrderStatus(value []int, variableName string) error {
+	if value == nil {
+		return nil
 	}
 
+	if HasDuplicates(value) {
+		return NewParameterValidationError(variableName, "must not contain duplicates")
+	}
+	validStatuses := []int{1, 2, 3}
+	if !IsSubset(value, validStatuses) {
+		return NewParameterValidationError(variableName, fmt.Sprintf("can only contain %v", validStatuses))
+	}
+	return nil
+}
+
+func CheckSortBy(value string, variableName string) error {
 	if value == "" {
 		return nil
 	}
 
 	validSortBy := []string{"createDateTime", "takerRate", "makerRate", "makerAmount", "takerAmount"}
-	if !slice_utils.Contains(value, validSortBy) {
+	if !slices.Contains(validSortBy, value) {
 		return NewParameterValidationError(variableName, fmt.Sprintf("can only contain %v", validSortBy))
 	}
 	return nil
 }
 
-func CheckOrderHashRequired(parameter interface{}, variableName string) error {
-	value, ok := parameter.(string)
-	if !ok {
-		return fmt.Errorf("for parameter '%v' to be validated as '%v', it must be a string", variableName, "OrderHash")
-	}
-
+func CheckOrderHashRequired(value string, variableName string) error {
 	if value == "" {
 		return NewParameterMissingError(variableName)
 	}
 	return CheckOrderHash(value, variableName)
 }
 
-func CheckOrderHash(parameter interface{}, variableName string) error {
-	value, ok := parameter.(string)
-	if !ok {
-		return fmt.Errorf("for parameter '%v' to be validated as '%v', it must be a string", variableName, "OrderHash")
-	}
-
+func CheckOrderHash(value string, variableName string) error {
 	if value == "" {
 		return nil
 	}
@@ -335,46 +259,30 @@ func CheckOrderHash(parameter interface{}, variableName string) error {
 	return nil
 }
 
-func CheckProtocols(parameter interface{}, variableName string) error {
-	value, ok := parameter.(string)
-	if !ok {
-		return fmt.Errorf("for parameter '%v' to be validated as '%v', it must be a string", variableName, "Protocols")
-	}
-
+func CheckProtocols(value string, variableName string) error {
 	if value == "" {
 		return nil
 	}
 
-	pattern := `^[a-zA-Z0-9_]+(,[a-zA-Z0-9_]+)*$`
-	re := regexp.MustCompile(pattern)
-
-	ok = re.MatchString(value)
-	if !ok {
+	if !protocolsRegex.MatchString(value) {
 		return NewParameterValidationError(variableName, "must be formatted as a single-string list exactly in the format 'Protocol1,Protocol2,Protocol3' without any "+
 			"spaces between each protocol name. These names must match the exact protocol id used by the 1inch APIs "+
 			"(use the Swap service's GetLiquiditySources function to see this list). Additionally, there cannot be a trailing comma at the end of the list.")
 	}
 
-	if ok {
-		addresses := strings.Split(value, ",")
-		addressesMap := make(map[string]bool)
-		for _, address := range addresses {
-			if _, exists := addressesMap[address]; exists {
-				return NewParameterValidationError(variableName, "Duplicate protocol found in list")
-			}
-			addressesMap[address] = true
+	protocols := strings.Split(value, ",")
+	protocolsMap := make(map[string]bool)
+	for _, protocol := range protocols {
+		if _, exists := protocolsMap[protocol]; exists {
+			return NewParameterValidationError(variableName, "Duplicate protocol found in list")
 		}
+		protocolsMap[protocol] = true
 	}
 
 	return nil
 }
 
-func CheckFee(parameter interface{}, variableName string) error {
-	value, ok := parameter.(float32)
-	if !ok {
-		return fmt.Errorf("for parameter '%v' to be validated as '%v', it must be a string", variableName, "Fee")
-	}
-
+func CheckFee(value float32, variableName string) error {
 	if value < 0 {
 		return NewParameterValidationError(variableName, "must be a positive value")
 	}
@@ -386,14 +294,7 @@ func CheckFee(parameter interface{}, variableName string) error {
 	return nil
 }
 
-//  TODO The enforced naming pattern for the variable name string literal doesn't work for generic types like "Float32NonNegativeWhole"
-
-func CheckFloat32NonNegativeWhole(parameter interface{}, variableName string) error {
-	value, ok := parameter.(float32)
-	if !ok {
-		return fmt.Errorf("for parameter '%v' to be validated as '%v', it must be a string", variableName, "Float32NonNegativeWhole")
-	}
-
+func CheckFloat32NonNegativeWhole(value float32, variableName string) error {
 	if value < 0 {
 		return NewParameterValidationError(variableName, "must be 0 or greater")
 	}
@@ -406,65 +307,44 @@ func CheckFloat32NonNegativeWhole(parameter interface{}, variableName string) er
 	return nil
 }
 
-func CheckConnectorTokens(parameter interface{}, variableName string) error {
-	value, ok := parameter.(string)
-	if !ok {
-		return fmt.Errorf("for parameter '%v' to be validated as '%v', it must be a string", variableName, "ConnectorTokens")
-	}
-
+func CheckConnectorTokens(value string, variableName string) error {
 	if value == "" {
 		return nil
 	}
 
-	pattern := `^0x[a-fA-F0-9]{40}(,0x[a-fA-F0-9]{40})*$`
-	re := regexp.MustCompile(pattern)
-
-	ok = re.MatchString(value)
-	if !ok {
+	if !connectorTokensRegex.MatchString(value) {
 		return NewParameterValidationError(variableName, "must be formatted as a single-string list exactly in the format '0x123,0x456,0x789' "+
 			"without any spaces between each protocol name. Additionally, there cannot be a trailing comma at the end of the list.")
 	}
 
-	if ok {
-		// Split the string by commas to get individual addresses
-		addresses := strings.Split(value, ",")
+	// Split the string by commas to get individual addresses
+	addresses := strings.Split(value, ",")
 
-		// Use a map to check for duplicates
-		addressesMap := make(map[string]bool)
+	// Use a map to check for duplicates
+	addressesMap := make(map[string]bool)
 
-		for _, address := range addresses {
-			if _, exists := addressesMap[address]; exists {
-				return NewParameterValidationError(variableName, "Duplicate address found in list")
-			}
-			addressesMap[address] = true
+	for _, address := range addresses {
+		if _, exists := addressesMap[address]; exists {
+			return NewParameterValidationError(variableName, "Duplicate address found in list")
 		}
+		addressesMap[address] = true
 	}
 
 	return nil
 }
 
-func CheckPermitHash(parameter interface{}, variableName string) error {
-	value, ok := parameter.(string)
-	if !ok {
-		return fmt.Errorf("for parameter '%v' to be validated as '%v', it must be a string", variableName, "PermitHash")
-	}
+func CheckPermitHash(value string, variableName string) error {
 	if value == "" {
 		return nil
 	}
 
-	re := regexp.MustCompile(`^0x[a-fA-F0-9]*$`)
-	if !re.MatchString(value) {
+	if !permitHashRegex.MatchString(value) {
 		return NewParameterValidationError(variableName, "not a valid permit hash")
 	}
 	return nil
 }
 
-func CheckFiatCurrency(parameter interface{}, variableName string) error {
-	value, ok := parameter.(string)
-	if !ok {
-		return fmt.Errorf("for parameter '%v' to be validated as '%v', it must be a string", variableName, "FiatCurrency")
-	}
-
+func CheckFiatCurrency(value string, variableName string) error {
 	if len(value) != 3 {
 		return NewParameterValidationError(variableName, "must have len = 3 (like USD, EUR, etc)")
 	}
@@ -472,25 +352,15 @@ func CheckFiatCurrency(parameter interface{}, variableName string) error {
 	return nil
 }
 
-func CheckTimerange(parameter interface{}, variableName string) error {
-	value, ok := parameter.(string)
-	if !ok {
-		return fmt.Errorf("for parameter '%v' to be validated as '%v', it must be a string", variableName, "Timerange")
-	}
-
+func CheckTimerange(value string, variableName string) error {
 	validTimerangeValues := []string{"1day", "1week", "1month", "1year", "3years"}
-	if !slice_utils.Contains(value, validTimerangeValues) {
-		return NewParameterValidationError(variableName, fmt.Sprintf("is invalid, valid chain ids are: %v", validTimerangeValues))
+	if !slices.Contains(validTimerangeValues, value) {
+		return NewParameterValidationError(variableName, fmt.Sprintf("is invalid, valid timerange values are: %v", validTimerangeValues))
 	}
 	return nil
 }
 
-func CheckJsonRpcVersionRequired(parameter interface{}, variableName string) error {
-	value, ok := parameter.(string)
-	if !ok {
-		return fmt.Errorf("for parameter '%v' to be validated as '%v', it must be a string", variableName, "JsonRpcVersion")
-	}
-
+func CheckJsonRpcVersionRequired(value string, variableName string) error {
 	if value == "" {
 		return NewParameterMissingError(variableName)
 	}
@@ -498,28 +368,18 @@ func CheckJsonRpcVersionRequired(parameter interface{}, variableName string) err
 	return CheckJsonRpcVersion(value, variableName)
 }
 
-func CheckJsonRpcVersion(parameter interface{}, variableName string) error {
-	value, ok := parameter.(string)
-	if !ok {
-		return fmt.Errorf("for parameter '%v' to be validated as '%v', it must be a string", variableName, "JsonRpcVersion")
-	}
-
+func CheckJsonRpcVersion(value string, variableName string) error {
 	validJsonRpcValues := []string{"1.0", "2.0"}
-	if !slice_utils.Contains(value, validJsonRpcValues) {
+	if !slices.Contains(validJsonRpcValues, value) {
 		return NewParameterValidationError(variableName, fmt.Sprintf("is invalid, valid rpc version are: %v", validJsonRpcValues))
 	}
 	return nil
 }
 
-func CheckNodeType(parameter interface{}, variableName string) error {
-	value, ok := parameter.(string)
-	if !ok {
-		return fmt.Errorf("for parameter '%v' to be validated as '%v', it must be a string", variableName, "NodeType")
-	}
-
-	validJsonRpcValues := []string{"1.0", "2.0"}
-	if !slice_utils.Contains(value, validJsonRpcValues) {
-		return NewParameterValidationError(variableName, fmt.Sprintf("is invalid, valid rpc version are: %v", validJsonRpcValues))
+func CheckNodeType(value string, variableName string) error {
+	validNodeTypes := []string{"archive", "full"}
+	if !slices.Contains(validNodeTypes, value) {
+		return NewParameterValidationError(variableName, fmt.Sprintf("is invalid, valid node types are: %v", validNodeTypes))
 	}
 	return nil
 }

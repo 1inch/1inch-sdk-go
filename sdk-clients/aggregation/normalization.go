@@ -1,7 +1,7 @@
 package aggregation
 
 import (
-	"errors"
+	"fmt"
 	"math/big"
 
 	"github.com/ethereum/go-ethereum/common"
@@ -11,28 +11,28 @@ import (
 )
 
 func normalizeSwapResponse(resp SwapResponse) (*SwapResponseExtended, error) {
-	toAddress := common.HexToAddress(resp.Tx.To)
 	if !common.IsHexAddress(resp.Tx.To) {
-		return nil, errors.New("invalid 'To' address")
+		return nil, fmt.Errorf("invalid to address: %s", resp.Tx.To)
 	}
+	toAddress := common.HexToAddress(resp.Tx.To)
 
 	gas := uint64(resp.Tx.Gas)
 
 	gasPrice := big.NewInt(0)
 	_, ok := gasPrice.SetString(resp.Tx.GasPrice, 10)
 	if !ok {
-		return nil, errors.New("invalid 'GasPrice' value")
+		return nil, fmt.Errorf("invalid gas price: %s", resp.Tx.GasPrice)
 	}
 
 	value := big.NewInt(0)
 	_, ok = value.SetString(resp.Tx.Value, 10)
 	if !ok {
-		return nil, errors.New("invalid 'Value' value")
+		return nil, fmt.Errorf("invalid tx value: %s", resp.Tx.Value)
 	}
 
 	data, err := hexutil.Decode(resp.Tx.Data)
 	if err != nil {
-		return nil, errors.New("invalid 'Data' value")
+		return nil, fmt.Errorf("invalid tx data: %w", err)
 	}
 
 	normalizedTx := NormalizedTransactionData{
@@ -52,31 +52,31 @@ func normalizeSwapResponse(resp SwapResponse) (*SwapResponseExtended, error) {
 }
 
 func normalizeApproveCallDataResponse(resp ApproveCallDataResponse) (*ApproveCallDataResponseExtended, error) {
-	toAddress := common.HexToAddress(resp.To)
 	if !common.IsHexAddress(resp.To) {
-		return nil, errors.New("invalid 'To' address")
+		return nil, fmt.Errorf("invalid to address: %s", resp.To)
 	}
+	toAddress := common.HexToAddress(resp.To)
 
 	gasPrice := big.NewInt(0)
 	_, ok := gasPrice.SetString(resp.GasPrice, 10)
 	if !ok {
-		return nil, errors.New("invalid 'GasPrice' value")
+		return nil, fmt.Errorf("invalid gas price: %s", resp.GasPrice)
 	}
 
 	value := big.NewInt(0)
 	_, ok = value.SetString(resp.Value, 10)
 	if !ok {
-		return nil, errors.New("invalid 'Value' value")
+		return nil, fmt.Errorf("invalid value: %s", resp.Value)
 	}
 
 	data, err := hexutil.Decode(resp.Data)
 	if err != nil {
-		return nil, errors.New("invalid 'Data' value")
+		return nil, fmt.Errorf("invalid data: %w", err)
 	}
 
 	normalizedTx := NormalizedTransactionData{
 		Data:     data,
-		Gas:      constants.ERC20_APPROVE_GAS,
+		Gas:      constants.Erc20ApproveGas,
 		GasPrice: gasPrice,
 		To:       toAddress,
 		Value:    value,

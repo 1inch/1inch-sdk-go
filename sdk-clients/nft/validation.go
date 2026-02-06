@@ -10,5 +10,5 @@ func (params *GetNftsByAddressParams) Validate() error {
 	for _, v := range params.ChainIds {
 		validationErrors = validate.Parameter(int(v), "ChainId", validate.CheckChainIdIntRequired, validationErrors)
 	}
-	return validate.ConsolidateValidationErorrs(validationErrors)
+	return validate.ConsolidateValidationErrors(validationErrors)
 }

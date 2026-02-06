@@ -2,19 +2,14 @@ package constants
 
 import (
 	"fmt"
-
-	"github.com/1inch/1inch-sdk-go/internal/slice_utils"
+	"slices"
 )
 
-const AggregationRouterV5 = "0x1111111254eeb25477b68fb85ed929f73a960582" // Contract address is identical for all chains except zkSync
 const AggregationRouterV6 = "0x111111125421cA6dc452d289314280a0f8842A65" // Contract address is identical for all chains except zkSync
-const AggregationV5RouterZkSyncEra = "0x6e2B76966cbD9cF4cC2Fa0D76d24d5241E0ABC2F"
-const AggregationRouterV5Name = "1inch Aggregation Router"
-const AggregationRouterV5VersionNumber = "5"
 const AggregationRouterV6Name = "1inch Aggregation Router"
 const AggregationRouterV6VersionNumber = "6"
 
-const ERC20_APPROVE_GAS = 45_000
+const Erc20ApproveGas = 45_000
 
 // Series Nonce Manager contract addresses are taken from limit-order-protocol/deployments
 
@@ -31,15 +26,13 @@ const SeriesNonceManagerOptimism = "0x32d12a25f539E341089050E2d26794F041fC9dF8"
 const SeriesNonceManagerPolygon = "0xa5eb255EF45dFb48B5d133d08833DEF69871691D"
 
 func Get1inchRouterFromChainId(chainId int) (string, error) {
-	if slice_utils.Contains(chainId, ValidChainIds) {
-		if chainId == ZkSyncEraChainId {
-			return "", fmt.Errorf("zksync not supported: %d", chainId)
-		} else {
-			return AggregationRouterV6, nil
-		}
-	} else {
-		return "", fmt.Errorf("unrecognized chain id: %d", chainId)
+	if !slices.Contains(ValidChainIds, chainId) {
+		return "", fmt.Errorf("unsupported chain ID: %d", chainId)
 	}
+	if chainId == ZkSyncEraChainId {
+		return "", fmt.Errorf("unsupported: zkSync for chain %d", chainId)
+	}
+	return AggregationRouterV6, nil
 }
 
 func GetSeriesNonceManagerFromChainId(chainId int) (string, error) {
@@ -67,8 +60,8 @@ func GetSeriesNonceManagerFromChainId(chainId int) (string, error) {
 	case PolygonChainId:
 		return SeriesNonceManagerPolygon, nil
 	case ZkSyncEraChainId:
-		return "", fmt.Errorf("zksync contract unknown") // TODO get this contract
+		return "", fmt.Errorf("zksync not currently supported")
 	default:
-		return "", fmt.Errorf("unrecognized chain id: %d", chainId)
+		return "", fmt.Errorf("unsupported chain ID: %d", chainId)
 	}
 }

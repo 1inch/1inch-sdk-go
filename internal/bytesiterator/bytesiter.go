@@ -82,7 +82,7 @@ func (iter *BytesIter) NextBytes(n int) ([]byte, error) {
 		return nil, errors.New("negative byte count")
 	}
 	if iter.pos+n > len(iter.data) {
-		return nil, errors.New("insufficient bytes for NextBytes")
+		return nil, errors.New("insufficient bytes for next bytes")
 	}
 	val := iter.data[iter.pos : iter.pos+n]
 	iter.pos += n

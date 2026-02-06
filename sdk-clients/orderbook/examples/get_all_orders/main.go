@@ -23,11 +23,11 @@ func main() {
 
 	config, err := orderbook.NewConfigurationAPI(chainId, "https://api.1inch.dev", devPortalToken)
 	if err != nil {
-		log.Fatal(err)
+		log.Fatalf("Failed to create configuration: %v", err)
 	}
 	client, err := orderbook.NewClientOnlyAPI(config)
 	if err != nil {
-		log.Fatal(err)
+		log.Fatalf("Failed to create client: %v", err)
 	}
 
 	orders, err := client.GetAllOrders(ctx, orderbook.GetAllOrdersParams{
@@ -38,12 +38,12 @@ func main() {
 		},
 	})
 	if err != nil {
-		log.Fatalf("Failed to get order count: %v", err)
+		log.Fatalf("Failed to get all orders: %v", err)
 	}
 
 	ordersIndented, err := json.MarshalIndent(orders, "", "  ")
 	if err != nil {
-		log.Fatal(fmt.Errorf("Failed to marshal response: %v\n", err))
+		log.Fatalf("Failed to marshal response: %v", err)
 	}
 
 	fmt.Printf("Orders: %s\n", ordersIndented)

@@ -5,15 +5,15 @@ import (
 	"fmt"
 	"math/big"
 	"time"
+
+	"github.com/1inch/1inch-sdk-go/constants"
 )
 
-var (
-// currently unused masks carried over from the Typescript Limit Order SDK
+// Bitmask definitions for the Typescript Limit Order SDK (currently unused):
 // allowedSenderMask = NewBitMask(big.NewInt(0), big.NewInt(80))
 // expirationMask    = NewBitMask(big.NewInt(80), big.NewInt(120))
 // nonceOrEpochMask  = NewBitMask(big.NewInt(120), big.NewInt(160))
 // seriesMask        = NewBitMask(big.NewInt(160), big.NewInt(200))
-)
 
 const (
 	noPartialFillsFlag      = 255
@@ -62,7 +62,7 @@ type MakerTraits struct {
 
 func NewMakerTraitsDefault() *MakerTraits {
 	return &MakerTraits{
-		AllowedSender:       "0x0000000000000000000000000000000000000000",
+		AllowedSender:       constants.ZeroAddress,
 		Expiry:              time.Now().Add(time.Hour).Unix(),
 		Nonce:               0,
 		Series:              0,
@@ -81,15 +81,15 @@ func NewMakerTraitsDefault() *MakerTraits {
 func NewMakerTraits(params MakerTraitsParams) (*MakerTraits, error) {
 
 	if params.AllowPartialFills && !params.AllowMultipleFills {
-		return nil, errors.New("AllowPartialFills must be false if AllowMultipleFills is false")
+		return nil, errors.New("allow partial fills must be false when allow multiple fills is false")
 	}
 
 	if !params.AllowPartialFills && params.AllowMultipleFills {
-		return nil, errors.New("AllowMultipleFills must be false if AllowPartialFills is false")
+		return nil, errors.New("allow multiple fills requires allow partial fills")
 	}
 
 	if !params.HasPostInteraction {
-		return nil, errors.New("in the current iteration of Limit Order Protocol, HasPostInteraction must be true")
+		return nil, errors.New("post interaction required")
 	}
 
 	return &MakerTraits{

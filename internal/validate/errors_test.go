@@ -19,14 +19,14 @@ func TestGetValidatorErrorsCount(t *testing.T) {
 		},
 		{
 			description: "Single validation error",
-			validationErr: ConsolidateValidationErorrs([]error{
+			validationErr: ConsolidateValidationErrors([]error{
 				NewParameterValidationError("chainId", "is required"),
 			}),
 			expectedCount: 1,
 		},
 		{
 			description: "Multiple validation errors",
-			validationErr: ConsolidateValidationErorrs([]error{
+			validationErr: ConsolidateValidationErrors([]error{
 				NewParameterValidationError("chainId", "is required"),
 				NewParameterValidationError("walletKey", "not a valid private key"),
 				NewParameterValidationError("sourceWallet", "not a valid Ethereum address"),

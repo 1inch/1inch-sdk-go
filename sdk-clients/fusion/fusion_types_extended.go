@@ -3,9 +3,16 @@ package fusion
 import (
 	"math/big"
 
-	"github.com/ethereum/go-ethereum/common"
-
+	"github.com/1inch/1inch-sdk-go/common/fusionorder"
 	"github.com/1inch/1inch-sdk-go/sdk-clients/orderbook"
+	"github.com/ethereum/go-ethereum/common"
+)
+
+// Type aliases for internal use - these types are now in fusionorder
+// Users should import from fusionorder directly for new code
+type (
+	Bps         = fusionorder.Bps
+	Interaction = fusionorder.Interaction
 )
 
 type GetQuoteOutputFixed struct {
@@ -51,9 +58,9 @@ type Order struct {
 	Inner               orderbook.OrderData
 	SettlementExtension common.Address
 	OrderInfo           FusionOrderV4
-	AuctionDetails      *AuctionDetails
+	AuctionDetails      *fusionorder.AuctionDetails
 	PostInteractionData *SettlementPostInteractionData
-	Extra               ExtraData
+	Extra               fusionorder.ExtraData
 }
 
 type OrderParams struct {
@@ -75,40 +82,15 @@ type OrderParams struct {
 	OrderExpirationDelay    uint32 // TODO this field is inaccessible in the typescript SDK
 }
 
-type TakingFeeInfo struct {
-	TakingFeeBps      *big.Int // 100 == 1%
-	TakingFeeReceiver common.Address
-}
+// Deprecated: Use fusionorder.TakingFeeInfo directly instead.
+type TakingFeeInfo = fusionorder.TakingFeeInfo
 
-type CustomPreset struct {
-	AuctionDuration    int                 `json:"auctionDuration"`
-	AuctionStartAmount string              `json:"auctionStartAmount"`
-	AuctionEndAmount   string              `json:"auctionEndAmount"`
-	Points             []CustomPresetPoint `json:"points,omitempty"`
-}
+// Deprecated: Use fusionorder.CustomPreset directly instead.
+type CustomPreset = fusionorder.CustomPreset
 
-type CustomPresetPoint struct {
-	ToTokenAmount string `json:"toTokenAmount"`
-	Delay         int    `json:"delay"`
-}
+// Deprecated: Use fusionorder.CustomPresetPoint directly instead.
+type CustomPresetPoint = fusionorder.CustomPresetPoint
 
-type AuctionDetails struct {
-	StartTime       uint32                   `json:"startTime"`
-	Duration        uint32                   `json:"duration"`
-	InitialRateBump uint32                   `json:"initialRateBump"`
-	Points          []AuctionPointClassFixed `json:"points"`
-	GasCost         GasCostConfigClassFixed  `json:"gasCost"`
-}
-
-type AuctionPointClassFixed struct {
-	Coefficient uint32 `json:"coefficient"`
-	Delay       uint16 `json:"delay"`
-}
-
-type GasCostConfigClassFixed struct {
-	GasBumpEstimate  uint32 `json:"gasBumpEstimate"`
-	GasPriceEstimate uint32 `json:"gasPriceEstimate"`
-}
 
 type Preset struct {
 	AuctionDuration    float32             `json:"auctionDuration"`
@@ -143,8 +125,8 @@ type FusionOrderConstructor struct {
 }
 
 type Details struct {
-	Auction            *AuctionDetails `json:"auction"`
-	Whitelist          []AuctionWhitelistItem
+	Auction            *fusionorder.AuctionDetails `json:"auction"`
+	Whitelist          []fusionorder.AuctionWhitelistItem
 	ResolvingStartTime *big.Int
 	FeesIntAndRes      *FeesIntegratorAndResolver
 }
@@ -152,14 +134,6 @@ type Details struct {
 type FeesIntegratorAndResolver struct {
 	Resolver   ResolverFee
 	Integrator IntegratorFee
-}
-
-type AuctionWhitelistItem struct {
-	Address common.Address
-	/**
-	 * Timestamp in sec at which address can start resolving
-	 */
-	AllowFrom *big.Int
 }
 
 type ExtraParams struct {
@@ -171,29 +145,6 @@ type ExtraParams struct {
 	EnablePermit2        bool
 	Source               string
 	unwrapWeth           bool
-}
-
-type WhitelistItem struct {
-	/**
-	 * last 10 bytes of address, no 0x prefix
-	 */
-	AddressHalf string
-	/**
-	 * Delay from previous resolver in seconds
-	 * For first resolver delay from `resolvingStartTime`
-	 */
-	Delay *big.Int
-}
-
-type ExtraData struct {
-	UnwrapWETH           bool
-	Nonce                *big.Int
-	Permit               string
-	AllowPartialFills    bool
-	AllowMultipleFills   bool
-	OrderExpirationDelay uint32
-	EnablePermit2        bool
-	Source               string
 }
 
 type QuoterControllerGetQuoteParamsFixed struct {
@@ -278,7 +229,7 @@ type OrderResponse struct {
 		TakingAmount string `json:"takingAmount"`
 	} `json:"order"`
 	OrderHash         string                   `json:"orderHash"`
-	Points            []AuctionPointClassFixed `json:"points"`
+	Points            []fusionorder.AuctionPointClassFixed `json:"points"`
 	Status            string                   `json:"status"`
 	ToTokenToUsdPrice string                   `json:"toTokenToUsdPrice"`
 }
@@ -292,7 +243,7 @@ type PresetClassFixed struct {
 	AuctionStartAmount string              `json:"auctionStartAmount"`
 	BankFee            string              `json:"bankFee"`
 	EstP               float32             `json:"estP"`
-	ExclusiveResolver  string              `json:"exclusiveResolver"` // This was changed to a string from a map[string]interface{}
+	ExclusiveResolver  string              `json:"exclusiveResolver"` // This was changed to a string from a map[string]any
 	GasCost            GasCostConfigClass  `json:"gasCost"`
 	InitialRateBump    float32             `json:"initialRateBump"`
 	Points             []AuctionPointClass `json:"points"`

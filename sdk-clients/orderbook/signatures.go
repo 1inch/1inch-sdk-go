@@ -20,7 +20,7 @@ func CompressSignature(signature string) (*CompactSignature, error) {
 	}
 
 	if len(signatureBytes) != 65 {
-		return nil, fmt.Errorf("signature must be 65 bytes long")
+		return nil, fmt.Errorf("invalid signature length: expected 65 bytes")
 	}
 
 	// Extract r, s, and v components from the signature

@@ -4,44 +4,41 @@ import (
 	"errors"
 	"fmt"
 	"math/big"
-	"strconv"
-	"time"
 
 	"github.com/1inch/1inch-sdk-go/common"
-	"github.com/1inch/1inch-sdk-go/internal/times"
-	geth_common "github.com/ethereum/go-ethereum/common"
-
+	"github.com/1inch/1inch-sdk-go/common/fusionorder"
+	"github.com/1inch/1inch-sdk-go/constants"
 	random_number_generation "github.com/1inch/1inch-sdk-go/internal/random-number-generation"
+	"github.com/1inch/1inch-sdk-go/internal/times"
 	"github.com/1inch/1inch-sdk-go/sdk-clients/orderbook"
+	geth_common "github.com/ethereum/go-ethereum/common"
 )
-
-var uint40Max = new(big.Int).Sub(new(big.Int).Lsh(big.NewInt(1), 40), big.NewInt(1))
 
 func CreateFusionOrderData(quote GetQuoteOutputFixed, orderParams OrderParams, wallet common.Wallet, chainId uint64) (*PreparedOrder, *orderbook.Order, error) {
 
 	preset, err := getPreset(quote.Presets, orderParams.Preset)
 	if err != nil {
-		return nil, nil, fmt.Errorf("error getting preset: %v", err)
+		return nil, nil, fmt.Errorf("failed to get preset: %w", err)
 	}
 
 	auctionDetails, err := CreateAuctionDetails(preset, orderParams.DelayAuctionStartTimeBy)
 	if err != nil {
-		return nil, nil, fmt.Errorf("error creating auction details: %v", err)
+		return nil, nil, fmt.Errorf("failed to create auction details: %w", err)
 	}
 
 	takerAsset := orderParams.ToTokenAddress
-	if takerAsset == NativeToken {
-		takerAssetWrapped, ok := chainToWrapper[NetworkEnum(chainId)]
+	if takerAsset == constants.NativeToken {
+		takerAssetWrapped, ok := constants.ChainToWrapper[constants.NetworkEnum(chainId)]
 		if !ok {
-			return nil, nil, fmt.Errorf("unable to get address for taker asset's wrapped token. unrecognized network: %v", chainId)
+			return nil, nil, fmt.Errorf("unsupported network for wrapped token: %d", chainId)
 		}
 		takerAsset = takerAssetWrapped.Hex()
 	}
 
-	whitelistAddresses := make([]AuctionWhitelistItem, 0)
+	whitelistAddresses := make([]fusionorder.AuctionWhitelistItem, 0)
 	whitelistAddressesStrings := make([]string, 0)
 	for _, address := range quote.Whitelist {
-		whitelistAddresses = append(whitelistAddresses, AuctionWhitelistItem{
+		whitelistAddresses = append(whitelistAddresses, fusionorder.AuctionWhitelistItem{
 			Address:   geth_common.HexToAddress(address),
 			AllowFrom: big.NewInt(0), // TODO generating the correct list here requires checking for an exclusive resolver. This needs to be checked for later. The generated object does not see exclusive resolver correctly
 		})
@@ -49,13 +46,13 @@ func CreateFusionOrderData(quote GetQuoteOutputFixed, orderParams OrderParams, w
 	}
 
 	var nonce *big.Int
-	if isNonceRequired(orderParams.AllowPartialFills, orderParams.AllowMultipleFills) {
+	if fusionorder.IsNonceRequired(orderParams.AllowPartialFills, orderParams.AllowMultipleFills) {
 		if orderParams.Nonce != nil {
 			nonce = orderParams.Nonce
 		} else {
-			nonce, err = random_number_generation.BigIntMaxFunc(uint40Max)
+			nonce, err = random_number_generation.BigIntMaxFunc(constants.Uint40Max)
 			if err != nil {
-				return nil, nil, fmt.Errorf("error generating nonce: %v\n", err)
+				return nil, nil, fmt.Errorf("failed to generate nonce: %w", err)
 			}
 		}
 	} else {
@@ -82,7 +79,7 @@ func CreateFusionOrderData(quote GetQuoteOutputFixed, orderParams OrderParams, w
 
 	makerTraits, err := CreateMakerTraits(details, extraParams)
 	if err != nil {
-		return nil, nil, fmt.Errorf("error creating maker traits: %v", err)
+		return nil, nil, fmt.Errorf("failed to create maker traits: %w", err)
 	}
 
 	orderInfo := FusionOrderV4{
@@ -94,24 +91,29 @@ func CreateFusionOrderData(quote GetQuoteOutputFixed, orderParams OrderParams, w
 		TakingAmount: preset.AuctionEndAmount,
 	}
 
-	whitelist, err := GenerateWhitelist(whitelistAddressesStrings, details.ResolvingStartTime)
+	whitelist, err := fusionorder.GenerateWhitelist(whitelistAddressesStrings, details.ResolvingStartTime)
 	if err != nil {
-		return nil, nil, fmt.Errorf("error generating whitelist: %v", err)
+		return nil, nil, fmt.Errorf("failed to generate whitelist: %w", err)
 	}
 	postInteractionData, err := CreateSettlementPostInteractionData(details, whitelist, orderInfo)
 	if err != nil {
-		return nil, nil, fmt.Errorf("error creating post interaction data: %v", err)
+		return nil, nil, fmt.Errorf("failed to create post interaction data: %w", err)
 	}
 
 	marketAmountBig := big.NewInt(0)
 	_, ok := marketAmountBig.SetString(quote.MarketAmount, 10)
 	if !ok {
-		return nil, nil, fmt.Errorf("error parsing marketAmount: %v", quote.MarketAmount)
+		return nil, nil, fmt.Errorf("failed to parse market amount: %s", quote.MarketAmount)
 	}
 
-	surplus, err := NewSurplusParams(marketAmountBig, FromPercent(float64(quote.SurplusFee), GetDefaultBase()))
+	surplusFee, err := fusionorder.FromPercent(float64(quote.SurplusFee), fusionorder.GetDefaultBase())
 	if err != nil {
-		return nil, nil, fmt.Errorf("error creating surplus: %v", err)
+		return nil, nil, fmt.Errorf("failed to parse surplus fee: %w", err)
+	}
+
+	surplus, err := NewSurplusParams(marketAmountBig, surplusFee)
+	if err != nil {
+		return nil, nil, fmt.Errorf("failed to create surplus params: %w", err)
 	}
 
 	extension, err := NewExtension(ExtensionParams{
@@ -124,7 +126,7 @@ func CreateFusionOrderData(quote GetQuoteOutputFixed, orderParams OrderParams, w
 		Surplus:             surplus,
 	})
 	if err != nil {
-		return nil, nil, fmt.Errorf("error creating extension: %v", err)
+		return nil, nil, fmt.Errorf("failed to create extension: %w", err)
 	}
 
 	fusionOrder, err := CreateOrder(CreateOrderDataParams{
@@ -137,18 +139,18 @@ func CreateFusionOrderData(quote GetQuoteOutputFixed, orderParams OrderParams, w
 		MakerTraits:         makerTraits,
 	})
 	if err != nil {
-		return nil, nil, fmt.Errorf("error creating fusion order: %v", err)
+		return nil, nil, fmt.Errorf("failed to create fusion order: %w", err)
 	}
 
 	orderbookExtension := fusionOrder.FusionExtension.ConvertToOrderbookExtension()
 	orderbookExtensionEncoded, err := orderbookExtension.Encode()
 	if err != nil {
-		return nil, nil, fmt.Errorf("error encoding orderbookExtension: %v", err)
+		return nil, nil, fmt.Errorf("failed to encode orderbook extension: %w", err)
 	}
 
 	salt, err := orderbook.GenerateSalt(orderbookExtensionEncoded, nil)
 	if err != nil {
-		return nil, nil, fmt.Errorf("error generating salt for orderbook: %v", err)
+		return nil, nil, fmt.Errorf("failed to generate salt: %w", err)
 	}
 
 	limitOrder, err := orderbook.CreateLimitOrderMessage(orderbook.CreateOrderParams{
@@ -165,7 +167,7 @@ func CreateFusionOrderData(quote GetQuoteOutputFixed, orderParams OrderParams, w
 		Taker:            fusionOrder.OrderInfo.Receiver,
 	}, int(chainId))
 	if err != nil {
-		return nil, nil, fmt.Errorf("error creating limit order message: %v", err)
+		return nil, nil, fmt.Errorf("failed to create limit order message: %w", err)
 	}
 
 	return &PreparedOrder{
@@ -179,7 +181,7 @@ func getPreset(presets QuotePresetsClassFixed, presetType GetQuoteOutputRecommen
 	switch presetType {
 	case Custom:
 		if presets.Custom == nil {
-			return nil, errors.New("custom preset selected, but no custom preset data provided")
+			return nil, errors.New("custom preset requires custom preset data")
 		}
 		return presets.Custom, nil
 	case Fast:
@@ -189,45 +191,31 @@ func getPreset(presets QuotePresetsClassFixed, presetType GetQuoteOutputRecommen
 	case Slow:
 		return &presets.Slow, nil
 	}
-	return nil, fmt.Errorf("unknown preset type: %v", presetType)
+	return nil, fmt.Errorf("unsupported preset type: %v", presetType)
 }
 
-var CalcAuctionStartTimeFunc func(uint32, uint32) uint32 = CalcAuctionStartTime
-
-func CalcAuctionStartTime(startAuctionIn uint32, additionalWaitPeriod uint32) uint32 {
-	currentTime := time.Now().Unix()
-	return uint32(currentTime) + additionalWaitPeriod + startAuctionIn
+func CreateAuctionDetails(preset *PresetClassFixed, additionalWaitPeriod float32) (*fusionorder.AuctionDetails, error) {
+	points := make([]fusionorder.AuctionPointInput, len(preset.Points))
+	for i, point := range preset.Points {
+		points[i] = fusionorder.AuctionPointInput{
+			Coefficient: point.Coefficient,
+			Delay:       point.Delay,
+		}
+	}
+	return fusionorder.CreateAuctionDetailsFromParams(fusionorder.CreateAuctionDetailsParams{
+		StartAuctionIn:       preset.StartAuctionIn,
+		AdditionalWaitPeriod: additionalWaitPeriod,
+		AuctionDuration:      preset.AuctionDuration,
+		InitialRateBump:      preset.InitialRateBump,
+		Points:               points,
+		GasCost: fusionorder.GasCostInput{
+			GasBumpEstimate:  preset.GasCost.GasBumpEstimate,
+			GasPriceEstimate: preset.GasCost.GasPriceEstimate,
+		},
+	})
 }
 
-func CreateAuctionDetails(preset *PresetClassFixed, additionalWaitPeriod float32) (*AuctionDetails, error) {
-	pointsFixed := make([]AuctionPointClassFixed, 0)
-	for _, point := range preset.Points {
-		pointsFixed = append(pointsFixed, AuctionPointClassFixed{
-			Coefficient: uint32(point.Coefficient),
-			Delay:       uint16(point.Delay),
-		})
-	}
-
-	gasPriceEstimateFixed, err := strconv.ParseUint(preset.GasCost.GasPriceEstimate, 10, 32)
-	if err != nil {
-		return nil, fmt.Errorf("error parsing gas price estimate: %v", err)
-	}
-
-	gasCostFixed := GasCostConfigClassFixed{
-		GasBumpEstimate:  uint32(preset.GasCost.GasBumpEstimate),
-		GasPriceEstimate: uint32(gasPriceEstimateFixed),
-	}
-
-	return &AuctionDetails{
-		StartTime:       CalcAuctionStartTimeFunc(uint32(preset.StartAuctionIn), uint32(additionalWaitPeriod)),
-		Duration:        uint32(preset.AuctionDuration),
-		InitialRateBump: uint32(preset.InitialRateBump),
-		Points:          pointsFixed,
-		GasCost:         gasCostFixed,
-	}, nil
-}
-
-func CreateSettlementPostInteractionData(details Details, whitelist []WhitelistItem, orderInfo FusionOrderV4) (*SettlementPostInteractionData, error) {
+func CreateSettlementPostInteractionData(details Details, whitelist []fusionorder.WhitelistItem, orderInfo FusionOrderV4) (*SettlementPostInteractionData, error) {
 	resolverStartTime := details.ResolvingStartTime
 	if details.ResolvingStartTime == nil || details.ResolvingStartTime.Cmp(big.NewInt(0)) == 0 {
 		resolverStartTime = big.NewInt(times.Now())
@@ -242,33 +230,16 @@ func CreateSettlementPostInteractionData(details Details, whitelist []WhitelistI
 }
 
 func CreateMakerTraits(details Details, extraParams ExtraParams) (*orderbook.MakerTraits, error) {
-	deadline := details.Auction.StartTime + details.Auction.Duration + extraParams.OrderExpirationDelay
-	var nonce int64
-	if extraParams.Nonce == nil {
-		nonce = 0
-	} else {
-		nonce = extraParams.Nonce.Int64()
-	}
-	makerTraitParms := orderbook.MakerTraitsParams{
-		Expiry:             int64(deadline),
-		AllowPartialFills:  extraParams.AllowPartialFills,
-		AllowMultipleFills: extraParams.AllowMultipleFills,
-		HasPostInteraction: true,
-		UnwrapWeth:         extraParams.unwrapWeth,
-		UsePermit2:         extraParams.EnablePermit2,
-		HasExtension:       true,
-		Nonce:              nonce,
-	}
-	makerTraits, err := orderbook.NewMakerTraits(makerTraitParms)
-	if err != nil {
-		return nil, fmt.Errorf("error creating maker traits: %v", err)
-	}
-	if makerTraits.IsBitInvalidatorMode() {
-		if extraParams.Nonce == nil || extraParams.Nonce.Cmp(big.NewInt(0)) == 0 {
-			return nil, errors.New("nonce required when partial fill or multiple fill disallowed")
-		}
-	}
-	return makerTraits, nil
+	return fusionorder.CreateMakerTraits(fusionorder.MakerTraitsParams{
+		AuctionStartTime:     details.Auction.StartTime,
+		AuctionDuration:      details.Auction.Duration,
+		OrderExpirationDelay: extraParams.OrderExpirationDelay,
+		Nonce:                extraParams.Nonce,
+		AllowPartialFills:    extraParams.AllowPartialFills,
+		AllowMultipleFills:   extraParams.AllowMultipleFills,
+		UnwrapWeth:           extraParams.unwrapWeth,
+		EnablePermit2:        extraParams.EnablePermit2,
+	})
 }
 
 type CreateOrderDataParams struct {
@@ -293,7 +264,12 @@ func CreateOrder(params CreateOrderDataParams) (*Order, error) {
 
 	salt, err := params.Extension.GenerateSalt()
 	if err != nil {
-		return nil, fmt.Errorf("error generating salt: %v", err)
+		return nil, fmt.Errorf("failed to generate salt: %w", err)
+	}
+
+	extensionHash, err := params.Extension.Keccak256()
+	if err != nil {
+		return nil, fmt.Errorf("failed to calculate extension hash: %w", err)
 	}
 
 	return &Order{
@@ -307,13 +283,13 @@ func CreateOrder(params CreateOrderDataParams) (*Order, error) {
 			Maker:        params.orderInfo.Maker,
 			Receiver:     receiver,
 			MakerTraits:  params.MakerTraits.Encode(),
-			Extension:    fmt.Sprintf("%x", params.Extension.Keccak256()),
+			Extension:    fmt.Sprintf("%x", extensionHash),
 		},
 		SettlementExtension: geth_common.HexToAddress(params.SettlementAddress),
 		OrderInfo:           params.orderInfo,
 		AuctionDetails:      params.Details.Auction,
 		PostInteractionData: params.PostInteractionData,
-		Extra: ExtraData{
+		Extra: fusionorder.ExtraData{
 			UnwrapWETH:           params.ExtraParams.unwrapWeth,
 			Nonce:                params.ExtraParams.Nonce,
 			Permit:               params.ExtraParams.Permit,
@@ -324,22 +300,4 @@ func CreateOrder(params CreateOrderDataParams) (*Order, error) {
 			Source:               params.ExtraParams.Source,
 		},
 	}, nil
-}
-
-func isNonceRequired(allowPartialFills, allowMultipleFills bool) bool {
-	return !allowPartialFills || !allowMultipleFills
-}
-
-var (
-	feeBase          = big.NewInt(100_000)
-	bpsBase          = big.NewInt(10_000)
-	bpsToRatioNumber = new(big.Int).Div(feeBase, bpsBase)
-)
-
-func bpsToRatioFormat(bps *big.Int) *big.Int {
-	if bps == nil || bps.Cmp(big.NewInt(0)) == 0 {
-		return big.NewInt(0)
-	}
-
-	return bps.Mul(bps, bpsToRatioNumber)
 }

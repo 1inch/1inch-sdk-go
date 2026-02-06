@@ -4,7 +4,8 @@ import (
 	"errors"
 	"fmt"
 
-	"github.com/1inch/1inch-sdk-go/internal/addresses"
+	"github.com/1inch/1inch-sdk-go/common/fusionorder"
+	"github.com/1inch/1inch-sdk-go/constants"
 )
 
 type IntegratorFee struct {
@@ -16,28 +17,28 @@ type IntegratorFee struct {
 
 // IntegratorFeeZero is a safe default with all zero values
 var IntegratorFeeZero = &IntegratorFee{
-	Integrator: addresses.ZeroAddress,
-	Protocol:   addresses.ZeroAddress,
-	Fee:        BpsZero,
-	Share:      BpsZero,
+	Integrator: constants.ZeroAddress,
+	Protocol:   constants.ZeroAddress,
+	Fee:        fusionorder.BpsZero,
+	Share:      fusionorder.BpsZero,
 }
 
 // NewIntegratorFee constructs a validated IntegratorFee or returns an error
 func NewIntegratorFee(integrator, protocol string, fee, share *Bps) (*IntegratorFee, error) {
 	if fee.IsZero() {
 		if !share.IsZero() {
-			return nil, errors.New("integrator share must be zero if fee is zero")
+			return nil, errors.New("zero fee requires zero integrator share")
 		}
-		if integrator != addresses.ZeroAddress {
-			return nil, errors.New("integrator address must be zero if fee is zero")
+		if integrator != constants.ZeroAddress {
+			return nil, errors.New("zero fee requires zero integrator address")
 		}
-		if protocol != addresses.ZeroAddress {
-			return nil, errors.New("protocol address must be zero if fee is zero")
+		if protocol != constants.ZeroAddress {
+			return nil, errors.New("zero fee requires zero protocol address")
 		}
 	}
 
-	if (integrator == addresses.ZeroAddress || protocol == addresses.ZeroAddress) && !fee.IsZero() {
-		return nil, errors.New("fee must be zero if integrator or protocol is zero address")
+	if (integrator == constants.ZeroAddress || protocol == constants.ZeroAddress) && !fee.IsZero() {
+		return nil, errors.New("non-zero fee requires non-zero integrator and protocol addresses")
 	}
 
 	return &IntegratorFee{

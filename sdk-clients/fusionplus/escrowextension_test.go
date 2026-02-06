@@ -5,6 +5,7 @@ import (
 	"math/big"
 	"testing"
 
+	"github.com/1inch/1inch-sdk-go/common/fusionorder"
 	"github.com/1inch/1inch-sdk-go/internal/bigint"
 	random_number_generation "github.com/1inch/1inch-sdk-go/internal/random-number-generation"
 	"github.com/ethereum/go-ethereum/common"
@@ -35,7 +36,7 @@ func TestGenerateSalt(t *testing.T) {
 		{
 			name: "Generate salt when extension is not empty",
 			extension: &EscrowExtension{
-				ExtensionFusion: ExtensionFusion{
+				ExtensionPlus: ExtensionPlus{
 					MakerAssetSuffix: "suffix1",
 					TakerAssetSuffix: "suffix2",
 					MakingAmountData: "data1",
@@ -79,18 +80,18 @@ func TestNewExtension(t *testing.T) {
 		{
 			name: "Valid parameters with Escrow",
 			params: EscrowExtensionParams{
-				ExtensionParamsFusion: ExtensionParamsFusion{
+				ExtensionParamsPlus: ExtensionParamsPlus{
 					SettlementContract: "0x5678",
-					AuctionDetails: &AuctionDetails{
+					AuctionDetails: &fusionorder.AuctionDetails{
 						StartTime:       0,
 						Duration:        0,
 						InitialRateBump: 0,
 						Points:          nil,
-						GasCost:         GasCostConfigClassFixed{},
+						GasCost:         fusionorder.GasCostConfigClassFixed{},
 					},
-					PostInteractionData: &SettlementPostInteractionDataFusion{
-						Whitelist: []WhitelistItem{},
-						IntegratorFee: &IntegratorFeeFusion{
+					PostInteractionData: &SettlementPostInteractionData{
+						Whitelist: []fusionorder.WhitelistItem{},
+						IntegratorFee: &IntegratorFee{
 							Ratio:    big.NewInt(0),
 							Receiver: common.Address{},
 						},
@@ -108,7 +109,7 @@ func TestNewExtension(t *testing.T) {
 				},
 			},
 			expected: &EscrowExtension{
-				ExtensionFusion: ExtensionFusion{
+				ExtensionPlus: ExtensionPlus{
 					MakerAssetSuffix: "0x1234",
 					TakerAssetSuffix: "0x1234",
 					MakingAmountData: "0x00000000000000000000000000000000000056780000000000000000000000000000000000",
@@ -124,7 +125,7 @@ func TestNewExtension(t *testing.T) {
 		{
 			name: "Invalid MakerAssetSuffix",
 			params: EscrowExtensionParams{
-				ExtensionParamsFusion: ExtensionParamsFusion{
+				ExtensionParamsPlus: ExtensionParamsPlus{
 					SettlementContract: "0x5678",
 					MakerAssetSuffix:   "invalid",
 					TakerAssetSuffix:   "0x1234",
@@ -133,12 +134,12 @@ func TestNewExtension(t *testing.T) {
 				},
 			},
 			expectErr: true,
-			errMsg:    "MakerAssetSuffix must be valid hex string",
+			errMsg:    "invalid maker asset suffix hex: invalid",
 		},
 		{
 			name: "Invalid TakerAssetSuffix",
 			params: EscrowExtensionParams{
-				ExtensionParamsFusion: ExtensionParamsFusion{
+				ExtensionParamsPlus: ExtensionParamsPlus{
 					SettlementContract: "0x5678",
 					MakerAssetSuffix:   "0x1234",
 					TakerAssetSuffix:   "invalid",
@@ -147,12 +148,12 @@ func TestNewExtension(t *testing.T) {
 				},
 			},
 			expectErr: true,
-			errMsg:    "TakerAssetSuffix must be valid hex string",
+			errMsg:    "invalid taker asset suffix hex: invalid",
 		},
 		{
 			name: "Invalid Predicate",
 			params: EscrowExtensionParams{
-				ExtensionParamsFusion: ExtensionParamsFusion{
+				ExtensionParamsPlus: ExtensionParamsPlus{
 					SettlementContract: "0x5678",
 					MakerAssetSuffix:   "0x1234",
 					TakerAssetSuffix:   "0x1234",
@@ -161,12 +162,12 @@ func TestNewExtension(t *testing.T) {
 				},
 			},
 			expectErr: true,
-			errMsg:    "Predicate must be valid hex string",
+			errMsg:    "invalid predicate hex: invalid",
 		},
 		{
 			name: "CustomData not supported",
 			params: EscrowExtensionParams{
-				ExtensionParamsFusion: ExtensionParamsFusion{
+				ExtensionParamsPlus: ExtensionParamsPlus{
 					SettlementContract: "0x5678",
 					MakerAssetSuffix:   "0x1234",
 					TakerAssetSuffix:   "0x1234",
@@ -176,7 +177,7 @@ func TestNewExtension(t *testing.T) {
 				},
 			},
 			expectErr: true,
-			errMsg:    "CustomData is not currently supported",
+			errMsg:    "unsupported: custom data",
 		},
 	}
 

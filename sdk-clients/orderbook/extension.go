@@ -1,10 +1,8 @@
 package orderbook
 
 import (
-	"bytes"
 	"encoding/binary"
 	"encoding/hex"
-	"errors"
 	"fmt"
 	"math/big"
 	"reflect"
@@ -29,13 +27,13 @@ func NewExtension(params ExtensionParams) (*Extension, error) {
 
 	if params.Permit != "" {
 		if params.MakerAsset == "" {
-			return nil, fmt.Errorf("when Permit is present, a maker asset must also be defined requires MakerAsset")
+			return nil, fmt.Errorf("permit requires maker asset to be defined")
 		}
 	}
 
 	if params.MakerAsset != "" {
 		if params.Permit == "" {
-			return nil, fmt.Errorf("when MakerAsset is present, a maker asset must also be defined requires Permit")
+			return nil, fmt.Errorf("maker asset requires permit to be defined")
 		}
 	}
 
@@ -74,7 +72,7 @@ func Decode(data []byte) (*Extension, error) {
 	// Read the first 32 bytes as offsets.
 	offsets, err := iter.NextUint256()
 	if err != nil {
-		return &Extension{}, errors.New("failed to read offsets: " + err.Error())
+		return &Extension{}, fmt.Errorf("failed to read offsets: %w", err)
 	}
 
 	consumed := 0
@@ -105,23 +103,23 @@ func Decode(data []byte) (*Extension, error) {
 		bytesCount := int(offset) - consumed
 
 		if bytesCount < 0 {
-			return &Extension{}, errors.New("invalid offset leading to negative bytesCount for field: " + field.Name)
+			return &Extension{}, fmt.Errorf("invalid offset for field %s: negative byte count", field.Name)
 		}
 
 		// Read the next bytesCount bytes for the current field.
 		fieldBytes, err := iter.NextBytes(bytesCount)
 		if err != nil {
-			return &Extension{}, errors.New("failed to read field " + field.Name + ": " + err.Error())
+			return &Extension{}, fmt.Errorf("failed to read field %s: %w", field.Name, err)
 		}
 		if len(fieldBytes) < bytesCount {
-			return &Extension{}, errors.New("insufficient bytes for field " + field.Name)
+			return &Extension{}, fmt.Errorf("insufficient bytes for field %s", field.Name)
 		}
 
 		// Set the field value using reflection.
 		if field.Type.Kind() == reflect.String {
 			fieldVal.SetString(fmt.Sprintf("0x%x", fieldBytes))
 		} else {
-			return &Extension{}, errors.New("unsupported field type for field: " + field.Name)
+			return &Extension{}, fmt.Errorf("unsupported type for field %s", field.Name)
 		}
 
 		// Update the consumed bytes and shift the offsets for the next field.
@@ -137,11 +135,6 @@ func Decode(data []byte) (*Extension, error) {
 	//ext.CustomData = string(customDataBytes)
 
 	return &ext, nil
-}
-
-// contains checks if the substring is present in the string.
-func contains(s, substr string) bool {
-	return bytes.Contains([]byte(s), []byte(substr))
 }
 
 // Encode encodes the Extension struct into a hex string with offsets.
@@ -163,7 +156,6 @@ func (ext *Extension) Encode() (string, error) {
 	// Decode each field and collect byte counts
 	for _, field := range fields {
 		fieldStr := hexadecimal.Trim0x(field)
-		fieldStr = hexadecimal.Trim0x(fieldStr)
 
 		// Ensure even length for hex decoding
 		if len(fieldStr)%2 != 0 {
@@ -172,7 +164,7 @@ func (ext *Extension) Encode() (string, error) {
 
 		fieldData, err := hex.DecodeString(fieldStr)
 		if err != nil {
-			return "", fmt.Errorf("failed to decode field '%s': %v", field, err)
+			return "", fmt.Errorf("failed to decode field '%s': %w", field, err)
 		}
 		byteCounts = append(byteCounts, len(fieldData))
 		dataBytes = append(dataBytes, fieldData...)

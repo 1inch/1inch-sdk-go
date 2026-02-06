@@ -106,16 +106,16 @@ func (api *api) PlaceOrder(ctx context.Context, quoteParams QuoterControllerGetQ
 
 	preset, err := GetPreset(quote.Presets, orderParams.Preset)
 	if err != nil {
-		return "", fmt.Errorf("failed to get preset: %v", err)
+		return "", fmt.Errorf("failed to get preset: %w", err)
 	}
 
 	// TODO orders will not be allowed with multiple secret hashes for now
 	if len(orderParams.SecretHashes) > 1 {
-		return "", fmt.Errorf("Multiple secret hashes are not supported at this time. Please ")
+		return "", fmt.Errorf("unsupported: multiple secret hashes")
 	}
 
 	if !preset.AllowMultipleFills && len(orderParams.SecretHashes) > 1 {
-		return "", fmt.Errorf("multiple secrets are required with multiple secret hashes")
+		return "", fmt.Errorf("multiple secret hashes require multiple secrets")
 	}
 	//else {
 	// TODO support multiple secrets
@@ -123,7 +123,7 @@ func (api *api) PlaceOrder(ctx context.Context, quoteParams QuoterControllerGetQ
 
 	fusionPlusOrder, err := CreateFusionPlusOrderData(quoteParams, quote, orderParams, wallet, int(quoteParams.SrcChain))
 	if err != nil {
-		return "", fmt.Errorf("failed to create order: %v", err)
+		return "", fmt.Errorf("failed to create order: %w", err)
 	}
 
 	signedOrder := SignedOrderInput{
@@ -146,7 +146,7 @@ func (api *api) PlaceOrder(ctx context.Context, quoteParams QuoterControllerGetQ
 
 	body, err := json.Marshal(signedOrder)
 	if err != nil {
-		return "", fmt.Errorf("failed to serialize order: %v", err)
+		return "", fmt.Errorf("failed to serialize order: %w", err)
 	}
 
 	payload := common.RequestPayload{
@@ -158,7 +158,7 @@ func (api *api) PlaceOrder(ctx context.Context, quoteParams QuoterControllerGetQ
 
 	err = api.httpExecutor.ExecuteRequest(ctx, payload, nil)
 	if err != nil {
-		return "", fmt.Errorf("failed to place order: %v", err)
+		return "", fmt.Errorf("failed to place order: %w", err)
 	}
 
 	return fusionPlusOrder.Hash, nil

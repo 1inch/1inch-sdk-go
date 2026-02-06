@@ -4,7 +4,6 @@ import (
 	"context"
 	"encoding/json"
 	"fmt"
-	"log"
 	"reflect"
 	"testing"
 
@@ -16,10 +15,10 @@ import (
 type MockHttpExecutor struct {
 	Called      bool
 	ExecuteErr  error
-	ResponseObj interface{}
+	ResponseObj any
 }
 
-func (m *MockHttpExecutor) ExecuteRequest(ctx context.Context, payload common.RequestPayload, v interface{}) error {
+func (m *MockHttpExecutor) ExecuteRequest(ctx context.Context, payload common.RequestPayload, v any) error {
 	m.Called = true
 	if m.ExecuteErr != nil {
 		return m.ExecuteErr
@@ -62,7 +61,7 @@ func TestGetCurrentValue(t *testing.T) {
 	// Unmarshal the JSON data into the struct
 	err := json.Unmarshal([]byte(data), &mockedResp)
 	if err != nil {
-		log.Fatalf("Error unmarshaling JSON: %v", err)
+		t.Fatalf("Error unmarshaling JSON: %v", err)
 	}
 
 	mockExecutor := &MockHttpExecutor{

@@ -13,16 +13,16 @@ func NormalizeGetOrderByHashResponse(resp *GetOrderByHashResponse) (*GetOrderByH
 	if !ok {
 		saltBigInt, ok = new(big.Int).SetString(resp.Data.Salt[2:], 16)
 		if !ok {
-			return nil, fmt.Errorf("invalid salt value")
+			return nil, fmt.Errorf("invalid salt: %s", resp.Data.Salt)
 		}
 	}
 	makingAmountBigInt, ok := new(big.Int).SetString(resp.Data.MakingAmount, 10)
 	if !ok {
-		return nil, fmt.Errorf("invalid making amount value")
+		return nil, fmt.Errorf("invalid making amount: %s", resp.Data.MakingAmount)
 	}
 	takingAmountBigInt, ok := new(big.Int).SetString(resp.Data.TakingAmount, 10)
 	if !ok {
-		return nil, fmt.Errorf("invalid taking amount value")
+		return nil, fmt.Errorf("invalid taking amount: %s", resp.Data.TakingAmount)
 	}
 
 	makerAssetBigInt := AddressStringToBigInt(resp.Data.MakerAsset)
@@ -32,7 +32,7 @@ func NormalizeGetOrderByHashResponse(resp *GetOrderByHashResponse) (*GetOrderByH
 
 	makerTraits, err := hexutil.DecodeBig(resp.Data.MakerTraits)
 	if err != nil {
-		return nil, fmt.Errorf("invalid maker traits value")
+		return nil, fmt.Errorf("invalid maker traits: %w", err)
 	}
 
 	return &GetOrderByHashResponseExtended{
