@@ -34,11 +34,16 @@ This is the official Go SDK for interacting with 1inch Network APIs. It provides
 ├── internal/             # Internal utilities (not exported)
 │   ├── http-executor/    # HTTP client implementation
 │   ├── web3-provider/    # Ethereum wallet/provider implementation
+│   │   └── multicall/    # Multicall contract support
 │   ├── transaction-builder/  # Tx construction utilities
-│   ├── validate/         # Parameter validation functions
+│   ├── validate/         # Parameter validation functions (generic typed)
 │   ├── bigint/           # Big integer utilities
+│   ├── bytesbuilder/     # Byte buffer construction
+│   ├── bytesiterator/    # Sequential byte parsing
+│   ├── hexadecimal/      # Hex string utilities
 │   ├── keccak/           # Keccak hashing
-│   └── multicall/        # Multicall contract support
+│   ├── random-number-generation/ # Cryptographic random number generation
+│   └── times/            # Time utilities
 ├── codegen/              # OpenAPI spec files and type generation
 │   ├── openapi/          # OpenAPI JSON specs for each API
 │   ├── generate_types.sh # Type generation script
@@ -58,8 +63,8 @@ make lint
 # Format code
 make fmt
 
-# Generate types from OpenAPI specs
-make codegen-types   # Must run from codegen/ directory
+# Generate types from OpenAPI specs (run from repo root)
+make codegen-types
 
 # Get dependencies
 make get
@@ -173,7 +178,7 @@ Common validators in `internal/validate/`:
 Types are auto-generated from OpenAPI specs using `oapi-codegen`:
 
 1. OpenAPI specs live in `codegen/openapi/*-openapi.json`
-2. Run `./generate_types.sh` from `codegen/` directory
+2. Run `make codegen-types` from the repo root (or `./generate_types.sh` from `codegen/`)
 3. Generated files: `sdk-clients/{package}/{package}_types.gen.go`
 
 **DO NOT manually edit `*_types.gen.go` files** - they are overwritten by codegen.
@@ -202,7 +207,7 @@ KlaytnChainId    = 8217
 
 Key addresses in `constants/contracts.go`:
 - `AggregationRouterV6` = `0x111111125421cA6dc452d289314280a0f8842A65` (all chains except zkSync)
-- `NativeToken` = `0xeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeee`
+- `NativeToken` = `0xEeeeeEeeeEeEeeEeEeEeeEEEeeeeEeeeeeeeEEeE`
 - SeriesNonceManager addresses per chain
 
 ## Environment Variables for Examples
@@ -286,18 +291,18 @@ Key conventions:
 |--------|---------|-------------|
 | `aggregation` | DEX swap aggregation | `GetQuote`, `GetSwap`, `GetApproveAllowance` |
 | `fusion` | Gasless swaps | `GetQuote`, `PlaceOrder`, `GetOrderStatus` |
-| `fusionplus` | Cross-chain gasless | `GetQuote`, `PlaceOrder` |
+| `fusionplus` | Cross-chain gasless | `GetQuote`, `PlaceOrder`, `SubmitSecret` |
 | `orderbook` | Limit orders | `CreateOrder`, `GetAllOrders` |
 | `balances` | Token balances | `GetBalancesAndAllowances` |
-| `gasprices` | Gas oracle | `GetGasPrices` |
+| `gasprices` | Gas oracle | `GetGasPriceEIP1559`, `GetGasPriceLegacy` |
 | `spotprices` | Token prices | `GetPricesForRequestedTokens` |
-| `tokens` | Token info | `GetWhitelistedTokens`, `SearchToken` |
+| `tokens` | Token info | `WhitelistedTokens`, `SearchTokenAllChains` |
 | `portfolio` | Portfolio tracking | `GetCurrentValue`, `GetProfitLoss` |
 | `history` | Tx history | `GetHistoryEventsByAddress` |
 | `web3` | RPC proxy | `PerformRpcCall` |
 | `txbroadcast` | Tx broadcasting | `BroadcastPublicTransaction` |
-| `traces` | Tx traces | `GetTxTrace` |
-| `nft` | NFT data | `GetNftsByAddress` |
+| `traces` | Tx traces | `GetTxTraceByNumberAndHash` |
+| `nft` | NFT data | `GetNFTsByAddress` |
 
 ## Common Patterns
 
@@ -360,7 +365,8 @@ common/fusionorder/   # Shared types and utilities (base layer)
 ├── whitelist.go      # Whitelist generation (GenerateWhitelist, GenerateWhitelistFromItems)
 ├── whitelist_utils.go # Whitelist helpers (CanExecuteAt, IsExclusiveResolver)
 ├── auction.go        # Auction details encoding
-├── nativetokenwrappers.go # Chain-specific wrapped token addresses
+├── preset.go         # Preset configuration types
+├── salt.go           # Order salt generation and hashing
 └── ...
 
 fusion/               # Fusion (single-chain gasless swaps)
@@ -382,11 +388,14 @@ fusionplus/           # Fusion+ (cross-chain swaps)
 // In fusion/fusion_types_extended.go
 type Bps = fusionorder.Bps
 type Interaction = fusionorder.Interaction
-type WhitelistItem = fusionorder.WhitelistItem
+type TakingFeeInfo = fusionorder.TakingFeeInfo
+type CustomPreset = fusionorder.CustomPreset
+type CustomPresetPoint = fusionorder.CustomPresetPoint
 
 // In fusionplus/fusionplus_types_extended.go  
-type Interaction = fusionorder.Interaction
-type WhitelistItem = fusionorder.WhitelistItem
+type TakingFeeInfo = fusionorder.TakingFeeInfo
+type CustomPreset = fusionorder.CustomPreset
+type CustomPresetPoint = fusionorder.CustomPresetPoint
 ```
 
 **Plus Suffix**: Types in `fusionplus` that need to be distinguished from `fusion` equivalents use the `Plus` suffix:
@@ -399,9 +408,11 @@ type WhitelistItem = fusionorder.WhitelistItem
 - In `fusion`: `fusionExtension`, `fusionOrder`
 - In `fusionplus`: `extensionPlus`, `auctionDetailsPlus`, `presetPlus`
 
-### Shared Functions
+### Shared Code
 
-When a function is shared across `fusion` and `fusionplus`, it lives in `fusionorder`. Import it directly from there — do not create re-export aliases in the leaf packages.
+When a **function** is shared across `fusion` and `fusionplus`, it lives in `fusionorder`. Import and call it directly from `fusionorder` — do not create function re-export aliases in the leaf packages.
+
+**Type aliases** (as shown above) are acceptable for commonly-used types to improve ergonomics for callers of the leaf packages.
 
 ### Encoding Differences
 
@@ -411,7 +422,7 @@ The packages have different binary encoding formats:
 
 ### Common Pitfalls to Avoid
 
-1. **Don't duplicate functions** - If logic is identical, put it in `fusionorder` and alias it
+1. **Don't duplicate functions** - If logic is identical, put it in `fusionorder` and import it directly
 2. **Don't use `log.Fatalf`** - Always return errors properly
 3. **Watch for case sensitivity** - Ethereum addresses are case-insensitive; use `strings.ToLower()` when comparing address halves
 4. **Keep variable names consistent** - Use `*Plus` in fusionplus, not `*Fusion`

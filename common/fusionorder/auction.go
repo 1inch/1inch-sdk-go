@@ -1,7 +1,6 @@
 package fusionorder
 
 import (
-	"encoding/binary"
 	"encoding/hex"
 	"errors"
 	"fmt"
@@ -9,6 +8,7 @@ import (
 	"time"
 
 	"github.com/1inch/1inch-sdk-go/constants"
+	"github.com/1inch/1inch-sdk-go/internal/bytesbuilder"
 	"github.com/1inch/1inch-sdk-go/internal/bytesiterator"
 )
 
@@ -130,63 +130,102 @@ func DecodeAuctionDetails(data string) (*AuctionDetails, error) {
 	)
 }
 
+// encodeHeader writes the common auction header fields to the builder.
+func (ad *AuctionDetails) encodeHeader(b *bytesbuilder.BytesBuilder) {
+	b.AddNativeUint24(ad.GasCost.GasBumpEstimate)
+	b.AddNativeUint32(ad.GasCost.GasPriceEstimate)
+	b.AddNativeUint32(ad.StartTime)
+	b.AddNativeUint24(ad.Duration)
+	b.AddNativeUint24(ad.InitialRateBump)
+}
+
+// encodePoints writes auction curve points to the builder.
+func (ad *AuctionDetails) encodePoints(b *bytesbuilder.BytesBuilder) {
+	for _, point := range ad.Points {
+		b.AddNativeUint24(point.Coefficient)
+		b.AddNativeUint16(point.Delay)
+	}
+}
+
 // Encode encodes the auction details to a hex string
 func (ad *AuctionDetails) Encode() string {
-	bytes := make([]byte, 0)
-	bytes = append(bytes, byte(ad.GasCost.GasBumpEstimate>>16), byte(ad.GasCost.GasBumpEstimate>>8), byte(ad.GasCost.GasBumpEstimate))
-	bytes = append(bytes, byte(ad.GasCost.GasPriceEstimate>>24), byte(ad.GasCost.GasPriceEstimate>>16), byte(ad.GasCost.GasPriceEstimate>>8), byte(ad.GasCost.GasPriceEstimate))
-	bytes = append(bytes, byte(ad.StartTime>>24), byte(ad.StartTime>>16), byte(ad.StartTime>>8), byte(ad.StartTime))
-	bytes = append(bytes, byte(ad.Duration>>16), byte(ad.Duration>>8), byte(ad.Duration))
-	bytes = append(bytes, byte(ad.InitialRateBump>>16), byte(ad.InitialRateBump>>8), byte(ad.InitialRateBump))
-	bytes = append(bytes, byte(len(ad.Points)))
-
-	for _, point := range ad.Points {
-		bytes = append(bytes, byte(point.Coefficient>>16), byte(point.Coefficient>>8), byte(point.Coefficient))
-		bytes = append(bytes, byte(point.Delay>>8), byte(point.Delay))
-	}
-
-	return hex.EncodeToString(bytes)
+	b := bytesbuilder.New()
+	ad.encodeHeader(b)
+	b.AddUint8(uint8(len(ad.Points)))
+	ad.encodePoints(b)
+	return b.AsHex()
 }
 
 // EncodeWithoutPointCount encodes without the point count byte (used by fusionplus)
 func (ad *AuctionDetails) EncodeWithoutPointCount() string {
-	bytes := make([]byte, 0)
-	bytes = append(bytes, byte(ad.GasCost.GasBumpEstimate>>16), byte(ad.GasCost.GasBumpEstimate>>8), byte(ad.GasCost.GasBumpEstimate))
-	bytes = append(bytes, byte(ad.GasCost.GasPriceEstimate>>24), byte(ad.GasCost.GasPriceEstimate>>16), byte(ad.GasCost.GasPriceEstimate>>8), byte(ad.GasCost.GasPriceEstimate))
-	bytes = append(bytes, byte(ad.StartTime>>24), byte(ad.StartTime>>16), byte(ad.StartTime>>8), byte(ad.StartTime))
-	bytes = append(bytes, byte(ad.Duration>>16), byte(ad.Duration>>8), byte(ad.Duration))
-	bytes = append(bytes, byte(ad.InitialRateBump>>16), byte(ad.InitialRateBump>>8), byte(ad.InitialRateBump))
-
-	for _, point := range ad.Points {
-		bytes = append(bytes, byte(point.Coefficient>>16), byte(point.Coefficient>>8), byte(point.Coefficient))
-		bytes = append(bytes, byte(point.Delay>>8), byte(point.Delay))
-	}
-
-	return hex.EncodeToString(bytes)
+	b := bytesbuilder.New()
+	ad.encodeHeader(b)
+	ad.encodePoints(b)
+	return b.AsHex()
 }
 
-// DecodeLegacyAuctionDetails decodes using the legacy format
+// DecodeLegacyAuctionDetails decodes using the legacy format (includes point count byte)
 func DecodeLegacyAuctionDetails(data string) (*AuctionDetails, error) {
-	bytes, err := hex.DecodeString(data)
+	rawBytes, err := hex.DecodeString(data)
 	if err != nil {
 		return nil, fmt.Errorf("invalid hex data: %w", err)
 	}
 
-	if len(bytes) < 15 {
-		return nil, errors.New("data too short: minimum 15 bytes required")
+	if len(rawBytes) < 18 {
+		return nil, errors.New("data too short: minimum 18 bytes required")
 	}
 
-	gasBumpEstimate := binary.BigEndian.Uint32(append([]byte{0x00}, bytes[0:3]...))
-	gasPriceEstimate := binary.BigEndian.Uint32(bytes[3:7])
-	startTime := binary.BigEndian.Uint32(bytes[7:11])
-	duration := binary.BigEndian.Uint32(append([]byte{0x00}, bytes[11:14]...))
-	initialRateBump := binary.BigEndian.Uint32(append([]byte{0x00}, bytes[14:17]...))
+	iter := bytesiterator.New(rawBytes)
+
+	gasBumpEstimate, err := iter.NextUint24()
+	if err != nil {
+		return nil, fmt.Errorf("failed to read gas bump estimate: %w", err)
+	}
+
+	gasPriceEstimateBI, err := iter.NextUint32()
+	if err != nil {
+		return nil, fmt.Errorf("failed to read gas price estimate: %w", err)
+	}
+	gasPriceEstimate := uint32(gasPriceEstimateBI.Uint64())
+
+	startTimeBI, err := iter.NextUint32()
+	if err != nil {
+		return nil, fmt.Errorf("failed to read start time: %w", err)
+	}
+	startTime := uint32(startTimeBI.Uint64())
+
+	duration, err := iter.NextUint24()
+	if err != nil {
+		return nil, fmt.Errorf("failed to read duration: %w", err)
+	}
+
+	initialRateBump, err := iter.NextUint24()
+	if err != nil {
+		return nil, fmt.Errorf("failed to read initial rate bump: %w", err)
+	}
+
+	// Legacy format includes a point count byte
+	pointCount, err := iter.NextByte()
+	if err != nil {
+		return nil, fmt.Errorf("failed to read point count: %w", err)
+	}
 
 	var points []AuctionPointClassFixed
-	for i := 18; i+5 <= len(bytes); i += 5 {
+	for i := 0; i < int(pointCount); i++ {
+		coeff, err := iter.NextUint24()
+		if err != nil {
+			return nil, fmt.Errorf("failed to read coefficient in points: %w", err)
+		}
+
+		delayBI, err := iter.NextUint16()
+		if err != nil {
+			return nil, fmt.Errorf("failed to read delay in points: %w", err)
+		}
+		delay := uint16(delayBI.Uint64())
+
 		points = append(points, AuctionPointClassFixed{
-			Coefficient: binary.BigEndian.Uint32(append([]byte{0x00}, bytes[i:i+3]...)),
-			Delay:       binary.BigEndian.Uint16(bytes[i+3 : i+5]),
+			Coefficient: coeff,
+			Delay:       delay,
 		})
 	}
 

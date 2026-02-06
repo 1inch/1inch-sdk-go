@@ -78,6 +78,26 @@ func (b *BytesBuilder) AddBytes(data string) error {
 	return nil
 }
 
+// AddNativeUint16 appends a uint16 as 2 big-endian bytes.
+func (b *BytesBuilder) AddNativeUint16(val uint16) {
+	b.data = append(b.data, byte(val>>8), byte(val))
+}
+
+// AddNativeUint24 appends the low 24 bits of a uint32 as 3 big-endian bytes.
+func (b *BytesBuilder) AddNativeUint24(val uint32) {
+	b.data = append(b.data, byte(val>>16), byte(val>>8), byte(val))
+}
+
+// AddNativeUint32 appends a uint32 as 4 big-endian bytes.
+func (b *BytesBuilder) AddNativeUint32(val uint32) {
+	b.data = append(b.data, byte(val>>24), byte(val>>16), byte(val>>8), byte(val))
+}
+
 func (b *BytesBuilder) AsHex() string {
 	return hex.EncodeToString(b.data)
+}
+
+// AsBytes returns the raw accumulated bytes.
+func (b *BytesBuilder) AsBytes() []byte {
+	return b.data
 }

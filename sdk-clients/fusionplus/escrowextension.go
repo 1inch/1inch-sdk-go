@@ -1,13 +1,12 @@
 package fusionplus
 
 import (
-	"bytes"
-	"encoding/binary"
 	"encoding/hex"
 	"fmt"
 	"math/big"
 	"strings"
 
+	"github.com/1inch/1inch-sdk-go/internal/bytesbuilder"
 	"github.com/1inch/1inch-sdk-go/internal/bytesiterator"
 	"github.com/1inch/1inch-sdk-go/internal/hexadecimal"
 	"github.com/1inch/1inch-sdk-go/sdk-clients/orderbook"
@@ -186,29 +185,34 @@ func decodeExtraData(data []byte) (*EscrowExtraData, error) {
 
 // decodeTimeLocks takes a *big.Int containing the raw hex data and returns a TimeLocks struct.
 func decodeTimeLocks(value *big.Int) (*TimeLocks, error) {
-	tl := &TimeLocks{}
-
-	// Convert big.Int to byte slice
+	// Convert big.Int to zero-padded 32-byte slice
 	data := value.Bytes()
-
 	if len(data) < 32 {
 		padded := make([]byte, 32)
 		copy(padded[32-len(data):], data)
 		data = padded
 	}
 
+	iter := bytesiterator.New(data)
+
+	// Buffer is exactly 32 bytes (8 x uint32), so reads cannot fail.
+	readNextUint32FromTimeLocksData := func() float32 {
+		val, _ := iter.NextUint32()
+		return float32(val.Uint64())
+	}
+
 	//TODO big.Int cannot preserve leading zeroes, so decoding the deploy time is impossible atm
+	_ = readNextUint32FromTimeLocksData() // skip deploy time
 
-	// tl.DeployTime = float32(binary.BigEndian.Uint32((data[0:4])))
-	tl.DstCancellation = float32(binary.BigEndian.Uint32((data[4:8])))
-	tl.DstPublicWithdrawal = float32(binary.BigEndian.Uint32((data[8:12])))
-	tl.DstWithdrawal = float32(binary.BigEndian.Uint32((data[12:16])))
-	tl.SrcPublicCancellation = float32(binary.BigEndian.Uint32((data[16:20])))
-	tl.SrcCancellation = float32(binary.BigEndian.Uint32((data[20:24])))
-	tl.SrcPublicWithdrawal = float32(binary.BigEndian.Uint32((data[24:28])))
-	tl.SrcWithdrawal = float32(binary.BigEndian.Uint32((data[28:32])))
-
-	return tl, nil
+	return &TimeLocks{
+		DstCancellation:       readNextUint32FromTimeLocksData(),
+		DstPublicWithdrawal:   readNextUint32FromTimeLocksData(),
+		DstWithdrawal:         readNextUint32FromTimeLocksData(),
+		SrcPublicCancellation: readNextUint32FromTimeLocksData(),
+		SrcCancellation:       readNextUint32FromTimeLocksData(),
+		SrcPublicWithdrawal:   readNextUint32FromTimeLocksData(),
+		SrcWithdrawal:         readNextUint32FromTimeLocksData(),
+	}, nil
 }
 
 type EscrowExtraData struct {
@@ -222,7 +226,7 @@ type EscrowExtraData struct {
 
 // encodeExtraData takes an EscrowExtraData struct and encodes it into a byte slice.
 func encodeExtraData(data *EscrowExtraData) ([]byte, error) {
-	var buffer bytes.Buffer
+	b := bytesbuilder.New()
 
 	// 1. Encode HashLock.Value
 	hashlockData := new(big.Int)
@@ -230,75 +234,41 @@ func encodeExtraData(data *EscrowExtraData) ([]byte, error) {
 	if !ok {
 		return nil, fmt.Errorf("invalid hashlock value: %s", data.HashLock.Value)
 	}
-	err := writeBigIntAsUint256(&buffer, hashlockData)
-	if err != nil {
-		return nil, err
-	}
+	b.AddUint256(hashlockData)
 
 	// 2. Encode DstChainId
-	dstChainIdBigInt := new(big.Int).SetUint64(uint64(data.DstChainId))
-	err = writeBigIntAsUint256(&buffer, dstChainIdBigInt)
-	if err != nil {
-		return nil, err
-	}
+	b.AddUint256(new(big.Int).SetUint64(uint64(data.DstChainId)))
 
 	// 3. Encode DstToken
-	addressBig := new(big.Int).SetBytes(data.DstToken.Bytes())
-	err = writeBigIntAsUint256(&buffer, addressBig)
-	if err != nil {
-		return nil, err
-	}
+	b.AddUint256(new(big.Int).SetBytes(data.DstToken.Bytes()))
 
 	// 4. Encode SafetyDeposits
 	safetyDepositData := new(big.Int)
 	srcShifted := new(big.Int).Lsh(data.SrcSafetyDeposit, 128)
 	safetyDepositData.Add(srcShifted, data.DstSafetyDeposit)
-	err = writeBigIntAsUint256(&buffer, safetyDepositData)
-	if err != nil {
-		return nil, err
-	}
+	b.AddUint256(safetyDepositData)
 
 	// 5. Encode TimeLocks
-	timeLocksData, err := encodeTimeLocks(data.TimeLocks)
-	if err != nil {
-		return nil, err
-	}
-	err = writeBigIntAsUint256(&buffer, timeLocksData)
-	if err != nil {
-		return nil, err
-	}
+	b.AddUint256(encodeTimeLocks(data.TimeLocks))
 
-	return buffer.Bytes(), nil
+	return b.AsBytes(), nil
 }
 
 // encodeTimeLocks packs a TimeLocks struct into a *big.Int.
-func encodeTimeLocks(tl *TimeLocks) (*big.Int, error) {
-	data := make([]byte, 32)
+func encodeTimeLocks(tl *TimeLocks) *big.Int {
+	b := bytesbuilder.New()
 
 	//TODO statically putting a timeDeployed value of 0 at the beginning of the encoded data for now. The data is missing from the generated struct.
 	// https://github.com/1inch/cross-chain-sdk/blob/532f6ae6dc401ddaf8fe3ad040305f2500156710/src/cross-chain-order/time-locks/time-locks.ts#L33-L33
 	// https://github.com/1inch/cross-chain-sdk/blob/532f6ae6dc401ddaf8fe3ad040305f2500156710/src/cross-chain-order/time-locks/time-locks.ts#L188-L188
-	binary.BigEndian.PutUint32(data[0:4], uint32(0))
-	binary.BigEndian.PutUint32(data[4:8], uint32(tl.DstCancellation))
-	binary.BigEndian.PutUint32(data[8:12], uint32(tl.DstPublicWithdrawal))
-	binary.BigEndian.PutUint32(data[12:16], uint32(tl.DstWithdrawal))
-	binary.BigEndian.PutUint32(data[16:20], uint32(tl.SrcPublicCancellation))
-	binary.BigEndian.PutUint32(data[20:24], uint32(tl.SrcCancellation))
-	binary.BigEndian.PutUint32(data[24:28], uint32(tl.SrcPublicWithdrawal))
-	binary.BigEndian.PutUint32(data[28:32], uint32(tl.SrcWithdrawal))
-	timeLocksData := new(big.Int).SetBytes(data)
-	return timeLocksData, nil
-}
+	b.AddNativeUint32(0)
+	b.AddNativeUint32(uint32(tl.DstCancellation))
+	b.AddNativeUint32(uint32(tl.DstPublicWithdrawal))
+	b.AddNativeUint32(uint32(tl.DstWithdrawal))
+	b.AddNativeUint32(uint32(tl.SrcPublicCancellation))
+	b.AddNativeUint32(uint32(tl.SrcCancellation))
+	b.AddNativeUint32(uint32(tl.SrcPublicWithdrawal))
+	b.AddNativeUint32(uint32(tl.SrcWithdrawal))
 
-// writeBigIntAsUint256 writes a *big.Int as a 32-byte big-endian uint256 to a buffer.
-func writeBigIntAsUint256(buffer *bytes.Buffer, value *big.Int) error {
-	bytes := value.Bytes()
-	if len(bytes) > 32 {
-		return fmt.Errorf("value exceeds uint256 maximum")
-	}
-	// Pad with leading zeros to make it 32 bytes
-	padded := make([]byte, 32)
-	copy(padded[32-len(bytes):], bytes)
-	_, err := buffer.Write(padded)
-	return err
+	return new(big.Int).SetBytes(b.AsBytes())
 }

@@ -296,6 +296,194 @@ func TestBytesBuilder_AddBytes(t *testing.T) {
 	}
 }
 
+func TestBytesBuilder_AddNativeUint16(t *testing.T) {
+	tests := []struct {
+		name     string
+		value    uint16
+		expected string
+	}{
+		{
+			name:     "Zero value",
+			value:    0,
+			expected: "0000",
+		},
+		{
+			name:     "Small value - 1",
+			value:    1,
+			expected: "0001",
+		},
+		{
+			name:     "Max uint16 - 65535",
+			value:    65535,
+			expected: "ffff",
+		},
+		{
+			name:     "Middle value - 256",
+			value:    256,
+			expected: "0100",
+		},
+	}
+
+	for _, tc := range tests {
+		t.Run(tc.name, func(t *testing.T) {
+			bb := New()
+			bb.AddNativeUint16(tc.value)
+			assert.Equal(t, tc.expected, bb.AsHex())
+		})
+	}
+}
+
+func TestBytesBuilder_AddNativeUint24(t *testing.T) {
+	tests := []struct {
+		name     string
+		value    uint32
+		expected string
+	}{
+		{
+			name:     "Zero value",
+			value:    0,
+			expected: "000000",
+		},
+		{
+			name:     "Small value - 1",
+			value:    1,
+			expected: "000001",
+		},
+		{
+			name:     "Max uint24 - 16777215",
+			value:    16777215,
+			expected: "ffffff",
+		},
+		{
+			name:     "Middle value - 256",
+			value:    256,
+			expected: "000100",
+		},
+		{
+			name:     "Value 10000",
+			value:    10000,
+			expected: "002710",
+		},
+	}
+
+	for _, tc := range tests {
+		t.Run(tc.name, func(t *testing.T) {
+			bb := New()
+			bb.AddNativeUint24(tc.value)
+			assert.Equal(t, tc.expected, bb.AsHex())
+		})
+	}
+}
+
+func TestBytesBuilder_AddNativeUint32(t *testing.T) {
+	tests := []struct {
+		name     string
+		value    uint32
+		expected string
+	}{
+		{
+			name:     "Zero value",
+			value:    0,
+			expected: "00000000",
+		},
+		{
+			name:     "Small value - 1",
+			value:    1,
+			expected: "00000001",
+		},
+		{
+			name:     "Max uint32 - 4294967295",
+			value:    4294967295,
+			expected: "ffffffff",
+		},
+		{
+			name:     "Middle value - 65536",
+			value:    65536,
+			expected: "00010000",
+		},
+		{
+			name:     "Timestamp - 1673548149",
+			value:    1673548149,
+			expected: "63c05175",
+		},
+	}
+
+	for _, tc := range tests {
+		t.Run(tc.name, func(t *testing.T) {
+			bb := New()
+			bb.AddNativeUint32(tc.value)
+			assert.Equal(t, tc.expected, bb.AsHex())
+		})
+	}
+}
+
+func TestBytesBuilder_AsBytes(t *testing.T) {
+	bb := New()
+	bb.AddUint8(0x01)
+	bb.AddUint8(0x02)
+	bb.AddUint8(0x03)
+
+	result := bb.AsBytes()
+	assert.Equal(t, []byte{0x01, 0x02, 0x03}, result)
+}
+
+func TestBytesBuilder_AsBytesEmpty(t *testing.T) {
+	bb := New()
+	result := bb.AsBytes()
+	assert.Equal(t, []byte{}, result)
+}
+
+func TestBytesBuilder_NativeMatchesBigInt(t *testing.T) {
+	// Verify that native methods produce identical output to big.Int methods
+	tests := []struct {
+		name  string
+		value uint32
+	}{
+		{"Zero", 0},
+		{"One", 1},
+		{"Thousand", 1000},
+		{"Large", 1673548149},
+		{"Max24", 16777215},
+		{"Max32", 4294967295},
+	}
+
+	for _, tc := range tests {
+		t.Run(tc.name+"_uint32", func(t *testing.T) {
+			native := New()
+			native.AddNativeUint32(tc.value)
+
+			bigint := New()
+			bigint.AddUint32(big.NewInt(int64(tc.value)))
+
+			assert.Equal(t, bigint.AsHex(), native.AsHex())
+		})
+
+		if tc.value <= 16777215 {
+			t.Run(tc.name+"_uint24", func(t *testing.T) {
+				native := New()
+				native.AddNativeUint24(tc.value)
+
+				bigint := New()
+				bigint.AddUint24(big.NewInt(int64(tc.value)))
+
+				assert.Equal(t, bigint.AsHex(), native.AsHex())
+			})
+		}
+
+		if tc.value <= 65535 {
+			t.Run(tc.name+"_uint16", func(t *testing.T) {
+				native := New()
+				native.AddNativeUint16(uint16(tc.value))
+
+				bigint := New()
+				bigint.AddUint16(big.NewInt(int64(tc.value)))
+
+				assert.Equal(t, bigint.AsHex(), native.AsHex())
+			})
+		}
+	}
+}
+
 func TestBytesBuilder_ChainedOperations(t *testing.T) {
 	bb := New()
 
