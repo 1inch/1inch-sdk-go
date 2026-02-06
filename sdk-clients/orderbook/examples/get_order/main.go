@@ -39,7 +39,7 @@ func main() {
 
 	orderIndented, err := json.MarshalIndent(order, "", "  ")
 	if err != nil {
-		log.Fatal(fmt.Errorf("Failed to marshal response: %v\n", err))
+		log.Fatalf("Failed to marshal response: %v", err)
 	}
 
 	fmt.Printf("Order: %s\n", orderIndented)

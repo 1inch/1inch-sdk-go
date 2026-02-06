@@ -12,7 +12,7 @@ import (
 )
 
 /*
-This example demonstrates how to swap tokens on the PolygonChainId network using the 1inch SDK.
+This example demonstrates how to swap tokens on the Base network using the 1inch SDK.
 The only thing you need to provide is your wallet address, wallet key, and dev portal token.
 This can be done through your environment, or you can directly set them in the variables below
 */
@@ -72,8 +72,8 @@ func main() {
 		log.Fatalf("Failed to broadcast transaction: %v\n", err)
 	}
 
-	// Waiting for transaction, just an examples of it
-	fmt.Printf("Transaction has been broadcast. View it on Polygonscan here: %v\n", fmt.Sprintf("https://polygonscan.com/tx/%v", signedTx.Hash().Hex()))
+	// Waiting for transaction, just an example of it
+	fmt.Printf("Transaction has been broadcast. View it on Basescan here: https://basescan.org/tx/%s\n", signedTx.Hash().Hex())
 	for {
 		receipt, err := client.Wallet.TransactionReceipt(ctx, signedTx.Hash())
 		if receipt != nil {

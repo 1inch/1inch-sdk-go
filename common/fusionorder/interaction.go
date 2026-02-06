@@ -32,17 +32,17 @@ func (i *Interaction) Encode() string {
 }
 
 // DecodeInteraction decodes a hex string into an Interaction
-func DecodeInteraction(bytes string) (*Interaction, error) {
-	if !hexadecimal.IsHexBytes(bytes) {
-		return nil, fmt.Errorf("invalid interaction hex: %s", bytes)
+func DecodeInteraction(hexData string) (*Interaction, error) {
+	if !hexadecimal.IsHexBytes(hexData) {
+		return nil, fmt.Errorf("invalid interaction hex: %s", hexData)
 	}
 
-	if len(bytes) < 42 {
+	if len(hexData) < 42 {
 		return nil, fmt.Errorf("interaction data too short: requires at least 20 bytes")
 	}
 
 	return &Interaction{
-		Target: common.HexToAddress(bytes[:42]),
-		Data:   fmt.Sprintf("0x%s", bytes[42:]),
+		Target: common.HexToAddress(hexData[:42]),
+		Data:   fmt.Sprintf("0x%s", hexData[42:]),
 	}, nil
 }

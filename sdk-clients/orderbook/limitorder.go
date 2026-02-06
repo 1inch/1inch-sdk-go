@@ -123,8 +123,10 @@ func CreateLimitOrderMessage(orderRequest CreateOrderParams, chainId int) (*Orde
 		OrderHash: challengeHashHex,
 		Signature: signatureHex,
 		Data:      orderData,
-	}, err
+	}, nil
 }
+
+var uint160Max = new(big.Int).Sub(new(big.Int).Lsh(big.NewInt(1), 160), big.NewInt(1))
 
 var timeNow = func() int64 {
 	return time.Now().UnixNano()
@@ -143,7 +145,6 @@ func GenerateSalt(extension string, customBaseSalt *big.Int) (string, error) {
 	keccakHash := crypto.Keccak256Hash(byteConverted)
 	salt := new(big.Int).SetBytes(keccakHash.Bytes())
 	// We need to keccak256 the extension and then bitwise & it with uint_160_max
-	var uint160Max = new(big.Int).Sub(new(big.Int).Lsh(big.NewInt(1), 160), big.NewInt(1))
 	salt.And(salt, uint160Max)
 
 	// Convert salt (20 bytes) to byte slice

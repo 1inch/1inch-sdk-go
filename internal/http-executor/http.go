@@ -17,6 +17,8 @@ import (
 	"github.com/1inch/1inch-sdk-go/common"
 )
 
+var scientificNotationRegex = regexp.MustCompile(`^[+-]?\d+(\.\d+)?[eE][+-]?\d+$`)
+
 func DefaultHttpClient(apiUrl string, apiKey string) (*Client, error) {
 	baseURL, err := url.Parse(apiUrl)
 	if err != nil {
@@ -72,7 +74,7 @@ func (c *Client) prepareRequest(ctx context.Context, method string, fullURL *url
 		return nil, err
 	}
 
-	req.Header.Set("User-Agent", "1inch-dev-portal-client-go:v1.0.0-beta.2")
+	req.Header.Set("User-Agent", "1inch-dev-portal-client-go:v2.0.0")
 	req.Header.Set("Authorization", fmt.Sprintf("Bearer %s", c.apiKey))
 	if len(body) > 0 {
 		req.Header.Set("Content-Type", "application/json")
@@ -159,9 +161,7 @@ func addQueryParameters(s string, params interface{}) (string, error) {
 
 // isScientificNotation checks if the string is in scientific notation (like 1e+18).
 func isScientificNotation(s string) bool {
-	// This regular expression matches strings in the format of "1e+18", "2.3e-4", etc.
-	re := regexp.MustCompile(`^[+-]?\d+(\.\d+)?[eE][+-]?\d+$`)
-	return re.MatchString(s)
+	return scientificNotationRegex.MatchString(s)
 }
 
 func expandScientificNotation(s string) (string, error) {

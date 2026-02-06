@@ -48,6 +48,9 @@ func main() {
 		TokenAddress:  PolygonWeth,
 		WalletAddress: client.Wallet.Address().Hex(),
 	})
+	if err != nil {
+		log.Fatalf("Failed to get allowance: %v", err)
+	}
 
 	allowance := new(big.Int)
 	allowance.SetString(allowanceData.Allowance, 10)
@@ -84,7 +87,7 @@ func main() {
 			log.Fatalf("Failed to broadcast approve transaction: %v\n", err)
 		}
 
-		fmt.Printf("Transaction has been broadcast. View it on Polygonscan here: %v\n", fmt.Sprintf("https://polygonscan.com/tx/%v", signedTx.Hash().Hex()))
+		fmt.Printf("Transaction has been broadcast. View it on Polygonscan here: https://polygonscan.com/tx/%s\n", signedTx.Hash().Hex())
 		for {
 			receipt, err := client.Wallet.TransactionReceipt(ctx, signedTx.Hash())
 			if receipt != nil {

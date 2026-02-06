@@ -11,6 +11,15 @@ import (
 	"github.com/1inch/1inch-sdk-go/internal/slice_utils"
 )
 
+// Pre-compiled regexes to avoid recompilation on every validation call
+var (
+	ethAddressRegex      = regexp.MustCompile(`^0x[a-fA-F0-9]{40}$`)
+	privateKeyRegex      = regexp.MustCompile(`^[a-fA-F0-9]{64}$`)
+	protocolsRegex       = regexp.MustCompile(`^[a-zA-Z0-9_]+(,[a-zA-Z0-9_]+)*$`)
+	connectorTokensRegex = regexp.MustCompile(`^0x[a-fA-F0-9]{40}(,0x[a-fA-F0-9]{40})*$`)
+	permitHashRegex      = regexp.MustCompile(`^0x[a-fA-F0-9]*$`)
+)
+
 func CheckEthereumAddressRequired(parameter interface{}, variableName string) error {
 	value, ok := parameter.(string)
 	if !ok {
@@ -33,8 +42,7 @@ func CheckEthereumAddress(parameter interface{}, variableName string) error {
 		return nil
 	}
 
-	re := regexp.MustCompile(`^0x[a-fA-F0-9]{40}$`)
-	if !re.MatchString(value) {
+	if !ethAddressRegex.MatchString(value) {
 		return NewParameterValidationError(variableName, "not a valid Ethereum address")
 	}
 	return nil
@@ -53,8 +61,7 @@ func CheckEthereumAddressListRequired(parameter interface{}, variableName string
 		if address == "" {
 			return NewParameterMissingError(variableName)
 		}
-		re := regexp.MustCompile(`^0x[a-fA-F0-9]{40}$`)
-		if !re.MatchString(address) {
+		if !ethAddressRegex.MatchString(address) {
 			return NewParameterValidationError(variableName, "not a valid Ethereum address")
 		}
 	}
@@ -179,8 +186,7 @@ func CheckPrivateKey(parameter interface{}, variableName string) error {
 		return nil
 	}
 
-	re := regexp.MustCompile(`^[a-fA-F0-9]{64}$`)
-	if !re.MatchString(address) {
+	if !privateKeyRegex.MatchString(address) {
 		return NewParameterValidationError(variableName, "not a valid private key")
 	}
 	return nil
@@ -365,10 +371,7 @@ func CheckProtocols(parameter interface{}, variableName string) error {
 		return nil
 	}
 
-	pattern := `^[a-zA-Z0-9_]+(,[a-zA-Z0-9_]+)*$`
-	re := regexp.MustCompile(pattern)
-
-	ok = re.MatchString(value)
+	ok = protocolsRegex.MatchString(value)
 	if !ok {
 		return NewParameterValidationError(variableName, "must be formatted as a single-string list exactly in the format 'Protocol1,Protocol2,Protocol3' without any "+
 			"spaces between each protocol name. These names must match the exact protocol id used by the 1inch APIs "+
@@ -392,7 +395,7 @@ func CheckProtocols(parameter interface{}, variableName string) error {
 func CheckFee(parameter interface{}, variableName string) error {
 	value, ok := parameter.(float32)
 	if !ok {
-		return fmt.Errorf("'%s' must be a string", variableName)
+		return fmt.Errorf("'%s' must be a float32", variableName)
 	}
 
 	if value < 0 {
@@ -411,7 +414,7 @@ func CheckFee(parameter interface{}, variableName string) error {
 func CheckFloat32NonNegativeWhole(parameter interface{}, variableName string) error {
 	value, ok := parameter.(float32)
 	if !ok {
-		return fmt.Errorf("'%s' must be a string", variableName)
+		return fmt.Errorf("'%s' must be a float32", variableName)
 	}
 
 	if value < 0 {
@@ -436,10 +439,7 @@ func CheckConnectorTokens(parameter interface{}, variableName string) error {
 		return nil
 	}
 
-	pattern := `^0x[a-fA-F0-9]{40}(,0x[a-fA-F0-9]{40})*$`
-	re := regexp.MustCompile(pattern)
-
-	ok = re.MatchString(value)
+	ok = connectorTokensRegex.MatchString(value)
 	if !ok {
 		return NewParameterValidationError(variableName, "must be formatted as a single-string list exactly in the format '0x123,0x456,0x789' "+
 			"without any spaces between each protocol name. Additionally, there cannot be a trailing comma at the end of the list.")
@@ -472,8 +472,7 @@ func CheckPermitHash(parameter interface{}, variableName string) error {
 		return nil
 	}
 
-	re := regexp.MustCompile(`^0x[a-fA-F0-9]*$`)
-	if !re.MatchString(value) {
+	if !permitHashRegex.MatchString(value) {
 		return NewParameterValidationError(variableName, "not a valid permit hash")
 	}
 	return nil
@@ -500,7 +499,7 @@ func CheckTimerange(parameter interface{}, variableName string) error {
 
 	validTimerangeValues := []string{"1day", "1week", "1month", "1year", "3years"}
 	if !slice_utils.Contains(value, validTimerangeValues) {
-		return NewParameterValidationError(variableName, fmt.Sprintf("is invalid, valid chain ids are: %v", validTimerangeValues))
+		return NewParameterValidationError(variableName, fmt.Sprintf("is invalid, valid timerange values are: %v", validTimerangeValues))
 	}
 	return nil
 }
@@ -537,9 +536,9 @@ func CheckNodeType(parameter interface{}, variableName string) error {
 		return fmt.Errorf("'%s' must be a string", variableName)
 	}
 
-	validJsonRpcValues := []string{"1.0", "2.0"}
-	if !slice_utils.Contains(value, validJsonRpcValues) {
-		return NewParameterValidationError(variableName, fmt.Sprintf("is invalid, valid rpc version are: %v", validJsonRpcValues))
+	validNodeTypes := []string{"archive", "full"}
+	if !slice_utils.Contains(value, validNodeTypes) {
+		return NewParameterValidationError(variableName, fmt.Sprintf("is invalid, valid node types are: %v", validNodeTypes))
 	}
 	return nil
 }
