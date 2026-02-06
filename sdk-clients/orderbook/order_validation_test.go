@@ -287,7 +287,7 @@ func TestBitmaskOperations_KnownValues(t *testing.T) {
 		t.Run(tc.name, func(t *testing.T) {
 			bitmask, err := NewBitMask(big.NewInt(tc.startBit), big.NewInt(tc.endBit))
 			require.NoError(t, err)
-			assert.Equal(t, tc.expectedString, bitmask.ToString(), "Bitmask string mismatch")
+			assert.Equal(t, tc.expectedString, bitmask.String(), "Bitmask string mismatch")
 		})
 	}
 }

@@ -47,8 +47,8 @@ func (b *BitMask) SetBits(value, bits *big.Int) *big.Int {
 	return value
 }
 
-// ToString returns the string representation of the mask shifted by the offset.
-func (b *BitMask) ToString() string {
+// String returns the string representation of the mask shifted by the offset.
+func (b *BitMask) String() string {
 	shiftedMask := new(big.Int).Lsh(b.Mask, uint(b.Offset.Uint64()))
 	return fmt.Sprintf("0x%x", shiftedMask)
 }

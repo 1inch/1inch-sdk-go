@@ -7,5 +7,5 @@ import (
 func (params *BroadcastRequest) Validate() error {
 	var validationErrors []error
 	validationErrors = validate.Parameter(params.RawTransaction, "RawTransaction", validate.CheckString, validationErrors)
-	return validate.ConsolidateValidationErorrs(validationErrors)
+	return validate.ConsolidateValidationErrors(validationErrors)
 }

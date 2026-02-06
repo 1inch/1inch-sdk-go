@@ -25,7 +25,7 @@ func (params *CreateOrderParams) Validate() error {
 
 	//TODO if an extension is present, then MakerTraits must also be marked for an extension in the order. Will be easy to do if Extension is changed to a pointer type
 
-	return validate.ConsolidateValidationErorrs(validationErrors)
+	return validate.ConsolidateValidationErrors(validationErrors)
 }
 
 func (params *GetOrdersByCreatorAddressParams) Validate() error {
@@ -37,13 +37,13 @@ func (params *GetOrdersByCreatorAddressParams) Validate() error {
 	validationErrors = validate.Parameter((string)(params.SortBy), "sortBy", validate.CheckSortBy, validationErrors)
 	validationErrors = validate.Parameter(params.TakerAsset, "takerAsset", validate.CheckEthereumAddress, validationErrors)
 	validationErrors = validate.Parameter(params.MakerAsset, "makerAsset", validate.CheckEthereumAddress, validationErrors)
-	return validate.ConsolidateValidationErorrs(validationErrors)
+	return validate.ConsolidateValidationErrors(validationErrors)
 }
 
 func (params *GetOrderParams) Validate() error {
 	var validationErrors []error
 	validationErrors = validate.Parameter(params.OrderHash, "orderHash", validate.CheckOrderHashRequired, validationErrors)
-	return validate.ConsolidateValidationErorrs(validationErrors)
+	return validate.ConsolidateValidationErrors(validationErrors)
 }
 
 func (params *GetAllOrdersParams) Validate() error {
@@ -54,32 +54,32 @@ func (params *GetAllOrdersParams) Validate() error {
 	validationErrors = validate.Parameter((string)(params.SortBy), "sortBy", validate.CheckSortBy, validationErrors)
 	validationErrors = validate.Parameter(params.TakerAsset, "takerAsset", validate.CheckEthereumAddress, validationErrors)
 	validationErrors = validate.Parameter(params.MakerAsset, "makerAsset", validate.CheckEthereumAddress, validationErrors)
-	return validate.ConsolidateValidationErorrs(validationErrors)
+	return validate.ConsolidateValidationErrors(validationErrors)
 }
 
 func (params *GetCountParams) Validate() error {
 	var validationErrors []error
 	validationErrors = validate.Parameter(params.Statuses, "statuses", validate.CheckStatusesStrings, validationErrors)
-	return validate.ConsolidateValidationErorrs(validationErrors)
+	return validate.ConsolidateValidationErrors(validationErrors)
 }
 
 func (params *GetEventParams) Validate() error {
 	var validationErrors []error
 	validationErrors = validate.Parameter(params.OrderHash, "orderHash", validate.CheckOrderHashRequired, validationErrors)
-	return validate.ConsolidateValidationErorrs(validationErrors)
+	return validate.ConsolidateValidationErrors(validationErrors)
 }
 
 func (params *GetEventsParams) Validate() error {
 	var validationErrors []error
 	validationErrors = validate.Parameter(params.Limit, "limit", validate.CheckLimit, validationErrors)
-	return validate.ConsolidateValidationErorrs(validationErrors)
+	return validate.ConsolidateValidationErrors(validationErrors)
 }
 
 func (params *GetActiveOrdersWithPermitParams) Validate() error {
 	var validationErrors []error
 	validationErrors = validate.Parameter(params.Wallet, "wallet", validate.CheckPrivateKeyRequired, validationErrors)
 	validationErrors = validate.Parameter(params.Token, "token", validate.CheckEthereumAddressRequired, validationErrors)
-	return validate.ConsolidateValidationErorrs(validationErrors)
+	return validate.ConsolidateValidationErrors(validationErrors)
 }
 
 func (params *GetFeeInfoParams) Validate() error {
@@ -88,7 +88,7 @@ func (params *GetFeeInfoParams) Validate() error {
 	validationErrors = validate.Parameter(params.MakerAsset, "makerAsset", validate.CheckEthereumAddressRequired, validationErrors)
 	validationErrors = validate.Parameter(params.TakerAmount, "takerAmount", validate.CheckBigIntRequired, validationErrors)
 	validationErrors = validate.Parameter(params.TakerAsset, "takerAsset", validate.CheckEthereumAddressRequired, validationErrors)
-	return validate.ConsolidateValidationErorrs(validationErrors)
+	return validate.ConsolidateValidationErrors(validationErrors)
 }
 
 func (params *GetOrderCountParams) Validate() error {
@@ -101,5 +101,5 @@ func (params *GetOrderCountParams) Validate() error {
 	validationErrors = validate.Parameter(statusesAsInts, "statuses", validate.CheckStatusesOrderStatus, validationErrors)
 	validationErrors = validate.Parameter(params.MakerAsset, "makerAsset", validate.CheckEthereumAddressRequired, validationErrors)
 	validationErrors = validate.Parameter(params.TakerAsset, "takerAsset", validate.CheckEthereumAddressRequired, validationErrors)
-	return validate.ConsolidateValidationErorrs(validationErrors)
+	return validate.ConsolidateValidationErrors(validationErrors)
 }

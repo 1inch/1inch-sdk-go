@@ -11,5 +11,5 @@ func (params *EventsByAddressParams) Validate() error {
 	validationErrors = validate.Parameter(params.ChainId, "ChainId", validate.CheckChainIdInt, validationErrors)
 	//validationErrors = validate.Parameter(params.FromTimestampMs, "FromTimestampMs", validate.CheckFloat32NonNegativeWhole, validationErrors)
 	//validationErrors = validate.Parameter(params.ToTimestampMs, "ToTimestampMs", validate.CheckFloat32NonNegativeWhole, validationErrors)
-	return validate.ConsolidateValidationErorrs(validationErrors)
+	return validate.ConsolidateValidationErrors(validationErrors)
 }

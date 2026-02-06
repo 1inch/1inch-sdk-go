@@ -67,7 +67,7 @@ func GetSeriesNonceManagerFromChainId(chainId int) (string, error) {
 	case PolygonChainId:
 		return SeriesNonceManagerPolygon, nil
 	case ZkSyncEraChainId:
-		return "", fmt.Errorf("unknown zkSync contract address") // TODO get this contract
+		return "", fmt.Errorf("zksync not currently supported")
 	default:
 		return "", fmt.Errorf("unsupported chain ID: %d", chainId)
 	}

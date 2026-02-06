@@ -18,7 +18,7 @@ func NewParameterCustomError(errorMessage string) error {
 	return fmt.Errorf("validation error: %s", errorMessage)
 }
 
-func ConsolidateValidationErorrs(validationErrors []error) error {
+func ConsolidateValidationErrors(validationErrors []error) error {
 	if len(validationErrors) == 0 {
 		return nil
 	}

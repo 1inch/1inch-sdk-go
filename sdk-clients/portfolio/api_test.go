@@ -4,7 +4,6 @@ import (
 	"context"
 	"encoding/json"
 	"fmt"
-	"log"
 	"reflect"
 	"testing"
 
@@ -62,7 +61,7 @@ func TestGetCurrentValue(t *testing.T) {
 	// Unmarshal the JSON data into the struct
 	err := json.Unmarshal([]byte(data), &mockedResp)
 	if err != nil {
-		log.Fatalf("Error unmarshaling JSON: %v", err)
+		t.Fatalf("Error unmarshaling JSON: %v", err)
 	}
 
 	mockExecutor := &MockHttpExecutor{

@@ -9,34 +9,34 @@ func (params *BalancesAndAllowancesParams) Validate() error {
 	validationErrors = validate.Parameter(params.FilterEmpty, "filterEmpty", validate.CheckBoolean, validationErrors)
 	validationErrors = validate.Parameter(params.Wallets, "wallets", validate.CheckEthereumAddressListRequired, validationErrors)
 	validationErrors = validate.Parameter(params.Spender, "spender", validate.CheckEthereumAddressRequired, validationErrors)
-	return validate.ConsolidateValidationErorrs(validationErrors)
+	return validate.ConsolidateValidationErrors(validationErrors)
 }
 
 func (params *BalancesByWalletAddressParams) Validate() error {
 	var validationErrors []error
 	validationErrors = validate.Parameter(params.Wallet, "wallet", validate.CheckEthereumAddressRequired, validationErrors)
-	return validate.ConsolidateValidationErorrs(validationErrors)
+	return validate.ConsolidateValidationErrors(validationErrors)
 }
 
 func (params *BalancesOfCustomTokensByWalletAddressParams) Validate() error {
 	var validationErrors []error
 	validationErrors = validate.Parameter(params.Wallet, "wallet", validate.CheckEthereumAddressRequired, validationErrors)
 	validationErrors = validate.Parameter(params.Tokens, "tokens", validate.CheckEthereumAddressListRequired, validationErrors)
-	return validate.ConsolidateValidationErorrs(validationErrors)
+	return validate.ConsolidateValidationErrors(validationErrors)
 }
 
 func (params *BalancesOfCustomTokensByWalletAddressesListParams) Validate() error {
 	var validationErrors []error
 	validationErrors = validate.Parameter(params.Wallets, "wallets", validate.CheckEthereumAddressListRequired, validationErrors)
 	validationErrors = validate.Parameter(params.Tokens, "tokens", validate.CheckEthereumAddressListRequired, validationErrors)
-	return validate.ConsolidateValidationErorrs(validationErrors)
+	return validate.ConsolidateValidationErrors(validationErrors)
 }
 
 func (params *BalancesAndAllowancesByWalletAddressListParams) Validate() error {
 	var validationErrors []error
 	validationErrors = validate.Parameter(params.Wallet, "wallet", validate.CheckEthereumAddressRequired, validationErrors)
 	validationErrors = validate.Parameter(params.Spender, "spender", validate.CheckEthereumAddressRequired, validationErrors)
-	return validate.ConsolidateValidationErorrs(validationErrors)
+	return validate.ConsolidateValidationErrors(validationErrors)
 }
 
 func (params *BalancesAndAllowancesOfCustomTokensByWalletAddressParams) Validate() error {
@@ -44,14 +44,14 @@ func (params *BalancesAndAllowancesOfCustomTokensByWalletAddressParams) Validate
 	validationErrors = validate.Parameter(params.Wallet, "wallet", validate.CheckEthereumAddressRequired, validationErrors)
 	validationErrors = validate.Parameter(params.Spender, "spender", validate.CheckEthereumAddressRequired, validationErrors)
 	validationErrors = validate.Parameter(params.Tokens, "tokens", validate.CheckEthereumAddressListRequired, validationErrors)
-	return validate.ConsolidateValidationErorrs(validationErrors)
+	return validate.ConsolidateValidationErrors(validationErrors)
 }
 
 func (params *AllowancesByWalletAddressParams) Validate() error {
 	var validationErrors []error
 	validationErrors = validate.Parameter(params.Wallet, "wallet", validate.CheckEthereumAddressRequired, validationErrors)
 	validationErrors = validate.Parameter(params.Spender, "spender", validate.CheckEthereumAddressRequired, validationErrors)
-	return validate.ConsolidateValidationErorrs(validationErrors)
+	return validate.ConsolidateValidationErrors(validationErrors)
 }
 
 func (params *AllowancesOfCustomTokensByWalletAddressParams) Validate() error {
@@ -59,5 +59,5 @@ func (params *AllowancesOfCustomTokensByWalletAddressParams) Validate() error {
 	validationErrors = validate.Parameter(params.Wallet, "wallet", validate.CheckEthereumAddressRequired, validationErrors)
 	validationErrors = validate.Parameter(params.Spender, "spender", validate.CheckEthereumAddressRequired, validationErrors)
 	validationErrors = validate.Parameter(params.Tokens, "tokens", validate.CheckEthereumAddressListRequired, validationErrors)
-	return validate.ConsolidateValidationErorrs(validationErrors)
+	return validate.ConsolidateValidationErrors(validationErrors)
 }

@@ -10,14 +10,14 @@ func (params *GetAllowanceParams) Validate() error {
 	var validationErrors []error
 	validationErrors = validate.Parameter(params.TokenAddress, "tokenAddress", validate.CheckEthereumAddressRequired, validationErrors)
 	validationErrors = validate.Parameter(params.WalletAddress, "walletAddress", validate.CheckEthereumAddressRequired, validationErrors)
-	return validate.ConsolidateValidationErorrs(validationErrors)
+	return validate.ConsolidateValidationErrors(validationErrors)
 }
 
 func (params *GetApproveParams) Validate() error {
 	var validationErrors []error
 	validationErrors = validate.Parameter(params.TokenAddress, "tokenAddress", validate.CheckEthereumAddressRequired, validationErrors)
 	validationErrors = validate.Parameter(params.Amount, "amount", validate.CheckBigInt, validationErrors)
-	return validate.ConsolidateValidationErorrs(validationErrors)
+	return validate.ConsolidateValidationErrors(validationErrors)
 }
 
 func (params *GetQuoteParams) Validate() error {
@@ -36,7 +36,7 @@ func (params *GetQuoteParams) Validate() error {
 	if len(params.Src) > 0 && len(params.Dst) > 0 && params.Src == params.Dst {
 		validationErrors = append(validationErrors, errors.New("src and dst tokens must be different"))
 	}
-	return validate.ConsolidateValidationErorrs(validationErrors)
+	return validate.ConsolidateValidationErrors(validationErrors)
 }
 
 func (params *GetSwapParams) Validate() error {
@@ -60,5 +60,5 @@ func (params *GetSwapParams) Validate() error {
 	if params.Src == params.Dst && len(params.Src) > 0 && len(params.Dst) > 0 {
 		validationErrors = append(validationErrors, errors.New("src and dst tokens must be different"))
 	}
-	return validate.ConsolidateValidationErorrs(validationErrors)
+	return validate.ConsolidateValidationErrors(validationErrors)
 }

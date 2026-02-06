@@ -11,7 +11,7 @@ func (params *OrderApiControllerGetActiveOrdersParams) Validate() error {
 	var validationErrors []error
 	validationErrors = validate.Parameter(params.Page, "Page", validate.CheckPage, validationErrors)
 	validationErrors = validate.Parameter(params.Limit, "Limit", validate.CheckLimit, validationErrors)
-	return validate.ConsolidateValidationErorrs(validationErrors)
+	return validate.ConsolidateValidationErrors(validationErrors)
 }
 
 func (params *QuoterControllerGetQuoteParamsFixed) Validate() error {
@@ -20,7 +20,7 @@ func (params *QuoterControllerGetQuoteParamsFixed) Validate() error {
 	validationErrors = validate.Parameter(params.ToTokenAddress, "ToTokenAddress", validate.CheckEthereumAddressRequired, validationErrors)
 	validationErrors = validate.Parameter(params.Amount, "Amount", validate.CheckBigIntRequired, validationErrors)
 	validationErrors = validate.Parameter(params.Permit, "Permit", validate.CheckPermitHash, validationErrors)
-	return validate.ConsolidateValidationErorrs(validationErrors)
+	return validate.ConsolidateValidationErrors(validationErrors)
 }
 
 // Note: QuoterControllerGetQuoteWithCustomPresetsParams (non-Fixed) intentionally has no Validate() method.
@@ -34,7 +34,7 @@ func (params *QuoterControllerGetQuoteWithCustomPresetsParamsFixed) Validate() e
 	validationErrors = validate.Parameter(params.Amount, "Amount", validate.CheckBigIntRequired, validationErrors)
 	validationErrors = validate.Parameter(params.WalletAddress, "WalletAddress", validate.CheckEthereumAddressRequired, validationErrors)
 	validationErrors = validate.Parameter(params.WalletAddress, "WalletAddress", validate.CheckEthereumAddressRequired, validationErrors)
-	return validate.ConsolidateValidationErorrs(validationErrors)
+	return validate.ConsolidateValidationErrors(validationErrors)
 }
 
 func (body *PlaceOrderBody) Validate() error {
@@ -43,7 +43,7 @@ func (body *PlaceOrderBody) Validate() error {
 	validationErrors = validate.Parameter(body.MakerAsset, "MakerAsset", validate.CheckEthereumAddressRequired, validationErrors)
 	validationErrors = validate.Parameter(body.MakingAmount, "MakingAmount", validate.CheckBigIntRequired, validationErrors)
 	validationErrors = validate.Parameter(body.Receiver, "Receiver", validate.CheckEthereumAddressRequired, validationErrors)
-	return validate.ConsolidateValidationErorrs(validationErrors)
+	return validate.ConsolidateValidationErrors(validationErrors)
 }
 
 func (body *OrderParams) Validate() error {
@@ -57,5 +57,5 @@ func (body *OrderParams) Validate() error {
 	if body.Preset == "" {
 		validationErrors = append(validationErrors, validate.NewParameterCustomError(fmt.Sprintf("Preset is required. Pass in one of the Fusion library constants: %v", constants.ValidFusionPresets)))
 	}
-	return validate.ConsolidateValidationErorrs(validationErrors)
+	return validate.ConsolidateValidationErrors(validationErrors)
 }

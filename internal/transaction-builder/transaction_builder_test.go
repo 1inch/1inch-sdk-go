@@ -2,6 +2,7 @@ package transaction_builder
 
 import (
 	"context"
+	"fmt"
 	"math/big"
 	"testing"
 
@@ -159,8 +160,7 @@ type MyWallet struct {
 }
 
 func (w *MyWallet) GetContractDetailsForPermit(ctx context.Context, token gethCommon.Address, spender gethCommon.Address, amount *big.Int, deadline int64) (*common.ContractPermitData, error) {
-	//TODO implement me
-	panic("implement me")
+	return nil, fmt.Errorf("GetContractDetailsForPermit not implemented in test mock")
 }
 
 func NewMyWallet(address gethCommon.Address, chainID *big.Int) *MyWallet {
