@@ -2,7 +2,7 @@
 
 This document tracks breaking changes between major versions of the SDK that affect users importing and integrating the library.
 
-## Version 3.0.0 (Upcoming)
+## Version 3.0.0
 
 ### New Shared `fusionorder` Package
 
@@ -14,8 +14,8 @@ Common types and functions previously in `fusion` and `fusionplus` have been con
 |------------|------------|
 | `fusion.BpsZero` | `fusionorder.BpsZero` |
 | `fusion.NewBps()` | `fusionorder.NewBps()` (signature changed: now returns `(*Bps, error)`) |
-| `fusion.FromPercent()` | `fusionorder.FromPercent()` |
-| `fusion.FromFraction()` | `fusionorder.FromFraction()` |
+| `fusion.FromPercent()` | `fusionorder.FromPercent()` (now returns `(*Bps, error)`) |
+| `fusion.FromFraction()` | `fusionorder.FromFraction()` (now returns `(*Bps, error)`) |
 | `fusion.GetDefaultBase()` | `fusionorder.GetDefaultBase()` |
 | `fusion.NewInteraction()` | `fusionorder.NewInteraction()` |
 | `fusion.DecodeInteraction()` | `fusionorder.DecodeInteraction()` |
@@ -45,6 +45,7 @@ Common types and functions previously in `fusion` and `fusionplus` have been con
 | `fusionplus.DecodeAuctionDetails()` | `fusionorder.DecodeAuctionDetails()` |
 | `fusionplus.CalcAuctionStartTime()` | `fusionorder.CalcAuctionStartTime()` |
 | `fusionplus.CalcAuctionStartTimeFunc` | `fusionorder.CalcAuctionStartTimeFunc` |
+| `fusionplus.CreateMakerTraitsFusion()` | `fusionplus.CreateMakerTraits()` (param types changed: `Details` replaces `DetailsFusion`) |
 | `fusionplus.NativeToken` | `constants.NativeToken` |
 | `fusionplus.NetworkEnum` | `constants.NetworkEnum` |
 | `fusionplus.ETHEREUM`, `fusionplus.POLYGON`, etc. | `constants.NetworkEthereum`, `constants.NetworkPolygon`, etc. |
@@ -111,6 +112,22 @@ Types with the `Fusion` suffix have been renamed. Types that need to be distingu
 | `NewSettlementPostInteractionDataFusion()` | `NewSettlementPostInteractionDataWithFees()` |
 | `CreateSettlementPostInteractionDataFusion()` | `CreateSettlementPostInteractionDataWithFees()` |
 | `DecodeFusion()` | `DecodeSettlementPostInteractionData()` |
+
+### Signature Changes (Now Return Errors)
+
+Several functions that previously could not fail now return errors for proper validation:
+
+| Function | Old Return | New Return |
+|----------|-----------|------------|
+| `fusion.Extension.Keccak256()` | `*big.Int` | `(*big.Int, error)` |
+| `fusionorder.FromPercent()` | `*Bps` | `(*Bps, error)` |
+| `fusionorder.FromFraction()` | `*Bps` | `(*Bps, error)` |
+| `orderbook.NewBitMask()` | `*BitMask` | `(*BitMask, error)` |
+| `orderbook.TakerTraits.Encode()` | `*TakerTraitsEncoded` | `(*TakerTraitsEncoded, error)` |
+
+`Must*` panic variants are provided for cases where failure is not expected:
+- `fusionorder.MustNewBps()`, `fusionorder.MustFromPercent()`, `fusionorder.MustFromFraction()`
+- `orderbook.MustNewBitMask()`
 
 ### Constants Changes
 

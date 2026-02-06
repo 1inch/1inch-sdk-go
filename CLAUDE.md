@@ -433,6 +433,26 @@ When making breaking changes, update both files:
 - `BREAKING_CHANGES.md` - Detailed migration guide with tables
 - `CHANGELOG.md` - Summary for release notes
 
+### Audience: External Library Consumers
+
+Both files are written for users who import this library via `go get`. Content should be limited to changes that affect the **public API surface** — things that would cause a compile error, behavior change, or require a code update in a downstream project.
+
+**Include:**
+- Moved/renamed/removed exported types, functions, and constants
+- Signature changes to public functions
+- New public APIs (packages, functions, constants)
+- Bug fixes that change observable behavior (e.g., HTTP method fix, `log.Fatalf` replaced with error returns)
+- Error wrapping changes that affect `errors.Is`/`errors.As` behavior
+- Deprecated symbols
+
+**Exclude:**
+- Internal file renames, deletions, or reorganization
+- Changes to `internal/` packages (users cannot import these)
+- Internal variable renames
+- Internal implementation details (e.g., switching from manual bit shifting to a helper library)
+- Removed non-Go files (markdown docs, audit reports) unless they are referenced by importers
+- Internal performance optimizations (e.g., regex precompilation in internal packages)
+
 ## Notes for Development
 
 1. **ABIs are embedded** via `//go:embed` in `constants/abis.go`
