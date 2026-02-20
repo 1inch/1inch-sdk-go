@@ -1,45 +1,91 @@
-This SDK will be open for contributions from the community. Contribution guidelines will be added soon!
+# Development Guide
 
-### Versioning
+This SDK is open for contributions from the community.
 
-This library is currently in the developer preview phase (versions 0.x.x). There will be significant changes to the
-design of this library leading up to a 1.0.0 release. You can expect the API calls, library structure, etc. to break
-between each release. Once the library version reaches 1.0.0 and beyond, it will follow traditional semver conventions.
+## Versioning
 
-### Project structure
+This library follows [semantic versioning](https://semver.org/). The current major version is **v3**. Breaking changes are documented in `BREAKING_CHANGES.md` and `CHANGELOG.md`.
 
-This SDK is powered by a [client struct](https://github.com/1inch/1inch-sdk/blob/main/golang/client/client.go) that
-contains instances of all Services used to talk to the 1inch APIs
+## Project Structure
 
-Each Service maps 1-to-1 with the underlying Dev Portal REST API.
-See [SwapService](https://github.com/1inch/1inch-sdk/blob/main/golang/client/swap.go) as an example. Under each
-function, you will find the matching REST API path)
+The SDK is organized into per-API client packages under `sdk-clients/`, each following a consistent pattern:
 
-Each Service uses various types and functions to do its job that are kept separate from the main service file. These can
-be found in the accompanying folder within the client directory (see
-the [swap](https://github.com/1inch/1inch-sdk/tree/main/golang/client/swap) package)
+```
+sdk-clients/{package}/
+├── client.go                    # Client struct and constructors (NewClient, NewClientOnlyAPI)
+├── api.go                       # API method implementations
+├── configuration.go             # Configuration structs and constructors
+├── validation.go                # Parameter validation (Validate() methods)
+├── *_types.gen.go               # Auto-generated types from OpenAPI specs (DO NOT EDIT)
+├── *_types_extended.go          # Manual type extensions and *Fixed workarounds
+└── examples/                    # Usage examples per operation
+```
 
-### Type generation
+Shared types and utilities live in:
+- `common/fusionorder/` — Shared types for fusion and fusionplus packages
+- `constants/` — Chain IDs, contract addresses, ABIs
+- `internal/` — Internal utilities (not exported)
 
-Type generation is done using the `generate_types.sh` script. To add a new openapi file or update an existing one, place
-the openapi file in `openapi` and run the script from the root of the project. It will generate the types files for all openapi specs and place them in the
-appropriately-named sub-folder inside the `generatedtypes` directory.
+See `CLAUDE.md` for detailed architecture documentation.
 
-### OpenAPI file formatting
+## Key Commands
 
-For consistency, openapi files should be formatted with `prettier`
+```bash
+# Run all unit tests
+make test
 
-This can be installed globally using npm:
+# Run linter (golangci-lint)
+make lint
 
-`npm install -g prettier`
+# Format code
+make fmt
 
-If using GoLand, you can set up this action to run automatically using File Watchers:
+# Generate types from OpenAPI specs
+make codegen-types
 
-1. Go to Settings or Preferences > Tools > File Watchers.
-2. Click the + button to add a new watcher.
-3. For `File type`, choose JSON.
-4. For `Scope`, choose Project Files.
-5. For `Program`, provide the path to the `prettier`. This can be gotten by running `which prettier`.
-6. For `Arguments`, use `--write $FilePath$`.
-7. For `Output paths to refresh`, use `$FilePath$`.
-8. Ensure the Auto-save edited files to trigger the watcher option is checked
+# Get dependencies
+make get
+```
+
+## Type Generation
+
+Types are auto-generated from OpenAPI specs using `oapi-codegen`:
+
+1. OpenAPI specs live in `codegen/openapi/*-openapi.json`
+2. Run `make codegen-types` from the repo root
+3. Generated files: `sdk-clients/{package}/*_types.gen.go`
+
+**Do not manually edit `*_types.gen.go` files** — they are overwritten by codegen.
+
+The codegen script applies several pre-processing transforms to specs (see `codegen/generate_types.sh`). Post-processing replaces `form:` struct tags with `url:` tags for `go-querystring` compatibility.
+
+### OpenAPI File Formatting
+
+For consistency, OpenAPI spec files should be formatted with `prettier`:
+
+```bash
+npm install -g prettier
+prettier --write codegen/openapi/*.json
+```
+
+## Testing
+
+- All tests use the **table-driven test pattern** (see `CLAUDE.md` for template)
+- Use `github.com/stretchr/testify` for assertions (`require` for fatal, `assert` for non-fatal)
+- Run with `make test` or `go test -race ./...`
+
+## Post-Change Verification
+
+After making changes, run these checks:
+
+```bash
+go build ./...           # Catch compile errors
+go vet ./...             # Static analysis
+golangci-lint run        # Linter
+go test ./...            # All tests
+```
+
+## CI/CD
+
+- **PR Validation** (`.github/workflows/pr.yml`): Runs tests + golangci-lint on PRs
+- **Release** (`.github/workflows/release.yml`): Manual dispatch for versioned releases

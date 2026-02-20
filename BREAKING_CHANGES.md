@@ -2,6 +2,10 @@
 
 This document tracks breaking changes between major versions of the SDK that affect users importing and integrating the library.
 
+## Unreleased
+
+*(No breaking changes yet)*
+
 ## Version 3.0.0
 
 ### New Shared `fusionorder` Package
