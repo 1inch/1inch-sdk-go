@@ -8,7 +8,7 @@ import (
 	"github.com/1inch/1inch-sdk-go/common"
 )
 
-func (api *api) GetOrderByOrderHash(ctx context.Context, params GetOrderByOrderHashParams) (*GetOrderFillsByHashOutputFixed, error) {
+func (api *api) GetOrderByOrderHash(ctx context.Context, params GetOrderByOrderHashParams) (*GetOrderFillsByHashOutput, error) {
 	u := fmt.Sprintf("/fusion-plus/orders/v1.1/order/status/%s", params.Hash)
 
 	payload := common.RequestPayload{
@@ -18,7 +18,7 @@ func (api *api) GetOrderByOrderHash(ctx context.Context, params GetOrderByOrderH
 		Body:   nil,
 	}
 
-	var response GetOrderFillsByHashOutputFixed
+	var response GetOrderFillsByHashOutput
 	err := api.httpExecutor.ExecuteRequest(ctx, payload, &response)
 	if err != nil {
 		return nil, err
@@ -69,7 +69,7 @@ func (api *api) SubmitSecret(ctx context.Context, params SecretInput) error {
 	return nil
 }
 
-func (api *api) GetQuote(ctx context.Context, params QuoterControllerGetQuoteParamsFixed) (*GetQuoteOutputFixed, error) {
+func (api *api) GetQuote(ctx context.Context, params QuoterControllerGetQuoteParamsFixed) (*GetQuoteOutput, error) {
 	u := "/fusion-plus/quoter/v1.1/quote/receive"
 
 	err := params.Validate()
@@ -84,7 +84,7 @@ func (api *api) GetQuote(ctx context.Context, params QuoterControllerGetQuotePar
 		Body:   nil,
 	}
 
-	var response GetQuoteOutputFixed
+	var response GetQuoteOutput
 	err = api.httpExecutor.ExecuteRequest(ctx, payload, &response)
 	if err != nil {
 		return nil, err
@@ -96,7 +96,7 @@ func (api *api) GetQuote(ctx context.Context, params QuoterControllerGetQuotePar
 }
 
 // PlaceOrder accepts a quote and submits it as a fusion plus order
-func (api *api) PlaceOrder(ctx context.Context, quoteParams QuoterControllerGetQuoteParamsFixed, quote *GetQuoteOutputFixed, orderParams OrderParams, wallet common.Wallet) (string, error) {
+func (api *api) PlaceOrder(ctx context.Context, quoteParams QuoterControllerGetQuoteParamsFixed, quote *GetQuoteOutput, orderParams OrderParams, wallet common.Wallet) (string, error) {
 	u := "/fusion-plus/relayer/v1.1/submit"
 
 	err := orderParams.Validate()

@@ -19,7 +19,7 @@ type GetQuoteOutputFixed struct {
 	// FeeToken Destination token address
 	FeeToken        string                 `json:"feeToken"`
 	FromTokenAmount string                 `json:"fromTokenAmount"`
-	Presets         QuotePresetsClassFixed `json:"presets"`
+	Presets         QuotePresetsClass `json:"presets"`
 	Prices          TokenPairValue         `json:"prices"`
 
 	// QuoteId Current generated quote id, should be passed with order
@@ -234,27 +234,3 @@ type OrderResponse struct {
 	ToTokenToUsdPrice string                   `json:"toTokenToUsdPrice"`
 }
 
-// PresetClassFixed defines model for PresetClass.
-type PresetClassFixed struct {
-	AllowMultipleFills bool                `json:"allowMultipleFills"`
-	AllowPartialFills  bool                `json:"allowPartialFills"`
-	AuctionDuration    float32             `json:"auctionDuration"`
-	AuctionEndAmount   string              `json:"auctionEndAmount"`
-	AuctionStartAmount string              `json:"auctionStartAmount"`
-	BankFee            string              `json:"bankFee"`
-	EstP               float32             `json:"estP"`
-	ExclusiveResolver  string              `json:"exclusiveResolver"` // This was changed to a string from a map[string]any
-	GasCost            GasCostConfigClass  `json:"gasCost"`
-	InitialRateBump    float32             `json:"initialRateBump"`
-	Points             []AuctionPointClass `json:"points"`
-	StartAuctionIn     float32             `json:"startAuctionIn"`
-	TokenFee           string              `json:"tokenFee"`
-}
-
-// QuotePresetsClassFixed defines model for QuotePresetsClass.
-type QuotePresetsClassFixed struct {
-	Custom *PresetClassFixed `json:"custom,omitempty"`
-	Fast   PresetClassFixed  `json:"fast"`
-	Medium PresetClassFixed  `json:"medium"`
-	Slow   PresetClassFixed  `json:"slow"`
-}

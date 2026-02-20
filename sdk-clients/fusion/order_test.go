@@ -15,7 +15,7 @@ import (
 )
 
 func TestGetPreset(t *testing.T) {
-	customPreset := &PresetClassFixed{
+	customPreset := &PresetClass{
 		AllowMultipleFills: true,
 		AllowPartialFills:  true,
 		AuctionDuration:    10.0,
@@ -36,7 +36,7 @@ func TestGetPreset(t *testing.T) {
 		TokenFee:       "1",
 	}
 
-	fastPreset := PresetClassFixed{
+	fastPreset := PresetClass{
 		AllowMultipleFills: false,
 		AllowPartialFills:  false,
 		AuctionDuration:    20.0,
@@ -57,7 +57,7 @@ func TestGetPreset(t *testing.T) {
 		TokenFee:       "2",
 	}
 
-	mediumPreset := PresetClassFixed{
+	mediumPreset := PresetClass{
 		AllowMultipleFills: true,
 		AllowPartialFills:  false,
 		AuctionDuration:    30.0,
@@ -78,7 +78,7 @@ func TestGetPreset(t *testing.T) {
 		TokenFee:       "3",
 	}
 
-	slowPreset := PresetClassFixed{
+	slowPreset := PresetClass{
 		AllowMultipleFills: false,
 		AllowPartialFills:  true,
 		AuctionDuration:    40.0,
@@ -99,7 +99,7 @@ func TestGetPreset(t *testing.T) {
 		TokenFee:       "4",
 	}
 
-	presets := QuotePresetsClassFixed{
+	presets := QuotePresetsClass{
 		Custom: customPreset,
 		Fast:   fastPreset,
 		Medium: mediumPreset,
@@ -109,7 +109,7 @@ func TestGetPreset(t *testing.T) {
 	tests := []struct {
 		name       string
 		presetType GetQuoteOutputRecommendedPreset
-		expected   *PresetClassFixed
+		expected   *PresetClass
 		expectErr  bool
 	}{
 		{
@@ -160,14 +160,14 @@ func TestGetPreset(t *testing.T) {
 func TestCreateAuctionDetails(t *testing.T) {
 	tests := []struct {
 		name                 string
-		preset               *PresetClassFixed
+		preset               *PresetClass
 		additionalWaitPeriod float32
 		expected             *fusionorder.AuctionDetails
 		expectErr            bool
 	}{
 		{
 			name: "Valid Preset",
-			preset: &PresetClassFixed{
+			preset: &PresetClass{
 				AllowMultipleFills: true,
 				AllowPartialFills:  true,
 				AuctionDuration:    60.0,
@@ -204,7 +204,7 @@ func TestCreateAuctionDetails(t *testing.T) {
 		},
 		{
 			name: "Invalid Gas Price Estimate",
-			preset: &PresetClassFixed{
+			preset: &PresetClass{
 				AllowMultipleFills: true,
 				AllowPartialFills:  true,
 				AuctionDuration:    60.0,

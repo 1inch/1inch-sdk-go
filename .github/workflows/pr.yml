@@ -22,6 +22,30 @@ jobs:
       - name: Unit tests
         run: make test
 
+  codegen:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v3
+
+      - name: Set up Go 1.22
+        uses: actions/setup-go@v3
+        with:
+          go-version: '1.22.0'
+
+      - name: Install jq
+        run: sudo apt-get install -y jq
+
+      - name: Run codegen
+        run: make codegen-types
+
+      - name: Verify generated types are up to date
+        run: |
+          if ! git diff --exit-code sdk-clients/; then
+            echo "Generated types are out of date. Run 'make codegen-types' and commit the changes."
+            exit 1
+          fi
+
   lint:
     runs-on: ubuntu-latest
     steps:

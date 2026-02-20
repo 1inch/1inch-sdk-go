@@ -4,6 +4,26 @@ All notable changes to this project will be documented in this file.
 
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/), and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html) starting with the *v1.0.0-beta.1* release.
 
+## [Unreleased]
+
+### Breaking Changes
+- **`fusion.PresetClassFixed`** removed — use `fusion.PresetClass` (generated type now correct via spec patch)
+- **`fusion.QuotePresetsClassFixed`** removed — use `fusion.QuotePresetsClass`
+- **`fusionplus.GetQuoteOutputFixed`** removed — use `fusionplus.GetQuoteOutput` (generated type now correct via spec patch)
+- **`fusionplus.GetOrderFillsByHashOutputFixed`** removed — use `fusionplus.GetOrderFillsByHashOutput`
+- **`tokens.TokenInfoDtoFixed`** removed (was unused)
+
+### Added
+- Spec patch system (`codegen/patches/*.jq`) for fixing upstream OpenAPI type errors at codegen time
+- CI enforcement: PRs now verify generated types are up to date
+
+### Fixed
+- OpenAPI spec bugs fixed via patches: `ExclusiveResolver` (fusion/fusionplus), `QuoteId` (fusionplus), `DstTokenPriceUsd`/`SrcTokenPriceUsd` (fusionplus), `Points` array (fusionplus), `Amount`/`Fee`/`IsPermit2` parameter types (fusionplus)
+
+### Changed
+- Codegen now uses a staging directory — specs in `codegen/openapi/` are no longer mutated in-place
+- Upgraded `oapi-codegen` from deprecated `v1.16.2` (`deepmap`) to `v2.5.1` (`oapi-codegen`)
+
 ## [v3.0.0] - 2026-02-06
 
 ### Breaking Changes

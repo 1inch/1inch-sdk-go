@@ -3,7 +3,6 @@
 # Global variables
 verbose_logging=false
 openapi_dir="openapi"
-output_dir="generatedtypes"
 
 # display_help shows the help message for this script
 display_help() {
@@ -151,7 +150,8 @@ check_and_fix_incorrect_number_arrays() {
     if grep -q '"schema": { "type": "number\[\]" }' "$api_openapi_file_name"; then
         # If the pattern exists, use sed to replace the incorrect schema type
         echo "$(basename "$api_openapi_file_name") uses number arrays directly instead of using the array type. Fixing..."
-        sed -i '' 's/"schema": { "type": "number\[\]" }/"schema": { "type": "array", "items": { "type": "number" } }/g' "$api_openapi_file_name" || {
+        local temp_file="${api_openapi_file_name}.tmp"
+        sed 's/"schema": { "type": "number\[\]" }/"schema": { "type": "array", "items": { "type": "number" } }/g' "$api_openapi_file_name" > "$temp_file" && mv "$temp_file" "$api_openapi_file_name" || {
             echo "Error while fixing number arrays in $api_openapi_file_name."
             exit 1
         }
@@ -213,7 +213,28 @@ add_pointer_skip_field() {
   mv "${temp_file}" "${api_openapi_file_name}"
 }
 
-# Check that the script is being run from within the golang folder specifically
+# apply_patches applies jq patch files from the patches/ directory to the corresponding spec
+apply_patches() {
+    local api_openapi_file_name="$1"
+    local spec_basename
+    spec_basename=$(basename "$api_openapi_file_name" -openapi.json)
+    local patches_dir="patches"
+
+    # Look for a matching patch file
+    local patch_file="${patches_dir}/${spec_basename}.jq"
+    if [ -f "$patch_file" ]; then
+        local temp_file="${api_openapi_file_name}.tmp"
+        echo "Applying patch: $patch_file"
+        jq -f "$patch_file" "$api_openapi_file_name" > "$temp_file"
+        if [ $? -ne 0 ]; then
+            echo "Error: Failed to apply patch $patch_file to $api_openapi_file_name."
+            exit 1
+        fi
+        mv "$temp_file" "$api_openapi_file_name"
+    fi
+}
+
+# Check that the script is being run from within the codegen folder
 current_folder_name=$(basename "$PWD")
 
 if [[ ! "$current_folder_name" == "codegen" ]]; then
@@ -256,7 +277,7 @@ while [ "$index" -le "$#" ]; do
 done
 
 # Install the type generator if it is not already installed
-go install github.com/deepmap/oapi-codegen/cmd/oapi-codegen@v1.16.2 || {
+go install github.com/oapi-codegen/oapi-codegen/v2/cmd/oapi-codegen@v2.5.1 || {
     echo "Failed to install oapi-codegen."
     exit 1
 }
@@ -279,9 +300,20 @@ if [ "$openapi_files_count" -eq 0 ]; then
     exit 0
 fi
 
-# Loop over all openapi files in the directory
-for api_openapi_file_name in "$openapi_dir"/*-openapi.json; do
+# Create a staging directory for spec transformations
+# This keeps the checked-in specs in openapi/ untouched
+staging_dir=$(mktemp -d)
+cp "$openapi_dir"/*.json "$staging_dir/"
+echo "Staging specs in $staging_dir"
 
+# Ensure cleanup on exit
+cleanup() {
+    rm -rf "$staging_dir"
+}
+trap cleanup EXIT
+
+# Loop over all openapi files in the staging directory
+for api_openapi_file_name in "$staging_dir"/*-openapi.json; do
 
     # Extract the service name from the filename
     package_name_raw=$(basename "$api_openapi_file_name" -openapi.json)
@@ -300,15 +332,10 @@ for api_openapi_file_name in "$openapi_dir"/*-openapi.json; do
     if [ "$verbose_logging" == "true" ]; then
         echo "Generating type data for the $package_name directory"
         echo "Using the openapi file at $api_openapi_file_name"
-        echo "The generated GoLang file will be in '$output_dir/$package_name/$types_file_name'"
+        echo "The generated GoLang file will be in 'sdk-clients/$package_name/$types_file_name'"
         echo
     fi
 
-    # Create a new directory with the service name under the output directory, if it doesn't exist
-    mkdir -p "$output_dir/$package_name" || {
-        echo "Error: Failed to create directory $output_dir/$package_name."
-        exit 1
-    }
     # Check for all known incorrect schema types and fix them if they exist
     check_and_fix_incorrect_number_arrays "$api_openapi_file_name"
 
@@ -328,28 +355,34 @@ for api_openapi_file_name in "$openapi_dir"/*-openapi.json; do
     # simplify ref
     change_any_of_ref_to_ref "$api_openapi_file_name"
 
+    # Apply spec-specific patches from patches/ directory
+    apply_patches "$api_openapi_file_name"
+
     # Should always be the final schema step!
     # Add x-go-type-skip-optional-pointer to schema objects and parameters if not already present
     add_pointer_skip_field "$api_openapi_file_name"
 
-    # Generate the oapi output into the new directory
-    output_file="$output_dir/$package_name/${types_file_name}"
+    # Generate the oapi output directly to the target directory
+    output_dir="../sdk-clients/$package_name"
+    mkdir -p "$output_dir" || {
+        echo "Error: Failed to create directory $output_dir."
+        exit 1
+    }
+
+    output_file="$output_dir/${types_file_name}"
     oapi-codegen -generate types -package "$package_name" "$api_openapi_file_name" > "$output_file" || {
        echo "Error: Failed to generate types for $api_openapi_file_name."
        exit 1
     }
 
     # In the generated file, replace all 'form:' tags with 'url:' tags
-    sed -i '' -E 's/`form:"([^"]+)"([^`]*)(`)/`url:"\1"\2\3/g' "$output_file" || {
+    tag_temp_file="${output_file}.tmp"
+    sed -E 's/`form:"([^"]+)"([^`]*)(`)/`url:"\1"\2\3/g' "$output_file" > "$tag_temp_file" && mv "$tag_temp_file" "$output_file" || {
         echo "Error: Failed to replace tags in $output_file."
         exit 1
     }
 
-    new_dir="../sdk-clients/$package_name"  # Adjust relative path according to your project structure
-        mkdir -p "$new_dir" && mv "$output_file" "$new_dir/" || {
-            echo "Error: Failed to move generated types to $new_dir."
-            exit 1
-        }
-
-    # Add logic to delete the temporary generatedtypes directory if everything succeeds
+    echo "Generated $output_file"
 done
+
+echo "Code generation complete."
