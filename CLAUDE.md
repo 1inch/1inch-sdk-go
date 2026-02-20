@@ -41,14 +41,15 @@ Two variants: `NewClient` (wallet + API) and `NewClientOnlyAPI` (read-only).
 Params have `Validate()` methods using generic `validate.Parameter[T]()` with typed check functions (`CheckEthereumAddressRequired`, `CheckBigIntRequired`, `CheckSlippageRequired`, `CheckPrivateKeyRequired`, `CheckChainIdIntRequired`, etc.).
 
 ### Type Generation
-- Generator: `oapi-codegen@v1.16.2` (types-only mode)
+- Generator: `oapi-codegen/oapi-codegen@v2.5.1` (types-only mode)
 - Specs: `codegen/openapi/*-openapi.json` (18 specs; `fusion`/`fusionplus` each consume 3)
-- `generate_types.sh` applies 6 jq transforms then replaces `form:` tags with `url:` tags
-- **WARNING**: Transforms mutate spec files in-place; checked-in specs contain codegen artifacts
+- `generate_types.sh` copies specs to a staging directory, applies jq transforms + spec patches from `codegen/patches/`, runs codegen, then replaces `form:` tags with `url:` tags. Checked-in specs are never mutated.
+- Spec patches (`codegen/patches/*.jq`) fix known upstream type errors (e.g., QuoteId as object→string, ExclusiveResolver as object→string). Add new patches here when upstream specs have incorrect types.
+- CI enforces codegen freshness: PRs fail if generated types are out of date.
 - Multi-spec packages produce: `{pkg}_orders_types.gen.go`, `{pkg}_quoter_types.gen.go`, `{pkg}_relayer_types.gen.go`
 
-### The `*Fixed` Type Pattern
-Many OpenAPI specs have incorrect types. Corrected versions live in `*_types_extended.go` with `*Fixed` suffix. **Always check for a `*Fixed` variant before using a generated type.** Key issues: wrong types for QuoteId, Amount, Fee, Tags, price fields. Test against live API when adding new methods.
+### The `*Fixed` Type Pattern (Remaining)
+Some OpenAPI specs still have issues that can't be fixed with simple patches (e.g., fusion's entire GetQuoteOutput response schema differs from the actual API, fusionplus Fee needs `*big.Int`). These corrected versions live in `*_types_extended.go` with `*Fixed` suffix. **Check for a `*Fixed` variant before using a generated type.** When adding new API methods, test against the live API to verify generated types are correct. Prefer adding spec patches over new `*Fixed` types when possible.
 
 ## Fusion/FusionPlus Architecture
 
@@ -74,13 +75,13 @@ Table-driven tests required. Use `tests` as slice name, `tc` as loop variable, `
 
 1. No `log.Fatalf` — always return errors
 2. BigInt amounts passed as strings
-3. Use `*Fixed` types when they exist
+3. Use `*Fixed` types when they exist; prefer adding spec patches (`codegen/patches/`) over new `*Fixed` types
 4. Struct tags: `url:` not `form:`
 5. Check for duplicate code before adding functions
 6. If `foo.go` is deleted, check if `foo_test.go` should be too
 7. Don't duplicate functions across fusion/fusionplus — put shared logic in `fusionorder`
 8. Ethereum addresses are case-insensitive; use `strings.ToLower()` for comparisons
-9. Don't re-run codegen without reviewing diffs to `codegen/openapi/`
+9. Codegen no longer mutates specs — safe to re-run anytime with `make codegen-types`
 10. ABIs are embedded via `//go:embed` in `constants/abis.go`
 11. Transaction builder auto-fetches nonce/gas if not set
 12. API errors are JSON: `statusCode`, `error`, `description`

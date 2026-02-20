@@ -4,7 +4,17 @@ This document tracks breaking changes between major versions of the SDK that aff
 
 ## Unreleased
 
-*(No breaking changes yet)*
+### Removed `*Fixed` Types (Replaced by Spec Patches)
+
+The following types have been removed because spec patches now fix the upstream OpenAPI type errors, making the generated types correct:
+
+| Removed Type | Package | Replacement |
+|---|---|---|
+| `PresetClassFixed` | `fusion` | `PresetClass` |
+| `QuotePresetsClassFixed` | `fusion` | `QuotePresetsClass` |
+| `GetQuoteOutputFixed` | `fusionplus` | `GetQuoteOutput` |
+| `GetOrderFillsByHashOutputFixed` | `fusionplus` | `GetOrderFillsByHashOutput` |
+| `TokenInfoDtoFixed` | `tokens` | *(removed, was unused)* |
 
 ## Version 3.0.0
 

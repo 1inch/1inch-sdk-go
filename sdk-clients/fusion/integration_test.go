@@ -17,8 +17,8 @@ import (
 func createTestQuote() GetQuoteOutputFixed {
 	return GetQuoteOutputFixed{
 		QuoteId: "test-quote-id-12345",
-		Presets: QuotePresetsClassFixed{
-			Fast: PresetClassFixed{
+		Presets: QuotePresetsClass{
+			Fast: PresetClass{
 				AllowMultipleFills: true,
 				AllowPartialFills:  true,
 				AuctionDuration:    180,
@@ -39,7 +39,7 @@ func createTestQuote() GetQuoteOutputFixed {
 				StartAuctionIn: 12,
 				TokenFee:       "0",
 			},
-			Medium: PresetClassFixed{
+			Medium: PresetClass{
 				AllowMultipleFills: true,
 				AllowPartialFills:  true,
 				AuctionDuration:    360,
@@ -60,7 +60,7 @@ func createTestQuote() GetQuoteOutputFixed {
 				StartAuctionIn: 24,
 				TokenFee:       "0",
 			},
-			Slow: PresetClassFixed{
+			Slow: PresetClass{
 				AllowMultipleFills: true,
 				AllowPartialFills:  true,
 				AuctionDuration:    600,
@@ -297,7 +297,7 @@ func TestAuctionDetailsCreation_Integration(t *testing.T) {
 	defer func() { fusionorder.CalcAuctionStartTimeFunc = originalCalcAuctionStartTimeFunc }()
 
 	// Create a preset with gas price that fits in uint32
-	preset := &PresetClassFixed{
+	preset := &PresetClass{
 		AllowMultipleFills: true,
 		AllowPartialFills:  true,
 		AuctionDuration:    180,
