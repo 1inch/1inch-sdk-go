@@ -18,7 +18,7 @@ var (
 func main() {
 	config, err := aggregation.NewConfigurationAPI(
 		constants.PolygonChainId,
-		"https://api.1inch.dev",
+		"https://api.1inch.com",
 		devPortalToken,
 	)
 	if err != nil {

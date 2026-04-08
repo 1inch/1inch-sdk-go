@@ -18,7 +18,7 @@ var (
 
 func main() {
 	config, err := fusionplus.NewConfiguration(fusionplus.ConfigurationParams{
-		ApiUrl:     "https://api.1inch.dev",
+		ApiUrl:     "https://api.1inch.com",
 		ApiKey:     devPortalToken,
 		PrivateKey: privateKey,
 	})

@@ -18,7 +18,7 @@ var (
 func main() {
 	config, err := web3.NewConfiguration(web3.ConfigurationParams{
 		ChainId: constants.EthereumChainId,
-		ApiUrl:  "https://api.1inch.dev",
+		ApiUrl:  "https://api.1inch.com",
 		ApiKey:  devPortalToken,
 	})
 	if err != nil {

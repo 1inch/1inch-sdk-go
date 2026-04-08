@@ -18,7 +18,7 @@ var (
 func main() {
 	configLegacyChain, err := gasprices.NewConfiguration(gasprices.ConfigurationParams{
 		ChainId: constants.AuroraChainId,
-		ApiUrl:  "https://api.1inch.dev",
+		ApiUrl:  "https://api.1inch.com",
 		ApiKey:  devPortalToken,
 	})
 	if err != nil {

@@ -25,7 +25,7 @@ const (
 func main() {
 	config, err := balances.NewConfiguration(balances.ConfigurationParams{
 		ChainId: constants.EthereumChainId,
-		ApiUrl:  "https://api.1inch.dev",
+		ApiUrl:  "https://api.1inch.com",
 		ApiKey:  devPortalToken,
 	})
 	if err != nil {

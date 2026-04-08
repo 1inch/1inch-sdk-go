@@ -16,7 +16,7 @@ var (
 )
 
 func main() {
-	config, err := traces.NewConfiguration(constants.EthereumChainId, "https://api.1inch.dev", devPortalToken)
+	config, err := traces.NewConfiguration(constants.EthereumChainId, "https://api.1inch.com", devPortalToken)
 	if err != nil {
 		log.Fatalf("failed to create configuration: %v", err)
 	}

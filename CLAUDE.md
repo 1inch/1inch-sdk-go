@@ -107,7 +107,7 @@ config, err := aggregation.NewConfiguration(aggregation.ConfigurationParams{
     NodeUrl:    nodeUrl,       // Ethereum RPC endpoint
     PrivateKey: privateKey,    // Wallet private key (64 hex chars, no 0x)
     ChainId:    constants.EthereumChainId,
-    ApiUrl:     "https://api.1inch.dev",
+    ApiUrl:     "https://api.1inch.com",
     ApiKey:     devPortalToken,  // 1inch Dev Portal API key
 })
 

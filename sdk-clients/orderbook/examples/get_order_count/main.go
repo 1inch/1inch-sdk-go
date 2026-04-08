@@ -20,7 +20,7 @@ const (
 func main() {
 	ctx := context.Background()
 
-	config, err := orderbook.NewConfigurationAPI(chainId, "https://api.1inch.dev", devPortalToken)
+	config, err := orderbook.NewConfigurationAPI(chainId, "https://api.1inch.com", devPortalToken)
 	if err != nil {
 		log.Fatalf("Failed to create configuration: %v", err)
 	}

@@ -7,7 +7,7 @@
   },
   "servers": [
     {
-      "url": "https://api.1inch.dev",
+      "url": "https://api.1inch.com",
       "description": "Production server"
     }
   ],

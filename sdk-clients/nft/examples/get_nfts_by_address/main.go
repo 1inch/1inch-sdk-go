@@ -17,7 +17,7 @@ var (
 
 func main() {
 	config, err := nft.NewConfiguration(nft.ConfigurationParams{
-		ApiUrl: "https://api.1inch.dev",
+		ApiUrl: "https://api.1inch.com",
 		ApiKey: devPortalToken,
 	})
 	if err != nil {

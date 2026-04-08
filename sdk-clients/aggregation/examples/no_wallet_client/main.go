@@ -20,7 +20,7 @@ const (
 )
 
 func main() {
-	config, err := aggregation.NewConfigurationAPI(constants.PolygonChainId, "https://api.1inch.dev", devPortalToken)
+	config, err := aggregation.NewConfigurationAPI(constants.PolygonChainId, "https://api.1inch.com", devPortalToken)
 	if err != nil {
 		log.Fatalf("Failed to create configuration: %v", err)
 	}

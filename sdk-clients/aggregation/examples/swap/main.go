@@ -35,7 +35,7 @@ func main() {
 		NodeUrl:    nodeUrl,
 		PrivateKey: privateKey,
 		ChainId:    constants.BaseChainId,
-		ApiUrl:     "https://api.1inch.dev",
+		ApiUrl:     "https://api.1inch.com",
 		ApiKey:     devPortalToken,
 	})
 	if err != nil {

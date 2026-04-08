@@ -17,32 +17,32 @@ Jump To:
 ## Supported APIs
 
 ### Token Swaps
-*Classic Swap API* - [[Docs](https://portal.1inch.dev/documentation/apis/swap/classic-swap/introduction) | [SDK Example](https://github.com/1inch/1inch-sdk-go/blob/main/sdk-clients/aggregation/examples/quote/main.go)]
+*Classic Swap API* - [[Docs](https://business.1inch.com/portal/documentation/apis/swap/classic-swap/introduction) | [SDK Example](https://github.com/1inch/1inch-sdk-go/blob/main/sdk-clients/aggregation/examples/quote/main.go)]
 
-*Intent-based Swap (Fusion) API* - [[Docs](https://portal.1inch.dev/documentation/apis/swap/intent-swap/introduction) | [SDK Example](https://github.com/1inch/1inch-sdk-go/blob/main/sdk-clients/fusion/examples/place_order/main.go)]
+*Intent-based Swap (Fusion) API* - [[Docs](https://business.1inch.com/portal/documentation/apis/swap/intent-swap/introduction) | [SDK Example](https://github.com/1inch/1inch-sdk-go/blob/main/sdk-clients/fusion/examples/place_order/main.go)]
 
-*Cross-chain Swap (Fusion+) API* - [[Docs](https://portal.1inch.dev/documentation/apis/swap/fusion-plus/introduction) | [SDK Example](https://github.com/1inch/1inch-sdk-go/blob/main/sdk-clients/fusionplus/examples/place_order/main.go)]
+*Cross-chain Swap (Fusion+) API* - [[Docs](https://business.1inch.com/portal/documentation/apis/swap/fusion-plus/introduction) | [SDK Example](https://github.com/1inch/1inch-sdk-go/blob/main/sdk-clients/fusionplus/examples/place_order/main.go)]
 
-*Orderbook API* - [[Docs](https://portal.1inch.dev/documentation/apis/orderbook/introduction) | [SDK Example](https://github.com/1inch/1inch-sdk-go/blob/main/sdk-clients/orderbook/examples/create_order/main.go)]
+*Orderbook API* - [[Docs](https://business.1inch.com/portal/documentation/apis/orderbook/introduction) | [SDK Example](https://github.com/1inch/1inch-sdk-go/blob/main/sdk-clients/orderbook/examples/create_order/main.go)]
 
 ### Infrastructure
-*Balance API* - [[Docs](https://portal.1inch.dev/documentation/apis/balance/introduction) | [SDK Example](https://github.com/1inch/1inch-sdk-go/blob/main/sdk-clients/balances/examples/get_allowances_of_custom_tokens/main.go)]
+*Balance API* - [[Docs](https://business.1inch.com/portal/documentation/apis/balance/introduction) | [SDK Example](https://github.com/1inch/1inch-sdk-go/blob/main/sdk-clients/balances/examples/get_allowances_of_custom_tokens/main.go)]
 
-*Gas Price API* - [[Docs](https://portal.1inch.dev/documentation/apis/gas-price/introduction) | [SDK Example](https://github.com/1inch/1inch-sdk-go/blob/main/sdk-clients/gasprices/examples/get_gas_price_eip1559/main.go)]
+*Gas Price API* - [[Docs](https://business.1inch.com/portal/documentation/apis/gas-price/introduction) | [SDK Example](https://github.com/1inch/1inch-sdk-go/blob/main/sdk-clients/gasprices/examples/get_gas_price_eip1559/main.go)]
 
-*History API* [[Docs](https://portal.1inch.dev/documentation/apis/history/introduction) | [SDK Example](https://github.com/1inch/1inch-sdk-go/blob/main/sdk-clients/history/examples/get_history_events_by_address/main.go)]
+*History API* [[Docs](https://business.1inch.com/portal/documentation/apis/history/introduction) | [SDK Example](https://github.com/1inch/1inch-sdk-go/blob/main/sdk-clients/history/examples/get_history_events_by_address/main.go)]
 
-*NFT API* - [[Docs](https://portal.1inch.dev/documentation/apis/nft/introduction) | [SDK Example](https://github.com/1inch/1inch-sdk-go/blob/main/sdk-clients/nft/examples/main.go)]
+*NFT API* - [[Docs](https://business.1inch.com/portal/documentation/apis/nft/introduction) | [SDK Example](https://github.com/1inch/1inch-sdk-go/blob/main/sdk-clients/nft/examples/main.go)]
 
-*Portfolio API* - [[Docs](https://portal.1inch.dev/documentation/apis/portfolio/introduction) | [SDK Example](https://github.com/1inch/1inch-sdk-go/blob/main/sdk-clients/portfolio/examples/get_current_protocols_value/main.go)]
+*Portfolio API* - [[Docs](https://business.1inch.com/portal/documentation/apis/portfolio/introduction) | [SDK Example](https://github.com/1inch/1inch-sdk-go/blob/main/sdk-clients/portfolio/examples/get_current_protocols_value/main.go)]
 
-*Spot Price API* - [[Docs](https://portal.1inch.dev/documentation/apis/spot-price/introduction) | [SDK Example](https://github.com/1inch/1inch-sdk-go/blob/main/sdk-clients/spotprices/examples/get_prices_for_requested_tokens/main.go)]
+*Spot Price API* - [[Docs](https://business.1inch.com/portal/documentation/apis/spot-price/introduction) | [SDK Example](https://github.com/1inch/1inch-sdk-go/blob/main/sdk-clients/spotprices/examples/get_prices_for_requested_tokens/main.go)]
 
-*Token API* - [[Docs](https://portal.1inch.dev/documentation/apis/tokens/introduction) | [SDK Example](https://github.com/1inch/1inch-sdk-go/blob/main/sdk-clients/tokens/examples/get_custom_token/main.go)]
+*Token API* - [[Docs](https://business.1inch.com/portal/documentation/apis/tokens/introduction) | [SDK Example](https://github.com/1inch/1inch-sdk-go/blob/main/sdk-clients/tokens/examples/get_custom_token/main.go)]
 
-*Traces API* - [[Docs](https://portal.1inch.dev/documentation/apis/traces/introduction) | [SDK Example](https://github.com/1inch/1inch-sdk-go/blob/main/sdk-clients/traces/examples/get_tx_trace_by_number_and_hash/main.go)]
+*Traces API* - [[Docs](https://business.1inch.com/portal/documentation/apis/traces/introduction) | [SDK Example](https://github.com/1inch/1inch-sdk-go/blob/main/sdk-clients/traces/examples/get_tx_trace_by_number_and_hash/main.go)]
 
-*Transaction Gateway API* - [[Docs](https://portal.1inch.dev/documentation/apis/transaction/introduction) | [SDK Example](https://github.com/1inch/1inch-sdk-go/blob/main/sdk-clients/txbroadcast/examples/broadcast_public_transaction/main.go)]
+*Transaction Gateway API* - [[Docs](https://business.1inch.com/portal/documentation/apis/transaction/introduction) | [SDK Example](https://github.com/1inch/1inch-sdk-go/blob/main/sdk-clients/txbroadcast/examples/broadcast_public_transaction/main.go)]
 
 
 ## Getting started
@@ -69,7 +69,7 @@ go get github.com/1inch/1inch-sdk-go/sdk-clients/aggregation
 
 In your preferred editor, add the following content to `main.go` and update the `devPortalToken` variable to use your own Dev Portal Token.
 
-**Note**: The 1inch Dev Portal Token can be generated at https://portal.1inch.dev
+**Note**: The 1inch Dev Portal Token can be generated at https://business.1inch.com/portal
 
 ```go
 package main
@@ -96,7 +96,7 @@ func main() {
 		NodeUrl:    rpcUrl,
 		PrivateKey: randomPrivateKey,
 		ChainId:    constants.EthereumChainId,
-		ApiUrl:     "https://api.1inch.dev",
+		ApiUrl:     "https://api.1inch.com",
 		ApiKey:     devPortalToken,
 	})
 	if err != nil {
@@ -134,7 +134,7 @@ func main() {
 go run .
 ```
 
-Documentation for all API calls can be found at https://portal.1inch.dev/documentation
+Documentation for all API calls can be found at https://business.1inch.com/portal/documentation
 
 Each folder inside the [sdk-clients directory](https://github.com/1inch/1inch-sdk-go/blob/main/sdk-clients) 
 will contain an SDK for one of the 1inch APIs and will also include dedicated examples.

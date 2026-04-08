@@ -20,7 +20,7 @@ var (
 
 func main() {
 	config, err := fusion.NewConfiguration(fusion.ConfigurationParams{
-		ApiUrl:     "https://api.1inch.dev",
+		ApiUrl:     "https://api.1inch.com",
 		ApiKey:     devPortalToken,
 		ChainId:    uint64(chainId),
 		PrivateKey: privateKey,

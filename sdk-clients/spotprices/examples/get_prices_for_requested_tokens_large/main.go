@@ -28,7 +28,7 @@ const (
 func main() {
 	config, err := spotprices.NewConfiguration(spotprices.ConfigurationParams{
 		ChainId: constants.EthereumChainId,
-		ApiUrl:  "https://api.1inch.dev",
+		ApiUrl:  "https://api.1inch.com",
 		ApiKey:  devPortalToken,
 	})
 	if err != nil {

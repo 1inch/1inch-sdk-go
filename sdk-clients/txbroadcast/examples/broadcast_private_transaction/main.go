@@ -18,7 +18,7 @@ var (
 func main() {
 	config, err := txbroadcast.NewConfiguration(txbroadcast.ConfigurationParams{
 		ChainId: constants.EthereumChainId,
-		ApiUrl:  "https://api.1inch.dev",
+		ApiUrl:  "https://api.1inch.com",
 		ApiKey:  devPortalToken,
 	})
 	if err != nil {

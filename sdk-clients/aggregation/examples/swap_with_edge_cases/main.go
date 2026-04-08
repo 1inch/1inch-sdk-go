@@ -69,7 +69,7 @@ func SwapWithCustomConnectorTokens(chain uint64, src string, dst string, connect
 		NodeUrl:    nodeUrl,
 		PrivateKey: privateKey,
 		ChainId:    chain,
-		ApiUrl:     "https://api.1inch.dev",
+		ApiUrl:     "https://api.1inch.com",
 		ApiKey:     devPortalToken,
 	})
 	if err != nil {
@@ -112,7 +112,7 @@ func SwapWithCustomSlippage(chain uint64, src string, dst string, amount string,
 		NodeUrl:    nodeUrl,
 		PrivateKey: privateKey,
 		ChainId:    chain,
-		ApiUrl:     "https://api.1inch.dev",
+		ApiUrl:     "https://api.1inch.com",
 		ApiKey:     devPortalToken,
 	})
 	if err != nil {
@@ -154,7 +154,7 @@ func SwapWithCustomProtocols(chain uint64, src string, dst string, amount string
 		NodeUrl:    nodeUrl,
 		PrivateKey: privateKey,
 		ChainId:    chain,
-		ApiUrl:     "https://api.1inch.dev",
+		ApiUrl:     "https://api.1inch.com",
 		ApiKey:     devPortalToken,
 	})
 	if err != nil {
@@ -197,7 +197,7 @@ func SwapWithCustomReceiver(chain uint64, src string, dst string, amount string,
 		NodeUrl:    nodeUrl,
 		PrivateKey: privateKey,
 		ChainId:    chain,
-		ApiUrl:     "https://api.1inch.dev",
+		ApiUrl:     "https://api.1inch.com",
 		ApiKey:     devPortalToken,
 	})
 	if err != nil {
@@ -236,12 +236,12 @@ func SwapWithCustomReceiver(chain uint64, src string, dst string, amount string,
 }
 
 func SwapWithCustomFeeAndReferrer(chain uint64, src string, dst string, amount string, fee float32, referrer string) {
-	// nodeUrl, privateKey, chain, "https://api.1inch.dev", devPortalToken
+	// nodeUrl, privateKey, chain, "https://api.1inch.com", devPortalToken
 	config, err := aggregation.NewConfiguration(aggregation.ConfigurationParams{
 		NodeUrl:    nodeUrl,
 		PrivateKey: privateKey,
 		ChainId:    chain,
-		ApiUrl:     "https://api.1inch.dev",
+		ApiUrl:     "https://api.1inch.com",
 		ApiKey:     devPortalToken,
 	})
 	if err != nil {
