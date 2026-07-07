@@ -7,6 +7,7 @@ import (
 
 	"github.com/1inch/1inch-sdk-go/common/fusionorder"
 	random_number_generation "github.com/1inch/1inch-sdk-go/internal/random-number-generation"
+	web3_provider "github.com/1inch/1inch-sdk-go/internal/web3-provider"
 	"github.com/1inch/1inch-sdk-go/sdk-clients/orderbook"
 	"github.com/ethereum/go-ethereum/common"
 	"github.com/stretchr/testify/assert"
@@ -555,4 +556,88 @@ func hexCharToByteLocal(c byte) byte {
 		return c - 'A' + 10
 	}
 	return 0
+}
+
+// TestPermit2OrderCreation_KnownValues verifies permit2 order construction end to end
+// (maker permit, encoded extension, maker traits, salt, and EIP-712 order hash) against
+// known expected values, using a deterministic salt base of 10
+func TestPermit2OrderCreation_KnownValues(t *testing.T) {
+	const (
+		expectedMakerPermit = "0xc02aaa39b223fe8d0a0e5c4f27ead9083c756cc2deadbeef01020304"
+		expectedMakerTraits = "33923463643744979127999312014264035503887692843207683804062753724538306953216"
+		expectedSalt        = "15146905382444067450835975202328308722278406108088"
+		expectedExtension   = "0x00000109000000940000009400000078000000780000003c00000000000000008273f37417da37c4a6c3995e82cf442f87a25d9c0000000000000063c051750000b400c35001004e20000c00000000006401bb839cbe05303d7705fa8273f37417da37c4a6c3995e82cf442f87a25d9c0000000000000063c051750000b400c35001004e20000c00000000006401bb839cbe05303d7705fac02aaa39b223fe8d0a0e5c4f27ead9083c756cc2deadbeef010203048273f37417da37c4a6c3995e82cf442f87a25d9c00000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000640000000001bb839cbe05303d7705fa0000ffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffff00"
+		expectedOrderHash   = "0x2629215693b0d50ec428d8a9c110e6890db18a124a549471a75c8357b703c93c"
+	)
+
+	auctionDetails := &fusionorder.AuctionDetails{
+		StartTime:       1673548149,
+		Duration:        180,
+		InitialRateBump: 50000,
+		Points:          []fusionorder.AuctionPointClassFixed{{Delay: 12, Coefficient: 20000}},
+		GasCost:         fusionorder.GasCostConfigClassFixed{},
+	}
+
+	whitelist, err := fusionorder.GenerateWhitelist(
+		[]string{"0x00000000219ab540356cbb839cbe05303d7705fa"}, big.NewInt(0))
+	require.NoError(t, err)
+
+	ext, err := NewExtension(ExtensionParams{
+		SettlementContract: "0x8273f37417da37c4a6c3995e82cf442f87a25d9c",
+		AuctionDetails:     auctionDetails,
+		PostInteractionData: &SettlementPostInteractionData{
+			Whitelist:          whitelist,
+			ResolvingStartTime: big.NewInt(0),
+			CustomReceiver:     common.Address{},
+		},
+		Asset:              "0xc02aaa39b223fe8d0a0e5c4f27ead9083c756cc2",
+		Permit:             "0xdeadbeef01020304",
+		ResolvingStartTime: big.NewInt(0),
+		Surplus:            SurplusParamsNoFee,
+	})
+	require.NoError(t, err)
+
+	assert.Equal(t, expectedMakerPermit, ext.MakerPermit, "maker permit mismatch")
+
+	extensionEncoded, err := ext.ConvertToOrderbookExtension().Encode()
+	require.NoError(t, err)
+	assert.Equal(t, expectedExtension, extensionEncoded, "encoded extension mismatch")
+
+	makerTraits, err := CreateMakerTraits(
+		Details{Auction: auctionDetails},
+		ExtraParams{
+			OrderExpirationDelay: 12,
+			AllowPartialFills:    true,
+			AllowMultipleFills:   true,
+			EnablePermit2:        true,
+		})
+	require.NoError(t, err)
+	makerTraitsBig, ok := new(big.Int).SetString(strings.TrimPrefix(makerTraits.Encode(), "0x"), 16)
+	require.True(t, ok)
+	assert.Equal(t, expectedMakerTraits, makerTraitsBig.String(), "maker traits mismatch")
+
+	salt, err := orderbook.GenerateSalt(extensionEncoded, big.NewInt(10))
+	require.NoError(t, err)
+	saltBig, ok := new(big.Int).SetString(strings.TrimPrefix(salt, "0x"), 16)
+	require.True(t, ok)
+	assert.Equal(t, expectedSalt, saltBig.String(), "salt mismatch")
+
+	wallet, err := web3_provider.DefaultWalletOnlyProvider(
+		"d8d1f95deb28949ea0ecc4e9a0decf89e98422c2d76ab6e5f736792a388c56c7", 1)
+	require.NoError(t, err)
+
+	limitOrder, err := orderbook.CreateLimitOrderMessage(orderbook.CreateOrderParams{
+		Wallet:           wallet,
+		MakerTraits:      makerTraits,
+		ExtensionEncoded: extensionEncoded,
+		Salt:             salt,
+		Maker:            "0x00000000219ab540356cbb839cbe05303d7705fa",
+		MakerAsset:       "0xc02aaa39b223fe8d0a0e5c4f27ead9083c756cc2",
+		TakerAsset:       "0xa0b86991c6218b36c1d19d4a2e9eb0ce3606eb48",
+		MakingAmount:     "1000000000000000000",
+		TakingAmount:     "1420000000",
+		Taker:            "0x0000000000000000000000000000000000000000",
+	}, 1)
+	require.NoError(t, err)
+	assert.Equal(t, expectedOrderHash, limitOrder.OrderHash, "EIP-712 order hash mismatch")
 }

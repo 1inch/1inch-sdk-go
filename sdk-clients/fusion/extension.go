@@ -120,11 +120,13 @@ func NewExtension(params ExtensionParams) (*Extension, error) {
 	fusionExtension.PostInteraction = interaction.Encode()
 
 	if params.Permit != "" {
+		// The first 20 bytes of the maker permit are the token the permit applies to,
+		// passed to the protocol's tryPermit as its token parameter
 		permitInteraction := &Interaction{
 			Target: geth_common.HexToAddress(params.Asset),
 			Data:   params.Permit,
 		}
-		fusionExtension.MakerPermit = permitInteraction.Target.String() + hexadecimal.Trim0x(permitInteraction.Data)
+		fusionExtension.MakerPermit = strings.ToLower(permitInteraction.Target.String()) + hexadecimal.Trim0x(permitInteraction.Data)
 	}
 
 	return fusionExtension, nil
