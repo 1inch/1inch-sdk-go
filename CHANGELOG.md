@@ -4,6 +4,24 @@ All notable changes to this project will be documented in this file.
 
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/), and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html) starting with the *v1.0.0-beta.1* release.
 
+## [Unreleased]
+
+### Added
+- New public constant: `constants.Permit2Address` (canonical Uniswap Permit2 contract, same address on all chains)
+- New method `fusion.Client.PlaceOrderFromParams`: fetches a quote and places the order in one call, so settings like `Permit` and `IsPermit2` are supplied once and propagate to both the quote request and the order
+- New function `orderbook.DecodeMakerTraits`: parses an encoded maker traits value back into a `MakerTraits` struct (inverse of `Encode`), enabling flag reads like `ShouldUsePermit2` from on-chain orders
+- New functions `orderbook.BuildPermit2Calldata`, `orderbook.BuildPermit2CalldataCompact`, and `orderbook.GetPermit2Allowance`: sign a Permit2 AllowanceTransfer PermitSingle (full 352-byte or compact 96-byte form) and read Permit2 allowance state. Note the compact form is currently rejected by fills through the deployed Aggregation Router v6 (see the function documentation); use the full form for orders.
+- New example `sdk-clients/fusion/examples/place_order_permit2`: full Permit2 fusion order flow (one-time ERC20 approval to Permit2, signed PermitSingle, one-call order placement)
+- Mainnet-fork integration tests under `tests/integration` (build tag `integration`, `make test-integration`)
+
+### Fixed
+- **`fusion.CreateFusionOrderData`**: `OrderParams.Permit` and `OrderParams.IsPermit2` are now honored; previously the permit was silently dropped and the `USE_PERMIT2` maker-traits bit was never set. The maker permit's leading 20 bytes carry the maker asset (the token parameter of the protocol's `tryPermit`), for regular permits and Permit2 permits alike.
+- **`fusionplus.CreateFusionPlusOrderData`**: `OrderParams.IsPermit2` now sets the `USE_PERMIT2` maker-traits bit.
+- **`fusionplus.FromLimitOrderExtension`**: post-interaction data now decodes correctly; the decoder previously failed on any extension with post-interaction data because the hex slice lacked the `0x` prefix.
+
+### Changed
+- The maker permit token field is encoded in lowercase hex in `fusion` and `fusionplus` extensions.
+
 ## [v3.0.0] - 2026-02-06
 
 ### Breaking Changes
