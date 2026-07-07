@@ -193,6 +193,7 @@ func TestNewExtension(t *testing.T) {
 				assert.Equal(t, tc.expected.MakerAssetSuffix, ext.MakerAssetSuffix)
 				assert.Equal(t, tc.expected.TakerAssetSuffix, ext.TakerAssetSuffix)
 				assert.Equal(t, tc.expected.Predicate, ext.Predicate)
+				assert.Equal(t, tc.expected.MakerPermit, ext.MakerPermit)
 				assert.Equal(t, tc.expected.PreInteraction, ext.PreInteraction)
 				assert.Equal(t, tc.expected.PostInteraction, ext.PostInteraction)
 				assert.Equal(t, tc.expected.CustomData, ext.CustomData)

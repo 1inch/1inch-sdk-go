@@ -3,6 +3,7 @@ package fusionplus
 import (
 	"fmt"
 	"math/big"
+	"strings"
 
 	"github.com/1inch/1inch-sdk-go/common/fusionorder"
 	"github.com/1inch/1inch-sdk-go/internal/hexadecimal"
@@ -52,11 +53,13 @@ func NewExtensionPlus(params ExtensionParamsPlus) (*ExtensionPlus, error) {
 	extensionPlus.PostInteraction = postInteraction.Encode()
 
 	if params.Permit != "" {
+		// The first 20 bytes of the maker permit are the token the permit applies to,
+		// passed to the protocol's tryPermit as its token parameter
 		permitInteraction := &fusionorder.Interaction{
 			Target: geth_common.HexToAddress(params.Asset),
 			Data:   params.Permit,
 		}
-		extensionPlus.MakerPermit = permitInteraction.Target.String() + hexadecimal.Trim0x(permitInteraction.Data)
+		extensionPlus.MakerPermit = strings.ToLower(permitInteraction.Target.String()) + hexadecimal.Trim0x(permitInteraction.Data)
 	}
 
 	return extensionPlus, nil
@@ -139,7 +142,7 @@ func FromLimitOrderExtension(extension *orderbook.Extension) (*ExtensionPlus, er
 		return nil, fmt.Errorf("failed to decode auction details: %w", err)
 	}
 
-	postInteractionData, err := DecodeSettlementPostInteractionData(extension.PostInteraction[42:])
+	postInteractionData, err := DecodeSettlementPostInteractionData(fusionorder.Prefix0x(extension.PostInteraction[42:]))
 	if err != nil {
 		return nil, fmt.Errorf("failed to decode post interaction data: %w", err)
 	}
