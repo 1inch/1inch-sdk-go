@@ -4,6 +4,7 @@ import (
 	"errors"
 	"fmt"
 	"math/big"
+	"strings"
 	"time"
 
 	"github.com/1inch/1inch-sdk-go/constants"
@@ -113,6 +114,47 @@ func NewMakerTraits(params MakerTraitsParams) (*MakerTraits, error) {
 
 func (m *MakerTraits) IsBitInvalidatorMode() bool {
 	return !m.AllowPartialFills || !m.AllowMultipleFills
+}
+
+// DecodeMakerTraits parses an encoded maker traits value (as produced by Encode or read
+// from an on-chain order) back into a MakerTraits struct. It is the inverse of Encode.
+// Note the encoding only stores the low 80 bits of AllowedSender, so a decoded non-zero
+// sender is the zero-padded 20-hex-char tail of the original address.
+func DecodeMakerTraits(encoded string) (*MakerTraits, error) {
+	value, ok := new(big.Int).SetString(strings.TrimPrefix(encoded, "0x"), 16)
+	if !ok {
+		return nil, fmt.Errorf("invalid maker traits hex: %s", encoded)
+	}
+
+	extractBits := func(start, size uint) *big.Int {
+		mask := new(big.Int).Sub(new(big.Int).Lsh(big.NewInt(1), size), big.NewInt(1))
+		return new(big.Int).And(new(big.Int).Rsh(value, start), mask)
+	}
+
+	allowedSender := ""
+	if sender := extractBits(0, 80); sender.Sign() != 0 {
+		allowedSender = fmt.Sprintf("%020x", sender)
+	}
+
+	noPartialFills := value.Bit(noPartialFillsFlag) == 1
+
+	return &MakerTraits{
+		AllowedSender: allowedSender,
+		Expiry:        extractBits(80, 40).Int64(),
+		Nonce:         extractBits(120, 40).Int64(),
+		Series:        extractBits(160, 40).Int64(),
+
+		NoPartialFills:      noPartialFills,
+		NeedPostinteraction: value.Bit(needPostinteractionFlag) == 1,
+		NeedPreinteraction:  value.Bit(needPreinteractionFlag) == 1,
+		NeedEpochCheck:      value.Bit(needEpochCheckFlag) == 1,
+		HasExtension:        value.Bit(hasExtensionFlag) == 1,
+		ShouldUsePermit2:    value.Bit(usePermit2Flag) == 1,
+		ShouldUnwrapWeth:    value.Bit(unwrapWethFlag) == 1,
+
+		AllowPartialFills:  !noPartialFills,
+		AllowMultipleFills: value.Bit(allowMultipleFillsFlag) == 1,
+	}, nil
 }
 
 func (m *MakerTraits) Encode() string {
