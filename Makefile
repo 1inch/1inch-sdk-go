@@ -18,6 +18,12 @@ test:
 	@echo "  >  Running unit tests"
 	GOBIN=$(GOBIN) go test -race ./...
 
+# Runs mainnet-fork integration tests. Requires anvil (foundry) on PATH and,
+# optionally, FORK_URL pointing to a mainnet RPC (falls back to public RPCs).
+test-integration:
+	@echo "  >  Running mainnet-fork integration tests"
+	GOBIN=$(GOBIN) go test -tags integration -v -timeout 15m ./tests/integration/...
+
 fmt:
 	@echo "  >  Running go fmt"
 	GOBIN=$(GOBIN) go fmt ./...
