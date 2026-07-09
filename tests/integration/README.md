@@ -39,6 +39,12 @@ FORK_URL=https://your-mainnet-rpc go test -tags integration -v -timeout 15m ./te
    calldata validation rejects, so such fills revert today. The subtest fails loudly
    if a future router deployment starts accepting compact permits.
 
+`TestPermit2TargetSemanticsFork` pins the token field semantics of the full 352-byte
+maker permit: the protocol dispatches full permits to the canonical Permit2 contract by
+calldata length and ignores the leading token field, so an order encoded with the
+Permit2 address in place of the maker asset still fills. The SDK always encodes the
+maker asset there for consistency across the SDK, API, and decoders.
+
 ## Regenerating testdata
 
 `testdata/SimpleSettlement.json` (abi + creation bytecode) comes from the fusion-sdk repo:
