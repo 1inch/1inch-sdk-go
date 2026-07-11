@@ -12,9 +12,9 @@ import (
 	"github.com/ethereum/go-ethereum/core/types"
 	"github.com/stretchr/testify/assert"
 
-	"github.com/1inch/1inch-sdk-go/common"
-	"github.com/1inch/1inch-sdk-go/constants"
-	transaction_builder "github.com/1inch/1inch-sdk-go/internal/transaction-builder"
+	"github.com/1inch/1inch-sdk-go/v3/common"
+	"github.com/1inch/1inch-sdk-go/v3/constants"
+	transaction_builder "github.com/1inch/1inch-sdk-go/v3/internal/transaction-builder"
 )
 
 func TestNewClient(t *testing.T) {

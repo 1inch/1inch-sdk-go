@@ -1,4 +1,4 @@
-module github.com/1inch/1inch-sdk-go
+module github.com/1inch/1inch-sdk-go/v3
 
 go 1.22
 

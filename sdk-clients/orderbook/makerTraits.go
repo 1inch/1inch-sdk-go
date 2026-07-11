@@ -6,7 +6,7 @@ import (
 	"math/big"
 	"time"
 
-	"github.com/1inch/1inch-sdk-go/constants"
+	"github.com/1inch/1inch-sdk-go/v3/constants"
 )
 
 // Bitmask definitions for the Typescript Limit Order SDK (currently unused):

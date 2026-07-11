@@ -1,7 +1,7 @@
 package gasprices
 
 import (
-	"github.com/1inch/1inch-sdk-go/common"
+	"github.com/1inch/1inch-sdk-go/v3/common"
 )
 
 type Client struct {

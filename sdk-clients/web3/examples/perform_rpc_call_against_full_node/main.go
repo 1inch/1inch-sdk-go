@@ -7,8 +7,8 @@ import (
 	"log"
 	"os"
 
-	"github.com/1inch/1inch-sdk-go/constants"
-	"github.com/1inch/1inch-sdk-go/sdk-clients/web3"
+	"github.com/1inch/1inch-sdk-go/v3/constants"
+	"github.com/1inch/1inch-sdk-go/v3/sdk-clients/web3"
 )
 
 var (

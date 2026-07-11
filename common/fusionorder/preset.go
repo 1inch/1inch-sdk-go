@@ -4,7 +4,7 @@ import (
 	"fmt"
 	"strconv"
 
-	"github.com/1inch/1inch-sdk-go/internal/bigint"
+	"github.com/1inch/1inch-sdk-go/v3/internal/bigint"
 )
 
 // CustomPreset allows users to specify custom auction parameters

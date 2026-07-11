@@ -4,8 +4,8 @@ import (
 	"math/big"
 	"testing"
 
-	"github.com/1inch/1inch-sdk-go/common/fusionorder"
-	"github.com/1inch/1inch-sdk-go/constants"
+	"github.com/1inch/1inch-sdk-go/v3/common/fusionorder"
+	"github.com/1inch/1inch-sdk-go/v3/constants"
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
 )
