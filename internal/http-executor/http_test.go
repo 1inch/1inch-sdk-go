@@ -13,7 +13,7 @@ import (
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
 
-	"github.com/1inch/1inch-sdk-go/common"
+	"github.com/1inch/1inch-sdk-go/v3/common"
 )
 
 func TestExecuteRequest_SuccessGET(t *testing.T) {

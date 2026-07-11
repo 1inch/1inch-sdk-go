@@ -9,9 +9,9 @@ import (
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
 
-	"github.com/1inch/1inch-sdk-go/common/fusionorder"
-	"github.com/1inch/1inch-sdk-go/constants"
-	random_number_generation "github.com/1inch/1inch-sdk-go/internal/random-number-generation"
+	"github.com/1inch/1inch-sdk-go/v3/common/fusionorder"
+	"github.com/1inch/1inch-sdk-go/v3/constants"
+	random_number_generation "github.com/1inch/1inch-sdk-go/v3/internal/random-number-generation"
 )
 
 // createTestQuoteFusionPlus creates a realistic quote for testing

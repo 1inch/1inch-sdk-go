@@ -4,7 +4,7 @@ import (
 	"math/big"
 	"testing"
 
-	web3_provider "github.com/1inch/1inch-sdk-go/internal/web3-provider"
+	web3_provider "github.com/1inch/1inch-sdk-go/v3/internal/web3-provider"
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
 )

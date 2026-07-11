@@ -5,7 +5,7 @@ import (
 	"math/big"
 	"testing"
 
-	"github.com/1inch/1inch-sdk-go/internal/bigint"
+	"github.com/1inch/1inch-sdk-go/v3/internal/bigint"
 	"github.com/ethereum/go-ethereum/common"
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"

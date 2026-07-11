@@ -1,7 +1,7 @@
 package nft
 
 import (
-	http_executor "github.com/1inch/1inch-sdk-go/internal/http-executor"
+	http_executor "github.com/1inch/1inch-sdk-go/v3/internal/http-executor"
 )
 
 type Configuration struct {

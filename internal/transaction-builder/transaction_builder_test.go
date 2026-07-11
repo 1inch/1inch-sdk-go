@@ -11,7 +11,7 @@ import (
 	"github.com/ethereum/go-ethereum/core/types"
 	"github.com/stretchr/testify/require"
 
-	"github.com/1inch/1inch-sdk-go/common"
+	"github.com/1inch/1inch-sdk-go/v3/common"
 )
 
 func TestTransactionBuilder_Build(t *testing.T) {

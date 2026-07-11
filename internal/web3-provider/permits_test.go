@@ -11,8 +11,8 @@ import (
 	"github.com/ethereum/go-ethereum/ethclient"
 	"github.com/stretchr/testify/require"
 
-	"github.com/1inch/1inch-sdk-go/common"
-	"github.com/1inch/1inch-sdk-go/constants"
+	"github.com/1inch/1inch-sdk-go/v3/common"
+	"github.com/1inch/1inch-sdk-go/v3/constants"
 )
 
 func Test_createPermitSignature(t *testing.T) {

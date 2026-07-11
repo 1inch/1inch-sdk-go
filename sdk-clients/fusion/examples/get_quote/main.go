@@ -7,7 +7,7 @@ import (
 	"log"
 	"os"
 
-	"github.com/1inch/1inch-sdk-go/sdk-clients/fusion"
+	"github.com/1inch/1inch-sdk-go/v3/sdk-clients/fusion"
 )
 
 var (

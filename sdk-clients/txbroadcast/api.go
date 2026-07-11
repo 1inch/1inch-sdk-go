@@ -5,7 +5,7 @@ import (
 	"encoding/json"
 	"fmt"
 
-	"github.com/1inch/1inch-sdk-go/common"
+	"github.com/1inch/1inch-sdk-go/v3/common"
 )
 
 // BroadcastPublicTransaction Do broadcast EVM transaction to the public mempool, takes the raw transaction data as input and returns the transaction hash
