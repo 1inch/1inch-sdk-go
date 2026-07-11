@@ -12,7 +12,7 @@ import (
 	"github.com/ethereum/go-ethereum/common/hexutil"
 	"github.com/ethereum/go-ethereum/ethclient"
 
-	"github.com/1inch/1inch-sdk-go/v3/constants"
+	"github.com/0xcary/1inch-sdk-go/v3/constants"
 )
 
 const multicallMethod = "multicall"

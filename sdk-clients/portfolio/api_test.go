@@ -9,7 +9,7 @@ import (
 
 	"github.com/stretchr/testify/require"
 
-	"github.com/1inch/1inch-sdk-go/v3/common"
+	"github.com/0xcary/1inch-sdk-go/v3/common"
 )
 
 type MockHttpExecutor struct {

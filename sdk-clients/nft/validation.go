@@ -1,7 +1,7 @@
 package nft
 
 import (
-	"github.com/1inch/1inch-sdk-go/v3/internal/validate"
+	"github.com/0xcary/1inch-sdk-go/v3/internal/validate"
 )
 
 func (params *GetNftsByAddressParams) Validate() error {

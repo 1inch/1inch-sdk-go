@@ -5,7 +5,7 @@ import (
 
 	"github.com/stretchr/testify/assert"
 
-	"github.com/1inch/1inch-sdk-go/v3/constants"
+	"github.com/0xcary/1inch-sdk-go/v3/constants"
 )
 
 func TestNewConfigurationAPI(t *testing.T) {

@@ -9,8 +9,8 @@ import (
 
 	"github.com/stretchr/testify/require"
 
-	"github.com/1inch/1inch-sdk-go/v3/common"
-	"github.com/1inch/1inch-sdk-go/v3/constants"
+	"github.com/0xcary/1inch-sdk-go/v3/common"
+	"github.com/0xcary/1inch-sdk-go/v3/constants"
 )
 
 type MockHttpExecutor struct {

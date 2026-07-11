@@ -8,8 +8,8 @@ import (
 	"fmt"
 	"math/big"
 
-	"github.com/1inch/1inch-sdk-go/v3/internal/hexadecimal"
-	"github.com/1inch/1inch-sdk-go/v3/internal/keccak"
+	"github.com/0xcary/1inch-sdk-go/v3/internal/hexadecimal"
+	"github.com/0xcary/1inch-sdk-go/v3/internal/keccak"
 	"github.com/ethereum/go-ethereum/common/hexutil"
 	"github.com/ethereum/go-ethereum/crypto"
 	"golang.org/x/crypto/sha3"

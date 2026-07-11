@@ -3,9 +3,9 @@ package fusion
 import (
 	"fmt"
 
-	"github.com/1inch/1inch-sdk-go/v3/common"
-	http_executor "github.com/1inch/1inch-sdk-go/v3/internal/http-executor"
-	web3_provider "github.com/1inch/1inch-sdk-go/v3/internal/web3-provider"
+	"github.com/0xcary/1inch-sdk-go/v3/common"
+	http_executor "github.com/0xcary/1inch-sdk-go/v3/internal/http-executor"
+	web3_provider "github.com/0xcary/1inch-sdk-go/v3/internal/web3-provider"
 )
 
 type Configuration struct {

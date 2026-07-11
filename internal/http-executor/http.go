@@ -14,7 +14,7 @@ import (
 
 	"github.com/google/go-querystring/query"
 
-	"github.com/1inch/1inch-sdk-go/v3/common"
+	"github.com/0xcary/1inch-sdk-go/v3/common"
 )
 
 var scientificNotationRegex = regexp.MustCompile(`^[+-]?\d+(\.\d+)?[eE][+-]?\d+$`)

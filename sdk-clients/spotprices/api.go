@@ -6,7 +6,7 @@ import (
 	"fmt"
 	"strings"
 
-	"github.com/1inch/1inch-sdk-go/v3/common"
+	"github.com/0xcary/1inch-sdk-go/v3/common"
 )
 
 // GetPricesForWhitelistedTokens Get Prices for whitelisted tokens

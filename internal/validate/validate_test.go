@@ -6,11 +6,11 @@ import (
 
 	"slices"
 
-	"github.com/1inch/1inch-sdk-go/v3/internal/bigint"
+	"github.com/0xcary/1inch-sdk-go/v3/internal/bigint"
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
 
-	"github.com/1inch/1inch-sdk-go/v3/constants"
+	"github.com/0xcary/1inch-sdk-go/v3/constants"
 )
 
 func TestIsEthereumAddressRequired(t *testing.T) {

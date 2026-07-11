@@ -5,8 +5,8 @@ import (
 
 	"github.com/ethereum/go-ethereum/accounts/abi"
 
-	"github.com/1inch/1inch-sdk-go/v3/common"
-	"github.com/1inch/1inch-sdk-go/v3/constants"
+	"github.com/0xcary/1inch-sdk-go/v3/common"
+	"github.com/0xcary/1inch-sdk-go/v3/constants"
 )
 
 type Client struct {

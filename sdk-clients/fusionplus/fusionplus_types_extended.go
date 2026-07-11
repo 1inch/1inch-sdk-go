@@ -3,9 +3,9 @@ package fusionplus
 import (
 	"math/big"
 
-	"github.com/1inch/1inch-sdk-go/v3/common/fusionorder"
-	"github.com/1inch/1inch-sdk-go/v3/sdk-clients/fusion"
-	"github.com/1inch/1inch-sdk-go/v3/sdk-clients/orderbook"
+	"github.com/0xcary/1inch-sdk-go/v3/common/fusionorder"
+	"github.com/0xcary/1inch-sdk-go/v3/sdk-clients/fusion"
+	"github.com/0xcary/1inch-sdk-go/v3/sdk-clients/orderbook"
 	"github.com/ethereum/go-ethereum/common"
 )
 
