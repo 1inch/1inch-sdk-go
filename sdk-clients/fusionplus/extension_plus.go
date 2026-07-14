@@ -4,9 +4,9 @@ import (
 	"fmt"
 	"math/big"
 
-	"github.com/1inch/1inch-sdk-go/common/fusionorder"
-	"github.com/1inch/1inch-sdk-go/internal/hexadecimal"
-	"github.com/1inch/1inch-sdk-go/sdk-clients/orderbook"
+	"github.com/1inch/1inch-sdk-go/v4/common/fusionorder"
+	"github.com/1inch/1inch-sdk-go/v4/internal/hexadecimal"
+	"github.com/1inch/1inch-sdk-go/v4/sdk-clients/orderbook"
 	geth_common "github.com/ethereum/go-ethereum/common"
 )
 

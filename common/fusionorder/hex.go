@@ -4,7 +4,7 @@ import (
 	"errors"
 	"fmt"
 
-	"github.com/1inch/1inch-sdk-go/internal/hexadecimal"
+	"github.com/1inch/1inch-sdk-go/v4/internal/hexadecimal"
 )
 
 // Prefix0x ensures a hex string has the 0x prefix

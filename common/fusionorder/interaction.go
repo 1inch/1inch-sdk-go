@@ -4,7 +4,7 @@ import (
 	"fmt"
 	"strings"
 
-	"github.com/1inch/1inch-sdk-go/internal/hexadecimal"
+	"github.com/1inch/1inch-sdk-go/v4/internal/hexadecimal"
 	"github.com/ethereum/go-ethereum/common"
 	"github.com/ethereum/go-ethereum/common/hexutil"
 )

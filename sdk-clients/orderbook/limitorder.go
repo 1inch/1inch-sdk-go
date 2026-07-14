@@ -7,12 +7,12 @@ import (
 	"math/big"
 	"time"
 
-	"github.com/1inch/1inch-sdk-go/internal/hexadecimal"
+	"github.com/1inch/1inch-sdk-go/v4/internal/hexadecimal"
 	"github.com/ethereum/go-ethereum/common/math"
 	"github.com/ethereum/go-ethereum/crypto"
 	"github.com/ethereum/go-ethereum/signer/core/apitypes"
 
-	"github.com/1inch/1inch-sdk-go/constants"
+	"github.com/1inch/1inch-sdk-go/v4/constants"
 )
 
 func CreateLimitOrderMessage(orderRequest CreateOrderParams, chainId int) (*Order, error) {

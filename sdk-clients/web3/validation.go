@@ -1,7 +1,7 @@
 package web3
 
 import (
-	"github.com/1inch/1inch-sdk-go/internal/validate"
+	"github.com/1inch/1inch-sdk-go/v4/internal/validate"
 )
 
 func (params *PerformRpcCallAgainstFullNodeParams) Validate() error {

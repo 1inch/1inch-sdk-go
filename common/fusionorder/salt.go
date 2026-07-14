@@ -5,7 +5,7 @@ import (
 	"fmt"
 	"math/big"
 
-	random_number_generation "github.com/1inch/1inch-sdk-go/internal/random-number-generation"
+	random_number_generation "github.com/1inch/1inch-sdk-go/v4/internal/random-number-generation"
 	"golang.org/x/crypto/sha3"
 )
 

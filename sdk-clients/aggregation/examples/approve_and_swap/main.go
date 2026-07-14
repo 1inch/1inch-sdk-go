@@ -8,8 +8,8 @@ import (
 	"os"
 	"time"
 
-	"github.com/1inch/1inch-sdk-go/constants"
-	"github.com/1inch/1inch-sdk-go/sdk-clients/aggregation"
+	"github.com/1inch/1inch-sdk-go/v4/constants"
+	"github.com/1inch/1inch-sdk-go/v4/sdk-clients/aggregation"
 	"github.com/ethereum/go-ethereum/common"
 	"github.com/ethereum/go-ethereum/common/hexutil"
 )
