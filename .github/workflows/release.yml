@@ -5,12 +5,15 @@ on:
     inputs:
       version:
         type: choice
-        description: Version
+        description: Semantic version bump to apply to the latest release tag
         options:
           - patch
           - minor
           - major
           - prerelease
+
+permissions:
+  contents: write
 
 jobs:
   create:
@@ -19,22 +22,77 @@ jobs:
     steps:
       - name: Check out code
         uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
 
       - name: Set up Go
         uses: actions/setup-go@v5
         with:
-          go-version: '1.21.0'
+          go-version: '1.25'
 
       - name: Build
         run: go build -v ./...
 
+      - name: Compute next version
+        id: version
+        run: |
+          set -euo pipefail
+          bump="${{ github.event.inputs.version }}"
+
+          # Base every bump on the latest stable release tag (ignore pre-releases).
+          latest_stable=$(git tag -l 'v*' --sort=-v:refname | grep -vE '\-' | head -n1 || true)
+          latest_stable="${latest_stable:-v0.0.0}"
+          echo "Latest stable tag: $latest_stable"
+
+          core="${latest_stable#v}"
+          IFS='.' read -r major minor patch <<< "$core"
+
+          case "$bump" in
+            major)
+              next="v$((major + 1)).0.0"
+              ;;
+            minor)
+              next="v${major}.$((minor + 1)).0"
+              ;;
+            patch)
+              next="v${major}.${minor}.$((patch + 1))"
+              ;;
+            prerelease)
+              rc_core="v${major}.${minor}.$((patch + 1))"
+              last_rc=$(git tag -l "${rc_core}-rc.*" --sort=-v:refname | head -n1 || true)
+              if [ -n "$last_rc" ]; then
+                n="${last_rc##*-rc.}"
+                next="${rc_core}-rc.$((n + 1))"
+              else
+                next="${rc_core}-rc.1"
+              fi
+              ;;
+            *)
+              echo "Unknown bump type: $bump" >&2
+              exit 1
+              ;;
+          esac
+
+          echo "Next version: $next"
+          if git rev-parse "$next" >/dev/null 2>&1; then
+            echo "Tag $next already exists" >&2
+            exit 1
+          fi
+
+          echo "version=$next" >> "$GITHUB_OUTPUT"
+          if [[ "$next" == *-* ]]; then
+            echo "prerelease=true" >> "$GITHUB_OUTPUT"
+          else
+            echo "prerelease=false" >> "$GITHUB_OUTPUT"
+          fi
+
       - name: Create Release
-        id: create_release
-        uses: actions/create-release@v1
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-        with:
-          tag_name: ${{ github.event.inputs.version }}
-          release_name: Release ${{ github.event.inputs.version }}
-          draft: false
-          prerelease: false
+        run: |
+          set -euo pipefail
+          args=(--target "$GITHUB_SHA" --title "${{ steps.version.outputs.version }}" --generate-notes)
+          if [ "${{ steps.version.outputs.prerelease }}" = "true" ]; then
+            args+=(--prerelease)
+          fi
+          gh release create "${{ steps.version.outputs.version }}" "${args[@]}"
