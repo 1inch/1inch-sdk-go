@@ -5,10 +5,10 @@ import (
 	"fmt"
 	"math/big"
 
-	"github.com/1inch/1inch-sdk-go/common/fusionorder"
-	"github.com/1inch/1inch-sdk-go/constants"
-	"github.com/1inch/1inch-sdk-go/internal/bytesbuilder"
-	"github.com/1inch/1inch-sdk-go/internal/bytesiterator"
+	"github.com/1inch/1inch-sdk-go/v4/common/fusionorder"
+	"github.com/1inch/1inch-sdk-go/v4/constants"
+	"github.com/1inch/1inch-sdk-go/v4/internal/bytesbuilder"
+	"github.com/1inch/1inch-sdk-go/v4/internal/bytesiterator"
 	"github.com/ethereum/go-ethereum/common"
 	"github.com/ethereum/go-ethereum/common/hexutil"
 )

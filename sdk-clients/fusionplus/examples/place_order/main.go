@@ -8,8 +8,8 @@ import (
 	"os"
 	"time"
 
-	"github.com/1inch/1inch-sdk-go/constants"
-	"github.com/1inch/1inch-sdk-go/sdk-clients/fusionplus"
+	"github.com/1inch/1inch-sdk-go/v4/constants"
+	"github.com/1inch/1inch-sdk-go/v4/sdk-clients/fusionplus"
 )
 
 var (

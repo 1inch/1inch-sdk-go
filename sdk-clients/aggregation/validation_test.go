@@ -5,7 +5,7 @@ import (
 
 	"github.com/stretchr/testify/require"
 
-	"github.com/1inch/1inch-sdk-go/internal/validate"
+	"github.com/1inch/1inch-sdk-go/v4/internal/validate"
 )
 
 const ethereumUsdc = "0xa0b86991c6218b36c1d19d4a2e9eb0ce3606eb48"
