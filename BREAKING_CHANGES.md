@@ -2,6 +2,16 @@
 
 This document tracks breaking changes between major versions of the SDK that affect users importing and integrating the library.
 
+## Version 4.0.0
+
+### Minimum Go Version Raised to 1.25
+
+The module's `go` directive has been bumped from `go 1.22` to `go 1.25.0`, and the explicit `toolchain go1.23.0` line has been removed. This change is required by the upgrade to `golang.org/x/crypto` v0.52.0 (part of a batch of security dependency upgrades that clear open Dependabot advisories).
+
+**Impact:** Downstream projects must build with Go 1.25 or newer. Projects pinned to an older Go toolchain will fail to compile against this version of the SDK.
+
+**Migration:** Update your toolchain to Go 1.25+ (e.g. bump the `go` directive in your own `go.mod` and your CI Go version).
+
 ## Version 3.0.0
 
 ### New Shared `fusionorder` Package

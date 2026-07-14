@@ -2,11 +2,13 @@ package web3_provider
 
 import (
 	"crypto/ecdsa"
+	"encoding/hex"
 	"math/big"
 	"strings"
 	"testing"
 
 	"github.com/ethereum/go-ethereum/accounts/abi"
+	gethCommon "github.com/ethereum/go-ethereum/common"
 	"github.com/ethereum/go-ethereum/crypto"
 	"github.com/ethereum/go-ethereum/ethclient"
 	"github.com/stretchr/testify/require"
@@ -275,6 +277,77 @@ func TestTokenPermit(t *testing.T) {
 			require.Equal(t, tc.expectedPermitString, permit)
 		})
 	}
+}
+
+// Test_erc20ABIPermitCalls locks in the exact ABI encoding produced for the
+// calls issued by GetContractDetailsForPermit. These selectors are stable
+// across ERC-20 / EIP-2612 tokens, so a change here would signal that a
+// go-ethereum upgrade altered ABI packing behavior.
+func Test_erc20ABIPermitCalls(t *testing.T) {
+	erc20ABI, err := abi.JSON(strings.NewReader(constants.Erc20ABI))
+	require.NoError(t, err)
+
+	owner := gethCommon.HexToAddress("0x2c9b2dbdba8a9c969ac24153f5c1c23cb0e63914")
+
+	tests := []struct {
+		name       string
+		method     string
+		args       []interface{}
+		expableHex string
+	}{
+		{
+			name:       "name() selector",
+			method:     "name",
+			expableHex: "06fdde03",
+		},
+		{
+			name:       "version() selector",
+			method:     "version",
+			expableHex: "54fd4d50",
+		},
+		{
+			name:       "nonces(address) selector and padded owner",
+			method:     "nonces",
+			args:       []interface{}{owner},
+			expableHex: "7ecebe000000000000000000000000002c9b2dbdba8a9c969ac24153f5c1c23cb0e63914",
+		},
+	}
+
+	for _, tc := range tests {
+		t.Run(tc.name, func(t *testing.T) {
+			packed, err := erc20ABI.Pack(tc.method, tc.args...)
+			require.NoError(t, err)
+			require.Equal(t, tc.expableHex, hex.EncodeToString(packed))
+		})
+	}
+}
+
+// Test_erc20ABIPermitUnpack verifies that the response decoding used by
+// GetContractDetailsForPermit round-trips through the go-ethereum ABI codec
+// for both a dynamic string ("name") and a uint256 ("nonces").
+func Test_erc20ABIPermitUnpack(t *testing.T) {
+	erc20ABI, err := abi.JSON(strings.NewReader(constants.Erc20ABI))
+	require.NoError(t, err)
+
+	t.Run("unpack name string", func(t *testing.T) {
+		encoded, err := erc20ABI.Methods["name"].Outputs.Pack("1INCH Token")
+		require.NoError(t, err)
+
+		var name string
+		err = erc20ABI.UnpackIntoInterface(&name, "name", encoded)
+		require.NoError(t, err)
+		require.Equal(t, "1INCH Token", name)
+	})
+
+	t.Run("unpack nonces uint256", func(t *testing.T) {
+		encoded, err := erc20ABI.Methods["nonces"].Outputs.Pack(big.NewInt(42))
+		require.NoError(t, err)
+
+		var nonce *big.Int
+		err = erc20ABI.UnpackIntoInterface(&nonce, "nonces", encoded)
+		require.NoError(t, err)
+		require.Equal(t, int64(42), nonce.Int64())
+	})
 }
 
 func Test_convertSignatureToVRSString(t *testing.T) {
