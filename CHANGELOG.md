@@ -4,7 +4,7 @@ All notable changes to this project will be documented in this file.
 
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/), and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html) starting with the *v1.0.0-beta.1* release.
 
-## [Unreleased]
+## [v4.0.0] - 2026-07-14
 
 ### Breaking Changes
 - **Minimum Go version raised to 1.25**: The `go` directive in `go.mod` is now `go 1.25.0` (previously `go 1.22`). This is required by `golang.org/x/crypto` v0.52.0. Consumers must build with Go 1.25 or newer.

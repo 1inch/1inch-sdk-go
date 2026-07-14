@@ -2,7 +2,7 @@
 
 This document tracks breaking changes between major versions of the SDK that affect users importing and integrating the library.
 
-## Unreleased
+## Version 4.0.0
 
 ### Minimum Go Version Raised to 1.25
 
