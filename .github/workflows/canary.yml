@@ -1,0 +1,27 @@
+name: Production canary
+
+on:
+  workflow_dispatch:
+  schedule:
+    # Weekly on Monday at 06:30 UTC
+    - cron: '30 6 * * 1'
+
+jobs:
+  canary-trade:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout code into workspace directory
+        uses: actions/checkout@v3
+
+      - name: Set up Go 1.25
+        uses: actions/setup-go@v3
+        with:
+          go-version: '1.25'
+
+      - name: Place and monitor a dust-sized permit2 order on Polygon
+        # The test skips itself when the canary secrets are not configured
+        env:
+          DEV_PORTAL_TOKEN: ${{ secrets.DEV_PORTAL_TOKEN }}
+          CANARY_WALLET_KEY: ${{ secrets.CANARY_WALLET_KEY }}
+          CANARY_NODE_URL: ${{ secrets.CANARY_NODE_URL }}
+        run: make test-canary

@@ -57,3 +57,31 @@ cd <fusion-sdk> && forge build
 jq '{abi: .abi, bytecode: .bytecode.object}' dist/contracts/SimpleSettlement.sol/SimpleSettlement.json \
   > <1inch-sdk-go>/tests/integration/testdata/SimpleSettlement.json
 ```
+
+## Production canary
+
+`TestProductionCanary` places one real, dust-sized permit2 fusion order on Polygon
+through the production API and waits for a resolver fill. It is the live counterpart
+to the fork suite: the fork proves the on-chain mechanics, the canary proves the
+relayer accepts Go-built orders and resolvers fill them.
+
+It skips unless all three env vars are set:
+
+```bash
+DEV_PORTAL_TOKEN=<api key> CANARY_WALLET_KEY=<private key> CANARY_NODE_URL=<polygon rpc> make test-canary
+```
+
+Direction alternates automatically: the test sells whichever of WETH/USDC the wallet
+holds more trades of (0.0002 WETH or 0.5 USDC per run), so the same funds recycle
+indefinitely. Fills are gasless for the maker; POL is only needed for the one-time
+ERC20 approvals to Permit2.
+
+Wallet setup and security posture:
+
+- Use a dedicated wallet holding only dust: about 1 USDC, 0.0005 WETH, and 1 POL.
+  Anyone with write access to repository workflows can exfiltrate Actions secrets,
+  so the key must protect nothing beyond that dust.
+- Permits are scoped to the exact trade amount and expire after 30 minutes.
+- The `canary.yml` workflow runs weekly and on manual dispatch only; secrets are
+  never exposed to pull_request events. Without the secrets configured the job
+  skips and stays green.

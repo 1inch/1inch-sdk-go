@@ -24,6 +24,12 @@ test-integration:
 	@echo "  >  Running mainnet-fork integration tests"
 	GOBIN=$(GOBIN) go test -tags integration -v -timeout 15m ./tests/integration/...
 
+# Places one real dust-sized permit2 order on Polygon and waits for a resolver
+# fill. Requires DEV_PORTAL_TOKEN, CANARY_WALLET_KEY, and CANARY_NODE_URL.
+test-canary:
+	@echo "  >  Running production canary trade"
+	GOBIN=$(GOBIN) go test -tags integration -v -timeout 10m -run TestProductionCanary ./tests/integration/
+
 fmt:
 	@echo "  >  Running go fmt"
 	GOBIN=$(GOBIN) go fmt ./...
