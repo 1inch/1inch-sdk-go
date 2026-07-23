@@ -19,6 +19,7 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 - **`fusionplus.CreateFusionPlusOrderData`**: `OrderParams.IsPermit2` now sets the `USE_PERMIT2` maker-traits bit.
 - **`fusionplus.FromLimitOrderExtension`**: post-interaction data now decodes correctly; the decoder previously failed on any extension with post-interaction data because the hex slice lacked the `0x` prefix.
 - **Permit input validation**: odd-length permit hex is now rejected by `CheckPermitHash`, `fusion.NewExtension`, and `fusionplus.NewExtensionPlus`; it previously corrupted the encoded extension and produced orders that could never fill.
+- **User-Agent header**: API requests now report the actual SDK version from build info; the header was pinned to `v3.0.0`.
 - **`common.Wallet.Call`**: wallets created without a node URL now return an error instead of panicking on on-chain calls.
 
 ### Changed
