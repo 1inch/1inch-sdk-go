@@ -25,27 +25,6 @@ jobs:
       - name: Compile integration tests
         run: go vet -tags integration ./tests/...
 
-  # Temporary job for the maiden canary run; reverted before merge. Dispatchable
-  # workflows require the file on the default branch, so the first run rides PR CI.
-  canary-live:
-    runs-on: ubuntu-latest
-    steps:
-      - name: Checkout code into workspace directory
-        uses: actions/checkout@v3
-
-      - name: Set up Go 1.25
-        uses: actions/setup-go@v3
-        with:
-          go-version: '1.25'
-
-      - name: Place and monitor dust-sized canary trades on Base and Arbitrum
-        env:
-          DEV_PORTAL_TOKEN: ${{ secrets.DEV_PORTAL_TOKEN }}
-          CANARY_WALLET_KEY: ${{ secrets.CANARY_WALLET_KEY }}
-          CANARY_BASE_RPC_URL: ${{ secrets.CANARY_BASE_RPC_URL }}
-          CANARY_ARBITRUM_RPC_URL: ${{ secrets.CANARY_ARBITRUM_RPC_URL }}
-        run: make test-canary
-
   lint:
     runs-on: ubuntu-latest
     steps:
