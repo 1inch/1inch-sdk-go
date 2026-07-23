@@ -154,7 +154,6 @@ func (a *canaryActor) sendTx(t *testing.T, to geth_common.Address, data []byte) 
 		tx, err := a.orderbook.TxBuilder.New().
 			SetData(data).
 			SetTo(&to).
-			SetGasFeeCap(a.feeCapWithHeadroom(t)).
 			Build(ctx)
 		if err == nil {
 			var signedTx *types.Transaction
@@ -171,17 +170,6 @@ func (a *canaryActor) sendTx(t *testing.T, to geth_common.Address, data []byte) 
 		t.Logf("transient send failure, rebuilding and retrying: %v", lastErr)
 	}
 	t.Fatalf("failed to send transaction after retries: %v", lastErr)
-}
-
-// feeCapWithHeadroom doubles the node's suggested gas price. The transaction
-// builder defaults the fee cap to the bare suggestion, which chains with a
-// volatile base fee (Arbitrum) reject whenever the base fee ticks up before
-// inclusion; only base fee plus tip is actually charged, so the headroom is free.
-func (a *canaryActor) feeCapWithHeadroom(t *testing.T) *big.Int {
-	t.Helper()
-	gasPrice, err := a.orderbook.Wallet.GetGasPrice(context.Background())
-	require.NoError(t, err)
-	return new(big.Int).Mul(gasPrice, big.NewInt(2))
 }
 
 // retryableBroadcastError reports whether a build or broadcast failure is a
@@ -574,7 +562,6 @@ func executeAggregationSwap(t *testing.T, actor *canaryActor, aggClient *aggrega
 			SetTo(&swap.TxNormalized.To).
 			SetGas(swap.TxNormalized.Gas).
 			SetValue(swap.TxNormalized.Value).
-			SetGasFeeCap(actor.feeCapWithHeadroom(t)).
 			Build(ctx)
 		if err == nil {
 			var signedTx *types.Transaction

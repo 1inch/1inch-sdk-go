@@ -21,6 +21,7 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 - **Permit input validation**: odd-length permit hex is now rejected by `CheckPermitHash`, `fusion.NewExtension`, and `fusionplus.NewExtensionPlus`; it previously corrupted the encoded extension and produced orders that could never fill.
 - **User-Agent header**: API requests now report the actual SDK version from build info; the header was pinned to `v3.0.0`.
 - **`common.Wallet.Call`**: wallets created without a node URL now return an error instead of panicking on on-chain calls.
+- **Transaction fee cap**: EIP-1559 transactions built without an explicit `SetGasFeeCap` now default the fee cap to twice the node's suggested gas price instead of the bare suggestion, and gas estimation no longer sends a gas price. The old defaults made builds and broadcasts fail with "max fee per gas less than block base fee" whenever the base fee rose before inclusion (near-constant on Arbitrum). The charged price (base fee plus tip) is unchanged.
 
 ### Changed
 - The maker permit token field is encoded in lowercase hex in `fusion` and `fusionplus` extensions.
