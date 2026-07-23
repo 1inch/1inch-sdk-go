@@ -405,6 +405,17 @@ func TestProductionCanaryFusion(t *testing.T) {
 // cross-chain fusion order, selling from whichever chain holds more USDC so the
 // funds ping-pong between the two chains across runs
 func TestProductionCanaryFusionPlus(t *testing.T) {
+	runFusionPlusCanary(t, false)
+}
+
+// TestProductionCanaryFusionPlusPermit2 runs the same bridge with the maker funds
+// pulled through Permit2: a signed PermitSingle for the source-chain USDC is
+// embedded in the order and the USE_PERMIT2 maker-traits bit is set
+func TestProductionCanaryFusionPlusPermit2(t *testing.T) {
+	runFusionPlusCanary(t, true)
+}
+
+func runFusionPlusCanary(t *testing.T, usePermit2 bool) {
 	baseActor := newCanaryActor(t, canaryBase)
 	arbActor := newCanaryActor(t, canaryArbitrum)
 	ctx := context.Background()
@@ -425,7 +436,13 @@ func TestProductionCanaryFusionPlus(t *testing.T) {
 		"canary wallet cannot cover a %s USDC bridge from %s; fund it on both chains", canaryFusionPlusAmount, src.name)
 	t.Logf("fusion+ direction: %s USDC from %s to %s", canaryFusionPlusAmount, src.name, dst.name)
 
-	srcActor.ensureErc20Allowance(t, srcToken, srcActor.router, canaryFusionPlusAmount)
+	var permit string
+	if usePermit2 {
+		srcActor.ensureErc20Allowance(t, srcToken, srcActor.permit2, canaryFusionPlusAmount)
+		permit = srcActor.buildPermit2OrderPermit(t, srcToken, canaryFusionPlusAmount)
+	} else {
+		srcActor.ensureErc20Allowance(t, srcToken, srcActor.router, canaryFusionPlusAmount)
+	}
 
 	plusConfig, err := fusionplus.NewConfiguration(fusionplus.ConfigurationParams{
 		ApiUrl:     canaryApiUrl,
@@ -444,6 +461,8 @@ func TestProductionCanaryFusionPlus(t *testing.T) {
 		Amount:          canaryFusionPlusAmount.String(),
 		WalletAddress:   srcActor.owner.Hex(),
 		EnableEstimate:  true,
+		Permit:          permit,
+		IsPermit2:       usePermit2,
 	}
 	// The estimation inside the quote can race a base fee update; retry briefly
 	var quote *fusionplus.GetQuoteOutputFixed
@@ -484,6 +503,8 @@ func TestProductionCanaryFusionPlus(t *testing.T) {
 		SecretHashes: secretHashes,
 		Receiver:     constants.ZeroAddress,
 		Preset:       quote.RecommendedPreset,
+		Permit:       permit,
+		IsPermit2:    usePermit2,
 	}, plusClient.Wallet)
 	require.NoError(t, err, "the production API rejected the cross-chain order")
 	t.Logf("fusion+ order placed: %s", orderHash)
@@ -503,6 +524,12 @@ func TestProductionCanaryFusionPlus(t *testing.T) {
 		switch string(order.Status) {
 		case "executed":
 			srcActor.awaitBalanceDelta(t, srcToken, initSrcBalance, canaryFusionPlusAmount, true, "source USDC spent")
+			if usePermit2 {
+				require.Eventually(t, func() bool {
+					finalAllowance, err := orderbook.GetPermit2Allowance(ctx, srcActor.orderbook.Wallet, srcActor.owner, srcToken, srcActor.router)
+					return err == nil && finalAllowance.Amount.Sign() == 0
+				}, time.Minute, 5*time.Second, "the Permit2 allowance must be fully consumed")
+			}
 			// The destination transfer can land moments after the status flips
 			arrivalDeadline := time.Now().Add(2 * time.Minute)
 			for time.Now().Before(arrivalDeadline) {
