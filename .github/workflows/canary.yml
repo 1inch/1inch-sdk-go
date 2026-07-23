@@ -18,10 +18,11 @@ jobs:
         with:
           go-version: '1.25'
 
-      - name: Place and monitor a dust-sized permit2 order on Polygon
-        # The test skips itself when the canary secrets are not configured
+      - name: Place and monitor dust-sized canary trades on Base and Arbitrum
+        # The tests skip themselves when the canary secrets are not configured
         env:
           DEV_PORTAL_TOKEN: ${{ secrets.DEV_PORTAL_TOKEN }}
           CANARY_WALLET_KEY: ${{ secrets.CANARY_WALLET_KEY }}
-          CANARY_NODE_URL: ${{ secrets.CANARY_NODE_URL }}
+          CANARY_BASE_RPC_URL: ${{ secrets.CANARY_BASE_RPC_URL }}
+          CANARY_ARBITRUM_RPC_URL: ${{ secrets.CANARY_ARBITRUM_RPC_URL }}
         run: make test-canary

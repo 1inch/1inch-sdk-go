@@ -58,30 +58,46 @@ jq '{abi: .abi, bytecode: .bytecode.object}' dist/contracts/SimpleSettlement.sol
   > <1inch-sdk-go>/tests/integration/testdata/SimpleSettlement.json
 ```
 
-## Production canary
+## Production canaries
 
-`TestProductionCanary` places one real, dust-sized permit2 fusion order on Polygon
-through the production API and waits for a resolver fill. It is the live counterpart
-to the fork suite: the fork proves the on-chain mechanics, the canary proves the
-relayer accepts Go-built orders and resolvers fill them.
+The canaries place real, dust-sized trades through the production API. They are the
+live counterpart to the fork suite: the fork proves the on-chain mechanics, the
+canaries prove the production API accepts Go-built requests and real counterparties
+execute them.
 
-It skips unless all three env vars are set:
+Coverage matrix:
+
+| Product | Chain(s) | Allowance mechanisms |
+|---|---|---|
+| `TestProductionCanaryFusion` | Base | direct approval, EIP-2612 permit, Permit2 permit |
+| `TestProductionCanaryFusionPlus` | Base and Arbitrum | direct approval |
+| `TestProductionCanaryAggregation` | Arbitrum | direct approval, EIP-2612 permit, Permit2 allowance |
+
+Fusion+ intentionally uses only direct approval: the cross-chain API does not offer
+permit-based flows, so probing them would fail by design.
+
+The tests skip unless all env vars are set:
 
 ```bash
-DEV_PORTAL_TOKEN=<api key> CANARY_WALLET_KEY=<private key> CANARY_NODE_URL=<polygon rpc> make test-canary
+DEV_PORTAL_TOKEN=<api key> CANARY_WALLET_KEY=<private key> \
+CANARY_BASE_RPC_URL=<base rpc> CANARY_ARBITRUM_RPC_URL=<arbitrum rpc> make test-canary
 ```
 
-Direction alternates automatically: the test sells whichever of WETH/USDC the wallet
-holds more trades of (0.0002 WETH or 0.5 USDC per run), so the same funds recycle
-indefinitely. Fills are gasless for the maker; POL is only needed for the one-time
-ERC20 approvals to Permit2.
+Direction alternates automatically: single-chain canaries sell whichever of
+WETH/USDC the wallet holds more trades of (0.0002 WETH or 0.5 USDC per trade), and
+the Fusion+ canary bridges 1.5 USDC from whichever chain holds more, so the same
+funds recycle indefinitely. Fusion fills are gasless for the maker; gas is needed
+for one-time approvals and for aggregation swaps.
 
 Wallet setup and security posture:
 
-- Use a dedicated wallet holding only dust: about 1 USDC, 0.0005 WETH, and 1 POL.
-  Anyone with write access to repository workflows can exfiltrate Actions secrets,
-  so the key must protect nothing beyond that dust.
-- Permits are scoped to the exact trade amount and expire after 30 minutes.
+- Fund a dedicated wallet on BOTH chains: about 2.5 USDC, 0.0005 WETH, and 0.0005
+  ETH on each of Base and Arbitrum. Anyone with write access to repository
+  workflows can exfiltrate Actions secrets, so the key must protect nothing beyond
+  that dust.
+- Signed permits are scoped to the exact trade amount and expire after 30 minutes.
+  The one-time approvals (ERC20 to Permit2/router, and the aggregation Permit2
+  standing allowance) are unlimited by the canonical pattern.
 - The `canary.yml` workflow runs weekly and on manual dispatch only; secrets are
-  never exposed to pull_request events. Without the secrets configured the job
-  skips and stays green.
+  never exposed to pull_request events. Without the secrets configured the jobs
+  skip and stay green.
