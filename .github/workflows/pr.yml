@@ -60,4 +60,5 @@ jobs:
           CANARY_WALLET_KEY: ${{ secrets.CANARY_WALLET_KEY }}
           CANARY_BASE_RPC_URL: ${{ secrets.CANARY_BASE_RPC_URL }}
           CANARY_ARBITRUM_RPC_URL: ${{ secrets.CANARY_ARBITRUM_RPC_URL }}
+          CANARY_FUSION_PLUS_PERMIT2: '1'
         run: go test -v -tags integration -timeout 30m -run TestProductionCanaryFusionPlusPermit2 ./tests/integration/
