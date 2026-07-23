@@ -5,9 +5,9 @@ import (
 	"math/big"
 	"testing"
 
-	"github.com/1inch/1inch-sdk-go/common/fusionorder"
-	"github.com/1inch/1inch-sdk-go/constants"
-	random_number_generation "github.com/1inch/1inch-sdk-go/internal/random-number-generation"
+	"github.com/1inch/1inch-sdk-go/v4/common/fusionorder"
+	"github.com/1inch/1inch-sdk-go/v4/constants"
+	random_number_generation "github.com/1inch/1inch-sdk-go/v4/internal/random-number-generation"
 	"github.com/ethereum/go-ethereum/common"
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"

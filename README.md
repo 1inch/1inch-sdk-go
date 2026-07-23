@@ -62,7 +62,7 @@ go mod init hello1inch
 ###### Add SDK Dependencies
 
 ```
-go get github.com/1inch/1inch-sdk-go/sdk-clients/aggregation
+go get github.com/1inch/1inch-sdk-go/v4/sdk-clients/aggregation
 ```
 
 ###### Write Code
@@ -80,8 +80,8 @@ import (
 	"fmt"
 	"log"
 
-	"github.com/1inch/1inch-sdk-go/constants"
-	"github.com/1inch/1inch-sdk-go/sdk-clients/aggregation"
+	"github.com/1inch/1inch-sdk-go/v4/constants"
+	"github.com/1inch/1inch-sdk-go/v4/sdk-clients/aggregation"
 )
 
 var (

@@ -16,12 +16,12 @@ import (
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
 
-	"github.com/1inch/1inch-sdk-go/common"
-	"github.com/1inch/1inch-sdk-go/constants"
-	transaction_builder "github.com/1inch/1inch-sdk-go/internal/transaction-builder"
-	web3_provider "github.com/1inch/1inch-sdk-go/internal/web3-provider"
-	"github.com/1inch/1inch-sdk-go/sdk-clients/fusion"
-	"github.com/1inch/1inch-sdk-go/sdk-clients/orderbook"
+	"github.com/1inch/1inch-sdk-go/v4/common"
+	"github.com/1inch/1inch-sdk-go/v4/constants"
+	transaction_builder "github.com/1inch/1inch-sdk-go/v4/internal/transaction-builder"
+	web3_provider "github.com/1inch/1inch-sdk-go/v4/internal/web3-provider"
+	"github.com/1inch/1inch-sdk-go/v4/sdk-clients/fusion"
+	"github.com/1inch/1inch-sdk-go/v4/sdk-clients/orderbook"
 )
 
 const minimalErc20ABI = `[

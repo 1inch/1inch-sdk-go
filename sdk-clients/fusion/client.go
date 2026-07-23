@@ -4,7 +4,7 @@ import (
 	"context"
 	"errors"
 
-	"github.com/1inch/1inch-sdk-go/common"
+	"github.com/1inch/1inch-sdk-go/v4/common"
 )
 
 type Client struct {

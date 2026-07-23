@@ -2,6 +2,36 @@
 
 This document tracks breaking changes between major versions of the SDK that affect users importing and integrating the library.
 
+## Version 4.0.0
+
+### Module Path Now Includes the `/v4` Major-Version Suffix
+
+Per [Go module rules](https://go.dev/ref/mod#major-version-suffixes), modules at major version 2 or higher must include the major-version suffix in their module path. The module path is now `github.com/1inch/1inch-sdk-go/v4` (previously `github.com/1inch/1inch-sdk-go`). Without this suffix the Go toolchain rejects `v4.x.x` tags as invalid and the module proxy cannot resolve them.
+
+**Impact:** All imports must include the `/v4` suffix.
+
+**Migration:** Update your import paths and `go get` commands:
+
+```go
+// Before
+import "github.com/1inch/1inch-sdk-go/sdk-clients/aggregation"
+
+// After
+import "github.com/1inch/1inch-sdk-go/v4/sdk-clients/aggregation"
+```
+
+```bash
+go get github.com/1inch/1inch-sdk-go/v4/sdk-clients/aggregation
+```
+
+### Minimum Go Version Raised to 1.25
+
+The module's `go` directive has been bumped from `go 1.22` to `go 1.25.0`, and the explicit `toolchain go1.23.0` line has been removed. This change is required by the upgrade to `golang.org/x/crypto` v0.52.0 (part of a batch of security dependency upgrades that clear open Dependabot advisories).
+
+**Impact:** Downstream projects must build with Go 1.25 or newer. Projects pinned to an older Go toolchain will fail to compile against this version of the SDK.
+
+**Migration:** Update your toolchain to Go 1.25+ (e.g. bump the `go` directive in your own `go.mod` and your CI Go version).
+
 ## Version 3.0.0
 
 ### New Shared `fusionorder` Package

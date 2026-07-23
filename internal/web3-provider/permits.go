@@ -11,8 +11,8 @@ import (
 	"github.com/ethereum/go-ethereum/crypto"
 	"github.com/ethereum/go-ethereum/signer/core/apitypes"
 
-	"github.com/1inch/1inch-sdk-go/common"
-	"github.com/1inch/1inch-sdk-go/internal/web3-provider/multicall"
+	"github.com/1inch/1inch-sdk-go/v4/common"
+	"github.com/1inch/1inch-sdk-go/v4/internal/web3-provider/multicall"
 )
 
 // TokenPermit Will return an erc2612 string struct if possible

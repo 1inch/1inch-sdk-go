@@ -1,0 +1,30 @@
+# golangci-lint v2 configuration.
+#
+# Added alongside the golangci-lint v1 -> v2 upgrade that was required when the
+# module's go directive moved to 1.25 (golangci-lint must be built with a Go
+# version >= the target). This config keeps the linting policy equivalent to the
+# previous v1 setup so the toolchain bump does not surface pre-existing findings
+# unrelated to that change.
+version: "2"
+
+run:
+  timeout: 3m
+
+linters:
+  # Default "standard" set (errcheck, govet, ineffassign, staticcheck, unused),
+  # matching the linters effectively enforced under the previous v1 defaults.
+  default: standard
+  exclusions:
+    # Restores the v1 default exclusions for unchecked Close/Flush/Write, etc.
+    presets:
+      - std-error-handling
+    rules:
+      # QF (quickfix) style suggestions such as De Morgan's law were not enforced
+      # under v1 and are stylistic only.
+      - linters: [staticcheck]
+        text: "QF1001"
+      # Example programs intentionally use illustrative patterns (busy-loops and
+      # the package's own deprecated aliases) for documentation purposes.
+      - path: examples/
+        linters: [staticcheck]
+        text: "S1000|S1037|SA4004|SA1019"

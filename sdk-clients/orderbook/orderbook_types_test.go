@@ -4,10 +4,10 @@ import (
 	"fmt"
 	"testing"
 
-	web3_provider "github.com/1inch/1inch-sdk-go/internal/web3-provider"
+	web3_provider "github.com/1inch/1inch-sdk-go/v4/internal/web3-provider"
 	"github.com/stretchr/testify/require"
 
-	"github.com/1inch/1inch-sdk-go/internal/validate"
+	"github.com/1inch/1inch-sdk-go/v4/internal/validate"
 )
 
 var wallet, _ = web3_provider.DefaultWalletOnlyProvider("965e092fdfc08940d2bd05c7b5c7e1c51e283e92c7f52bbf1408973ae9a9acb7", 137)

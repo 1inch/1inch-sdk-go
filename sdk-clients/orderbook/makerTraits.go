@@ -7,7 +7,7 @@ import (
 	"strings"
 	"time"
 
-	"github.com/1inch/1inch-sdk-go/constants"
+	"github.com/1inch/1inch-sdk-go/v4/constants"
 )
 
 // Bitmask definitions for the Typescript Limit Order SDK (currently unused):

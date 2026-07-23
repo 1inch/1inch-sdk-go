@@ -8,7 +8,7 @@ import (
 	"sort"
 	"strings"
 
-	"github.com/1inch/1inch-sdk-go/constants"
+	"github.com/1inch/1inch-sdk-go/v4/constants"
 )
 
 // packFeeParameter encodes integrator and resolver fee details into a single 48-bit value with error checks on input ranges.

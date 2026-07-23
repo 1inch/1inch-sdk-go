@@ -22,9 +22,9 @@ import (
 	"github.com/ethereum/go-ethereum/ethclient"
 	"github.com/ethereum/go-ethereum/rpc"
 
-	"github.com/1inch/1inch-sdk-go/common"
-	"github.com/1inch/1inch-sdk-go/constants"
-	web3_provider "github.com/1inch/1inch-sdk-go/internal/web3-provider"
+	"github.com/1inch/1inch-sdk-go/v4/common"
+	"github.com/1inch/1inch-sdk-go/v4/constants"
+	web3_provider "github.com/1inch/1inch-sdk-go/v4/internal/web3-provider"
 )
 
 const (

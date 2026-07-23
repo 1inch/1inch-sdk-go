@@ -24,6 +24,18 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 ### Changed
 - The maker permit token field is encoded in lowercase hex in `fusion` and `fusionplus` extensions.
 
+## [v4.0.0] - 2026-07-14
+
+### Breaking Changes
+- **Module path now includes `/v4` suffix**: The module path is now `github.com/1inch/1inch-sdk-go/v4`, as required by Go for major versions >= 2. All imports and `go get` commands must include the `/v4` suffix (e.g. `github.com/1inch/1inch-sdk-go/v4/sdk-clients/aggregation`).
+- **Minimum Go version raised to 1.25**: The `go` directive in `go.mod` is now `go 1.25.0` (previously `go 1.22`). This is required by `golang.org/x/crypto` v0.52.0. Consumers must build with Go 1.25 or newer.
+
+### Changed
+- **Dependency security upgrades** (resolves open Dependabot alerts):
+  - `golang.org/x/crypto` v0.31.0 → v0.52.0
+  - `github.com/ethereum/go-ethereum` v1.14.13 → v1.17.0
+  - `github.com/consensys/gnark-crypto` v0.12.1 → v0.18.1 (transitive)
+
 ## [v3.0.0] - 2026-02-06
 
 ### Breaking Changes

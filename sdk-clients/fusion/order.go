@@ -5,12 +5,12 @@ import (
 	"fmt"
 	"math/big"
 
-	"github.com/1inch/1inch-sdk-go/common"
-	"github.com/1inch/1inch-sdk-go/common/fusionorder"
-	"github.com/1inch/1inch-sdk-go/constants"
-	random_number_generation "github.com/1inch/1inch-sdk-go/internal/random-number-generation"
-	"github.com/1inch/1inch-sdk-go/internal/times"
-	"github.com/1inch/1inch-sdk-go/sdk-clients/orderbook"
+	"github.com/1inch/1inch-sdk-go/v4/common"
+	"github.com/1inch/1inch-sdk-go/v4/common/fusionorder"
+	"github.com/1inch/1inch-sdk-go/v4/constants"
+	random_number_generation "github.com/1inch/1inch-sdk-go/v4/internal/random-number-generation"
+	"github.com/1inch/1inch-sdk-go/v4/internal/times"
+	"github.com/1inch/1inch-sdk-go/v4/sdk-clients/orderbook"
 	geth_common "github.com/ethereum/go-ethereum/common"
 )
 

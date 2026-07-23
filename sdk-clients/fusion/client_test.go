@@ -10,8 +10,8 @@ import (
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
 
-	"github.com/1inch/1inch-sdk-go/common"
-	web3_provider "github.com/1inch/1inch-sdk-go/internal/web3-provider"
+	"github.com/1inch/1inch-sdk-go/v4/common"
+	web3_provider "github.com/1inch/1inch-sdk-go/v4/internal/web3-provider"
 )
 
 // capturingHttpExecutor records every request and replays queued responses.

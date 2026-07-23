@@ -11,8 +11,8 @@ import (
 	"github.com/ethereum/go-ethereum/crypto"
 	"github.com/ethereum/go-ethereum/ethclient"
 
-	"github.com/1inch/1inch-sdk-go/constants"
-	"github.com/1inch/1inch-sdk-go/internal/web3-provider/multicall"
+	"github.com/1inch/1inch-sdk-go/v4/constants"
+	"github.com/1inch/1inch-sdk-go/v4/internal/web3-provider/multicall"
 )
 
 type Wallet struct {
