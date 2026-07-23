@@ -41,23 +41,3 @@ jobs:
         with:
           version: v2.10.1
           args: --timeout=3m
-
-  # Temporary probe for the maiden Fusion+ EIP-2612 canary; reverted before merge.
-  fusionplus-eip2612-probe:
-    runs-on: ubuntu-latest
-    steps:
-      - name: Checkout code into workspace directory
-        uses: actions/checkout@v4
-
-      - name: Set up Go
-        uses: actions/setup-go@v5
-        with:
-          go-version: '1.25'
-
-      - name: Place one Fusion+ EIP-2612 canary order
-        env:
-          DEV_PORTAL_TOKEN: ${{ secrets.DEV_PORTAL_TOKEN }}
-          CANARY_WALLET_KEY: ${{ secrets.CANARY_WALLET_KEY }}
-          CANARY_BASE_RPC_URL: ${{ secrets.CANARY_BASE_RPC_URL }}
-          CANARY_ARBITRUM_RPC_URL: ${{ secrets.CANARY_ARBITRUM_RPC_URL }}
-        run: go test -v -tags integration -timeout 30m -run TestProductionCanaryFusionPlusEip2612 ./tests/integration/
