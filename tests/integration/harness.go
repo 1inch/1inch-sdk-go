@@ -23,16 +23,18 @@ import (
 	"github.com/ethereum/go-ethereum/rpc"
 
 	"github.com/1inch/1inch-sdk-go/common"
+	"github.com/1inch/1inch-sdk-go/constants"
 	web3_provider "github.com/1inch/1inch-sdk-go/internal/web3-provider"
 )
 
 const (
 	wethAddress      = "0xc02aaa39b223fe8d0a0e5c4f27ead9083c756cc2"
 	usdcAddress      = "0xa0b86991c6218b36c1d19d4a2e9eb0ce3606eb48"
-	lopV4Address     = "0x111111125421cA6dc452d289314280a0f8842A65"
 	accessToken      = "0xacce550000159e70908c0499a1119d04e7039c28"
-	zeroAddress      = "0x0000000000000000000000000000000000000000"
 	usdcDonorAddress = "0x37305B1cD40574E4C5Ce33f8e8306Be057fD7341"
+
+	lopV4Address = constants.AggregationRouterV6
+	zeroAddress  = constants.ZeroAddress
 )
 
 // freshPrivateKey generates a random key so test accounts have no mainnet state.
@@ -52,6 +54,19 @@ var fallbackForkUrls = []string{
 	"https://eth.merkle.io",
 	"https://1rpc.io/eth",
 	"https://eth.drpc.org", // free tier throttles quickly, last resort
+}
+
+// anvilCmd holds the shared fork process, torn down in TestMain after all tests run
+var anvilCmd *exec.Cmd
+
+// TestMain tears down the shared anvil fork once the whole package has run
+func TestMain(m *testing.M) {
+	code := m.Run()
+	if anvilCmd != nil && anvilCmd.Process != nil {
+		_ = anvilCmd.Process.Kill()
+		_, _ = anvilCmd.Process.Wait()
+	}
+	os.Exit(code)
 }
 
 type forkNode struct {
@@ -116,10 +131,7 @@ func startAnvil(t *testing.T) *forkNode {
 	if err := cmd.Start(); err != nil {
 		t.Fatalf("failed to start anvil: %v", err)
 	}
-	t.Cleanup(func() {
-		_ = cmd.Process.Kill()
-		_, _ = cmd.Process.Wait()
-	})
+	anvilCmd = cmd
 
 	ready := make(chan struct{})
 	go func() {
@@ -159,9 +171,18 @@ func (n *forkNode) setBalance(t *testing.T, address string, wei *big.Int) {
 	}
 }
 
+// setNextBlockTimestamp moves the next block's timestamp to at least the given value,
+// clamped above the current head so sequential subtests never rewind the chain
 func (n *forkNode) setNextBlockTimestamp(t *testing.T, timestamp int64) {
 	t.Helper()
-	err := n.rpcClient.CallContext(context.Background(), nil, "evm_setNextBlockTimestamp", hexutil.EncodeBig(big.NewInt(timestamp)))
+	header, err := n.ethClient.HeaderByNumber(context.Background(), nil)
+	if err != nil {
+		t.Fatalf("failed to read latest header: %v", err)
+	}
+	if head := int64(header.Time); timestamp <= head {
+		timestamp = head + 1
+	}
+	err = n.rpcClient.CallContext(context.Background(), nil, "evm_setNextBlockTimestamp", hexutil.EncodeBig(big.NewInt(timestamp)))
 	if err != nil {
 		t.Fatalf("evm_setNextBlockTimestamp failed: %v", err)
 	}

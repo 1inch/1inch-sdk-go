@@ -22,6 +22,9 @@ jobs:
       - name: Unit tests
         run: make test
 
+      - name: Compile integration tests
+        run: go vet -tags integration ./tests/...
+
   lint:
     runs-on: ubuntu-latest
     steps:

@@ -38,6 +38,9 @@ FORK_URL=https://your-mainnet-rpc go test -tags integration -v -timeout 15m ./te
    expansion of the compact amount leaves dirty upper bits that Permit2's uint160
    calldata validation rejects, so such fills revert today. The subtest fails loudly
    if a future router deployment starts accepting compact permits.
+8. A regular EIP-2612 permit subtest sells USDC through a permit built with
+   `Wallet.TokenPermit`, proving the non-Permit2 permit path fills with no prior
+   ERC20 approval and consumes the granted allowance exactly.
 
 `TestPermit2TargetSemanticsFork` pins the token field semantics of the full 352-byte
 maker permit: the protocol dispatches full permits to the canonical Permit2 contract by

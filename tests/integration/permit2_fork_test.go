@@ -6,6 +6,7 @@ import (
 	"context"
 	"math/big"
 	"strings"
+	"sync"
 	"testing"
 	"time"
 
@@ -27,6 +28,7 @@ const minimalErc20ABI = `[
 	{"name":"approve","type":"function","inputs":[{"name":"spender","type":"address"},{"name":"amount","type":"uint256"}],"outputs":[{"name":"","type":"bool"}]},
 	{"name":"transfer","type":"function","inputs":[{"name":"to","type":"address"},{"name":"amount","type":"uint256"}],"outputs":[{"name":"","type":"bool"}]},
 	{"name":"balanceOf","type":"function","stateMutability":"view","inputs":[{"name":"owner","type":"address"}],"outputs":[{"name":"","type":"uint256"}]},
+	{"name":"allowance","type":"function","stateMutability":"view","inputs":[{"name":"owner","type":"address"},{"name":"spender","type":"address"}],"outputs":[{"name":"","type":"uint256"}]},
 	{"name":"deposit","type":"function","stateMutability":"payable","inputs":[],"outputs":[]}
 ]`
 
@@ -65,8 +67,27 @@ func (e *forkEnv) balanceOf(t *testing.T, token, owner geth_common.Address) *big
 	return new(big.Int).SetBytes(result)
 }
 
-// setupForkEnv boots the fork, deploys SimpleSettlement, and funds maker (WETH) and taker (USDC)
+var (
+	forkEnvOnce   sync.Once
+	sharedForkEnv *forkEnv
+)
+
+// setupForkEnv returns the package's shared fork environment, booting it on first use.
+// Tests assert balance deltas rather than absolute values, so state accumulates safely
+// across the test functions that share the fork.
 func setupForkEnv(t *testing.T) *forkEnv {
+	t.Helper()
+	forkEnvOnce.Do(func() {
+		sharedForkEnv = buildForkEnv(t)
+	})
+	if sharedForkEnv == nil {
+		t.Fatal("shared fork environment failed to initialize")
+	}
+	return sharedForkEnv
+}
+
+// buildForkEnv boots the fork, deploys SimpleSettlement, and funds the maker and taker
+func buildForkEnv(t *testing.T) *forkEnv {
 	t.Helper()
 
 	node := startAnvil(t)
@@ -107,13 +128,30 @@ func setupForkEnv(t *testing.T) *forkEnv {
 	require.NoError(t, err)
 	node.sendTx(t, env.maker.wallet, env.maker.txBuilder, wethAddress, depositData, big.NewInt(1e18))
 
-	// Taker receives USDC from a mainnet donor via impersonation
-	usdcAmount := big.NewInt(1_000_000_000) // 1000 USDC
+	// Taker receives USDC from a mainnet donor via impersonation; the maker receives a
+	// smaller amount for orders that sell USDC
+	takerUsdc := big.NewInt(1_000_000_000) // 1000 USDC
+	makerUsdc := big.NewInt(200_000_000)   // 200 USDC
+	required := new(big.Int).Add(takerUsdc, makerUsdc)
 	donorBalance := env.balanceOf(t, geth_common.HexToAddress(usdcAddress), geth_common.HexToAddress(usdcDonorAddress))
-	require.True(t, donorBalance.Cmp(usdcAmount) >= 0, "USDC donor %s has insufficient balance %s at fork block", usdcDonorAddress, donorBalance)
-	transferData, err := erc20.Pack("transfer", env.taker.address, usdcAmount)
+	require.True(t, donorBalance.Cmp(required) >= 0, "USDC donor %s has insufficient balance %s at fork block", usdcDonorAddress, donorBalance)
+	for _, transfer := range []struct {
+		to     geth_common.Address
+		amount *big.Int
+	}{
+		{env.taker.address, takerUsdc},
+		{env.maker.address, makerUsdc},
+	} {
+		transferData, err := erc20.Pack("transfer", transfer.to, transfer.amount)
+		require.NoError(t, err)
+		node.sendImpersonated(t, usdcDonorAddress, usdcAddress, transferData)
+	}
+
+	// Taker also wraps ETH and approves WETH to the LOP to pay for orders selling USDC
+	node.sendTx(t, env.taker.wallet, env.taker.txBuilder, wethAddress, depositData, big.NewInt(1e18))
+	takerWethApprove, err := erc20.Pack("approve", geth_common.HexToAddress(lopV4Address), constants.Uint256Max)
 	require.NoError(t, err)
-	node.sendImpersonated(t, usdcDonorAddress, usdcAddress, transferData)
+	node.sendTx(t, env.taker.wallet, env.taker.txBuilder, wethAddress, takerWethApprove, nil)
 
 	// Maker approves WETH to Permit2. The Permit2 -> LOP allowance itself is granted
 	// on-chain by the maker permit embedded in the order.
@@ -141,14 +179,13 @@ func buildPermit2Calldata(t *testing.T, env *forkEnv, makingAmount *big.Int) str
 	)
 	require.NoError(t, err)
 
-	maxUint48 := new(big.Int).Sub(new(big.Int).Lsh(big.NewInt(1), 48), big.NewInt(1))
 	permitCalldata, err := orderbook.BuildPermit2Calldata(env.maker.wallet, orderbook.Permit2PermitParams{
 		Token:       geth_common.HexToAddress(wethAddress),
 		Amount:      makingAmount,
-		Expiration:  maxUint48,
+		Expiration:  constants.Uint48Max,
 		Nonce:       allowance.Nonce,
 		Spender:     geth_common.HexToAddress(lopV4Address),
-		SigDeadline: maxUint48,
+		SigDeadline: constants.Uint48Max,
 	})
 	require.NoError(t, err)
 	return permitCalldata
@@ -324,7 +361,7 @@ func TestFusionOrderPermit2Fork(t *testing.T) {
 
 		fillData := packFillOrderArgs(t, limitOrder, makingAmount, true)
 
-		env.node.setNextBlockTimestamp(t, time.Now().Unix()+10)
+		env.node.setNextBlockTimestamp(t, time.Now().Unix()+5)
 		status := env.node.trySendTx(t, env.taker.wallet, env.taker.txBuilder, lopV4Address, fillData)
 		assert.Equal(t, uint64(0), status, "fill without the embedded permit must revert for a Permit2-only maker")
 	})
@@ -357,7 +394,7 @@ func TestFusionOrderPermit2Fork(t *testing.T) {
 		halfAmount := new(big.Int).Div(makingAmount, big.NewInt(2))
 		fillData := packFillOrderArgs(t, limitOrder, halfAmount, true)
 
-		env.node.setNextBlockTimestamp(t, time.Now().Unix()+15)
+		env.node.setNextBlockTimestamp(t, time.Now().Unix()+5)
 		env.node.sendTx(t, env.taker.wallet, env.taker.txBuilder, lopV4Address, fillData, nil)
 		env.node.sendTx(t, env.taker.wallet, env.taker.txBuilder, lopV4Address, fillData, nil)
 
@@ -387,14 +424,13 @@ func TestFusionOrderPermit2Fork(t *testing.T) {
 		)
 		require.NoError(t, err)
 
-		maxUint48 := new(big.Int).Sub(new(big.Int).Lsh(big.NewInt(1), 48), big.NewInt(1))
 		permitCalldata, err := orderbook.BuildPermit2CalldataCompact(env.maker.wallet, orderbook.Permit2PermitParams{
 			Token:       weth,
 			Amount:      makingAmount,
-			Expiration:  maxUint48,
+			Expiration:  constants.Uint48Max,
 			Nonce:       allowance.Nonce,
 			Spender:     geth_common.HexToAddress(lopV4Address),
-			SigDeadline: maxUint48,
+			SigDeadline: constants.Uint48Max,
 		})
 		require.NoError(t, err)
 
@@ -416,9 +452,60 @@ func TestFusionOrderPermit2Fork(t *testing.T) {
 		require.NoError(t, err)
 
 		fillData := packFillOrderArgs(t, limitOrder, makingAmount, true)
-		env.node.setNextBlockTimestamp(t, time.Now().Unix()+18)
+		env.node.setNextBlockTimestamp(t, time.Now().Unix()+5)
 		status := env.node.trySendTx(t, env.taker.wallet, env.taker.txBuilder, lopV4Address, fillData)
 		assert.Equal(t, uint64(0), status, "compact permit fill is expected to revert on the current router")
+	})
+
+	// A regular EIP-2612 permit rides the same maker permit field: the token field is
+	// the call target for the permit and the maker needs no prior ERC20 approval
+	t.Run("eip2612 permit order fills without prior approval", func(t *testing.T) {
+		usdcToken := geth_common.HexToAddress(usdcAddress)
+		makingUsdc := big.NewInt(100_000_000)            // 100 USDC
+		takingWeth := big.NewInt(10_000_000_000_000_000) // 0.01 WETH
+
+		deadline := time.Now().Add(24 * time.Hour).Unix()
+		permitData, err := env.maker.wallet.GetContractDetailsForPermit(
+			context.Background(), usdcToken, geth_common.HexToAddress(lopV4Address), makingUsdc, deadline)
+		require.NoError(t, err)
+		permit, err := env.maker.wallet.TokenPermit(*permitData)
+		require.NoError(t, err)
+
+		quote := quoteFixture(env, takingWeth.String())
+		orderParams := fusion.OrderParams{
+			FromTokenAddress:   usdcAddress,
+			ToTokenAddress:     wethAddress,
+			Amount:             makingUsdc.String(),
+			WalletAddress:      strings.ToLower(env.maker.address.Hex()),
+			Receiver:           zeroAddress,
+			Preset:             fusion.Fast,
+			Permit:             permit,
+			IsPermit2:          false,
+			AllowPartialFills:  true,
+			AllowMultipleFills: true,
+		}
+
+		preparedOrder, limitOrder, err := fusion.CreateFusionOrderData(quote, orderParams, env.maker.wallet, 1)
+		require.NoError(t, err)
+		require.True(t,
+			strings.EqualFold(preparedOrder.Order.FusionExtension.MakerPermit[:42], usdcAddress),
+			"maker permit token field must be the maker asset")
+
+		initMakerUsdc := env.balanceOf(t, usdcToken, env.maker.address)
+
+		fillData := packFillOrderArgs(t, limitOrder, makingUsdc, true)
+		env.node.setNextBlockTimestamp(t, time.Now().Unix()+5)
+		env.node.sendTx(t, env.taker.wallet, env.taker.txBuilder, lopV4Address, fillData, nil)
+
+		finalMakerUsdc := env.balanceOf(t, usdcToken, env.maker.address)
+		assert.Equal(t, makingUsdc.String(), new(big.Int).Sub(initMakerUsdc, finalMakerUsdc).String(), "maker USDC spent via EIP-2612 permit")
+
+		// The permit granted exactly the making amount, so the fill consumes it fully
+		allowanceData, err := env.erc20.Pack("allowance", env.maker.address, geth_common.HexToAddress(lopV4Address))
+		require.NoError(t, err)
+		result, err := env.maker.wallet.Call(context.Background(), usdcToken, allowanceData)
+		require.NoError(t, err)
+		assert.Equal(t, "0", new(big.Int).SetBytes(result).String(), "ERC20 allowance fully consumed")
 	})
 
 	// Regression: ordinary orders without any permit must be unaffected by the permit wiring
@@ -445,7 +532,7 @@ func TestFusionOrderPermit2Fork(t *testing.T) {
 		initMakerWeth := env.balanceOf(t, weth, env.maker.address)
 
 		fillData := packFillOrderArgs(t, limitOrder, makingAmount, true)
-		env.node.setNextBlockTimestamp(t, time.Now().Unix()+20)
+		env.node.setNextBlockTimestamp(t, time.Now().Unix()+5)
 		env.node.sendTx(t, env.taker.wallet, env.taker.txBuilder, lopV4Address, fillData, nil)
 
 		finalMakerWeth := env.balanceOf(t, weth, env.maker.address)
