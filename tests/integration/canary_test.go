@@ -12,6 +12,7 @@ import (
 
 	"github.com/ethereum/go-ethereum/accounts/abi"
 	geth_common "github.com/ethereum/go-ethereum/common"
+	"github.com/ethereum/go-ethereum/core/types"
 	"github.com/stretchr/testify/require"
 
 	"github.com/1inch/1inch-sdk-go/v4/constants"
@@ -150,21 +151,45 @@ func (a *canaryActor) sendTx(t *testing.T, to geth_common.Address, data []byte) 
 		if attempt > 0 {
 			time.Sleep(5 * time.Second)
 		}
-		tx, err := a.orderbook.TxBuilder.New().SetData(data).SetTo(&to).Build(ctx)
-		require.NoError(t, err)
-		signedTx, err := a.orderbook.Wallet.Sign(tx)
-		require.NoError(t, err)
-		lastErr = a.orderbook.Wallet.BroadcastTransaction(ctx, signedTx)
-		if lastErr == nil {
-			a.waitForReceipt(t, signedTx.Hash(), 3*time.Minute)
-			return
+		tx, err := a.orderbook.TxBuilder.New().
+			SetData(data).
+			SetTo(&to).
+			SetGasFeeCap(a.feeCapWithHeadroom(t)).
+			Build(ctx)
+		if err == nil {
+			var signedTx *types.Transaction
+			signedTx, err = a.orderbook.Wallet.Sign(tx)
+			require.NoError(t, err)
+			err = a.orderbook.Wallet.BroadcastTransaction(ctx, signedTx)
+			if err == nil {
+				a.waitForReceipt(t, signedTx.Hash(), 3*time.Minute)
+				return
+			}
 		}
-		if !strings.Contains(strings.ToLower(lastErr.Error()), "nonce") {
-			break
-		}
-		t.Logf("broadcast rejected with stale nonce, retrying: %v", lastErr)
+		lastErr = err
+		require.True(t, retryableBroadcastError(lastErr), "failed to send transaction: %v", lastErr)
+		t.Logf("transient send failure, rebuilding and retrying: %v", lastErr)
 	}
-	t.Fatalf("failed to broadcast transaction: %v", lastErr)
+	t.Fatalf("failed to send transaction after retries: %v", lastErr)
+}
+
+// feeCapWithHeadroom doubles the node's suggested gas price. The transaction
+// builder defaults the fee cap to the bare suggestion, which chains with a
+// volatile base fee (Arbitrum) reject whenever the base fee ticks up before
+// inclusion; only base fee plus tip is actually charged, so the headroom is free.
+func (a *canaryActor) feeCapWithHeadroom(t *testing.T) *big.Int {
+	t.Helper()
+	gasPrice, err := a.orderbook.Wallet.GetGasPrice(context.Background())
+	require.NoError(t, err)
+	return new(big.Int).Mul(gasPrice, big.NewInt(2))
+}
+
+// retryableBroadcastError reports whether a build or broadcast failure is a
+// transient RPC-state race worth rebuilding for: a stale nonce from a lagging
+// node, or a fee cap that fell below a freshly risen base fee
+func retryableBroadcastError(err error) bool {
+	msg := strings.ToLower(err.Error())
+	return strings.Contains(msg, "nonce") || strings.Contains(msg, "fee per gas")
 }
 
 // awaitBalanceDelta retries the balance read until the expected delta appears,
@@ -539,18 +564,35 @@ func executeAggregationSwap(t *testing.T, actor *canaryActor, aggClient *aggrega
 	})
 	require.NoError(t, err, "the production API rejected the swap request")
 
-	tx, err := aggClient.TxBuilder.New().
-		SetData(swap.TxNormalized.Data).
-		SetTo(&swap.TxNormalized.To).
-		SetGas(swap.TxNormalized.Gas).
-		SetValue(swap.TxNormalized.Value).
-		Build(ctx)
-	require.NoError(t, err)
-	signedTx, err := aggClient.Wallet.Sign(tx)
-	require.NoError(t, err)
-	require.NoError(t, aggClient.Wallet.BroadcastTransaction(ctx, signedTx))
-	t.Logf("swap broadcast: %s", signedTx.Hash().Hex())
-	actor.waitForReceipt(t, signedTx.Hash(), 3*time.Minute)
+	var lastErr error
+	for attempt := 0; attempt < 4; attempt++ {
+		if attempt > 0 {
+			time.Sleep(5 * time.Second)
+		}
+		tx, err := aggClient.TxBuilder.New().
+			SetData(swap.TxNormalized.Data).
+			SetTo(&swap.TxNormalized.To).
+			SetGas(swap.TxNormalized.Gas).
+			SetValue(swap.TxNormalized.Value).
+			SetGasFeeCap(actor.feeCapWithHeadroom(t)).
+			Build(ctx)
+		if err == nil {
+			var signedTx *types.Transaction
+			signedTx, err = aggClient.Wallet.Sign(tx)
+			require.NoError(t, err)
+			err = aggClient.Wallet.BroadcastTransaction(ctx, signedTx)
+			if err == nil {
+				t.Logf("swap broadcast: %s", signedTx.Hash().Hex())
+				actor.waitForReceipt(t, signedTx.Hash(), 3*time.Minute)
+				lastErr = nil
+				break
+			}
+		}
+		lastErr = err
+		require.True(t, retryableBroadcastError(lastErr), "failed to send swap: %v", lastErr)
+		t.Logf("transient send failure, rebuilding and retrying: %v", lastErr)
+	}
+	require.NoError(t, lastErr, "failed to send swap after retries")
 
 	actor.awaitBalanceDelta(t, sellToken, initSellBalance, sellAmount, true, "sell amount spent")
 	actor.awaitBalanceDelta(t, buyToken, initBuyBalance, nil, false, "buy balance increased")
