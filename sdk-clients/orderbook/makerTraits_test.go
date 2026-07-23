@@ -164,3 +164,21 @@ func TestMakerTraitsEncodeDecodeRoundTrip(t *testing.T) {
 		})
 	}
 }
+
+func TestDecodeMakerTraitsRejectsSignedHex(t *testing.T) {
+	tests := []struct {
+		name    string
+		encoded string
+	}{
+		{name: "Negative hex", encoded: "-1"},
+		{name: "Negative prefixed hex", encoded: "0x-1"},
+	}
+
+	for _, tc := range tests {
+		t.Run(tc.name, func(t *testing.T) {
+			_, err := DecodeMakerTraits(tc.encoded)
+			require.Error(t, err)
+			assert.Contains(t, err.Error(), "invalid maker traits hex")
+		})
+	}
+}

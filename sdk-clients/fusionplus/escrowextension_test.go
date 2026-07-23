@@ -193,7 +193,23 @@ func TestNewExtension(t *testing.T) {
 				},
 			},
 			expectErr: true,
-			errMsg:    "invalid permit hex: odd length",
+			errMsg:    "invalid permit hex: 0xabc",
+		},
+		{
+			name: "Non-hex permit",
+			params: EscrowExtensionParams{
+				ExtensionParamsPlus: ExtensionParamsPlus{
+					SettlementContract: "0x5678",
+					MakerAssetSuffix:   "0x1234",
+					TakerAssetSuffix:   "0x1234",
+					Predicate:          "0x1234",
+					PreInteraction:     "pre",
+					Asset:              "0x1234",
+					Permit:             "0xzz34",
+				},
+			},
+			expectErr: true,
+			errMsg:    "invalid permit hex: 0xzz34",
 		},
 	}
 

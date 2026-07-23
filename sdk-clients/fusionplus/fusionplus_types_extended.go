@@ -25,7 +25,7 @@ type GetOrderFillsByHashOutputFixed struct {
 	AuctionDuration float32 `json:"auctionDuration"`
 
 	// AuctionStartDate Unix timestamp in milliseconds
-	AuctionStartDate float32                `json:"auctionStartDate"`
+	AuctionStartDate float32        `json:"auctionStartDate"`
 	CancelTx         map[string]any `json:"cancelTx"`
 
 	// Cancelable Is order cancelable

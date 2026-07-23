@@ -80,17 +80,17 @@ type CreateOrderResponse struct {
 }
 
 type OrderResponse struct {
-	Signature            string      `json:"signature"`
-	OrderHash            string      `json:"orderHash"`
-	CreateDateTime       time.Time   `json:"createDateTime"`
-	RemainingMakerAmount string      `json:"remainingMakerAmount"`
-	MakerBalance         string      `json:"makerBalance"`
-	MakerAllowance       string      `json:"makerAllowance"`
-	Data                 OrderData   `json:"data"`
-	MakerRate            string      `json:"makerRate"`
-	TakerRate            string      `json:"takerRate"`
-	IsMakerContract      bool        `json:"isMakerContract"`
-	OrderInvalidReason   any `json:"orderInvalidReason"`
+	Signature            string    `json:"signature"`
+	OrderHash            string    `json:"orderHash"`
+	CreateDateTime       time.Time `json:"createDateTime"`
+	RemainingMakerAmount string    `json:"remainingMakerAmount"`
+	MakerBalance         string    `json:"makerBalance"`
+	MakerAllowance       string    `json:"makerAllowance"`
+	Data                 OrderData `json:"data"`
+	MakerRate            string    `json:"makerRate"`
+	TakerRate            string    `json:"takerRate"`
+	IsMakerContract      bool      `json:"isMakerContract"`
+	OrderInvalidReason   any       `json:"orderInvalidReason"`
 }
 
 type OrderResponseExtended struct {

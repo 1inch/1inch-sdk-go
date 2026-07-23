@@ -86,7 +86,12 @@ func main() {
 
 	fromToken := weth
 	toToken := usdc
-	owner := gethCommon.HexToAddress(publicAddress)
+	// The permit owner, order maker, and nonce lookups must all use the address
+	// derived from the signing key; WALLET_ADDRESS is only sanity-checked against it
+	owner := orderbookClient.Wallet.Address()
+	if publicAddress != "" && !strings.EqualFold(publicAddress, owner.Hex()) {
+		log.Fatalf("WALLET_ADDRESS %s does not match the address %s derived from WALLET_KEY", publicAddress, owner.Hex())
+	}
 	sellToken := gethCommon.HexToAddress(fromToken)
 	router := gethCommon.HexToAddress(constants.AggregationRouterV6)
 	makingAmount, ok := new(big.Int).SetString(amount, 10)
@@ -123,7 +128,7 @@ func main() {
 	// Step 3: quote and place the order in one call. PlaceOrderFromParams propagates
 	// Permit and IsPermit2 into both the quote request and the order.
 	orderParams := fusion.OrderParams{
-		WalletAddress:    publicAddress,
+		WalletAddress:    owner.Hex(),
 		FromTokenAddress: fromToken,
 		ToTokenAddress:   toToken,
 		Amount:           amount,
@@ -150,7 +155,11 @@ func main() {
 		}
 
 		fmt.Printf("Order status: %s\n", order.Status)
-		if order.Status == "filled" {
+		switch order.Status {
+		case "filled":
+			return
+		case "expired", "cancelled", "refunded", "false-predicate", "not-enough-balance-or-allowance", "wrong-permit":
+			fmt.Printf("Order ended without filling (status %s)\n", order.Status)
 			return
 		}
 	}
@@ -178,6 +187,10 @@ func ensurePermit2Approval(ctx context.Context, client *orderbook.Client, token 
 		return nil
 	}
 
+	// The unlimited approval is the common Permit2 pattern: per-trade limits are
+	// enforced by the signed permits, which are amount-scoped and expiring. To keep
+	// the ERC20 layer bounded too, replace constants.Uint256Max with the exact
+	// required amount at the cost of one approval transaction per order.
 	fmt.Println("Sending one-time ERC20 approval to Permit2...")
 	approveData, err := erc20.Pack("approve", permit2, constants.Uint256Max)
 	if err != nil {

@@ -27,10 +27,10 @@ var (
 const (
 	PolygonFRAX = "0x45c32fa6df82ead1e2ef74d17b76547eddfaff89"
 	PolygonUsdc = "0x3c499c542cEF5E3811e1192ce70d8cC03d5c3359"
-	ten16   = "10000000000000000"
-	ten6    = "1000000"
-	ten4    = "10000"
-	chainId = 137
+	ten16       = "10000000000000000"
+	ten6        = "1000000"
+	ten4        = "10000"
+	chainId     = 137
 )
 
 var (

@@ -21,8 +21,8 @@ func NewExtensionPlus(params ExtensionParamsPlus) (*ExtensionPlus, error) {
 		return nil, err
 	}
 
-	if params.Permit != "" && len(hexadecimal.Trim0x(params.Permit))%2 != 0 {
-		return nil, fmt.Errorf("invalid permit hex: odd length")
+	if params.Permit != "" && !hexadecimal.IsHexBytes(params.Permit) {
+		return nil, fmt.Errorf("invalid permit hex: %s", params.Permit)
 	}
 
 	settlementContractAddress := geth_common.HexToAddress(params.SettlementContract)
@@ -130,6 +130,9 @@ func DecodeExtension(data []byte) (*ExtensionPlus, error) {
 }
 
 func FromLimitOrderExtension(extension *orderbook.Extension) (*ExtensionPlus, error) {
+	if len(extension.MakingAmountData) < 42 || len(extension.TakingAmountData) < 42 || len(extension.PostInteraction) < 42 {
+		return nil, fmt.Errorf("malformed extension: amount data and post interaction must start with a settlement contract address")
+	}
 
 	settlementContractAddress := extension.MakingAmountData[:42]
 

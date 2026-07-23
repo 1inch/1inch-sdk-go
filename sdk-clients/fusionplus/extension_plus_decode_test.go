@@ -8,6 +8,7 @@ import (
 	"github.com/stretchr/testify/require"
 
 	"github.com/1inch/1inch-sdk-go/v4/common/fusionorder"
+	"github.com/1inch/1inch-sdk-go/v4/sdk-clients/orderbook"
 	"github.com/ethereum/go-ethereum/common"
 )
 
@@ -141,6 +142,36 @@ func TestDecodeSettlementPostInteractionData_Empty(t *testing.T) {
 			_, err := DecodeSettlementPostInteractionData(tc.data)
 			require.Error(t, err)
 			assert.Contains(t, err.Error(), tc.errorMsg)
+		})
+	}
+}
+
+// TestFromLimitOrderExtension_ShortFields verifies malformed extensions with fields
+// shorter than a settlement address return errors instead of panicking
+func TestFromLimitOrderExtension_ShortFields(t *testing.T) {
+	tests := []struct {
+		name      string
+		extension *orderbook.Extension
+	}{
+		{
+			name:      "Empty fields",
+			extension: &orderbook.Extension{MakingAmountData: "0x", TakingAmountData: "0x", PostInteraction: "0x"},
+		},
+		{
+			name: "Post interaction shorter than an address",
+			extension: &orderbook.Extension{
+				MakingAmountData: "0x0000000000000000000000000000000000005678",
+				TakingAmountData: "0x0000000000000000000000000000000000005678",
+				PostInteraction:  "0x12",
+			},
+		},
+	}
+
+	for _, tc := range tests {
+		t.Run(tc.name, func(t *testing.T) {
+			_, err := FromLimitOrderExtension(tc.extension)
+			require.Error(t, err)
+			assert.Contains(t, err.Error(), "malformed extension")
 		})
 	}
 }

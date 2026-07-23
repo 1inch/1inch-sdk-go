@@ -68,8 +68,8 @@ func NewExtension(params ExtensionParams) (*Extension, error) {
 		return nil, err
 	}
 
-	if params.Permit != "" && len(hexadecimal.Trim0x(params.Permit))%2 != 0 {
-		return nil, fmt.Errorf("invalid permit hex: odd length")
+	if params.Permit != "" && !hexadecimal.IsHexBytes(params.Permit) {
+		return nil, fmt.Errorf("invalid permit hex: %s", params.Permit)
 	}
 
 	var resolvingStartTime *big.Int

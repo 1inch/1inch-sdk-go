@@ -122,7 +122,7 @@ func (m *MakerTraits) IsBitInvalidatorMode() bool {
 // sender is the zero-padded 20-hex-char tail of the original address.
 func DecodeMakerTraits(encoded string) (*MakerTraits, error) {
 	value, ok := new(big.Int).SetString(strings.TrimPrefix(encoded, "0x"), 16)
-	if !ok {
+	if !ok || value.Sign() < 0 {
 		return nil, fmt.Errorf("invalid maker traits hex: %s", encoded)
 	}
 

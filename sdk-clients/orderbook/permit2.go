@@ -235,6 +235,9 @@ func signPermit2PermitSingle(wallet common.Wallet, params Permit2PermitParams) (
 	if err != nil {
 		return nil, fmt.Errorf("failed to sign PermitSingle digest: %w", err)
 	}
+	if len(signature) != 65 {
+		return nil, fmt.Errorf("unexpected signature length %d, want 65", len(signature))
+	}
 	signature[64] += 27
 
 	compact, err := CompressSignature(fmt.Sprintf("%x", signature))

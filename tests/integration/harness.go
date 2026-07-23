@@ -134,18 +134,29 @@ func startAnvil(t *testing.T) *forkNode {
 	anvilCmd = cmd
 
 	ready := make(chan struct{})
+	died := make(chan string, 1)
 	go func() {
 		scanner := bufio.NewScanner(stdout)
+		signaled := false
+		lastLine := ""
+		// Keep draining to EOF for the process lifetime so anvil never blocks on a
+		// full pipe; EOF before the readiness line means the process exited early
 		for scanner.Scan() {
-			if strings.Contains(scanner.Text(), "Listening on") {
+			lastLine = scanner.Text()
+			if !signaled && strings.Contains(lastLine, "Listening on") {
+				signaled = true
 				close(ready)
-				return
 			}
+		}
+		if !signaled {
+			died <- lastLine
 		}
 	}()
 
 	select {
 	case <-ready:
+	case lastLine := <-died:
+		t.Fatalf("anvil exited before becoming ready, last output: %s", lastLine)
 	case <-time.After(120 * time.Second):
 		t.Fatal("anvil did not become ready within 120s (slow fork RPC?)")
 	}
@@ -269,9 +280,13 @@ func (n *forkNode) trySendTx(t *testing.T, wallet *web3_provider.Wallet, txBuild
 		t.Fatalf("failed to sign tx: %v", err)
 	}
 	if err := wallet.BroadcastTransaction(ctx, signedTx); err != nil {
-		// anvil may reject reverting transactions at broadcast time
-		t.Logf("broadcast rejected (treated as revert): %v", err)
-		return 0
+		// anvil may reject reverting transactions at broadcast time; any other
+		// broadcast failure is an environment problem the test must not hide
+		if strings.Contains(strings.ToLower(err.Error()), "revert") {
+			t.Logf("broadcast rejected with revert: %v", err)
+			return 0
+		}
+		t.Fatalf("broadcast failed for a reason other than revert: %v", err)
 	}
 	deadline := time.Now().Add(30 * time.Second)
 	for time.Now().Before(deadline) {

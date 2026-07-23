@@ -116,6 +116,14 @@ func TestBuildPermit2CalldataCompact(t *testing.T) {
 			expectError: true,
 			errorMsg:    "nonce must fit in uint32",
 		},
+		{
+			name: "Negative amount",
+			mutate: func(p *Permit2PermitParams) {
+				p.Amount = big.NewInt(-1)
+			},
+			expectError: true,
+			errorMsg:    "amount must fit in uint160",
+		},
 	}
 
 	for _, tc := range tests {
@@ -179,21 +187,4 @@ func TestCompactPermit2Timestamp(t *testing.T) {
 			}
 		})
 	}
-}
-
-func TestBuildPermit2CalldataCompact_NegativeAmount(t *testing.T) {
-	testKey := "d8d1f95deb28949ea0ecc4e9a0decf89e98422c2d76ab6e5f736792a388c56c7"
-	wallet, err := web3_provider.DefaultWalletOnlyProvider(testKey, 1)
-	require.NoError(t, err)
-
-	_, err = BuildPermit2CalldataCompact(wallet, Permit2PermitParams{
-		Token:       gethCommon.HexToAddress("0xc02aaa39b223fe8d0a0e5c4f27ead9083c756cc2"),
-		Amount:      big.NewInt(-1),
-		Expiration:  constants.Uint48Max,
-		Nonce:       big.NewInt(0),
-		Spender:     gethCommon.HexToAddress("0x111111125421cA6dc452d289314280a0f8842A65"),
-		SigDeadline: constants.Uint48Max,
-	})
-	require.Error(t, err)
-	assert.Contains(t, err.Error(), "amount must fit in uint160")
 }
