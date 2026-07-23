@@ -3,7 +3,6 @@ package fusionplus
 import (
 	"fmt"
 	"math/big"
-	"strings"
 
 	"github.com/1inch/1inch-sdk-go/common/fusionorder"
 	"github.com/1inch/1inch-sdk-go/internal/hexadecimal"
@@ -20,6 +19,10 @@ func NewExtensionPlus(params ExtensionParamsPlus) (*ExtensionPlus, error) {
 		CustomData:         params.CustomData,
 	}); err != nil {
 		return nil, err
+	}
+
+	if params.Permit != "" && len(hexadecimal.Trim0x(params.Permit))%2 != 0 {
+		return nil, fmt.Errorf("invalid permit hex: odd length")
 	}
 
 	settlementContractAddress := geth_common.HexToAddress(params.SettlementContract)
@@ -59,7 +62,7 @@ func NewExtensionPlus(params ExtensionParamsPlus) (*ExtensionPlus, error) {
 			Target: geth_common.HexToAddress(params.Asset),
 			Data:   params.Permit,
 		}
-		extensionPlus.MakerPermit = strings.ToLower(permitInteraction.Target.String()) + hexadecimal.Trim0x(permitInteraction.Data)
+		extensionPlus.MakerPermit = permitInteraction.Encode()
 	}
 
 	return extensionPlus, nil

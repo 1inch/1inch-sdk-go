@@ -20,6 +20,39 @@ import (
 
 const permit2AllowanceABI = `[{"inputs":[{"internalType":"address","name":"","type":"address"},{"internalType":"address","name":"","type":"address"},{"internalType":"address","name":"","type":"address"}],"name":"allowance","outputs":[{"internalType":"uint160","name":"amount","type":"uint160"},{"internalType":"uint48","name":"expiration","type":"uint48"},{"internalType":"uint48","name":"nonce","type":"uint48"}],"stateMutability":"view","type":"function"}]`
 
+var permit2AllowanceParsedABI, permit2AllowanceParsedABIErr = abi.JSON(strings.NewReader(permit2AllowanceABI))
+
+var permit2CalldataArguments, permit2CalldataArgumentsErr = buildPermit2CalldataArguments()
+
+func buildPermit2CalldataArguments() (abi.Arguments, error) {
+	addressType, err := abi.NewType("address", "", nil)
+	if err != nil {
+		return nil, err
+	}
+	permitSingleType, err := abi.NewType("tuple", "", []abi.ArgumentMarshaling{
+		{Name: "details", Type: "tuple", Components: []abi.ArgumentMarshaling{
+			{Name: "token", Type: "address"},
+			{Name: "amount", Type: "uint160"},
+			{Name: "expiration", Type: "uint48"},
+			{Name: "nonce", Type: "uint48"},
+		}},
+		{Name: "spender", Type: "address"},
+		{Name: "sigDeadline", Type: "uint256"},
+	})
+	if err != nil {
+		return nil, err
+	}
+	bytesType, err := abi.NewType("bytes", "", nil)
+	if err != nil {
+		return nil, err
+	}
+	return abi.Arguments{
+		{Type: addressType},
+		{Type: permitSingleType},
+		{Type: bytesType},
+	}, nil
+}
+
 // Permit2Allowance is the AllowanceTransfer state stored by the Permit2 contract
 // for an (owner, token, spender) triple
 type Permit2Allowance struct {
@@ -48,11 +81,10 @@ type Permit2PermitParams struct {
 // (owner, token, spender) from the canonical Permit2 contract. The wallet must be
 // RPC-connected (created with a node URL).
 func GetPermit2Allowance(ctx context.Context, wallet common.Wallet, owner, token, spender gethCommon.Address) (*Permit2Allowance, error) {
-	parsedABI, err := abi.JSON(strings.NewReader(permit2AllowanceABI))
-	if err != nil {
-		return nil, err
+	if permit2AllowanceParsedABIErr != nil {
+		return nil, permit2AllowanceParsedABIErr
 	}
-	callData, err := parsedABI.Pack("allowance", owner, token, spender)
+	callData, err := permit2AllowanceParsedABI.Pack("allowance", owner, token, spender)
 	if err != nil {
 		return nil, err
 	}
@@ -60,7 +92,7 @@ func GetPermit2Allowance(ctx context.Context, wallet common.Wallet, owner, token
 	if err != nil {
 		return nil, fmt.Errorf("failed to read Permit2 allowance: %w", err)
 	}
-	values, err := parsedABI.Unpack("allowance", result)
+	values, err := permit2AllowanceParsedABI.Unpack("allowance", result)
 	if err != nil {
 		return nil, err
 	}
@@ -138,12 +170,10 @@ func BuildPermit2CalldataCompact(wallet common.Wallet, params Permit2PermitParam
 	return fmt.Sprintf("0x%x", out), nil
 }
 
-var maxUint48 = new(big.Int).Sub(new(big.Int).Lsh(big.NewInt(1), 48), big.NewInt(1))
-
 // compactPermit2Timestamp encodes a uint48 timestamp for the compact permit form,
 // which the protocol decodes as (stored - 1) truncated to uint48
 func compactPermit2Timestamp(value *big.Int) (uint32, error) {
-	if value.Cmp(maxUint48) == 0 {
+	if value.Cmp(constants.Uint48Max) == 0 {
 		return 0, nil
 	}
 	if value.Sign() < 0 || value.BitLen() > 32 || value.Uint64()+1 > stdmath.MaxUint32 {
@@ -216,26 +246,8 @@ func signPermit2PermitSingle(wallet common.Wallet, params Permit2PermitParams) (
 
 // encodePermit2Calldata encodes (address owner, PermitSingle permit, bytes signature)
 func encodePermit2Calldata(owner gethCommon.Address, params Permit2PermitParams, signature []byte) (string, error) {
-	addressType, err := abi.NewType("address", "", nil)
-	if err != nil {
-		return "", err
-	}
-	permitSingleType, err := abi.NewType("tuple", "", []abi.ArgumentMarshaling{
-		{Name: "details", Type: "tuple", Components: []abi.ArgumentMarshaling{
-			{Name: "token", Type: "address"},
-			{Name: "amount", Type: "uint160"},
-			{Name: "expiration", Type: "uint48"},
-			{Name: "nonce", Type: "uint48"},
-		}},
-		{Name: "spender", Type: "address"},
-		{Name: "sigDeadline", Type: "uint256"},
-	})
-	if err != nil {
-		return "", err
-	}
-	bytesType, err := abi.NewType("bytes", "", nil)
-	if err != nil {
-		return "", err
+	if permit2CalldataArgumentsErr != nil {
+		return "", permit2CalldataArgumentsErr
 	}
 
 	permitValue := struct {
@@ -263,12 +275,7 @@ func encodePermit2Calldata(owner gethCommon.Address, params Permit2PermitParams,
 		SigDeadline: params.SigDeadline,
 	}
 
-	arguments := abi.Arguments{
-		{Type: addressType},
-		{Type: permitSingleType},
-		{Type: bytesType},
-	}
-	packed, err := arguments.Pack(owner, permitValue, signature)
+	packed, err := permit2CalldataArguments.Pack(owner, permitValue, signature)
 	if err != nil {
 		return "", fmt.Errorf("failed to encode permit2 calldata: %w", err)
 	}

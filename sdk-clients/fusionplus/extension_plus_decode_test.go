@@ -70,3 +70,77 @@ func TestFromLimitOrderExtension_RoundTrip(t *testing.T) {
 		})
 	}
 }
+
+// TestDecodeExtension_RoundTrip verifies the raw byte entry point reproduces the
+// built extension, exercising orderbook.Decode and FromLimitOrderExtension together
+func TestDecodeExtension_RoundTrip(t *testing.T) {
+	built, err := NewExtensionPlus(ExtensionParamsPlus{
+		SettlementContract: "0x5678",
+		AuctionDetails: &fusionorder.AuctionDetails{
+			StartTime:       0,
+			Duration:        0,
+			InitialRateBump: 0,
+			Points:          nil,
+			GasCost:         fusionorder.GasCostConfigClassFixed{},
+		},
+		PostInteractionData: &SettlementPostInteractionData{
+			Whitelist: []fusionorder.WhitelistItem{},
+			IntegratorFee: &IntegratorFee{
+				Ratio:    big.NewInt(0),
+				Receiver: common.Address{},
+			},
+			BankFee:            big.NewInt(0),
+			ResolvingStartTime: big.NewInt(0),
+			CustomReceiver:     common.Address{},
+		},
+		Asset:  "0x00000000000000000000000000000000000f1234",
+		Permit: "0x3456",
+
+		MakerAssetSuffix: "0x1234",
+		TakerAssetSuffix: "0x1234",
+		Predicate:        "0x1234",
+		PreInteraction:   "0x9abc",
+	})
+	require.NoError(t, err)
+
+	encoded, err := built.ConvertToOrderbookExtension().Encode()
+	require.NoError(t, err)
+
+	decoded, err := DecodeExtension(common.FromHex(encoded))
+	require.NoError(t, err)
+
+	assert.Equal(t, "0x00000000000000000000000000000000000f1234", decoded.Asset)
+	assert.Equal(t, "0x3456", decoded.Permit)
+	assert.Equal(t, built.MakerPermit, decoded.MakerPermit)
+	assert.Equal(t, built.MakingAmountData, decoded.MakingAmountData)
+	assert.Equal(t, built.PostInteraction, decoded.PostInteraction)
+}
+
+// TestDecodeSettlementPostInteractionData_Empty verifies empty input returns an error
+// instead of panicking
+func TestDecodeSettlementPostInteractionData_Empty(t *testing.T) {
+	tests := []struct {
+		name     string
+		data     string
+		errorMsg string
+	}{
+		{
+			name:     "Empty hex data",
+			data:     "0x",
+			errorMsg: "post interaction data is empty",
+		},
+		{
+			name:     "Missing prefix",
+			data:     "",
+			errorMsg: "invalid hex string",
+		},
+	}
+
+	for _, tc := range tests {
+		t.Run(tc.name, func(t *testing.T) {
+			_, err := DecodeSettlementPostInteractionData(tc.data)
+			require.Error(t, err)
+			assert.Contains(t, err.Error(), tc.errorMsg)
+		})
+	}
+}

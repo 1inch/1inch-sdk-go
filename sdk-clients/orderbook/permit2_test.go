@@ -9,12 +9,12 @@ import (
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
 
+	"github.com/1inch/1inch-sdk-go/constants"
 	web3_provider "github.com/1inch/1inch-sdk-go/internal/web3-provider"
 )
 
 func TestBuildPermit2Calldata(t *testing.T) {
 	testKey := "d8d1f95deb28949ea0ecc4e9a0decf89e98422c2d76ab6e5f736792a388c56c7"
-	maxUint48 := new(big.Int).Sub(new(big.Int).Lsh(big.NewInt(1), 48), big.NewInt(1))
 
 	tests := []struct {
 		name        string
@@ -28,10 +28,10 @@ func TestBuildPermit2Calldata(t *testing.T) {
 			params: Permit2PermitParams{
 				Token:       gethCommon.HexToAddress("0xc02aaa39b223fe8d0a0e5c4f27ead9083c756cc2"),
 				Amount:      big.NewInt(100000000000000000),
-				Expiration:  maxUint48,
+				Expiration:  constants.Uint48Max,
 				Nonce:       big.NewInt(0),
 				Spender:     gethCommon.HexToAddress("0x111111125421cA6dc452d289314280a0f8842A65"),
-				SigDeadline: maxUint48,
+				SigDeadline: constants.Uint48Max,
 			},
 			expected: "0x000000000000000000000000a07c1d51497fb6e66aa2329cecb86fca0a957fdb000000000000000000000000c02aaa39b223fe8d0a0e5c4f27ead9083c756cc2000000000000000000000000000000000000000000000000016345785d8a00000000000000000000000000000000000000000000000000000000ffffffffffff0000000000000000000000000000000000000000000000000000000000000000000000000000000000000000111111125421ca6dc452d289314280a0f8842a650000000000000000000000000000000000000000000000000000ffffffffffff00000000000000000000000000000000000000000000000000000000000001000000000000000000000000000000000000000000000000000000000000000040977350b6dbbf5b1308a4b231bf73c8e779cc15d7be0c9c48bdfaed90528ae66da6fbe646b71e7f00265deac46e2c89bc2827f0d1029839cd18f82e24a8ee90ad",
 		},
@@ -40,9 +40,9 @@ func TestBuildPermit2Calldata(t *testing.T) {
 			params: Permit2PermitParams{
 				Token:       gethCommon.HexToAddress("0xc02aaa39b223fe8d0a0e5c4f27ead9083c756cc2"),
 				Amount:      big.NewInt(1),
-				Expiration:  maxUint48,
+				Expiration:  constants.Uint48Max,
 				Spender:     gethCommon.HexToAddress("0x111111125421cA6dc452d289314280a0f8842A65"),
-				SigDeadline: maxUint48,
+				SigDeadline: constants.Uint48Max,
 			},
 			expectError: true,
 			errorMsg:    "amount, expiration, nonce, and sig deadline are required",
@@ -76,16 +76,15 @@ func TestBuildPermit2Calldata(t *testing.T) {
 
 func TestBuildPermit2CalldataCompact(t *testing.T) {
 	testKey := "d8d1f95deb28949ea0ecc4e9a0decf89e98422c2d76ab6e5f736792a388c56c7"
-	maxUint48Val := new(big.Int).Sub(new(big.Int).Lsh(big.NewInt(1), 48), big.NewInt(1))
 
 	baseParams := func() Permit2PermitParams {
 		return Permit2PermitParams{
 			Token:       gethCommon.HexToAddress("0xc02aaa39b223fe8d0a0e5c4f27ead9083c756cc2"),
 			Amount:      big.NewInt(100000000000000000),
-			Expiration:  maxUint48Val,
+			Expiration:  constants.Uint48Max,
 			Nonce:       big.NewInt(0),
 			Spender:     gethCommon.HexToAddress("0x111111125421cA6dc452d289314280a0f8842A65"),
-			SigDeadline: maxUint48Val,
+			SigDeadline: constants.Uint48Max,
 		}
 	}
 
@@ -141,8 +140,6 @@ func TestBuildPermit2CalldataCompact(t *testing.T) {
 }
 
 func TestCompactPermit2Timestamp(t *testing.T) {
-	maxUint48Val := new(big.Int).Sub(new(big.Int).Lsh(big.NewInt(1), 48), big.NewInt(1))
-
 	tests := []struct {
 		name        string
 		value       *big.Int
@@ -151,7 +148,7 @@ func TestCompactPermit2Timestamp(t *testing.T) {
 	}{
 		{
 			name:     "Max uint48 stores zero",
-			value:    maxUint48Val,
+			value:    constants.Uint48Max,
 			expected: 0,
 		},
 		{

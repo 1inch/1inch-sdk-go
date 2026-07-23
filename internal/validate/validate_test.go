@@ -942,6 +942,11 @@ func TestCheckPermitHash(t *testing.T) {
 			value:       "0xT6487c5cb7c4b20202d34117abc57b1c7d91570e100d8a16eced3dbbe8b22eee41339c0772fc6affe3bb8b2a72e9e3e2e2b061d351936c1d534fcfe8d336073d1b",
 			expectError: true,
 		},
+		{
+			description: "Invalid permit hash - odd length",
+			value:       "0xabc",
+			expectError: true,
+		},
 	}
 
 	for _, tc := range testcases {

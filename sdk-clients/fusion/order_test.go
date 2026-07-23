@@ -678,12 +678,9 @@ func TestCreateFusionOrderTdd(t *testing.T) {
 	}
 }
 
-func TestCreateFusionOrderData_Permit2(t *testing.T) {
-	testPrivateKey := "d8d1f95deb28949ea0ecc4e9a0decf89e98422c2d76ab6e5f736792a388c56c7"
-	wallet, err := web3_provider.DefaultWalletOnlyProvider(testPrivateKey, 1)
-	require.NoError(t, err)
-
-	quote := GetQuoteOutputFixed{
+// permit2TestQuote is the shared quote fixture for permit2 order creation tests
+func permit2TestQuote() GetQuoteOutputFixed {
+	return GetQuoteOutputFixed{
 		QuoteId:           "test-quote-id",
 		SettlementAddress: extensionContract,
 		Whitelist:         []string{"0x00000000219ab540356cbb839cbe05303d7705fa"},
@@ -703,6 +700,14 @@ func TestCreateFusionOrderData_Permit2(t *testing.T) {
 			},
 		},
 	}
+}
+
+func TestCreateFusionOrderData_Permit2(t *testing.T) {
+	testPrivateKey := "d8d1f95deb28949ea0ecc4e9a0decf89e98422c2d76ab6e5f736792a388c56c7"
+	wallet, err := web3_provider.DefaultWalletOnlyProvider(testPrivateKey, 1)
+	require.NoError(t, err)
+
+	quote := permit2TestQuote()
 
 	// The maker permit token field is always the maker asset; isPermit2 controls
 	// only the USE_PERMIT2 maker traits bit

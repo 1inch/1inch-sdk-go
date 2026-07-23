@@ -14,7 +14,8 @@ import (
 	web3_provider "github.com/1inch/1inch-sdk-go/internal/web3-provider"
 )
 
-// capturingHttpExecutor records every request and replays queued responses
+// capturingHttpExecutor records every request and replays queued responses.
+// A response of type error is returned as the request error.
 type capturingHttpExecutor struct {
 	Payloads  []common.RequestPayload
 	Responses []any
@@ -27,6 +28,9 @@ func (m *capturingHttpExecutor) ExecuteRequest(ctx context.Context, payload comm
 	}
 	response := m.Responses[0]
 	m.Responses = m.Responses[1:]
+	if err, ok := response.(error); ok {
+		return err
+	}
 	if response != nil && v != nil {
 		rv := reflect.ValueOf(v)
 		if rv.Kind() != reflect.Ptr || rv.IsNil() {
@@ -42,26 +46,7 @@ func TestPlaceOrderFromParams(t *testing.T) {
 	wallet, err := web3_provider.DefaultWalletOnlyProvider(testPrivateKey, 1)
 	require.NoError(t, err)
 
-	quote := GetQuoteOutputFixed{
-		QuoteId:           "test-quote-id",
-		SettlementAddress: extensionContract,
-		Whitelist:         []string{"0x00000000219ab540356cbb839cbe05303d7705fa"},
-		MarketAmount:      "1420000000",
-		SurplusFee:        0,
-		Presets: QuotePresetsClassFixed{
-			Fast: PresetClassFixed{
-				AllowMultipleFills: true,
-				AllowPartialFills:  true,
-				AuctionDuration:    180,
-				AuctionEndAmount:   "1420000000",
-				AuctionStartAmount: "1500000000",
-				GasCost:            GasCostConfigClass{GasBumpEstimate: 0, GasPriceEstimate: "0"},
-				InitialRateBump:    50000,
-				Points:             []AuctionPointClass{{Coefficient: 20000, Delay: 12}},
-				StartAuctionIn:     0,
-			},
-		},
-	}
+	quote := permit2TestQuote()
 
 	executor := &capturingHttpExecutor{Responses: []any{quote, nil}}
 	client := &Client{
@@ -100,4 +85,102 @@ func TestPlaceOrderFromParams(t *testing.T) {
 	submission := executor.Payloads[1]
 	assert.Contains(t, submission.U, "/order/submit")
 	assert.Contains(t, string(submission.Body), "deadbeef01020304")
+}
+
+func TestPlaceOrderFromParams_QuoteError(t *testing.T) {
+	testPrivateKey := "d8d1f95deb28949ea0ecc4e9a0decf89e98422c2d76ab6e5f736792a388c56c7"
+	wallet, err := web3_provider.DefaultWalletOnlyProvider(testPrivateKey, 1)
+	require.NoError(t, err)
+
+	executor := &capturingHttpExecutor{Responses: []any{fmt.Errorf("quote unavailable")}}
+	client := &Client{
+		api:    api{chainId: 1, httpExecutor: executor},
+		Wallet: wallet,
+	}
+
+	orderParams := OrderParams{
+		FromTokenAddress:   "0xc02aaa39b223fe8d0a0e5c4f27ead9083c756cc2",
+		ToTokenAddress:     "0xa0b86991c6218b36c1d19d4a2e9eb0ce3606eb48",
+		Amount:             "1000000000000000000",
+		WalletAddress:      strings.ToLower(wallet.Address().Hex()),
+		Receiver:           "0x0000000000000000000000000000000000000000",
+		Preset:             Fast,
+		AllowPartialFills:  true,
+		AllowMultipleFills: true,
+	}
+
+	_, err = client.PlaceOrderFromParams(context.Background(), orderParams)
+	require.Error(t, err)
+	assert.Contains(t, err.Error(), "quote unavailable")
+	assert.Len(t, executor.Payloads, 1, "no order submission after a failed quote")
+}
+
+func TestPlaceOrderFromParams_CustomPreset(t *testing.T) {
+	testPrivateKey := "d8d1f95deb28949ea0ecc4e9a0decf89e98422c2d76ab6e5f736792a388c56c7"
+	wallet, err := web3_provider.DefaultWalletOnlyProvider(testPrivateKey, 1)
+	require.NoError(t, err)
+
+	quote := permit2TestQuote()
+	customFixed := quote.Presets.Fast
+	quote.Presets.Custom = &customFixed
+
+	tests := []struct {
+		name         string
+		customPreset *CustomPreset
+		expectError  bool
+		errorMsg     string
+	}{
+		{
+			name: "Custom preset quotes through the custom preset endpoint",
+			customPreset: &CustomPreset{
+				AuctionDuration:    180,
+				AuctionStartAmount: "1500000000",
+				AuctionEndAmount:   "1420000000",
+			},
+		},
+		{
+			name:        "Custom preset without data returns an error",
+			expectError: true,
+			errorMsg:    "custom preset data required",
+		},
+	}
+
+	for _, tc := range tests {
+		t.Run(tc.name, func(t *testing.T) {
+			executor := &capturingHttpExecutor{Responses: []any{quote, nil}}
+			client := &Client{
+				api:    api{chainId: 1, httpExecutor: executor},
+				Wallet: wallet,
+			}
+
+			orderParams := OrderParams{
+				FromTokenAddress:   "0xc02aaa39b223fe8d0a0e5c4f27ead9083c756cc2",
+				ToTokenAddress:     "0xa0b86991c6218b36c1d19d4a2e9eb0ce3606eb48",
+				Amount:             "1000000000000000000",
+				WalletAddress:      strings.ToLower(wallet.Address().Hex()),
+				Receiver:           "0x0000000000000000000000000000000000000000",
+				Preset:             Custom,
+				CustomPreset:       tc.customPreset,
+				AllowPartialFills:  true,
+				AllowMultipleFills: true,
+			}
+
+			orderHash, err := client.PlaceOrderFromParams(context.Background(), orderParams)
+			if tc.expectError {
+				require.Error(t, err)
+				assert.Contains(t, err.Error(), tc.errorMsg)
+				assert.Empty(t, executor.Payloads, "no requests before validation fails")
+				return
+			}
+			require.NoError(t, err)
+			assert.NotEmpty(t, orderHash)
+			require.Len(t, executor.Payloads, 2)
+
+			quoteRequest := executor.Payloads[0]
+			assert.Equal(t, "POST", quoteRequest.Method, "custom preset quotes use the POST endpoint")
+			_, ok := quoteRequest.Params.(QuoterControllerGetQuoteWithCustomPresetsParamsFixed)
+			assert.True(t, ok, "quote request must use the custom preset params")
+			assert.Contains(t, string(quoteRequest.Body), "auctionDuration")
+		})
+	}
 }

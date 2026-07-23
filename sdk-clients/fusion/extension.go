@@ -68,6 +68,10 @@ func NewExtension(params ExtensionParams) (*Extension, error) {
 		return nil, err
 	}
 
+	if params.Permit != "" && len(hexadecimal.Trim0x(params.Permit))%2 != 0 {
+		return nil, fmt.Errorf("invalid permit hex: odd length")
+	}
+
 	var resolvingStartTime *big.Int
 	if params.ResolvingStartTime == nil {
 		resolvingStartTime = big.NewInt(times.Now())
@@ -126,7 +130,7 @@ func NewExtension(params ExtensionParams) (*Extension, error) {
 			Target: geth_common.HexToAddress(params.Asset),
 			Data:   params.Permit,
 		}
-		fusionExtension.MakerPermit = strings.ToLower(permitInteraction.Target.String()) + hexadecimal.Trim0x(permitInteraction.Data)
+		fusionExtension.MakerPermit = permitInteraction.Encode()
 	}
 
 	return fusionExtension, nil

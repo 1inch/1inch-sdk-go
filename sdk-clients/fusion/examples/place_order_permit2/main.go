@@ -195,7 +195,8 @@ func ensurePermit2Approval(ctx context.Context, client *orderbook.Client, token 
 		return fmt.Errorf("failed to broadcast approval tx: %w", err)
 	}
 
-	for {
+	deadline := time.Now().Add(3 * time.Minute)
+	for time.Now().Before(deadline) {
 		receipt, err := client.Wallet.TransactionReceipt(ctx, signedTx.Hash())
 		if err == nil {
 			if receipt.Status != 1 {
@@ -206,4 +207,5 @@ func ensurePermit2Approval(ctx context.Context, client *orderbook.Client, token 
 		}
 		time.Sleep(2 * time.Second)
 	}
+	return fmt.Errorf("timed out waiting for approval receipt: %s", signedTx.Hash().Hex())
 }

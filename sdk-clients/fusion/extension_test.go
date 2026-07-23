@@ -277,6 +277,20 @@ func TestNewExtension(t *testing.T) {
 			expectErr: true,
 			errMsg:    "unsupported: custom data",
 		},
+		{
+			name: "Odd length permit",
+			params: ExtensionParams{
+				SettlementContract: "0x9012",
+				MakerAssetSuffix:   "0x1234",
+				TakerAssetSuffix:   "0x1234",
+				Predicate:          "0x1234",
+				PreInteraction:     "0x5678",
+				Asset:              "0x1234",
+				Permit:             "0xabc",
+			},
+			expectErr: true,
+			errMsg:    "invalid permit hex: odd length",
+		},
 	}
 
 	for _, tc := range tests {
