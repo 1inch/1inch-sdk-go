@@ -27,8 +27,9 @@ import (
 //
 //	Fusion (Base):        direct approval, EIP-2612 permit, Permit2 permit
 //	Aggregation (Arbitrum): direct approval, EIP-2612 permit, Permit2 allowance
-//	Fusion+ (Base <-> Arbitrum): direct approval (cross-chain permits are not
-//	  offered by the API, so probing them would fail by design)
+//	Fusion+ (Base <-> Arbitrum): direct approval; a Permit2 variant exists but is
+//	  opt-in (CANARY_FUSION_PLUS_PERMIT2=1) until the cross-chain order validator
+//	  recovers Permit2 signers with the Permit2 allowance nonce
 //
 // They run only when the canary secrets are present and alternate direction based
 // on current balances, so the same funds recycle indefinitely. Fusion and Fusion+

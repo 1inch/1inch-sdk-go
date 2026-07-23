@@ -71,10 +71,16 @@ Coverage matrix:
 |---|---|---|
 | `TestProductionCanaryFusion` | Base | direct approval, EIP-2612 permit, Permit2 permit |
 | `TestProductionCanaryFusionPlus` | Base and Arbitrum | direct approval |
+| `TestProductionCanaryFusionPlusPermit2` | Base and Arbitrum | Permit2 permit (opt-in) |
 | `TestProductionCanaryAggregation` | Arbitrum | direct approval, EIP-2612 permit, Permit2 allowance |
 
-Fusion+ intentionally uses only direct approval: the cross-chain API does not offer
-permit-based flows, so probing them would fail by design.
+The Fusion+ Permit2 canary is opt-in (`CANARY_FUSION_PLUS_PERMIT2=1`): the
+cross-chain order validator currently recovers Permit2 signers with the maker
+asset's ERC-2612 nonce instead of the Permit2 allowance nonce, so the order is
+rejected as "invalid permit signer" whenever the two nonces differ. The test
+aligns the nonces on-chain first (proven end to end in production on 2026-07-23,
+order 0xc78c876bea0e2f8f4129fec856af75a8e87904bc020b49dca9a481f617858e7a), and can
+join the routine runs once the validator reads the Permit2 nonce.
 
 The tests skip unless all env vars are set:
 
