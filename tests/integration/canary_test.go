@@ -142,12 +142,56 @@ func (a *canaryActor) erc20Allowance(t *testing.T, token, spender geth_common.Ad
 func (a *canaryActor) sendTx(t *testing.T, to geth_common.Address, data []byte) {
 	t.Helper()
 	ctx := context.Background()
-	tx, err := a.orderbook.TxBuilder.New().SetData(data).SetTo(&to).Build(ctx)
-	require.NoError(t, err)
-	signedTx, err := a.orderbook.Wallet.Sign(tx)
-	require.NoError(t, err)
-	require.NoError(t, a.orderbook.Wallet.BroadcastTransaction(ctx, signedTx))
-	a.waitForReceipt(t, signedTx.Hash(), 3*time.Minute)
+	// Public RPCs load-balance across nodes that can lag a block behind, so a
+	// freshly mined transaction may not be reflected in the next nonce query yet;
+	// rebuild for a fresh nonce and retry when the broadcast is rejected as stale
+	var lastErr error
+	for attempt := 0; attempt < 4; attempt++ {
+		if attempt > 0 {
+			time.Sleep(5 * time.Second)
+		}
+		tx, err := a.orderbook.TxBuilder.New().SetData(data).SetTo(&to).Build(ctx)
+		require.NoError(t, err)
+		signedTx, err := a.orderbook.Wallet.Sign(tx)
+		require.NoError(t, err)
+		lastErr = a.orderbook.Wallet.BroadcastTransaction(ctx, signedTx)
+		if lastErr == nil {
+			a.waitForReceipt(t, signedTx.Hash(), 3*time.Minute)
+			return
+		}
+		if !strings.Contains(strings.ToLower(lastErr.Error()), "nonce") {
+			break
+		}
+		t.Logf("broadcast rejected with stale nonce, retrying: %v", lastErr)
+	}
+	t.Fatalf("failed to broadcast transaction: %v", lastErr)
+}
+
+// awaitBalanceDelta retries the balance read until the expected delta appears,
+// tolerating RPC nodes that lag the fill block. A nil expectedDelta accepts any
+// increase over the initial balance.
+func (a *canaryActor) awaitBalanceDelta(t *testing.T, token geth_common.Address, initial, expectedDelta *big.Int, decreasing bool, label string) {
+	t.Helper()
+	deadline := time.Now().Add(2 * time.Minute)
+	var current *big.Int
+	for time.Now().Before(deadline) {
+		current = a.balance(t, token)
+		delta := new(big.Int).Sub(initial, current)
+		if !decreasing {
+			delta = new(big.Int).Sub(current, initial)
+		}
+		if expectedDelta == nil {
+			if delta.Sign() > 0 {
+				t.Logf("%s: delta %s", label, delta)
+				return
+			}
+		} else if delta.Cmp(expectedDelta) == 0 {
+			t.Logf("%s: delta %s", label, delta)
+			return
+		}
+		time.Sleep(5 * time.Second)
+	}
+	t.Fatalf("%s: balance delta did not reach expectation within 2 minutes (initial %s, current %s)", label, initial, current)
 }
 
 // ensureErc20Allowance sends a one-time unlimited approval when the current
@@ -287,11 +331,8 @@ func placeFusionOrderAndAwaitFill(t *testing.T, actor *canaryActor, fusionClient
 		t.Logf("order status: %s", order.Status)
 		switch order.Status {
 		case "filled":
-			finalSellBalance := actor.balance(t, sellToken)
-			finalBuyBalance := actor.balance(t, buyToken)
-			require.Equal(t, sellAmount.String(), new(big.Int).Sub(initSellBalance, finalSellBalance).String(), "sell amount spent")
-			require.Equal(t, 1, finalBuyBalance.Cmp(initBuyBalance), "buy balance increased")
-			t.Logf("fusion canary filled: received %s of %s", new(big.Int).Sub(finalBuyBalance, initBuyBalance), buyToken.Hex())
+			actor.awaitBalanceDelta(t, sellToken, initSellBalance, sellAmount, true, "sell amount spent")
+			actor.awaitBalanceDelta(t, buyToken, initBuyBalance, nil, false, "buy balance increased")
 			return
 		case "expired", "cancelled", "refunded", "false-predicate", "not-enough-balance-or-allowance", "wrong-permit":
 			t.Fatalf("order %s ended without filling: %s", orderHash, order.Status)
@@ -330,7 +371,9 @@ func TestProductionCanaryFusion(t *testing.T) {
 		require.True(t, actor.balance(t, usdc).Cmp(sellAmount) >= 0, "canary wallet needs %s USDC on base", sellAmount)
 		permit := actor.buildEip2612Permit(t, usdc, sellAmount)
 		placeFusionOrderAndAwaitFill(t, actor, fusionClient, usdc, weth, sellAmount, permit, false)
-		require.Equal(t, "0", actor.erc20Allowance(t, usdc, actor.router).String(), "the 2612 permit allowance must be fully consumed")
+		require.Eventually(t, func() bool {
+			return actor.erc20Allowance(t, usdc, actor.router).Sign() == 0
+		}, time.Minute, 5*time.Second, "the 2612 permit allowance must be fully consumed")
 	})
 
 	t.Run("permit2 permit", func(t *testing.T) {
@@ -338,9 +381,10 @@ func TestProductionCanaryFusion(t *testing.T) {
 		actor.ensureErc20Allowance(t, sellToken, actor.permit2, sellAmount)
 		permit := actor.buildPermit2OrderPermit(t, sellToken, sellAmount)
 		placeFusionOrderAndAwaitFill(t, actor, fusionClient, sellToken, buyToken, sellAmount, permit, true)
-		finalAllowance, err := orderbook.GetPermit2Allowance(context.Background(), actor.orderbook.Wallet, actor.owner, sellToken, actor.router)
-		require.NoError(t, err)
-		require.Equal(t, "0", finalAllowance.Amount.String(), "the Permit2 allowance must be fully consumed")
+		require.Eventually(t, func() bool {
+			finalAllowance, err := orderbook.GetPermit2Allowance(context.Background(), actor.orderbook.Wallet, actor.owner, sellToken, actor.router)
+			return err == nil && finalAllowance.Amount.Sign() == 0
+		}, time.Minute, 5*time.Second, "the Permit2 allowance must be fully consumed")
 	})
 }
 
@@ -388,8 +432,17 @@ func TestProductionCanaryFusionPlus(t *testing.T) {
 		WalletAddress:   srcActor.owner.Hex(),
 		EnableEstimate:  true,
 	}
-	quote, err := plusClient.GetQuote(ctx, quoteParams)
-	require.NoError(t, err, "the production API rejected the cross-chain quote")
+	// The estimation inside the quote can race a base fee update; retry briefly
+	var quote *fusionplus.GetQuoteOutputFixed
+	for attempt := 0; ; attempt++ {
+		quote, err = plusClient.GetQuote(ctx, quoteParams)
+		if err == nil {
+			break
+		}
+		require.True(t, attempt < 3, "the production API rejected the cross-chain quote: %v", err)
+		t.Logf("cross-chain quote failed, retrying: %v", err)
+		time.Sleep(10 * time.Second)
+	}
 
 	preset, err := fusionplus.GetPreset(quote.Presets, quote.RecommendedPreset)
 	require.NoError(t, err)
@@ -436,8 +489,7 @@ func TestProductionCanaryFusionPlus(t *testing.T) {
 		t.Logf("order status: %s", order.Status)
 		switch string(order.Status) {
 		case "executed":
-			finalSrcBalance := srcActor.balance(t, srcToken)
-			require.Equal(t, canaryFusionPlusAmount.String(), new(big.Int).Sub(initSrcBalance, finalSrcBalance).String(), "source USDC spent")
+			srcActor.awaitBalanceDelta(t, srcToken, initSrcBalance, canaryFusionPlusAmount, true, "source USDC spent")
 			// The destination transfer can land moments after the status flips
 			arrivalDeadline := time.Now().Add(2 * time.Minute)
 			for time.Now().Before(arrivalDeadline) {
@@ -500,11 +552,8 @@ func executeAggregationSwap(t *testing.T, actor *canaryActor, aggClient *aggrega
 	t.Logf("swap broadcast: %s", signedTx.Hash().Hex())
 	actor.waitForReceipt(t, signedTx.Hash(), 3*time.Minute)
 
-	finalSellBalance := actor.balance(t, sellToken)
-	finalBuyBalance := actor.balance(t, buyToken)
-	require.Equal(t, sellAmount.String(), new(big.Int).Sub(initSellBalance, finalSellBalance).String(), "sell amount spent")
-	require.Equal(t, 1, finalBuyBalance.Cmp(initBuyBalance), "buy balance increased")
-	t.Logf("aggregation canary swapped: received %s of %s", new(big.Int).Sub(finalBuyBalance, initBuyBalance), buyToken.Hex())
+	actor.awaitBalanceDelta(t, sellToken, initSellBalance, sellAmount, true, "sell amount spent")
+	actor.awaitBalanceDelta(t, buyToken, initBuyBalance, nil, false, "buy balance increased")
 }
 
 // TestProductionCanaryAggregation performs dust-sized classic swaps on Arbitrum, one
