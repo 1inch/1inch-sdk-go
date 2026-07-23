@@ -71,6 +71,7 @@ Coverage matrix:
 |---|---|---|
 | `TestProductionCanaryFusion` | Base | direct approval, EIP-2612 permit, Permit2 permit |
 | `TestProductionCanaryFusionPlus` | Base and Arbitrum | direct approval |
+| `TestProductionCanaryFusionPlusEip2612` | Base and Arbitrum | EIP-2612 permit |
 | `TestProductionCanaryFusionPlusPermit2` | Base and Arbitrum | Permit2 permit (opt-in) |
 | `TestProductionCanaryAggregation` | Arbitrum | direct approval, EIP-2612 permit, Permit2 allowance |
 

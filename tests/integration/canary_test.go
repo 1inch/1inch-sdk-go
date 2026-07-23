@@ -27,9 +27,10 @@ import (
 //
 //	Fusion (Base):        direct approval, EIP-2612 permit, Permit2 permit
 //	Aggregation (Arbitrum): direct approval, EIP-2612 permit, Permit2 allowance
-//	Fusion+ (Base <-> Arbitrum): direct approval; a Permit2 variant exists but is
-//	  opt-in (CANARY_FUSION_PLUS_PERMIT2=1) until the cross-chain order validator
-//	  recovers Permit2 signers with the Permit2 allowance nonce
+//	Fusion+ (Base <-> Arbitrum): direct approval, EIP-2612 permit; a Permit2
+//	  variant exists but is opt-in (CANARY_FUSION_PLUS_PERMIT2=1) until the
+//	  cross-chain order validator recovers Permit2 signers with the Permit2
+//	  allowance nonce
 //
 // They run only when the canary secrets are present and alternate direction based
 // on current balances, so the same funds recycle indefinitely. Fusion and Fusion+
@@ -446,7 +447,15 @@ func TestProductionCanaryFusion(t *testing.T) {
 // cross-chain fusion order, selling from whichever chain holds more USDC so the
 // funds ping-pong between the two chains across runs
 func TestProductionCanaryFusionPlus(t *testing.T) {
-	runFusionPlusCanary(t, false)
+	runFusionPlusCanary(t, fusionPlusApproval)
+}
+
+// TestProductionCanaryFusionPlusEip2612 runs the same bridge with an EIP-2612
+// permit for the source-chain USDC embedded in the order instead of relying on a
+// standing router allowance. The permit overwrites any standing allowance with
+// exactly the trade amount, which the fill consumes back to zero.
+func TestProductionCanaryFusionPlusEip2612(t *testing.T) {
+	runFusionPlusCanary(t, fusionPlusEip2612)
 }
 
 // TestProductionCanaryFusionPlusPermit2 runs the same bridge with the maker funds
@@ -463,10 +472,18 @@ func TestProductionCanaryFusionPlusPermit2(t *testing.T) {
 	if os.Getenv("CANARY_FUSION_PLUS_PERMIT2") == "" {
 		t.Skip("set CANARY_FUSION_PLUS_PERMIT2=1 to probe the Fusion+ permit2 path (see comment above)")
 	}
-	runFusionPlusCanary(t, true)
+	runFusionPlusCanary(t, fusionPlusPermit2)
 }
 
-func runFusionPlusCanary(t *testing.T, usePermit2 bool) {
+type fusionPlusMode int
+
+const (
+	fusionPlusApproval fusionPlusMode = iota
+	fusionPlusEip2612
+	fusionPlusPermit2
+)
+
+func runFusionPlusCanary(t *testing.T, mode fusionPlusMode) {
 	baseActor := newCanaryActor(t, canaryBase)
 	arbActor := newCanaryActor(t, canaryArbitrum)
 	ctx := context.Background()
@@ -488,11 +505,15 @@ func runFusionPlusCanary(t *testing.T, usePermit2 bool) {
 	t.Logf("fusion+ direction: %s USDC from %s to %s", canaryFusionPlusAmount, src.name, dst.name)
 
 	var permit string
-	if usePermit2 {
+	usePermit2 := mode == fusionPlusPermit2
+	switch mode {
+	case fusionPlusPermit2:
 		srcActor.ensureErc20Allowance(t, srcToken, srcActor.permit2, canaryFusionPlusAmount)
 		srcActor.alignPermit2NonceWithErc2612(t, srcToken)
 		permit = srcActor.buildPermit2OrderPermit(t, srcToken, canaryFusionPlusAmount)
-	} else {
+	case fusionPlusEip2612:
+		permit = srcActor.buildEip2612Permit(t, srcToken, canaryFusionPlusAmount)
+	default:
 		srcActor.ensureErc20Allowance(t, srcToken, srcActor.router, canaryFusionPlusAmount)
 	}
 
@@ -576,11 +597,16 @@ func runFusionPlusCanary(t *testing.T, usePermit2 bool) {
 		switch string(order.Status) {
 		case "executed":
 			srcActor.awaitBalanceDelta(t, srcToken, initSrcBalance, canaryFusionPlusAmount, true, "source USDC spent")
-			if usePermit2 {
+			switch mode {
+			case fusionPlusPermit2:
 				require.Eventually(t, func() bool {
 					finalAllowance, err := orderbook.GetPermit2Allowance(ctx, srcActor.orderbook.Wallet, srcActor.owner, srcToken, srcActor.router)
 					return err == nil && finalAllowance.Amount.Sign() == 0
 				}, time.Minute, 5*time.Second, "the Permit2 allowance must be fully consumed")
+			case fusionPlusEip2612:
+				require.Eventually(t, func() bool {
+					return srcActor.erc20Allowance(t, srcToken, srcActor.router).Sign() == 0
+				}, time.Minute, 5*time.Second, "the 2612 permit allowance must be fully consumed")
 			}
 			// The destination transfer can land moments after the status flips
 			arrivalDeadline := time.Now().Add(2 * time.Minute)
