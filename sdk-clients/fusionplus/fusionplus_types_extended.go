@@ -356,3 +356,9 @@ type ExtensionPlus struct {
 	PostInteraction  string
 	CustomData       string
 }
+
+// GetSettlementContractParams defines parameters for GetSettlementContract
+type GetSettlementContractParams struct {
+	// ChainId Chain ID
+	ChainId float32 `url:"chainId,omitempty" json:"chainId,omitempty"`
+}

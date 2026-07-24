@@ -26,6 +26,10 @@ const (
 )
 
 func main() {
+	if devPortalToken == "" {
+		log.Fatal("set DEV_PORTAL_TOKEN to run this example")
+	}
+
 	config, err := spotprices.NewConfiguration(spotprices.ConfigurationParams{
 		ChainId: constants.EthereumChainId,
 		ApiUrl:  "https://api.1inch.com",

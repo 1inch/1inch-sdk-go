@@ -12,6 +12,7 @@ import (
 	"time"
 
 	"github.com/ethereum/go-ethereum/common"
+	"github.com/ethereum/go-ethereum/common/hexutil"
 	"github.com/ethereum/go-ethereum/crypto"
 
 	"github.com/1inch/1inch-sdk-go/v4/constants"
@@ -41,6 +42,10 @@ var (
 )
 
 func main() {
+	if devPortalToken == "" || privateKey == "" || nodeUrl == "" {
+		log.Fatal("set DEV_PORTAL_TOKEN, WALLET_KEY, and NODE_URL to run this example")
+	}
+
 	ctx := context.Background()
 
 	config, err := orderbook.NewConfiguration(orderbook.ConfigurationParams{
@@ -51,16 +56,16 @@ func main() {
 		ApiKey:     devPortalToken,
 	})
 	if err != nil {
-		log.Fatalf("Failed to create configuration: %v", err)
+		log.Fatalf("failed to create configuration: %v", err)
 	}
 	client, err := orderbook.NewClient(config)
 	if err != nil {
-		log.Fatalf("Failed to create client: %v", err)
+		log.Fatalf("failed to create client: %v", err)
 	}
 
 	ecdsaPrivateKey, err := crypto.HexToECDSA(privateKey)
 	if err != nil {
-		log.Fatalf("error converting private key to ECDSA: %v", err)
+		log.Fatalf("failed to parse private key: %v", err)
 	}
 	publicKey := ecdsaPrivateKey.Public()
 	publicAddress := crypto.PubkeyToAddress(*publicKey.(*ecdsa.PublicKey))
@@ -74,7 +79,7 @@ func main() {
 
 	makingAmountInt, err := strconv.ParseInt(makerAmount, 10, 64)
 	if err != nil {
-		log.Fatalf("Error converting string to int: %v", err)
+		log.Fatalf("failed to parse amount: %v", err)
 	}
 
 	permitData, err := client.Wallet.GetContractDetailsForPermit(ctx, common.HexToAddress(makerAsset), common.HexToAddress(router), big.NewInt(makingAmountInt), expireAfter)
@@ -83,10 +88,16 @@ func main() {
 	}
 	permit, err := client.Wallet.TokenPermit(*permitData)
 	if err != nil {
-		log.Fatalf("Failed to get permit: %v", err)
+		log.Fatalf("failed to sign permit: %v", err)
 	}
+	permitBytes, err := hexutil.Decode(permit)
+	if err != nil {
+		log.Fatalf("failed to decode permit: %v", err)
+	}
+	// The extension expects the maker asset address followed by the raw permit calldata
+	makerPermit := append(common.HexToAddress(makerAsset).Bytes(), permitBytes...)
 
-	fmt.Printf("Permit: %v", permit)
+	fmt.Printf("Permit signed: %s\n", permit)
 
 	feeInfo, err := client.GetFeeInfo(ctx, orderbook.GetFeeInfoParams{
 		MakerAsset:  makerAsset,
@@ -95,7 +106,7 @@ func main() {
 		TakerAmount: takerAmount,
 	})
 	if err != nil {
-		log.Fatalf("Failed to get fee info: %v", err)
+		log.Fatalf("failed to get fee info: %v", err)
 	}
 
 	buildOrderExtensionBytesParams := &orderbook.BuildOrderExtensionBytesParams{
@@ -106,7 +117,7 @@ func main() {
 			Fee:        0,
 			Share:      0,
 		},
-		MakerPermit: []byte(permit),
+		MakerPermit: makerPermit,
 		ResolverFee: &orderbook.ResolverFee{
 			Receiver:          feeInfo.ProtocolFeeReceiver,
 			Fee:               feeInfo.FeeBps,
@@ -118,14 +129,14 @@ func main() {
 
 	extensionEncoded, err := orderbook.BuildOrderExtensionBytes(buildOrderExtensionBytesParams)
 	if err != nil {
-		log.Fatalf("Failed to create extension: %v", err)
+		log.Fatalf("failed to create extension: %v", err)
 	}
 
 	salt, err := orderbook.GenerateSaltWithFees(&orderbook.GetSaltParams{
 		Extension: extensionEncoded,
 	})
 	if err != nil {
-		log.Fatalf("Failed to generate salt: %v", err)
+		log.Fatalf("failed to generate salt: %v", err)
 	}
 
 	createOrderResponse, err := client.CreateOrder(ctx, orderbook.CreateOrderParams{
@@ -143,7 +154,7 @@ func main() {
 		EnableOnchainApprovalsIfNeeded: false,
 	})
 	if err != nil {
-		log.Fatalf("Failed to create order: %v", err)
+		log.Fatalf("failed to create order: %v", err)
 	}
 	if !createOrderResponse.Success {
 		log.Fatalf("Request completed, but order creation status was a failure: %v", createOrderResponse)
@@ -156,12 +167,12 @@ func main() {
 		CreatorAddress: publicAddress.Hex(),
 	})
 	if err != nil {
-		log.Fatalf("Failed to get orders by creator address: %v", err)
+		log.Fatalf("failed to get orders by creator address: %v", err)
 	}
 
 	orderIndented, err := json.MarshalIndent(getOrderResponse[0], "", "  ")
 	if err != nil {
-		log.Fatalf("Failed to marshal response: %v", err)
+		log.Fatalf("failed to marshal response: %v", err)
 	}
 
 	fmt.Printf("Order created: %s\n", orderIndented)

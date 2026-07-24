@@ -52,6 +52,10 @@ const (
 )
 
 func main() {
+	if devPortalToken == "" || privateKey == "" || publicAddress == "" || nodeUrl == "" {
+		log.Fatal("set DEV_PORTAL_TOKEN, WALLET_KEY, WALLET_ADDRESS, and NODE_URL to run this example")
+	}
+
 	ctx := context.Background()
 
 	// The orderbook client is RPC-connected and handles the on-chain Permit2 steps

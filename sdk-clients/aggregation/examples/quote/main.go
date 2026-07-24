@@ -24,6 +24,10 @@ var (
 )
 
 func main() {
+	if devPortalToken == "" || privateKey == "" || nodeUrl == "" {
+		log.Fatal("set DEV_PORTAL_TOKEN, WALLET_KEY, and NODE_URL to run this example")
+	}
+
 	config, err := aggregation.NewConfiguration(aggregation.ConfigurationParams{
 		NodeUrl:    nodeUrl,
 		PrivateKey: privateKey,
@@ -32,11 +36,11 @@ func main() {
 		ApiKey:     devPortalToken,
 	})
 	if err != nil {
-		log.Fatalf("Failed to create configuration: %v", err)
+		log.Fatalf("failed to create configuration: %v", err)
 	}
 	client, err := aggregation.NewClient(config)
 	if err != nil {
-		log.Fatalf("Failed to create client: %v", err)
+		log.Fatalf("failed to create client: %v", err)
 	}
 	ctx := context.Background()
 
@@ -48,12 +52,12 @@ func main() {
 		Slippage: 1,
 	})
 	if err != nil {
-		log.Fatalf("Failed to get swap data: %v", err)
+		log.Fatalf("failed to get swap data: %v", err)
 	}
 
 	output, err := json.MarshalIndent(swapData, "", "  ")
 	if err != nil {
-		log.Fatalf("Failed to marshal swap data: %v", err)
+		log.Fatalf("failed to marshal swap data: %v", err)
 	}
 	fmt.Printf("%s\n", string(output))
 }

@@ -4,30 +4,36 @@ import (
 	"context"
 	"fmt"
 	"log"
+	"math/big"
 	"os"
 	"time"
 
+	gethCommon "github.com/ethereum/go-ethereum/common"
+
 	"github.com/1inch/1inch-sdk-go/v4/constants"
 	"github.com/1inch/1inch-sdk-go/v4/sdk-clients/fusionplus"
+	"github.com/1inch/1inch-sdk-go/v4/sdk-clients/orderbook"
 )
 
 /*
 This example places a cross-chain fusion order bridging USDC from Arbitrum to
-Base, submits the hashlock secrets as resolvers deploy escrows, and monitors the
-order until it reaches a terminal status.
+Base with a signed EIP-2612 permit embedded in the order, so no prior router
+allowance is needed and the maker sends no transactions at all.
 
-The maker must already have granted the 1inch Aggregation Router an allowance for
-the source-chain token (see the aggregation approve example), or the order can
-carry a signed permit instead (see the place_order_permit example).
+The permit grants the 1inch Aggregation Router exactly the trade amount and is
+executed on-chain by the protocol during the fill. Signing it requires reading
+the token's permit nonce, so an RPC endpoint for the source chain is required.
 
 Requires the following environment variables:
   - DEV_PORTAL_TOKEN: 1inch Developer Portal API key
   - WALLET_KEY:       private key (64 hex chars, no 0x prefix)
+  - NODE_URL:         RPC endpoint for the source chain (Arbitrum)
 */
 
 var (
 	devPortalToken = os.Getenv("DEV_PORTAL_TOKEN")
 	privateKey     = os.Getenv("WALLET_KEY")
+	nodeUrl        = os.Getenv("NODE_URL")
 )
 
 const (
@@ -41,43 +47,81 @@ const (
 )
 
 func main() {
-	if devPortalToken == "" || privateKey == "" {
-		log.Fatal("set DEV_PORTAL_TOKEN and WALLET_KEY to run this example")
+	if devPortalToken == "" || privateKey == "" || nodeUrl == "" {
+		log.Fatal("set DEV_PORTAL_TOKEN, WALLET_KEY, and NODE_URL to run this example")
+	}
+	ctx := context.Background()
+
+	// The orderbook client is RPC-connected and used to sign the permit, which
+	// requires the token's current permit nonce from the source chain
+	orderbookConfig, err := orderbook.NewConfiguration(orderbook.ConfigurationParams{
+		NodeUrl:    nodeUrl,
+		PrivateKey: privateKey,
+		ChainId:    srcChain,
+		ApiUrl:     "https://api.1inch.com",
+		ApiKey:     devPortalToken,
+	})
+	if err != nil {
+		log.Fatalf("failed to create orderbook configuration: %v", err)
+	}
+	orderbookClient, err := orderbook.NewClient(orderbookConfig)
+	if err != nil {
+		log.Fatalf("failed to create orderbook client: %v", err)
 	}
 
-	config, err := fusionplus.NewConfiguration(fusionplus.ConfigurationParams{
+	plusConfig, err := fusionplus.NewConfiguration(fusionplus.ConfigurationParams{
 		ApiUrl:     "https://api.1inch.com",
 		ApiKey:     devPortalToken,
 		PrivateKey: privateKey,
 	})
 	if err != nil {
-		log.Fatalf("failed to create configuration: %v", err)
+		log.Fatalf("failed to create fusionplus configuration: %v", err)
 	}
-	client, err := fusionplus.NewClient(config)
+	client, err := fusionplus.NewClient(plusConfig)
 	if err != nil {
-		log.Fatalf("failed to create client: %v", err)
+		log.Fatalf("failed to create fusionplus client: %v", err)
 	}
-	ctx := context.Background()
 
 	// The maker address must match the signing key, so it is derived from the wallet
-	owner := client.Wallet.Address().Hex()
+	owner := orderbookClient.Wallet.Address()
+	makingAmount, ok := new(big.Int).SetString(amount, 10)
+	if !ok {
+		log.Fatalf("invalid amount: %s", amount)
+	}
 
+	// Sign an EIP-2612 permit granting the router exactly the trade amount
+	permitData, err := orderbookClient.Wallet.GetContractDetailsForPermit(
+		ctx,
+		gethCommon.HexToAddress(arbitrumUsdc),
+		gethCommon.HexToAddress(constants.AggregationRouterV6),
+		makingAmount,
+		time.Now().Add(30*time.Minute).Unix(),
+	)
+	if err != nil {
+		log.Fatalf("failed to get permit details: %v", err)
+	}
+	permit, err := orderbookClient.Wallet.TokenPermit(*permitData)
+	if err != nil {
+		log.Fatalf("failed to sign permit: %v", err)
+	}
+	fmt.Println("Permit signed")
+
+	// The permit is supplied to both the quote request and the order
 	quoteParams := fusionplus.QuoterControllerGetQuoteParamsFixed{
 		SrcChain:        srcChain,
 		DstChain:        dstChain,
 		SrcTokenAddress: arbitrumUsdc,
 		DstTokenAddress: baseUsdc,
 		Amount:          amount,
-		WalletAddress:   owner,
+		WalletAddress:   owner.Hex(),
 		EnableEstimate:  true,
+		Permit:          permit,
 	}
 	quote, err := client.GetQuote(ctx, quoteParams)
 	if err != nil {
 		log.Fatalf("failed to get quote: %v", err)
 	}
 
-	// Each fill of the order requires revealing a secret; generate one per fill
-	// and lock the order to their hashes
 	preset, err := fusionplus.GetPreset(quote.Presets, quote.RecommendedPreset)
 	if err != nil {
 		log.Fatalf("failed to get preset: %v", err)
@@ -109,6 +153,7 @@ func main() {
 		SecretHashes: secretHashes,
 		Receiver:     constants.ZeroAddress,
 		Preset:       quote.RecommendedPreset,
+		Permit:       permit,
 	}, client.Wallet)
 	if err != nil {
 		log.Fatalf("failed to place order: %v", err)
@@ -117,12 +162,6 @@ func main() {
 	fmt.Printf("Order placed: %s\n", orderHash)
 	fmt.Println("Monitoring the order and submitting secrets as escrows deploy...")
 
-	monitorFusionPlusOrder(ctx, client, orderHash, secrets)
-}
-
-// monitorFusionPlusOrder polls the order status, submits a secret for each fill
-// whose escrows are deployed, and returns when the order reaches a terminal status
-func monitorFusionPlusOrder(ctx context.Context, client *fusionplus.Client, orderHash string, secrets []string) {
 	submitted := 0
 	deadline := time.Now().Add(15 * time.Minute)
 	for time.Now().Before(deadline) {

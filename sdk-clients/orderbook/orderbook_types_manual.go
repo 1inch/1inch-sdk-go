@@ -236,10 +236,15 @@ type buildFeePostInteractionDataParams struct {
 }
 
 type BuildOrderExtensionBytesParams struct {
-	ExtensionTarget  string
-	IntegratorFee    *IntegratorFee
-	ResolverFee      *ResolverFee
-	Whitelist        map[string]string
+	ExtensionTarget string
+	IntegratorFee   *IntegratorFee
+	ResolverFee     *ResolverFee
+	Whitelist       map[string]string
+
+	// MakerPermit holds raw bytes: the 20-byte maker asset address followed by the
+	// permit calldata. Decode hex strings (e.g. the Wallet.TokenPermit result) with
+	// hexutil.Decode before assigning; a hex string cast directly to []byte embeds
+	// the ASCII characters and produces a permit that can never execute.
 	MakerPermit      []byte
 	CustomReceiver   string
 	ExtraInteraction []byte

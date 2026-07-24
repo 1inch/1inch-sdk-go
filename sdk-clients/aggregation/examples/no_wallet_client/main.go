@@ -20,13 +20,17 @@ const (
 )
 
 func main() {
+	if devPortalToken == "" {
+		log.Fatal("set DEV_PORTAL_TOKEN to run this example")
+	}
+
 	config, err := aggregation.NewConfigurationAPI(constants.PolygonChainId, "https://api.1inch.com", devPortalToken)
 	if err != nil {
-		log.Fatalf("Failed to create configuration: %v", err)
+		log.Fatalf("failed to create configuration: %v", err)
 	}
 	client, err := aggregation.NewClientOnlyAPI(config)
 	if err != nil {
-		log.Fatalf("Failed to create client: %v", err)
+		log.Fatalf("failed to create client: %v", err)
 	}
 	ctx := context.Background()
 
@@ -37,7 +41,7 @@ func main() {
 	})
 
 	if err != nil {
-		log.Fatalf("Failed to get quote: %v", err)
+		log.Fatalf("failed to get quote: %v", err)
 	}
 
 	fmt.Printf("Quote Amount: %+v\n", quote.DstAmount)

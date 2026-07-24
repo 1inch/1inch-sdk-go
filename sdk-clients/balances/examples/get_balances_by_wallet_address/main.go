@@ -20,25 +20,29 @@ const (
 )
 
 func main() {
+	if devPortalToken == "" {
+		log.Fatal("set DEV_PORTAL_TOKEN to run this example")
+	}
+
 	config, err := balances.NewConfiguration(balances.ConfigurationParams{
 		ChainId: constants.EthereumChainId,
 		ApiUrl:  "https://api.1inch.com",
 		ApiKey:  devPortalToken,
 	})
 	if err != nil {
-		log.Fatalf("Failed to create configuration: %v", err)
+		log.Fatalf("failed to create configuration: %v", err)
 	}
 
 	client, err := balances.NewClient(config)
 	if err != nil {
-		log.Fatalf("Failed to create client: %v", err)
+		log.Fatalf("failed to create client: %v", err)
 	}
 
 	ctx := context.Background()
 
 	response, err := client.GetBalancesByWalletAddress(ctx, balances.BalancesByWalletAddressParams{Wallet: mainWalletAddress})
 	if err != nil {
-		log.Fatalf("Failed to get balances by wallet address: %v", err)
+		log.Fatalf("failed to get balances by wallet address: %v", err)
 	}
 
 	responseIndented, err := json.MarshalIndent(response, "", "  ")
