@@ -26,3 +26,53 @@ func TestBuildUserAgent(t *testing.T) {
 		})
 	}
 }
+
+func TestReleaseVersionRegex(t *testing.T) {
+	tests := []struct {
+		name    string
+		version string
+		allowed bool
+	}{
+		{
+			name:    "Release tag",
+			version: "v4.1.0",
+			allowed: true,
+		},
+		{
+			name:    "Multi-digit release tag",
+			version: "v10.22.333",
+			allowed: true,
+		},
+		{
+			name:    "Pseudo-version",
+			version: "v4.1.1-0.20260801120000-abcdef123456",
+			allowed: false,
+		},
+		{
+			name:    "Prerelease tag",
+			version: "v4.2.0-rc.1",
+			allowed: false,
+		},
+		{
+			name:    "Toolchain placeholder",
+			version: "(devel)",
+			allowed: false,
+		},
+		{
+			name:    "Build metadata suffix",
+			version: "v4.1.0+incompatible",
+			allowed: false,
+		},
+		{
+			name:    "Empty version",
+			version: "",
+			allowed: false,
+		},
+	}
+
+	for _, tc := range tests {
+		t.Run(tc.name, func(t *testing.T) {
+			assert.Equal(t, tc.allowed, releaseVersionRegex.MatchString(tc.version))
+		})
+	}
+}
