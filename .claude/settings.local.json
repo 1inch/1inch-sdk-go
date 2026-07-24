@@ -1,8 +1,0 @@
-{
-  "permissions": {
-    "allow": [
-      "WebFetch(domain:business.1inch.com)",
-      "WebFetch(domain:api.1inch.dev)"
-    ]
-  }
-}
