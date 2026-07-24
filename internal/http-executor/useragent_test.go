@@ -14,7 +14,7 @@ func TestBuildUserAgent(t *testing.T) {
 		expectedPrefix string
 	}{
 		{
-			name:           "User agent carries the client name and a version",
+			name:           "User agent carries the client name and a semver version",
 			expectedPrefix: "1inch-dev-portal-client-go:",
 		},
 	}
@@ -23,7 +23,8 @@ func TestBuildUserAgent(t *testing.T) {
 		t.Run(tc.name, func(t *testing.T) {
 			result := buildUserAgent()
 			assert.True(t, strings.HasPrefix(result, tc.expectedPrefix), "user agent %q must start with %q", result, tc.expectedPrefix)
-			assert.NotEqual(t, tc.expectedPrefix, result, "user agent must include a version suffix")
+			version := strings.TrimPrefix(result, tc.expectedPrefix)
+			assert.True(t, semverRegex.MatchString(version), "user agent version %q must be valid semver", version)
 		})
 	}
 }
@@ -43,12 +44,20 @@ func TestSdkVersionFromBuildInfo(t *testing.T) {
 			expected: "v4.1.0",
 		},
 		{
-			name: "Pseudo-version is reported verbatim",
+			name: "Pseudo-version is rewritten to its base release with dev metadata",
 			info: &debug.BuildInfo{
 				Main: debug.Module{Path: "example.com/consumer"},
 				Deps: []*debug.Module{{Path: modulePath, Version: "v4.1.1-0.20260801120000-abcdef123456"}},
 			},
-			expected: "v4.1.1-0.20260801120000-abcdef123456",
+			expected: "v4.1.0+dev.20260801120000.abcdef123456",
+		},
+		{
+			name: "Pseudo-version after a prerelease keeps the prerelease base",
+			info: &debug.BuildInfo{
+				Main: debug.Module{Path: "example.com/consumer"},
+				Deps: []*debug.Module{{Path: modulePath, Version: "v4.2.0-rc.1.0.20260801120000-abcdef123456"}},
+			},
+			expected: "v4.2.0-rc.1+dev.20260801120000.abcdef123456",
 		},
 		{
 			name: "Prerelease tag is reported verbatim",
@@ -79,7 +88,7 @@ func TestSdkVersionFromBuildInfo(t *testing.T) {
 			expected: "v4.1.2",
 		},
 		{
-			name: "Local path replacement reports unknown",
+			name: "Local path replacement reports the unknown sentinel",
 			info: &debug.BuildInfo{
 				Main: debug.Module{Path: "example.com/consumer"},
 				Deps: []*debug.Module{{
@@ -88,7 +97,7 @@ func TestSdkVersionFromBuildInfo(t *testing.T) {
 					Replace: &debug.Module{Path: "../1inch-sdk-go", Version: ""},
 				}},
 			},
-			expected: "unknown",
+			expected: "v0.0.0+unknown",
 		},
 		{
 			name: "In-repo build with a stamped release tag",
@@ -98,30 +107,32 @@ func TestSdkVersionFromBuildInfo(t *testing.T) {
 			expected: "v4.1.0",
 		},
 		{
-			name: "In-repo build with the devel placeholder reports unknown",
+			name: "In-repo build with the devel placeholder reports the unknown sentinel",
 			info: &debug.BuildInfo{
 				Main: debug.Module{Path: modulePath, Version: "(devel)"},
 			},
-			expected: "unknown",
+			expected: "v0.0.0+unknown",
 		},
 		{
-			name:     "No build info reports unknown",
+			name:     "No build info reports the unknown sentinel",
 			info:     nil,
-			expected: "unknown",
+			expected: "v0.0.0+unknown",
 		},
 		{
-			name: "Unrelated dependencies report unknown",
+			name: "Unrelated dependencies report the unknown sentinel",
 			info: &debug.BuildInfo{
 				Main: debug.Module{Path: "example.com/consumer"},
 				Deps: []*debug.Module{{Path: "example.com/other", Version: "v1.0.0"}},
 			},
-			expected: "unknown",
+			expected: "v0.0.0+unknown",
 		},
 	}
 
 	for _, tc := range tests {
 		t.Run(tc.name, func(t *testing.T) {
-			assert.Equal(t, tc.expected, sdkVersionFromBuildInfo(tc.info))
+			result := sdkVersionFromBuildInfo(tc.info)
+			assert.Equal(t, tc.expected, result)
+			assert.True(t, semverRegex.MatchString(result), "result %q must be valid semver", result)
 		})
 	}
 }
