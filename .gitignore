@@ -7,3 +7,7 @@
 *.DS_Store
 .AppleDouble
 .LSOverride
+
+.claude/
+bin/
+bin2/

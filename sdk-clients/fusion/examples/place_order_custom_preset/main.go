@@ -12,22 +12,36 @@ import (
 	"github.com/1inch/1inch-sdk-go/v4/sdk-clients/fusion"
 )
 
+/*
+This example places a gasless fusion order selling USDC for WETH on Polygon using
+a custom auction preset instead of the API's fast/medium/slow presets, then
+monitors it until it reaches a terminal status.
+
+The maker must already have granted the 1inch Aggregation Router an allowance for
+the sell token (see the aggregation approve example).
+
+Requires the following environment variables:
+  - DEV_PORTAL_TOKEN: 1inch Developer Portal API key
+  - WALLET_KEY:       private key (64 hex chars, no 0x prefix)
+*/
+
 var (
 	devPortalToken = os.Getenv("DEV_PORTAL_TOKEN")
-	publicAddress  = os.Getenv("WALLET_ADDRESS")
 	privateKey     = os.Getenv("WALLET_KEY")
 )
 
 const (
 	usdc       = "0x3c499c542cEF5E3811e1192ce70d8cC03d5c3359"
-	wmatic     = "0x0d500B1d8E8eF31E21C99d1Db9A6444d3ADf1270"
 	weth       = "0x7ceB23fD6bC0adD59E62ac25578270cFf1b9f619"
-	amountEth  = "200000000000000"
-	amountUsdc = "500000" // 50 cents of USDC
+	amountUsdc = "500000" // 0.5 USDC (6 decimals)
 	chainId    = 137
 )
 
 func main() {
+	if devPortalToken == "" || privateKey == "" {
+		log.Fatal("set DEV_PORTAL_TOKEN and WALLET_KEY to run this example")
+	}
+
 	config, err := fusion.NewConfiguration(fusion.ConfigurationParams{
 		ApiUrl:     "https://api.1inch.com",
 		ApiKey:     devPortalToken,
@@ -43,74 +57,74 @@ func main() {
 	}
 	ctx := context.Background()
 
-	fromToken := usdc
-	toToken := weth
-	amount := amountUsdc
+	// The maker address must match the signing key, so it is derived from the wallet
+	owner := client.Wallet.Address().Hex()
 
-	response, err := client.GetQuoteWithCustomPreset(ctx,
+	customPreset := fusion.CustomPreset{
+		AuctionDuration:    30,
+		AuctionStartAmount: "240000000000000",
+		AuctionEndAmount:   "150000000000000",
+		Points: []fusion.CustomPresetPoint{
+			{ToTokenAmount: "240000000000000", Delay: 10},
+			{ToTokenAmount: "150000000000000", Delay: 20},
+		},
+	}
+
+	quote, err := client.GetQuoteWithCustomPreset(ctx,
 		fusion.QuoterControllerGetQuoteWithCustomPresetsParamsFixed{
-			FromTokenAddress: fromToken,
-			ToTokenAddress:   toToken,
-			Amount:           amount,
-			WalletAddress:    publicAddress,
+			FromTokenAddress: usdc,
+			ToTokenAddress:   weth,
+			Amount:           amountUsdc,
+			WalletAddress:    owner,
 			EnableEstimate:   true,
 			Surplus:          true,
 		},
-		fusion.CustomPreset{
-			AuctionDuration:    30,
-			AuctionStartAmount: "240000000000000",
-			AuctionEndAmount:   "150000000000000",
-			Points: []fusion.CustomPresetPoint{
-				{ToTokenAmount: "240000000000000", Delay: 10},
-				{ToTokenAmount: "150000000000000", Delay: 20},
-			},
-		})
+		customPreset,
+	)
 	if err != nil {
-		log.Fatalf("failed to request: %v", err)
+		log.Fatalf("failed to get quote: %v", err)
 	}
 
-	output, err := json.MarshalIndent(response, "", "  ")
+	quoteIndented, err := json.MarshalIndent(quote, "", "  ")
 	if err != nil {
-		log.Fatalf("Failed to marshal response: %v", err)
+		log.Fatalf("failed to marshal quote: %v", err)
 	}
-	fmt.Printf("Response: %s\n", string(output))
+	fmt.Printf("Quote: %s\n", quoteIndented)
 
-	orderParams := fusion.OrderParams{
-		WalletAddress:    publicAddress,
-		FromTokenAddress: fromToken,
-		ToTokenAddress:   toToken,
-		Amount:           amount,
+	orderHash, err := client.PlaceOrder(ctx, *quote, fusion.OrderParams{
+		WalletAddress:    owner,
+		FromTokenAddress: usdc,
+		ToTokenAddress:   weth,
+		Amount:           amountUsdc,
 		Receiver:         constants.ZeroAddress,
 		Preset:           fusion.Custom,
-	}
-
-	orderHash, err := client.PlaceOrder(ctx, *response, orderParams, client.Wallet)
+		CustomPreset:     &customPreset,
+	}, client.Wallet)
 	if err != nil {
 		log.Fatalf("failed to place order: %v", err)
 	}
 
-	fmt.Printf("Order placed! Order hash: %s\n", orderHash)
-	fmt.Println("Monitoring order until it completes...")
+	fmt.Printf("Order placed: %s\n", orderHash)
+	fmt.Println("Monitoring the order until it completes...")
 
-	auctionSecondsPassed := 0
-	for {
-		select {
-		case <-time.After(1 * time.Second):
-			order, err := client.GetOrderStatus(ctx, orderHash)
-			if err != nil {
-				fmt.Printf("failed to get order from order hash: %v", err)
-				return
-			}
+	deadline := time.Now().Add(5 * time.Minute)
+	for time.Now().Before(deadline) {
+		time.Sleep(3 * time.Second)
 
-			auctionSecondsPassed++
-			fmt.Printf("Seconds passed: %v", auctionSecondsPassed)
-			fmt.Printf("Order status: %s\n", order.Status)
-			if order.Status == "filled" {
-				return
-			}
-			if order.Status == "expired" {
-				return
-			}
+		order, err := client.GetOrderStatus(ctx, orderHash)
+		if err != nil {
+			fmt.Printf("status poll failed, retrying: %v\n", err)
+			continue
+		}
+
+		fmt.Printf("Order status: %s\n", order.Status)
+		switch order.Status {
+		case "filled":
+			fmt.Println("Order filled")
+			return
+		case "expired", "cancelled", "refunded", "false-predicate", "not-enough-balance-or-allowance", "wrong-permit":
+			log.Fatalf("order ended without filling (status %s)", order.Status)
 		}
 	}
+	log.Fatalf("order %s did not reach a terminal status within 5 minutes", orderHash)
 }

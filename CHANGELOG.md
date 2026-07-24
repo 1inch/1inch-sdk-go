@@ -4,6 +4,32 @@ All notable changes to this project will be documented in this file.
 
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/), and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html) starting with the *v1.0.0-beta.1* release.
 
+## [Unreleased]
+
+### Added
+- New public constants: `constants.Permit2Address` (canonical Uniswap Permit2 contract, same address on all chains) and `constants.Uint48Max`
+- New method `fusion.Client.PlaceOrderFromParams`: fetches a quote and places the order in one call, so settings like `Permit` and `IsPermit2` are supplied once and propagate to both the quote request and the order
+- New function `orderbook.DecodeMakerTraits`: parses an encoded maker traits value back into a `MakerTraits` struct (inverse of `Encode`), enabling flag reads like `ShouldUsePermit2` from on-chain orders
+- New functions `orderbook.BuildPermit2Calldata`, `orderbook.BuildPermit2CalldataCompact`, and `orderbook.GetPermit2Allowance`: sign a Permit2 AllowanceTransfer PermitSingle (full 352-byte or compact 96-byte form) and read Permit2 allowance state. Note the compact form is currently rejected by fills through the deployed Aggregation Router v6 (see the function documentation); use the full form for orders.
+- New example `sdk-clients/fusion/examples/place_order_permit2`: full Permit2 fusion order flow (one-time ERC20 approval to Permit2, signed PermitSingle, one-call order placement)
+- Mainnet-fork integration tests under `tests/integration` (build tag `integration`, `make test-integration`)
+- New methods `fusionplus.Client.GetActiveOrders` and `fusionplus.Client.GetSettlementContract`: list open cross-chain orders and fetch the escrow factory address (the fusionplus examples for these previously called the fusion API)
+- New examples: `aggregation/examples/swap_with_permit2` (classic swap through a standing Permit2 allowance with `UsePermit2`) and `fusionplus/examples/place_order_permit` (cross-chain order with an embedded EIP-2612 permit)
+
+### Fixed
+- **`fusion.CreateFusionOrderData`**: `OrderParams.Permit` and `OrderParams.IsPermit2` are now honored; previously the permit was silently dropped and the `USE_PERMIT2` maker-traits bit was never set. The maker permit's leading 20 bytes carry the maker asset (the token parameter of the protocol's `tryPermit`), for regular permits and Permit2 permits alike.
+- **`fusionplus.CreateFusionPlusOrderData`**: `OrderParams.IsPermit2` now sets the `USE_PERMIT2` maker-traits bit.
+- **`fusionplus.FromLimitOrderExtension`**: post-interaction data now decodes correctly; the decoder previously failed on any extension with post-interaction data because the hex slice lacked the `0x` prefix.
+- **Permit input validation**: odd-length permit hex is now rejected by `CheckPermitHash`, `fusion.NewExtension`, and `fusionplus.NewExtensionPlus`; it previously corrupted the encoded extension and produced orders that could never fill.
+- **User-Agent header**: API requests now report the actual SDK version from the binary's build info; the header was pinned to `v3.0.0`. The reported value is always valid semver: release and prerelease tags verbatim, pseudo-versions rewritten to their base tag with the commit timestamp and hash preserved as build metadata (`v4.1.0+dev.20260801120000.abcdef123456`), replace directives reporting the replacement's version, and `v0.0.0+unknown` when the build carries no usable version.
+- **`common.Wallet.Call`**: wallets created without a node URL now return an error instead of panicking on on-chain calls.
+- **`orderbook.BuildOrderExtensionBytes`**: a hex string cast to `[]byte` in `MakerPermit` is now rejected with an error; it previously produced an extension whose permit could never execute. The field expects raw bytes: the maker asset address followed by the permit calldata (the `create_order_permit` example now shows the correct encoding).
+- **Examples**: order-placement examples now derive the maker address from `WALLET_KEY` instead of trusting `WALLET_ADDRESS`, monitor orders with deadlines and every terminal status, and validate required environment variables at startup; `fusionplus/get_active_orders` and `fusionplus/get_settlement_contract` now call the Fusion+ API, `aggregation/get_approve_spender` and `get_approval_allowance` had their operations swapped, `orderbook/get_order_count` used a Polygon token on Base, and `balances/get_balances_of_custom_tokens_by_wallet_addresses_list` now actually queries custom tokens.
+- **Transaction fee cap**: EIP-1559 transactions built without an explicit `SetGasFeeCap` now default the fee cap to twice the node's suggested gas price instead of the bare suggestion, and gas estimation no longer sends a gas price. The old defaults made builds and broadcasts fail with "max fee per gas less than block base fee" whenever the base fee rose before inclusion (near-constant on Arbitrum). The charged price (base fee plus tip) is unchanged.
+
+### Changed
+- The maker permit token field is encoded in lowercase hex in `fusion` and `fusionplus` extensions.
+
 ## [v4.0.0] - 2026-07-14
 
 ### Breaking Changes

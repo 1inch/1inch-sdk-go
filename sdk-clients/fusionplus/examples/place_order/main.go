@@ -2,7 +2,6 @@ package main
 
 import (
 	"context"
-	"encoding/json"
 	"fmt"
 	"log"
 	"os"
@@ -12,13 +11,40 @@ import (
 	"github.com/1inch/1inch-sdk-go/v4/sdk-clients/fusionplus"
 )
 
+/*
+This example places a cross-chain fusion order bridging USDC from Arbitrum to
+Base, submits the hashlock secrets as resolvers deploy escrows, and monitors the
+order until it reaches a terminal status.
+
+The maker must already have granted the 1inch Aggregation Router an allowance for
+the source-chain token (see the aggregation approve example), or the order can
+carry a signed permit instead (see the place_order_permit example).
+
+Requires the following environment variables:
+  - DEV_PORTAL_TOKEN: 1inch Developer Portal API key
+  - WALLET_KEY:       private key (64 hex chars, no 0x prefix)
+*/
+
 var (
 	devPortalToken = os.Getenv("DEV_PORTAL_TOKEN")
-	publicAddress  = os.Getenv("WALLET_ADDRESS")
 	privateKey     = os.Getenv("WALLET_KEY")
 )
 
+const (
+	srcChain = 42161 // Arbitrum
+	dstChain = 8453  // Base
+
+	arbitrumUsdc = "0xaf88d065e77c8cC2239327C5EDb3A432268e5831"
+	baseUsdc     = "0x833589fCD6eDb6E08f4c7C32D4f71b54bdA02913"
+
+	amount = "1500000" // 1.5 USDC (6 decimals)
+)
+
 func main() {
+	if devPortalToken == "" || privateKey == "" {
+		log.Fatal("set DEV_PORTAL_TOKEN and WALLET_KEY to run this example")
+	}
+
 	config, err := fusionplus.NewConfiguration(fusionplus.ConfigurationParams{
 		ApiUrl:     "https://api.1inch.com",
 		ApiKey:     devPortalToken,
@@ -33,25 +59,16 @@ func main() {
 	}
 	ctx := context.Background()
 
-	srcChain := 42161
-	dstChain := 8453
-
-	srcToken := "0xaf88d065e77c8cC2239327C5EDb3A432268e5831"
-	dstToken := "0x833589fCD6eDb6E08f4c7C32D4f71b54bdA02913"
-
-	invert := true
-	if invert {
-		srcChain, dstChain = dstChain, srcChain
-		srcToken, dstToken = dstToken, srcToken
-	}
+	// The maker address must match the signing key, so it is derived from the wallet
+	owner := client.Wallet.Address().Hex()
 
 	quoteParams := fusionplus.QuoterControllerGetQuoteParamsFixed{
-		SrcChain:        float32(srcChain),
-		DstChain:        float32(dstChain),
-		SrcTokenAddress: srcToken,
-		DstTokenAddress: dstToken,
-		Amount:          "1500000",
-		WalletAddress:   publicAddress,
+		SrcChain:        srcChain,
+		DstChain:        dstChain,
+		SrcTokenAddress: arbitrumUsdc,
+		DstTokenAddress: baseUsdc,
+		Amount:          amount,
+		WalletAddress:   owner,
 		EnableEstimate:  true,
 	}
 	quote, err := client.GetQuote(ctx, quoteParams)
@@ -59,111 +76,87 @@ func main() {
 		log.Fatalf("failed to get quote: %v", err)
 	}
 
+	// Each fill of the order requires revealing a secret; generate one per fill
+	// and lock the order to their hashes
 	preset, err := fusionplus.GetPreset(quote.Presets, quote.RecommendedPreset)
 	if err != nil {
-		log.Fatalf("Failed to get preset: %v", err)
+		log.Fatalf("failed to get preset: %v", err)
 	}
-	secretsCount := preset.SecretsCount
 
-	secrets := make([]string, int(secretsCount))
-	for i := 0; i < int(secretsCount); i++ {
-		randomBytes, err := fusionplus.GetRandomBytes32()
-		if err != nil {
-			log.Fatalf("Failed to get random bytes: %v", err)
+	secrets := make([]string, int(preset.SecretsCount))
+	secretHashes := make([]string, int(preset.SecretsCount))
+	for i := range secrets {
+		if secrets[i], err = fusionplus.GetRandomBytes32(); err != nil {
+			log.Fatalf("failed to generate secret: %v", err)
 		}
-		secrets[i] = randomBytes
-	}
-	var secretHashes []string
-	for _, secret := range secrets {
-		secretHash, err := fusionplus.HashSecret(secret)
-		if err != nil {
-			log.Fatalf("Failed to hash secret: %v", err)
+		if secretHashes[i], err = fusionplus.HashSecret(secrets[i]); err != nil {
+			log.Fatalf("failed to hash secret: %v", err)
 		}
-		secretHashes = append(secretHashes, secretHash)
 	}
 
 	var hashLock *fusionplus.HashLock
-
-	if secretsCount == 1 {
+	if len(secrets) == 1 {
 		hashLock, err = fusionplus.ForSingleFill(secrets[0])
-		if err != nil {
-			log.Fatalf("Failed to create hashlock: %v", err)
-		}
 	} else {
 		hashLock, err = fusionplus.ForMultipleFills(secrets)
-		if err != nil {
-			log.Fatalf("Failed to create hashlock: %v", err)
-		}
+	}
+	if err != nil {
+		log.Fatalf("failed to create hashlock: %v", err)
 	}
 
-	orderParams := fusionplus.OrderParams{
+	orderHash, err := client.PlaceOrder(ctx, quoteParams, quote, fusionplus.OrderParams{
 		HashLock:     hashLock,
 		SecretHashes: secretHashes,
 		Receiver:     constants.ZeroAddress,
 		Preset:       quote.RecommendedPreset,
-	}
-
-	orderHash, err := client.PlaceOrder(ctx, quoteParams, quote, orderParams, client.Wallet)
+	}, client.Wallet)
 	if err != nil {
-		log.Fatalf("Failed to create order data: %v", err)
+		log.Fatalf("failed to place order: %v", err)
 	}
 
-	order, err := client.GetOrderByOrderHash(ctx, fusionplus.GetOrderByOrderHashParams{
-		Hash: orderHash,
-	})
-	if err != nil {
-		log.Fatalf("Failed to get order by hash: %v", err)
-	}
+	fmt.Printf("Order placed: %s\n", orderHash)
+	fmt.Println("Monitoring the order and submitting secrets as escrows deploy...")
 
-	orderQuickLookIndented, err := json.MarshalIndent(order, "", "  ")
-	if err != nil {
-		log.Fatalf("Failed to marshal response: %v", err)
-	}
-	fmt.Printf("Order: %s\n", string(orderQuickLookIndented))
+	monitorFusionPlusOrder(ctx, client, orderHash, secrets)
+}
 
-	delay := 1 * time.Second // Delay between retries
-	retryCount := 0          // Current retry count
-	orderStatus := ""        // Current order status
+// monitorFusionPlusOrder polls the order status, submits a secret for each fill
+// whose escrows are deployed, and returns when the order reaches a terminal status
+func monitorFusionPlusOrder(ctx context.Context, client *fusionplus.Client, orderHash string, secrets []string) {
+	submitted := 0
+	deadline := time.Now().Add(15 * time.Minute)
+	for time.Now().Before(deadline) {
+		time.Sleep(5 * time.Second)
 
-	fmt.Println("Waiting for fill requests from the Cross Chain Swap system...")
-
-	for {
-		order, err = client.GetOrderByOrderHash(ctx, fusionplus.GetOrderByOrderHashParams{
-			Hash: orderHash,
-		})
+		order, err := client.GetOrderByOrderHash(ctx, fusionplus.GetOrderByOrderHashParams{Hash: orderHash})
 		if err != nil {
-			log.Printf("Failed to get order by hash: %v", err)
-		} else {
-			orderStatus = string(order.Status)
-			if orderStatus == "executed" {
-				fmt.Println("Order completed successfully.")
-				break
-			}
-			if orderStatus == "refunded" {
-				fmt.Println("Order did not complete and has been refunded.")
-				break
-			}
+			fmt.Printf("status poll failed, retrying: %v\n", err)
+			continue
 		}
 
-		fills, err := client.GetReadyToAcceptFills(ctx, fusionplus.GetReadyToAcceptFillsParams{
-			Hash: orderHash,
-		})
-		if err != nil {
-			log.Fatalf("failed to request: %v", err)
+		fmt.Printf("Order status: %s\n", order.Status)
+		switch string(order.Status) {
+		case "executed":
+			fmt.Println("Order executed; funds arrive on the destination chain shortly")
+			return
+		case "refunded", "cancelled", "expired":
+			log.Fatalf("order ended without executing (status %s)", order.Status)
 		}
 
-		if len(fills.Fills) > 0 {
-			// TODO the secret index needs to match the index of the fill object, but this is not important for single-secret orders
-			err = client.SubmitSecret(ctx, fusionplus.SecretInput{
+		fills, err := client.GetReadyToAcceptFills(ctx, fusionplus.GetReadyToAcceptFillsParams{Hash: orderHash})
+		if err != nil {
+			fmt.Printf("fills poll failed, retrying: %v\n", err)
+			continue
+		}
+		for ; submitted < len(fills.Fills) && submitted < len(secrets); submitted++ {
+			if err := client.SubmitSecret(ctx, fusionplus.SecretInput{
 				OrderHash: orderHash,
-				Secret:    secrets[0],
-			})
-			if err != nil {
-				log.Fatalf("failed to submit secret: %v", err)
+				Secret:    secrets[submitted],
+			}); err != nil {
+				log.Fatalf("failed to submit secret %d: %v", submitted, err)
 			}
-			fmt.Println("Fill request received and secret submitted! Checking for more fills...")
+			fmt.Printf("Submitted secret %d\n", submitted)
 		}
-		retryCount++
-		time.Sleep(delay)
 	}
+	log.Fatalf("order %s did not reach a terminal status within 15 minutes", orderHash)
 }

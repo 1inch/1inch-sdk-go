@@ -80,17 +80,17 @@ type CreateOrderResponse struct {
 }
 
 type OrderResponse struct {
-	Signature            string      `json:"signature"`
-	OrderHash            string      `json:"orderHash"`
-	CreateDateTime       time.Time   `json:"createDateTime"`
-	RemainingMakerAmount string      `json:"remainingMakerAmount"`
-	MakerBalance         string      `json:"makerBalance"`
-	MakerAllowance       string      `json:"makerAllowance"`
-	Data                 OrderData   `json:"data"`
-	MakerRate            string      `json:"makerRate"`
-	TakerRate            string      `json:"takerRate"`
-	IsMakerContract      bool        `json:"isMakerContract"`
-	OrderInvalidReason   any `json:"orderInvalidReason"`
+	Signature            string    `json:"signature"`
+	OrderHash            string    `json:"orderHash"`
+	CreateDateTime       time.Time `json:"createDateTime"`
+	RemainingMakerAmount string    `json:"remainingMakerAmount"`
+	MakerBalance         string    `json:"makerBalance"`
+	MakerAllowance       string    `json:"makerAllowance"`
+	Data                 OrderData `json:"data"`
+	MakerRate            string    `json:"makerRate"`
+	TakerRate            string    `json:"takerRate"`
+	IsMakerContract      bool      `json:"isMakerContract"`
+	OrderInvalidReason   any       `json:"orderInvalidReason"`
 }
 
 type OrderResponseExtended struct {
@@ -236,10 +236,15 @@ type buildFeePostInteractionDataParams struct {
 }
 
 type BuildOrderExtensionBytesParams struct {
-	ExtensionTarget  string
-	IntegratorFee    *IntegratorFee
-	ResolverFee      *ResolverFee
-	Whitelist        map[string]string
+	ExtensionTarget string
+	IntegratorFee   *IntegratorFee
+	ResolverFee     *ResolverFee
+	Whitelist       map[string]string
+
+	// MakerPermit holds raw bytes: the 20-byte maker asset address followed by the
+	// permit calldata. Decode hex strings (e.g. the Wallet.TokenPermit result) with
+	// hexutil.Decode before assigning; a hex string cast directly to []byte embeds
+	// the ASCII characters and produces a permit that can never execute.
 	MakerPermit      []byte
 	CustomReceiver   string
 	ExtraInteraction []byte

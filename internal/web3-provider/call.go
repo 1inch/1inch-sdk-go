@@ -9,6 +9,9 @@ import (
 )
 
 func (w Wallet) Call(ctx context.Context, contractAddress gethCommon.Address, callData []byte) ([]byte, error) {
+	if w.ethClient == nil {
+		return nil, fmt.Errorf("wallet has no node connection: create it with a node URL to make on-chain calls")
+	}
 	nodeMsg := ethereum.CallMsg{
 		To:   &contractAddress,
 		Data: callData,

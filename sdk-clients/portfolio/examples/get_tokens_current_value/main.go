@@ -15,6 +15,10 @@ var (
 )
 
 func main() {
+	if devPortalToken == "" {
+		log.Fatal("set DEV_PORTAL_TOKEN to run this example")
+	}
+
 	config, err := portfolio.NewConfiguration(portfolio.ConfigurationParams{
 		ApiUrl: "https://api.1inch.com",
 		ApiKey: devPortalToken,

@@ -17,7 +17,7 @@ var (
 	privateKeyRegex      = regexp.MustCompile(`^[a-fA-F0-9]{64}$`)
 	protocolsRegex       = regexp.MustCompile(`^[a-zA-Z0-9_]+(,[a-zA-Z0-9_]+)*$`)
 	connectorTokensRegex = regexp.MustCompile(`^0x[a-fA-F0-9]{40}(,0x[a-fA-F0-9]{40})*$`)
-	permitHashRegex      = regexp.MustCompile(`^0x[a-fA-F0-9]*$`)
+	permitHashRegex      = regexp.MustCompile(`^0x(?:[a-fA-F0-9]{2})*$`)
 )
 
 func CheckEthereumAddressRequired(value string, variableName string) error {

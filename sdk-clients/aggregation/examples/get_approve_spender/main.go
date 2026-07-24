@@ -2,6 +2,7 @@ package main
 
 import (
 	"context"
+	"fmt"
 	"log"
 	"os"
 
@@ -9,35 +10,41 @@ import (
 	"github.com/1inch/1inch-sdk-go/v4/sdk-clients/aggregation"
 )
 
+/*
+This example fetches the address tokens must be approved to before swapping
+(the 1inch Aggregation Router).
+
+Requires the following environment variables:
+  - DEV_PORTAL_TOKEN: 1inch Developer Portal API key
+*/
+
 var (
 	devPortalToken = os.Getenv("DEV_PORTAL_TOKEN")
-	walletAddress  = os.Getenv("WALLET_ADDRESS")
 )
 
-const PolygonWeth = "0x7ceB23fD6bC0adD59E62ac25578270cFf1b9f619"
-
 func main() {
+	if devPortalToken == "" {
+		log.Fatal("set DEV_PORTAL_TOKEN to run this example")
+	}
+
 	config, err := aggregation.NewConfigurationAPI(
 		constants.PolygonChainId,
 		"https://api.1inch.com",
 		devPortalToken,
 	)
 	if err != nil {
-		log.Fatalf("Failed to create configuration: %v", err)
+		log.Fatalf("failed to create configuration: %v", err)
 	}
 	client, err := aggregation.NewClientOnlyAPI(config)
 	if err != nil {
-		log.Fatalf("Failed to create client: %v", err)
+		log.Fatalf("failed to create client: %v", err)
 	}
 	ctx := context.Background()
 
-	response, err := client.GetApproveAllowance(ctx, aggregation.GetAllowanceParams{
-		TokenAddress:  PolygonWeth,
-		WalletAddress: walletAddress,
-	})
+	response, err := client.GetApproveSpender(ctx)
 	if err != nil {
-		log.Fatalf("Failed to get approve spender: %v", err)
+		log.Fatalf("failed to get approve spender: %v", err)
 	}
 
-	log.Printf("Allowance: %v", response.Allowance)
+	fmt.Printf("Approve spender (1inch router): %s\n", response.Address)
 }

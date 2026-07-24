@@ -170,6 +170,53 @@ func TestNewExtension(t *testing.T) {
 			expectErr: false,
 		},
 		{
+			name: "Maker permit token field is lowercase",
+			params: ExtensionParams{
+				SettlementContract: "0x5678",
+				AuctionDetails: &fusionorder.AuctionDetails{
+					StartTime:       0,
+					Duration:        0,
+					InitialRateBump: 0,
+					Points:          nil,
+					GasCost:         fusionorder.GasCostConfigClassFixed{},
+				},
+				PostInteractionData: &SettlementPostInteractionData{
+					Whitelist: []fusionorder.WhitelistItem{},
+					AuctionFees: &FeesIntegratorAndResolver{
+						Resolver:   ResolverFee{},
+						Integrator: IntegratorFee{},
+					},
+					ResolvingStartTime: big.NewInt(0),
+					CustomReceiver:     common.Address{},
+				},
+				Asset:  "0x00000000000000000000000000000000000ABCDE",
+				Permit: "0x3456",
+
+				MakerAssetSuffix: "0x1234",
+				TakerAssetSuffix: "0x1234",
+				Predicate:        "0x1234",
+				PreInteraction:   "0x5678",
+
+				Surplus: &SurplusParams{
+					EstimatedTakerAmount: big.NewInt(1),
+					ProtocolFee:          fusionorder.MustFromPercent(1, fusionorder.GetDefaultBase()),
+				},
+
+				ResolvingStartTime: big.NewInt(0),
+			},
+			expectedExtension: &Extension{
+				MakerAssetSuffix: "0x1234",
+				TakerAssetSuffix: "0x1234",
+				MakingAmountData: "0x000000000000000000000000000000000000567800000000000000000000000000000000000000000000006400",
+				TakingAmountData: "0x000000000000000000000000000000000000567800000000000000000000000000000000000000000000006400",
+				Predicate:        "0x1234",
+				MakerPermit:      "0x00000000000000000000000000000000000abcde3456",
+				PreInteraction:   "0x5678",
+				PostInteraction:  "0x000000000000000000000000000000000000567800000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000640000000000000000000000000000000000000000000000000000000000000000000000000101",
+			},
+			expectErr: false,
+		},
+		{
 			name: "Invalid SettlementContract",
 			params: ExtensionParams{
 				SettlementContract: "invalid",
@@ -229,6 +276,34 @@ func TestNewExtension(t *testing.T) {
 			},
 			expectErr: true,
 			errMsg:    "unsupported: custom data",
+		},
+		{
+			name: "Odd length permit",
+			params: ExtensionParams{
+				SettlementContract: "0x9012",
+				MakerAssetSuffix:   "0x1234",
+				TakerAssetSuffix:   "0x1234",
+				Predicate:          "0x1234",
+				PreInteraction:     "0x5678",
+				Asset:              "0x1234",
+				Permit:             "0xabc",
+			},
+			expectErr: true,
+			errMsg:    "invalid permit hex: 0xabc",
+		},
+		{
+			name: "Non-hex permit",
+			params: ExtensionParams{
+				SettlementContract: "0x9012",
+				MakerAssetSuffix:   "0x1234",
+				TakerAssetSuffix:   "0x1234",
+				Predicate:          "0x1234",
+				PreInteraction:     "0x5678",
+				Asset:              "0x1234",
+				Permit:             "0xzz34",
+			},
+			expectErr: true,
+			errMsg:    "invalid permit hex: 0xzz34",
 		},
 	}
 

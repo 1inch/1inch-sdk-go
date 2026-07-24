@@ -1,0 +1,28 @@
+name: Integration tests
+
+on:
+  workflow_dispatch:
+  schedule:
+    # Nightly at 04:12 UTC
+    - cron: '12 4 * * *'
+
+jobs:
+  fork-tests:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout code into workspace directory
+        uses: actions/checkout@v3
+
+      - name: Set up Go 1.25
+        uses: actions/setup-go@v3
+        with:
+          go-version: '1.25'
+
+      - name: Install Foundry
+        uses: foundry-rs/foundry-toolchain@v1
+
+      - name: Mainnet fork tests
+        # Falls back to public RPC endpoints when the FORK_URL secret is unset
+        env:
+          FORK_URL: ${{ secrets.FORK_URL }}
+        run: make test-integration

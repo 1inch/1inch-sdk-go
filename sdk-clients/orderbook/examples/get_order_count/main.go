@@ -18,24 +18,28 @@ const (
 )
 
 func main() {
+	if devPortalToken == "" {
+		log.Fatal("set DEV_PORTAL_TOKEN to run this example")
+	}
+
 	ctx := context.Background()
 
 	config, err := orderbook.NewConfigurationAPI(chainId, "https://api.1inch.com", devPortalToken)
 	if err != nil {
-		log.Fatalf("Failed to create configuration: %v", err)
+		log.Fatalf("failed to create configuration: %v", err)
 	}
 	client, err := orderbook.NewClientOnlyAPI(config)
 	if err != nil {
-		log.Fatalf("Failed to create client: %v", err)
+		log.Fatalf("failed to create client: %v", err)
 	}
 
 	orderCount, err := client.GetOrderCount(ctx, orderbook.GetOrderCountParams{
 		Statuses:   []orderbook.OrderStatus{orderbook.ValidOrders},
 		MakerAsset: "0x833589fCD6eDb6E08f4c7C32D4f71b54bdA02913",
-		TakerAsset: "0x3c499c542cEF5E3811e1192ce70d8cC03d5c3359",
+		TakerAsset: "0x4200000000000000000000000000000000000006",
 	})
 	if err != nil {
-		log.Fatalf("Failed to get order count: %v", err)
+		log.Fatalf("failed to get order count: %v", err)
 	}
 
 	fmt.Printf("Order count: %v\n", orderCount.Count)
