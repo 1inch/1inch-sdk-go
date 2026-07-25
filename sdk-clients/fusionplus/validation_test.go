@@ -1,6 +1,7 @@
 package fusionplus
 
 import (
+	"strings"
 	"testing"
 
 	"github.com/stretchr/testify/assert"
@@ -282,6 +283,17 @@ func TestOrderParams_Validate(t *testing.T) {
 			},
 			expectError: true,
 			errorMsg:    "Preset",
+		},
+		{
+			name: "Compact permit2 form rejected",
+			params: OrderParams{
+				Receiver:  validAddress,
+				Preset:    "fast",
+				Permit:    "0x" + strings.Repeat("11", 96),
+				IsPermit2: true,
+			},
+			expectError: true,
+			errorMsg:    "compact permit2",
 		},
 		{
 			name: "Empty Preset",

@@ -143,16 +143,26 @@ func (t *TransactionBuilder) BuildDynamicTx(ctx context.Context) (*types.Transac
 		if err != nil {
 			return nil, err
 		}
-		t.gasFeeCap = gasPrice
+		// The node's suggested gas price tracks the current base fee, so using it
+		// directly as the fee cap makes the transaction invalid as soon as the base
+		// fee rises before inclusion. Doubling the suggestion keeps the cap at or
+		// above twice the base fee plus the tip; the network only charges base fee
+		// plus tip, so the headroom adds no cost.
+		t.gasFeeCap = new(big.Int).Mul(gasPrice, big.NewInt(2))
+		if t.gasFeeCap.Cmp(t.gasTipCap) < 0 {
+			t.gasFeeCap = new(big.Int).Set(t.gasTipCap)
+		}
 	}
 
 	if t.gas == nil {
+		// Fee fields are omitted from the estimate: gas usage does not depend on
+		// them, and including a price makes the node reject the estimate whenever
+		// the base fee moves or the account cannot prepay at the capped price
 		gas, err := t.wallet.GetGasEstimate(ctx, ethereum.CallMsg{
-			From:     t.wallet.Address(),
-			To:       t.to,
-			Value:    t.value,
-			GasPrice: t.gasFeeCap,
-			Data:     t.data,
+			From:  t.wallet.Address(),
+			To:    t.to,
+			Value: t.value,
+			Data:  t.data,
 		})
 		if err != nil {
 			return nil, err

@@ -16,6 +16,10 @@ var (
 )
 
 func main() {
+	if devPortalToken == "" || privateKey == "" {
+		log.Fatal("set DEV_PORTAL_TOKEN and WALLET_KEY to run this example")
+	}
+
 	config, err := fusionplus.NewConfiguration(fusionplus.ConfigurationParams{
 		ApiUrl:     "https://api.1inch.com",
 		ApiKey:     devPortalToken,
@@ -39,7 +43,7 @@ func main() {
 
 	output, err := json.MarshalIndent(response, "", "  ")
 	if err != nil {
-		log.Fatalf("Failed to marshal response: %v", err)
+		log.Fatalf("failed to marshal response: %v", err)
 	}
 	fmt.Printf("Response: %s\n", string(output))
 }

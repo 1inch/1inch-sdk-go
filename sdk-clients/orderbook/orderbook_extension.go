@@ -224,6 +224,9 @@ func buildFeePostInteractionData(params *buildFeePostInteractionDataParams) ([]b
 // BuildOrderExtensionBytes builds the complete order extension
 // Returns the encoded extension as a hex string
 func BuildOrderExtensionBytes(params *BuildOrderExtensionBytesParams) (string, error) {
+	if len(params.MakerPermit) >= 2 && params.MakerPermit[0] == '0' && params.MakerPermit[1] == 'x' {
+		return "", fmt.Errorf("MakerPermit must be raw bytes (maker asset address followed by the permit calldata), not a hex string cast to []byte")
+	}
 
 	whitelistResolvers := make([]string, 0, len(params.Whitelist))
 	for _, value := range params.Whitelist {

@@ -17,14 +17,14 @@ type ProviderTokenDtoFixed struct {
 
 // TokenInfoDtoFixed uses the Tag struct for Tags
 type TokenInfoDtoFixed struct {
-	Address    string                  `json:"address"`
-	ChainId    float32                 `json:"chainId"`
-	Decimals   float32                 `json:"decimals"`
+	Address    string          `json:"address"`
+	ChainId    float32         `json:"chainId"`
+	Decimals   float32         `json:"decimals"`
 	Extensions *map[string]any `json:"extensions,omitempty"`
-	LogoURI    string                  `json:"logoURI"`
-	Name       string                  `json:"name"`
-	Symbol     string                  `json:"symbol"`
-	Tags       []TagDto                `json:"tags"`
+	LogoURI    string          `json:"logoURI"`
+	Name       string          `json:"name"`
+	Symbol     string          `json:"symbol"`
+	Tags       []TagDto        `json:"tags"`
 }
 
 type CustomTokensControllerGetTokenInfoParams struct {

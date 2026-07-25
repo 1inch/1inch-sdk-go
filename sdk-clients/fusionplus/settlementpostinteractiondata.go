@@ -102,6 +102,9 @@ func DecodeSettlementPostInteractionData(data string) (*SettlementPostInteractio
 	if err != nil {
 		return nil, fmt.Errorf("invalid hex string: %w", err)
 	}
+	if len(bytes) == 0 {
+		return nil, fmt.Errorf("post interaction data is empty")
+	}
 
 	flags := big.NewInt(int64(bytes[len(bytes)-1]))
 	bytesWithoutFlags := bytes[:len(bytes)-1]

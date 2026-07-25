@@ -107,6 +107,7 @@ func CreateFusionPlusOrderData(quoteParams QuoterControllerGetQuoteParamsFixed, 
 		AllowPartialFills:    preset.AllowPartialFills,
 		AllowMultipleFills:   preset.AllowMultipleFills,
 		OrderExpirationDelay: 0,
+		EnablePermit2:        orderParams.IsPermit2,
 		Source:               "",
 	}
 

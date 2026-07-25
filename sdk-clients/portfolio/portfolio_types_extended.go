@@ -58,25 +58,25 @@ type GetProtocolsDetailsResponse struct {
 		ValueUsd     float64 `json:"value_usd"`
 		ProtocolName string  `json:"protocol_name"`
 		Info         struct {
-			Amount                    float64     `json:"amount"`
-			UnderlyingContractAddress float64     `json:"underlying_contract_address"`
-			PositionStartTimestamp    any `json:"position_start_timestamp"`
-			TimeIntervalSec           int         `json:"time_interval_sec,omitempty"`
-			PriceToUsd                float64     `json:"price_to_usd"`
-			ValueUsd                  float64     `json:"value_usd"`
-			GainedReward              float64     `json:"gained_reward"`
-			GainedRewardUsd           float64     `json:"gained_reward_usd"`
-			Roi                       *float64    `json:"roi"`
-			Apr                       *float64    `json:"apr"`
-			Apy                       *float64    `json:"apy,omitempty"`
-			AveragePriceUsd           *float64    `json:"average_price_usd,omitempty"`
-			HoldingTimeDays           float64     `json:"holding_time_days"`
-			StethAmount               float64     `json:"steth_amount,omitempty"`
-			IsWrapped                 int         `json:"is_wrapped,omitempty"`
-			ChiCoeff                  float64     `json:"chi_coeff,omitempty"`
-			ChaiAmount                float64     `json:"chai_amount,omitempty"`
-			UnderlyingAmountInvested  float64     `json:"underlying_amount_invested,omitempty"`
-			UnderlyingAmount          float64     `json:"underlying_amount,omitempty"`
+			Amount                    float64  `json:"amount"`
+			UnderlyingContractAddress float64  `json:"underlying_contract_address"`
+			PositionStartTimestamp    any      `json:"position_start_timestamp"`
+			TimeIntervalSec           int      `json:"time_interval_sec,omitempty"`
+			PriceToUsd                float64  `json:"price_to_usd"`
+			ValueUsd                  float64  `json:"value_usd"`
+			GainedReward              float64  `json:"gained_reward"`
+			GainedRewardUsd           float64  `json:"gained_reward_usd"`
+			Roi                       *float64 `json:"roi"`
+			Apr                       *float64 `json:"apr"`
+			Apy                       *float64 `json:"apy,omitempty"`
+			AveragePriceUsd           *float64 `json:"average_price_usd,omitempty"`
+			HoldingTimeDays           float64  `json:"holding_time_days"`
+			StethAmount               float64  `json:"steth_amount,omitempty"`
+			IsWrapped                 int      `json:"is_wrapped,omitempty"`
+			ChiCoeff                  float64  `json:"chi_coeff,omitempty"`
+			ChaiAmount                float64  `json:"chai_amount,omitempty"`
+			UnderlyingAmountInvested  float64  `json:"underlying_amount_invested,omitempty"`
+			UnderlyingAmount          float64  `json:"underlying_amount,omitempty"`
 		} `json:"info"`
 	} `json:"result"`
 	System struct {

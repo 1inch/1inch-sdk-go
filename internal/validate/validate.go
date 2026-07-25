@@ -17,7 +17,7 @@ var (
 	privateKeyRegex      = regexp.MustCompile(`^[a-fA-F0-9]{64}$`)
 	protocolsRegex       = regexp.MustCompile(`^[a-zA-Z0-9_]+(,[a-zA-Z0-9_]+)*$`)
 	connectorTokensRegex = regexp.MustCompile(`^0x[a-fA-F0-9]{40}(,0x[a-fA-F0-9]{40})*$`)
-	permitHashRegex      = regexp.MustCompile(`^0x[a-fA-F0-9]*$`)
+	permitHashRegex      = regexp.MustCompile(`^0x(?:[a-fA-F0-9]{2})*$`)
 )
 
 func CheckEthereumAddressRequired(value string, variableName string) error {
@@ -340,6 +340,16 @@ func CheckPermitHash(value string, variableName string) error {
 
 	if !permitHashRegex.MatchString(value) {
 		return NewParameterValidationError(variableName, "not a valid permit hash")
+	}
+	return nil
+}
+
+// CheckFillablePermit rejects the 96-byte compact permit2 form: fills through the
+// deployed Aggregation Router v6 revert on it, so orders carrying it can never
+// execute. Only the full 352-byte permit2 form is fillable.
+func CheckFillablePermit(value string, variableName string) error {
+	if len(strings.TrimPrefix(value, "0x")) == 96*2 {
+		return NewParameterValidationError(variableName, "the 96-byte compact permit2 form is rejected by fills through the deployed router; use the full 352-byte form from orderbook.BuildPermit2Calldata")
 	}
 	return nil
 }

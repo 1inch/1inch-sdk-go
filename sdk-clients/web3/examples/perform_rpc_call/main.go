@@ -16,6 +16,10 @@ var (
 )
 
 func main() {
+	if devPortalToken == "" {
+		log.Fatal("set DEV_PORTAL_TOKEN to run this example")
+	}
+
 	config, err := web3.NewConfiguration(web3.ConfigurationParams{
 		ChainId: constants.EthereumChainId,
 		ApiUrl:  "https://api.1inch.com",

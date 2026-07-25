@@ -91,7 +91,6 @@ type CustomPreset = fusionorder.CustomPreset
 // Deprecated: Use fusionorder.CustomPresetPoint directly instead.
 type CustomPresetPoint = fusionorder.CustomPresetPoint
 
-
 type Preset struct {
 	AuctionDuration    float32             `json:"auctionDuration"`
 	StartAuctionIn     float32             `json:"startAuctionIn"`
@@ -228,10 +227,10 @@ type OrderResponse struct {
 		TakerAsset   string `json:"takerAsset"`
 		TakingAmount string `json:"takingAmount"`
 	} `json:"order"`
-	OrderHash         string                   `json:"orderHash"`
+	OrderHash         string                               `json:"orderHash"`
 	Points            []fusionorder.AuctionPointClassFixed `json:"points"`
-	Status            string                   `json:"status"`
-	ToTokenToUsdPrice string                   `json:"toTokenToUsdPrice"`
+	Status            string                               `json:"status"`
+	ToTokenToUsdPrice string                               `json:"toTokenToUsdPrice"`
 }
 
 // PresetClassFixed defines model for PresetClass.

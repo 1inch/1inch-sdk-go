@@ -16,6 +16,10 @@ var (
 )
 
 func main() {
+	if devPortalToken == "" {
+		log.Fatal("set DEV_PORTAL_TOKEN to run this example")
+	}
+
 	configLegacyChain, err := gasprices.NewConfiguration(gasprices.ConfigurationParams{
 		ChainId: constants.AuroraChainId,
 		ApiUrl:  "https://api.1inch.com",

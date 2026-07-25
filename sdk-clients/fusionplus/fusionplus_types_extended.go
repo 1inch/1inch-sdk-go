@@ -25,7 +25,7 @@ type GetOrderFillsByHashOutputFixed struct {
 	AuctionDuration float32 `json:"auctionDuration"`
 
 	// AuctionStartDate Unix timestamp in milliseconds
-	AuctionStartDate float32                `json:"auctionStartDate"`
+	AuctionStartDate float32        `json:"auctionStartDate"`
 	CancelTx         map[string]any `json:"cancelTx"`
 
 	// Cancelable Is order cancelable
@@ -355,4 +355,10 @@ type ExtensionPlus struct {
 	PreInteraction   string
 	PostInteraction  string
 	CustomData       string
+}
+
+// GetSettlementContractParams defines parameters for GetSettlementContract
+type GetSettlementContractParams struct {
+	// ChainId Chain ID
+	ChainId float32 `url:"chainId,omitempty" json:"chainId,omitempty"`
 }

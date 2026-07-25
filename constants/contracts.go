@@ -11,6 +11,10 @@ const AggregationRouterV6VersionNumber = "6"
 
 const Erc20ApproveGas = 45_000
 
+// Permit2Address is the canonical Uniswap Permit2 contract, same address on all chains
+// https://github.com/Uniswap/permit2
+const Permit2Address = "0x000000000022d473030f116ddee9f6b43ac78ba3"
+
 // Series Nonce Manager contract addresses are taken from limit-order-protocol/deployments
 
 const SeriesNonceManagerArbitrum = "0xD7936052D1e096d48C81Ef3918F9Fd6384108480"

@@ -14,5 +14,8 @@ const Uint32Max = (1 << 32) - 1
 // Uint40Max is the maximum value for a uint40 (2^40 - 1) as *big.Int
 var Uint40Max = new(big.Int).Sub(new(big.Int).Lsh(big.NewInt(1), 40), big.NewInt(1))
 
+// Uint48Max is the maximum value for a uint48 (2^48 - 1) as *big.Int
+var Uint48Max = new(big.Int).Sub(new(big.Int).Lsh(big.NewInt(1), 48), big.NewInt(1))
+
 // Uint256Max is the maximum value for a uint256 (2^256 - 1) as *big.Int
 var Uint256Max = new(big.Int).Sub(new(big.Int).Lsh(big.NewInt(1), 256), big.NewInt(1))

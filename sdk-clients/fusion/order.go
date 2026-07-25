@@ -70,10 +70,11 @@ func CreateFusionOrderData(quote GetQuoteOutputFixed, orderParams OrderParams, w
 	}
 	extraParams := ExtraParams{
 		Nonce:                nonce,
-		Permit:               "",
+		Permit:               orderParams.Permit,
 		AllowPartialFills:    orderParams.AllowPartialFills,
 		AllowMultipleFills:   orderParams.AllowMultipleFills,
 		OrderExpirationDelay: orderParams.OrderExpirationDelay,
+		EnablePermit2:        orderParams.IsPermit2,
 		Source:               "",
 	}
 

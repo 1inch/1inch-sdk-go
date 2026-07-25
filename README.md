@@ -1,11 +1,11 @@
 # Dev Portal Go SDK
 
-The SDK requires a minimum version of Go `1.22`.
+The SDK requires a minimum version of Go `1.25`.
 
 Check out the [release notes](https://github.com/1inch/1inch-sdk-go/blob/main/CHANGELOG.md) for information about
 the latest bug fixes, updates, and features added to the SDK.
 
-Beyond simplifying Go-based interactions with our REST API, this SDK also helps broadcast transactions to the network, can generate Permit1 signatures to skip the need for Approval transactions, and enables access to our Fusion system. Each SDK has examples of how to send valid requests to each Dev Portal endpoint. 
+Beyond simplifying Go-based interactions with our REST API, this SDK broadcasts transactions to the network, signs gasless approvals (EIP-2612 permits and Permit2), and places gasless swaps through Fusion and cross-chain swaps through Fusion+. Each client has examples of how to send valid requests to each Dev Portal endpoint.
 
 Jump To:
 
@@ -32,7 +32,7 @@ Jump To:
 
 *History API* [[Docs](https://business.1inch.com/portal/documentation/apis/history/introduction) | [SDK Example](https://github.com/1inch/1inch-sdk-go/blob/main/sdk-clients/history/examples/get_history_events_by_address/main.go)]
 
-*NFT API* - [[Docs](https://business.1inch.com/portal/documentation/apis/nft/introduction) | [SDK Example](https://github.com/1inch/1inch-sdk-go/blob/main/sdk-clients/nft/examples/main.go)]
+*NFT API* - [[Docs](https://business.1inch.com/portal/documentation/apis/nft/introduction) | [SDK Example](https://github.com/1inch/1inch-sdk-go/blob/main/sdk-clients/nft/examples/get_nfts_by_address/main.go)]
 
 *Portfolio API* - [[Docs](https://business.1inch.com/portal/documentation/apis/portfolio/introduction) | [SDK Example](https://github.com/1inch/1inch-sdk-go/blob/main/sdk-clients/portfolio/examples/get_current_protocols_value/main.go)]
 
@@ -44,12 +44,14 @@ Jump To:
 
 *Transaction Gateway API* - [[Docs](https://business.1inch.com/portal/documentation/apis/transaction/introduction) | [SDK Example](https://github.com/1inch/1inch-sdk-go/blob/main/sdk-clients/txbroadcast/examples/broadcast_public_transaction/main.go)]
 
+*Web3 RPC API* - [[Docs](https://business.1inch.com/portal/documentation/apis/web3/overview) | [SDK Example](https://github.com/1inch/1inch-sdk-go/blob/main/sdk-clients/web3/examples/perform_rpc_call/main.go)]
+
 
 ## Getting started
 
 To get started working with the SDK, set up your project for Go modules and retrieve the SDK dependencies with `go get`.
 
-This example shows how you can use the SDK in a new project to request a quote to swap 1 USDC for DAI on Ethereum:
+This example shows how you can use the SDK in a new project to fetch swap data for trading 100 USDC to 1INCH on Ethereum:
 
 ###### Initialize Project
 
@@ -89,7 +91,8 @@ var (
 )
 
 func main() {
-	rpcUrl := "https://eth.llamarpc.com"
+	rpcUrl := "https://ethereum-rpc.publicnode.com"
+	// Throwaway placeholder key, used only to derive an address for the request
 	randomPrivateKey := "e8f32e723decf4051aefac8e6c1a25ad146334449d2792c2b8b15d0b59c2a35f"
 
 	config, err := aggregation.NewConfiguration(aggregation.ConfigurationParams{
@@ -142,7 +145,7 @@ will contain an SDK for one of the 1inch APIs and will also include dedicated ex
 ## Getting Help
 
 If you have questions, want to discuss the tool, or have found a bug, please open
-an [issue](https://github.com/1inch/1inch-sdk/issues) here on GitHub
+an [issue](https://github.com/1inch/1inch-sdk-go/issues) here on GitHub
 
 ## Development
 

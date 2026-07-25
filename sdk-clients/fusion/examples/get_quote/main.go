@@ -12,7 +12,6 @@ import (
 
 var (
 	devPortalToken = os.Getenv("DEV_PORTAL_TOKEN")
-	publicAddress  = os.Getenv("WALLET_ADDRESS")
 	privateKey     = os.Getenv("WALLET_KEY")
 )
 
@@ -24,6 +23,10 @@ const (
 )
 
 func main() {
+	if devPortalToken == "" || privateKey == "" {
+		log.Fatal("set DEV_PORTAL_TOKEN and WALLET_KEY to run this example")
+	}
+
 	config, err := fusion.NewConfiguration(fusion.ConfigurationParams{
 		ApiUrl:     "https://api.1inch.com",
 		ApiKey:     devPortalToken,
@@ -43,7 +46,7 @@ func main() {
 		FromTokenAddress: usdc,
 		ToTokenAddress:   wmatic,
 		Amount:           amount,
-		WalletAddress:    publicAddress,
+		WalletAddress:    client.Wallet.Address().Hex(),
 	})
 	if err != nil {
 		log.Fatalf("failed to request: %v", err)
@@ -51,7 +54,7 @@ func main() {
 
 	output, err := json.MarshalIndent(response, "", "  ")
 	if err != nil {
-		log.Fatalf("Failed to marshal response: %v", err)
+		log.Fatalf("failed to marshal response: %v", err)
 	}
 	fmt.Printf("Response: %s\n", string(output))
 }

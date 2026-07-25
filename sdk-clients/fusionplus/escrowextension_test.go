@@ -179,6 +179,38 @@ func TestNewExtension(t *testing.T) {
 			expectErr: true,
 			errMsg:    "unsupported: custom data",
 		},
+		{
+			name: "Odd length permit",
+			params: EscrowExtensionParams{
+				ExtensionParamsPlus: ExtensionParamsPlus{
+					SettlementContract: "0x5678",
+					MakerAssetSuffix:   "0x1234",
+					TakerAssetSuffix:   "0x1234",
+					Predicate:          "0x1234",
+					PreInteraction:     "pre",
+					Asset:              "0x1234",
+					Permit:             "0xabc",
+				},
+			},
+			expectErr: true,
+			errMsg:    "invalid permit hex: 0xabc",
+		},
+		{
+			name: "Non-hex permit",
+			params: EscrowExtensionParams{
+				ExtensionParamsPlus: ExtensionParamsPlus{
+					SettlementContract: "0x5678",
+					MakerAssetSuffix:   "0x1234",
+					TakerAssetSuffix:   "0x1234",
+					Predicate:          "0x1234",
+					PreInteraction:     "pre",
+					Asset:              "0x1234",
+					Permit:             "0xzz34",
+				},
+			},
+			expectErr: true,
+			errMsg:    "invalid permit hex: 0xzz34",
+		},
 	}
 
 	for _, tc := range tests {
@@ -193,6 +225,7 @@ func TestNewExtension(t *testing.T) {
 				assert.Equal(t, tc.expected.MakerAssetSuffix, ext.MakerAssetSuffix)
 				assert.Equal(t, tc.expected.TakerAssetSuffix, ext.TakerAssetSuffix)
 				assert.Equal(t, tc.expected.Predicate, ext.Predicate)
+				assert.Equal(t, tc.expected.MakerPermit, ext.MakerPermit)
 				assert.Equal(t, tc.expected.PreInteraction, ext.PreInteraction)
 				assert.Equal(t, tc.expected.PostInteraction, ext.PostInteraction)
 				assert.Equal(t, tc.expected.CustomData, ext.CustomData)

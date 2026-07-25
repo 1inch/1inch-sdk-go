@@ -3,11 +3,13 @@ package fusion
 import (
 	"errors"
 	"math/big"
+	"strings"
 	"testing"
 
 	"github.com/1inch/1inch-sdk-go/v4/common/fusionorder"
 	random_number_generation "github.com/1inch/1inch-sdk-go/v4/internal/random-number-generation"
 	"github.com/1inch/1inch-sdk-go/v4/internal/times"
+	web3_provider "github.com/1inch/1inch-sdk-go/v4/internal/web3-provider"
 	"github.com/1inch/1inch-sdk-go/v4/sdk-clients/orderbook"
 	"github.com/ethereum/go-ethereum/common"
 	"github.com/stretchr/testify/assert"
@@ -672,6 +674,86 @@ func TestCreateFusionOrderTdd(t *testing.T) {
 			assert.Equal(t, tt.expected.MakerTraits, order.MakerTraits)
 			assert.Equal(t, tt.expected.Salt, order.Salt)
 			assert.Equal(t, tt.expectedPostInteraction, extension.PostInteraction)
+		})
+	}
+}
+
+// permit2TestQuote is the shared quote fixture for permit2 order creation tests
+func permit2TestQuote() GetQuoteOutputFixed {
+	return GetQuoteOutputFixed{
+		QuoteId:           "test-quote-id",
+		SettlementAddress: extensionContract,
+		Whitelist:         []string{"0x00000000219ab540356cbb839cbe05303d7705fa"},
+		MarketAmount:      "1420000000",
+		SurplusFee:        0,
+		Presets: QuotePresetsClassFixed{
+			Fast: PresetClassFixed{
+				AllowMultipleFills: true,
+				AllowPartialFills:  true,
+				AuctionDuration:    180,
+				AuctionEndAmount:   "1420000000",
+				AuctionStartAmount: "1500000000",
+				GasCost:            GasCostConfigClass{GasBumpEstimate: 0, GasPriceEstimate: "0"},
+				InitialRateBump:    50000,
+				Points:             []AuctionPointClass{{Coefficient: 20000, Delay: 12}},
+				StartAuctionIn:     0,
+			},
+		},
+	}
+}
+
+func TestCreateFusionOrderData_Permit2(t *testing.T) {
+	testPrivateKey := "d8d1f95deb28949ea0ecc4e9a0decf89e98422c2d76ab6e5f736792a388c56c7"
+	wallet, err := web3_provider.DefaultWalletOnlyProvider(testPrivateKey, 1)
+	require.NoError(t, err)
+
+	quote := permit2TestQuote()
+
+	// The maker permit token field is always the maker asset; isPermit2 controls
+	// only the USE_PERMIT2 maker traits bit
+	tests := []struct {
+		name                 string
+		isPermit2            bool
+		expectedPermitTarget string
+	}{
+		{
+			name:                 "Permit included and USE_PERMIT2 bit set when isPermit2 is true",
+			isPermit2:            true,
+			expectedPermitTarget: "0xc02aaa39b223fe8d0a0e5c4f27ead9083c756cc2",
+		},
+		{
+			name:                 "Permit included without USE_PERMIT2 bit when isPermit2 is false",
+			isPermit2:            false,
+			expectedPermitTarget: "0xc02aaa39b223fe8d0a0e5c4f27ead9083c756cc2",
+		},
+	}
+
+	for _, tc := range tests {
+		t.Run(tc.name, func(t *testing.T) {
+			orderParams := OrderParams{
+				FromTokenAddress:   "0xc02aaa39b223fe8d0a0e5c4f27ead9083c756cc2",
+				ToTokenAddress:     "0xa0b86991c6218b36c1d19d4a2e9eb0ce3606eb48",
+				Amount:             "1000000000000000000",
+				WalletAddress:      wallet.Address().Hex(),
+				Receiver:           "0x0000000000000000000000000000000000000000",
+				Preset:             Fast,
+				Permit:             "0xdeadbeef01020304",
+				IsPermit2:          tc.isPermit2,
+				AllowPartialFills:  true,
+				AllowMultipleFills: true,
+			}
+
+			preparedOrder, limitOrder, err := CreateFusionOrderData(quote, orderParams, wallet, 1)
+			require.NoError(t, err)
+			require.NotNil(t, preparedOrder)
+			require.NotNil(t, limitOrder)
+
+			expectedMakerPermit := tc.expectedPermitTarget + "deadbeef01020304"
+			assert.Equal(t, expectedMakerPermit, preparedOrder.Order.FusionExtension.MakerPermit, "MakerPermit mismatch")
+
+			makerTraits, ok := new(big.Int).SetString(strings.TrimPrefix(limitOrder.Data.MakerTraits, "0x"), 16)
+			require.True(t, ok)
+			assert.Equal(t, tc.isPermit2, makerTraits.Bit(248) == 1, "USE_PERMIT2 maker traits bit mismatch")
 		})
 	}
 }

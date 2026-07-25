@@ -2,6 +2,7 @@ package validate
 
 import (
 	"fmt"
+	"strings"
 	"testing"
 
 	"slices"
@@ -923,6 +924,49 @@ func TestCheckConnectorTokens(t *testing.T) {
 	}
 }
 
+func TestCheckFillablePermit(t *testing.T) {
+	testcases := []struct {
+		description string
+		value       string
+		expectError bool
+	}{
+		{
+			description: "Empty permit",
+			value:       "",
+		},
+		{
+			description: "Full 352-byte permit2 form",
+			value:       "0x" + strings.Repeat("11", 352),
+		},
+		{
+			description: "224-byte EIP-2612 permit",
+			value:       "0x" + strings.Repeat("22", 224),
+		},
+		{
+			description: "Compact 96-byte permit2 form",
+			value:       "0x" + strings.Repeat("33", 96),
+			expectError: true,
+		},
+		{
+			description: "Compact form without 0x prefix",
+			value:       strings.Repeat("44", 96),
+			expectError: true,
+		},
+	}
+
+	for _, tc := range testcases {
+		t.Run(tc.description, func(t *testing.T) {
+			err := CheckFillablePermit(tc.value, "testValue")
+			if tc.expectError {
+				require.Error(t, err, fmt.Sprintf("%s should have caused an error", tc.description))
+				require.Contains(t, err.Error(), "compact permit2")
+			} else {
+				require.NoError(t, err, fmt.Sprintf("%s should not have caused an error", tc.description))
+			}
+		})
+	}
+}
+
 func TestCheckPermitHash(t *testing.T) {
 	testcases := []struct {
 		description string
@@ -940,6 +984,11 @@ func TestCheckPermitHash(t *testing.T) {
 		{
 			description: "Invalid permit hash - invalid character",
 			value:       "0xT6487c5cb7c4b20202d34117abc57b1c7d91570e100d8a16eced3dbbe8b22eee41339c0772fc6affe3bb8b2a72e9e3e2e2b061d351936c1d534fcfe8d336073d1b",
+			expectError: true,
+		},
+		{
+			description: "Invalid permit hash - odd length",
+			value:       "0xabc",
 			expectError: true,
 		},
 	}

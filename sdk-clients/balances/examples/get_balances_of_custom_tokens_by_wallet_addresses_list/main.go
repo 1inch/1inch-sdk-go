@@ -11,45 +11,56 @@ import (
 	"github.com/1inch/1inch-sdk-go/v4/sdk-clients/balances"
 )
 
+/*
+This example fetches the balances of a specific list of tokens for multiple
+wallet addresses in one request.
+
+Requires the following environment variables:
+  - DEV_PORTAL_TOKEN: 1inch Developer Portal API key
+*/
+
 var (
 	devPortalToken = os.Getenv("DEV_PORTAL_TOKEN")
 )
 
 const (
-	secondaryWalletAddress = "0x28C6c06298d514Db089934071355E5743bf21d60"
+	binanceHotWallet  = "0x28C6c06298d514Db089934071355E5743bf21d60"
+	binanceColdWallet = "0xF977814e90dA44bFA03b6295A0616a897441aceC"
 
-	spenderInch = "0x111111125421ca6dc452d289314280a0f8842a65"
+	mainnetUsdc = "0xA0b86991c6218b36c1d19D4a2e9Eb0cE3606eB48"
+	mainnetDai  = "0x6B175474E89094C44Da98b954EedeAC495271d0F"
 )
 
 func main() {
+	if devPortalToken == "" {
+		log.Fatal("set DEV_PORTAL_TOKEN to run this example")
+	}
+
 	config, err := balances.NewConfiguration(balances.ConfigurationParams{
 		ChainId: constants.EthereumChainId,
 		ApiUrl:  "https://api.1inch.com",
 		ApiKey:  devPortalToken,
 	})
 	if err != nil {
-		log.Fatalf("Failed to create configuration: %v", err)
+		log.Fatalf("failed to create configuration: %v", err)
 	}
-
 	client, err := balances.NewClient(config)
 	if err != nil {
-		log.Fatalf("Failed to create client: %v", err)
+		log.Fatalf("failed to create client: %v", err)
 	}
-
 	ctx := context.Background()
 
-	response, err := client.GetBalancesAndAllowancesByWalletAddressList(ctx, balances.BalancesAndAllowancesByWalletAddressListParams{
-		Wallet:  secondaryWalletAddress,
-		Spender: spenderInch,
+	response, err := client.GetBalancesOfCustomTokensByWalletAddressesList(ctx, balances.BalancesOfCustomTokensByWalletAddressesListParams{
+		Wallets: []string{binanceHotWallet, binanceColdWallet},
+		Tokens:  []string{mainnetUsdc, mainnetDai},
 	})
 	if err != nil {
-		log.Fatalf("Failed to get balances and allowances by wallet address list: %v", err)
+		log.Fatalf("failed to get balances of custom tokens by wallet list: %v", err)
 	}
 
 	responseIndented, err := json.MarshalIndent(response, "", "  ")
 	if err != nil {
 		log.Fatalf("failed to marshal response: %v", err)
 	}
-
-	fmt.Printf("GetBalancesAndAllowancesByWalletAddressList: %s\n", responseIndented)
+	fmt.Printf("Balances by wallet: %s\n", responseIndented)
 }

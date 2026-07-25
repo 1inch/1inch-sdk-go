@@ -163,3 +163,43 @@ func (api *api) PlaceOrder(ctx context.Context, quoteParams QuoterControllerGetQ
 
 	return fusionPlusOrder.Hash, nil
 }
+
+// GetActiveOrders returns cross-chain orders that are currently open for filling
+func (api *api) GetActiveOrders(ctx context.Context, params OrderApiControllerGetActiveOrdersParams) (*GetActiveOrdersOutput, error) {
+	u := "/fusion-plus/orders/v1.1/order/active"
+
+	payload := common.RequestPayload{
+		Method: "GET",
+		Params: params,
+		U:      u,
+		Body:   nil,
+	}
+
+	var response GetActiveOrdersOutput
+	err := api.httpExecutor.ExecuteRequest(ctx, payload, &response)
+	if err != nil {
+		return nil, err
+	}
+
+	return &response, nil
+}
+
+// GetSettlementContract returns the escrow factory contract address for a chain
+func (api *api) GetSettlementContract(ctx context.Context, params GetSettlementContractParams) (*EscrowFactory, error) {
+	u := "/fusion-plus/orders/v1.1/order/escrow"
+
+	payload := common.RequestPayload{
+		Method: "GET",
+		Params: params,
+		U:      u,
+		Body:   nil,
+	}
+
+	var response EscrowFactory
+	err := api.httpExecutor.ExecuteRequest(ctx, payload, &response)
+	if err != nil {
+		return nil, err
+	}
+
+	return &response, nil
+}

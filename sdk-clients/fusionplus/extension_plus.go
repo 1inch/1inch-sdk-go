@@ -21,6 +21,10 @@ func NewExtensionPlus(params ExtensionParamsPlus) (*ExtensionPlus, error) {
 		return nil, err
 	}
 
+	if params.Permit != "" && !hexadecimal.IsHexBytes(params.Permit) {
+		return nil, fmt.Errorf("invalid permit hex: %s", params.Permit)
+	}
+
 	settlementContractAddress := geth_common.HexToAddress(params.SettlementContract)
 	// FusionPlus uses encoding without point count byte
 	makingAndTakingAmountData := settlementContractAddress.String() + hexadecimal.Trim0x(params.AuctionDetails.EncodeWithoutPointCount())
@@ -52,11 +56,13 @@ func NewExtensionPlus(params ExtensionParamsPlus) (*ExtensionPlus, error) {
 	extensionPlus.PostInteraction = postInteraction.Encode()
 
 	if params.Permit != "" {
+		// The first 20 bytes of the maker permit are the token the permit applies to,
+		// passed to the protocol's tryPermit as its token parameter
 		permitInteraction := &fusionorder.Interaction{
 			Target: geth_common.HexToAddress(params.Asset),
 			Data:   params.Permit,
 		}
-		extensionPlus.MakerPermit = permitInteraction.Target.String() + hexadecimal.Trim0x(permitInteraction.Data)
+		extensionPlus.MakerPermit = permitInteraction.Encode()
 	}
 
 	return extensionPlus, nil
@@ -124,6 +130,9 @@ func DecodeExtension(data []byte) (*ExtensionPlus, error) {
 }
 
 func FromLimitOrderExtension(extension *orderbook.Extension) (*ExtensionPlus, error) {
+	if len(extension.MakingAmountData) < 42 || len(extension.TakingAmountData) < 42 || len(extension.PostInteraction) < 42 {
+		return nil, fmt.Errorf("malformed extension: amount data and post interaction must start with a settlement contract address")
+	}
 
 	settlementContractAddress := extension.MakingAmountData[:42]
 
@@ -139,7 +148,7 @@ func FromLimitOrderExtension(extension *orderbook.Extension) (*ExtensionPlus, er
 		return nil, fmt.Errorf("failed to decode auction details: %w", err)
 	}
 
-	postInteractionData, err := DecodeSettlementPostInteractionData(extension.PostInteraction[42:])
+	postInteractionData, err := DecodeSettlementPostInteractionData(fusionorder.Prefix0x(extension.PostInteraction[42:]))
 	if err != nil {
 		return nil, fmt.Errorf("failed to decode post interaction data: %w", err)
 	}

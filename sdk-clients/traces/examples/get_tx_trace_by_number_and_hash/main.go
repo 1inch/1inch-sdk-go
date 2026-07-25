@@ -16,6 +16,10 @@ var (
 )
 
 func main() {
+	if devPortalToken == "" {
+		log.Fatal("set DEV_PORTAL_TOKEN to run this example")
+	}
+
 	config, err := traces.NewConfiguration(constants.EthereumChainId, "https://api.1inch.com", devPortalToken)
 	if err != nil {
 		log.Fatalf("failed to create configuration: %v", err)

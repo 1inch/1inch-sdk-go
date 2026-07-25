@@ -86,13 +86,77 @@ jobs:
             echo "prerelease=false" >> "$GITHUB_OUTPUT"
           fi
 
+      # Stable releases write the new version into the source constant (so the
+      # User-Agent header always matches the release tag) and roll the CHANGELOG
+      # Unreleased section into a dated heading, then commit and tag that commit.
+      # Prerelease tags skip this: the constant only ever names stable releases.
+      # The push relies on contents: write and no branch protection on main; if
+      # protection is added later, the github-actions bot needs a bypass.
+      - name: Update version constant and roll the changelog
+        id: bump
+        if: steps.version.outputs.prerelease == 'false'
+        run: |
+          set -euo pipefail
+          version="${{ steps.version.outputs.version }}"
+
+          sed -i 's|const Version = "v.*"|const Version = "'"$version"'"|' internal/version/version.go
+          grep -q "const Version = \"$version\"" internal/version/version.go || {
+            echo "failed to write $version into internal/version/version.go" >&2
+            exit 1
+          }
+
+          # Roll "## [Unreleased]" into "## [<version>] - <date>" when it has
+          # content and no section for this version exists yet
+          if ! grep -q "^## \[$version\]" CHANGELOG.md; then
+            unreleased=$(awk 'index($0, "## [Unreleased]") == 1 {flag=1; next} /^## \[/ {flag=0} flag' CHANGELOG.md)
+            if [ -n "$(echo "$unreleased" | tr -d '[:space:]')" ]; then
+              today=$(date -u +%Y-%m-%d)
+              sed -i "0,/^## \[Unreleased\]/s||## [Unreleased]\n\n## [$version] - $today|" CHANGELOG.md
+              echo "Rolled the Unreleased section into ## [$version] - $today"
+            else
+              echo "Unreleased section is empty; leaving CHANGELOG.md untouched"
+            fi
+          else
+            echo "CHANGELOG.md already has a section for $version"
+          fi
+
+          go build ./...
+          go test ./internal/...
+
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add internal/version/version.go CHANGELOG.md
+          git commit -m "release: $version"
+          git push origin HEAD:${{ github.ref_name }}
+          echo "sha=$(git rev-parse HEAD)" >> "$GITHUB_OUTPUT"
+
       - name: Create Release
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         run: |
           set -euo pipefail
-          args=(--target "$GITHUB_SHA" --title "${{ steps.version.outputs.version }}" --generate-notes)
+          version="${{ steps.version.outputs.version }}"
+          target="${{ steps.bump.outputs.sha }}"
+          target="${target:-$GITHUB_SHA}"
+
+          args=(--target "$target" --title "$version")
           if [ "${{ steps.version.outputs.prerelease }}" = "true" ]; then
             args+=(--prerelease)
           fi
-          gh release create "${{ steps.version.outputs.version }}" "${args[@]}"
+
+          # Hand-written notes when the CHANGELOG has a section for this version;
+          # otherwise fall back to auto-generated notes from merged PR titles
+          notes=$(awk -v ver="$version" 'index($0, "## [" ver "]") == 1 {flag=1; next} /^## \[/ {flag=0} flag' CHANGELOG.md)
+          if [ -n "$(echo "$notes" | tr -d '[:space:]')" ]; then
+            latest_previous=$(git tag -l 'v*' --sort=-v:refname | grep -vE -- '-' | head -n1 || true)
+            if [ -n "$latest_previous" ]; then
+              notes=$(printf '%s\n\n**Full Changelog**: https://github.com/%s/compare/%s...%s' "$notes" "$GITHUB_REPOSITORY" "$latest_previous" "$version")
+            fi
+            args+=(--notes "$notes")
+            echo "Using the CHANGELOG section for $version as release notes"
+          else
+            args+=(--generate-notes)
+            echo "No CHANGELOG section for $version; using auto-generated notes"
+          fi
+
+          gh release create "$version" "${args[@]}"

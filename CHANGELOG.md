@@ -4,6 +4,29 @@ All notable changes to this project will be documented in this file.
 
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/), and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html) starting with the *v1.0.0-beta.1* release.
 
+## [Unreleased]
+
+### Added
+- New method `fusion.Client.PlaceOrderFromParams`: fetches a quote and places the order in one call, so settings like `Permit` and `IsPermit2` are supplied once and propagate to both the quote request and the order
+- New function `orderbook.DecodeMakerTraits`: parses an encoded maker traits value back into a `MakerTraits` struct, enabling flag reads like `ShouldUsePermit2` from on-chain orders
+- New functions `orderbook.BuildPermit2Calldata` and `orderbook.GetPermit2Allowance`: sign a Permit2 AllowanceTransfer PermitSingle (the 352-byte form the protocol fills) and read Permit2 allowance state. The protocol's 96-byte compact permit2 form is deliberately not offered and is rejected by order validation, because fills through the deployed Aggregation Router v6 revert on it
+- Mainnet-fork integration tests under `tests/integration` (build tag `integration`, `make test-integration`)
+- New methods `fusionplus.Client.GetActiveOrders` and `fusionplus.Client.GetSettlementContract`: list open cross-chain orders and fetch the escrow factory address
+
+### Fixed
+- **`fusion.CreateFusionOrderData`**: `OrderParams.Permit` and `OrderParams.IsPermit2` are now honored
+- **`fusionplus.CreateFusionPlusOrderData`**: `OrderParams.IsPermit2` now sets the `USE_PERMIT2` maker-traits bit.
+- **`fusionplus.FromLimitOrderExtension`**: post-interaction data now decodes correctly
+- **Permit input validation**: odd-length permit hex is now rejected by `CheckPermitHash`, `fusion.NewExtension`, and `fusionplus.NewExtensionPlus`; it previously corrupted the encoded extension and produced orders that could never fill.
+- **User-Agent header**: API requests now report the SDK release version from `internal/version.Version`
+- **`common.Wallet.Call`**: wallets created without a node URL now return an error instead of panicking on on-chain calls
+- **`orderbook.BuildOrderExtensionBytes`**: a hex string cast to `[]byte` in `MakerPermit` is now rejected with an error
+- **Transaction fee cap**: EIP-1559 transactions built without an explicit `SetGasFeeCap` now default the fee cap to twice the node's suggested gas price instead of the bare suggestion, and gas estimation no longer sends a gas price
+
+### Changed
+- The maker permit token field is encoded in lowercase hex in `fusion` and `fusionplus` extensions.
+- The "Release new version" workflow now updates `internal/version/version.go` and rolls the CHANGELOG `Unreleased` section into a dated version heading as part of each stable release, and uses that CHANGELOG section as the GitHub release notes (falling back to auto-generated notes when no entries were written). PR CI blocks manual edits to the version constant and warns when code changes ship without a CHANGELOG entry.
+
 ## [v4.0.0] - 2026-07-14
 
 ### Breaking Changes

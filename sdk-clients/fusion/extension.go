@@ -68,6 +68,10 @@ func NewExtension(params ExtensionParams) (*Extension, error) {
 		return nil, err
 	}
 
+	if params.Permit != "" && !hexadecimal.IsHexBytes(params.Permit) {
+		return nil, fmt.Errorf("invalid permit hex: %s", params.Permit)
+	}
+
 	var resolvingStartTime *big.Int
 	if params.ResolvingStartTime == nil {
 		resolvingStartTime = big.NewInt(times.Now())
@@ -120,11 +124,13 @@ func NewExtension(params ExtensionParams) (*Extension, error) {
 	fusionExtension.PostInteraction = interaction.Encode()
 
 	if params.Permit != "" {
+		// The first 20 bytes of the maker permit are the token the permit applies to,
+		// passed to the protocol's tryPermit as its token parameter
 		permitInteraction := &Interaction{
 			Target: geth_common.HexToAddress(params.Asset),
 			Data:   params.Permit,
 		}
-		fusionExtension.MakerPermit = permitInteraction.Target.String() + hexadecimal.Trim0x(permitInteraction.Data)
+		fusionExtension.MakerPermit = permitInteraction.Encode()
 	}
 
 	return fusionExtension, nil
