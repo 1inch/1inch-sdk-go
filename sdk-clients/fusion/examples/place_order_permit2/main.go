@@ -150,23 +150,26 @@ func main() {
 	fmt.Printf("Order placed! Order hash: %s\n", orderHash)
 	fmt.Println("Monitoring order until it completes...")
 
-	for {
-		<-time.After(1 * time.Second)
+	deadline := time.Now().Add(5 * time.Minute)
+	for time.Now().Before(deadline) {
+		time.Sleep(3 * time.Second)
+
 		order, err := fusionClient.GetOrderStatus(ctx, orderHash)
 		if err != nil {
-			fmt.Printf("failed to get order from order hash: %v", err)
-			return
+			fmt.Printf("status poll failed, retrying: %v\n", err)
+			continue
 		}
 
 		fmt.Printf("Order status: %s\n", order.Status)
 		switch order.Status {
 		case "filled":
+			fmt.Println("Order filled")
 			return
 		case "expired", "cancelled", "refunded", "false-predicate", "not-enough-balance-or-allowance", "wrong-permit":
-			fmt.Printf("Order ended without filling (status %s)\n", order.Status)
-			return
+			log.Fatalf("order ended without filling (status %s)", order.Status)
 		}
 	}
+	log.Fatalf("order %s did not reach a terminal status within 5 minutes", orderHash)
 }
 
 // ensurePermit2Approval checks the ERC20 allowance from the sell token to the Permit2

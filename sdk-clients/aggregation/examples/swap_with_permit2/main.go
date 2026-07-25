@@ -98,6 +98,10 @@ func main() {
 		log.Fatalf("failed to read ERC20 allowance: %v", err)
 	}
 	if new(big.Int).SetBytes(result).Cmp(amount) < 0 {
+		// The unlimited approval is the common Permit2 pattern: per-trade limits are
+		// enforced by the Permit2 allowance layer, which is amount-scoped and expiring.
+		// To keep the ERC20 layer bounded too, replace constants.Uint256Max with the
+		// exact required amount at the cost of one approval transaction per trade.
 		fmt.Println("Sending one-time ERC20 approval to Permit2...")
 		approveData, err := erc20.Pack("approve", permit2, constants.Uint256Max)
 		if err != nil {
