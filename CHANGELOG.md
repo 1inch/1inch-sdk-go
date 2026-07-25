@@ -6,6 +6,8 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 
 ## [Unreleased]
 
+## [v4.1.0] - 2026-07-25
+
 ### Added
 - New method `fusion.Client.PlaceOrderFromParams`: fetches a quote and places the order in one call, so settings like `Permit` and `IsPermit2` are supplied once and propagate to both the quote request and the order
 - New function `orderbook.DecodeMakerTraits`: parses an encoded maker traits value back into a `MakerTraits` struct, enabling flag reads like `ShouldUsePermit2` from on-chain orders
