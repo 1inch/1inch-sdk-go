@@ -57,7 +57,7 @@ This is the official Go SDK for interacting with 1inch Network APIs. It provides
 # Run all unit tests
 make test
 
-# Run linter (golangci-lint v1.54.1)
+# Run linter (golangci-lint v2.10.1, same version as CI)
 make lint
 
 # Format code
