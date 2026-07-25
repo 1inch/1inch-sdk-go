@@ -4,6 +4,9 @@ package integration
 
 import (
 	"context"
+	"encoding/binary"
+	"fmt"
+	stdmath "math"
 	"math/big"
 	"strings"
 	"sync"
@@ -424,7 +427,7 @@ func TestFusionOrderPermit2Fork(t *testing.T) {
 		)
 		require.NoError(t, err)
 
-		permitCalldata, err := orderbook.BuildPermit2CalldataCompact(env.maker.wallet, orderbook.Permit2PermitParams{
+		permitCalldata := buildCompactPermit2Calldata(t, env.maker.wallet, orderbook.Permit2PermitParams{
 			Token:       weth,
 			Amount:      makingAmount,
 			Expiration:  constants.Uint48Max,
@@ -432,7 +435,6 @@ func TestFusionOrderPermit2Fork(t *testing.T) {
 			Spender:     geth_common.HexToAddress(lopV4Address),
 			SigDeadline: constants.Uint48Max,
 		})
-		require.NoError(t, err)
 
 		quote := quoteFixture(env, takingAmount.String())
 		orderParams := fusion.OrderParams{
@@ -538,4 +540,41 @@ func TestFusionOrderPermit2Fork(t *testing.T) {
 		finalMakerWeth := env.balanceOf(t, weth, env.maker.address)
 		assert.Equal(t, makingAmount.String(), new(big.Int).Sub(initMakerWeth, finalMakerWeth).String(), "maker WETH spent on plain order")
 	})
+}
+
+// buildCompactPermit2Calldata assembles the protocol's 96-byte compact permit2
+// form: amount uint160 | expiration uint32 | nonce uint32 | sigDeadline uint32 |
+// r | vs, where the uint32 timestamps decode on-chain as (stored - 1) truncated
+// to uint48 (stored 0 means max uint48). The SDK does not offer this form because
+// the deployed router rejects it (the subtest above pins that), so the test signs
+// the PermitSingle through the full-form builder and extracts the EIP-2098
+// signature from its trailing 64 bytes.
+func buildCompactPermit2Calldata(t *testing.T, wallet common.Wallet, params orderbook.Permit2PermitParams) string {
+	t.Helper()
+
+	fullForm, err := orderbook.BuildPermit2Calldata(wallet, params)
+	require.NoError(t, err)
+	fullBytes := geth_common.FromHex(fullForm)
+	require.Len(t, fullBytes, 352, "full permit2 calldata must be 352 bytes")
+	compactSig := fullBytes[352-64:]
+
+	compactTimestamp := func(value *big.Int) uint32 {
+		if value.Cmp(constants.Uint48Max) == 0 {
+			return 0
+		}
+		require.True(t, value.Sign() >= 0 && value.Uint64()+1 <= stdmath.MaxUint32, "timestamp must be max uint48 or fit in uint32")
+		return uint32(value.Uint64()) + 1
+	}
+
+	out := make([]byte, 0, 96)
+	amountBytes := make([]byte, 20)
+	params.Amount.FillBytes(amountBytes)
+	out = append(out, amountBytes...)
+	out = binary.BigEndian.AppendUint32(out, compactTimestamp(params.Expiration))
+	require.True(t, params.Nonce.IsUint64() && params.Nonce.Uint64() <= stdmath.MaxUint32, "nonce must fit in uint32")
+	out = binary.BigEndian.AppendUint32(out, uint32(params.Nonce.Uint64()))
+	out = binary.BigEndian.AppendUint32(out, compactTimestamp(params.SigDeadline))
+	out = append(out, compactSig...)
+
+	return fmt.Sprintf("0x%x", out)
 }

@@ -2,10 +2,8 @@ package orderbook
 
 import (
 	"context"
-	"encoding/binary"
 	"errors"
 	"fmt"
-	stdmath "math"
 	"math/big"
 	"strings"
 
@@ -111,75 +109,19 @@ func GetPermit2Allowance(ctx context.Context, wallet common.Wallet, owner, token
 // to the protocol.
 //
 // The maker must have an ERC20 approval from Token to the Permit2 contract
-// (constants.Permit2Address) for the permit to be executable. See
-// BuildPermit2CalldataCompact for the smaller 96-byte encoding.
+// (constants.Permit2Address) for the permit to be executable.
+//
+// The protocol also defines a 96-byte compact permit2 encoding, which this
+// package does not produce: fills through the deployed Aggregation Router v6
+// revert on it, because the router's expansion of the 20-byte amount leaves
+// uncleaned upper bits that fail Permit2's uint160 calldata validation
+// (verified on a mainnet fork, pinned by an integration test).
 func BuildPermit2Calldata(wallet common.Wallet, params Permit2PermitParams) (string, error) {
 	compactSig, err := signPermit2PermitSingle(wallet, params)
 	if err != nil {
 		return "", err
 	}
 	return encodePermit2Calldata(wallet.Address(), params, compactSig)
-}
-
-// BuildPermit2CalldataCompact signs the same PermitSingle message but returns the
-// 96-byte compact permit encoding:
-// amount uint160 | expiration uint32 | nonce uint32 | sigDeadline uint32 | r | vs.
-// The protocol expands the uint32 timestamps as (value - 1) truncated to uint48, so a
-// stored 0 means max uint48 (unlimited). Expiration and SigDeadline must therefore be
-// either max uint48 or at most 2^32 - 2, and Nonce must fit in uint32.
-//
-// Caution: fusion order fills through the currently deployed Aggregation Router v6
-// revert on compact permits, because the router's expansion of the 20-byte amount
-// leaves uncleaned upper bits that fail Permit2's uint160 calldata validation
-// (verified on a mainnet fork). Use BuildPermit2Calldata for orders until a router
-// deployment accepts the compact form.
-func BuildPermit2CalldataCompact(wallet common.Wallet, params Permit2PermitParams) (string, error) {
-	if params.Amount == nil || params.Expiration == nil || params.Nonce == nil || params.SigDeadline == nil {
-		return "", errors.New("amount, expiration, nonce, and sig deadline are required")
-	}
-
-	expirationStored, err := compactPermit2Timestamp(params.Expiration)
-	if err != nil {
-		return "", fmt.Errorf("expiration: %w", err)
-	}
-	sigDeadlineStored, err := compactPermit2Timestamp(params.SigDeadline)
-	if err != nil {
-		return "", fmt.Errorf("sig deadline: %w", err)
-	}
-	if !params.Nonce.IsUint64() || params.Nonce.Uint64() > stdmath.MaxUint32 {
-		return "", errors.New("nonce must fit in uint32 for the compact permit encoding")
-	}
-	if params.Amount.Sign() < 0 || params.Amount.BitLen() > 160 {
-		return "", errors.New("amount must fit in uint160")
-	}
-
-	compactSig, err := signPermit2PermitSingle(wallet, params)
-	if err != nil {
-		return "", err
-	}
-
-	out := make([]byte, 0, 96)
-	amountBytes := make([]byte, 20)
-	params.Amount.FillBytes(amountBytes)
-	out = append(out, amountBytes...)
-	out = binary.BigEndian.AppendUint32(out, expirationStored)
-	out = binary.BigEndian.AppendUint32(out, uint32(params.Nonce.Uint64()))
-	out = binary.BigEndian.AppendUint32(out, sigDeadlineStored)
-	out = append(out, compactSig...)
-
-	return fmt.Sprintf("0x%x", out), nil
-}
-
-// compactPermit2Timestamp encodes a uint48 timestamp for the compact permit form,
-// which the protocol decodes as (stored - 1) truncated to uint48
-func compactPermit2Timestamp(value *big.Int) (uint32, error) {
-	if value.Cmp(constants.Uint48Max) == 0 {
-		return 0, nil
-	}
-	if value.Sign() < 0 || value.BitLen() > 32 || value.Uint64()+1 > stdmath.MaxUint32 {
-		return 0, errors.New("value must be max uint48 or at most 2^32 - 2")
-	}
-	return uint32(value.Uint64()) + 1, nil
 }
 
 // signPermit2PermitSingle signs the EIP-712 PermitSingle and returns the 64-byte

@@ -53,6 +53,7 @@ func (body *OrderParams) Validate() error {
 	validationErrors = validate.Parameter(body.ToTokenAddress, "ToTokenAddress", validate.CheckEthereumAddress, validationErrors)
 	validationErrors = validate.Parameter(body.Amount, "Amount", validate.CheckBigInt, validationErrors)
 	validationErrors = validate.Parameter(body.Permit, "Permit", validate.CheckPermitHash, validationErrors)
+	validationErrors = validate.Parameter(body.Permit, "Permit", validate.CheckFillablePermit, validationErrors)
 	if body.Preset == "" {
 		validationErrors = append(validationErrors, validate.NewParameterCustomError(fmt.Sprintf("Preset is required. Pass in one of the Fusion library constants: %v", constants.ValidFusionPresets)))
 	}

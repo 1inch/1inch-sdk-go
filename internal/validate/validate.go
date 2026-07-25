@@ -344,6 +344,16 @@ func CheckPermitHash(value string, variableName string) error {
 	return nil
 }
 
+// CheckFillablePermit rejects the 96-byte compact permit2 form: fills through the
+// deployed Aggregation Router v6 revert on it, so orders carrying it can never
+// execute. Only the full 352-byte permit2 form is fillable.
+func CheckFillablePermit(value string, variableName string) error {
+	if len(strings.TrimPrefix(value, "0x")) == 96*2 {
+		return NewParameterValidationError(variableName, "the 96-byte compact permit2 form is rejected by fills through the deployed router; use the full 352-byte form from orderbook.BuildPermit2Calldata")
+	}
+	return nil
+}
+
 func CheckFiatCurrency(value string, variableName string) error {
 	if len(value) != 3 {
 		return NewParameterValidationError(variableName, "must have len = 3 (like USD, EUR, etc)")
