@@ -25,6 +25,34 @@ jobs:
       - name: Compile integration tests
         run: go vet -tags integration ./tests/...
 
+  # Two release-hygiene rules: the version constant is owned by the release
+  # workflow (PRs must not modify it), and code changes without a CHANGELOG
+  # entry get a warning that their release notes will be auto-generated.
+  version-and-changelog:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout code into workspace directory
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Check version constant ownership and changelog coverage
+        run: |
+          set -euo pipefail
+          base="origin/${{ github.base_ref }}"
+          changed=$(git diff --name-only "$base"...HEAD)
+
+          if echo "$changed" | grep -qx "internal/version/version.go" \
+            && git cat-file -e "$base:internal/version/version.go" 2>/dev/null; then
+            echo "::error::internal/version/version.go is owned by the Release new version workflow and must not be modified in pull requests"
+            exit 1
+          fi
+
+          if echo "$changed" | grep -qE '^(sdk-clients|internal|common|constants)/' \
+            && ! echo "$changed" | grep -qx "CHANGELOG.md"; then
+            echo "::warning::This PR changes shipped code without a CHANGELOG.md entry. If it merges without one, the next release's notes for this change will be auto-generated from the PR title."
+          fi
+
   lint:
     runs-on: ubuntu-latest
     steps:

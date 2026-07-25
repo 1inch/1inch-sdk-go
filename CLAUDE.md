@@ -7,7 +7,7 @@ This is the official Go SDK for interacting with 1inch Network APIs. It provides
 **Module**: `github.com/1inch/1inch-sdk-go/v4`  
 **Go Version**: 1.22+ (toolchain 1.23.0)  
 **License**: MIT  
-**Current Version**: v3.0.0
+**Version**: git tags, mirrored in `internal/version/version.go` (owned by the release workflow; never edit by hand)
 
 ## Project Structure
 
@@ -275,8 +275,8 @@ Key conventions:
 
 ## CI/CD
 
-- **PR Validation** (`.github/workflows/pr.yml`): Runs tests + golangci-lint on PRs
-- **Release** (`.github/workflows/release.yml`): Manual dispatch for versioned releases
+- **PR Validation** (`.github/workflows/pr.yml`): Runs tests + golangci-lint on PRs, blocks manual edits to `internal/version/version.go`, and warns when code changes lack a CHANGELOG entry (their release notes would be auto-generated)
+- **Release** (`.github/workflows/release.yml`): Manual dispatch with a patch/minor/major/prerelease picker. Stable releases write the new version into `internal/version/version.go`, roll the CHANGELOG `Unreleased` section into a dated heading, commit, tag that commit, and publish a GitHub release whose notes come from the CHANGELOG section (auto-generated when empty)
 
 ## Key Dependencies
 
