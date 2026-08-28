@@ -86,28 +86,35 @@ change_any_of_ref_to_ref() {
         .
       end;
 
-    # Apply the simplification to the paths
-    .paths |= map_values(
-      . as $path |
-      . | map_values(
-        if .parameters? then
-          .parameters |= map(
-            if .schema? then .schema |= simplify_allOf else . end
-          )
-        else . end |
-        if .requestBody? then
-          .requestBody.content."application/json".schema |= simplify_allOf
-        else . end
+    # Apply the simplification to the paths.
+    # NOTE: guard with explicit existence checks rather than error suppression (?).
+    # On jq 1.6, "path |= f?" deletes the key even when f succeeds, and a swallowed
+    # error inside |= silently drops entire spec sections.
+    (if (.paths | type) == "object" then
+      .paths |= map_values(
+        . as $path |
+        . | map_values(
+          if .parameters? then
+            .parameters |= map(
+              if .schema? then .schema |= simplify_allOf else . end
+            )
+          else . end |
+          if .requestBody? then
+            .requestBody.content."application/json".schema |= simplify_allOf
+          else . end
+        )
       )
-    )? |
+    else . end) |
 
     # Apply the simplification to the components schemas
-    .components.schemas |= map_values(
-      . |= simplify_allOf |
-      if .properties? then
-        .properties |= map_values(simplify_allOf)
-      else . end
-    )?
+    (if (.components.schemas? | type) == "object" then
+      .components.schemas |= map_values(
+        . |= simplify_allOf |
+        if .properties? then
+          .properties |= map_values(simplify_allOf)
+        else . end
+      )
+    else . end)
   ' ${api_openapi_file_name} > ${temp_file}
 
   if [ $? -ne 0 ]; then
@@ -220,34 +227,41 @@ add_pointer_skip_field() {
         .
       end;
 
-    # Apply to path parameters and requestBody
-    .paths |= map_values(
-      . as $path |
-      . | map_values(
-        if .parameters? and (.parameters != null) then
-          .parameters |= map(
-            if .required == false and .schema? and (.schema != null) then
-              .schema |= add_skip_pointer
-            else . end
-          )
-        else . end |
-        if .requestBody? and (.requestBody.content?["application/json"].schema != null) then
-          .requestBody.content["application/json"].schema |= add_skip_pointer |
-          if .requestBody.content["application/json"].schema.properties? then
-            .requestBody.content["application/json"].schema.properties |= map_values(add_skip_pointer)
-          else
-            .
-          end
-        else . end
+    # Apply to path parameters and requestBody.
+    # NOTE: guard with explicit existence checks rather than error suppression (?).
+    # On jq 1.6, "path |= f?" deletes the key even when f succeeds, and a swallowed
+    # error inside |= silently drops entire spec sections.
+    (if (.paths | type) == "object" then
+      .paths |= map_values(
+        . as $path |
+        . | map_values(
+          if .parameters? and (.parameters != null) then
+            .parameters |= map(
+              if .required == false and .schema? and (.schema != null) then
+                .schema |= add_skip_pointer
+              else . end
+            )
+          else . end |
+          if .requestBody? and (.requestBody.content?["application/json"].schema != null) then
+            .requestBody.content["application/json"].schema |= add_skip_pointer |
+            if .requestBody.content["application/json"].schema.properties? then
+              .requestBody.content["application/json"].schema.properties |= map_values(add_skip_pointer)
+            else
+              .
+            end
+          else . end
+        )
       )
-    )? |
+    else . end) |
 
     # Apply to components schemas
-    .components.schemas |= map_values(
-      if .properties? and (.properties != null) then
-        .properties |= map_values(add_skip_pointer)
-      else . end
-    )?
+    (if (.components.schemas? | type) == "object" then
+      .components.schemas |= map_values(
+        if .properties? and (.properties != null) then
+          .properties |= map_values(add_skip_pointer)
+        else . end
+      )
+    else . end)
   ' ${api_openapi_file_name} > ${temp_file}
 
   if [ $? -ne 0 ]; then
