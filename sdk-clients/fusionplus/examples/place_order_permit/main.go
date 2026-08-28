@@ -167,7 +167,7 @@ func main() {
 	for time.Now().Before(deadline) {
 		time.Sleep(5 * time.Second)
 
-		order, err := client.GetOrderByOrderHash(ctx, fusionplus.GetOrderByOrderHashParams{Hash: orderHash})
+		order, err := client.GetOrderFillsByHash(ctx, fusionplus.GetOrderFillsByHashParams{Hash: orderHash})
 		if err != nil {
 			fmt.Printf("status poll failed, retrying: %v\n", err)
 			continue

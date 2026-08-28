@@ -9,9 +9,13 @@ import (
 	"github.com/ethereum/go-ethereum/common"
 )
 
-type GetOrderByOrderHashParams struct {
+type GetOrderFillsByHashParams struct {
 	Hash string `url:"hash" json:"hash"`
 }
+
+// Deprecated: Use GetOrderFillsByHashParams instead (renamed to match the
+// GetOrderFillsByHash method and its GetOrderFillsByHashOutput return type).
+type GetOrderByOrderHashParams = GetOrderFillsByHashParams
 type GetReadyToAcceptFillsParams struct {
 	Hash string `url:"hash" json:"hash"`
 }
@@ -38,7 +42,7 @@ type QuoterControllerGetQuoteWithCustomPresetsParamsFixed = CustomPresetQuotePar
 type GetQuoteOutputFixed = Quote
 
 type Order struct {
-	EscExtension        *EscrowExtension
+	EscrowExtension     *EscrowExtension
 	Inner               orderbook.OrderData
 	SettlementExtension common.Address
 	OrderInfo           CrossChainOrderDto
@@ -56,22 +60,6 @@ type EscrowExtensionParams struct {
 	SrcSafetyDeposit string
 	DstSafetyDeposit string
 	TimeLocks        TimeLocks
-}
-
-type CrossChainOrderParams struct {
-	HashLock                *HashLock
-	Preset                  GetQuoteOutputRecommendedPreset
-	Receiver                string
-	Nonce                   *big.Int
-	Permit                  string
-	IsPermit2               bool
-	TakingFeeReceiver       string
-	DelayAuctionStartTimeBy float32
-	/**
-	 * Order will expire in `orderExpirationDelay` after auction ends
-	 * Default 12s
-	 */
-	OrderExpirationDelay uint32
 }
 
 type OrderParams struct {
@@ -165,46 +153,13 @@ type PresetClassFixed struct {
 	TokenFee           string              `json:"tokenFee"`
 }
 
-// Deprecated: Use the generated GasCostConfig type instead; this legacy shape
-// exists only as part of PresetClassFixed.
-type GasCostConfigClass struct {
-	GasBumpEstimate  float32 `json:"gasBumpEstimate"`
-	GasPriceEstimate string  `json:"gasPriceEstimate"`
-}
+// Deprecated: Use the generated GasCostConfig type instead. Now an alias of it
+// (the shapes are identical); kept so existing integrations keep compiling.
+type GasCostConfigClass = GasCostConfig
 
-// Deprecated: Use the generated AuctionPoint type instead; this legacy shape
-// exists only as part of PresetClassFixed.
-type AuctionPointClass struct {
-	Coefficient float32 `json:"coefficient"`
-	Delay       float32 `json:"delay"`
-}
-
-// FusionOrderV4 defines model for FusionOrderV4.
-type FusionOrderV4 struct {
-	// Maker Address of the account creating the order (maker).
-	Maker string `json:"maker"`
-
-	// MakerAsset Identifier of the asset being offered by the maker.
-	MakerAsset string `json:"makerAsset"`
-
-	// MakerTraits Includes some flags like, allow multiple fills, is partial fill allowed or not, price improvement, nonce, deadline etc.
-	MakerTraits string `json:"makerTraits"`
-
-	// MakingAmount Amount of the makerAsset being offered by the maker.
-	MakingAmount string `json:"makingAmount"`
-
-	// Receiver Address of the account receiving the assets (receiver), if different from maker.
-	Receiver string `json:"receiver"`
-
-	// Salt Some unique value. It is necessary to be able to create limit orders with the same parameters (so that they have a different hash), Lowest 160 bits of the order salt must be equal to the lowest 160 bits of the extension hash
-	Salt string `json:"salt"`
-
-	// TakerAsset Identifier of the asset being requested by the maker in exchange.
-	TakerAsset string `json:"takerAsset"`
-
-	// TakingAmount Amount of the takerAsset being requested by the maker.
-	TakingAmount string `json:"takingAmount"`
-}
+// Deprecated: Use the generated AuctionPoint type instead. Now an alias of it
+// (the shapes are identical); kept so existing integrations keep compiling.
+type AuctionPointClass = AuctionPoint
 
 type ExtensionParamsPlus struct {
 	SettlementContract  string

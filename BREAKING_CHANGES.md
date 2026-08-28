@@ -38,6 +38,11 @@ The v5 major is used to make the public API consistent and intent-based. Every r
 - Added clean, `fusionplus`-consistent names `fusion.Preset`, `fusion.QuotePresets`, `fusion.AuctionPoint`, `fusion.GasCostConfig` (aliases of the generated `*Class` types, which remain valid). Prefer the clean names.
 - **Removed** the unused hand-written `fusion.Preset` struct (it shadowed the real quoter preset and had no SDK references). If you referenced it directly, use the generated preset type. No alias (the name now refers to the quoter preset).
 
+**`fusionplus`**
+- `MakeTree`→`NewMerkleTree`, `MyMerkleTree`→`MerkleTree`, `GetOrderByOrderHash`→`GetOrderFillsByHash` (matches its `GetOrderFillsByHashOutput` return), and the param type `GetOrderByOrderHashParams`→`GetOrderFillsByHashParams`. All old names kept (aliases / a forwarding method/function). `GasCostConfigClass` and `AuctionPointClass` are now aliases of the generated `GasCostConfig`/`AuctionPoint`.
+- **Breaking (no alias possible):** the exported field `Order.EscExtension` is renamed to `Order.EscrowExtension` (struct fields can't be aliased). Update any `prepared.Order.EscExtension` access to `.EscrowExtension`.
+- **Removed** dead unused public types `FusionOrderV4` and `CrossChainOrderParams` (never referenced by any SDK method), and unexported the internal `ParentIndex` merkle helper. No aliases.
+
 ## Version 4.0.0
 
 ### Module Path Now Includes the `/v4` Major-Version Suffix

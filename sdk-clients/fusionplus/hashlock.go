@@ -35,7 +35,7 @@ func ForMultipleFills(leaves []string) (*HashLock, error) {
 		return nil, errors.New("leaves array requires more than 2 elements")
 	}
 
-	tree := MakeTree(leaves)
+	tree := NewMerkleTree(leaves)
 
 	root := tree.tree[0]
 

@@ -8,7 +8,13 @@ import (
 	"github.com/1inch/1inch-sdk-go/v4/common"
 )
 
+// Deprecated: Use GetOrderFillsByHash instead. The name now matches its return
+// type (GetOrderFillsByHashOutput). This forwards to GetOrderFillsByHash.
 func (api *api) GetOrderByOrderHash(ctx context.Context, params GetOrderByOrderHashParams) (*GetOrderFillsByHashOutput, error) {
+	return api.GetOrderFillsByHash(ctx, params)
+}
+
+func (api *api) GetOrderFillsByHash(ctx context.Context, params GetOrderFillsByHashParams) (*GetOrderFillsByHashOutput, error) {
 	u := fmt.Sprintf("/fusion-plus/orders/v1.1/order/status/%s", params.Hash)
 
 	payload := common.RequestPayload{

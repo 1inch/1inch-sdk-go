@@ -65,7 +65,7 @@ func TestFusionPlusSourceTakerAssetIsTrueERC20(t *testing.T) {
 			assert.NotEqual(t, strings.ToLower(tc.dstToken), signedTaker,
 				"source-chain taker asset must never be the destination token")
 
-			assert.Equal(t, tc.wantDstHex, prepared.Order.EscExtension.DstToken.Hex(),
+			assert.Equal(t, tc.wantDstHex, prepared.Order.EscrowExtension.DstToken.Hex(),
 				"escrow extension must carry the real destination token")
 		})
 	}

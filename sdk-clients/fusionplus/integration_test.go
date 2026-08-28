@@ -256,7 +256,7 @@ func TestMerkleTreeIntegration(t *testing.T) {
 	singleLeaf := []string{
 		"0xaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
 	}
-	tree1 := MakeTree(singleLeaf)
+	tree1 := NewMerkleTree(singleLeaf)
 	require.NotNil(t, tree1)
 	assert.Len(t, tree1.leaves, 1)
 
@@ -266,7 +266,7 @@ func TestMerkleTreeIntegration(t *testing.T) {
 		"0xbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb",
 		"0xcccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccc",
 	}
-	tree2 := MakeTree(multipleLeaves)
+	tree2 := NewMerkleTree(multipleLeaves)
 	require.NotNil(t, tree2)
 	assert.Len(t, tree2.leaves, 3)
 

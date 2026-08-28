@@ -295,7 +295,7 @@ func CreateOrder(params CreateOrderDataParams) (*Order, error) {
 	}
 
 	return &Order{
-		EscExtension: params.extension,
+		EscrowExtension: params.extension,
 		Inner: orderbook.OrderData{
 			MakerAsset:   params.orderInfo.MakerAsset,
 			TakerAsset:   params.orderInfo.TakerAsset,
