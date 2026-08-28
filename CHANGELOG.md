@@ -6,6 +6,8 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 
 ## [Unreleased]
 
+## [v4.2.0] - 2026-08-28
+
 ### Added
 - `constants.ChainToTrueERC20` and `constants.GetTrueERC20` give the Fusion+ TRUE_ERC20 sentinel token for each supported chain.
 
