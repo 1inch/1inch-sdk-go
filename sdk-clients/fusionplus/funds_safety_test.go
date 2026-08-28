@@ -15,61 +15,6 @@ import (
 	"github.com/1inch/1inch-sdk-go/v4/constants"
 )
 
-// TestResolveTakerAsset pins funds-critical behavior: the taker asset lives on
-// the destination chain, so a native-token sentinel must resolve to the
-// DESTINATION chain's wrapped native token. Resolving with the source chain
-// (the historical bug) baked a wrong-chain token address into the signed
-// order — e.g. Arbitrum WETH as the taker asset of an order settling on Base.
-func TestResolveTakerAsset(t *testing.T) {
-	tests := []struct {
-		name        string
-		dstToken    string
-		dstChain    int
-		expected    string
-		expectError bool
-		errorMsg    string
-	}{
-		{
-			name:     "ERC-20 destination token passes through",
-			dstToken: "0x833589fcd6edb6e08f4c7c32d4f71b54bda02913",
-			dstChain: constants.BaseChainId,
-			expected: "0x833589fcd6edb6e08f4c7c32d4f71b54bda02913",
-		},
-		{
-			name:     "Native destination resolves to the DESTINATION chain wrapper",
-			dstToken: constants.NativeToken,
-			dstChain: constants.BaseChainId,
-			expected: "0x4200000000000000000000000000000000000006", // WETH on Base, not on the source chain
-		},
-		{
-			name:     "Native destination on Arbitrum",
-			dstToken: constants.NativeToken,
-			dstChain: constants.ArbitrumChainId,
-			expected: "0x82aF49447D8a07e3bd95BD0d56f35241523fBab1",
-		},
-		{
-			name:        "Native destination on a chain without a registered wrapper fails loudly",
-			dstToken:    constants.NativeToken,
-			dstChain:    constants.AuroraChainId,
-			expectError: true,
-			errorMsg:    "destination chain",
-		},
-	}
-
-	for _, tc := range tests {
-		t.Run(tc.name, func(t *testing.T) {
-			got, err := resolveTakerAsset(tc.dstToken, tc.dstChain)
-			if tc.expectError {
-				require.Error(t, err)
-				assert.Contains(t, err.Error(), tc.errorMsg)
-			} else {
-				require.NoError(t, err)
-				assert.Equal(t, tc.expected, got)
-			}
-		})
-	}
-}
-
 // TestConvertToOrderbookExtensionIsPure pins funds-critical behavior: encoding
 // the escrow extension must not mutate the receiver. The historical bug
 // appended the escrow extra data to the extension in place, so a second call

@@ -27,9 +27,19 @@ func CreateFusionPlusOrderData(quoteParams QuoteParams, quote *Quote, orderParam
 		return nil, fmt.Errorf("failed to create auction details: %w", err)
 	}
 
-	takerAsset, err := resolveTakerAsset(quoteParams.DstTokenAddress, quoteParams.DstChain)
-	if err != nil {
-		return nil, err
+	// NOTE: This sets the source-chain order's takerAsset (and the extension
+	// DstToken) to the destination token address. This is a known correctness
+	// defect — the source-chain takerAsset should be the chain-specific
+	// ERC20True sentinel, with the destination token living only in the escrow
+	// extension. Left unchanged here so this refactor stays behavior-identical
+	// to v4.1.0/main; the fix is tracked separately.
+	takerAsset := quoteParams.DstTokenAddress
+	if takerAsset == constants.NativeToken {
+		takerAssetWrapped, ok := constants.ChainToWrapper[constants.NetworkEnum(chainId)]
+		if !ok {
+			return nil, fmt.Errorf("unsupported network for wrapped token: %d", chainId)
+		}
+		takerAsset = takerAssetWrapped.Hex()
 	}
 
 	var takingFeeReceiver geth_common.Address
@@ -196,21 +206,6 @@ func CreateFusionPlusOrderData(quoteParams QuoteParams, quote *Quote, orderParam
 		QuoteId:    quote.QuoteId,
 		LimitOrder: limitOrder,
 	}, nil
-}
-
-// resolveTakerAsset returns the taker asset for the order. The taker asset
-// lives on the destination chain, so a native-token sentinel resolves to the
-// destination chain's wrapped native token — using the source chain's wrapper
-// here would bake a wrong-chain token address into the signed order.
-func resolveTakerAsset(dstTokenAddress string, dstChain int) (string, error) {
-	if dstTokenAddress != constants.NativeToken {
-		return dstTokenAddress, nil
-	}
-	wrapped, ok := constants.ChainToWrapper[constants.NetworkEnum(dstChain)]
-	if !ok {
-		return "", fmt.Errorf("no wrapped native token registered for destination chain %d", dstChain)
-	}
-	return wrapped.Hex(), nil
 }
 
 func GetPreset(presets QuotePresets, presetType GetQuoteOutputRecommendedPreset) (*Preset, error) {

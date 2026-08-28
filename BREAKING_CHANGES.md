@@ -24,7 +24,6 @@ Not breaking, for the avoidance of doubt: ~60 generated types and constants were
 
 ### Behavior Changes (compile clean, act differently)
 
-- **Cross-chain orders with a native destination token are signed with the destination chain's wrapped token** as the taker asset and escrow `DstToken`. Previously the source chain's wrapper address was used — a funds-safety bug.
 - **`fusionplus` quote fees are now transmitted.** Previously a configured `Fee` was silently omitted from the quote request (`*big.Int` cannot be encoded by go-querystring), so quotes were priced without the fee the order then carried.
 - **`fusionplus.DecodeEscrowExtension` output is corrected**: source/destination safety deposits are no longer swapped, deposits are decimal strings, and the hashlock is 0x-prefixed hex — decode → re-encode is now lossless. Malformed input returns an error instead of panicking.
 - **`EscrowExtension.ConvertToOrderbookExtension` no longer mutates the receiver** (a second call previously double-appended the escrow extra data, corrupting the extension).

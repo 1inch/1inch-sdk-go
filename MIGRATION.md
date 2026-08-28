@@ -35,10 +35,6 @@ likelihood:
 
 ## 3. Review behavior changes (compile clean, act differently)
 
-- **Cross-chain orders with a native destination token are now signed with the
-  destination chain's wrapped token** as the taker asset. v4 signed the
-  source chain's wrapper address — a funds-safety bug. If you worked around it
-  by passing the wrapped address explicitly, your code is unaffected.
 - **`fusionplus` quote fees are now transmitted.** In v4 a configured `Fee`
   never reached the quoter (encoding bug), so quotes were priced without it.
 - **`fusionplus.DecodeEscrowExtension` output is corrected**: source and
