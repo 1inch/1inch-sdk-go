@@ -56,8 +56,8 @@ var canaryBase = canaryChain{
 	rpcEnv:     "CANARY_BASE_RPC_URL",
 	weth:       "0x4200000000000000000000000000000000000006",
 	usdc:       "0x833589fCD6eDb6E08f4c7C32D4f71b54bdA02913",
-	wethAmount: big.NewInt(400_000_000_000_000), // 0.0004 WETH
-	usdcAmount: big.NewInt(1_000_000),           // 1.0 USDC
+	wethAmount: big.NewInt(1_000_000_000_000_000), // 0.001 WETH
+	usdcAmount: big.NewInt(1_000_000),             // 1.0 USDC
 }
 
 var canaryArbitrum = canaryChain{
@@ -66,8 +66,8 @@ var canaryArbitrum = canaryChain{
 	rpcEnv:     "CANARY_ARBITRUM_RPC_URL",
 	weth:       "0x82aF49447D8a07e3bd95BD0d56f35241523fBab1",
 	usdc:       "0xaf88d065e77c8cC2239327C5EDb3A432268e5831",
-	wethAmount: big.NewInt(400_000_000_000_000), // 0.0004 WETH
-	usdcAmount: big.NewInt(1_000_000),           // 1.0 USDC
+	wethAmount: big.NewInt(1_000_000_000_000_000), // 0.001 WETH
+	usdcAmount: big.NewInt(1_000_000),             // 1.0 USDC
 }
 
 // canaryFusionPlusAmount is the USDC amount bridged per Fusion+ run; cross-chain
