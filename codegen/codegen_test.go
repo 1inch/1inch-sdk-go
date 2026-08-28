@@ -374,6 +374,52 @@ func TestSpecSourcesCoverAllSpecs(t *testing.T) {
 	})
 }
 
+// TestSpecsMatchLock verifies the provenance chain: every committed spec file
+// must hash to exactly what specs.lock.json records. Together with
+// TestGenerateTypesReproducesCommittedFiles this ties the generated code to a
+// specific upstream snapshot: generated code ⇔ committed specs ⇔ lock entry
+// (source, upstream version, hash, fetch time).
+//
+// If this test fails, either a spec was hand-edited (not allowed — put
+// corrections in codegen/overrides.go) or specs were updated without the fetch
+// tool (run `go run ./codegen/cmd/fetch-specs`, or `-seed` to repair).
+func TestSpecsMatchLock(t *testing.T) {
+	lock, err := loadSpecLock("specs.lock.json")
+	require.NoError(t, err)
+
+	type testCase struct {
+		name string
+		file string
+	}
+	var tests []testCase
+	for _, f := range specFiles {
+		tests = append(tests, testCase{name: f, file: f})
+	}
+
+	for _, tc := range tests {
+		t.Run(tc.name, func(t *testing.T) {
+			entry, ok := lock[tc.file]
+			require.True(t, ok, "spec %s has no entry in specs.lock.json", tc.file)
+			raw, err := os.ReadFile(filepath.Join("openapi", tc.file))
+			require.NoError(t, err)
+			assert.Equal(t, entry.SHA256, sha256Hex(raw),
+				"committed spec does not match specs.lock.json — hand edits are not allowed; use codegen/overrides.go for corrections and the fetch-specs tool for updates")
+			assert.Equal(t, entry.Version, specVersion(raw),
+				"lock version does not match the spec's info.version")
+		})
+	}
+
+	t.Run("No unknown lock entries", func(t *testing.T) {
+		known := make(map[string]bool, len(specFiles))
+		for _, f := range specFiles {
+			known[f] = true
+		}
+		for name := range lock {
+			assert.True(t, known[name], "lock entry %s does not match any committed spec", name)
+		}
+	})
+}
+
 // TestValidateAndIndentSpec documents the fetch-time validation and
 // normalization contract: whitespace is normalized, key order and values are
 // preserved, and non-OpenAPI payloads are rejected.

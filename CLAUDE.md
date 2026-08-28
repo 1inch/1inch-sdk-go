@@ -194,7 +194,13 @@ make codegen-types                              # regenerate types
 go test ./codegen                               # re-pin the output
 ```
 
-Sources live in `specSources` in `codegen/fetch.go`. Fetched specs are validated against the transform pipeline at fetch time, so upstream drift that breaks an override fails immediately with a pointer to `codegen/overrides.go`. **Never hand-edit files in `codegen/openapi/`** — fix type bugs in the override table instead.
+Sources live in `specSources` in `codegen/fetch.go`. Fetched specs are validated against the transform pipeline at fetch time, so upstream drift that breaks an override fails immediately with a pointer to `codegen/overrides.go`. **Never hand-edit files in `codegen/openapi/`** — fix type bugs in the override table instead; CI enforces this by hashing every spec against `codegen/specs.lock.json`.
+
+### Spec Provenance and Drift Detection
+
+`codegen/specs.lock.json` records each spec's source URL, upstream `info.version`, content hash, and fetch time — tying the generated code to a specific upstream snapshot (generated code ⇔ specs via the byte-for-byte tests, specs ⇔ upstream via the lock). The fetch tool maintains it; `fetch-specs -seed` rebuilds it from local copies (bootstrap/repair only).
+
+The `spec-drift.yml` workflow runs weekly (and via manual dispatch, requires the `DEV_PORTAL_TOKEN` repo secret): it fetches the live specs and, when anything changed, regenerates the types, runs the tests, and opens an automated PR (`automation/spec-drift` branch) with the diff and updated lock — flagging in the PR body if regeneration or tests failed.
 
 **DO NOT manually edit `*_types.gen.go` files** - they are overwritten by codegen.
 

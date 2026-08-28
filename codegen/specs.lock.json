@@ -1,0 +1,86 @@
+{
+  "aggregation-openapi.json": {
+    "source": "https://api.1inch.dev/portal/apis/swagger/swap",
+    "version": "6.0",
+    "sha256": "dce7f761128c7f7c2cf26a968df3e77d4264359d40ec1af0130f2ea8d9f13cf1"
+  },
+  "balances-openapi.json": {
+    "source": "https://api.1inch.dev/portal/apis/swagger/balance",
+    "version": "1.2",
+    "sha256": "bc0c524a1f3d426596acd7967cbf3d44c805765703ad825aab2d388fac1998e4"
+  },
+  "fusion_orders-openapi.json": {
+    "version": "2.0",
+    "sha256": "0f36de8d8f8b1671c79096b479aa54628de32c6e7a1aa4bfc2375953498c52f6"
+  },
+  "fusion_quoter-openapi.json": {
+    "version": "2.0",
+    "sha256": "54b59f8645bd1716616d98efc840b2b3bd29ab574328e0da72dfdfc7c1844cfb"
+  },
+  "fusion_relayer-openapi.json": {
+    "version": "2.0",
+    "sha256": "ee921b4c5e7412cdfac3922e33583ac9ed4305ab11ddb747a3c5562689003a52"
+  },
+  "fusionplus_orders-openapi.json": {
+    "version": "1.0",
+    "sha256": "2f3ea49d76b6a904d0bfef7cb9c2b3e74a356b111e4e256b05db3b68907f1618"
+  },
+  "fusionplus_quoter-openapi.json": {
+    "version": "1.0",
+    "sha256": "b548bdd5c6c62a7572057a5e70ba05d1600469825d8614f340106d7942b0714d"
+  },
+  "fusionplus_relayer-openapi.json": {
+    "version": "1.0",
+    "sha256": "e4c534bd9931248314eb2881a1a7bb740cb91004618f02d252dc7d9aaafcf8ca"
+  },
+  "gasprices-openapi.json": {
+    "source": "https://api.1inch.dev/portal/apis/swagger/gas-price",
+    "version": "1.4",
+    "sha256": "d8094089d457aad68833dd44ca57b7a180b67a7422b8265fa6a4cfd7d5396c63"
+  },
+  "history-openapi.json": {
+    "source": "https://api.1inch.dev/portal/apis/swagger/history",
+    "version": "2.0",
+    "sha256": "a3fdb8b8a018062be2d58eb61e746e120b4f79782f0b5b0be589fcdf5c1ec5b1"
+  },
+  "nft-openapi.json": {
+    "source": "https://api.1inch.dev/portal/apis/swagger/nft",
+    "version": "0.1",
+    "sha256": "46f84cc6a50b4c5abe31af228df100749a4a908ea4da3419abb7ea1fa776d129"
+  },
+  "orderbook-openapi.json": {
+    "source": "https://api.1inch.dev/portal/apis/swagger/orderbook",
+    "version": "v3.0",
+    "sha256": "b1c9bcee1c503a096a42f183a1da22a74850eef8e32a62500a5dd1270c7c2452"
+  },
+  "portfolio-openapi.json": {
+    "source": "https://api.1inch.dev/portal/apis/swagger/portfolio",
+    "version": "0.1.0",
+    "sha256": "6d189385c162af3f8e5ef9d0782e3d78bf14d90ec4f4c890b73c3d2ddff51eb2"
+  },
+  "spotprices-openapi.json": {
+    "source": "https://api.1inch.dev/portal/apis/swagger/spot-price",
+    "version": "2.1.28",
+    "sha256": "55e27a3464d42a7b87bf96b732f87769989ebfbe18f0ef4480bfa988c0f7aee1"
+  },
+  "tokens-openapi.json": {
+    "source": "https://api.1inch.dev/portal/apis/swagger/token",
+    "version": "4.3.80",
+    "sha256": "168ab037f1052123f5d92eb4ca288f53fc78b85a8a0d30fcc4f0e7dfc75e34a2"
+  },
+  "traces-openapi.json": {
+    "source": "https://api.1inch.dev/portal/apis/swagger/traces",
+    "version": "1.0",
+    "sha256": "e9e4de54aba2e17d3de514577a9016838c0bfba4e843c3d6360c58e0073aea7e"
+  },
+  "txbroadcast-openapi.json": {
+    "source": "https://api.1inch.dev/portal/apis/swagger/tx-gateway",
+    "version": "1.0",
+    "sha256": "29a6e4da110984aac554d29149bc85003875395dd22969e9c5287de20a0e045a"
+  },
+  "web3-openapi.json": {
+    "source": "https://api.1inch.dev/portal/apis/swagger/web3",
+    "version": "1.0.0",
+    "sha256": "953d7a68f736b9c243d94b92ffa8325cbc5139af2e2465af3938640c5f37b529"
+  }
+}
