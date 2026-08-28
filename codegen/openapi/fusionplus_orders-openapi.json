@@ -35,7 +35,7 @@
             "description": "Source chain of cross chain",
             "example": 1,
             "schema": {
-              "type": "number",
+              "type": "integer",
               "x-go-type-skip-optional-pointer": true
             }
           },
@@ -46,7 +46,7 @@
             "description": "Destination chain of cross chain",
             "example": 137,
             "schema": {
-              "type": "number",
+              "type": "integer",
               "x-go-type-skip-optional-pointer": true
             }
           }
@@ -86,7 +86,7 @@
             "description": "Chain ID",
             "example": 1,
             "schema": {
-              "type": "number",
+              "type": "integer",
               "x-go-type-skip-optional-pointer": true
             }
           }
@@ -206,7 +206,7 @@
             "description": "Destination chain of cross chain",
             "example": 137,
             "schema": {
-              "type": "number",
+              "type": "integer",
               "x-go-type-skip-optional-pointer": true
             }
           },
@@ -217,7 +217,7 @@
             "description": "Source chain of cross chain",
             "example": 1,
             "schema": {
-              "type": "number",
+              "type": "integer",
               "x-go-type-skip-optional-pointer": true
             }
           },
@@ -228,7 +228,7 @@
             "description": "chainId for looking by dstChainId == chainId OR srcChainId == chainId",
             "example": 56,
             "schema": {
-              "type": "number",
+              "type": "integer",
               "x-go-type-skip-optional-pointer": true
             }
           }
@@ -596,13 +596,13 @@
             "x-go-type-skip-optional-pointer": true
           },
           "srcChainId": {
-            "type": "number",
+            "type": "integer",
             "description": "Identifier of the chain where the maker asset is located. ",
             "example": 1,
             "x-go-type-skip-optional-pointer": true
           },
           "dstChainId": {
-            "type": "number",
+            "type": "integer",
             "description": "Identifier of the chain where the taker asset is located.",
             "example": 2,
             "x-go-type-skip-optional-pointer": true
@@ -936,7 +936,7 @@
             "$ref": "#/components/schemas/Immutables"
           },
           "chainId": {
-            "type": "number",
+            "type": "integer",
             "description": "Execute action on this chain",
             "example": 1,
             "x-go-type-skip-optional-pointer": true
@@ -1261,13 +1261,13 @@
             "x-go-type-skip-optional-pointer": true
           },
           "srcChainId": {
-            "type": "number",
+            "type": "integer",
             "description": "Identifier of the chain where the maker asset is located. ",
             "example": 1,
             "x-go-type-skip-optional-pointer": true
           },
           "dstChainId": {
-            "type": "number",
+            "type": "integer",
             "description": "Identifier of the chain where the taker asset is located.",
             "example": 2,
             "x-go-type-skip-optional-pointer": true

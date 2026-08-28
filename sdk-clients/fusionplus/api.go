@@ -121,7 +121,7 @@ func (api *api) PlaceOrder(ctx context.Context, quoteParams QuoterControllerGetQ
 	// TODO support multiple secrets
 	//}
 
-	fusionPlusOrder, err := CreateFusionPlusOrderData(quoteParams, quote, orderParams, wallet, int(quoteParams.SrcChain))
+	fusionPlusOrder, err := CreateFusionPlusOrderData(quoteParams, quote, orderParams, wallet, quoteParams.SrcChain)
 	if err != nil {
 		return "", fmt.Errorf("failed to create order: %w", err)
 	}

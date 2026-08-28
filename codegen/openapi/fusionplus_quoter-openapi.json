@@ -13,7 +13,7 @@
             "description": "Id of source chain",
             "example": "1",
             "schema": {
-              "type": "number"
+              "type": "integer"
             }
           },
           {
@@ -23,7 +23,7 @@
             "description": "Id of destination chain",
             "example": "137",
             "schema": {
-              "type": "number"
+              "type": "integer"
             }
           },
           {
@@ -138,7 +138,7 @@
             "description": "Id of source chain",
             "example": "1",
             "schema": {
-              "type": "number"
+              "type": "integer"
             }
           },
           {
@@ -148,7 +148,7 @@
             "description": "Id of destination chain",
             "example": "137",
             "schema": {
-              "type": "number"
+              "type": "integer"
             }
           },
           {
@@ -275,7 +275,7 @@
             "description": "Id of source chain",
             "example": "1",
             "schema": {
-              "type": "number"
+              "type": "integer"
             }
           },
           {
@@ -285,7 +285,7 @@
             "description": "Id of destination chain",
             "example": "137",
             "schema": {
-              "type": "number"
+              "type": "integer"
             }
           },
           {

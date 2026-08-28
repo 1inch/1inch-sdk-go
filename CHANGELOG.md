@@ -6,6 +6,9 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 
 ## [Unreleased]
 
+### Breaking Changes
+- **Chain-id fields changed from `float32` to `int`**: A `float32` cannot exactly represent integers above 2²⁴, so Aurora's chain id (1313161554) was silently rounded to 1313161600 — corrupting the EIP-712 signing domain and the encoded escrow `DstChainId`, and making Aurora impossible to pass through parameter validation. All chain-id fields in the `fusionplus` and `tokens` packages are now `int`. Affected exported types include `fusionplus.QuoterControllerGetQuoteParamsFixed` (`SrcChain`, `DstChain`), `fusionplus.QuoterControllerGetQuoteWithCustomPresetsParamsFixed`, `fusionplus.GetSettlementContractParams`, `fusionplus.EscrowExtension`/`EscrowExtensionParams`/`EscrowExtraData` (`DstChainId`), `fusionplus.SignedOrderInput` (`SrcChainId`), the generated fusionplus order/quoter/relayer types, and `tokens.ProviderTokenDtoFixed`/`TokenInfoDtoFixed` (`ChainId`). Callers using untyped constants (e.g. `constants.AuroraChainId` or literal chain ids) are unaffected; callers passing `float32`-typed variables must drop the conversion. The fix is applied at the codegen layer (`codegen/generate_types.sh` now rewrites chain-id fields typed as `number` to `integer` before type generation), and the internal `CheckChainIdFloat32`/`CheckChainIdFloat32Required` validators were removed.
+
 ## [v4.1.0] - 2026-07-25
 
 ### Added

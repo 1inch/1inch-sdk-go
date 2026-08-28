@@ -35,8 +35,8 @@ type GetOrderFillsByHashOutputFixed struct {
 	CreatedAt float32 `json:"createdAt"`
 
 	// DstChainId Identifier of the chain where the taker asset is located.
-	DstChainId       float32 `json:"dstChainId"`
-	DstTokenPriceUsd string  `json:"dstTokenPriceUsd"`
+	DstChainId       int    `json:"dstChainId"`
+	DstTokenPriceUsd string `json:"dstTokenPriceUsd"`
 
 	// Extension An interaction call data. ABI encoded set of makerAssetSuffix, takerAssetSuffix, makingAmountGetter, takingAmountGetter, predicate, permit, preInteraction, postInteraction.If extension exists then lowest 160 bits of the order salt must be equal to the lowest 160 bits of the extension hash
 	Extension string `json:"extension"`
@@ -53,8 +53,8 @@ type GetOrderFillsByHashOutputFixed struct {
 	Points    []AuctionPointOutput `json:"points"`
 
 	// SrcChainId Identifier of the chain where the maker asset is located.
-	SrcChainId       float32 `json:"srcChainId"`
-	SrcTokenPriceUsd string  `json:"srcTokenPriceUsd"`
+	SrcChainId       int    `json:"srcChainId"`
+	SrcTokenPriceUsd string `json:"srcTokenPriceUsd"`
 
 	// Status Order status
 	Status GetOrderFillsByHashOutputStatus `json:"status"`
@@ -72,10 +72,10 @@ type GetOrderFillsByHashOutputFixed struct {
 // QuoterControllerGetQuoteParamsFixed defines parameters for QuoterControllerGetQuote.
 type QuoterControllerGetQuoteParamsFixed struct {
 	// SrcChain Id of source chain
-	SrcChain float32 `url:"srcChain" json:"srcChain"`
+	SrcChain int `url:"srcChain" json:"srcChain"`
 
 	// DstChain Id of destination chain
-	DstChain float32 `url:"dstChain" json:"dstChain"`
+	DstChain int `url:"dstChain" json:"dstChain"`
 
 	// SrcTokenAddress Address of "SOURCE" token in source chain
 	SrcTokenAddress string `url:"srcTokenAddress" json:"srcTokenAddress"`
@@ -106,10 +106,10 @@ type QuoterControllerGetQuoteParamsFixed struct {
 // This is a fixed version with Amount as string instead of float32 for proper BigInt validation.
 type QuoterControllerGetQuoteWithCustomPresetsParamsFixed struct {
 	// SrcChain Id of source chain
-	SrcChain float32 `url:"srcChain" json:"srcChain"`
+	SrcChain int `url:"srcChain" json:"srcChain"`
 
 	// DstChain Id of destination chain
-	DstChain float32 `url:"dstChain" json:"dstChain"`
+	DstChain int `url:"dstChain" json:"dstChain"`
 
 	// SrcTokenAddress Address of "SOURCE" token
 	SrcTokenAddress string `url:"srcTokenAddress" json:"srcTokenAddress"`
@@ -170,7 +170,7 @@ type EscrowExtensionParams struct {
 	fusion.ExtensionParams
 	ExtensionParamsPlus
 	HashLock         *HashLock
-	DstChainId       float32
+	DstChainId       int
 	DstToken         common.Address
 	SrcSafetyDeposit string
 	DstSafetyDeposit string
@@ -360,5 +360,5 @@ type ExtensionPlus struct {
 // GetSettlementContractParams defines parameters for GetSettlementContract
 type GetSettlementContractParams struct {
 	// ChainId Chain ID
-	ChainId float32 `url:"chainId,omitempty" json:"chainId,omitempty"`
+	ChainId int `url:"chainId,omitempty" json:"chainId,omitempty"`
 }

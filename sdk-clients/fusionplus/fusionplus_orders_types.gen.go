@@ -77,7 +77,7 @@ type ActiveOrdersOutput struct {
 	Deadline float32 `json:"deadline"`
 
 	// DstChainId Identifier of the chain where the taker asset is located.
-	DstChainId float32 `json:"dstChainId"`
+	DstChainId int `json:"dstChainId"`
 
 	// Extension An interaction call data. ABI encoded set of makerAssetSuffix, takerAssetSuffix, makingAmountGetter, takingAmountGetter, predicate, permit, preInteraction, postInteraction.If extension exists then lowest 160 bits of the order salt must be equal to the lowest 160 bits of the extension hash
 	Extension string `json:"extension"`
@@ -111,7 +111,7 @@ type ActiveOrdersOutput struct {
 	Signature string `json:"signature"`
 
 	// SrcChainId Identifier of the chain where the maker asset is located.
-	SrcChainId float32 `json:"srcChainId"`
+	SrcChainId int `json:"srcChainId"`
 }
 
 // AuctionPointOutput defines model for AuctionPointOutput.
@@ -228,7 +228,7 @@ type GetOrderFillsByHashOutput struct {
 	CreatedAt float32 `json:"createdAt"`
 
 	// DstChainId Identifier of the chain where the taker asset is located.
-	DstChainId       float32                `json:"dstChainId"`
+	DstChainId       int                    `json:"dstChainId"`
 	DstTokenPriceUsd map[string]interface{} `json:"dstTokenPriceUsd"`
 
 	// Extension An interaction call data. ABI encoded set of makerAssetSuffix, takerAssetSuffix, makingAmountGetter, takingAmountGetter, predicate, permit, preInteraction, postInteraction.If extension exists then lowest 160 bits of the order salt must be equal to the lowest 160 bits of the extension hash
@@ -246,7 +246,7 @@ type GetOrderFillsByHashOutput struct {
 	Points    AuctionPointOutput `json:"points"`
 
 	// SrcChainId Identifier of the chain where the maker asset is located.
-	SrcChainId       float32                `json:"srcChainId"`
+	SrcChainId       int                    `json:"srcChainId"`
 	SrcTokenPriceUsd map[string]interface{} `json:"srcTokenPriceUsd"`
 
 	// Status Order status
@@ -384,7 +384,7 @@ type ReadyToExecutePublicAction struct {
 	Action ReadyToExecutePublicActionAction `json:"action"`
 
 	// ChainId Execute action on this chain
-	ChainId float32 `json:"chainId"`
+	ChainId int `json:"chainId"`
 
 	// Escrow Escrow's address to perform public action
 	Escrow     string     `json:"escrow"`
@@ -427,16 +427,16 @@ type OrderApiControllerGetActiveOrdersParams struct {
 	Limit float32 `url:"limit,omitempty" json:"limit,omitempty"`
 
 	// SrcChain Source chain of cross chain
-	SrcChain float32 `url:"srcChain,omitempty" json:"srcChain,omitempty"`
+	SrcChain int `url:"srcChain,omitempty" json:"srcChain,omitempty"`
 
 	// DstChain Destination chain of cross chain
-	DstChain float32 `url:"dstChain,omitempty" json:"dstChain,omitempty"`
+	DstChain int `url:"dstChain,omitempty" json:"dstChain,omitempty"`
 }
 
 // OrderApiControllerGetSettlementContractParams defines parameters for OrderApiControllerGetSettlementContract.
 type OrderApiControllerGetSettlementContractParams struct {
 	// ChainId Chain ID
-	ChainId float32 `url:"chainId,omitempty" json:"chainId,omitempty"`
+	ChainId int `url:"chainId,omitempty" json:"chainId,omitempty"`
 }
 
 // OrderApiControllerGetOrdersByMakerParams defines parameters for OrderApiControllerGetOrdersByMaker.
@@ -463,13 +463,13 @@ type OrderApiControllerGetOrdersByMakerParams struct {
 	WithToken string `url:"withToken,omitempty" json:"withToken,omitempty"`
 
 	// DstChainId Destination chain of cross chain
-	DstChainId float32 `url:"dstChainId,omitempty" json:"dstChainId,omitempty"`
+	DstChainId int `url:"dstChainId,omitempty" json:"dstChainId,omitempty"`
 
 	// SrcChainId Source chain of cross chain
-	SrcChainId float32 `url:"srcChainId,omitempty" json:"srcChainId,omitempty"`
+	SrcChainId int `url:"srcChainId,omitempty" json:"srcChainId,omitempty"`
 
 	// ChainId chainId for looking by dstChainId == chainId OR srcChainId == chainId
-	ChainId float32 `url:"chainId,omitempty" json:"chainId,omitempty"`
+	ChainId int `url:"chainId,omitempty" json:"chainId,omitempty"`
 }
 
 // OrderApiControllerGetOrdersByOrderHashesJSONRequestBody defines body for OrderApiControllerGetOrdersByOrderHashes for application/json ContentType.

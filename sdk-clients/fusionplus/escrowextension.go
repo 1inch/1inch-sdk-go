@@ -16,7 +16,7 @@ import (
 type EscrowExtension struct {
 	ExtensionPlus
 	HashLock         *HashLock
-	DstChainId       float32
+	DstChainId       int
 	DstToken         common.Address
 	SrcSafetyDeposit string
 	DstSafetyDeposit string
@@ -175,7 +175,7 @@ func decodeExtraData(data []byte) (*EscrowExtraData, error) {
 		HashLock: &HashLock{
 			hashlockData.String(),
 		},
-		DstChainId:       float32(dstChainIdData.Uint64()),
+		DstChainId:       int(dstChainIdData.Uint64()),
 		DstToken:         common.HexToAddress(addressHex),
 		SrcSafetyDeposit: srcSafetyDeposit,
 		DstSafetyDeposit: dstSafetyDeposit,
@@ -217,7 +217,7 @@ func decodeTimeLocks(value *big.Int) (*TimeLocks, error) {
 
 type EscrowExtraData struct {
 	HashLock         *HashLock
-	DstChainId       float32
+	DstChainId       int
 	DstToken         common.Address
 	SrcSafetyDeposit *big.Int
 	DstSafetyDeposit *big.Int

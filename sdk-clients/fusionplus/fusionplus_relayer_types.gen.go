@@ -52,7 +52,7 @@ type SignedOrderInput struct {
 	Signature string `json:"signature"`
 
 	// SrcChainId Source chain id
-	SrcChainId float32 `json:"srcChainId"`
+	SrcChainId int `json:"srcChainId"`
 }
 
 // RelayerControllerSubmitManyJSONBody defines parameters for RelayerControllerSubmitMany.

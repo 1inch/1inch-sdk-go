@@ -5,6 +5,15 @@ verbose_logging=false
 openapi_dir="openapi"
 output_dir="generatedtypes"
 
+# sed_inplace edits a file in place, handling the flag difference between GNU sed (Linux) and BSD sed (macOS)
+sed_inplace() {
+    if sed --version > /dev/null 2>&1; then
+        sed -i "$@"
+    else
+        sed -i '' "$@"
+    fi
+}
+
 # display_help shows the help message for this script
 display_help() {
     echo "This script will generate request/response structs for all APIs supported by the SDK"
@@ -151,11 +160,47 @@ check_and_fix_incorrect_number_arrays() {
     if grep -q '"schema": { "type": "number\[\]" }' "$api_openapi_file_name"; then
         # If the pattern exists, use sed to replace the incorrect schema type
         echo "$(basename "$api_openapi_file_name") uses number arrays directly instead of using the array type. Fixing..."
-        sed -i '' 's/"schema": { "type": "number\[\]" }/"schema": { "type": "array", "items": { "type": "number" } }/g' "$api_openapi_file_name" || {
+        sed_inplace 's/"schema": { "type": "number\[\]" }/"schema": { "type": "array", "items": { "type": "number" } }/g' "$api_openapi_file_name" || {
             echo "Error while fixing number arrays in $api_openapi_file_name."
             exit 1
         }
     fi
+}
+
+# fix_chain_id_number_types converts chain-id parameters and properties declared as "number" to "integer".
+# The upstream specs type chain ids as number, which oapi-codegen generates as float32. A float32 cannot
+# represent integers above 2^24, so Aurora (1313161554) silently rounds to 1313161600.
+fix_chain_id_number_types() {
+  local api_openapi_file_name="$1"
+  local temp_file="${api_openapi_file_name}.tmp"
+
+  jq '
+    def is_chain_key: test("^(src|dst|from|to)?_?chain_?(id)?s?$"; "i");
+
+    walk(
+      if type == "object" then
+        (if (.properties? | type) == "object" then
+          .properties |= with_entries(
+            if (.key | is_chain_key) and ((.value | type) == "object") and .value.type == "number" then
+              .value.type = "integer"
+            else . end
+          )
+        else . end)
+        |
+        (if ((.name? | type) == "string") and (.name | is_chain_key)
+            and ((.schema? | type) == "object") and .schema.type == "number" then
+          .schema.type = "integer"
+        else . end)
+      else . end
+    )
+  ' ${api_openapi_file_name} > ${temp_file}
+
+  if [ $? -ne 0 ]; then
+    echo "Error: Failed to fix chain id number types with jq on $api_openapi_file_name."
+    exit 1
+  fi
+
+  mv "${temp_file}" "${api_openapi_file_name}"
 }
 
 # add_pointer_skip_field adds x-go-type-skip-optional-pointer to schema objects and parameters if not already present
@@ -328,6 +373,9 @@ for api_openapi_file_name in "$openapi_dir"/*-openapi.json; do
     # simplify ref
     change_any_of_ref_to_ref "$api_openapi_file_name"
 
+    # Convert chain-id fields from number to integer so they are not generated as float32
+    fix_chain_id_number_types "$api_openapi_file_name"
+
     # Should always be the final schema step!
     # Add x-go-type-skip-optional-pointer to schema objects and parameters if not already present
     add_pointer_skip_field "$api_openapi_file_name"
@@ -340,7 +388,7 @@ for api_openapi_file_name in "$openapi_dir"/*-openapi.json; do
     }
 
     # In the generated file, replace all 'form:' tags with 'url:' tags
-    sed -i '' -E 's/`form:"([^"]+)"([^`]*)(`)/`url:"\1"\2\3/g' "$output_file" || {
+    sed_inplace -E 's/`form:"([^"]+)"([^`]*)(`)/`url:"\1"\2\3/g' "$output_file" || {
         echo "Error: Failed to replace tags in $output_file."
         exit 1
     }

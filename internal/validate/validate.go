@@ -103,25 +103,6 @@ func CheckChainIdInt(value int, variableName string) error {
 	return nil
 }
 
-func CheckChainIdFloat32Required(value float32, variableName string) error {
-	if value == 0 {
-		return NewParameterMissingError(variableName)
-	}
-
-	return CheckChainIdFloat32(value, variableName)
-}
-
-func CheckChainIdFloat32(value float32, variableName string) error {
-	if value == 0 {
-		return nil
-	}
-
-	if !slices.Contains(constants.ValidChainIds, int(value)) {
-		return NewParameterValidationError(variableName, fmt.Sprintf("is invalid, valid chain ids are: %v", constants.ValidChainIds))
-	}
-	return nil
-}
-
 func CheckPrivateKeyRequired(value string, variableName string) error {
 	if value == "" {
 		return NewParameterMissingError(variableName)

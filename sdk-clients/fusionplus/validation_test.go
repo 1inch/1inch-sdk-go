@@ -6,6 +6,8 @@ import (
 
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
+
+	"github.com/1inch/1inch-sdk-go/v4/constants"
 )
 
 func TestOrderApiControllerGetActiveOrdersParams_Validate(t *testing.T) {
@@ -128,6 +130,20 @@ func TestQuoterControllerGetQuoteParamsFixed_Validate(t *testing.T) {
 			},
 			expectError: true,
 			errorMsg:    "Amount",
+		},
+		{
+			// Aurora's chain id (1313161554) exceeds float32's 24-bit integer precision;
+			// it must survive validation unrounded now that chain ids are ints.
+			name: "Valid params - Aurora chain id above 2^24",
+			params: QuoterControllerGetQuoteParamsFixed{
+				SrcTokenAddress: validAddress,
+				DstTokenAddress: validAddress,
+				WalletAddress:   validAddress,
+				SrcChain:        constants.AuroraChainId,
+				DstChain:        constants.AuroraChainId,
+				Amount:          "1000000000000000000",
+			},
+			expectError: false,
 		},
 		{
 			name: "Invalid SrcChain - zero",

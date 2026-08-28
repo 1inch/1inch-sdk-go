@@ -127,10 +127,10 @@ type TokenPair struct {
 // QuoterControllerBuildQuoteTypedDataParams defines parameters for QuoterControllerBuildQuoteTypedData.
 type QuoterControllerBuildQuoteTypedDataParams struct {
 	// SrcChain Id of source chain
-	SrcChain float32 `url:"srcChain" json:"srcChain"`
+	SrcChain int `url:"srcChain" json:"srcChain"`
 
 	// DstChain Id of destination chain
-	DstChain float32 `url:"dstChain" json:"dstChain"`
+	DstChain int `url:"dstChain" json:"dstChain"`
 
 	// SrcTokenAddress Address of "SOURCE" token
 	SrcTokenAddress string `url:"srcTokenAddress" json:"srcTokenAddress"`
@@ -169,10 +169,10 @@ type QuoterControllerBuildQuoteTypedDataParams struct {
 // QuoterControllerGetQuoteParams defines parameters for QuoterControllerGetQuote.
 type QuoterControllerGetQuoteParams struct {
 	// SrcChain Id of source chain
-	SrcChain float32 `url:"srcChain" json:"srcChain"`
+	SrcChain int `url:"srcChain" json:"srcChain"`
 
 	// DstChain Id of destination chain
-	DstChain float32 `url:"dstChain" json:"dstChain"`
+	DstChain int `url:"dstChain" json:"dstChain"`
 
 	// SrcTokenAddress Address of "SOURCE" token in source chain
 	SrcTokenAddress string `url:"srcTokenAddress" json:"srcTokenAddress"`
@@ -202,10 +202,10 @@ type QuoterControllerGetQuoteParams struct {
 // QuoterControllerGetQuoteWithCustomPresetsParams defines parameters for QuoterControllerGetQuoteWithCustomPresets.
 type QuoterControllerGetQuoteWithCustomPresetsParams struct {
 	// SrcChain Id of source chain
-	SrcChain float32 `url:"srcChain" json:"srcChain"`
+	SrcChain int `url:"srcChain" json:"srcChain"`
 
 	// DstChain Id of destination chain
-	DstChain float32 `url:"dstChain" json:"dstChain"`
+	DstChain int `url:"dstChain" json:"dstChain"`
 
 	// SrcTokenAddress Address of "SOURCE" token
 	SrcTokenAddress string `url:"srcTokenAddress" json:"srcTokenAddress"`
