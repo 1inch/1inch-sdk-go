@@ -84,7 +84,7 @@
             "required": true,
             "in": "path",
             "schema": {
-              "type": "integer",
+              "type": "number",
               "x-go-type-skip-optional-pointer": true
             }
           },
@@ -165,7 +165,7 @@
             "required": true,
             "in": "path",
             "schema": {
-              "type": "integer",
+              "type": "number",
               "x-go-type-skip-optional-pointer": true
             }
           },
@@ -235,7 +235,7 @@
             "required": true,
             "in": "path",
             "schema": {
-              "type": "integer",
+              "type": "number",
               "x-go-type-skip-optional-pointer": true
             }
           },
@@ -300,7 +300,7 @@
             "required": true,
             "in": "path",
             "schema": {
-              "type": "integer",
+              "type": "number",
               "x-go-type-skip-optional-pointer": true
             }
           },
@@ -360,7 +360,7 @@
             "required": true,
             "in": "path",
             "schema": {
-              "type": "integer",
+              "type": "number",
               "x-go-type-skip-optional-pointer": true
             }
           },
@@ -440,7 +440,7 @@
         "type": "object",
         "properties": {
           "chainId": {
-            "type": "integer",
+            "type": "number",
             "x-go-type-skip-optional-pointer": true
           },
           "symbol": {
@@ -505,7 +505,7 @@
         "type": "object",
         "properties": {
           "chainId": {
-            "type": "integer",
+            "type": "number",
             "x-go-type-skip-optional-pointer": true
           },
           "symbol": {
@@ -596,7 +596,7 @@
             "x-go-type-skip-optional-pointer": true
           },
           "chainId": {
-            "type": "integer",
+            "type": "number",
             "x-go-type-skip-optional-pointer": true
           },
           "decimals": {

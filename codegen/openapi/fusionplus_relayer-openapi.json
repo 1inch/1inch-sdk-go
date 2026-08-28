@@ -164,7 +164,7 @@
             "$ref": "#/components/schemas/OrderInput"
           },
           "srcChainId": {
-            "type": "integer",
+            "type": "number",
             "description": "Source chain id",
             "example": 1,
             "x-go-type-skip-optional-pointer": true
