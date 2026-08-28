@@ -25,7 +25,7 @@ func (params *GetCustomTokensParams) Validate() error {
 	return validate.ConsolidateValidationErrors(validationErrors)
 }
 
-func (params *CustomTokensControllerGetTokenInfoParams) Validate() error {
+func (params *GetCustomTokenParams) Validate() error {
 	var validationErrors []error
 	validationErrors = validate.Parameter(params.Address, "address", validate.CheckEthereumAddressRequired, validationErrors)
 	return validate.ConsolidateValidationErrors(validationErrors)

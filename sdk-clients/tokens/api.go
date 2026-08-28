@@ -129,7 +129,7 @@ func (api *api) GetCustomTokens(ctx context.Context, params GetCustomTokensParam
 	return response, nil
 }
 
-func (api *api) GetCustomToken(ctx context.Context, params CustomTokensControllerGetTokenInfoParams) (*ProviderTokenDto, error) {
+func (api *api) GetCustomToken(ctx context.Context, params GetCustomTokenParams) (*ProviderTokenDto, error) {
 	u := fmt.Sprintf("/token/v1.2/%d/custom/%s", api.chainId, params.Address)
 
 	err := params.Validate()

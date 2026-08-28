@@ -50,12 +50,12 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - name: Checkout code into workspace directory
-        uses: actions/checkout@v4
+        uses: actions/checkout@v7
         with:
           fetch-depth: 0
 
       - name: Set up Go
-        uses: actions/setup-go@v5
+        uses: actions/setup-go@v7
         with:
           go-version: '1.25'
 
@@ -68,7 +68,16 @@ jobs:
             exit 0
           fi
           echo "## Public API diff vs $base" >> "$GITHUB_STEP_SUMMARY"
-          go run golang.org/x/exp/cmd/gorelease@v0.0.0-20260824195058-e88cd73687aa -base="$base" > /tmp/apidiff.txt 2>&1 || true
+          # A cross-major diff (e.g. a /v5 module vs a v4.x base tag) is not
+          # meaningful — gorelease would compare different module paths and
+          # error. Skip it explicitly rather than let the error read as a pass.
+          base_major="${base#v}"; base_major="${base_major%%.*}"
+          mod_major=$(go list -m | sed -nE 's|.*/v([0-9]+)$|\1|p'); mod_major="${mod_major:-1}"
+          if [ "$mod_major" != "$base_major" ]; then
+            echo "Module major v$mod_major differs from base tag major v$base_major; cross-major API diff is not meaningful — skipping." >> "$GITHUB_STEP_SUMMARY"
+            exit 0
+          fi
+          if go run golang.org/x/exp/cmd/gorelease@v0.0.0-20260824195058-e88cd73687aa -base="$base" > /tmp/apidiff.txt 2>&1; then rc=0; else rc=$?; fi
           { echo '```'; cat /tmp/apidiff.txt; echo '```'; } >> "$GITHUB_STEP_SUMMARY"
           if grep -q '^## incompatible changes' /tmp/apidiff.txt; then
             if grep -q '^## Unreleased' BREAKING_CHANGES.md; then
@@ -77,6 +86,9 @@ jobs:
               echo "::error::Incompatible public API changes detected (see job summary), but BREAKING_CHANGES.md has no Unreleased section documenting them."
               exit 1
             fi
+          elif [ "$rc" -ne 0 ]; then
+            echo "::error::gorelease failed (exit $rc) without an incompatible-changes report — see job summary. Check the base tag and module path."
+            exit 1
           else
             echo "No incompatible public API changes."
           fi

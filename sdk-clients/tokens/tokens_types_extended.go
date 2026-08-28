@@ -9,6 +9,10 @@ type ProviderTokenDtoFixed = ProviderTokenDto
 // Deprecated: Use TokenInfoDto instead; see ProviderTokenDtoFixed.
 type TokenInfoDtoFixed = TokenInfoDto
 
-type CustomTokensControllerGetTokenInfoParams struct {
+type GetCustomTokenParams struct {
 	Address string `url:"address" json:"address"`
 }
+
+// Deprecated: Use GetCustomTokenParams instead. Renamed to match the intent-based
+// naming used across the SDK (and its sibling GetCustomTokensParams).
+type CustomTokensControllerGetTokenInfoParams = GetCustomTokenParams

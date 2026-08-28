@@ -154,6 +154,12 @@ func FetchSpecs(opts FetchOptions) error {
 			FetchedAt: now().UTC().Format(time.RFC3339),
 		}
 		if prev, ok := lock[name]; ok && prev.SHA256 == entry.SHA256 {
+			// Preserve the prior fetch time when the content is unchanged, so the
+			// lock only changes on a real content/version/source change. Otherwise
+			// every fetch would rewrite timestamps and the weekly spec-drift
+			// workflow would open a false-positive PR containing only timestamp
+			// noise.
+			entry.FetchedAt = prev.FetchedAt
 			fmt.Printf("unchanged %s (version %s)\n", name, entry.Version)
 		} else {
 			fmt.Printf("refreshed %s (version %s)\n", name, entry.Version)
