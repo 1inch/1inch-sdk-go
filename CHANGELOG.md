@@ -7,6 +7,7 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 ## [Unreleased]
 
 ### Added
+- Wire-surface diff in CI (`tools/wiredump` + `wire-surface` job): every PR's job summary shows the exact diff of all exported struct fields (name, Go type, json/url tags) against the base branch — catching struct-tag changes that compile fine but silently alter the wire format, which type-level API diffing cannot see. An A/B run against the pre-refactor tree verified all 73 wire-surface differences on this branch map to documented changes, with zero field removals and zero tag changes.
 - Public API compatibility gate in CI: every PR gets a machine-generated `gorelease` diff against the latest stable release in its job summary, and incompatible changes fail the build unless BREAKING_CHANGES.md has an Unreleased section documenting them. The release workflow refuses patch/minor (and rc) releases that contain incompatible public API changes.
 - Wire-format regression tests pinning the exact query-string and JSON encodings of the fusionplus quoter params, relayer order submission, and response decoding for fusionplus and tokens (`wire_test.go`)
 - Live API smoke tests (`go test -tags liveapi ./tests/liveapi/`, requires `DEV_PORTAL_TOKEN`): read-only production requests validating that live responses still decode into the SDK's types; run weekly by the spec-drift workflow

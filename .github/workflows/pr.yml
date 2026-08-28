@@ -67,6 +67,40 @@ jobs:
             echo "No incompatible public API changes."
           fi
 
+  # Complements api-compat: gorelease sees Go types but not struct tags, and a
+  # changed json/url tag compiles fine while silently changing the wire format.
+  # This dumps every exported struct field (name, type, tag) for the PR and its
+  # base and puts the diff in the job summary. Informational — breaking type
+  # changes are gated by api-compat; this makes tag/wire changes impossible to
+  # miss in review.
+  wire-surface:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout code into workspace directory
+        uses: actions/checkout@v7
+        with:
+          fetch-depth: 0
+
+      - name: Set up Go
+        uses: actions/setup-go@v7
+        with:
+          go-version: '1.25'
+
+      - name: Diff wire surface against the base branch
+        run: |
+          set -euo pipefail
+          go run ./tools/wiredump . > /tmp/wire-new.json
+          git worktree add /tmp/base "origin/${{ github.base_ref }}"
+          # Use the PR's tool for both trees so the comparison is apples-to-apples.
+          go run ./tools/wiredump /tmp/base > /tmp/wire-old.json
+          echo "## Wire surface diff vs ${{ github.base_ref }}" >> "$GITHUB_STEP_SUMMARY"
+          if diff -u /tmp/wire-old.json /tmp/wire-new.json > /tmp/wire.diff; then
+            echo "No exported struct field, type, or tag changes." >> "$GITHUB_STEP_SUMMARY"
+          else
+            { echo '```diff'; cat /tmp/wire.diff; echo '```'; } >> "$GITHUB_STEP_SUMMARY"
+            echo "::warning::This PR changes the exported wire surface (fields, types, or struct tags) — see the wire-surface job summary and confirm every change is intended and documented."
+          fi
+
   # Two release-hygiene rules: the version constant is owned by the release
   # workflow (PRs must not modify it), and code changes without a CHANGELOG
   # entry get a warning that their release notes will be auto-generated.
