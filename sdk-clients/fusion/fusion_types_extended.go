@@ -68,21 +68,6 @@ type CustomPreset = fusionorder.CustomPreset
 // Deprecated: Use fusionorder.CustomPresetPoint directly instead.
 type CustomPresetPoint = fusionorder.CustomPresetPoint
 
-type Preset struct {
-	AuctionDuration    float32             `json:"auctionDuration"`
-	StartAuctionIn     float32             `json:"startAuctionIn"`
-	BankFee            *big.Int            `json:"bankFee"`
-	InitialRateBump    float32             `json:"initialRateBump"`
-	AuctionStartAmount string              `json:"auctionStartAmount"`
-	AuctionEndAmount   string              `json:"auctionEndAmount"`
-	TokenFee           *big.Int            `json:"tokenFee"`
-	Points             []AuctionPointClass `json:"points"`
-	GasCostInfo        GasCostConfigClass  `json:"gasCostInfo"`
-	ExclusiveResolver  *common.Address     `json:"exclusiveResolver,omitempty"`
-	AllowPartialFills  bool                `json:"allowPartialFills"`
-	AllowMultipleFills bool                `json:"allowMultipleFills"`
-}
-
 type PreparedOrder struct {
 	Order   Order  `json:"order"`
 	Hash    string `json:"hash"`
@@ -164,12 +149,22 @@ type OrderResponse struct {
 	ToTokenToUsdPrice string                     `json:"toTokenToUsdPrice"`
 }
 
-// Deprecated: Use PresetClass instead. The exclusiveResolver type bug this
-// type used to correct is now fixed at generation time
-// (codegen/overrides.go); the alias is kept so existing integrations keep
-// compiling.
+// Deprecated: Use Preset instead. The exclusiveResolver type bug this type used
+// to correct is now fixed at generation time (codegen/overrides.go); the alias
+// is kept so existing integrations keep compiling.
 type PresetClassFixed = PresetClass
 
-// Deprecated: Use QuotePresetsClass instead. The alias is kept so existing
+// Deprecated: Use QuotePresets instead. The alias is kept so existing
 // integrations keep compiling.
 type QuotePresetsClassFixed = QuotePresetsClass
+
+// Clean, fusionplus-consistent names for the fusion quoter types. The generated
+// types keep the upstream "Class" suffix (renaming them via x-go-name would also
+// rename every struct field that references them), so these aliases give callers
+// the clean names — prefer these over the *Class names.
+type (
+	Preset        = PresetClass
+	QuotePresets  = QuotePresetsClass
+	AuctionPoint  = AuctionPointClass
+	GasCostConfig = GasCostConfigClass
+)

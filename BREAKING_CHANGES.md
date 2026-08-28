@@ -30,6 +30,14 @@ Not breaking, for the avoidance of doubt: ~60 generated types and constants were
 - **API requests time out after 60 seconds** (previously they could hang forever) and response bodies are capped at 64 MiB.
 - `fusion.Quote.SurplusFee` and `fusion.Quote.MarketAmount` marshal with `omitempty`; fee params are validated as basis points in [0, 10000].
 
+### API Surface Cleanup (v5)
+
+The v5 major is used to make the public API consistent and intent-based. Every renamed symbol keeps its old name as a `// Deprecated:` alias, so existing code compiles unchanged; only removed **dead** types (never referenced by any SDK method) have no alias. New clean names are additive.
+
+**`fusion`**
+- Added clean, `fusionplus`-consistent names `fusion.Preset`, `fusion.QuotePresets`, `fusion.AuctionPoint`, `fusion.GasCostConfig` (aliases of the generated `*Class` types, which remain valid). Prefer the clean names.
+- **Removed** the unused hand-written `fusion.Preset` struct (it shadowed the real quoter preset and had no SDK references). If you referenced it directly, use the generated preset type. No alias (the name now refers to the quoter preset).
+
 ## Version 4.0.0
 
 ### Module Path Now Includes the `/v4` Major-Version Suffix

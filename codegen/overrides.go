@@ -61,6 +61,12 @@ var specOverrides = map[string][]schemaPatch{
 		}},
 		// Friendly SDK-facing name: fusion.Quote instead of GetQuoteOutput.
 		{path: "components.schemas.GetQuoteOutput", merge: true, value: spec{"x-go-name": "Quote"}},
+		// NOTE: the upstream "Class" suffix (PresetClass/QuotePresetsClass/
+		// AuctionPointClass/GasCostConfigClass) is NOT renamed here. x-go-name on
+		// these schemas also renames every struct field that $refs them (e.g. the
+		// four QuotePresets tiers all collapse to a single "Preset" field), so the
+		// clean names are provided as forward aliases in fusion_types_extended.go
+		// (type Preset = PresetClass, …) instead.
 	},
 	"fusionplus_orders-openapi.json": {
 		// Token USD prices are declared as objects but the API returns

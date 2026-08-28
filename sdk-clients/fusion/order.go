@@ -178,7 +178,7 @@ func CreateFusionOrderData(quote Quote, orderParams OrderParams, wallet common.W
 	}, limitOrder, nil
 }
 
-func getPreset(presets QuotePresetsClass, presetType GetQuoteOutputRecommendedPreset) (*PresetClass, error) {
+func getPreset(presets QuotePresets, presetType GetQuoteOutputRecommendedPreset) (*Preset, error) {
 	switch presetType {
 	case Custom:
 		if presets.Custom == nil {
@@ -195,7 +195,7 @@ func getPreset(presets QuotePresetsClass, presetType GetQuoteOutputRecommendedPr
 	return nil, fmt.Errorf("unsupported preset type: %v", presetType)
 }
 
-func CreateAuctionDetails(preset *PresetClass, additionalWaitPeriod float32) (*fusionorder.AuctionDetails, error) {
+func CreateAuctionDetails(preset *Preset, additionalWaitPeriod float32) (*fusionorder.AuctionDetails, error) {
 	points := make([]fusionorder.AuctionPointInput, len(preset.Points))
 	for i, point := range preset.Points {
 		points[i] = fusionorder.AuctionPointInput{
