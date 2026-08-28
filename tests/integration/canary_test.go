@@ -527,8 +527,8 @@ func runFusionPlusCanary(t *testing.T, mode fusionPlusMode) {
 	require.NoError(t, err)
 
 	quoteParams := fusionplus.QuoterControllerGetQuoteParamsFixed{
-		SrcChain:        float32(src.chainId),
-		DstChain:        float32(dst.chainId),
+		SrcChain:        int(src.chainId),
+		DstChain:        int(dst.chainId),
 		SrcTokenAddress: strings.ToLower(srcToken.Hex()),
 		DstTokenAddress: strings.ToLower(dstToken.Hex()),
 		Amount:          canaryFusionPlusAmount.String(),
