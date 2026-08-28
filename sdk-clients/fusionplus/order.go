@@ -27,13 +27,9 @@ func CreateFusionPlusOrderData(quoteParams QuoteParams, quote *Quote, orderParam
 		return nil, fmt.Errorf("failed to create auction details: %w", err)
 	}
 
-	takerAsset := quoteParams.DstTokenAddress
-	if takerAsset == constants.NativeToken {
-		takerAssetWrapped, ok := constants.ChainToWrapper[constants.NetworkEnum(chainId)]
-		if !ok {
-			return nil, fmt.Errorf("unsupported network for wrapped token: %d", chainId)
-		}
-		takerAsset = takerAssetWrapped.Hex()
+	takerAsset, err := resolveTakerAsset(quoteParams.DstTokenAddress, quoteParams.DstChain)
+	if err != nil {
+		return nil, err
 	}
 
 	var takingFeeReceiver geth_common.Address
@@ -200,6 +196,21 @@ func CreateFusionPlusOrderData(quoteParams QuoteParams, quote *Quote, orderParam
 		QuoteId:    quote.QuoteId,
 		LimitOrder: limitOrder,
 	}, nil
+}
+
+// resolveTakerAsset returns the taker asset for the order. The taker asset
+// lives on the destination chain, so a native-token sentinel resolves to the
+// destination chain's wrapped native token — using the source chain's wrapper
+// here would bake a wrong-chain token address into the signed order.
+func resolveTakerAsset(dstTokenAddress string, dstChain int) (string, error) {
+	if dstTokenAddress != constants.NativeToken {
+		return dstTokenAddress, nil
+	}
+	wrapped, ok := constants.ChainToWrapper[constants.NetworkEnum(dstChain)]
+	if !ok {
+		return "", fmt.Errorf("no wrapped native token registered for destination chain %d", dstChain)
+	}
+	return wrapped.Hex(), nil
 }
 
 func GetPreset(presets QuotePresets, presetType GetQuoteOutputRecommendedPreset) (*Preset, error) {
