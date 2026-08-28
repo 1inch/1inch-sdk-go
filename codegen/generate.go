@@ -14,7 +14,7 @@ import (
 // generatorModule pins the exact oapi-codegen build used for generation. It is
 // invoked hermetically via `go run module@version`, so no pre-installed binary
 // is required and the version cannot drift between machines.
-const generatorModule = "github.com/deepmap/oapi-codegen/cmd/oapi-codegen@v1.16.2"
+const generatorModule = "github.com/oapi-codegen/oapi-codegen/v2/cmd/oapi-codegen@v2.8.0"
 
 const specSuffix = "-openapi.json"
 

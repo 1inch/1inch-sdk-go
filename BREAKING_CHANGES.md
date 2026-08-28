@@ -4,6 +4,24 @@ This document tracks breaking changes between major versions of the SDK that aff
 
 ## Unreleased
 
+### Type Generator Upgraded to oapi-codegen v2
+
+The deprecated `deepmap/oapi-codegen` v1.16.2 has been replaced by the maintained `oapi-codegen/oapi-codegen` v2.8.0. Generated struct fields and type names are unchanged, with two exceptions:
+
+- **`spotprices` bare currency constants are now prefixed with their enum type name** (v1 only prefixed on collision; v2 is consistent).
+
+  ```go
+  // Before
+  params.Currency = spotprices.GetPricesRequestDtoCurrency(spotprices.USD)
+
+  // After
+  params.Currency = spotprices.GetPricesRequestDtoCurrencyUSD
+  ```
+
+- **`web3.ApiKeyAuthScopes` constant removed** (a security-scheme artifact v2 no longer emits for types-only generation; it referenced nothing usable).
+
+Additions (non-breaking): every generated enum type gains a `Valid() bool` method, response types gain doc comments from the spec, and `traces` gains typed union response helpers (`As*/From*/Merge*`).
+
 ### Chain-ID Fields Changed from `float32` to `int`
 
 The OpenAPI specs type chain ids as `number`, which oapi-codegen generated as `float32`. A `float32` cannot exactly represent integers above 2²⁴ (16,777,216), so Aurora's chain id (1313161554) was silently rounded to 1313161600 the moment it was assigned. This corrupted the EIP-712 signing domain and the escrow extension's encoded `DstChainId`, and made Aurora impossible to pass through parameter validation (which correctly rejected the rounded value with a misleading error). All chain-id fields in the `fusionplus` and `tokens` packages are now `int`. The codegen pipeline (`codegen/generate_types.sh`) now rewrites chain-id fields typed as `number` to `integer` before generation, so regenerated types stay correct when specs are refreshed.

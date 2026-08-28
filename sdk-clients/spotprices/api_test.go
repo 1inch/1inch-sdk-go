@@ -55,7 +55,7 @@ func TestGetPricesForWhitelistedTokens(t *testing.T) {
 	}
 
 	params := GetWhitelistedTokensPricesParams{
-		Currency: GetWhitelistedTokensPricesParamsCurrency(USD),
+		Currency: GetWhitelistedTokensPricesParamsCurrencyUSD,
 	}
 
 	prices, err := api.GetPricesForWhitelistedTokens(ctx, params)
@@ -104,7 +104,7 @@ func TestGetPricesForRequestedTokensLarge(t *testing.T) {
 	)
 
 	params := GetPricesRequestDto{
-		Currency: GetPricesRequestDtoCurrency(USD),
+		Currency: GetPricesRequestDtoCurrencyUSD,
 		Tokens:   []string{tokenAddress1, tokenAddress2, tokenAddress3, tokenAddress4, tokenAddress5, tokenAddress6, tokenAddress7},
 	}
 
