@@ -49,14 +49,22 @@ func CreateFusionPlusOrderData(quoteParams QuoterControllerGetQuoteParamsFixed, 
 		return nil, fmt.Errorf("failed to create auction details: %w", err)
 	}
 
-	takerAsset := quoteParams.DstTokenAddress
-	if takerAsset == constants.NativeToken {
-		takerAssetWrapped, ok := constants.ChainToWrapper[constants.NetworkEnum(chainId)]
-		if !ok {
-			return nil, fmt.Errorf("unsupported network for wrapped token: %d", chainId)
-		}
-		takerAsset = takerAssetWrapped.Hex()
+	// The source-chain order's taker asset is the chain-specific TRUE_ERC20
+	// sentinel — a token whose transfer is a no-op — not the destination token.
+	// The real destination token is carried only by the escrow extension
+	// (DstToken) and delivered on the destination chain. Putting the
+	// destination token here would let the source-chain fill run a real
+	// transferFrom of an unintended token when that address is also a live
+	// ERC-20 on the source chain.
+	trueERC20, ok := constants.GetTrueERC20(chainId)
+	if !ok {
+		return nil, fmt.Errorf("fusion+ is not supported on source chain %d (no TRUE_ERC20 sentinel)", chainId)
 	}
+	takerAsset := trueERC20.Hex()
+
+	// The destination token is used verbatim (including the native 0xEeee…
+	// sentinel); it lives in the escrow extension, on the destination chain.
+	dstToken := quoteParams.DstTokenAddress
 
 	var takingFeeReceiver geth_common.Address
 	if orderParams.TakingFeeReceiver == "" {
@@ -161,7 +169,7 @@ func CreateFusionPlusOrderData(quoteParams QuoterControllerGetQuoteParamsFixed, 
 		},
 		HashLock:         orderParams.HashLock,
 		DstChainId:       quoteParams.DstChain,
-		DstToken:         geth_common.HexToAddress(takerAsset),
+		DstToken:         geth_common.HexToAddress(dstToken),
 		SrcSafetyDeposit: quote.SrcSafetyDeposit,
 		DstSafetyDeposit: quote.DstSafetyDeposit,
 		TimeLocks:        escrowParams.TimeLocks,

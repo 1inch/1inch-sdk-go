@@ -6,6 +6,9 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 
 ## [Unreleased]
 
+### Fixed
+- **Fusion+ orders were signed with the wrong source-chain taker asset.** `CreateFusionPlusOrderData` wrote the destination token into the signed source-chain order's `takerAsset` (and native destinations resolved to the source chain's wrapped token). The taker asset is now the chain-specific TRUE_ERC20 sentinel (a no-op token), and the real destination token — including the native `0xEeee…` sentinel — is carried only by the escrow extension's `DstToken`. When the destination token was also a live ERC-20 on the source chain, the old behavior could cause a real, unintended token transfer on the source chain during a fill. Fusion+ order construction on a chain without a TRUE_ERC20 sentinel now errors instead of signing a wrong-asset order. Adds `constants.ChainToTrueERC20` / `constants.GetTrueERC20`.
+
 ## [v4.1.0] - 2026-07-25
 
 ### Added
