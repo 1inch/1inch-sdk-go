@@ -183,7 +183,18 @@ Types are auto-generated from OpenAPI specs by the Go pipeline in `codegen/`:
 2. Run `make codegen-types` from the repo root (or `go run ./codegen/cmd/generate-types`)
 3. Generated files: `sdk-clients/{package}/{package}_types.gen.go`
 
-The pipeline applies in-memory corrections to each spec (see `codegen/transforms.go`) before invoking a pinned `oapi-codegen` via `go run module@version`; the committed spec files are never modified. The pipeline's behavior is pinned by characterization tests in `codegen/codegen_test.go` — the committed `*_types.gen.go` files must be reproducible byte-for-byte, so any intentional pipeline change requires regenerating and committing the types alongside it.
+The pipeline applies in-memory corrections to each spec (see `codegen/transforms.go` and the per-spec override table in `codegen/overrides.go`) before invoking a pinned `oapi-codegen` via `go run module@version`; the committed spec files are never modified — they are untouched copies of the upstream documents. The pipeline's behavior is pinned by characterization tests in `codegen/codegen_test.go` — the committed `*_types.gen.go` files must be reproducible byte-for-byte, so any intentional pipeline change requires regenerating and committing the types alongside it.
+
+### Refreshing Specs from the Dev Portal
+
+```bash
+DEV_PORTAL_TOKEN=... make codegen-fetch-specs   # rewrite local spec copies
+git diff codegen/openapi                        # review upstream changes
+make codegen-types                              # regenerate types
+go test ./codegen                               # re-pin the output
+```
+
+Sources live in `specSources` in `codegen/fetch.go`. Fetched specs are validated against the transform pipeline at fetch time, so upstream drift that breaks an override fails immediately with a pointer to `codegen/overrides.go`. **Never hand-edit files in `codegen/openapi/`** — fix type bugs in the override table instead.
 
 **DO NOT manually edit `*_types.gen.go` files** - they are overwritten by codegen.
 

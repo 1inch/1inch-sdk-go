@@ -59,4 +59,10 @@ go-lint:
 codegen-types:
 	@echo "  >  Generating types from OpenAPI specs..."
 	go run ./codegen/cmd/generate-types
+
+# Refreshes the local OpenAPI spec copies from the 1inch Dev Portal.
+# Requires DEV_PORTAL_TOKEN. Review the diff, then run codegen-types.
+codegen-fetch-specs:
+	@echo "  >  Fetching OpenAPI specs from the Dev Portal..."
+	go run ./codegen/cmd/fetch-specs
 	@echo "Script execution completed."

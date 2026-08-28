@@ -341,6 +341,89 @@ func TestGenerateTypesRejectsInvalidSpecFilenames(t *testing.T) {
 	}
 }
 
+// TestSpecSourcesCoverAllSpecs pins the fetch manifest to the committed spec
+// set: every spec must have a manifest entry (possibly empty, meaning "source
+// not confirmed yet"), and the manifest must not reference unknown specs.
+func TestSpecSourcesCoverAllSpecs(t *testing.T) {
+	tests := []struct {
+		name string
+		file string
+	}{}
+	for _, f := range specFiles {
+		tests = append(tests, struct {
+			name string
+			file string
+		}{name: f, file: f})
+	}
+
+	for _, tc := range tests {
+		t.Run(tc.name, func(t *testing.T) {
+			_, ok := specSources[tc.file]
+			assert.True(t, ok, "spec %s has no entry in specSources (codegen/fetch.go)", tc.file)
+		})
+	}
+
+	t.Run("No unknown manifest entries", func(t *testing.T) {
+		known := make(map[string]bool, len(specFiles))
+		for _, f := range specFiles {
+			known[f] = true
+		}
+		for name := range specSources {
+			assert.True(t, known[name], "specSources entry %s does not match any committed spec", name)
+		}
+	})
+}
+
+// TestValidateAndIndentSpec documents the fetch-time validation and
+// normalization contract: whitespace is normalized, key order and values are
+// preserved, and non-OpenAPI payloads are rejected.
+func TestValidateAndIndentSpec(t *testing.T) {
+	tests := []struct {
+		name        string
+		input       string
+		expected    string
+		expectError bool
+		errorMsg    string
+	}{
+		{
+			name:     "Valid spec is re-indented preserving key order",
+			input:    `{"openapi":"3.0.0","zebra":1,"alpha":2,"paths":{}}`,
+			expected: "{\n  \"openapi\": \"3.0.0\",\n  \"zebra\": 1,\n  \"alpha\": 2,\n  \"paths\": {}\n}\n",
+		},
+		{
+			name:        "Missing openapi field",
+			input:       `{"paths":{}}`,
+			expectError: true,
+			errorMsg:    `missing "openapi"`,
+		},
+		{
+			name:        "Missing paths object",
+			input:       `{"openapi":"3.0.0"}`,
+			expectError: true,
+			errorMsg:    `missing "paths"`,
+		},
+		{
+			name:        "HTML error page is rejected",
+			input:       `<!doctype html><html></html>`,
+			expectError: true,
+			errorMsg:    "invalid spec JSON",
+		},
+	}
+
+	for _, tc := range tests {
+		t.Run(tc.name, func(t *testing.T) {
+			out, err := validateAndIndentSpec([]byte(tc.input))
+			if tc.expectError {
+				require.Error(t, err)
+				assert.Contains(t, err.Error(), tc.errorMsg)
+			} else {
+				require.NoError(t, err)
+				assert.Equal(t, tc.expected, string(out))
+			}
+		})
+	}
+}
+
 func readAll(t *testing.T, dir string, names []string) map[string]string {
 	t.Helper()
 	files := make(map[string]string, len(names))
