@@ -6,107 +6,30 @@ For a step-by-step upgrade checklist, see [MIGRATION.md](MIGRATION.md); this doc
 
 ## Unreleased
 
-### Generated Type Names No Longer Leak Upstream Controller Naming
+Step-by-step upgrade instructions for everything below: [MIGRATION.md](MIGRATION.md).
 
-Generated type names previously mirrored 1inch's internal operation ids (`QuoterControllerGetQuoteWithCustomPresetsParams`, `TxProcessorApiControllerBroadcastTransactionJSONRequestBody`, …). Every operation now has a friendly name in `codegen/mapping.json`, and key schemas are renamed via `x-go-name` overrides, so the SDK reads as intended:
+### Compile-Time Breaking Changes
 
-```go
-// Before
-quote, err := client.GetQuote(ctx, fusionplus.QuoterControllerGetQuoteParams{...}) // returns *GetQuoteOutput
+- **Chain-id fields are `int` instead of `float32`** across `fusionplus` and `tokens` (quoter/orders params, response DTOs, `EscrowExtension`/`EscrowExtensionParams`/`EscrowExtraData`, `SignedOrderInput`, `GetSettlementContractParams`). `float32` cannot represent Aurora's chain id (1313161554), which silently rounded and corrupted the EIP-712 signing domain. Untyped constants and literals compile unchanged; explicit `float32(...)` conversions do not.
+- **Corrected field types on the generated quoter/orders types** (previously exclusive to the `*Fixed` copies): `Amount` `float32` → `string` on all fusion/fusionplus quoter params; `fusionplus` `IsPermit2` `string` → `bool`; `fusion.Quote.QuoteId` and `fusionplus.Quote.QuoteId` `map[string]interface{}` → `string`; `fusion.PresetClass.ExclusiveResolver` `map[string]interface{}` → `string`; `fusionplus.GetOrderFillsByHashOutput` USD prices `map[string]interface{}` → `string` and `Points` → `[]AuctionPointOutput`.
+- **`Fee` on the fusionplus quoter params is `int` (basis points)** — previously `*big.Int` on the `Fixed` types and `float32` on the raw generated types.
+- **`tokens` optional fields are values instead of pointers** (`DisplayedSymbol`, `Eip2612`, `IsFoT`, `LogoURI`, `Extensions`), and `Tags` is `[]TagDto` (was `[]string` on the generated types).
+- **Optional object-typed response fields lost their pointers**: `history.TransactionDetailsDto.Meta`, `nft.Asset.Collection`, `nft.Asset.RarityData`.
+- **Bare enum constants in `spotprices` and `traces` are prefixed with their type name** (`spotprices.USD` → `spotprices.GetPricesForRequestedTokensParamsCurrencyUSD`, `traces.CALL` → `traces.CoreCustomRootTxEventCallstackTraceFullDtoTypeCALL`).
+- **`web3.ApiKeyAuthScopes` removed** (unused generated artifact).
+- **`fusionplus.CreateAuctionDetailsPlus` takes `*Preset`** instead of `*PresetClassFixed`.
+- **Embedded field names changed in four `orderbook` wrapper params** (`GetAllOrdersParams`, `GetCountParams`, `GetEventsParams`, `GetOrdersByCreatorAddressParams`): struct literals naming the embedded query field must use the new name (e.g. `LimitOrdersQueryParams`). Promoted field access (`params.Page`) is unaffected.
 
-// After
-quote, err := client.GetQuote(ctx, fusionplus.QuoteParams{...}) // returns *fusionplus.Quote
-```
+Not breaking, for the avoidance of doubt: ~60 generated types and constants were renamed to intent-based names (`fusionplus.QuoteParams`, `fusionplus.Quote`, …), `fusionorder.AuctionPointClassFixed`/`GasCostConfigClassFixed` became `AuctionPoint`/`GasCostConfig`, and all 12 `*Fixed` types became aliases — every old name remains available as a `// Deprecated:` alias of the identical type, so existing code compiles and behaves unchanged.
 
-**Compatibility:** every renamed identifier (55 types, 14 constants) keeps its old name as a `// Deprecated:` alias in each package's `deprecated_names.go` — aliases are identical types, so existing code compiles and behaves identically. The one exception: the `orderbook` wrapper params (`GetAllOrdersParams`, `GetCountParams`, `GetEventsParams`, `GetOrdersByCreatorAddressParams`) embed the generated query types, and an embedded field's name is its type name — struct literals that named the embedded field (e.g. `GetAllOrdersParams{LimitOrderV3SubscribedApiControllerGetAllLimitOrdersParams: q}`) must use the new field name (`LimitOrdersQueryParams: q`). Promoted field access (`params.Page`) and assignment through a variable are unaffected.
+### Behavior Changes (compile clean, act differently)
 
-### `*Fixed` Types Are Now Aliases of Corrected Generated Types
-
-Known type bugs in the upstream OpenAPI specs are now corrected at generation time (`codegen/overrides.go`) instead of via hand-maintained `*Fixed` shadow copies. All 12 `*Fixed` types in `fusion`, `fusionplus`, and `tokens` are now type aliases of the corrected generated types.
-
-**Impact:**
-- `fusion` and `fusionplus` aliases keep the same field sets and types — no code changes needed. (`fusionplus.QuoterControllerGetQuoteWithCustomPresetsParamsFixed` gains `Fee *big.Int` and `IsPermit2 bool` fields; additive.)
-- `tokens.ProviderTokenDtoFixed` / `TokenInfoDtoFixed`: optional fields (`DisplayedSymbol`, `Eip2612`, `IsFoT`, `LogoURI`, `Extensions`) changed from pointers to values, matching the SDK-wide policy of generating optional fields without pointers. `Tags` is `[]TagDto` on the generated types too.
-- **The raw (non-`Fixed`) generated types now carry the corrections**, so code using them directly sees type changes: `fusion.GetQuoteOutput.QuoteId` and `fusionplus.GetQuoteOutput.QuoteId` (`map[string]interface{}` → `string`), `fusion.PresetClass.ExclusiveResolver` (`map[string]interface{}` → `string`), `Amount` on all fusion/fusionplus quoter params (`float32` → `string`), `fusionplus` quoter params `IsPermit2` (`string` → `bool`) — including `QuoterControllerBuildQuoteTypedDataParams` — and `fusionplus.GetOrderFillsByHashOutput` (`DstTokenPriceUsd`/`SrcTokenPriceUsd` `map[string]interface{}` → `string`, `Points` → `[]AuctionPointOutput`). These now match what the `Fixed` types (the types the SDK's own methods use) have always had.
-- **`Fee` on the fusionplus quoter params changed from `*big.Int` to `int`** (including the `Fixed` alias, where it was `*big.Int` since the type was introduced). This also fixes a silent bug: `go-querystring` cannot encode `*big.Int` (a struct with only unexported fields), so a fee set on a quote request was **silently omitted from the query string** and never reached the API. Fees are integral basis points (1% = 100 bps), so `int` is both correct and wire-safe; a wire-format regression test now pins the encoding.
-
-**Migration (tokens only):**
-
-```go
-// Before
-if token.DisplayedSymbol != nil { use(*token.DisplayedSymbol) }
-eip2612 := token.Eip2612 != nil && *token.Eip2612
-
-// After
-if token.DisplayedSymbol != "" { use(token.DisplayedSymbol) }
-eip2612 := token.Eip2612
-```
-
-The `*Fixed` names remain available as aliases, now marked `// Deprecated:` (IDEs and linters flag usages; pkg.go.dev strikes them through). All SDK method signatures, examples, and tests use the underlying generated names; aliases are identical types, so this changes nothing for callers.
-
-Two related changes:
-
-- **`fusionplus.CreateAuctionDetailsPlus` now takes `*Preset`** (the generated quoter preset) instead of `*PresetClassFixed`. The legacy `PresetClassFixed`/`GasCostConfigClass`/`AuctionPointClass` bridge shape is no longer produced or consumed by the SDK and is kept only as deprecated types.
-- **`fusionorder.AuctionPointClassFixed` and `fusionorder.GasCostConfigClassFixed` are renamed to `fusionorder.AuctionPoint` and `fusionorder.GasCostConfig`**, with deprecated aliases under the old names.
-- Minor encoding nuance: `fusion.Quote.SurplusFee` and `fusion.Quote.MarketAmount` (previously hand-added on `GetQuoteOutputFixed`) now carry `omitempty`, so re-marshaling a quote omits them when zero. Decoding is unchanged.
-
-### Type Generator Upgraded to oapi-codegen v2
-
-The deprecated `deepmap/oapi-codegen` v1.16.2 has been replaced by the maintained `oapi-codegen/oapi-codegen` v2.8.0. The full public-API delta was machine-verified with `gorelease -base=v4.1.0`; the incompatible changes are:
-
-- **`spotprices` and `traces` bare enum constants are now prefixed with their enum type name** (v1 only prefixed on collision; v2 is consistent).
-
-  ```go
-  // Before
-  params.Currency = spotprices.GetPricesRequestDtoCurrency(spotprices.USD)
-  trace.Type == traces.CALL
-
-  // After
-  params.Currency = spotprices.GetPricesRequestDtoCurrencyUSD
-  trace.Type == traces.CoreCustomRootTxEventCallstackTraceFullDtoTypeCALL
-  ```
-
-- **Optional object-typed response fields lost their pointers**: `history.TransactionDetailsDto.Meta` (`*TransactionDetailsMetaDto` → `TransactionDetailsMetaDto`), `nft.Asset.Collection` (`*Collection` → `Collection`), and `nft.Asset.RarityData` (`*RarityData` → `RarityData`). v1 ignored the SDK's skip-optional-pointer annotation on object-typed properties; v2 honors it. Nil checks become zero-value checks; when a response omits the field you now get a zero struct instead of nil.
-
-- **`web3.ApiKeyAuthScopes` constant removed** (a security-scheme artifact v2 no longer emits for types-only generation; it referenced nothing usable).
-
-Additions (non-breaking): every generated enum type gains a `Valid() bool` method, response types gain doc comments from the spec, and `traces` gains typed union response helpers (`As*/From*/Merge*`).
-
-### Chain-ID Fields Changed from `float32` to `int`
-
-The OpenAPI specs type chain ids as `number`, which oapi-codegen generated as `float32`. A `float32` cannot exactly represent integers above 2²⁴ (16,777,216), so Aurora's chain id (1313161554) was silently rounded to 1313161600 the moment it was assigned. This corrupted the EIP-712 signing domain and the escrow extension's encoded `DstChainId`, and made Aurora impossible to pass through parameter validation (which correctly rejected the rounded value with a misleading error). All chain-id fields in the `fusionplus` and `tokens` packages are now `int`. The codegen pipeline (`codegen/transforms.go`) now rewrites chain-id fields typed as `number` to `integer` before generation, so regenerated types stay correct when specs are refreshed.
-
-**Affected exported types:**
-
-| Package | Type | Field(s) |
-|---------|------|----------|
-| `fusionplus` | `QuoterControllerGetQuoteParamsFixed` | `SrcChain`, `DstChain` |
-| `fusionplus` | `QuoterControllerGetQuoteWithCustomPresetsParamsFixed` | `SrcChain`, `DstChain` |
-| `fusionplus` | `GetSettlementContractParams` | `ChainId` |
-| `fusionplus` | `EscrowExtension`, `EscrowExtensionParams`, `EscrowExtraData` | `DstChainId` |
-| `fusionplus` | `SignedOrderInput` | `SrcChainId` |
-| `fusionplus` | `GetOrderFillsByHashOutputFixed`, `GetOrderFillsByHashOutput`, `ActiveOrdersOutput`, `ReadyToExecutePublicAction`, `OrderApiControllerGetActiveOrdersParams`, `OrderApiControllerGetOrdersByMakerParams`, `OrderApiControllerGetSettlementContractParams`, `QuoterControllerGetQuoteParams`, `QuoterControllerGetQuoteWithCustomPresetsParams`, `QuoterControllerBuildQuoteTypedDataParams` | chain-id fields |
-| `tokens` | `ProviderTokenDtoFixed`, `TokenInfoDtoFixed`, `ProviderTokenDto`, `TokenDto`, `TokenInfoDto` | `ChainId` |
-
-**Impact:** Code that assigns a `float32`-typed variable or an explicit `float32(...)` conversion to these fields will no longer compile. Code using untyped constants — including all `constants.*ChainId` values and integer literals — compiles unchanged.
-
-**Migration:** Remove `float32` conversions:
-
-```go
-// Before
-params := fusionplus.QuoterControllerGetQuoteParamsFixed{
-    SrcChain: float32(constants.ArbitrumChainId),
-    DstChain: float32(constants.BaseChainId),
-}
-
-// After
-params := fusionplus.QuoterControllerGetQuoteParamsFixed{
-    SrcChain: constants.ArbitrumChainId,
-    DstChain: constants.BaseChainId,
-}
-```
-
-The internal validators `CheckChainIdFloat32` and `CheckChainIdFloat32Required` were removed (internal package; not importable by consumers).
+- **Cross-chain orders with a native destination token are signed with the destination chain's wrapped token** as the taker asset and escrow `DstToken`. Previously the source chain's wrapper address was used — a funds-safety bug.
+- **`fusionplus` quote fees are now transmitted.** Previously a configured `Fee` was silently omitted from the quote request (`*big.Int` cannot be encoded by go-querystring), so quotes were priced without the fee the order then carried.
+- **`fusionplus.DecodeEscrowExtension` output is corrected**: source/destination safety deposits are no longer swapped, deposits are decimal strings, and the hashlock is 0x-prefixed hex — decode → re-encode is now lossless. Malformed input returns an error instead of panicking.
+- **`EscrowExtension.ConvertToOrderbookExtension` no longer mutates the receiver** (a second call previously double-appended the escrow extra data, corrupting the extension).
+- **API requests time out after 60 seconds** (previously they could hang forever) and response bodies are capped at 64 MiB.
+- `fusion.Quote.SurplusFee` and `fusion.Quote.MarketAmount` marshal with `omitempty`; fee params are validated as basis points in [0, 10000].
 
 ## Version 4.0.0
 

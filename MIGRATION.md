@@ -79,3 +79,64 @@ go run honnef.co/go/tools/cmd/staticcheck@latest ./... # flags remaining depreca
 If anything behaves differently after upgrading that is not listed here,
 please open an issue — the SDK's CI machine-verifies its public API surface
 against each release, and undocumented differences are treated as bugs.
+
+## Appendix: reference detail
+
+### Chain-id fields changed to `int`
+
+Every chain-id field in `fusionplus` and `tokens` is `int`. Untyped constants
+(`constants.ArbitrumChainId`, literals) compile unchanged; only explicit
+`float32(...)` conversions need removing:
+
+```go
+// Before
+params := fusionplus.QuoteParams{
+    SrcChain: float32(constants.ArbitrumChainId),
+    DstChain: float32(constants.BaseChainId),
+}
+
+// After
+params := fusionplus.QuoteParams{
+    SrcChain: constants.ArbitrumChainId,
+    DstChain: constants.BaseChainId,
+}
+```
+
+Affected exported types:
+
+| Package | Type | Field(s) |
+|---------|------|----------|
+| `fusionplus` | `QuoteParams`, `CustomPresetQuoteParams`, `BuildQuoteTypedDataParams` | `SrcChain`, `DstChain` |
+| `fusionplus` | `GetSettlementContractParams` | `ChainId` |
+| `fusionplus` | `EscrowExtension`, `EscrowExtensionParams`, `EscrowExtraData` | `DstChainId` |
+| `fusionplus` | `SignedOrderInput` | `SrcChainId` |
+| `fusionplus` | `GetOrderFillsByHashOutput`, `ActiveOrdersOutput`, `ReadyToExecutePublicAction`, `GetActiveOrdersParams`, `GetOrdersByMakerParams` | chain-id fields |
+| `tokens` | `ProviderTokenDto`, `TokenDto`, `TokenInfoDto` | `ChainId` |
+
+(The deprecated `*Fixed` aliases of these types carry the same field types.)
+
+### Tokens optional fields changed to values
+
+```go
+// Before
+if token.DisplayedSymbol != nil { use(*token.DisplayedSymbol) }
+eip2612 := token.Eip2612 != nil && *token.Eip2612
+
+// After
+if token.DisplayedSymbol != "" { use(token.DisplayedSymbol) }
+eip2612 := token.Eip2612
+```
+
+The same pattern applies to `history.TransactionDetailsDto.Meta`,
+`nft.Asset.Collection`, and `nft.Asset.RarityData` (zero-struct checks instead
+of nil checks).
+
+### Renamed types in one picture
+
+```go
+// Before (v4)
+quote, err := client.GetQuote(ctx, fusionplus.QuoterControllerGetQuoteParamsFixed{...}) // *GetQuoteOutputFixed
+
+// After (v5) — the v4 names still compile as deprecated aliases
+quote, err := client.GetQuote(ctx, fusionplus.QuoteParams{...}) // *fusionplus.Quote
+```
