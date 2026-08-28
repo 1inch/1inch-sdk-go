@@ -74,7 +74,7 @@ Additions (non-breaking): every generated enum type gains a `Valid() bool` metho
 
 ### Chain-ID Fields Changed from `float32` to `int`
 
-The OpenAPI specs type chain ids as `number`, which oapi-codegen generated as `float32`. A `float32` cannot exactly represent integers above 2²⁴ (16,777,216), so Aurora's chain id (1313161554) was silently rounded to 1313161600 the moment it was assigned. This corrupted the EIP-712 signing domain and the escrow extension's encoded `DstChainId`, and made Aurora impossible to pass through parameter validation (which correctly rejected the rounded value with a misleading error). All chain-id fields in the `fusionplus` and `tokens` packages are now `int`. The codegen pipeline (`codegen/generate_types.sh`) now rewrites chain-id fields typed as `number` to `integer` before generation, so regenerated types stay correct when specs are refreshed.
+The OpenAPI specs type chain ids as `number`, which oapi-codegen generated as `float32`. A `float32` cannot exactly represent integers above 2²⁴ (16,777,216), so Aurora's chain id (1313161554) was silently rounded to 1313161600 the moment it was assigned. This corrupted the EIP-712 signing domain and the escrow extension's encoded `DstChainId`, and made Aurora impossible to pass through parameter validation (which correctly rejected the rounded value with a misleading error). All chain-id fields in the `fusionplus` and `tokens` packages are now `int`. The codegen pipeline (`codegen/transforms.go`) now rewrites chain-id fields typed as `number` to `integer` before generation, so regenerated types stay correct when specs are refreshed.
 
 **Affected exported types:**
 
