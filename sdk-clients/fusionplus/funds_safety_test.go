@@ -154,3 +154,36 @@ func TestEscrowExtensionRoundTrip(t *testing.T) {
 	assert.Equal(t, original.DstSafetyDeposit, decoded.DstSafetyDeposit, "destination safety deposit must not be swapped or reformatted")
 	assert.Equal(t, original.TimeLocks, decoded.TimeLocks)
 }
+
+// TestSettlementPostInteractionDataRoundTrip pins funds-critical behavior:
+// the settlement post-interaction data carries the resolver whitelist (who
+// may fill the order), the integrator fee, and the custom receiver. It must
+// survive encode -> decode intact.
+func TestSettlementPostInteractionDataRoundTrip(t *testing.T) {
+	spid, err := NewSettlementPostInteractionDataWithFees(SettlementSuffixData{
+		Whitelist: []fusionorder.AuctionWhitelistItem{
+			{Address: gethCommon.HexToAddress("0x1111111254eeb25477b68fb85ed929f73a960582"), AllowFrom: big.NewInt(1700000100)},
+			{Address: gethCommon.HexToAddress("0x2222222254eeb25477b68fb85ed929f73a960582"), AllowFrom: big.NewInt(1700000200)},
+		},
+		IntegratorFee: &IntegratorFee{
+			Ratio:    big.NewInt(100),
+			Receiver: gethCommon.HexToAddress("0x3333333333333333333333333333333333333333"),
+		},
+		BankFee:            big.NewInt(7),
+		ResolvingStartTime: big.NewInt(1700000000),
+		CustomReceiver:     gethCommon.HexToAddress("0x4444444444444444444444444444444444444444"),
+	})
+	require.NoError(t, err)
+
+	encoded, err := spid.Encode()
+	require.NoError(t, err)
+
+	decoded, err := DecodeSettlementPostInteractionData(encoded)
+	require.NoError(t, err)
+
+	assert.Equal(t, spid.Whitelist, decoded.Whitelist, "whitelist controls who may fill the order")
+	assert.Equal(t, spid.IntegratorFee, decoded.IntegratorFee, "integrator fee routing must round-trip")
+	assert.Equal(t, spid.BankFee, decoded.BankFee)
+	assert.Equal(t, spid.ResolvingStartTime, decoded.ResolvingStartTime)
+	assert.Equal(t, spid.CustomReceiver, decoded.CustomReceiver, "custom receiver is where funds are delivered")
+}
