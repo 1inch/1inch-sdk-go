@@ -14,27 +14,35 @@ import (
 
 // AuctionDetails contains the auction configuration for a fusion order
 type AuctionDetails struct {
-	StartTime       uint32                   `json:"startTime"`
-	Duration        uint32                   `json:"duration"`
-	InitialRateBump uint32                   `json:"initialRateBump"`
-	Points          []AuctionPointClassFixed `json:"points"`
-	GasCost         GasCostConfigClassFixed  `json:"gasCost"`
+	StartTime       uint32         `json:"startTime"`
+	Duration        uint32         `json:"duration"`
+	InitialRateBump uint32         `json:"initialRateBump"`
+	Points          []AuctionPoint `json:"points"`
+	GasCost         GasCostConfig  `json:"gasCost"`
 }
 
-// AuctionPointClassFixed represents a point in the auction curve
-type AuctionPointClassFixed struct {
+// Deprecated: Use AuctionPoint instead. The alias is kept so existing
+// integrations keep compiling.
+type AuctionPointClassFixed = AuctionPoint
+
+// Deprecated: Use GasCostConfig instead. The alias is kept so existing
+// integrations keep compiling.
+type GasCostConfigClassFixed = GasCostConfig
+
+// AuctionPoint represents a point in the auction curve
+type AuctionPoint struct {
 	Coefficient uint32 `json:"coefficient"`
 	Delay       uint16 `json:"delay"`
 }
 
-// GasCostConfigClassFixed contains gas cost estimation parameters
-type GasCostConfigClassFixed struct {
+// GasCostConfig contains gas cost estimation parameters
+type GasCostConfig struct {
 	GasBumpEstimate  uint32 `json:"gasBumpEstimate"`
 	GasPriceEstimate uint32 `json:"gasPriceEstimate"`
 }
 
 // NewAuctionDetails creates validated AuctionDetails
-func NewAuctionDetails(startTime, duration, initialRateBump uint32, points []AuctionPointClassFixed, gasCost GasCostConfigClassFixed) (*AuctionDetails, error) {
+func NewAuctionDetails(startTime, duration, initialRateBump uint32, points []AuctionPoint, gasCost GasCostConfig) (*AuctionDetails, error) {
 	if gasCost.GasBumpEstimate > constants.Uint24Max || gasCost.GasPriceEstimate > constants.Uint32Max ||
 		startTime > constants.Uint32Max || duration > constants.Uint24Max || initialRateBump > constants.Uint24Max {
 		return nil, errors.New("values exceed limits")
@@ -95,7 +103,7 @@ func DecodeAuctionDetails(data string) (*AuctionDetails, error) {
 		return nil, fmt.Errorf("failed to read initial rate bump: %w", err)
 	}
 
-	var points []AuctionPointClassFixed
+	var points []AuctionPoint
 	for !iter.IsEmpty() {
 		if iter.BytesLeft() < 5 {
 			return nil, errors.New("insufficient bytes to read next auction point")
@@ -112,7 +120,7 @@ func DecodeAuctionDetails(data string) (*AuctionDetails, error) {
 		}
 		delay := uint16(delayBI.Uint64())
 
-		points = append(points, AuctionPointClassFixed{
+		points = append(points, AuctionPoint{
 			Coefficient: coeff,
 			Delay:       delay,
 		})
@@ -123,7 +131,7 @@ func DecodeAuctionDetails(data string) (*AuctionDetails, error) {
 		duration,
 		initialRateBump,
 		points,
-		GasCostConfigClassFixed{
+		GasCostConfig{
 			GasBumpEstimate:  gasBumpEstimate,
 			GasPriceEstimate: gasPriceEstimate,
 		},
@@ -210,7 +218,7 @@ func DecodeLegacyAuctionDetails(data string) (*AuctionDetails, error) {
 		return nil, fmt.Errorf("failed to read point count: %w", err)
 	}
 
-	var points []AuctionPointClassFixed
+	var points []AuctionPoint
 	for i := 0; i < int(pointCount); i++ {
 		coeff, err := iter.NextUint24()
 		if err != nil {
@@ -223,13 +231,13 @@ func DecodeLegacyAuctionDetails(data string) (*AuctionDetails, error) {
 		}
 		delay := uint16(delayBI.Uint64())
 
-		points = append(points, AuctionPointClassFixed{
+		points = append(points, AuctionPoint{
 			Coefficient: coeff,
 			Delay:       delay,
 		})
 	}
 
-	return NewAuctionDetails(startTime, duration, initialRateBump, points, GasCostConfigClassFixed{
+	return NewAuctionDetails(startTime, duration, initialRateBump, points, GasCostConfig{
 		GasBumpEstimate:  gasBumpEstimate,
 		GasPriceEstimate: gasPriceEstimate,
 	})
@@ -263,9 +271,9 @@ var CalcAuctionStartTimeFunc func(uint32, uint32) uint32 = CalcAuctionStartTime
 // CreateAuctionDetailsFromParams creates AuctionDetails from API response parameters
 // This is shared between fusion and fusionplus packages
 func CreateAuctionDetailsFromParams(params CreateAuctionDetailsParams) (*AuctionDetails, error) {
-	pointsFixed := make([]AuctionPointClassFixed, 0)
+	pointsFixed := make([]AuctionPoint, 0)
 	for _, point := range params.Points {
-		pointsFixed = append(pointsFixed, AuctionPointClassFixed{
+		pointsFixed = append(pointsFixed, AuctionPoint{
 			Coefficient: uint32(point.Coefficient),
 			Delay:       uint16(point.Delay),
 		})
@@ -276,7 +284,7 @@ func CreateAuctionDetailsFromParams(params CreateAuctionDetailsParams) (*Auction
 		return nil, fmt.Errorf("failed to parse gas price estimate: %w", err)
 	}
 
-	gasCostFixed := GasCostConfigClassFixed{
+	gasCostFixed := GasCostConfig{
 		GasBumpEstimate:  uint32(params.GasCost.GasBumpEstimate),
 		GasPriceEstimate: uint32(gasPriceEstimateFixed),
 	}

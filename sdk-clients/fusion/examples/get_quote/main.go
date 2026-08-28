@@ -42,7 +42,7 @@ func main() {
 	}
 	ctx := context.Background()
 
-	response, err := client.GetQuote(ctx, fusion.QuoterControllerGetQuoteParamsFixed{
+	response, err := client.GetQuote(ctx, fusion.QuoterControllerGetQuoteParams{
 		FromTokenAddress: usdc,
 		ToTokenAddress:   wmatic,
 		Amount:           amount,

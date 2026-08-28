@@ -14,7 +14,7 @@ import (
 	geth_common "github.com/ethereum/go-ethereum/common"
 )
 
-func CreateFusionOrderData(quote GetQuoteOutputFixed, orderParams OrderParams, wallet common.Wallet, chainId uint64) (*PreparedOrder, *orderbook.Order, error) {
+func CreateFusionOrderData(quote GetQuoteOutput, orderParams OrderParams, wallet common.Wallet, chainId uint64) (*PreparedOrder, *orderbook.Order, error) {
 
 	preset, err := getPreset(quote.Presets, orderParams.Preset)
 	if err != nil {
@@ -178,7 +178,7 @@ func CreateFusionOrderData(quote GetQuoteOutputFixed, orderParams OrderParams, w
 	}, limitOrder, nil
 }
 
-func getPreset(presets QuotePresetsClassFixed, presetType GetQuoteOutputRecommendedPreset) (*PresetClassFixed, error) {
+func getPreset(presets QuotePresetsClass, presetType GetQuoteOutputRecommendedPreset) (*PresetClass, error) {
 	switch presetType {
 	case Custom:
 		if presets.Custom == nil {
@@ -195,7 +195,7 @@ func getPreset(presets QuotePresetsClassFixed, presetType GetQuoteOutputRecommen
 	return nil, fmt.Errorf("unsupported preset type: %v", presetType)
 }
 
-func CreateAuctionDetails(preset *PresetClassFixed, additionalWaitPeriod float32) (*fusionorder.AuctionDetails, error) {
+func CreateAuctionDetails(preset *PresetClass, additionalWaitPeriod float32) (*fusionorder.AuctionDetails, error) {
 	points := make([]fusionorder.AuctionPointInput, len(preset.Points))
 	for i, point := range preset.Points {
 		points[i] = fusionorder.AuctionPointInput{

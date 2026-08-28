@@ -15,8 +15,8 @@ import (
 )
 
 // createTestQuoteFusionPlus creates a realistic quote for testing
-func createTestQuoteFusionPlus() *GetQuoteOutputFixed {
-	return &GetQuoteOutputFixed{
+func createTestQuoteFusionPlus() *GetQuoteOutput {
+	return &GetQuoteOutput{
 		QuoteId: "test-quote-id-fusionplus-12345",
 		Presets: QuotePresets{
 			Fast: Preset{
@@ -122,8 +122,8 @@ func TestSignedOrderInput_Serialization_FusionPlus(t *testing.T) {
 	assert.Equal(t, order.QuoteId, deserialized.QuoteId)
 }
 
-// TestGetQuoteOutputFixed_Serialization_FusionPlus tests quote response deserialization
-func TestGetQuoteOutputFixed_Serialization_FusionPlus(t *testing.T) {
+// TestGetQuoteOutput_Serialization_FusionPlus tests quote response deserialization
+func TestGetQuoteOutput_Serialization_FusionPlus(t *testing.T) {
 	apiResponse := `{
 		"quoteId": "abc123",
 		"srcEscrowFactory": "0x8273f37417da37c4a6c3995e82cf442f87a25d9c",
@@ -186,7 +186,7 @@ func TestGetQuoteOutputFixed_Serialization_FusionPlus(t *testing.T) {
 		}
 	}`
 
-	var quote GetQuoteOutputFixed
+	var quote GetQuoteOutput
 	err := json.Unmarshal([]byte(apiResponse), &quote)
 	require.NoError(t, err)
 

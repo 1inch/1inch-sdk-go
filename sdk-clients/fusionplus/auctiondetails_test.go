@@ -19,7 +19,7 @@ func TestAuctionDetails(t *testing.T) {
 				Duration:        180,
 				StartTime:       1673548149,
 				InitialRateBump: 50000,
-				Points: []fusionorder.AuctionPointClassFixed{
+				Points: []fusionorder.AuctionPoint{
 					{
 						Delay:       10,
 						Coefficient: 10000,

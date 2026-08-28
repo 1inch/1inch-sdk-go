@@ -194,8 +194,8 @@ func buildPermit2Calldata(t *testing.T, env *forkEnv, makingAmount *big.Int) str
 	return permitCalldata
 }
 
-func quoteFixture(env *forkEnv, takingAmount string) fusion.GetQuoteOutputFixed {
-	preset := fusion.PresetClassFixed{
+func quoteFixture(env *forkEnv, takingAmount string) fusion.GetQuoteOutput {
+	preset := fusion.PresetClass{
 		AllowMultipleFills: true,
 		AllowPartialFills:  true,
 		AuctionDuration:    120,
@@ -206,13 +206,13 @@ func quoteFixture(env *forkEnv, takingAmount string) fusion.GetQuoteOutputFixed 
 		Points:             nil,
 		StartAuctionIn:     0,
 	}
-	return fusion.GetQuoteOutputFixed{
+	return fusion.GetQuoteOutput{
 		QuoteId:           "fork-test",
 		SettlementAddress: strings.ToLower(env.settlement.Hex()),
 		Whitelist:         []string{strings.ToLower(env.taker.address.Hex())},
 		MarketAmount:      takingAmount,
 		SurplusFee:        0,
-		Presets:           fusion.QuotePresetsClassFixed{Fast: preset},
+		Presets:           fusion.QuotePresetsClass{Fast: preset},
 	}
 }
 

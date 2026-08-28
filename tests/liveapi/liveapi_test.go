@@ -89,7 +89,7 @@ func TestFusionPlusQuoteDecodes(t *testing.T) {
 	client, err := fusionplus.NewClient(config)
 	require.NoError(t, err)
 
-	quote, err := client.GetQuote(testContext(t), fusionplus.QuoterControllerGetQuoteParamsFixed{
+	quote, err := client.GetQuote(testContext(t), fusionplus.QuoterControllerGetQuoteParams{
 		SrcChain:        constants.ArbitrumChainId,
 		DstChain:        constants.BaseChainId,
 		SrcTokenAddress: "0x82af49447d8a07e3bd95bd0d56f35241523fbab1", // WETH (Arbitrum)

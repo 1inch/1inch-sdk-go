@@ -46,7 +46,7 @@ func (api *api) GetSettlementContract(ctx context.Context) (*SettlementAddressOu
 	return &response, nil
 }
 
-func (api *api) GetQuote(ctx context.Context, params QuoterControllerGetQuoteParamsFixed) (*GetQuoteOutputFixed, error) {
+func (api *api) GetQuote(ctx context.Context, params QuoterControllerGetQuoteParams) (*GetQuoteOutput, error) {
 	u := fmt.Sprintf("/fusion/quoter/v2.0/%d/quote/receive", api.chainId)
 
 	err := params.Validate()
@@ -65,7 +65,7 @@ func (api *api) GetQuote(ctx context.Context, params QuoterControllerGetQuotePar
 		Body:   nil,
 	}
 
-	var response GetQuoteOutputFixed
+	var response GetQuoteOutput
 	err = api.httpExecutor.ExecuteRequest(ctx, payload, &response)
 	if err != nil {
 		return nil, err
@@ -74,7 +74,7 @@ func (api *api) GetQuote(ctx context.Context, params QuoterControllerGetQuotePar
 	return &response, nil
 }
 
-func (api *api) GetQuoteWithCustomPreset(ctx context.Context, params QuoterControllerGetQuoteWithCustomPresetsParamsFixed, customPreset CustomPreset) (*GetQuoteOutputFixed, error) {
+func (api *api) GetQuoteWithCustomPreset(ctx context.Context, params QuoterControllerGetQuoteWithCustomPresetsParams, customPreset CustomPreset) (*GetQuoteOutput, error) {
 	u := fmt.Sprintf("/fusion/quoter/v2.0/%d/quote/receive", api.chainId)
 
 	err := params.Validate()
@@ -99,7 +99,7 @@ func (api *api) GetQuoteWithCustomPreset(ctx context.Context, params QuoterContr
 		Body:   body,
 	}
 
-	var response GetQuoteOutputFixed
+	var response GetQuoteOutput
 	err = api.httpExecutor.ExecuteRequest(ctx, payload, &response)
 	if err != nil {
 		return nil, err
@@ -109,7 +109,7 @@ func (api *api) GetQuoteWithCustomPreset(ctx context.Context, params QuoterContr
 }
 
 // PlaceOrder accepts a quote and submits it as a fusion order
-func (api *api) PlaceOrder(ctx context.Context, fusionQuote GetQuoteOutputFixed, orderParams OrderParams, wallet common.Wallet) (string, error) {
+func (api *api) PlaceOrder(ctx context.Context, fusionQuote GetQuoteOutput, orderParams OrderParams, wallet common.Wallet) (string, error) {
 	u := fmt.Sprintf("/fusion/relayer/v2.0/%d/order/submit", api.chainId)
 
 	err := orderParams.Validate()

@@ -26,7 +26,12 @@ if token.DisplayedSymbol != "" { use(token.DisplayedSymbol) }
 eip2612 := token.Eip2612
 ```
 
-The `*Fixed` names remain available indefinitely as aliases; new code can use the underlying generated names (`GetQuoteOutput`, `PresetClass`, `ProviderTokenDto`, …) interchangeably.
+The `*Fixed` names remain available as aliases, now marked `// Deprecated:` (IDEs and linters flag usages; pkg.go.dev strikes them through). All SDK method signatures, examples, and tests use the underlying generated names; aliases are identical types, so this changes nothing for callers.
+
+Two related changes:
+
+- **`fusionplus.CreateAuctionDetailsPlus` now takes `*Preset`** (the generated quoter preset) instead of `*PresetClassFixed`. The legacy `PresetClassFixed`/`GasCostConfigClass`/`AuctionPointClass` bridge shape is no longer produced or consumed by the SDK and is kept only as deprecated types.
+- **`fusionorder.AuctionPointClassFixed` and `fusionorder.GasCostConfigClassFixed` are renamed to `fusionorder.AuctionPoint` and `fusionorder.GasCostConfig`**, with deprecated aliases under the old names.
 
 ### Type Generator Upgraded to oapi-codegen v2
 

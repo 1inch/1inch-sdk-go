@@ -14,7 +14,7 @@ func (params *OrderApiControllerGetActiveOrdersParams) Validate() error {
 	return validate.ConsolidateValidationErrors(validationErrors)
 }
 
-func (params *QuoterControllerGetQuoteParamsFixed) Validate() error {
+func (params *QuoterControllerGetQuoteParams) Validate() error {
 	var validationErrors []error
 	validationErrors = validate.Parameter(params.FromTokenAddress, "FromTokenAddress", validate.CheckEthereumAddressRequired, validationErrors)
 	validationErrors = validate.Parameter(params.ToTokenAddress, "ToTokenAddress", validate.CheckEthereumAddressRequired, validationErrors)
@@ -25,9 +25,9 @@ func (params *QuoterControllerGetQuoteParamsFixed) Validate() error {
 
 // Note: QuoterControllerGetQuoteWithCustomPresetsParams (non-Fixed) intentionally has no Validate() method.
 // The generated type has Amount as float32 which is incorrect for Ethereum uint256 amounts.
-// Users should use QuoterControllerGetQuoteWithCustomPresetsParamsFixed instead.
+// Users should use QuoterControllerGetQuoteWithCustomPresetsParams instead.
 
-func (params *QuoterControllerGetQuoteWithCustomPresetsParamsFixed) Validate() error {
+func (params *QuoterControllerGetQuoteWithCustomPresetsParams) Validate() error {
 	var validationErrors []error
 	validationErrors = validate.Parameter(params.FromTokenAddress, "FromTokenAddress", validate.CheckEthereumAddressRequired, validationErrors)
 	validationErrors = validate.Parameter(params.ToTokenAddress, "ToTokenAddress", validate.CheckEthereumAddressRequired, validationErrors)

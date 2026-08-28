@@ -107,7 +107,7 @@ func main() {
 	fmt.Println("Permit signed")
 
 	// The permit is supplied to both the quote request and the order
-	quoteParams := fusionplus.QuoterControllerGetQuoteParamsFixed{
+	quoteParams := fusionplus.QuoterControllerGetQuoteParams{
 		SrcChain:        srcChain,
 		DstChain:        dstChain,
 		SrcTokenAddress: arbitrumUsdc,

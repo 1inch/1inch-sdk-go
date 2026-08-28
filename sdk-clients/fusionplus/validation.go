@@ -14,7 +14,7 @@ func (params *OrderApiControllerGetActiveOrdersParams) Validate() error {
 	return validate.ConsolidateValidationErrors(validationErrors)
 }
 
-func (params *QuoterControllerGetQuoteParamsFixed) Validate() error {
+func (params *QuoterControllerGetQuoteParams) Validate() error {
 	var validationErrors []error
 	validationErrors = validate.Parameter(params.SrcTokenAddress, "SrcTokenAddress", validate.CheckEthereumAddressRequired, validationErrors)
 	validationErrors = validate.Parameter(params.DstTokenAddress, "DstTokenAddress", validate.CheckEthereumAddressRequired, validationErrors)
@@ -26,7 +26,7 @@ func (params *QuoterControllerGetQuoteParamsFixed) Validate() error {
 	return validate.ConsolidateValidationErrors(validationErrors)
 }
 
-func (params *QuoterControllerGetQuoteWithCustomPresetsParamsFixed) Validate() error {
+func (params *QuoterControllerGetQuoteWithCustomPresetsParams) Validate() error {
 	var validationErrors []error
 	validationErrors = validate.Parameter(params.SrcTokenAddress, "SrcTokenAddress", validate.CheckEthereumAddressRequired, validationErrors)
 	validationErrors = validate.Parameter(params.DstTokenAddress, "DstTokenAddress", validate.CheckEthereumAddressRequired, validationErrors)

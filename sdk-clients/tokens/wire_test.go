@@ -15,7 +15,7 @@ func TestProviderTokenDecoding(t *testing.T) {
 	tests := []struct {
 		name     string
 		payload  string
-		expected ProviderTokenDtoFixed
+		expected ProviderTokenDto
 	}{
 		{
 			name: "Full token with object tags",
@@ -30,7 +30,7 @@ func TestProviderTokenDecoding(t *testing.T) {
 				"logoURI": "https://tokens.1inch.io/1inch.png",
 				"tags": [{"provider": "1inch", "value": "tokens"}]
 			}`,
-			expected: ProviderTokenDtoFixed{
+			expected: ProviderTokenDto{
 				Address:   "0x111111111117dc0aa78b770fa6a738034120c302",
 				ChainId:   1,
 				Decimals:  18,
@@ -53,7 +53,7 @@ func TestProviderTokenDecoding(t *testing.T) {
 				"providers": [],
 				"tags": []
 			}`,
-			expected: ProviderTokenDtoFixed{
+			expected: ProviderTokenDto{
 				Address:   "0x0000000000000000000000000000000000000000",
 				ChainId:   1313161554,
 				Decimals:  18,
@@ -67,7 +67,7 @@ func TestProviderTokenDecoding(t *testing.T) {
 
 	for _, tc := range tests {
 		t.Run(tc.name, func(t *testing.T) {
-			var out ProviderTokenDtoFixed
+			var out ProviderTokenDto
 			require.NoError(t, json.Unmarshal([]byte(tc.payload), &out))
 			assert.Equal(t, tc.expected, out)
 		})

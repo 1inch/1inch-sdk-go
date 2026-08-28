@@ -1,10 +1,12 @@
 package tokens
 
-// ProviderTokenDtoFixed and TokenInfoDtoFixed are kept as aliases for
-// backward compatibility. The type bugs they used to correct (tags being
-// objects, not strings) are now fixed at generation time in
-// codegen/overrides.go, so the generated types are correct.
+// Deprecated: Use ProviderTokenDto instead. The type bugs this type used to
+// correct (tags being objects, not strings) are now fixed at generation time
+// (codegen/overrides.go); the alias is kept so existing integrations keep
+// compiling.
 type ProviderTokenDtoFixed = ProviderTokenDto
+
+// Deprecated: Use TokenInfoDto instead; see ProviderTokenDtoFixed.
 type TokenInfoDtoFixed = TokenInfoDto
 
 type CustomTokensControllerGetTokenInfoParams struct {

@@ -84,7 +84,7 @@ func TestNewExtension(t *testing.T) {
 					Duration:        0,
 					InitialRateBump: 0,
 					Points:          nil,
-					GasCost:         fusionorder.GasCostConfigClassFixed{},
+					GasCost:         fusionorder.GasCostConfig{},
 				},
 				PostInteractionData: &SettlementPostInteractionData{
 					Whitelist: []fusionorder.WhitelistItem{},
@@ -131,7 +131,7 @@ func TestNewExtension(t *testing.T) {
 					Duration:        0,
 					InitialRateBump: 0,
 					Points:          nil,
-					GasCost:         fusionorder.GasCostConfigClassFixed{},
+					GasCost:         fusionorder.GasCostConfig{},
 				},
 				PostInteractionData: &SettlementPostInteractionData{
 					Whitelist: []fusionorder.WhitelistItem{},
@@ -178,7 +178,7 @@ func TestNewExtension(t *testing.T) {
 					Duration:        0,
 					InitialRateBump: 0,
 					Points:          nil,
-					GasCost:         fusionorder.GasCostConfigClassFixed{},
+					GasCost:         fusionorder.GasCostConfig{},
 				},
 				PostInteractionData: &SettlementPostInteractionData{
 					Whitelist: []fusionorder.WhitelistItem{},
@@ -392,14 +392,14 @@ func TestBuildAmountGetterData(t *testing.T) {
 			name: "basic auction details with forAmountGetters true",
 			detailsFull: &Details{
 				Auction: &fusionorder.AuctionDetails{
-					GasCost: fusionorder.GasCostConfigClassFixed{
+					GasCost: fusionorder.GasCostConfig{
 						GasBumpEstimate:  0,
 						GasPriceEstimate: 0,
 					},
 					StartTime:       1673548149,
 					Duration:        180,
 					InitialRateBump: 50000,
-					Points: []fusionorder.AuctionPointClassFixed{
+					Points: []fusionorder.AuctionPoint{
 						{
 							Delay:       12,
 							Coefficient: 20000,
@@ -421,14 +421,14 @@ func TestBuildAmountGetterData(t *testing.T) {
 			name: "basic auction details with forAmountGetters false",
 			detailsFull: &Details{
 				Auction: &fusionorder.AuctionDetails{
-					GasCost: fusionorder.GasCostConfigClassFixed{
+					GasCost: fusionorder.GasCostConfig{
 						GasBumpEstimate:  0,
 						GasPriceEstimate: 0,
 					},
 					StartTime:       1673548149,
 					Duration:        180,
 					InitialRateBump: 50000,
-					Points: []fusionorder.AuctionPointClassFixed{
+					Points: []fusionorder.AuctionPoint{
 						{
 							Delay:       12,
 							Coefficient: 20000,
@@ -453,7 +453,7 @@ func TestBuildAmountGetterData(t *testing.T) {
 					StartTime:       1673548149,
 					Duration:        180,
 					InitialRateBump: 50000,
-					Points:          []fusionorder.AuctionPointClassFixed{{Coefficient: 20000, Delay: 12}},
+					Points:          []fusionorder.AuctionPoint{{Coefficient: 20000, Delay: 12}},
 				},
 				FeesIntAndRes: &FeesIntegratorAndResolver{
 					Integrator: IntegratorFee{

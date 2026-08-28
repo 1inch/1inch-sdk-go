@@ -23,8 +23,8 @@ func TestAuctionDetailsEncoding_KnownValues(t *testing.T) {
 				StartTime:       1673548149,
 				Duration:        180,
 				InitialRateBump: 50000,
-				Points:          []AuctionPointClassFixed{{Coefficient: 20000, Delay: 12}},
-				GasCost:         GasCostConfigClassFixed{GasBumpEstimate: 0, GasPriceEstimate: 0},
+				Points:          []AuctionPoint{{Coefficient: 20000, Delay: 12}},
+				GasCost:         GasCostConfig{GasBumpEstimate: 0, GasPriceEstimate: 0},
 			},
 			// Format: GasCost(7 bytes) + StartTime(4 bytes) + Duration(3 bytes) + InitialRateBump(3 bytes) + PointCount(1 byte) + Points
 			// GasCost: 00 00 00 00 00 00 00 (zeros)
@@ -41,8 +41,8 @@ func TestAuctionDetailsEncoding_KnownValues(t *testing.T) {
 				StartTime:       1673548149,
 				Duration:        180,
 				InitialRateBump: 50000,
-				Points:          []AuctionPointClassFixed{{Coefficient: 20000, Delay: 12}},
-				GasCost:         GasCostConfigClassFixed{GasBumpEstimate: 10000, GasPriceEstimate: 1000000},
+				Points:          []AuctionPoint{{Coefficient: 20000, Delay: 12}},
+				GasCost:         GasCostConfig{GasBumpEstimate: 10000, GasPriceEstimate: 1000000},
 			},
 			// GasCost: 002710 (10000) + 000f4240 (1000000)
 			expectedEncode: "002710000f424063c051750000b400c35001004e20000c",
@@ -53,11 +53,11 @@ func TestAuctionDetailsEncoding_KnownValues(t *testing.T) {
 				StartTime:       1673548149,
 				Duration:        180,
 				InitialRateBump: 50000,
-				Points: []AuctionPointClassFixed{
+				Points: []AuctionPoint{
 					{Coefficient: 10000, Delay: 10},
 					{Coefficient: 5000, Delay: 20},
 				},
-				GasCost: GasCostConfigClassFixed{GasBumpEstimate: 0, GasPriceEstimate: 0},
+				GasCost: GasCostConfig{GasBumpEstimate: 0, GasPriceEstimate: 0},
 			},
 			// PointCount: 02
 			// Point 1: 002710 (10000) + 000a (10)
@@ -71,7 +71,7 @@ func TestAuctionDetailsEncoding_KnownValues(t *testing.T) {
 				Duration:        180,
 				InitialRateBump: 50000,
 				Points:          nil,
-				GasCost:         GasCostConfigClassFixed{GasBumpEstimate: 0, GasPriceEstimate: 0},
+				GasCost:         GasCostConfig{GasBumpEstimate: 0, GasPriceEstimate: 0},
 			},
 			// PointCount: 00
 			expectedEncode: "0000000000000063c051750000b400c35000",
@@ -103,8 +103,8 @@ func TestAuctionDetailsEncoding_WithoutPointCount_KnownValues(t *testing.T) {
 				StartTime:       1673548149,
 				Duration:        180,
 				InitialRateBump: 50000,
-				Points:          []AuctionPointClassFixed{{Coefficient: 20000, Delay: 12}},
-				GasCost:         GasCostConfigClassFixed{GasBumpEstimate: 0, GasPriceEstimate: 0},
+				Points:          []AuctionPoint{{Coefficient: 20000, Delay: 12}},
+				GasCost:         GasCostConfig{GasBumpEstimate: 0, GasPriceEstimate: 0},
 			},
 			// Same as Encode but without point count byte
 			expectedEncode: "0000000000000063c051750000b400c350004e20000c",
@@ -115,11 +115,11 @@ func TestAuctionDetailsEncoding_WithoutPointCount_KnownValues(t *testing.T) {
 				StartTime:       1673548149,
 				Duration:        180,
 				InitialRateBump: 50000,
-				Points: []AuctionPointClassFixed{
+				Points: []AuctionPoint{
 					{Coefficient: 10000, Delay: 10},
 					{Coefficient: 5000, Delay: 20},
 				},
-				GasCost: GasCostConfigClassFixed{GasBumpEstimate: 0, GasPriceEstimate: 0},
+				GasCost: GasCostConfig{GasBumpEstimate: 0, GasPriceEstimate: 0},
 			},
 			expectedEncode: "0000000000000063c051750000b400c350002710000a0013880014",
 		},

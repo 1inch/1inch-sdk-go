@@ -71,7 +71,7 @@ func main() {
 	}
 
 	quote, err := client.GetQuoteWithCustomPreset(ctx,
-		fusion.QuoterControllerGetQuoteWithCustomPresetsParamsFixed{
+		fusion.QuoterControllerGetQuoteWithCustomPresetsParams{
 			FromTokenAddress: usdc,
 			ToTokenAddress:   weth,
 			Amount:           amountUsdc,

@@ -15,7 +15,7 @@ func TestNewAuctionDetails(t *testing.T) {
 		startTime       uint32
 		duration        uint32
 		initialRateBump uint32
-		gasCost         GasCostConfigClassFixed
+		gasCost         GasCostConfig
 		shouldError     bool
 	}{
 		{
@@ -23,7 +23,7 @@ func TestNewAuctionDetails(t *testing.T) {
 			startTime:       1673548149,
 			duration:        180,
 			initialRateBump: 50000,
-			gasCost: GasCostConfigClassFixed{
+			gasCost: GasCostConfig{
 				GasBumpEstimate:  10000,
 				GasPriceEstimate: 1000000000,
 			},
@@ -34,7 +34,7 @@ func TestNewAuctionDetails(t *testing.T) {
 			startTime:       1673548149,
 			duration:        constants.Uint24Max + 1,
 			initialRateBump: 50000,
-			gasCost: GasCostConfigClassFixed{
+			gasCost: GasCostConfig{
 				GasBumpEstimate:  10000,
 				GasPriceEstimate: 1000000000,
 			},
@@ -45,7 +45,7 @@ func TestNewAuctionDetails(t *testing.T) {
 			startTime:       1673548149,
 			duration:        180,
 			initialRateBump: constants.Uint24Max + 1,
-			gasCost: GasCostConfigClassFixed{
+			gasCost: GasCostConfig{
 				GasBumpEstimate:  10000,
 				GasPriceEstimate: 1000000000,
 			},
@@ -56,7 +56,7 @@ func TestNewAuctionDetails(t *testing.T) {
 			startTime:       1673548149,
 			duration:        180,
 			initialRateBump: 50000,
-			gasCost: GasCostConfigClassFixed{
+			gasCost: GasCostConfig{
 				GasBumpEstimate:  constants.Uint24Max + 1,
 				GasPriceEstimate: 1000000000,
 			},
@@ -92,7 +92,7 @@ func TestAuctionDetailsEncodeDecode(t *testing.T) {
 				Duration:        180,
 				InitialRateBump: 50000,
 				Points:          nil, // Decoded points will be nil, not empty slice
-				GasCost: GasCostConfigClassFixed{
+				GasCost: GasCostConfig{
 					GasBumpEstimate:  0,
 					GasPriceEstimate: 0,
 				},
@@ -104,11 +104,11 @@ func TestAuctionDetailsEncodeDecode(t *testing.T) {
 				StartTime:       1673548149,
 				Duration:        180,
 				InitialRateBump: 50000,
-				Points: []AuctionPointClassFixed{
+				Points: []AuctionPoint{
 					{Coefficient: 10000, Delay: 10},
 					{Coefficient: 5000, Delay: 20},
 				},
-				GasCost: GasCostConfigClassFixed{
+				GasCost: GasCostConfig{
 					GasBumpEstimate:  10000,
 					GasPriceEstimate: 1000000000,
 				},
@@ -120,10 +120,10 @@ func TestAuctionDetailsEncodeDecode(t *testing.T) {
 				StartTime:       1700000000,
 				Duration:        300,
 				InitialRateBump: 100000,
-				Points: []AuctionPointClassFixed{
+				Points: []AuctionPoint{
 					{Coefficient: 25000, Delay: 30},
 				},
-				GasCost: GasCostConfigClassFixed{
+				GasCost: GasCostConfig{
 					GasBumpEstimate:  5000,
 					GasPriceEstimate: 500000000,
 				},
@@ -147,11 +147,11 @@ func TestAuctionDetailsEncodeWithoutPointCount(t *testing.T) {
 		StartTime:       1673548149,
 		Duration:        180,
 		InitialRateBump: 50000,
-		Points: []AuctionPointClassFixed{
+		Points: []AuctionPoint{
 			{Coefficient: 10000, Delay: 10},
 			{Coefficient: 5000, Delay: 20},
 		},
-		GasCost: GasCostConfigClassFixed{
+		GasCost: GasCostConfig{
 			GasBumpEstimate:  0,
 			GasPriceEstimate: 0,
 		},

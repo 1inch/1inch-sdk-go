@@ -59,18 +59,18 @@ func TestOrderApiControllerGetActiveOrdersParams_Validate(t *testing.T) {
 	}
 }
 
-func TestQuoterControllerGetQuoteParamsFixed_Validate(t *testing.T) {
+func TestQuoterControllerGetQuoteParams_Validate(t *testing.T) {
 	validAddress := "0x6B175474E89094C44Da98b954EedeAC495271d0F"
 
 	tests := []struct {
 		name        string
-		params      QuoterControllerGetQuoteParamsFixed
+		params      QuoterControllerGetQuoteParams
 		expectError bool
 		errorMsg    string
 	}{
 		{
 			name: "Valid params",
-			params: QuoterControllerGetQuoteParamsFixed{
+			params: QuoterControllerGetQuoteParams{
 				FromTokenAddress: validAddress,
 				ToTokenAddress:   validAddress,
 				Amount:           "1000000000000000000",
@@ -79,7 +79,7 @@ func TestQuoterControllerGetQuoteParamsFixed_Validate(t *testing.T) {
 		},
 		{
 			name: "Missing FromTokenAddress",
-			params: QuoterControllerGetQuoteParamsFixed{
+			params: QuoterControllerGetQuoteParams{
 				ToTokenAddress: validAddress,
 				Amount:         "1000000000000000000",
 			},
@@ -88,7 +88,7 @@ func TestQuoterControllerGetQuoteParamsFixed_Validate(t *testing.T) {
 		},
 		{
 			name: "Missing ToTokenAddress",
-			params: QuoterControllerGetQuoteParamsFixed{
+			params: QuoterControllerGetQuoteParams{
 				FromTokenAddress: validAddress,
 				Amount:           "1000000000000000000",
 			},
@@ -97,7 +97,7 @@ func TestQuoterControllerGetQuoteParamsFixed_Validate(t *testing.T) {
 		},
 		{
 			name: "Missing Amount",
-			params: QuoterControllerGetQuoteParamsFixed{
+			params: QuoterControllerGetQuoteParams{
 				FromTokenAddress: validAddress,
 				ToTokenAddress:   validAddress,
 			},
@@ -106,7 +106,7 @@ func TestQuoterControllerGetQuoteParamsFixed_Validate(t *testing.T) {
 		},
 		{
 			name: "Invalid Amount - not a number",
-			params: QuoterControllerGetQuoteParamsFixed{
+			params: QuoterControllerGetQuoteParams{
 				FromTokenAddress: validAddress,
 				ToTokenAddress:   validAddress,
 				Amount:           "invalid",
@@ -116,7 +116,7 @@ func TestQuoterControllerGetQuoteParamsFixed_Validate(t *testing.T) {
 		},
 		{
 			name: "Invalid FromTokenAddress",
-			params: QuoterControllerGetQuoteParamsFixed{
+			params: QuoterControllerGetQuoteParams{
 				FromTokenAddress: "invalid",
 				ToTokenAddress:   validAddress,
 				Amount:           "1000000000000000000",
@@ -126,7 +126,7 @@ func TestQuoterControllerGetQuoteParamsFixed_Validate(t *testing.T) {
 		},
 		{
 			name: "Valid with permit",
-			params: QuoterControllerGetQuoteParamsFixed{
+			params: QuoterControllerGetQuoteParams{
 				FromTokenAddress: validAddress,
 				ToTokenAddress:   validAddress,
 				Amount:           "1000000000000000000",
@@ -149,18 +149,18 @@ func TestQuoterControllerGetQuoteParamsFixed_Validate(t *testing.T) {
 	}
 }
 
-func TestQuoterControllerGetQuoteWithCustomPresetsParamsFixed_Validate(t *testing.T) {
+func TestQuoterControllerGetQuoteWithCustomPresetsParams_Validate(t *testing.T) {
 	validAddress := "0x6B175474E89094C44Da98b954EedeAC495271d0F"
 
 	tests := []struct {
 		name        string
-		params      QuoterControllerGetQuoteWithCustomPresetsParamsFixed
+		params      QuoterControllerGetQuoteWithCustomPresetsParams
 		expectError bool
 		errorMsg    string
 	}{
 		{
 			name: "Valid params",
-			params: QuoterControllerGetQuoteWithCustomPresetsParamsFixed{
+			params: QuoterControllerGetQuoteWithCustomPresetsParams{
 				FromTokenAddress: validAddress,
 				ToTokenAddress:   validAddress,
 				Amount:           "1000000000000000000",
@@ -170,7 +170,7 @@ func TestQuoterControllerGetQuoteWithCustomPresetsParamsFixed_Validate(t *testin
 		},
 		{
 			name: "Missing WalletAddress",
-			params: QuoterControllerGetQuoteWithCustomPresetsParamsFixed{
+			params: QuoterControllerGetQuoteWithCustomPresetsParams{
 				FromTokenAddress: validAddress,
 				ToTokenAddress:   validAddress,
 				Amount:           "1000000000000000000",
@@ -180,7 +180,7 @@ func TestQuoterControllerGetQuoteWithCustomPresetsParamsFixed_Validate(t *testin
 		},
 		{
 			name:        "Missing all required fields",
-			params:      QuoterControllerGetQuoteWithCustomPresetsParamsFixed{},
+			params:      QuoterControllerGetQuoteWithCustomPresetsParams{},
 			expectError: true,
 		},
 	}

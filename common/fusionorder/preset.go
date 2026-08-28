@@ -100,8 +100,8 @@ type PresetData struct {
 	InitialRateBump    float32
 	AuctionStartAmount string
 	AuctionEndAmount   string
-	Points             []AuctionPointClassFixed
-	GasCost            GasCostConfigClassFixed
+	Points             []AuctionPoint
+	GasCost            GasCostConfig
 	AllowPartialFills  bool
 	AllowMultipleFills bool
 	BankFee            string
@@ -111,9 +111,9 @@ type PresetData struct {
 
 // CreateAuctionDetailsFromPreset creates AuctionDetails from preset data
 func CreateAuctionDetailsFromPreset(preset *PresetData, additionalWaitPeriod float32) (*AuctionDetails, error) {
-	points := make([]AuctionPointClassFixed, len(preset.Points))
+	points := make([]AuctionPoint, len(preset.Points))
 	for i, p := range preset.Points {
-		points[i] = AuctionPointClassFixed{
+		points[i] = AuctionPoint{
 			Coefficient: p.Coefficient,
 			Delay:       p.Delay,
 		}

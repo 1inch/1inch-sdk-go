@@ -14,11 +14,11 @@ import (
 )
 
 // createTestQuote creates a realistic quote for testing
-func createTestQuote() GetQuoteOutputFixed {
-	return GetQuoteOutputFixed{
+func createTestQuote() GetQuoteOutput {
+	return GetQuoteOutput{
 		QuoteId: "test-quote-id-12345",
-		Presets: QuotePresetsClassFixed{
-			Fast: PresetClassFixed{
+		Presets: QuotePresetsClass{
+			Fast: PresetClass{
 				AllowMultipleFills: true,
 				AllowPartialFills:  true,
 				AuctionDuration:    180,
@@ -39,7 +39,7 @@ func createTestQuote() GetQuoteOutputFixed {
 				StartAuctionIn: 12,
 				TokenFee:       "0",
 			},
-			Medium: PresetClassFixed{
+			Medium: PresetClass{
 				AllowMultipleFills: true,
 				AllowPartialFills:  true,
 				AuctionDuration:    360,
@@ -60,7 +60,7 @@ func createTestQuote() GetQuoteOutputFixed {
 				StartAuctionIn: 24,
 				TokenFee:       "0",
 			},
-			Slow: PresetClassFixed{
+			Slow: PresetClass{
 				AllowMultipleFills: true,
 				AllowPartialFills:  true,
 				AuctionDuration:    600,
@@ -133,8 +133,8 @@ func TestSignedOrderInput_Serialization(t *testing.T) {
 	assert.Equal(t, order.Signature, deserialized.Signature)
 }
 
-// TestGetQuoteOutputFixed_Serialization tests quote response deserialization
-func TestGetQuoteOutputFixed_Serialization(t *testing.T) {
+// TestGetQuoteOutput_Serialization tests quote response deserialization
+func TestGetQuoteOutput_Serialization(t *testing.T) {
 	// Simulate API response JSON
 	apiResponse := `{
 		"quoteId": "abc123",
@@ -200,7 +200,7 @@ func TestGetQuoteOutputFixed_Serialization(t *testing.T) {
 		}
 	}`
 
-	var quote GetQuoteOutputFixed
+	var quote GetQuoteOutput
 	err := json.Unmarshal([]byte(apiResponse), &quote)
 	require.NoError(t, err)
 
@@ -236,7 +236,7 @@ func TestExtensionEncoding_Integration(t *testing.T) {
 		StartTime:       1673548149,
 		Duration:        180,
 		InitialRateBump: 50000,
-		Points:          []fusionorder.AuctionPointClassFixed{{Coefficient: 20000, Delay: 12}},
+		Points:          []fusionorder.AuctionPoint{{Coefficient: 20000, Delay: 12}},
 	}
 
 	extension, err := NewExtension(ExtensionParams{
@@ -297,7 +297,7 @@ func TestAuctionDetailsCreation_Integration(t *testing.T) {
 	defer func() { fusionorder.CalcAuctionStartTimeFunc = originalCalcAuctionStartTimeFunc }()
 
 	// Create a preset with gas price that fits in uint32
-	preset := &PresetClassFixed{
+	preset := &PresetClass{
 		AllowMultipleFills: true,
 		AllowPartialFills:  true,
 		AuctionDuration:    180,
@@ -459,7 +459,7 @@ func TestSaltGeneration_Integration(t *testing.T) {
 		StartTime:       1673548149,
 		Duration:        180,
 		InitialRateBump: 50000,
-		Points:          []fusionorder.AuctionPointClassFixed{{Coefficient: 20000, Delay: 12}},
+		Points:          []fusionorder.AuctionPoint{{Coefficient: 20000, Delay: 12}},
 	}
 
 	extension, err := NewExtension(ExtensionParams{

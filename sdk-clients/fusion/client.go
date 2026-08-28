@@ -36,13 +36,13 @@ func (c *Client) PlaceOrderFromParams(ctx context.Context, orderParams OrderPara
 		isPermit2 = "true"
 	}
 
-	var quote *GetQuoteOutputFixed
+	var quote *GetQuoteOutput
 	var err error
 	if orderParams.Preset == Custom {
 		if orderParams.CustomPreset == nil {
 			return "", errors.New("custom preset data required when the custom preset is selected")
 		}
-		quote, err = c.GetQuoteWithCustomPreset(ctx, QuoterControllerGetQuoteWithCustomPresetsParamsFixed{
+		quote, err = c.GetQuoteWithCustomPreset(ctx, QuoterControllerGetQuoteWithCustomPresetsParams{
 			FromTokenAddress: orderParams.FromTokenAddress,
 			ToTokenAddress:   orderParams.ToTokenAddress,
 			Amount:           orderParams.Amount,
@@ -53,7 +53,7 @@ func (c *Client) PlaceOrderFromParams(ctx context.Context, orderParams OrderPara
 			Surplus:          true,
 		}, *orderParams.CustomPreset)
 	} else {
-		quote, err = c.GetQuote(ctx, QuoterControllerGetQuoteParamsFixed{
+		quote, err = c.GetQuote(ctx, QuoterControllerGetQuoteParams{
 			FromTokenAddress: orderParams.FromTokenAddress,
 			ToTokenAddress:   orderParams.ToTokenAddress,
 			Amount:           orderParams.Amount,

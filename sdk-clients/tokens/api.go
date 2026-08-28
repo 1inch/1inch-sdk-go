@@ -8,7 +8,7 @@ import (
 )
 
 // SearchTokenAllChains Get Tokens that match the provided search criteria across all chains
-func (api *api) SearchTokenAllChains(ctx context.Context, params SearchControllerSearchAllChainsParams) ([]ProviderTokenDtoFixed, error) {
+func (api *api) SearchTokenAllChains(ctx context.Context, params SearchControllerSearchAllChainsParams) ([]ProviderTokenDto, error) {
 	u := "/token/v1.2/search"
 
 	err := params.Validate()
@@ -23,7 +23,7 @@ func (api *api) SearchTokenAllChains(ctx context.Context, params SearchControlle
 		Body:   nil,
 	}
 
-	var response []ProviderTokenDtoFixed
+	var response []ProviderTokenDto
 	err = api.httpExecutor.ExecuteRequest(ctx, payload, &response)
 	if err != nil {
 		return nil, err
@@ -33,7 +33,7 @@ func (api *api) SearchTokenAllChains(ctx context.Context, params SearchControlle
 }
 
 // SearchTokenSingleChain Get Tokens that match the provided search criteria on a specific chain
-func (api *api) SearchTokenSingleChain(ctx context.Context, params SearchControllerSearchSingleChainParams) ([]ProviderTokenDtoFixed, error) {
+func (api *api) SearchTokenSingleChain(ctx context.Context, params SearchControllerSearchSingleChainParams) ([]ProviderTokenDto, error) {
 	u := fmt.Sprintf("/token/v1.2/%d/search", api.chainId)
 
 	err := params.Validate()
@@ -48,7 +48,7 @@ func (api *api) SearchTokenSingleChain(ctx context.Context, params SearchControl
 		Body:   nil,
 	}
 
-	var response []ProviderTokenDtoFixed
+	var response []ProviderTokenDto
 	err = api.httpExecutor.ExecuteRequest(ctx, payload, &response)
 	if err != nil {
 		return nil, err
@@ -129,7 +129,7 @@ func (api *api) GetCustomTokens(ctx context.Context, params CustomTokensControll
 	return response, nil
 }
 
-func (api *api) GetCustomToken(ctx context.Context, params CustomTokensControllerGetTokenInfoParams) (*ProviderTokenDtoFixed, error) {
+func (api *api) GetCustomToken(ctx context.Context, params CustomTokensControllerGetTokenInfoParams) (*ProviderTokenDto, error) {
 	u := fmt.Sprintf("/token/v1.2/%d/custom/%s", api.chainId, params.Address)
 
 	err := params.Validate()
@@ -144,7 +144,7 @@ func (api *api) GetCustomToken(ctx context.Context, params CustomTokensControlle
 		Body:   nil,
 	}
 
-	var response ProviderTokenDtoFixed
+	var response ProviderTokenDto
 	err = api.httpExecutor.ExecuteRequest(ctx, payload, &response)
 	if err != nil {
 		return nil, err

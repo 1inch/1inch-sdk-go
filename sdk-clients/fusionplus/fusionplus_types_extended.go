@@ -16,24 +16,25 @@ type GetReadyToAcceptFillsParams struct {
 	Hash string `url:"hash" json:"hash"`
 }
 
-// GetOrderFillsByHashOutputFixed is kept as an alias for backward
-// compatibility; the type bugs it used to correct (string USD prices, points
-// being an array) are now fixed at generation time in codegen/overrides.go.
+// Deprecated: Use GetOrderFillsByHashOutput instead. The type bugs this type
+// used to correct (string USD prices, points being an array) are now fixed at
+// generation time (codegen/overrides.go); the alias is kept so existing
+// integrations keep compiling.
 type GetOrderFillsByHashOutputFixed = GetOrderFillsByHashOutput
 
-// QuoterControllerGetQuoteParamsFixed is kept as an alias for backward
-// compatibility; the type bugs it used to correct (string amount, *big.Int
-// fee, boolean isPermit2) are now fixed at generation time in
-// codegen/overrides.go.
+// Deprecated: Use QuoterControllerGetQuoteParams instead. The type bugs this
+// type used to correct (string amount, integer fee, boolean isPermit2) are now
+// fixed at generation time (codegen/overrides.go); the alias is kept so
+// existing integrations keep compiling.
 type QuoterControllerGetQuoteParamsFixed = QuoterControllerGetQuoteParams
 
-// QuoterControllerGetQuoteWithCustomPresetsParamsFixed is kept as an alias
-// for backward compatibility; see QuoterControllerGetQuoteParamsFixed.
+// Deprecated: Use QuoterControllerGetQuoteWithCustomPresetsParams instead;
+// see QuoterControllerGetQuoteParamsFixed.
 type QuoterControllerGetQuoteWithCustomPresetsParamsFixed = QuoterControllerGetQuoteWithCustomPresetsParams
 
-// GetQuoteOutputFixed is kept as an alias for backward compatibility; the
-// quoteId type bug it used to correct is now fixed at generation time in
-// codegen/overrides.go.
+// Deprecated: Use GetQuoteOutput instead. The quoteId type bug this type used
+// to correct is now fixed at generation time (codegen/overrides.go); the alias
+// is kept so existing integrations keep compiling.
 type GetQuoteOutputFixed = GetQuoteOutput
 
 type Order struct {
@@ -145,7 +146,9 @@ type SettlementSuffixData struct {
 	CustomReceiver     common.Address
 }
 
-// PresetClassFixed defines model for PresetClass.
+// Deprecated: Use the generated Preset type instead. This legacy shape is no
+// longer produced or consumed by the SDK (CreateAuctionDetailsPlus now takes
+// *Preset); it is kept so existing integrations keep compiling.
 type PresetClassFixed struct {
 	AllowMultipleFills bool                `json:"allowMultipleFills"`
 	AllowPartialFills  bool                `json:"allowPartialFills"`
@@ -162,13 +165,15 @@ type PresetClassFixed struct {
 	TokenFee           string              `json:"tokenFee"`
 }
 
-// GasCostConfigClass defines model for GasCostConfigClass.
+// Deprecated: Use the generated GasCostConfig type instead; this legacy shape
+// exists only as part of PresetClassFixed.
 type GasCostConfigClass struct {
 	GasBumpEstimate  float32 `json:"gasBumpEstimate"`
 	GasPriceEstimate string  `json:"gasPriceEstimate"`
 }
 
-// AuctionPointClass defines model for AuctionPointClass.
+// Deprecated: Use the generated AuctionPoint type instead; this legacy shape
+// exists only as part of PresetClassFixed.
 type AuctionPointClass struct {
 	Coefficient float32 `json:"coefficient"`
 	Delay       float32 `json:"delay"`

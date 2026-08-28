@@ -14,7 +14,7 @@ import (
 	geth_common "github.com/ethereum/go-ethereum/common"
 )
 
-func CreateFusionPlusOrderData(quoteParams QuoterControllerGetQuoteParamsFixed, quote *GetQuoteOutputFixed, orderParams OrderParams, wallet common.Wallet, chainId int) (*PreparedOrder, error) {
+func CreateFusionPlusOrderData(quoteParams QuoterControllerGetQuoteParams, quote *GetQuoteOutput, orderParams OrderParams, wallet common.Wallet, chainId int) (*PreparedOrder, error) {
 
 	// TODO preset is already gotten earlier for the secret count
 	preset, err := GetPreset(quote.Presets, orderParams.Preset)
@@ -22,29 +22,7 @@ func CreateFusionPlusOrderData(quoteParams QuoterControllerGetQuoteParamsFixed, 
 		return nil, fmt.Errorf("failed to get preset: %w", err)
 	}
 
-	auctionPointsPlus := make([]AuctionPointClass, 0)
-	for _, point := range preset.Points {
-		auctionPointsPlus = append(auctionPointsPlus, AuctionPointClass(point))
-	}
-
-	gasCostsPlus := GasCostConfigClass{
-		GasBumpEstimate:  preset.GasCost.GasBumpEstimate,
-		GasPriceEstimate: preset.GasCost.GasPriceEstimate,
-	}
-	presetPlus := &PresetClassFixed{
-		AllowMultipleFills: preset.AllowMultipleFills,
-		//ExclusiveResolver: preset.ExclusiveResolver, // TODO This is not working for fusion at the moment
-		AllowPartialFills:  preset.AllowPartialFills,
-		AuctionDuration:    preset.AuctionDuration,
-		AuctionEndAmount:   preset.AuctionEndAmount,
-		AuctionStartAmount: preset.AuctionStartAmount,
-		GasCost:            gasCostsPlus,
-		InitialRateBump:    preset.InitialRateBump,
-		Points:             auctionPointsPlus,
-		StartAuctionIn:     preset.StartAuctionIn,
-	}
-
-	auctionDetailsPlus, err := CreateAuctionDetailsPlus(presetPlus, 0)
+	auctionDetailsPlus, err := CreateAuctionDetailsPlus(preset, 0)
 	if err != nil {
 		return nil, fmt.Errorf("failed to create auction details: %w", err)
 	}
@@ -334,7 +312,7 @@ func CreateOrder(params CreateOrderDataParams) (*Order, error) {
 	}, nil
 }
 
-func CreateAuctionDetailsPlus(preset *PresetClassFixed, additionalWaitPeriod float32) (*fusionorder.AuctionDetails, error) {
+func CreateAuctionDetailsPlus(preset *Preset, additionalWaitPeriod float32) (*fusionorder.AuctionDetails, error) {
 	points := make([]fusionorder.AuctionPointInput, len(preset.Points))
 	for i, point := range preset.Points {
 		points[i] = fusionorder.AuctionPointInput{

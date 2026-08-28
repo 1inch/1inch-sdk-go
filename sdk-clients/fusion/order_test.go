@@ -17,7 +17,7 @@ import (
 )
 
 func TestGetPreset(t *testing.T) {
-	customPreset := &PresetClassFixed{
+	customPreset := &PresetClass{
 		AllowMultipleFills: true,
 		AllowPartialFills:  true,
 		AuctionDuration:    10.0,
@@ -38,7 +38,7 @@ func TestGetPreset(t *testing.T) {
 		TokenFee:       "1",
 	}
 
-	fastPreset := PresetClassFixed{
+	fastPreset := PresetClass{
 		AllowMultipleFills: false,
 		AllowPartialFills:  false,
 		AuctionDuration:    20.0,
@@ -59,7 +59,7 @@ func TestGetPreset(t *testing.T) {
 		TokenFee:       "2",
 	}
 
-	mediumPreset := PresetClassFixed{
+	mediumPreset := PresetClass{
 		AllowMultipleFills: true,
 		AllowPartialFills:  false,
 		AuctionDuration:    30.0,
@@ -80,7 +80,7 @@ func TestGetPreset(t *testing.T) {
 		TokenFee:       "3",
 	}
 
-	slowPreset := PresetClassFixed{
+	slowPreset := PresetClass{
 		AllowMultipleFills: false,
 		AllowPartialFills:  true,
 		AuctionDuration:    40.0,
@@ -101,7 +101,7 @@ func TestGetPreset(t *testing.T) {
 		TokenFee:       "4",
 	}
 
-	presets := QuotePresetsClassFixed{
+	presets := QuotePresetsClass{
 		Custom: customPreset,
 		Fast:   fastPreset,
 		Medium: mediumPreset,
@@ -111,7 +111,7 @@ func TestGetPreset(t *testing.T) {
 	tests := []struct {
 		name       string
 		presetType GetQuoteOutputRecommendedPreset
-		expected   *PresetClassFixed
+		expected   *PresetClass
 		expectErr  bool
 	}{
 		{
@@ -162,14 +162,14 @@ func TestGetPreset(t *testing.T) {
 func TestCreateAuctionDetails(t *testing.T) {
 	tests := []struct {
 		name                 string
-		preset               *PresetClassFixed
+		preset               *PresetClass
 		additionalWaitPeriod float32
 		expected             *fusionorder.AuctionDetails
 		expectErr            bool
 	}{
 		{
 			name: "Valid Preset",
-			preset: &PresetClassFixed{
+			preset: &PresetClass{
 				AllowMultipleFills: true,
 				AllowPartialFills:  true,
 				AuctionDuration:    60.0,
@@ -194,10 +194,10 @@ func TestCreateAuctionDetails(t *testing.T) {
 				StartTime:       fusionorder.CalcAuctionStartTimeFunc(5, 10),
 				Duration:        60,
 				InitialRateBump: 2,
-				Points: []fusionorder.AuctionPointClassFixed{
+				Points: []fusionorder.AuctionPoint{
 					{Coefficient: 1, Delay: 2},
 				},
-				GasCost: fusionorder.GasCostConfigClassFixed{
+				GasCost: fusionorder.GasCostConfig{
 					GasBumpEstimate:  1,
 					GasPriceEstimate: 100,
 				},
@@ -206,7 +206,7 @@ func TestCreateAuctionDetails(t *testing.T) {
 		},
 		{
 			name: "Invalid Gas Price Estimate",
-			preset: &PresetClassFixed{
+			preset: &PresetClass{
 				AllowMultipleFills: true,
 				AllowPartialFills:  true,
 				AuctionDuration:    60.0,
@@ -538,7 +538,7 @@ func TestCreateFusionOrderTdd(t *testing.T) {
 					StartTime:       1673548149,
 					Duration:        180,
 					InitialRateBump: 50000,
-					Points:          []fusionorder.AuctionPointClassFixed{{Coefficient: 20000, Delay: 12}},
+					Points:          []fusionorder.AuctionPoint{{Coefficient: 20000, Delay: 12}},
 				},
 				Whitelist:          []fusionorder.AuctionWhitelistItem{{Address: common.HexToAddress("0x00000000219ab540356cbb839cbe05303d7705fa"), AllowFrom: big.NewInt(0)}},
 				ResolvingStartTime: big.NewInt(1673548139),
@@ -562,7 +562,7 @@ func TestCreateFusionOrderTdd(t *testing.T) {
 					StartTime:       1673548149,
 					Duration:        180,
 					InitialRateBump: 50000,
-					Points:          []fusionorder.AuctionPointClassFixed{{Coefficient: 20000, Delay: 12}},
+					Points:          []fusionorder.AuctionPoint{{Coefficient: 20000, Delay: 12}},
 				},
 				FeesIntAndRes: &FeesIntegratorAndResolver{
 					Integrator: IntegratorFee{
@@ -679,15 +679,15 @@ func TestCreateFusionOrderTdd(t *testing.T) {
 }
 
 // permit2TestQuote is the shared quote fixture for permit2 order creation tests
-func permit2TestQuote() GetQuoteOutputFixed {
-	return GetQuoteOutputFixed{
+func permit2TestQuote() GetQuoteOutput {
+	return GetQuoteOutput{
 		QuoteId:           "test-quote-id",
 		SettlementAddress: extensionContract,
 		Whitelist:         []string{"0x00000000219ab540356cbb839cbe05303d7705fa"},
 		MarketAmount:      "1420000000",
 		SurplusFee:        0,
-		Presets: QuotePresetsClassFixed{
-			Fast: PresetClassFixed{
+		Presets: QuotePresetsClass{
+			Fast: PresetClass{
 				AllowMultipleFills: true,
 				AllowPartialFills:  true,
 				AuctionDuration:    180,
@@ -783,8 +783,8 @@ func TestCreateOrder(t *testing.T) {
 		StartTime:       1673548149,
 		Duration:        180,
 		InitialRateBump: 50000,
-		Points:          []fusionorder.AuctionPointClassFixed{{Coefficient: 20000, Delay: 12}},
-		GasCost:         fusionorder.GasCostConfigClassFixed{GasBumpEstimate: 10000, GasPriceEstimate: 1000000},
+		Points:          []fusionorder.AuctionPoint{{Coefficient: 20000, Delay: 12}},
+		GasCost:         fusionorder.GasCostConfig{GasBumpEstimate: 10000, GasPriceEstimate: 1000000},
 	}
 
 	extension, err := NewExtension(ExtensionParams{
@@ -881,8 +881,8 @@ func TestCreateOrder_WithFees(t *testing.T) {
 		StartTime:       1673548149,
 		Duration:        180,
 		InitialRateBump: 50000,
-		Points:          []fusionorder.AuctionPointClassFixed{{Coefficient: 20000, Delay: 12}},
-		GasCost:         fusionorder.GasCostConfigClassFixed{GasBumpEstimate: 10000, GasPriceEstimate: 1000000},
+		Points:          []fusionorder.AuctionPoint{{Coefficient: 20000, Delay: 12}},
+		GasCost:         fusionorder.GasCostConfig{GasBumpEstimate: 10000, GasPriceEstimate: 1000000},
 	}
 
 	extension, err := NewExtension(ExtensionParams{

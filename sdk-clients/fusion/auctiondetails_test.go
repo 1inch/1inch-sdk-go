@@ -19,7 +19,7 @@ func TestDecodeAuctionDetails(t *testing.T) {
 				Duration:        180,
 				StartTime:       1673548149,
 				InitialRateBump: 50000,
-				Points: []fusionorder.AuctionPointClassFixed{
+				Points: []fusionorder.AuctionPoint{
 					{
 						Delay:       10,
 						Coefficient: 10000,
@@ -52,14 +52,14 @@ func TestEncodeAuctionDetails(t *testing.T) {
 		{
 			name: "Encode fusionorder.AuctionDetails",
 			details: fusionorder.AuctionDetails{
-				GasCost: fusionorder.GasCostConfigClassFixed{
+				GasCost: fusionorder.GasCostConfig{
 					GasBumpEstimate:  0,
 					GasPriceEstimate: 0,
 				},
 				StartTime:       1673548149,
 				Duration:        180,
 				InitialRateBump: 50000,
-				Points: []fusionorder.AuctionPointClassFixed{
+				Points: []fusionorder.AuctionPoint{
 					{
 						Delay:       12,
 						Coefficient: 20000,

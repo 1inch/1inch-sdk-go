@@ -15,9 +15,9 @@ type (
 	Interaction = fusionorder.Interaction
 )
 
-// GetQuoteOutputFixed is kept as an alias for backward compatibility; the
-// spec bugs it used to correct (quoteId type, missing surplusFee and
-// marketAmount) are now fixed at generation time in codegen/overrides.go.
+// Deprecated: Use GetQuoteOutput instead. The spec bugs this type used to
+// correct are now fixed at generation time (codegen/overrides.go); the alias
+// is kept so existing integrations keep compiling.
 type GetQuoteOutputFixed = GetQuoteOutput
 
 type PlaceOrderBody struct {
@@ -123,13 +123,14 @@ type ExtraParams struct {
 	unwrapWeth           bool
 }
 
-// QuoterControllerGetQuoteParamsFixed is kept as an alias for backward
-// compatibility; the spec bugs it used to correct (string amount, missing
-// surplus parameter) are now fixed at generation time in codegen/overrides.go.
+// Deprecated: Use QuoterControllerGetQuoteParams instead. The spec bugs this
+// type used to correct are now fixed at generation time
+// (codegen/overrides.go); the alias is kept so existing integrations keep
+// compiling.
 type QuoterControllerGetQuoteParamsFixed = QuoterControllerGetQuoteParams
 
-// QuoterControllerGetQuoteWithCustomPresetsParamsFixed is kept as an alias
-// for backward compatibility; see QuoterControllerGetQuoteParamsFixed.
+// Deprecated: Use QuoterControllerGetQuoteWithCustomPresetsParams instead;
+// see QuoterControllerGetQuoteParamsFixed.
 type QuoterControllerGetQuoteWithCustomPresetsParamsFixed = QuoterControllerGetQuoteWithCustomPresetsParams
 
 type OrderResponse struct {
@@ -157,16 +158,18 @@ type OrderResponse struct {
 		TakerAsset   string `json:"takerAsset"`
 		TakingAmount string `json:"takingAmount"`
 	} `json:"order"`
-	OrderHash         string                               `json:"orderHash"`
-	Points            []fusionorder.AuctionPointClassFixed `json:"points"`
-	Status            string                               `json:"status"`
-	ToTokenToUsdPrice string                               `json:"toTokenToUsdPrice"`
+	OrderHash         string                     `json:"orderHash"`
+	Points            []fusionorder.AuctionPoint `json:"points"`
+	Status            string                     `json:"status"`
+	ToTokenToUsdPrice string                     `json:"toTokenToUsdPrice"`
 }
 
-// PresetClassFixed is kept as an alias for backward compatibility; the
-// exclusiveResolver type bug it used to correct is now fixed at generation
-// time in codegen/overrides.go.
+// Deprecated: Use PresetClass instead. The exclusiveResolver type bug this
+// type used to correct is now fixed at generation time
+// (codegen/overrides.go); the alias is kept so existing integrations keep
+// compiling.
 type PresetClassFixed = PresetClass
 
-// QuotePresetsClassFixed is kept as an alias for backward compatibility.
+// Deprecated: Use QuotePresetsClass instead. The alias is kept so existing
+// integrations keep compiling.
 type QuotePresetsClassFixed = QuotePresetsClass

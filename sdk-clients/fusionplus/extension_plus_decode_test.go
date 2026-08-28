@@ -40,7 +40,7 @@ func TestFromLimitOrderExtension_RoundTrip(t *testing.T) {
 					Duration:        0,
 					InitialRateBump: 0,
 					Points:          nil,
-					GasCost:         fusionorder.GasCostConfigClassFixed{},
+					GasCost:         fusionorder.GasCostConfig{},
 				},
 				PostInteractionData: &SettlementPostInteractionData{
 					Whitelist: []fusionorder.WhitelistItem{},
@@ -82,7 +82,7 @@ func TestDecodeExtension_RoundTrip(t *testing.T) {
 			Duration:        0,
 			InitialRateBump: 0,
 			Points:          nil,
-			GasCost:         fusionorder.GasCostConfigClassFixed{},
+			GasCost:         fusionorder.GasCostConfig{},
 		},
 		PostInteractionData: &SettlementPostInteractionData{
 			Whitelist: []fusionorder.WhitelistItem{},
