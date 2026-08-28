@@ -95,7 +95,7 @@ func takerAssetTestQuoteParams(dstToken string) QuoteParams {
 		DstTokenAddress: dstToken,
 		Amount:          "1000000",
 		WalletAddress:   "0x4444444444444444444444444444444444444444",
-		Fee:             big.NewInt(0),
+		Fee:             0,
 	}
 }
 
