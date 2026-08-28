@@ -93,7 +93,7 @@ func DecodeEscrowExtension(data []byte) (*EscrowExtension, error) {
 	const extraDataCharacterLength = 320
 
 	// Create one extension that will be used for the Escrow extension data
-	orderbookExtensionTruncated, err := orderbook.Decode(data)
+	orderbookExtensionTruncated, err := orderbook.DecodeExtension(data)
 	if err != nil {
 		return nil, fmt.Errorf("failed to decode extension: %w", err)
 	}
@@ -110,7 +110,7 @@ func DecodeEscrowExtension(data []byte) (*EscrowExtension, error) {
 	}
 
 	// Create a second extension to extract extra data
-	orderbookExtension, err := orderbook.Decode(data)
+	orderbookExtension, err := orderbook.DecodeExtension(data)
 	if err != nil {
 		return nil, fmt.Errorf("failed to decode extension: %w", err)
 	}

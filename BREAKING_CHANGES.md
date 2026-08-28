@@ -43,6 +43,10 @@ The v5 major is used to make the public API consistent and intent-based. Every r
 - **Breaking (no alias possible):** the exported field `Order.EscExtension` is renamed to `Order.EscrowExtension` (struct fields can't be aliased). Update any `prepared.Order.EscExtension` access to `.EscrowExtension`.
 - **Removed** dead unused public types `FusionOrderV4` and `CrossChainOrderParams` (never referenced by any SDK method), and unexported the internal `ParentIndex` merkle helper. No aliases.
 
+**`orderbook`**
+- `Decode`→`DecodeExtension` (the bare `Decode` was too generic at package scope) and `GetSaltParams`→`GenerateSaltWithFeesParams` (named for its consumer). Old names kept as a forwarding function / alias.
+- **Removed** 7 dead unused public types (`GetCountParams`, `CountResponse`, `GetEventParams`, `GetEventsParams`, `EventResponse`, `OrderResponseExtended`, `GetActiveOrdersWithPermitParams`) that no API method referenced (two shadowed the real `GetOrderCount*` types). No aliases.
+
 ## Version 4.0.0
 
 ### Module Path Now Includes the `/v4` Major-Version Suffix

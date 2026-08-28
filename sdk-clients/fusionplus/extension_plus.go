@@ -101,7 +101,7 @@ func (e *ExtensionPlus) isEmpty() bool {
 }
 
 func DecodeExtension(data []byte) (*ExtensionPlus, error) {
-	orderbookExtension, err := orderbook.Decode(data)
+	orderbookExtension, err := orderbook.DecodeExtension(data)
 	if err != nil {
 		return &ExtensionPlus{}, fmt.Errorf("failed to decode extension: %w", err)
 	}

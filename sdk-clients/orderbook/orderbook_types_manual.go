@@ -39,23 +39,6 @@ type GetAllOrdersParams struct {
 	LimitOrdersQueryParams
 }
 
-type GetCountParams struct {
-	OrdersCountQueryParams
-}
-
-type GetEventParams struct {
-	OrderHash string
-}
-
-type GetEventsParams struct {
-	EventsQueryParams
-}
-
-type GetActiveOrdersWithPermitParams struct {
-	Wallet string
-	Token  string
-}
-
 type Order struct {
 	OrderHash string    `json:"orderHash"`
 	Signature string    `json:"signature"`
@@ -93,11 +76,6 @@ type OrderResponse struct {
 	OrderInvalidReason   any       `json:"orderInvalidReason"`
 }
 
-type OrderResponseExtended struct {
-	OrderResponse
-	LimitOrderDataNormalized NormalizedLimitOrderData
-}
-
 type GetOrderByHashResponse struct {
 	OrderHash            string    `json:"orderHash"`
 	CreateDateTime       time.Time `json:"createDateTime"`
@@ -112,24 +90,6 @@ type GetOrderByHashResponse struct {
 	OrderInvalidReason   string    `json:"orderInvalidReason"`
 	IsMakerContract      bool      `json:"isMakerContract"`
 	Events               string    `json:"events"`
-}
-
-type CountResponse struct {
-	Count int `json:"count"`
-}
-
-type EventResponse struct {
-	Id                   int       `json:"id"`
-	Network              int       `json:"network"`
-	LogId                string    `json:"logId"`
-	Version              int       `json:"version"`
-	Action               string    `json:"action"`
-	OrderHash            string    `json:"orderHash"`
-	Taker                string    `json:"taker"`
-	RemainingMakerAmount string    `json:"remainingMakerAmount"`
-	TransactionHash      string    `json:"transactionHash"`
-	BlockNumber          int       `json:"blockNumber"`
-	CreateDateTime       time.Time `json:"createDateTime"`
 }
 
 type GetOrderByHashResponseExtended struct {
