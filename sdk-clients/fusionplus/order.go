@@ -27,20 +27,25 @@ func CreateFusionPlusOrderData(quoteParams QuoteParams, quote *Quote, orderParam
 		return nil, fmt.Errorf("failed to create auction details: %w", err)
 	}
 
-	// NOTE: This sets the source-chain order's takerAsset (and the extension
-	// DstToken) to the destination token address. This is a known correctness
-	// defect — the source-chain takerAsset should be the chain-specific
-	// ERC20True sentinel, with the destination token living only in the escrow
-	// extension. Left unchanged here so this refactor stays behavior-identical
-	// to v4.1.0/main; the fix is tracked separately.
-	takerAsset := quoteParams.DstTokenAddress
-	if takerAsset == constants.NativeToken {
-		takerAssetWrapped, ok := constants.ChainToWrapper[constants.NetworkEnum(chainId)]
-		if !ok {
-			return nil, fmt.Errorf("unsupported network for wrapped token: %d", chainId)
-		}
-		takerAsset = takerAssetWrapped.Hex()
+	// The taker asset of the source-chain order is the TRUE_ERC20 sentinel of
+	// the chain, not the destination token. The sentinel is a token that does
+	// nothing when a resolver transfers it. The escrow extension carries the
+	// real destination token in DstToken. The swap delivers this token on the
+	// destination chain.
+	//
+	// Do not put the destination token in this taker asset. The destination
+	// token can also be a live ERC-20 on the source chain. In that condition, a
+	// source-chain fill does a real transferFrom of an unwanted token.
+	trueERC20, ok := constants.GetTrueERC20(chainId)
+	if !ok {
+		return nil, fmt.Errorf("fusion+ is not supported on source chain %d (no TRUE_ERC20 sentinel)", chainId)
 	}
+	takerAsset := trueERC20.Hex()
+
+	// Use the destination token without a change. This includes the native
+	// sentinel 0xEeee…. The escrow extension holds this token for the
+	// destination chain.
+	dstToken := quoteParams.DstTokenAddress
 
 	var takingFeeReceiver geth_common.Address
 	if orderParams.TakingFeeReceiver == "" {
@@ -145,7 +150,7 @@ func CreateFusionPlusOrderData(quoteParams QuoteParams, quote *Quote, orderParam
 		},
 		HashLock:         orderParams.HashLock,
 		DstChainId:       quoteParams.DstChain,
-		DstToken:         geth_common.HexToAddress(takerAsset),
+		DstToken:         geth_common.HexToAddress(dstToken),
 		SrcSafetyDeposit: quote.SrcSafetyDeposit,
 		DstSafetyDeposit: quote.DstSafetyDeposit,
 		TimeLocks:        escrowParams.TimeLocks,

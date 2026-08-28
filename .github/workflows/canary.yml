@@ -2,6 +2,10 @@ name: Production canary
 
 on:
   workflow_dispatch:
+    inputs:
+      test_filter:
+        description: "go test -run filter (narrow to save funds, e.g. TestProductionCanaryFusion)"
+        default: "TestProductionCanary"
   schedule:
     # Weekly on Monday at 06:30 UTC
     - cron: '30 6 * * 1'
@@ -25,4 +29,5 @@ jobs:
           CANARY_WALLET_KEY: ${{ secrets.CANARY_WALLET_KEY }}
           CANARY_BASE_RPC_URL: ${{ secrets.CANARY_BASE_RPC_URL }}
           CANARY_ARBITRUM_RPC_URL: ${{ secrets.CANARY_ARBITRUM_RPC_URL }}
+          TEST_FILTER: ${{ github.event.inputs.test_filter || 'TestProductionCanary' }}
         run: make test-canary

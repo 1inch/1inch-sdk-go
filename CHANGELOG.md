@@ -39,6 +39,14 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 - **Raw generated types now carry the spec corrections previously exclusive to the `*Fixed` types**: `QuoteId` string, `Amount` string, `Fee *big.Int`, `IsPermit2` bool, string USD prices, `Points` slice, `ExclusiveResolver` string (fusion/fusionplus). See BREAKING_CHANGES.md for the full list.
 - **Chain-id fields changed from `float32` to `int`**: A `float32` cannot exactly represent integers above 2²⁴, so Aurora's chain id (1313161554) was silently rounded to 1313161600 — corrupting the EIP-712 signing domain and the encoded escrow `DstChainId`, and making Aurora impossible to pass through parameter validation. All chain-id fields in the `fusionplus` and `tokens` packages are now `int`. Affected exported types include `fusionplus.QuoterControllerGetQuoteParamsFixed` (`SrcChain`, `DstChain`), `fusionplus.QuoterControllerGetQuoteWithCustomPresetsParamsFixed`, `fusionplus.GetSettlementContractParams`, `fusionplus.EscrowExtension`/`EscrowExtensionParams`/`EscrowExtraData` (`DstChainId`), `fusionplus.SignedOrderInput` (`SrcChainId`), the generated fusionplus order/quoter/relayer types, and `tokens.ProviderTokenDtoFixed`/`TokenInfoDtoFixed` (`ChainId`). Callers using untyped constants (e.g. `constants.AuroraChainId` or literal chain ids) are unaffected; callers passing `float32`-typed variables must drop the conversion. The fix is applied at the codegen layer (the pipeline now rewrites chain-id fields typed as `number` to `integer` before type generation; see `codegen/transforms.go`), and the internal `CheckChainIdFloat32`/`CheckChainIdFloat32Required` validators were removed.
 
+## [v4.2.0] - 2026-08-28
+
+### Added
+- `constants.ChainToTrueERC20` and `constants.GetTrueERC20` give the Fusion+ TRUE_ERC20 sentinel token for each supported chain.
+
+### Fixed
+- **Fusion+ orders had the wrong taker asset on the source chain.** `CreateFusionPlusOrderData` put the destination token into the taker asset of the source-chain order. For a native destination, it used the wrapped token of the source chain. The taker asset is now the TRUE_ERC20 sentinel of the chain. This sentinel is a token that does nothing when a resolver transfers it. The escrow extension now holds the real destination token in its `DstToken` field. This includes the native sentinel `0xEeee…`. The destination token can also be a live ERC-20 on the source chain. In this condition, the old behavior could transfer a real and unwanted token on the source chain during a fill. The SDK now stops with an error when the source chain has no TRUE_ERC20 sentinel. It does not sign an order that has the wrong asset.
+
 ## [v4.1.0] - 2026-07-25
 
 ### Added
