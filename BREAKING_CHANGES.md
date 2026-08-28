@@ -2,6 +2,8 @@
 
 This document tracks breaking changes between major versions of the SDK that affect users importing and integrating the library.
 
+For a step-by-step upgrade checklist, see [MIGRATION.md](MIGRATION.md); this document is the per-change reference it links back to.
+
 ## Unreleased
 
 ### Generated Type Names No Longer Leak Upstream Controller Naming

@@ -7,6 +7,7 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 ## [Unreleased]
 
 ### Added
+- MIGRATION.md: step-by-step v4 → v5 upgrade checklist complementing the per-change reference in BREAKING_CHANGES.md
 - Wire-surface diff in CI (`tools/wiredump` + `wire-surface` job): every PR's job summary shows the exact diff of all exported struct fields (name, Go type, json/url tags) against the base branch — catching struct-tag changes that compile fine but silently alter the wire format, which type-level API diffing cannot see. An A/B run against the pre-refactor tree verified all 73 wire-surface differences on this branch map to documented changes, with zero field removals and zero tag changes.
 - Fee validation on fusion/fusionplus quote params: fees must be basis points in [0, 10000]
 - `govulncheck` job on every PR and a weekly fuzzing workflow for the untrusted-input decoders
