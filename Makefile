@@ -30,7 +30,7 @@ test-integration:
 # CANARY_ARBITRUM_RPC_URL.
 test-canary:
 	@echo "  >  Running production canary trades"
-	GOBIN=$(GOBIN) go test -tags integration -v -timeout 60m -run TestProductionCanary ./tests/integration/
+	GOBIN=$(GOBIN) go test -tags integration -v -timeout 60m -run "$${TEST_FILTER:-TestProductionCanary}" ./tests/integration/
 
 fmt:
 	@echo "  >  Running go fmt"
