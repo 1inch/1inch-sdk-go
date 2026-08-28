@@ -46,6 +46,7 @@ Two related changes:
 
 - **`fusionplus.CreateAuctionDetailsPlus` now takes `*Preset`** (the generated quoter preset) instead of `*PresetClassFixed`. The legacy `PresetClassFixed`/`GasCostConfigClass`/`AuctionPointClass` bridge shape is no longer produced or consumed by the SDK and is kept only as deprecated types.
 - **`fusionorder.AuctionPointClassFixed` and `fusionorder.GasCostConfigClassFixed` are renamed to `fusionorder.AuctionPoint` and `fusionorder.GasCostConfig`**, with deprecated aliases under the old names.
+- Minor encoding nuance: `fusion.Quote.SurplusFee` and `fusion.Quote.MarketAmount` (previously hand-added on `GetQuoteOutputFixed`) now carry `omitempty`, so re-marshaling a quote omits them when zero. Decoding is unchanged.
 
 ### Type Generator Upgraded to oapi-codegen v2
 

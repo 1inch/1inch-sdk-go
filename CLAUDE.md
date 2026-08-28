@@ -352,7 +352,7 @@ client.Wallet.BroadcastTransaction(ctx, signedTx)
 ### Fusion Order
 ```go
 // 1. Get quote
-quote, _ := client.GetQuote(ctx, fusion.QuoterControllerGetQuoteParamsFixed{...})
+quote, _ := client.GetQuote(ctx, fusion.QuoteParams{...})
 
 // 2. Place order (signs and submits)
 orderHash, _ := client.PlaceOrder(ctx, *quote, fusion.OrderParams{

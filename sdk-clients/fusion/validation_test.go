@@ -8,7 +8,7 @@ import (
 	"github.com/stretchr/testify/require"
 )
 
-func TestOrderApiControllerGetActiveOrdersParams_Validate(t *testing.T) {
+func TestGetActiveOrdersParams_Validate(t *testing.T) {
 	tests := []struct {
 		name        string
 		params      GetActiveOrdersParams
@@ -59,7 +59,7 @@ func TestOrderApiControllerGetActiveOrdersParams_Validate(t *testing.T) {
 	}
 }
 
-func TestQuoterControllerGetQuoteParams_Validate(t *testing.T) {
+func TestQuoteParams_Validate(t *testing.T) {
 	validAddress := "0x6B175474E89094C44Da98b954EedeAC495271d0F"
 
 	tests := []struct {
@@ -149,7 +149,7 @@ func TestQuoterControllerGetQuoteParams_Validate(t *testing.T) {
 	}
 }
 
-func TestQuoterControllerGetQuoteWithCustomPresetsParams_Validate(t *testing.T) {
+func TestCustomPresetQuoteParams_Validate(t *testing.T) {
 	validAddress := "0x6B175474E89094C44Da98b954EedeAC495271d0F"
 
 	tests := []struct {

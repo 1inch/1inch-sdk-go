@@ -134,7 +134,7 @@ func TestSignedOrderInput_Serialization(t *testing.T) {
 }
 
 // TestGetQuoteOutput_Serialization tests quote response deserialization
-func TestGetQuoteOutput_Serialization(t *testing.T) {
+func TestQuote_Serialization(t *testing.T) {
 	// Simulate API response JSON
 	apiResponse := `{
 		"quoteId": "abc123",

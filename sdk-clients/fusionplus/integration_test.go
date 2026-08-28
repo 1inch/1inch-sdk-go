@@ -123,7 +123,7 @@ func TestSignedOrderInput_Serialization_FusionPlus(t *testing.T) {
 }
 
 // TestGetQuoteOutput_Serialization_FusionPlus tests quote response deserialization
-func TestGetQuoteOutput_Serialization_FusionPlus(t *testing.T) {
+func TestQuote_Serialization_FusionPlus(t *testing.T) {
 	apiResponse := `{
 		"quoteId": "abc123",
 		"srcEscrowFactory": "0x8273f37417da37c4a6c3995e82cf442f87a25d9c",
