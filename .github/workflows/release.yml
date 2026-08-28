@@ -85,6 +85,27 @@ jobs:
           else
             echo "prerelease=false" >> "$GITHUB_OUTPUT"
           fi
+          echo "base=$latest_stable" >> "$GITHUB_OUTPUT"
+
+      # Semver guard: a patch or minor release (or an rc of one) must not
+      # contain incompatible public API changes. Machine-verified with
+      # gorelease against the latest stable tag; a major bump skips the guard.
+      - name: Enforce semver for public API changes
+        if: github.event.inputs.version != 'major'
+        run: |
+          set -uo pipefail
+          base="${{ steps.version.outputs.base }}"
+          if [ "$base" = "v0.0.0" ]; then
+            echo "No previous stable release; skipping API compatibility guard."
+            exit 0
+          fi
+          go run golang.org/x/exp/cmd/gorelease@v0.0.0-20260824195058-e88cd73687aa -base="$base" > /tmp/apidiff.txt 2>&1 || true
+          cat /tmp/apidiff.txt
+          if grep -q '^## incompatible changes' /tmp/apidiff.txt; then
+            echo "::error::This ${{ github.event.inputs.version }} release contains incompatible public API changes since $base (see log). Use a major release, or revert the incompatible changes."
+            exit 1
+          fi
+          echo "No incompatible public API changes since $base."
 
       # Stable releases write the new version into the source constant (so the
       # User-Agent header always matches the release tag) and roll the CHANGELOG

@@ -47,6 +47,14 @@ jobs:
         with:
           go-version: '1.25'
 
+      # Live behavior check: production responses must still decode into the
+      # SDK's types. Catches drift that spec comparison alone cannot see.
+      - name: Live API smoke tests
+        if: steps.token.outputs.available == 'true'
+        env:
+          DEV_PORTAL_TOKEN: ${{ secrets.DEV_PORTAL_TOKEN }}
+        run: go test -tags liveapi -v ./tests/liveapi/
+
       - name: Fetch latest specs
         if: steps.token.outputs.available == 'true'
         env:

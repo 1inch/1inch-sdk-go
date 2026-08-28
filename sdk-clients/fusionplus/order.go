@@ -67,7 +67,7 @@ func CreateFusionPlusOrderData(quoteParams QuoterControllerGetQuoteParamsFixed, 
 
 	fees := Fees{
 		IntFee: IntegratorFee{
-			Ratio:    fusionorder.BpsToRatioFormat(quoteParams.Fee),
+			Ratio:    fusionorder.BpsToRatioFormat(big.NewInt(int64(quoteParams.Fee))),
 			Receiver: takingFeeReceiver,
 		},
 		BankFee: big.NewInt(0),

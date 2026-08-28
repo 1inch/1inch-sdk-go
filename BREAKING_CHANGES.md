@@ -11,6 +11,8 @@ Known type bugs in the upstream OpenAPI specs are now corrected at generation ti
 **Impact:**
 - `fusion` and `fusionplus` aliases keep the same field sets and types — no code changes needed. (`fusionplus.QuoterControllerGetQuoteWithCustomPresetsParamsFixed` gains `Fee *big.Int` and `IsPermit2 bool` fields; additive.)
 - `tokens.ProviderTokenDtoFixed` / `TokenInfoDtoFixed`: optional fields (`DisplayedSymbol`, `Eip2612`, `IsFoT`, `LogoURI`, `Extensions`) changed from pointers to values, matching the SDK-wide policy of generating optional fields without pointers. `Tags` is `[]TagDto` on the generated types too.
+- **The raw (non-`Fixed`) generated types now carry the corrections**, so code using them directly sees type changes: `fusion.GetQuoteOutput.QuoteId` and `fusionplus.GetQuoteOutput.QuoteId` (`map[string]interface{}` → `string`), `fusion.PresetClass.ExclusiveResolver` (`map[string]interface{}` → `string`), `Amount` on all fusion/fusionplus quoter params (`float32` → `string`), `fusionplus` quoter params `IsPermit2` (`string` → `bool`) — including `QuoterControllerBuildQuoteTypedDataParams` — and `fusionplus.GetOrderFillsByHashOutput` (`DstTokenPriceUsd`/`SrcTokenPriceUsd` `map[string]interface{}` → `string`, `Points` → `[]AuctionPointOutput`). These now match what the `Fixed` types (the types the SDK's own methods use) have always had.
+- **`Fee` on the fusionplus quoter params changed from `*big.Int` to `int`** (including the `Fixed` alias, where it was `*big.Int` since the type was introduced). This also fixes a silent bug: `go-querystring` cannot encode `*big.Int` (a struct with only unexported fields), so a fee set on a quote request was **silently omitted from the query string** and never reached the API. Fees are integral basis points (1% = 100 bps), so `int` is both correct and wire-safe; a wire-format regression test now pins the encoding.
 
 **Migration (tokens only):**
 
@@ -28,17 +30,21 @@ The `*Fixed` names remain available indefinitely as aliases; new code can use th
 
 ### Type Generator Upgraded to oapi-codegen v2
 
-The deprecated `deepmap/oapi-codegen` v1.16.2 has been replaced by the maintained `oapi-codegen/oapi-codegen` v2.8.0. Generated struct fields and type names are unchanged, with two exceptions:
+The deprecated `deepmap/oapi-codegen` v1.16.2 has been replaced by the maintained `oapi-codegen/oapi-codegen` v2.8.0. The full public-API delta was machine-verified with `gorelease -base=v4.1.0`; the incompatible changes are:
 
-- **`spotprices` bare currency constants are now prefixed with their enum type name** (v1 only prefixed on collision; v2 is consistent).
+- **`spotprices` and `traces` bare enum constants are now prefixed with their enum type name** (v1 only prefixed on collision; v2 is consistent).
 
   ```go
   // Before
   params.Currency = spotprices.GetPricesRequestDtoCurrency(spotprices.USD)
+  trace.Type == traces.CALL
 
   // After
   params.Currency = spotprices.GetPricesRequestDtoCurrencyUSD
+  trace.Type == traces.CoreCustomRootTxEventCallstackTraceFullDtoTypeCALL
   ```
+
+- **Optional object-typed response fields lost their pointers**: `history.TransactionDetailsDto.Meta` (`*TransactionDetailsMetaDto` → `TransactionDetailsMetaDto`), `nft.Asset.Collection` (`*Collection` → `Collection`), and `nft.Asset.RarityData` (`*RarityData` → `RarityData`). v1 ignored the SDK's skip-optional-pointer annotation on object-typed properties; v2 honors it. Nil checks become zero-value checks; when a response omits the field you now get a zero struct instead of nil.
 
 - **`web3.ApiKeyAuthScopes` constant removed** (a security-scheme artifact v2 no longer emits for types-only generation; it referenced nothing usable).
 

@@ -27,16 +27,6 @@ func ref(name string) spec {
 	return spec{"$ref": "#/components/schemas/" + name}
 }
 
-// bigIntType is an x-go-type schema generating *big.Int, for amounts that
-// overflow float64.
-func bigIntType() spec {
-	return spec{
-		"type":             "number",
-		"x-go-type":        "*big.Int",
-		"x-go-type-import": spec{"path": "math/big"},
-	}
-}
-
 // specOverrides lists the known type bugs in each upstream spec, keyed by spec
 // file name. See schemaPatch for semantics.
 var specOverrides = map[string][]schemaPatch{
@@ -88,8 +78,11 @@ var paramOverrides = map[string]map[string]spec{
 	"fusionplus_quoter-openapi.json": {
 		// Amounts are big-integer wei strings; float32 would corrupt them.
 		"amount": {"type": "string"},
-		// Fee is in bps; *big.Int matches the SDK-wide amount handling.
-		"fee": bigIntType(),
+		// Fee is an integral bps value (1% = 100 bps). It must be a plain
+		// integer: the previous *big.Int type was silently dropped from the
+		// query string because go-querystring cannot encode a struct with only
+		// unexported fields.
+		"fee": {"type": "integer"},
 		// isPermit2 is a flag, not a string.
 		"isPermit2": {"type": "boolean"},
 	},

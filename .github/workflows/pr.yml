@@ -25,6 +25,48 @@ jobs:
       - name: Compile integration tests
         run: go vet -tags integration ./tests/...
 
+      - name: Compile live API tests
+        run: go vet -tags liveapi ./tests/...
+
+  # Machine-verifies the public API surface against the latest stable release
+  # with gorelease. The full report lands in the job summary on every PR;
+  # the job fails only when incompatible changes exist and BREAKING_CHANGES.md
+  # has no Unreleased section acknowledging pending breaking changes.
+  api-compat:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout code into workspace directory
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Set up Go
+        uses: actions/setup-go@v5
+        with:
+          go-version: '1.25'
+
+      - name: Diff public API against the latest stable release
+        run: |
+          set -uo pipefail
+          base=$(git tag -l 'v*' --sort=-v:refname | grep -vE '\-' | head -n1)
+          if [ -z "$base" ]; then
+            echo "No stable release tag found; skipping API diff." >> "$GITHUB_STEP_SUMMARY"
+            exit 0
+          fi
+          echo "## Public API diff vs $base" >> "$GITHUB_STEP_SUMMARY"
+          go run golang.org/x/exp/cmd/gorelease@v0.0.0-20260824195058-e88cd73687aa -base="$base" > /tmp/apidiff.txt 2>&1 || true
+          { echo '```'; cat /tmp/apidiff.txt; echo '```'; } >> "$GITHUB_STEP_SUMMARY"
+          if grep -q '^## incompatible changes' /tmp/apidiff.txt; then
+            if grep -q '^## Unreleased' BREAKING_CHANGES.md; then
+              echo "Incompatible API changes detected and acknowledged in BREAKING_CHANGES.md (Unreleased section)."
+            else
+              echo "::error::Incompatible public API changes detected (see job summary), but BREAKING_CHANGES.md has no Unreleased section documenting them."
+              exit 1
+            fi
+          else
+            echo "No incompatible public API changes."
+          fi
+
   # Two release-hygiene rules: the version constant is owned by the release
   # workflow (PRs must not modify it), and code changes without a CHANGELOG
   # entry get a warning that their release notes will be auto-generated.

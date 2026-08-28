@@ -159,6 +159,39 @@ func TestGenerateTypesReproducesCommittedFiles(t *testing.T) {
 	})
 }
 
+// TestGenerateTypesIsDeterministic asserts that two runs of the pipeline over
+// the same specs produce byte-identical output — guarding against
+// nondeterminism (e.g. map-iteration order) sneaking into the transforms or
+// overrides.
+func TestGenerateTypesIsDeterministic(t *testing.T) {
+	first := runReproPipeline(t)
+	second := t.TempDir()
+	require.NoError(t, Generate(Options{
+		SpecsDir:    "openapi",
+		MappingFile: "mapping.json",
+		OutputDir:   second,
+	}))
+
+	type testCase struct {
+		name string
+		file string
+	}
+	var tests []testCase
+	for _, f := range generatedFiles {
+		tests = append(tests, testCase{name: f, file: f})
+	}
+
+	for _, tc := range tests {
+		t.Run(tc.name, func(t *testing.T) {
+			a, err := os.ReadFile(filepath.Join(first, tc.file))
+			require.NoError(t, err)
+			b, err := os.ReadFile(filepath.Join(second, tc.file))
+			require.NoError(t, err)
+			require.Equal(t, string(a), string(b), "pipeline output is not deterministic")
+		})
+	}
+}
+
 // TestTransformsAreIdempotent asserts that applying the transform chain to an
 // already-transformed spec changes nothing. This guards against transforms
 // that corrupt their own output — the committed specs have all historically
