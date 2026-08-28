@@ -432,10 +432,8 @@ type GetOrderFillsByHashOutput struct {
 	// DstChainId Identifier of the chain where the taker asset is located.
 	//
 	// Example: 2
-	DstChainId int `json:"dstChainId"`
-
-	// DstTokenPriceUsd Example: 200
-	DstTokenPriceUsd map[string]interface{} `json:"dstTokenPriceUsd"`
+	DstChainId       int    `json:"dstChainId"`
+	DstTokenPriceUsd string `json:"dstTokenPriceUsd"`
 
 	// Extension An interaction call data. ABI encoded set of makerAssetSuffix, takerAssetSuffix, makingAmountGetter, takingAmountGetter, predicate, permit, preInteraction, postInteraction.If extension exists then lowest 160 bits of the order salt must be equal to the lowest 160 bits of the extension hash
 	Extension string `json:"extension"`
@@ -452,16 +450,14 @@ type GetOrderFillsByHashOutput struct {
 	// OrderHash Order hash
 	//
 	// Example: 0x496755a88564d8ded6759dff0252d3e6c3ef1fe42b4fa1bbc3f03bd2674f1078
-	OrderHash string             `json:"orderHash"`
-	Points    AuctionPointOutput `json:"points"`
+	OrderHash string               `json:"orderHash"`
+	Points    []AuctionPointOutput `json:"points"`
 
 	// SrcChainId Identifier of the chain where the maker asset is located.
 	//
 	// Example: 1
-	SrcChainId int `json:"srcChainId"`
-
-	// SrcTokenPriceUsd Example: 100
-	SrcTokenPriceUsd map[string]interface{} `json:"srcTokenPriceUsd"`
+	SrcChainId       int    `json:"srcChainId"`
+	SrcTokenPriceUsd string `json:"srcTokenPriceUsd"`
 
 	// Status Order status
 	//

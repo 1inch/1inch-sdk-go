@@ -52,11 +52,12 @@ type GetQuoteOutput struct {
 	// FeeToken Destination token address
 	FeeToken        string            `json:"feeToken"`
 	FromTokenAmount string            `json:"fromTokenAmount"`
+	MarketAmount    string            `json:"marketAmount,omitempty"`
 	Presets         QuotePresetsClass `json:"presets"`
 	Prices          TokenPairValue    `json:"prices"`
 
 	// QuoteId Current generated quote id, should be passed with order
-	QuoteId map[string]interface{} `json:"quoteId"`
+	QuoteId string `json:"quoteId"`
 
 	// RecommendedPreset suggested to use this preset
 	RecommendedPreset GetQuoteOutputRecommendedPreset `json:"recommended_preset"`
@@ -66,6 +67,7 @@ type GetQuoteOutput struct {
 
 	// Suggested is it suggested to use Fusion
 	Suggested     bool           `json:"suggested"`
+	SurplusFee    float32        `json:"surplusFee,omitempty"`
 	ToTokenAmount string         `json:"toTokenAmount"`
 	Volume        TokenPairValue `json:"volume"`
 
@@ -84,19 +86,19 @@ type PairCurrencyValue struct {
 
 // PresetClass defines model for PresetClass.
 type PresetClass struct {
-	AllowMultipleFills bool                   `json:"allowMultipleFills"`
-	AllowPartialFills  bool                   `json:"allowPartialFills"`
-	AuctionDuration    float32                `json:"auctionDuration"`
-	AuctionEndAmount   string                 `json:"auctionEndAmount"`
-	AuctionStartAmount string                 `json:"auctionStartAmount"`
-	BankFee            string                 `json:"bankFee"`
-	EstP               float32                `json:"estP"`
-	ExclusiveResolver  map[string]interface{} `json:"exclusiveResolver"`
-	GasCost            GasCostConfigClass     `json:"gasCost"`
-	InitialRateBump    float32                `json:"initialRateBump"`
-	Points             []AuctionPointClass    `json:"points"`
-	StartAuctionIn     float32                `json:"startAuctionIn"`
-	TokenFee           string                 `json:"tokenFee"`
+	AllowMultipleFills bool                `json:"allowMultipleFills"`
+	AllowPartialFills  bool                `json:"allowPartialFills"`
+	AuctionDuration    float32             `json:"auctionDuration"`
+	AuctionEndAmount   string              `json:"auctionEndAmount"`
+	AuctionStartAmount string              `json:"auctionStartAmount"`
+	BankFee            string              `json:"bankFee"`
+	EstP               float32             `json:"estP"`
+	ExclusiveResolver  string              `json:"exclusiveResolver"`
+	GasCost            GasCostConfigClass  `json:"gasCost"`
+	InitialRateBump    float32             `json:"initialRateBump"`
+	Points             []AuctionPointClass `json:"points"`
+	StartAuctionIn     float32             `json:"startAuctionIn"`
+	TokenFee           string              `json:"tokenFee"`
 }
 
 // QuotePresetsClass defines model for QuotePresetsClass.
@@ -121,7 +123,7 @@ type QuoterControllerGetQuoteParams struct {
 	ToTokenAddress string `url:"toTokenAddress" json:"toTokenAddress"`
 
 	// Amount Amount to take from "FROM" token to get "TO" token
-	Amount float32 `url:"amount" json:"amount"`
+	Amount string `url:"amount" json:"amount"`
 
 	// WalletAddress An address of the wallet or contract who will create Fusion order
 	WalletAddress string `url:"walletAddress" json:"walletAddress"`
@@ -137,7 +139,8 @@ type QuoterControllerGetQuoteParams struct {
 	IsLedgerLive bool   `url:"isLedgerLive" json:"isLedgerLive"`
 
 	// Permit permit, user approval sign
-	Permit string `url:"permit,omitempty" json:"permit,omitempty"`
+	Permit  string `url:"permit,omitempty" json:"permit,omitempty"`
+	Surplus bool   `url:"surplus,omitempty" json:"surplus,omitempty"`
 }
 
 // QuoterControllerGetQuoteWithCustomPresetsParams defines parameters for QuoterControllerGetQuoteWithCustomPresets.
@@ -149,7 +152,7 @@ type QuoterControllerGetQuoteWithCustomPresetsParams struct {
 	ToTokenAddress string `url:"toTokenAddress" json:"toTokenAddress"`
 
 	// Amount Amount to take from "FROM" token to get "TO" token
-	Amount float32 `url:"amount" json:"amount"`
+	Amount string `url:"amount" json:"amount"`
 
 	// WalletAddress An address of the wallet or contract who will create Fusion order
 	WalletAddress string `url:"walletAddress" json:"walletAddress"`
@@ -164,7 +167,9 @@ type QuoterControllerGetQuoteWithCustomPresetsParams struct {
 	IsPermit2 string `url:"isPermit2,omitempty" json:"isPermit2,omitempty"`
 
 	// Permit permit, user approval sign
-	Permit string `url:"permit,omitempty" json:"permit,omitempty"`
+	Permit       string `url:"permit,omitempty" json:"permit,omitempty"`
+	IsLedgerLive bool   `url:"isLedgerLive" json:"isLedgerLive"`
+	Surplus      bool   `url:"surplus,omitempty" json:"surplus,omitempty"`
 }
 
 // QuoterControllerGetQuoteWithCustomPresetsJSONRequestBody defines body for QuoterControllerGetQuoteWithCustomPresets for application/json ContentType.

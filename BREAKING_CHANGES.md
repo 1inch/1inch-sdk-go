@@ -4,6 +4,28 @@ This document tracks breaking changes between major versions of the SDK that aff
 
 ## Unreleased
 
+### `*Fixed` Types Are Now Aliases of Corrected Generated Types
+
+Known type bugs in the upstream OpenAPI specs are now corrected at generation time (`codegen/overrides.go`) instead of via hand-maintained `*Fixed` shadow copies. All 12 `*Fixed` types in `fusion`, `fusionplus`, and `tokens` are now type aliases of the corrected generated types.
+
+**Impact:**
+- `fusion` and `fusionplus` aliases keep the same field sets and types — no code changes needed. (`fusionplus.QuoterControllerGetQuoteWithCustomPresetsParamsFixed` gains `Fee *big.Int` and `IsPermit2 bool` fields; additive.)
+- `tokens.ProviderTokenDtoFixed` / `TokenInfoDtoFixed`: optional fields (`DisplayedSymbol`, `Eip2612`, `IsFoT`, `LogoURI`, `Extensions`) changed from pointers to values, matching the SDK-wide policy of generating optional fields without pointers. `Tags` is `[]TagDto` on the generated types too.
+
+**Migration (tokens only):**
+
+```go
+// Before
+if token.DisplayedSymbol != nil { use(*token.DisplayedSymbol) }
+eip2612 := token.Eip2612 != nil && *token.Eip2612
+
+// After
+if token.DisplayedSymbol != "" { use(token.DisplayedSymbol) }
+eip2612 := token.Eip2612
+```
+
+The `*Fixed` names remain available indefinitely as aliases; new code can use the underlying generated names (`GetQuoteOutput`, `PresetClass`, `ProviderTokenDto`, …) interchangeably.
+
 ### Type Generator Upgraded to oapi-codegen v2
 
 The deprecated `deepmap/oapi-codegen` v1.16.2 has been replaced by the maintained `oapi-codegen/oapi-codegen` v2.8.0. Generated struct fields and type names are unchanged, with two exceptions:
