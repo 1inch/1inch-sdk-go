@@ -412,15 +412,34 @@ func TestProductionCanaryFusion(t *testing.T) {
 	fusionClient, err := fusion.NewClient(fusionConfig)
 	require.NoError(t, err)
 
+	// All Fusion subtests sell USDC -> WETH. Resolvers reliably fill that
+	// direction on Base; the reverse (WETH -> USDC) does not fill at dust sizes,
+	// so the wallet is kept in USDC by recycling accumulated WETH back through
+	// the classic-swap path, which fills both directions. This still exercises
+	// each approval mechanism (direct approval, EIP-2612, Permit2), which is the
+	// point of the Fusion canary.
+	aggConfig, err := aggregation.NewConfiguration(aggregation.ConfigurationParams{
+		NodeUrl:    actor.rpcUrl,
+		PrivateKey: actor.walletKey,
+		ChainId:    actor.chain.chainId,
+		ApiUrl:     canaryApiUrl,
+		ApiKey:     actor.apiKey,
+	})
+	require.NoError(t, err)
+	aggClient, err := aggregation.NewClient(aggConfig)
+	require.NoError(t, err)
+
+	needed := new(big.Int).Mul(big.NewInt(3), actor.chain.usdcAmount) // one per subtest
+	ensureCanaryUsdc(t, actor, aggClient, weth, usdc, needed)
+
 	t.Run("direct approval", func(t *testing.T) {
-		sellToken, buyToken, sellAmount := pickDirection(t, actor)
-		actor.ensureErc20Allowance(t, sellToken, actor.router, sellAmount)
-		placeFusionOrderAndAwaitFill(t, actor, fusionClient, sellToken, buyToken, sellAmount, "", false)
+		sellAmount := actor.chain.usdcAmount
+		actor.ensureErc20Allowance(t, usdc, actor.router, sellAmount)
+		placeFusionOrderAndAwaitFill(t, actor, fusionClient, usdc, weth, sellAmount, "", false)
 	})
 
-	// The EIP-2612 permit sells USDC (WETH has no permit function); the on-chain
-	// permit overwrites any standing allowance with the exact amount, so the fill
-	// consuming it to zero proves the permit executed
+	// The EIP-2612 permit overwrites any standing allowance with the exact
+	// amount, so the fill consuming it to zero proves the permit executed
 	t.Run("eip2612 permit", func(t *testing.T) {
 		sellAmount := actor.chain.usdcAmount
 		require.True(t, actor.balance(t, usdc).Cmp(sellAmount) >= 0, "canary wallet needs %s USDC on base", sellAmount)
@@ -432,15 +451,34 @@ func TestProductionCanaryFusion(t *testing.T) {
 	})
 
 	t.Run("permit2 permit", func(t *testing.T) {
-		sellToken, buyToken, sellAmount := pickDirection(t, actor)
-		actor.ensureErc20Allowance(t, sellToken, actor.permit2, sellAmount)
-		permit := actor.buildPermit2OrderPermit(t, sellToken, sellAmount)
-		placeFusionOrderAndAwaitFill(t, actor, fusionClient, sellToken, buyToken, sellAmount, permit, true)
+		sellAmount := actor.chain.usdcAmount
+		actor.ensureErc20Allowance(t, usdc, actor.permit2, sellAmount)
+		permit := actor.buildPermit2OrderPermit(t, usdc, sellAmount)
+		placeFusionOrderAndAwaitFill(t, actor, fusionClient, usdc, weth, sellAmount, permit, true)
 		require.Eventually(t, func() bool {
-			finalAllowance, err := orderbook.GetPermit2Allowance(context.Background(), actor.orderbook.Wallet, actor.owner, sellToken, actor.router)
+			finalAllowance, err := orderbook.GetPermit2Allowance(context.Background(), actor.orderbook.Wallet, actor.owner, usdc, actor.router)
 			return err == nil && finalAllowance.Amount.Sign() == 0
 		}, time.Minute, 5*time.Second, "the Permit2 allowance must be fully consumed")
 	})
+}
+
+// ensureCanaryUsdc tops the wallet's USDC up to `needed` by swapping a fixed
+// chunk of WETH to USDC through the classic-swap path. The Fusion subtests only
+// sell USDC (the direction resolvers fill on Base), so without this the wallet
+// would drift entirely into WETH; the classic swap recycles that WETH because
+// it fills both directions.
+func ensureCanaryUsdc(t *testing.T, actor *canaryActor, aggClient *aggregation.Client, weth, usdc geth_common.Address, needed *big.Int) {
+	t.Helper()
+	if actor.balance(t, usdc).Cmp(needed) >= 0 {
+		return
+	}
+	const rebalanceWethChunk = 2_000_000_000_000_000 // 0.002 WETH, ~$6: covers the run plus buffer
+	chunk := big.NewInt(rebalanceWethChunk)
+	require.True(t, actor.balance(t, weth).Cmp(chunk) >= 0,
+		"canary wallet %s on base is low on both USDC and WETH; fund it with dust WETH", actor.owner.Hex())
+	t.Logf("topping up USDC: swapping %s WETH -> USDC via classic swap", chunk)
+	actor.ensureErc20Allowance(t, weth, actor.router, chunk)
+	executeAggregationSwap(t, actor, aggClient, weth, usdc, chunk, "", false)
 }
 
 // TestProductionCanaryFusionPlus bridges USDC between Base and Arbitrum through a
