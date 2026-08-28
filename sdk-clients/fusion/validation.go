@@ -19,6 +19,7 @@ func (params *QuoteParams) Validate() error {
 	validationErrors = validate.Parameter(params.FromTokenAddress, "FromTokenAddress", validate.CheckEthereumAddressRequired, validationErrors)
 	validationErrors = validate.Parameter(params.ToTokenAddress, "ToTokenAddress", validate.CheckEthereumAddressRequired, validationErrors)
 	validationErrors = validate.Parameter(params.Amount, "Amount", validate.CheckBigIntRequired, validationErrors)
+	validationErrors = validate.Parameter(params.Fee, "Fee", validate.CheckFeeBpsFloat32, validationErrors)
 	validationErrors = validate.Parameter(params.Permit, "Permit", validate.CheckPermitHash, validationErrors)
 	return validate.ConsolidateValidationErrors(validationErrors)
 }
@@ -33,6 +34,7 @@ func (params *CustomPresetQuoteParams) Validate() error {
 	validationErrors = validate.Parameter(params.ToTokenAddress, "ToTokenAddress", validate.CheckEthereumAddressRequired, validationErrors)
 	validationErrors = validate.Parameter(params.Amount, "Amount", validate.CheckBigIntRequired, validationErrors)
 	validationErrors = validate.Parameter(params.WalletAddress, "WalletAddress", validate.CheckEthereumAddressRequired, validationErrors)
+	validationErrors = validate.Parameter(params.Fee, "Fee", validate.CheckFeeBpsFloat32, validationErrors)
 	return validate.ConsolidateValidationErrors(validationErrors)
 }
 

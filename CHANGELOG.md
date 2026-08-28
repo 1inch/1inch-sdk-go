@@ -8,6 +8,8 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 
 ### Added
 - Wire-surface diff in CI (`tools/wiredump` + `wire-surface` job): every PR's job summary shows the exact diff of all exported struct fields (name, Go type, json/url tags) against the base branch — catching struct-tag changes that compile fine but silently alter the wire format, which type-level API diffing cannot see. An A/B run against the pre-refactor tree verified all 73 wire-surface differences on this branch map to documented changes, with zero field removals and zero tag changes.
+- Fee validation on fusion/fusionplus quote params: fees must be basis points in [0, 10000]
+- `govulncheck` job on every PR and a weekly fuzzing workflow for the untrusted-input decoders
 - Public API compatibility gate in CI: every PR gets a machine-generated `gorelease` diff against the latest stable release in its job summary, and incompatible changes fail the build unless BREAKING_CHANGES.md has an Unreleased section documenting them. The release workflow refuses patch/minor (and rc) releases that contain incompatible public API changes.
 - Wire-format regression tests pinning the exact query-string and JSON encodings of the fusionplus quoter params, relayer order submission, and response decoding for fusionplus and tokens (`wire_test.go`)
 - Live API smoke tests (`go test -tags liveapi ./tests/liveapi/`, requires `DEV_PORTAL_TOKEN`): read-only production requests validating that live responses still decode into the SDK's types; run weekly by the spec-drift workflow
@@ -22,6 +24,8 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 - The type-generation pipeline was rewritten from bash/jq/sed (`generate_types.sh`) into a Go tool (`codegen` package, `go run ./codegen/cmd/generate-types`, `make codegen-types`). Output is byte-identical; spec files are no longer mutated in place; the pinned oapi-codegen is invoked hermetically via `go run module@version`. No user-facing impact.
 
 ### Fixed
+- **`fusionplus.DecodeEscrowExtension` panicked on malformed input** (slice bounds out of range) when the post-interaction data was shorter than the escrow extra-data section — found by the new fuzz tests; it now returns an error. Decoders parsing untrusted data (extensions, maker traits, auction details, interactions) are covered by fuzz targets run weekly in CI.
+- **API requests could hang forever and response bodies were read unbounded**: the HTTP client now has a 60s default timeout (per-request contexts can still set shorter deadlines) and caps response bodies at 64 MiB.
 - **`fusionplus` quote fee was silently dropped from requests**: the `Fee *big.Int` param could not be encoded by `go-querystring`, so a set fee never reached the API. The field is now `int` (bps) and a wire-format test pins the encoding.
 - `codegen/generate_types.sh` now runs correctly on Linux and with jq 1.6: BSD-only `sed -i ''` calls are replaced with a portable helper, and jq error suppression that silently deleted entire `paths`/`components.schemas` sections on jq 1.6 is replaced with explicit existence guards (no user-facing impact; the SDK code itself is unchanged by regeneration)
 

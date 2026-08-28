@@ -22,6 +22,7 @@ func (params *QuoteParams) Validate() error {
 	validationErrors = validate.Parameter(params.SrcChain, "SrcChain", validate.CheckChainIdIntRequired, validationErrors)
 	validationErrors = validate.Parameter(params.DstChain, "DstChain", validate.CheckChainIdIntRequired, validationErrors)
 	validationErrors = validate.Parameter(params.Amount, "Amount", validate.CheckBigIntRequired, validationErrors)
+	validationErrors = validate.Parameter(params.Fee, "Fee", validate.CheckFeeBps, validationErrors)
 	validationErrors = validate.Parameter(params.Permit, "Permit", validate.CheckPermitHash, validationErrors)
 	return validate.ConsolidateValidationErrors(validationErrors)
 }
@@ -34,6 +35,7 @@ func (params *CustomPresetQuoteParams) Validate() error {
 	validationErrors = validate.Parameter(params.SrcChain, "SrcChain", validate.CheckChainIdIntRequired, validationErrors)
 	validationErrors = validate.Parameter(params.DstChain, "DstChain", validate.CheckChainIdIntRequired, validationErrors)
 	validationErrors = validate.Parameter(params.Amount, "Amount", validate.CheckBigIntRequired, validationErrors)
+	validationErrors = validate.Parameter(params.Fee, "Fee", validate.CheckFeeBps, validationErrors)
 	validationErrors = validate.Parameter(params.Permit, "Permit", validate.CheckPermitHash, validationErrors)
 	return validate.ConsolidateValidationErrors(validationErrors)
 }

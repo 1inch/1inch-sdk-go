@@ -28,6 +28,20 @@ jobs:
       - name: Compile live API tests
         run: go vet -tags liveapi ./tests/...
 
+  govulncheck:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout code into workspace directory
+        uses: actions/checkout@v7
+
+      - name: Set up Go
+        uses: actions/setup-go@v7
+        with:
+          go-version: '1.25'
+
+      - name: Scan for known vulnerabilities
+        run: go run golang.org/x/vuln/cmd/govulncheck@latest ./...
+
   # Machine-verifies the public API surface against the latest stable release
   # with gorelease. The full report lands in the job summary on every PR;
   # the job fails only when incompatible changes exist and BREAKING_CHANGES.md

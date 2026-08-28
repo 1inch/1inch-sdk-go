@@ -11,6 +11,7 @@ import (
 	"net/url"
 	"reflect"
 	"regexp"
+	"time"
 
 	"github.com/google/go-querystring/query"
 
@@ -19,13 +20,24 @@ import (
 
 var scientificNotationRegex = regexp.MustCompile(`^[+-]?\d+(\.\d+)?[eE][+-]?\d+$`)
 
+// defaultRequestTimeout bounds each API request end-to-end (connection, TLS,
+// headers, and body). Without it a stalled connection hangs callers that pass
+// context.Background() forever. Callers can still enforce shorter deadlines
+// per request through the context.
+const defaultRequestTimeout = 60 * time.Second
+
+// maxResponseBytes caps how much of a response body is read, protecting
+// callers from unbounded memory use on a misbehaving endpoint or proxy. The
+// largest legitimate responses (full token lists) are a few megabytes.
+const maxResponseBytes = 64 << 20
+
 func DefaultHttpClient(apiUrl string, apiKey string) (*Client, error) {
 	baseURL, err := url.Parse(apiUrl)
 	if err != nil {
 		return nil, err
 	}
 	return &Client{
-		httpClient: *http.DefaultClient,
+		httpClient: http.Client{Timeout: defaultRequestTimeout},
 		baseURL:    baseURL,
 		apiKey:     apiKey,
 	}, nil
@@ -91,9 +103,12 @@ func (c *Client) processResponse(resp *http.Response, v any) error {
 	}
 
 	buf := new(bytes.Buffer)
-	_, err := buf.ReadFrom(resp.Body)
+	n, err := buf.ReadFrom(io.LimitReader(resp.Body, maxResponseBytes+1))
 	if err != nil {
 		return err
+	}
+	if n > maxResponseBytes {
+		return fmt.Errorf("response body exceeds %d bytes", int64(maxResponseBytes))
 	}
 
 	if buf.Len() == 0 {
@@ -108,7 +123,7 @@ func (c *Client) processResponse(resp *http.Response, v any) error {
 }
 
 func (c *Client) handleErrorResponse(resp *http.Response) error {
-	body, err := io.ReadAll(resp.Body)
+	body, err := io.ReadAll(io.LimitReader(resp.Body, maxResponseBytes))
 	if err != nil {
 		return fmt.Errorf("failed to read error response body: %w", err)
 	}

@@ -95,6 +95,10 @@ func DecodeEscrowExtension(data []byte) (*EscrowExtension, error) {
 		return nil, fmt.Errorf("failed to decode extension: %w", err)
 	}
 
+	if len(orderbookExtensionTruncated.PostInteraction) < extraDataCharacterLength {
+		return nil, fmt.Errorf("invalid escrow extension: post-interaction data is %d characters, need at least %d", len(orderbookExtensionTruncated.PostInteraction), extraDataCharacterLength)
+	}
+
 	// Remove the Fusion Plus Extension data before decoding
 	orderbookExtensionTruncated.PostInteraction = orderbookExtensionTruncated.PostInteraction[:len(orderbookExtensionTruncated.PostInteraction)-extraDataCharacterLength]
 	extensionPlus, err := FromLimitOrderExtension(orderbookExtensionTruncated)
