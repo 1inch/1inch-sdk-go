@@ -326,11 +326,15 @@ func addSkipOptionalPointer(doc spec) error {
 	return nil
 }
 
-// applyTransforms decodes a spec, runs the operation-id mapping and the full
-// transform chain, and returns the corrected document re-encoded as JSON.
-func applyTransforms(raw []byte, operationIDs map[string]string) ([]byte, error) {
+// applyTransforms decodes a spec, applies its declarative overrides, runs the
+// operation-id mapping and the full transform chain, and returns the corrected
+// document re-encoded as JSON. specName selects the override list.
+func applyTransforms(specName string, raw []byte, operationIDs map[string]string) ([]byte, error) {
 	doc, err := decodeSpec(raw)
 	if err != nil {
+		return nil, err
+	}
+	if err := applyOverrides(specName, doc); err != nil {
 		return nil, err
 	}
 	if err := renameOperationIDs(doc, operationIDs); err != nil {

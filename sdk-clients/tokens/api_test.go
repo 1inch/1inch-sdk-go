@@ -35,10 +35,6 @@ func (m *MockHttpExecutor) ExecuteRequest(ctx context.Context, payload common.Re
 	return nil
 }
 
-func getPtr[T any](v T) *T {
-	return &v
-}
-
 func TestGetPricesForWhitelistedTokens(t *testing.T) {
 	ctx := context.Background()
 
@@ -47,10 +43,10 @@ func TestGetPricesForWhitelistedTokens(t *testing.T) {
 			Address:         "0x1f9840a85d5af5bf1d1762f925bdaddc4201f984",
 			ChainId:         1,
 			Decimals:        18,
-			DisplayedSymbol: nil,
-			Eip2612:         getPtr(true),
-			IsFoT:           nil,
-			LogoURI:         getPtr("https://tokens.1inch.io/0x1f9840a85d5af5bf1d1762f925bdaddc4201f984.png"),
+			DisplayedSymbol: "",
+			Eip2612:         true,
+			IsFoT:           false,
+			LogoURI:         "https://tokens.1inch.io/0x1f9840a85d5af5bf1d1762f925bdaddc4201f984.png",
 			Name:            "Uniswap",
 			Providers: []string{
 				"1inch",

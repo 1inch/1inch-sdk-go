@@ -103,7 +103,7 @@ func generateOne(opts Options, specName string, mapping map[string]string) error
 		return err
 	}
 
-	corrected, err := applyTransforms(raw, mapping)
+	corrected, err := applyTransforms(specName, raw, mapping)
 	if err != nil {
 		return err
 	}

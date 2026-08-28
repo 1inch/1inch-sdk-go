@@ -180,9 +180,9 @@ func TestTransformsAreIdempotent(t *testing.T) {
 		t.Run(tc.name, func(t *testing.T) {
 			raw, err := os.ReadFile(filepath.Join("openapi", tc.file))
 			require.NoError(t, err)
-			once, err := applyTransforms(raw, mapping)
+			once, err := applyTransforms(tc.file, raw, mapping)
 			require.NoError(t, err)
-			twice, err := applyTransforms(once, mapping)
+			twice, err := applyTransforms(tc.file, once, mapping)
 			require.NoError(t, err)
 
 			var first, second any

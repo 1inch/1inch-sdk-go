@@ -24,7 +24,7 @@ type ProviderTokenDto struct {
 	Name            string   `json:"name"`
 	Providers       []string `json:"providers"`
 	Symbol          string   `json:"symbol"`
-	Tags            []string `json:"tags"`
+	Tags            []TagDto `json:"tags"`
 }
 
 // TagDto defines model for TagDto.
@@ -57,7 +57,7 @@ type TokenInfoDto struct {
 	LogoURI    string                 `json:"logoURI"`
 	Name       string                 `json:"name"`
 	Symbol     string                 `json:"symbol"`
-	Tags       []string               `json:"tags"`
+	Tags       []TagDto               `json:"tags"`
 }
 
 // TokenListResponseDto defines model for TokenListResponseDto.

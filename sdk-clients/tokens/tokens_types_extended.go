@@ -1,31 +1,11 @@
 package tokens
 
-// ProviderTokenDtoFixed uses the Tag struct for Tags
-type ProviderTokenDtoFixed struct {
-	Address         string   `json:"address"`
-	ChainId         int      `json:"chainId"`
-	Decimals        float32  `json:"decimals"`
-	DisplayedSymbol *string  `json:"displayedSymbol,omitempty"`
-	Eip2612         *bool    `json:"eip2612,omitempty"`
-	IsFoT           *bool    `json:"isFoT,omitempty"`
-	LogoURI         *string  `json:"logoURI,omitempty"`
-	Name            string   `json:"name"`
-	Providers       []string `json:"providers"`
-	Symbol          string   `json:"symbol"`
-	Tags            []TagDto `json:"tags"`
-}
-
-// TokenInfoDtoFixed uses the Tag struct for Tags
-type TokenInfoDtoFixed struct {
-	Address    string          `json:"address"`
-	ChainId    int             `json:"chainId"`
-	Decimals   float32         `json:"decimals"`
-	Extensions *map[string]any `json:"extensions,omitempty"`
-	LogoURI    string          `json:"logoURI"`
-	Name       string          `json:"name"`
-	Symbol     string          `json:"symbol"`
-	Tags       []TagDto        `json:"tags"`
-}
+// ProviderTokenDtoFixed and TokenInfoDtoFixed are kept as aliases for
+// backward compatibility. The type bugs they used to correct (tags being
+// objects, not strings) are now fixed at generation time in
+// codegen/overrides.go, so the generated types are correct.
+type ProviderTokenDtoFixed = ProviderTokenDto
+type TokenInfoDtoFixed = TokenInfoDto
 
 type CustomTokensControllerGetTokenInfoParams struct {
 	Address string `url:"address" json:"address"`
