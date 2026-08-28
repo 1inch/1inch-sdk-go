@@ -6,8 +6,11 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 
 ## [Unreleased]
 
+### Added
+- `constants.ChainToTrueERC20` and `constants.GetTrueERC20` give the Fusion+ TRUE_ERC20 sentinel token for each supported chain.
+
 ### Fixed
-- **Fusion+ orders had the wrong taker asset on the source chain.** `CreateFusionPlusOrderData` put the destination token into the taker asset of the source-chain order. For a native destination, it used the wrapped token of the source chain. The taker asset is now the TRUE_ERC20 sentinel of the chain. This sentinel is a token that does nothing when a resolver transfers it. The escrow extension now holds the real destination token in its `DstToken` field. This includes the native sentinel `0xEeee…`. The destination token can also be a live ERC-20 on the source chain. In this condition, the old behavior could transfer a real and unwanted token on the source chain during a fill. The SDK now stops with an error when the source chain has no TRUE_ERC20 sentinel. It does not sign an order that has the wrong asset. This change adds `constants.ChainToTrueERC20` and `constants.GetTrueERC20`.
+- **Fusion+ orders had the wrong taker asset on the source chain.** `CreateFusionPlusOrderData` put the destination token into the taker asset of the source-chain order. For a native destination, it used the wrapped token of the source chain. The taker asset is now the TRUE_ERC20 sentinel of the chain. This sentinel is a token that does nothing when a resolver transfers it. The escrow extension now holds the real destination token in its `DstToken` field. This includes the native sentinel `0xEeee…`. The destination token can also be a live ERC-20 on the source chain. In this condition, the old behavior could transfer a real and unwanted token on the source chain during a fill. The SDK now stops with an error when the source chain has no TRUE_ERC20 sentinel. It does not sign an order that has the wrong asset.
 
 ## [v4.1.0] - 2026-07-25
 
