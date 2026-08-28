@@ -26,30 +26,36 @@ import (
 //	make codegen-types                              # regenerate (overrides fail loudly on mismatches)
 //	go test ./codegen                               # re-pin the output
 //
-// An empty URL means the source has not been confirmed yet: the fusion and
-// fusion-plus services are split into orders/quoter/relayer sub-APIs whose
-// portal slugs cannot be discovered without a token (the endpoint returns 401
-// before routing). Fill these in from the portal documentation page's network
-// requests, then delete this note once all sources are confirmed.
+// An empty URL means the API has no fetchable upstream source right now; see
+// the per-entry comments.
 var specSources = map[string]string{
-	"aggregation-openapi.json":        "https://api.1inch.dev/portal/apis/swagger/swap",
-	"balances-openapi.json":           "https://api.1inch.dev/portal/apis/swagger/balance",
-	"fusion_orders-openapi.json":      "",
-	"fusion_quoter-openapi.json":      "",
-	"fusion_relayer-openapi.json":     "",
-	"fusionplus_orders-openapi.json":  "",
-	"fusionplus_quoter-openapi.json":  "",
-	"fusionplus_relayer-openapi.json": "",
-	"gasprices-openapi.json":          "https://api.1inch.dev/portal/apis/swagger/gas-price",
-	"history-openapi.json":            "https://api.1inch.dev/portal/apis/swagger/history",
-	"nft-openapi.json":                "https://api.1inch.dev/portal/apis/swagger/nft",
-	"orderbook-openapi.json":          "https://api.1inch.dev/portal/apis/swagger/orderbook",
-	"portfolio-openapi.json":          "https://api.1inch.dev/portal/apis/swagger/portfolio",
-	"spotprices-openapi.json":         "https://api.1inch.dev/portal/apis/swagger/spot-price",
-	"tokens-openapi.json":             "https://api.1inch.dev/portal/apis/swagger/token",
-	"traces-openapi.json":             "https://api.1inch.dev/portal/apis/swagger/traces",
-	"txbroadcast-openapi.json":        "https://api.1inch.dev/portal/apis/swagger/tx-gateway",
-	"web3-openapi.json":               "https://api.1inch.dev/portal/apis/swagger/web3",
+	// Confirmed against the live portal on 2026-08-28. Sources whose URL embeds
+	// a version (history, traces, portfolio) pin that version and need a bump
+	// here when upstream releases a new major.
+	"aggregation-openapi.json":        "https://api.1inch.dev/swap/swagger/ethereum-json",
+	"balances-openapi.json":           "https://api.1inch.dev/balance/swagger/ethereum-json",
+	"fusion_orders-openapi.json":      "https://api.1inch.dev/fusion/orders/swagger/ethereum-json",
+	"fusion_quoter-openapi.json":      "https://api.1inch.dev/fusion/quoter/swagger/ethereum-json",
+	"fusion_relayer-openapi.json":     "https://api.1inch.dev/fusion/relayer/swagger/ethereum-json",
+	"fusionplus_orders-openapi.json":  "https://api.1inch.dev/fusion-plus/orders/swagger-json",
+	"fusionplus_quoter-openapi.json":  "https://api.1inch.dev/fusion-plus/quoter/swagger-json",
+	"fusionplus_relayer-openapi.json": "https://api.1inch.dev/fusion-plus/relayer/swagger-json",
+	"gasprices-openapi.json":          "https://api.1inch.dev/gas-price/swagger/ethereum-json",
+	"history-openapi.json":            "https://api.1inch.dev/history/v2.0/history/1/swagger-json",
+	"nft-openapi.json":                "https://api.1inch.dev/nft/swagger-json",
+	// The portal documentation references /orderbook/swagger/ethereum-json for
+	// this API, but that endpoint currently returns 404; left unconfigured
+	// until upstream fixes it.
+	"orderbook-openapi.json":   "",
+	"portfolio-openapi.json":   "https://api.1inch.dev/portfolio/v5.0/openapi.json",
+	"spotprices-openapi.json":  "https://api.1inch.dev/price/swagger/ethereum-json",
+	"tokens-openapi.json":      "https://api.1inch.dev/token/swagger-json",
+	"traces-openapi.json":      "https://api.1inch.dev/traces/v1.0/chain/1/swagger-json",
+	"txbroadcast-openapi.json": "https://api.1inch.dev/tx-gateway/swagger/ethereum-json",
+	// The web3 API has no spec in the portal documentation catalog; the
+	// committed spec appears to be authored for this SDK and has no upstream
+	// source to fetch.
+	"web3-openapi.json": "",
 }
 
 // FetchOptions configures a spec refresh.
