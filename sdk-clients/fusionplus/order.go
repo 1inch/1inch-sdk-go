@@ -49,21 +49,24 @@ func CreateFusionPlusOrderData(quoteParams QuoterControllerGetQuoteParamsFixed, 
 		return nil, fmt.Errorf("failed to create auction details: %w", err)
 	}
 
-	// The source-chain order's taker asset is the chain-specific TRUE_ERC20
-	// sentinel — a token whose transfer is a no-op — not the destination token.
-	// The real destination token is carried only by the escrow extension
-	// (DstToken) and delivered on the destination chain. Putting the
-	// destination token here would let the source-chain fill run a real
-	// transferFrom of an unintended token when that address is also a live
-	// ERC-20 on the source chain.
+	// The taker asset of the source-chain order is the TRUE_ERC20 sentinel of
+	// the chain, not the destination token. The sentinel is a token that does
+	// nothing when a resolver transfers it. The escrow extension carries the
+	// real destination token in DstToken. The swap delivers this token on the
+	// destination chain.
+	//
+	// Do not put the destination token in this taker asset. The destination
+	// token can also be a live ERC-20 on the source chain. In that condition, a
+	// source-chain fill does a real transferFrom of an unwanted token.
 	trueERC20, ok := constants.GetTrueERC20(chainId)
 	if !ok {
 		return nil, fmt.Errorf("fusion+ is not supported on source chain %d (no TRUE_ERC20 sentinel)", chainId)
 	}
 	takerAsset := trueERC20.Hex()
 
-	// The destination token is used verbatim (including the native 0xEeee…
-	// sentinel); it lives in the escrow extension, on the destination chain.
+	// Use the destination token without a change. This includes the native
+	// sentinel 0xEeee…. The escrow extension holds this token for the
+	// destination chain.
 	dstToken := quoteParams.DstTokenAddress
 
 	var takingFeeReceiver geth_common.Address

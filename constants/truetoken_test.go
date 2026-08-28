@@ -42,9 +42,9 @@ func TestGetTrueERC20(t *testing.T) {
 	}
 }
 
-// TestTrueERC20NeverCollidesWithNativeSentinel guards the whole point of the
-// sentinel: it must never equal the native-token address, or the source-chain
-// taker asset could move real value.
+// TestTrueERC20NeverCollidesWithNativeSentinel verifies that the sentinel is
+// never the native-token address. If the sentinel equals the native-token
+// address, the source-chain taker asset can move real value.
 func TestTrueERC20NeverCollidesWithNativeSentinel(t *testing.T) {
 	for chainID, addr := range ChainToTrueERC20 {
 		require.NotEqualf(t, NativeToken, addr.Hex(), "TRUE_ERC20 for chain %d equals the native sentinel", chainID)

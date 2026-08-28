@@ -19,16 +19,17 @@ import (
 // mainnetTrueERC20 is the Ethereum Fusion+ TRUE_ERC20 sentinel.
 const mainnetTrueERC20 = "0xda0000d4000015a526378bb6fafc650cea5966f8"
 
-// collisionToken is a real ERC-20 (1INCH) — the class of destination token
-// that, if written into the source-chain taker asset, could be transferred for
-// real on the source chain.
+// collisionToken is a real ERC-20 (1INCH). It is the type of destination token
+// that can move real value on the source chain. This happens if the code writes
+// it into the source-chain taker asset.
 const collisionToken = "0x111111111117dc0aa78b770fa6a738034120c302"
 
-// TestFusionPlusSourceTakerAssetIsTrueERC20 pins the funds-critical invariant:
-// the signed source-chain order carries the chain's TRUE_ERC20 sentinel as its
-// taker asset (never the destination token), while the destination token —
-// including the native 0xEeee… sentinel — is carried verbatim by the escrow
-// extension. Writing the destination token into the source taker asset is the defect this test guards against.
+// TestFusionPlusSourceTakerAssetIsTrueERC20 checks the funds-critical rule.
+// The source-chain order must use the chain's TRUE_ERC20 sentinel as its taker
+// asset. It must never use the destination token. The escrow extension must
+// hold the real destination token without a change. This includes the native
+// 0xEeee… sentinel. The defect is a destination token in the source taker
+// asset. This test guards against that defect.
 func TestFusionPlusSourceTakerAssetIsTrueERC20(t *testing.T) {
 	tests := []struct {
 		name       string
@@ -70,9 +71,10 @@ func TestFusionPlusSourceTakerAssetIsTrueERC20(t *testing.T) {
 	}
 }
 
-// TestFusionPlusUnsupportedSourceChainFailsLoudly ensures a source chain with
-// no TRUE_ERC20 sentinel (i.e. not a Fusion+ chain) errors instead of signing
-// an order with a wrong taker asset.
+// TestFusionPlusUnsupportedSourceChainFailsLoudly checks the behavior for a
+// source chain that has no TRUE_ERC20 sentinel. Such a chain is not a Fusion+
+// chain. Order construction must fail with an error. It must not sign an order
+// that has a wrong taker asset.
 func TestFusionPlusUnsupportedSourceChainFailsLoudly(t *testing.T) {
 	_, err := CreateFusionPlusOrderData(
 		takerAssetTestQuoteParams(collisionToken),
@@ -139,8 +141,9 @@ func takerAssetTestQuote() *GetQuoteOutputFixed {
 	}
 }
 
-// stubWallet is a no-op common.Wallet for local order construction; SignBytes
-// returns a 65-byte signature so limit-order signing succeeds.
+// stubWallet is a common.Wallet that does nothing, for local order
+// construction. SignBytes returns a 65-byte signature so the limit-order
+// signature step completes.
 type stubWallet struct{ addr gethcommon.Address }
 
 func (w *stubWallet) Call(context.Context, gethcommon.Address, []byte) ([]byte, error) {
