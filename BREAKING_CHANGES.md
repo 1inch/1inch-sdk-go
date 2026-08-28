@@ -18,7 +18,7 @@ Step-by-step upgrade instructions for everything below: [MIGRATION.md](MIGRATION
 - **Bare enum constants in `spotprices` and `traces` are prefixed with their type name** (`spotprices.USD` → `spotprices.GetPricesForRequestedTokensParamsCurrencyUSD`, `traces.CALL` → `traces.CoreCustomRootTxEventCallstackTraceFullDtoTypeCALL`).
 - **`web3.ApiKeyAuthScopes` removed** (unused generated artifact).
 - **`fusionplus.CreateAuctionDetailsPlus` takes `*Preset`** instead of `*PresetClassFixed`.
-- **Embedded field names changed in four `orderbook` wrapper params** (`GetAllOrdersParams`, `GetCountParams`, `GetEventsParams`, `GetOrdersByCreatorAddressParams`): struct literals naming the embedded query field must use the new name (e.g. `LimitOrdersQueryParams`). Promoted field access (`params.Page`) is unaffected.
+- **Embedded field name changed in the `orderbook` wrapper params** (`GetAllOrdersParams`, `GetOrdersByCreatorAddressParams`): struct literals naming the embedded query field must use the new name `LimitOrdersQueryParams`. Promoted field access (`params.Page`) is unaffected.
 
 Not breaking, for the avoidance of doubt: ~60 generated types and constants were renamed to intent-based names (`fusionplus.QuoteParams`, `fusionplus.Quote`, …), `fusionorder.AuctionPointClassFixed`/`GasCostConfigClassFixed` became `AuctionPoint`/`GasCostConfig`, and all 12 `*Fixed` types became aliases — every old name remains available as a `// Deprecated:` alias of the identical type, so existing code compiles and behaves unchanged.
 
