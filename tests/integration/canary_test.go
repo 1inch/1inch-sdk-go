@@ -56,8 +56,8 @@ var canaryBase = canaryChain{
 	rpcEnv:     "CANARY_BASE_RPC_URL",
 	weth:       "0x4200000000000000000000000000000000000006",
 	usdc:       "0x833589fCD6eDb6E08f4c7C32D4f71b54bdA02913",
-	wethAmount: big.NewInt(1_000_000_000_000_000), // 0.001 WETH
-	usdcAmount: big.NewInt(1_000_000),             // 1.0 USDC
+	wethAmount: big.NewInt(200_000_000_000_000), // 0.0002 WETH
+	usdcAmount: big.NewInt(500_000),             // 0.5 USDC
 }
 
 var canaryArbitrum = canaryChain{
@@ -66,13 +66,13 @@ var canaryArbitrum = canaryChain{
 	rpcEnv:     "CANARY_ARBITRUM_RPC_URL",
 	weth:       "0x82aF49447D8a07e3bd95BD0d56f35241523fBab1",
 	usdc:       "0xaf88d065e77c8cC2239327C5EDb3A432268e5831",
-	wethAmount: big.NewInt(1_000_000_000_000_000), // 0.001 WETH
-	usdcAmount: big.NewInt(1_000_000),             // 1.0 USDC
+	wethAmount: big.NewInt(200_000_000_000_000), // 0.0002 WETH
+	usdcAmount: big.NewInt(500_000),             // 0.5 USDC
 }
 
 // canaryFusionPlusAmount is the USDC amount bridged per Fusion+ run; cross-chain
 // orders carry safety deposit economics, so it is larger than the single-chain dust
-var canaryFusionPlusAmount = big.NewInt(3_000_000) // 3.0 USDC
+var canaryFusionPlusAmount = big.NewInt(1_500_000) // 1.5 USDC
 
 type canaryActor struct {
 	chain     canaryChain
@@ -472,7 +472,7 @@ func ensureCanaryUsdc(t *testing.T, actor *canaryActor, aggClient *aggregation.C
 	if actor.balance(t, usdc).Cmp(needed) >= 0 {
 		return
 	}
-	const rebalanceWethChunk = 2_000_000_000_000_000 // 0.002 WETH, ~$6: covers the run plus buffer
+	const rebalanceWethChunk = 1_000_000_000_000_000 // 0.001 WETH, ~$3: covers the run plus buffer
 	chunk := big.NewInt(rebalanceWethChunk)
 	require.True(t, actor.balance(t, weth).Cmp(chunk) >= 0,
 		"canary wallet %s on base is low on both USDC and WETH; fund it with dust WETH", actor.owner.Hex())
