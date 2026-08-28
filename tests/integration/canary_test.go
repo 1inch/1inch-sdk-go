@@ -4,6 +4,7 @@ package integration
 
 import (
 	"context"
+	"fmt"
 	"math/big"
 	"os"
 	"strings"
@@ -353,7 +354,7 @@ func pickDirection(t *testing.T, actor *canaryActor) (sellToken, buyToken geth_c
 
 // placeFusionOrderAndAwaitFill places one fusion order and waits for a resolver fill,
 // asserting the sell amount left the wallet and the buy side arrived
-func placeFusionOrderAndAwaitFill(t *testing.T, actor *canaryActor, fusionClient *fusion.Client, sellToken, buyToken geth_common.Address, sellAmount *big.Int, permit string, isPermit2 bool) {
+func placeFusionOrderAndAwaitFill(t *testing.T, actor *canaryActor, fusionClient *fusion.Client, sellToken, buyToken geth_common.Address, sellAmount *big.Int, permit string, isPermit2 bool) (string, error) {
 	t.Helper()
 	ctx := context.Background()
 
@@ -375,7 +376,9 @@ func placeFusionOrderAndAwaitFill(t *testing.T, actor *canaryActor, fusionClient
 
 	deadline := time.Now().Add(5 * time.Minute)
 	for {
-		require.True(t, time.Now().Before(deadline), "order %s was not filled within 5 minutes", orderHash)
+		if !time.Now().Before(deadline) {
+			return "timeout", fmt.Errorf("order %s was not filled within 5 minutes", orderHash)
+		}
 		time.Sleep(5 * time.Second)
 
 		order, err := fusionClient.GetOrderStatus(ctx, orderHash)
@@ -388,11 +391,37 @@ func placeFusionOrderAndAwaitFill(t *testing.T, actor *canaryActor, fusionClient
 		case "filled":
 			actor.awaitBalanceDelta(t, sellToken, initSellBalance, sellAmount, true, "sell amount spent")
 			actor.awaitBalanceDelta(t, buyToken, initBuyBalance, nil, false, "buy balance increased")
-			return
+			return "filled", nil
 		case "expired", "cancelled", "refunded", "false-predicate", "not-enough-balance-or-allowance", "wrong-permit":
-			t.Fatalf("order %s ended without filling: %s", orderHash, order.Status)
+			return order.Status, fmt.Errorf("order %s ended without filling: %s", orderHash, order.Status)
 		}
 	}
+}
+
+// retryableOrderStatus reports whether a terminal non-fill status is a transient
+// worth retrying with a freshly built permit. "wrong-permit" is an intermittent
+// permit-validation race (the order validator recovered a signer that no longer
+// matched the current nonce); a fresh permit and order usually clears it.
+func retryableOrderStatus(status string) bool {
+	return status == "wrong-permit"
+}
+
+// placeFusionOrderWithPermitRetry places a permit-carrying fusion order, and on a
+// transient permit-validation failure rebuilds the permit and retries. buildPermit
+// is called once per attempt so each retry signs a fresh permit.
+func placeFusionOrderWithPermitRetry(t *testing.T, actor *canaryActor, fusionClient *fusion.Client, sellToken, buyToken geth_common.Address, sellAmount *big.Int, buildPermit func() string, isPermit2 bool) {
+	t.Helper()
+	var status string
+	var err error
+	for attempt := 0; attempt < 3; attempt++ {
+		status, err = placeFusionOrderAndAwaitFill(t, actor, fusionClient, sellToken, buyToken, sellAmount, buildPermit(), isPermit2)
+		if err == nil {
+			return
+		}
+		require.True(t, retryableOrderStatus(status), "fusion order failed: %v", err)
+		t.Logf("fusion order not filled (%s); rebuilding permit and retrying (attempt %d)", status, attempt+1)
+	}
+	require.NoError(t, err, "fusion order failed after permit retries")
 }
 
 // TestProductionCanaryFusion places dust-sized fusion orders on Base, one per
@@ -435,16 +464,19 @@ func TestProductionCanaryFusion(t *testing.T) {
 	t.Run("direct approval", func(t *testing.T) {
 		sellAmount := actor.chain.usdcAmount
 		actor.ensureErc20Allowance(t, usdc, actor.router, sellAmount)
-		placeFusionOrderAndAwaitFill(t, actor, fusionClient, usdc, weth, sellAmount, "", false)
+		_, err := placeFusionOrderAndAwaitFill(t, actor, fusionClient, usdc, weth, sellAmount, "", false)
+		require.NoError(t, err)
 	})
 
 	// The EIP-2612 permit overwrites any standing allowance with the exact
-	// amount, so the fill consuming it to zero proves the permit executed
+	// amount, so the fill consuming it to zero proves the permit executed. The
+	// permit is retried on the transient "wrong-permit" validation race.
 	t.Run("eip2612 permit", func(t *testing.T) {
 		sellAmount := actor.chain.usdcAmount
 		require.True(t, actor.balance(t, usdc).Cmp(sellAmount) >= 0, "canary wallet needs %s USDC on base", sellAmount)
-		permit := actor.buildEip2612Permit(t, usdc, sellAmount)
-		placeFusionOrderAndAwaitFill(t, actor, fusionClient, usdc, weth, sellAmount, permit, false)
+		placeFusionOrderWithPermitRetry(t, actor, fusionClient, usdc, weth, sellAmount, func() string {
+			return actor.buildEip2612Permit(t, usdc, sellAmount)
+		}, false)
 		require.Eventually(t, func() bool {
 			return actor.erc20Allowance(t, usdc, actor.router).Sign() == 0
 		}, time.Minute, 5*time.Second, "the 2612 permit allowance must be fully consumed")
@@ -453,8 +485,9 @@ func TestProductionCanaryFusion(t *testing.T) {
 	t.Run("permit2 permit", func(t *testing.T) {
 		sellAmount := actor.chain.usdcAmount
 		actor.ensureErc20Allowance(t, usdc, actor.permit2, sellAmount)
-		permit := actor.buildPermit2OrderPermit(t, usdc, sellAmount)
-		placeFusionOrderAndAwaitFill(t, actor, fusionClient, usdc, weth, sellAmount, permit, true)
+		placeFusionOrderWithPermitRetry(t, actor, fusionClient, usdc, weth, sellAmount, func() string {
+			return actor.buildPermit2OrderPermit(t, usdc, sellAmount)
+		}, true)
 		require.Eventually(t, func() bool {
 			finalAllowance, err := orderbook.GetPermit2Allowance(context.Background(), actor.orderbook.Wallet, actor.owner, usdc, actor.router)
 			return err == nil && finalAllowance.Amount.Sign() == 0
