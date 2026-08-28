@@ -57,6 +57,6 @@ go-lint:
 	@./bin/golangci-lint run --timeout=3m
 
 codegen-types:
-	@echo "Running generate_types.sh from the codegen directory..."
-	@cd codegen && ./generate_types.sh
+	@echo "  >  Generating types from OpenAPI specs..."
+	go run ./codegen/cmd/generate-types
 	@echo "Script execution completed."

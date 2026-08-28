@@ -46,7 +46,9 @@ This is the official Go SDK for interacting with 1inch Network APIs. It provides
 │   └── times/            # Time utilities
 ├── codegen/              # OpenAPI spec files and type generation
 │   ├── openapi/          # OpenAPI JSON specs for each API
-│   ├── generate_types.sh # Type generation script
+│   ├── generate.go       # Type generation pipeline (Go)
+│   ├── transforms.go     # In-memory spec corrections applied before generation
+│   ├── cmd/generate-types # CLI entry point (go run ./codegen/cmd/generate-types)
 │   └── mapping.json      # Operation ID mappings
 └── .github/workflows/    # CI/CD (pr.yml, release.yml)
 ```
@@ -175,11 +177,13 @@ Common validators in `internal/validate/`:
 
 ## Type Generation
 
-Types are auto-generated from OpenAPI specs using `oapi-codegen`:
+Types are auto-generated from OpenAPI specs by the Go pipeline in `codegen/`:
 
 1. OpenAPI specs live in `codegen/openapi/*-openapi.json`
-2. Run `make codegen-types` from the repo root (or `./generate_types.sh` from `codegen/`)
+2. Run `make codegen-types` from the repo root (or `go run ./codegen/cmd/generate-types`)
 3. Generated files: `sdk-clients/{package}/{package}_types.gen.go`
+
+The pipeline applies in-memory corrections to each spec (see `codegen/transforms.go`) before invoking a pinned `oapi-codegen` via `go run module@version`; the committed spec files are never modified. The pipeline's behavior is pinned by characterization tests in `codegen/codegen_test.go` — the committed `*_types.gen.go` files must be reproducible byte-for-byte, so any intentional pipeline change requires regenerating and committing the types alongside it.
 
 **DO NOT manually edit `*_types.gen.go` files** - they are overwritten by codegen.
 

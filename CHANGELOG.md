@@ -9,6 +9,9 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 ### Added
 - Characterization test suite for the codegen pipeline (`codegen/codegen_test.go`): asserts that `generate_types.sh` reproduces every committed `*_types.gen.go` file byte-for-byte from the committed specs, that the specs are a fixed point of the in-place transforms, and documents each transform's behavior via synthetic fixtures. This makes the pipeline safe to restructure.
 
+### Changed
+- The type-generation pipeline was rewritten from bash/jq/sed (`generate_types.sh`) into a Go tool (`codegen` package, `go run ./codegen/cmd/generate-types`, `make codegen-types`). Output is byte-identical; spec files are no longer mutated in place; the pinned oapi-codegen is invoked hermetically via `go run module@version`. No user-facing impact.
+
 ### Fixed
 - `codegen/generate_types.sh` now runs correctly on Linux and with jq 1.6: BSD-only `sed -i ''` calls are replaced with a portable helper, and jq error suppression that silently deleted entire `paths`/`components.schemas` sections on jq 1.6 is replaced with explicit existence guards (no user-facing impact; the SDK code itself is unchanged by regeneration)
 
