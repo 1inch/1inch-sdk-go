@@ -79,8 +79,8 @@ type VersionDto struct {
 	Patch float32 `json:"patch"`
 }
 
-// SearchControllerSearchAllChainsParams defines parameters for SearchControllerSearchAllChains.
-type SearchControllerSearchAllChainsParams struct {
+// SearchAllChainsParams defines parameters for SearchAllChains.
+type SearchAllChainsParams struct {
 	// Query Text to search for in token address, token symbol, or description
 	Query string `url:"query,omitempty" json:"query,omitempty"`
 
@@ -92,8 +92,8 @@ type SearchControllerSearchAllChainsParams struct {
 	Limit float32 `url:"limit,omitempty" json:"limit,omitempty"`
 }
 
-// TokenListControllerTokensParams defines parameters for TokenListControllerTokens.
-type TokenListControllerTokensParams struct {
+// GetWhitelistedTokensParams defines parameters for GetWhitelistedTokens.
+type GetWhitelistedTokensParams struct {
 	// Provider Provider code. Default value is 1inch
 	Provider string `url:"provider,omitempty" json:"provider,omitempty"`
 
@@ -101,13 +101,13 @@ type TokenListControllerTokensParams struct {
 	Country string `url:"country,omitempty" json:"country,omitempty"`
 }
 
-// CustomTokensControllerGetTokensInfoParams defines parameters for CustomTokensControllerGetTokensInfo.
-type CustomTokensControllerGetTokensInfoParams struct {
+// GetCustomTokensParams defines parameters for GetCustomTokens.
+type GetCustomTokensParams struct {
 	Addresses []string `url:"addresses" json:"addresses"`
 }
 
-// SearchControllerSearchSingleChainParams defines parameters for SearchControllerSearchSingleChain.
-type SearchControllerSearchSingleChainParams struct {
+// SearchSingleChainParams defines parameters for SearchSingleChain.
+type SearchSingleChainParams struct {
 	// Query Text to search for in token address, token symbol, or description
 	Query string `url:"query,omitempty" json:"query,omitempty"`
 
@@ -119,8 +119,8 @@ type SearchControllerSearchSingleChainParams struct {
 	Limit float32 `url:"limit,omitempty" json:"limit,omitempty"`
 }
 
-// TokenListControllerTokensListParams defines parameters for TokenListControllerTokensList.
-type TokenListControllerTokensListParams struct {
+// GetWhitelistedTokensListParams defines parameters for GetWhitelistedTokensList.
+type GetWhitelistedTokensListParams struct {
 	// Provider Provider code. Default value is "1inch"
 	Provider string `url:"provider,omitempty" json:"provider,omitempty"`
 

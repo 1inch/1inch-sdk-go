@@ -14,7 +14,7 @@ import (
 	geth_common "github.com/ethereum/go-ethereum/common"
 )
 
-func CreateFusionPlusOrderData(quoteParams QuoterControllerGetQuoteParams, quote *GetQuoteOutput, orderParams OrderParams, wallet common.Wallet, chainId int) (*PreparedOrder, error) {
+func CreateFusionPlusOrderData(quoteParams QuoteParams, quote *Quote, orderParams OrderParams, wallet common.Wallet, chainId int) (*PreparedOrder, error) {
 
 	// TODO preset is already gotten earlier for the secret count
 	preset, err := GetPreset(quote.Presets, orderParams.Preset)

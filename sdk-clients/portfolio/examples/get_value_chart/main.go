@@ -32,7 +32,7 @@ func main() {
 	}
 	ctx := context.Background()
 
-	response, err := client.GetValueChart(ctx, portfolio.GetValueChartPortfolioV4GeneralValueChartGetParams{
+	response, err := client.GetValueChart(ctx, portfolio.GetValueChartParams{
 		Addresses: []string{"0xd8dA6BF26964aF9D7eEd9e03E53415D37aA96045"},
 		ChainId:   1,
 	})

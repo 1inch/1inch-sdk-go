@@ -101,11 +101,11 @@ func TestGetOrdersByCreatorAddressParams_Validate(t *testing.T) {
 			description: "Valid parameters",
 			params: GetOrdersByCreatorAddressParams{
 				CreatorAddress: "0x1234567890abcdef1234567890abcdef12345678",
-				LimitOrderV3SubscribedApiControllerGetAllLimitOrdersParams: LimitOrderV3SubscribedApiControllerGetAllLimitOrdersParams{
+				LimitOrdersQueryParams: LimitOrdersQueryParams{
 					Page:       1,
 					Limit:      1,
 					Statuses:   []float32{1},
-					SortBy:     LimitOrderV3SubscribedApiControllerGetAllLimitOrdersParamsSortByCreateDateTime,
+					SortBy:     LimitOrdersQueryParamsSortByCreateDateTime,
 					TakerAsset: "0x1234567890abcdef1234567890abcdef12345678",
 					MakerAsset: "0x1234567890abcdef1234567890abcdef12345678",
 				},
@@ -148,11 +148,11 @@ func TestGetAllOrdersParams_Validate(t *testing.T) {
 		{
 			description: "Valid parameters",
 			params: GetAllOrdersParams{
-				LimitOrderV3SubscribedApiControllerGetAllLimitOrdersParams: LimitOrderV3SubscribedApiControllerGetAllLimitOrdersParams{
+				LimitOrdersQueryParams: LimitOrdersQueryParams{
 					Page:       1,
 					Limit:      1,
 					Statuses:   []float32{1},
-					SortBy:     LimitOrderV3SubscribedApiControllerGetAllLimitOrdersParamsSortByCreateDateTime,
+					SortBy:     LimitOrdersQueryParamsSortByCreateDateTime,
 					TakerAsset: "0x1234567890abcdef1234567890abcdef12345678",
 					MakerAsset: "0x1234567890abcdef1234567890abcdef12345678",
 				},
@@ -188,7 +188,7 @@ func TestGetCountParams_Validate(t *testing.T) {
 		{
 			description: "Valid parameters",
 			params: GetCountParams{
-				LimitOrderV3SubscribedApiControllerGetAllOrdersCountParams: LimitOrderV3SubscribedApiControllerGetAllOrdersCountParams{
+				OrdersCountQueryParams: OrdersCountQueryParams{
 					Statuses: []string{"1"},
 				},
 			},
@@ -263,7 +263,7 @@ func TestGetEventsParams_Validate(t *testing.T) {
 		{
 			description: "Invalid limit parameter",
 			params: GetEventsParams{
-				LimitOrderV3SubscribedApiControllerGetEventsParams: LimitOrderV3SubscribedApiControllerGetEventsParams{
+				EventsQueryParams: EventsQueryParams{
 					Limit: -1,
 				}},
 			expectErrors: []string{

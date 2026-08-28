@@ -34,7 +34,7 @@ func main() {
 
 	timerange := portfolio.N1day
 
-	response, err := client.GetProtocolsProfitAndLoss(ctx, portfolio.GetProfitAndLossPortfolioV4OverviewProtocolsProfitAndLossGetParams{
+	response, err := client.GetProtocolsProfitAndLoss(ctx, portfolio.GetProtocolsProfitAndLossParams{
 		Addresses: []string{"0xd8dA6BF26964aF9D7eEd9e03E53415D37aA96045"},
 		ChainId:   1,
 		Timerange: &timerange,

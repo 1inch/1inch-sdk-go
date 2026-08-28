@@ -13,18 +13,18 @@ import (
 func TestOrderApiControllerGetActiveOrdersParams_Validate(t *testing.T) {
 	tests := []struct {
 		name        string
-		params      OrderApiControllerGetActiveOrdersParams
+		params      GetActiveOrdersParams
 		expectError bool
 		errorMsg    string
 	}{
 		{
 			name:        "Valid params - empty (defaults)",
-			params:      OrderApiControllerGetActiveOrdersParams{},
+			params:      GetActiveOrdersParams{},
 			expectError: false,
 		},
 		{
 			name: "Valid params - with page and limit",
-			params: OrderApiControllerGetActiveOrdersParams{
+			params: GetActiveOrdersParams{
 				Page:  1,
 				Limit: 10,
 			},
@@ -32,7 +32,7 @@ func TestOrderApiControllerGetActiveOrdersParams_Validate(t *testing.T) {
 		},
 		{
 			name: "Invalid page - negative",
-			params: OrderApiControllerGetActiveOrdersParams{
+			params: GetActiveOrdersParams{
 				Page: -1,
 			},
 			expectError: true,
@@ -40,7 +40,7 @@ func TestOrderApiControllerGetActiveOrdersParams_Validate(t *testing.T) {
 		},
 		{
 			name: "Invalid limit - negative",
-			params: OrderApiControllerGetActiveOrdersParams{
+			params: GetActiveOrdersParams{
 				Limit: -1,
 			},
 			expectError: true,
@@ -66,13 +66,13 @@ func TestQuoterControllerGetQuoteParams_Validate(t *testing.T) {
 
 	tests := []struct {
 		name        string
-		params      QuoterControllerGetQuoteParams
+		params      QuoteParams
 		expectError bool
 		errorMsg    string
 	}{
 		{
 			name: "Valid params",
-			params: QuoterControllerGetQuoteParams{
+			params: QuoteParams{
 				SrcTokenAddress: validAddress,
 				DstTokenAddress: validAddress,
 				WalletAddress:   validAddress,
@@ -84,7 +84,7 @@ func TestQuoterControllerGetQuoteParams_Validate(t *testing.T) {
 		},
 		{
 			name: "Missing SrcTokenAddress",
-			params: QuoterControllerGetQuoteParams{
+			params: QuoteParams{
 				DstTokenAddress: validAddress,
 				WalletAddress:   validAddress,
 				SrcChain:        1,
@@ -96,7 +96,7 @@ func TestQuoterControllerGetQuoteParams_Validate(t *testing.T) {
 		},
 		{
 			name: "Missing WalletAddress",
-			params: QuoterControllerGetQuoteParams{
+			params: QuoteParams{
 				SrcTokenAddress: validAddress,
 				DstTokenAddress: validAddress,
 				SrcChain:        1,
@@ -108,7 +108,7 @@ func TestQuoterControllerGetQuoteParams_Validate(t *testing.T) {
 		},
 		{
 			name: "Missing Amount",
-			params: QuoterControllerGetQuoteParams{
+			params: QuoteParams{
 				SrcTokenAddress: validAddress,
 				DstTokenAddress: validAddress,
 				WalletAddress:   validAddress,
@@ -120,7 +120,7 @@ func TestQuoterControllerGetQuoteParams_Validate(t *testing.T) {
 		},
 		{
 			name: "Invalid Amount",
-			params: QuoterControllerGetQuoteParams{
+			params: QuoteParams{
 				SrcTokenAddress: validAddress,
 				DstTokenAddress: validAddress,
 				WalletAddress:   validAddress,
@@ -135,7 +135,7 @@ func TestQuoterControllerGetQuoteParams_Validate(t *testing.T) {
 			// Aurora's chain id (1313161554) exceeds float32's 24-bit integer precision;
 			// it must survive validation unrounded now that chain ids are ints.
 			name: "Valid params - Aurora chain id above 2^24",
-			params: QuoterControllerGetQuoteParams{
+			params: QuoteParams{
 				SrcTokenAddress: validAddress,
 				DstTokenAddress: validAddress,
 				WalletAddress:   validAddress,
@@ -147,7 +147,7 @@ func TestQuoterControllerGetQuoteParams_Validate(t *testing.T) {
 		},
 		{
 			name: "Invalid SrcChain - zero",
-			params: QuoterControllerGetQuoteParams{
+			params: QuoteParams{
 				SrcTokenAddress: validAddress,
 				DstTokenAddress: validAddress,
 				WalletAddress:   validAddress,
@@ -160,7 +160,7 @@ func TestQuoterControllerGetQuoteParams_Validate(t *testing.T) {
 		},
 		{
 			name: "Invalid DstChain - zero",
-			params: QuoterControllerGetQuoteParams{
+			params: QuoteParams{
 				SrcTokenAddress: validAddress,
 				DstTokenAddress: validAddress,
 				WalletAddress:   validAddress,
@@ -191,13 +191,13 @@ func TestQuoterControllerGetQuoteWithCustomPresetsParams_Validate(t *testing.T) 
 
 	tests := []struct {
 		name        string
-		params      QuoterControllerGetQuoteWithCustomPresetsParams
+		params      CustomPresetQuoteParams
 		expectError bool
 		errorMsg    string
 	}{
 		{
 			name: "Valid params",
-			params: QuoterControllerGetQuoteWithCustomPresetsParams{
+			params: CustomPresetQuoteParams{
 				SrcTokenAddress: validAddress,
 				DstTokenAddress: validAddress,
 				WalletAddress:   validAddress,
@@ -209,7 +209,7 @@ func TestQuoterControllerGetQuoteWithCustomPresetsParams_Validate(t *testing.T) 
 		},
 		{
 			name: "Missing SrcTokenAddress",
-			params: QuoterControllerGetQuoteWithCustomPresetsParams{
+			params: CustomPresetQuoteParams{
 				DstTokenAddress: validAddress,
 				WalletAddress:   validAddress,
 				SrcChain:        1,
@@ -221,7 +221,7 @@ func TestQuoterControllerGetQuoteWithCustomPresetsParams_Validate(t *testing.T) 
 		},
 		{
 			name: "Missing Amount",
-			params: QuoterControllerGetQuoteWithCustomPresetsParams{
+			params: CustomPresetQuoteParams{
 				SrcTokenAddress: validAddress,
 				DstTokenAddress: validAddress,
 				WalletAddress:   validAddress,
@@ -234,7 +234,7 @@ func TestQuoterControllerGetQuoteWithCustomPresetsParams_Validate(t *testing.T) 
 		},
 		{
 			name: "Invalid chain",
-			params: QuoterControllerGetQuoteWithCustomPresetsParams{
+			params: CustomPresetQuoteParams{
 				SrcTokenAddress: validAddress,
 				DstTokenAddress: validAddress,
 				WalletAddress:   validAddress,
@@ -247,7 +247,7 @@ func TestQuoterControllerGetQuoteWithCustomPresetsParams_Validate(t *testing.T) 
 		},
 		{
 			name:        "Missing all required fields",
-			params:      QuoterControllerGetQuoteWithCustomPresetsParams{},
+			params:      CustomPresetQuoteParams{},
 			expectError: true,
 		},
 	}

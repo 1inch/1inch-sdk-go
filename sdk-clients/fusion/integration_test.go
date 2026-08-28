@@ -14,8 +14,8 @@ import (
 )
 
 // createTestQuote creates a realistic quote for testing
-func createTestQuote() GetQuoteOutput {
-	return GetQuoteOutput{
+func createTestQuote() Quote {
+	return Quote{
 		QuoteId: "test-quote-id-12345",
 		Presets: QuotePresetsClass{
 			Fast: PresetClass{
@@ -200,7 +200,7 @@ func TestGetQuoteOutput_Serialization(t *testing.T) {
 		}
 	}`
 
-	var quote GetQuoteOutput
+	var quote Quote
 	err := json.Unmarshal([]byte(apiResponse), &quote)
 	require.NoError(t, err)
 

@@ -41,6 +41,8 @@ var specOverrides = map[string][]schemaPatch{
 			"type":        "string",
 			"description": "Current generated quote id, should be passed with order",
 		}},
+		// Friendly SDK-facing name: fusionplus.Quote instead of GetQuoteOutput.
+		{path: "components.schemas.GetQuoteOutput", merge: true, value: spec{"x-go-name": "Quote"}},
 	},
 	"fusion_quoter-openapi.json": {
 		// quoteId is declared as object but the API returns a string.
@@ -57,6 +59,8 @@ var specOverrides = map[string][]schemaPatch{
 			"surplusFee":   spec{"type": "number"},
 			"marketAmount": spec{"type": "string"},
 		}},
+		// Friendly SDK-facing name: fusion.Quote instead of GetQuoteOutput.
+		{path: "components.schemas.GetQuoteOutput", merge: true, value: spec{"x-go-name": "Quote"}},
 	},
 	"fusionplus_orders-openapi.json": {
 		// Token USD prices are declared as objects but the API returns
@@ -123,8 +127,10 @@ func surplusParam() spec {
 }
 
 // applyOverrides applies the spec's schema patches and parameter overrides,
-// if any.
-func applyOverrides(specName string, doc spec) error {
+// if any. operationIDs is the raw-to-friendly mapping: overrides are keyed by
+// raw upstream operation ids, but must also resolve on an already-renamed
+// document so the transform chain stays idempotent.
+func applyOverrides(specName string, doc spec, operationIDs map[string]string) error {
 	for _, patch := range specOverrides[specName] {
 		node, err := resolvePath(doc, patch.path)
 		if err != nil {
@@ -139,7 +145,7 @@ func applyOverrides(specName string, doc spec) error {
 		}
 	}
 
-	if err := addParameters(specName, doc); err != nil {
+	if err := addParameters(specName, doc, operationIDs); err != nil {
 		return err
 	}
 
@@ -172,15 +178,27 @@ func applyOverrides(specName string, doc spec) error {
 // addParameters appends the spec's parameter additions, if any. A parameter is
 // only added if the operation does not already declare it, so a refreshed
 // upstream spec that gains the parameter wins over the addition.
-func addParameters(specName string, doc spec) error {
+func addParameters(specName string, doc spec, operationIDs map[string]string) error {
 	additions := paramAdditions[specName]
 	if len(additions) == 0 {
 		return nil
 	}
+	// Accept the friendly id too, so re-running the transforms on an
+	// already-renamed document still resolves the operation.
+	byAnyID := make(map[string][]spec, len(additions))
+	rawID := make(map[string]string, len(additions))
+	for raw, add := range additions {
+		byAnyID[raw] = add
+		rawID[raw] = raw
+		if friendly, ok := operationIDs[raw]; ok {
+			byAnyID[friendly] = add
+			rawID[friendly] = raw
+		}
+	}
 	applied := make(map[string]bool, len(additions))
 	forEachOperation(doc, func(op spec) {
 		id, _ := op["operationId"].(string)
-		add, ok := additions[id]
+		add, ok := byAnyID[id]
 		if !ok {
 			return
 		}
@@ -199,7 +217,7 @@ func addParameters(specName string, doc spec) error {
 			}
 		}
 		op["parameters"] = params
-		applied[id] = true
+		applied[rawID[id]] = true
 	})
 	for id := range additions {
 		if !applied[id] {

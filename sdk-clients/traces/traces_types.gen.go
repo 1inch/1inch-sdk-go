@@ -672,8 +672,8 @@ type ReadSyncedIntervalResponseDto struct {
 	To float32 `json:"to"`
 }
 
-// BlockTraceRestApiControllerBlockTraceByNumber200JSONResponseBody defines parameters for BlockTraceRestApiControllerBlockTraceByNumber.
-type BlockTraceRestApiControllerBlockTraceByNumber200JSONResponseBody struct {
+// GetBlockTraceByNumber200JSONResponseBody defines parameters for GetBlockTraceByNumber.
+type GetBlockTraceByNumber200JSONResponseBody struct {
 	union json.RawMessage
 }
 
@@ -827,22 +827,22 @@ func (t *PlainTransactionTraceWithTypeDto_TransactionTrace_Item) UnmarshalJSON(b
 	return err
 }
 
-// AsCoreBuiltinBlockTracesDto returns the union data inside the BlockTraceRestApiControllerBlockTraceByNumber200JSONResponseBody as a CoreBuiltinBlockTracesDto
-func (t BlockTraceRestApiControllerBlockTraceByNumber200JSONResponseBody) AsCoreBuiltinBlockTracesDto() (CoreBuiltinBlockTracesDto, error) {
+// AsCoreBuiltinBlockTracesDto returns the union data inside the GetBlockTraceByNumber200JSONResponseBody as a CoreBuiltinBlockTracesDto
+func (t GetBlockTraceByNumber200JSONResponseBody) AsCoreBuiltinBlockTracesDto() (CoreBuiltinBlockTracesDto, error) {
 	var body CoreBuiltinBlockTracesDto
 	err := json.Unmarshal(t.union, &body)
 	return body, err
 }
 
-// FromCoreBuiltinBlockTracesDto overwrites any union data inside the BlockTraceRestApiControllerBlockTraceByNumber200JSONResponseBody as the provided CoreBuiltinBlockTracesDto
-func (t *BlockTraceRestApiControllerBlockTraceByNumber200JSONResponseBody) FromCoreBuiltinBlockTracesDto(v CoreBuiltinBlockTracesDto) error {
+// FromCoreBuiltinBlockTracesDto overwrites any union data inside the GetBlockTraceByNumber200JSONResponseBody as the provided CoreBuiltinBlockTracesDto
+func (t *GetBlockTraceByNumber200JSONResponseBody) FromCoreBuiltinBlockTracesDto(v CoreBuiltinBlockTracesDto) error {
 	b, err := json.Marshal(v)
 	t.union = b
 	return err
 }
 
-// MergeCoreBuiltinBlockTracesDto performs a merge with any union data inside the BlockTraceRestApiControllerBlockTraceByNumber200JSONResponseBody, using the provided CoreBuiltinBlockTracesDto
-func (t *BlockTraceRestApiControllerBlockTraceByNumber200JSONResponseBody) MergeCoreBuiltinBlockTracesDto(v CoreBuiltinBlockTracesDto) error {
+// MergeCoreBuiltinBlockTracesDto performs a merge with any union data inside the GetBlockTraceByNumber200JSONResponseBody, using the provided CoreBuiltinBlockTracesDto
+func (t *GetBlockTraceByNumber200JSONResponseBody) MergeCoreBuiltinBlockTracesDto(v CoreBuiltinBlockTracesDto) error {
 	b, err := json.Marshal(v)
 	if err != nil {
 		return err
@@ -853,22 +853,22 @@ func (t *BlockTraceRestApiControllerBlockTraceByNumber200JSONResponseBody) Merge
 	return err
 }
 
-// AsCoreCustomBlockTraceDto returns the union data inside the BlockTraceRestApiControllerBlockTraceByNumber200JSONResponseBody as a CoreCustomBlockTraceDto
-func (t BlockTraceRestApiControllerBlockTraceByNumber200JSONResponseBody) AsCoreCustomBlockTraceDto() (CoreCustomBlockTraceDto, error) {
+// AsCoreCustomBlockTraceDto returns the union data inside the GetBlockTraceByNumber200JSONResponseBody as a CoreCustomBlockTraceDto
+func (t GetBlockTraceByNumber200JSONResponseBody) AsCoreCustomBlockTraceDto() (CoreCustomBlockTraceDto, error) {
 	var body CoreCustomBlockTraceDto
 	err := json.Unmarshal(t.union, &body)
 	return body, err
 }
 
-// FromCoreCustomBlockTraceDto overwrites any union data inside the BlockTraceRestApiControllerBlockTraceByNumber200JSONResponseBody as the provided CoreCustomBlockTraceDto
-func (t *BlockTraceRestApiControllerBlockTraceByNumber200JSONResponseBody) FromCoreCustomBlockTraceDto(v CoreCustomBlockTraceDto) error {
+// FromCoreCustomBlockTraceDto overwrites any union data inside the GetBlockTraceByNumber200JSONResponseBody as the provided CoreCustomBlockTraceDto
+func (t *GetBlockTraceByNumber200JSONResponseBody) FromCoreCustomBlockTraceDto(v CoreCustomBlockTraceDto) error {
 	b, err := json.Marshal(v)
 	t.union = b
 	return err
 }
 
-// MergeCoreCustomBlockTraceDto performs a merge with any union data inside the BlockTraceRestApiControllerBlockTraceByNumber200JSONResponseBody, using the provided CoreCustomBlockTraceDto
-func (t *BlockTraceRestApiControllerBlockTraceByNumber200JSONResponseBody) MergeCoreCustomBlockTraceDto(v CoreCustomBlockTraceDto) error {
+// MergeCoreCustomBlockTraceDto performs a merge with any union data inside the GetBlockTraceByNumber200JSONResponseBody, using the provided CoreCustomBlockTraceDto
+func (t *GetBlockTraceByNumber200JSONResponseBody) MergeCoreCustomBlockTraceDto(v CoreCustomBlockTraceDto) error {
 	b, err := json.Marshal(v)
 	if err != nil {
 		return err
@@ -879,12 +879,12 @@ func (t *BlockTraceRestApiControllerBlockTraceByNumber200JSONResponseBody) Merge
 	return err
 }
 
-func (t BlockTraceRestApiControllerBlockTraceByNumber200JSONResponseBody) MarshalJSON() ([]byte, error) {
+func (t GetBlockTraceByNumber200JSONResponseBody) MarshalJSON() ([]byte, error) {
 	b, err := t.union.MarshalJSON()
 	return b, err
 }
 
-func (t *BlockTraceRestApiControllerBlockTraceByNumber200JSONResponseBody) UnmarshalJSON(b []byte) error {
+func (t *GetBlockTraceByNumber200JSONResponseBody) UnmarshalJSON(b []byte) error {
 	err := t.union.UnmarshalJSON(b)
 	return err
 }

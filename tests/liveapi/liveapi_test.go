@@ -63,7 +63,7 @@ func TestTokensSearchDecodes(t *testing.T) {
 	client, err := tokens.NewClient(config)
 	require.NoError(t, err)
 
-	results, err := client.SearchTokenAllChains(testContext(t), tokens.SearchControllerSearchAllChainsParams{
+	results, err := client.SearchTokenAllChains(testContext(t), tokens.SearchAllChainsParams{
 		Query: "1inch",
 		Limit: 5,
 	})
@@ -89,7 +89,7 @@ func TestFusionPlusQuoteDecodes(t *testing.T) {
 	client, err := fusionplus.NewClient(config)
 	require.NoError(t, err)
 
-	quote, err := client.GetQuote(testContext(t), fusionplus.QuoterControllerGetQuoteParams{
+	quote, err := client.GetQuote(testContext(t), fusionplus.QuoteParams{
 		SrcChain:        constants.ArbitrumChainId,
 		DstChain:        constants.BaseChainId,
 		SrcTokenAddress: "0x82af49447d8a07e3bd95bd0d56f35241523fbab1", // WETH (Arbitrum)

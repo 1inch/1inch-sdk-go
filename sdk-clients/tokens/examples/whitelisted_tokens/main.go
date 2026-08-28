@@ -34,7 +34,7 @@ func main() {
 	}
 	ctx := context.Background()
 
-	whitelistedTokens, err := client.WhitelistedTokens(ctx, tokens.TokenListControllerTokensParams{})
+	whitelistedTokens, err := client.WhitelistedTokens(ctx, tokens.GetWhitelistedTokensParams{})
 	if err != nil {
 		log.Fatalf("failed to search token: %v", err)
 	}

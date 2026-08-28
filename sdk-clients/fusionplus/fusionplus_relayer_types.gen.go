@@ -71,14 +71,14 @@ type SignedOrderInput struct {
 	SrcChainId int `json:"srcChainId"`
 }
 
-// RelayerControllerSubmitManyJSONBody defines parameters for RelayerControllerSubmitMany.
-type RelayerControllerSubmitManyJSONBody = []string
+// SubmitManyOrdersJSONBody defines parameters for SubmitManyOrders.
+type SubmitManyOrdersJSONBody = []string
 
-// RelayerControllerSubmitJSONRequestBody defines body for RelayerControllerSubmit for application/json ContentType.
-type RelayerControllerSubmitJSONRequestBody = SignedOrderInput
+// SubmitOrderJSONRequestBody defines body for SubmitOrder for application/json ContentType.
+type SubmitOrderJSONRequestBody = SignedOrderInput
 
-// RelayerControllerSubmitManyJSONRequestBody defines body for RelayerControllerSubmitMany for application/json ContentType.
-type RelayerControllerSubmitManyJSONRequestBody = RelayerControllerSubmitManyJSONBody
+// SubmitManyOrdersJSONRequestBody defines body for SubmitManyOrders for application/json ContentType.
+type SubmitManyOrdersJSONRequestBody = SubmitManyOrdersJSONBody
 
-// RelayerControllerSubmitSecretsJSONRequestBody defines body for RelayerControllerSubmitSecrets for application/json ContentType.
-type RelayerControllerSubmitSecretsJSONRequestBody = SecretInput
+// SubmitSecretsJSONRequestBody defines body for SubmitSecrets for application/json ContentType.
+type SubmitSecretsJSONRequestBody = SecretInput

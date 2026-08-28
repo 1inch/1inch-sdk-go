@@ -35,7 +35,7 @@ func main() {
 	}
 	ctx := context.Background()
 
-	response, err := client.GetActiveOrders(ctx, fusion.OrderApiControllerGetActiveOrdersParams{
+	response, err := client.GetActiveOrders(ctx, fusion.GetActiveOrdersParams{
 		Page:  0,
 		Limit: 2,
 	})

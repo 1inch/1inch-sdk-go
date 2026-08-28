@@ -73,7 +73,7 @@ func TestPlaceOrderFromParams(t *testing.T) {
 	require.Len(t, executor.Payloads, 2)
 
 	// The quote request must carry the permit settings from the single input
-	quoteParams, ok := executor.Payloads[0].Params.(QuoterControllerGetQuoteParams)
+	quoteParams, ok := executor.Payloads[0].Params.(QuoteParams)
 	require.True(t, ok, "first request must be the quote request")
 	assert.Equal(t, "true", quoteParams.IsPermit2)
 	assert.Equal(t, orderParams.Permit, quoteParams.Permit)
@@ -178,7 +178,7 @@ func TestPlaceOrderFromParams_CustomPreset(t *testing.T) {
 
 			quoteRequest := executor.Payloads[0]
 			assert.Equal(t, "POST", quoteRequest.Method, "custom preset quotes use the POST endpoint")
-			_, ok := quoteRequest.Params.(QuoterControllerGetQuoteWithCustomPresetsParams)
+			_, ok := quoteRequest.Params.(CustomPresetQuoteParams)
 			assert.True(t, ok, "quote request must use the custom preset params")
 			assert.Contains(t, string(quoteRequest.Body), "auctionDuration")
 		})

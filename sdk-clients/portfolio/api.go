@@ -6,7 +6,7 @@ import (
 	"github.com/1inch/1inch-sdk-go/v4/common"
 )
 
-func (api *api) GetProtocolsCurrentValue(ctx context.Context, params GetCurrentValuePortfolioV4OverviewProtocolsCurrentValueGetParams) (*GetPortfolioValueResponse, error) {
+func (api *api) GetProtocolsCurrentValue(ctx context.Context, params GetProtocolsCurrentValueParams) (*GetPortfolioValueResponse, error) {
 	u := "/portfolio/portfolio/v4/overview/protocols/current_value"
 
 	err := params.Validate()
@@ -30,7 +30,7 @@ func (api *api) GetProtocolsCurrentValue(ctx context.Context, params GetCurrentV
 	return &response, nil
 }
 
-func (api *api) GetProtocolsProfitAndLoss(ctx context.Context, params GetProfitAndLossPortfolioV4OverviewProtocolsProfitAndLossGetParams) (*GetPortfolioProfitAndLossResponse, error) {
+func (api *api) GetProtocolsProfitAndLoss(ctx context.Context, params GetProtocolsProfitAndLossParams) (*GetPortfolioProfitAndLossResponse, error) {
 	u := "/portfolio/portfolio/v4/overview/protocols/profit_and_loss"
 
 	err := params.Validate()
@@ -54,7 +54,7 @@ func (api *api) GetProtocolsProfitAndLoss(ctx context.Context, params GetProfitA
 	return &response, nil
 }
 
-func (api *api) GetProtocolsDetails(ctx context.Context, params GetDetailsPortfolioV4OverviewProtocolsDetailsGetParams) (*GetProtocolsDetailsResponse, error) {
+func (api *api) GetProtocolsDetails(ctx context.Context, params GetProtocolsDetailsParams) (*GetProtocolsDetailsResponse, error) {
 	u := "/portfolio/portfolio/v4/overview/protocols/details"
 
 	err := params.Validate()
@@ -78,7 +78,7 @@ func (api *api) GetProtocolsDetails(ctx context.Context, params GetDetailsPortfo
 	return &response, nil
 }
 
-func (api *api) GetTokensCurrentValue(ctx context.Context, params GetCurrentValuePortfolioV4OverviewErc20CurrentValueGetParams) (*GetTokensCurrentValueResponse, error) {
+func (api *api) GetTokensCurrentValue(ctx context.Context, params GetTokensCurrentValueParams) (*GetTokensCurrentValueResponse, error) {
 	u := "/portfolio/portfolio/v4/overview/erc20/current_value"
 
 	err := params.Validate()
@@ -102,7 +102,7 @@ func (api *api) GetTokensCurrentValue(ctx context.Context, params GetCurrentValu
 	return &response, nil
 }
 
-func (api *api) GetTokensProfitLoss(ctx context.Context, params GetProfitAndLossPortfolioV4OverviewErc20ProfitAndLossGetParams) (*GetTokensProfitLossResponse, error) {
+func (api *api) GetTokensProfitLoss(ctx context.Context, params GetTokensProfitAndLossParams) (*GetTokensProfitLossResponse, error) {
 	u := "/portfolio/portfolio/v4/overview/erc20/profit_and_loss"
 
 	err := params.Validate()
@@ -126,7 +126,7 @@ func (api *api) GetTokensProfitLoss(ctx context.Context, params GetProfitAndLoss
 	return &response, nil
 }
 
-func (api *api) GetTokensDetails(ctx context.Context, params GetDetailsPortfolioV4OverviewErc20DetailsGetParams) (*GetTokensDetailsResponse, error) {
+func (api *api) GetTokensDetails(ctx context.Context, params GetTokensDetailsParams) (*GetTokensDetailsResponse, error) {
 	u := "/portfolio/portfolio/v4/overview/erc20/details"
 
 	err := params.Validate()
@@ -188,7 +188,7 @@ func (api *api) GetSupportedChains(ctx context.Context) (*GetSupportedChainsResp
 	return &response, nil
 }
 
-func (api *api) GetCurrentValue(ctx context.Context, params GetCurrentValuePortfolioV4GeneralCurrentValueGetParams) (*GetCurrentValueResponse, error) {
+func (api *api) GetCurrentValue(ctx context.Context, params GetCurrentValueParams) (*GetCurrentValueResponse, error) {
 	u := "/portfolio/portfolio/v4/general/current_value"
 
 	err := params.Validate()
@@ -212,7 +212,7 @@ func (api *api) GetCurrentValue(ctx context.Context, params GetCurrentValuePortf
 	return &response, nil
 }
 
-func (api *api) GetProfitLoss(ctx context.Context, params GetProfitAndLossPortfolioV4GeneralProfitAndLossGetParams) (*GetCurrentProfitLossResponse, error) {
+func (api *api) GetProfitLoss(ctx context.Context, params GetProfitAndLossParams) (*GetCurrentProfitLossResponse, error) {
 	u := "/portfolio/portfolio/v4/general/profit_and_loss"
 
 	err := params.Validate()
@@ -236,7 +236,7 @@ func (api *api) GetProfitLoss(ctx context.Context, params GetProfitAndLossPortfo
 	return &response, nil
 }
 
-func (api *api) GetValueChart(ctx context.Context, params GetValueChartPortfolioV4GeneralValueChartGetParams) (*GetValueChartResponse, error) {
+func (api *api) GetValueChart(ctx context.Context, params GetValueChartParams) (*GetValueChartResponse, error) {
 	u := "/portfolio/portfolio/v4/general/value_chart"
 
 	err := params.Validate()

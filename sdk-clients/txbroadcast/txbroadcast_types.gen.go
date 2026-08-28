@@ -19,8 +19,8 @@ type BroadcastResponse struct {
 	TransactionHash string `json:"transactionHash"`
 }
 
-// TxProcessorApiControllerBroadcastTransactionJSONRequestBody defines body for TxProcessorApiControllerBroadcastTransaction for application/json ContentType.
-type TxProcessorApiControllerBroadcastTransactionJSONRequestBody = BroadcastRequest
+// BroadcastPublicTransactionJSONRequestBody defines body for BroadcastPublicTransaction for application/json ContentType.
+type BroadcastPublicTransactionJSONRequestBody = BroadcastRequest
 
-// TxProcessorApiControllerBroadcastFlashbotsTransactionJSONRequestBody defines body for TxProcessorApiControllerBroadcastFlashbotsTransaction for application/json ContentType.
-type TxProcessorApiControllerBroadcastFlashbotsTransactionJSONRequestBody = BroadcastRequest
+// BroadcastPrivateTransactionJSONRequestBody defines body for BroadcastPrivateTransaction for application/json ContentType.
+type BroadcastPrivateTransactionJSONRequestBody = BroadcastRequest

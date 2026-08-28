@@ -62,8 +62,8 @@ type ValidationError_Loc_Item struct {
 	union json.RawMessage
 }
 
-// GetCurrentValuePortfolioV4GeneralCurrentValueGetParams defines parameters for GetCurrentValuePortfolioV4GeneralCurrentValueGet.
-type GetCurrentValuePortfolioV4GeneralCurrentValueGetParams struct {
+// GetCurrentValueParams defines parameters for GetCurrentValue.
+type GetCurrentValueParams struct {
 	// Addresses Addresses
 	Addresses []string `url:"addresses" json:"addresses"`
 
@@ -71,20 +71,8 @@ type GetCurrentValuePortfolioV4GeneralCurrentValueGetParams struct {
 	ChainId int `url:"chain_id,omitempty" json:"chain_id,omitempty"`
 }
 
-// GetProfitAndLossPortfolioV4GeneralProfitAndLossGetParams defines parameters for GetProfitAndLossPortfolioV4GeneralProfitAndLossGet.
-type GetProfitAndLossPortfolioV4GeneralProfitAndLossGetParams struct {
-	// Addresses Addresses
-	Addresses []string `url:"addresses" json:"addresses"`
-
-	// ChainId Chain id or nothing
-	ChainId int `url:"chain_id,omitempty" json:"chain_id,omitempty"`
-
-	// Timerange Timerange
-	Timerange *TimeRange `url:"timerange,omitempty" json:"timerange,omitempty"`
-}
-
-// GetValueChartPortfolioV4GeneralValueChartGetParams defines parameters for GetValueChartPortfolioV4GeneralValueChartGet.
-type GetValueChartPortfolioV4GeneralValueChartGetParams struct {
+// GetProfitAndLossParams defines parameters for GetProfitAndLoss.
+type GetProfitAndLossParams struct {
 	// Addresses Addresses
 	Addresses []string `url:"addresses" json:"addresses"`
 
@@ -95,17 +83,8 @@ type GetValueChartPortfolioV4GeneralValueChartGetParams struct {
 	Timerange *TimeRange `url:"timerange,omitempty" json:"timerange,omitempty"`
 }
 
-// GetCurrentValuePortfolioV4OverviewErc20CurrentValueGetParams defines parameters for GetCurrentValuePortfolioV4OverviewErc20CurrentValueGet.
-type GetCurrentValuePortfolioV4OverviewErc20CurrentValueGetParams struct {
-	// Addresses Addresses
-	Addresses []string `url:"addresses" json:"addresses"`
-
-	// ChainId Chain id or nothing
-	ChainId int `url:"chain_id,omitempty" json:"chain_id,omitempty"`
-}
-
-// GetDetailsPortfolioV4OverviewErc20DetailsGetParams defines parameters for GetDetailsPortfolioV4OverviewErc20DetailsGet.
-type GetDetailsPortfolioV4OverviewErc20DetailsGetParams struct {
+// GetValueChartParams defines parameters for GetValueChart.
+type GetValueChartParams struct {
 	// Addresses Addresses
 	Addresses []string `url:"addresses" json:"addresses"`
 
@@ -116,8 +95,17 @@ type GetDetailsPortfolioV4OverviewErc20DetailsGetParams struct {
 	Timerange *TimeRange `url:"timerange,omitempty" json:"timerange,omitempty"`
 }
 
-// GetProfitAndLossPortfolioV4OverviewErc20ProfitAndLossGetParams defines parameters for GetProfitAndLossPortfolioV4OverviewErc20ProfitAndLossGet.
-type GetProfitAndLossPortfolioV4OverviewErc20ProfitAndLossGetParams struct {
+// GetTokensCurrentValueParams defines parameters for GetTokensCurrentValue.
+type GetTokensCurrentValueParams struct {
+	// Addresses Addresses
+	Addresses []string `url:"addresses" json:"addresses"`
+
+	// ChainId Chain id or nothing
+	ChainId int `url:"chain_id,omitempty" json:"chain_id,omitempty"`
+}
+
+// GetTokensDetailsParams defines parameters for GetTokensDetails.
+type GetTokensDetailsParams struct {
 	// Addresses Addresses
 	Addresses []string `url:"addresses" json:"addresses"`
 
@@ -128,8 +116,20 @@ type GetProfitAndLossPortfolioV4OverviewErc20ProfitAndLossGetParams struct {
 	Timerange *TimeRange `url:"timerange,omitempty" json:"timerange,omitempty"`
 }
 
-// GetCurrentValuePortfolioV4OverviewProtocolsCurrentValueGetParams defines parameters for GetCurrentValuePortfolioV4OverviewProtocolsCurrentValueGet.
-type GetCurrentValuePortfolioV4OverviewProtocolsCurrentValueGetParams struct {
+// GetTokensProfitAndLossParams defines parameters for GetTokensProfitAndLoss.
+type GetTokensProfitAndLossParams struct {
+	// Addresses Addresses
+	Addresses []string `url:"addresses" json:"addresses"`
+
+	// ChainId Chain id or nothing
+	ChainId int `url:"chain_id,omitempty" json:"chain_id,omitempty"`
+
+	// Timerange Timerange
+	Timerange *TimeRange `url:"timerange,omitempty" json:"timerange,omitempty"`
+}
+
+// GetProtocolsCurrentValueParams defines parameters for GetProtocolsCurrentValue.
+type GetProtocolsCurrentValueParams struct {
 	// Addresses Addresses
 	Addresses []string `url:"addresses" json:"addresses"`
 
@@ -137,8 +137,8 @@ type GetCurrentValuePortfolioV4OverviewProtocolsCurrentValueGetParams struct {
 	ChainId int `url:"chain_id,omitempty" json:"chain_id,omitempty"`
 }
 
-// GetDetailsPortfolioV4OverviewProtocolsDetailsGetParams defines parameters for GetDetailsPortfolioV4OverviewProtocolsDetailsGet.
-type GetDetailsPortfolioV4OverviewProtocolsDetailsGetParams struct {
+// GetProtocolsDetailsParams defines parameters for GetProtocolsDetails.
+type GetProtocolsDetailsParams struct {
 	// Addresses Addresses
 	Addresses []string `url:"addresses" json:"addresses"`
 
@@ -146,8 +146,8 @@ type GetDetailsPortfolioV4OverviewProtocolsDetailsGetParams struct {
 	ChainId int `url:"chain_id,omitempty" json:"chain_id,omitempty"`
 }
 
-// GetProfitAndLossPortfolioV4OverviewProtocolsProfitAndLossGetParams defines parameters for GetProfitAndLossPortfolioV4OverviewProtocolsProfitAndLossGet.
-type GetProfitAndLossPortfolioV4OverviewProtocolsProfitAndLossGetParams struct {
+// GetProtocolsProfitAndLossParams defines parameters for GetProtocolsProfitAndLoss.
+type GetProtocolsProfitAndLossParams struct {
 	// Addresses Addresses
 	Addresses []string `url:"addresses" json:"addresses"`
 

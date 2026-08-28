@@ -4,6 +4,20 @@ This document tracks breaking changes between major versions of the SDK that aff
 
 ## Unreleased
 
+### Generated Type Names No Longer Leak Upstream Controller Naming
+
+Generated type names previously mirrored 1inch's internal operation ids (`QuoterControllerGetQuoteWithCustomPresetsParams`, `TxProcessorApiControllerBroadcastTransactionJSONRequestBody`, …). Every operation now has a friendly name in `codegen/mapping.json`, and key schemas are renamed via `x-go-name` overrides, so the SDK reads as intended:
+
+```go
+// Before
+quote, err := client.GetQuote(ctx, fusionplus.QuoterControllerGetQuoteParams{...}) // returns *GetQuoteOutput
+
+// After
+quote, err := client.GetQuote(ctx, fusionplus.QuoteParams{...}) // returns *fusionplus.Quote
+```
+
+**Compatibility:** every renamed identifier (55 types, 14 constants) keeps its old name as a `// Deprecated:` alias in each package's `deprecated_names.go` — aliases are identical types, so existing code compiles and behaves identically. The one exception: the `orderbook` wrapper params (`GetAllOrdersParams`, `GetCountParams`, `GetEventsParams`, `GetOrdersByCreatorAddressParams`) embed the generated query types, and an embedded field's name is its type name — struct literals that named the embedded field (e.g. `GetAllOrdersParams{LimitOrderV3SubscribedApiControllerGetAllLimitOrdersParams: q}`) must use the new field name (`LimitOrdersQueryParams: q`). Promoted field access (`params.Page`) and assignment through a variable are unaffected.
+
 ### `*Fixed` Types Are Now Aliases of Corrected Generated Types
 
 Known type bugs in the upstream OpenAPI specs are now corrected at generation time (`codegen/overrides.go`) instead of via hand-maintained `*Fixed` shadow copies. All 12 `*Fixed` types in `fusion`, `fusionplus`, and `tokens` are now type aliases of the corrected generated types.

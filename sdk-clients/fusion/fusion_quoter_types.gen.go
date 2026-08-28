@@ -47,8 +47,8 @@ type GasCostConfigClass struct {
 	GasPriceEstimate string  `json:"gasPriceEstimate"`
 }
 
-// GetQuoteOutput defines model for GetQuoteOutput.
-type GetQuoteOutput struct {
+// Quote defines model for GetQuoteOutput.
+type Quote struct {
 	// FeeToken Destination token address
 	FeeToken        string            `json:"feeToken"`
 	FromTokenAmount string            `json:"fromTokenAmount"`
@@ -114,8 +114,8 @@ type TokenPairValue struct {
 	Usd PairCurrencyValue `json:"usd"`
 }
 
-// QuoterControllerGetQuoteParams defines parameters for QuoterControllerGetQuote.
-type QuoterControllerGetQuoteParams struct {
+// QuoteParams defines parameters for Quote.
+type QuoteParams struct {
 	// FromTokenAddress Address of "FROM" token
 	FromTokenAddress string `url:"fromTokenAddress" json:"fromTokenAddress"`
 
@@ -143,8 +143,8 @@ type QuoterControllerGetQuoteParams struct {
 	Surplus bool   `url:"surplus,omitempty" json:"surplus,omitempty"`
 }
 
-// QuoterControllerGetQuoteWithCustomPresetsParams defines parameters for QuoterControllerGetQuoteWithCustomPresets.
-type QuoterControllerGetQuoteWithCustomPresetsParams struct {
+// CustomPresetQuoteParams defines parameters for CustomPresetQuote.
+type CustomPresetQuoteParams struct {
 	// FromTokenAddress Address of "FROM" token
 	FromTokenAddress string `url:"fromTokenAddress" json:"fromTokenAddress"`
 
@@ -172,5 +172,5 @@ type QuoterControllerGetQuoteWithCustomPresetsParams struct {
 	Surplus      bool   `url:"surplus,omitempty" json:"surplus,omitempty"`
 }
 
-// QuoterControllerGetQuoteWithCustomPresetsJSONRequestBody defines body for QuoterControllerGetQuoteWithCustomPresets for application/json ContentType.
-type QuoterControllerGetQuoteWithCustomPresetsJSONRequestBody = CustomPresetInput
+// CustomPresetQuoteJSONRequestBody defines body for CustomPresetQuote for application/json ContentType.
+type CustomPresetQuoteJSONRequestBody = CustomPresetInput

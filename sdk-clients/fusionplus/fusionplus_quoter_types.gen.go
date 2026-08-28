@@ -35,7 +35,7 @@ type AuctionPoint struct {
 
 // BuildOrderBody defines model for BuildOrderBody.
 type BuildOrderBody struct {
-	Quote GetQuoteOutput `json:"quote"`
+	Quote Quote `json:"quote"`
 
 	// SecretsHashList keccak256(secret)[]
 	//
@@ -64,8 +64,8 @@ type GasCostConfig struct {
 	GasPriceEstimate string  `json:"gasPriceEstimate"`
 }
 
-// GetQuoteOutput defines model for GetQuoteOutput.
-type GetQuoteOutput struct {
+// Quote defines model for GetQuoteOutput.
+type Quote struct {
 	// DstEscrowFactory Escrow factory contract address at destination chain
 	DstEscrowFactory string       `json:"dstEscrowFactory"`
 	DstSafetyDeposit string       `json:"dstSafetyDeposit"`
@@ -142,8 +142,8 @@ type TokenPair struct {
 	SrcToken string `json:"srcToken"`
 }
 
-// QuoterControllerBuildQuoteTypedDataParams defines parameters for QuoterControllerBuildQuoteTypedData.
-type QuoterControllerBuildQuoteTypedDataParams struct {
+// BuildQuoteTypedDataParams defines parameters for BuildQuoteTypedData.
+type BuildQuoteTypedDataParams struct {
 	// SrcChain Id of source chain
 	SrcChain int `url:"srcChain" json:"srcChain"`
 
@@ -184,8 +184,8 @@ type QuoterControllerBuildQuoteTypedDataParams struct {
 	Preset string `url:"preset,omitempty" json:"preset,omitempty"`
 }
 
-// QuoterControllerGetQuoteParams defines parameters for QuoterControllerGetQuote.
-type QuoterControllerGetQuoteParams struct {
+// QuoteParams defines parameters for Quote.
+type QuoteParams struct {
 	// SrcChain Id of source chain
 	SrcChain int `url:"srcChain" json:"srcChain"`
 
@@ -217,8 +217,8 @@ type QuoterControllerGetQuoteParams struct {
 	Permit string `url:"permit,omitempty" json:"permit,omitempty"`
 }
 
-// QuoterControllerGetQuoteWithCustomPresetsParams defines parameters for QuoterControllerGetQuoteWithCustomPresets.
-type QuoterControllerGetQuoteWithCustomPresetsParams struct {
+// CustomPresetQuoteParams defines parameters for CustomPresetQuote.
+type CustomPresetQuoteParams struct {
 	// SrcChain Id of source chain
 	SrcChain int `url:"srcChain" json:"srcChain"`
 
@@ -250,8 +250,8 @@ type QuoterControllerGetQuoteWithCustomPresetsParams struct {
 	Permit string `url:"permit,omitempty" json:"permit,omitempty"`
 }
 
-// QuoterControllerBuildQuoteTypedDataJSONRequestBody defines body for QuoterControllerBuildQuoteTypedData for application/json ContentType.
-type QuoterControllerBuildQuoteTypedDataJSONRequestBody = BuildOrderBody
+// BuildQuoteTypedDataJSONRequestBody defines body for BuildQuoteTypedData for application/json ContentType.
+type BuildQuoteTypedDataJSONRequestBody = BuildOrderBody
 
-// QuoterControllerGetQuoteWithCustomPresetsJSONRequestBody defines body for QuoterControllerGetQuoteWithCustomPresets for application/json ContentType.
-type QuoterControllerGetQuoteWithCustomPresetsJSONRequestBody = CustomPresetParams
+// CustomPresetQuoteJSONRequestBody defines body for CustomPresetQuote for application/json ContentType.
+type CustomPresetQuoteJSONRequestBody = CustomPresetParams

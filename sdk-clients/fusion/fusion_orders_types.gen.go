@@ -82,8 +82,8 @@ type SettlementAddressOutput struct {
 	Address string `json:"address"`
 }
 
-// OrderApiControllerGetActiveOrdersParams defines parameters for OrderApiControllerGetActiveOrders.
-type OrderApiControllerGetActiveOrdersParams struct {
+// GetActiveOrdersParams defines parameters for GetActiveOrders.
+type GetActiveOrdersParams struct {
 	// Page Pagination step, default: 1 (page = offset / limit)
 	Page float32 `url:"page,omitempty" json:"page,omitempty"`
 

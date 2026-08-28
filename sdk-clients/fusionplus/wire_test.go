@@ -19,12 +19,12 @@ import (
 func TestQuoteParamsQueryEncoding(t *testing.T) {
 	tests := []struct {
 		name     string
-		params   QuoterControllerGetQuoteParams
+		params   QuoteParams
 		expected string
 	}{
 		{
 			name: "All fields including Aurora chain id and fee",
-			params: QuoterControllerGetQuoteParams{
+			params: QuoteParams{
 				SrcChain:        constants.AuroraChainId,
 				DstChain:        constants.BaseChainId,
 				SrcTokenAddress: "0xeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeee",
@@ -47,7 +47,7 @@ func TestQuoteParamsQueryEncoding(t *testing.T) {
 		},
 		{
 			name: "Optional fields omitted when zero",
-			params: QuoterControllerGetQuoteParams{
+			params: QuoteParams{
 				SrcChain:        constants.EthereumChainId,
 				DstChain:        constants.ArbitrumChainId,
 				SrcTokenAddress: "0xeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeee",
@@ -111,7 +111,7 @@ func TestSignedOrderInputJSONEncoding(t *testing.T) {
 // types: quoteId as a string, USD prices as strings, points as an array, and
 // chain ids as exact integers.
 func TestResponseDecoding(t *testing.T) {
-	t.Run("GetQuoteOutput", func(t *testing.T) {
+	t.Run("Quote", func(t *testing.T) {
 		payload := `{
 			"quoteId": "9a43c86d-f3d7-45b9-8cb6-803d2bdb7a6b",
 			"srcTokenAmount": "12345678901234567890",
@@ -123,7 +123,7 @@ func TestResponseDecoding(t *testing.T) {
 			"recommendedPreset": "fast",
 			"whitelist": ["0x3333333333333333333333333333333333333333"]
 		}`
-		var out GetQuoteOutput
+		var out Quote
 		require.NoError(t, json.Unmarshal([]byte(payload), &out))
 		assert.Equal(t, "9a43c86d-f3d7-45b9-8cb6-803d2bdb7a6b", out.QuoteId)
 		assert.Equal(t, "12345678901234567890", out.SrcTokenAmount)

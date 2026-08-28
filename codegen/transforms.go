@@ -334,7 +334,7 @@ func applyTransforms(specName string, raw []byte, operationIDs map[string]string
 	if err != nil {
 		return nil, err
 	}
-	if err := applyOverrides(specName, doc); err != nil {
+	if err := applyOverrides(specName, doc, operationIDs); err != nil {
 		return nil, err
 	}
 	if err := renameOperationIDs(doc, operationIDs); err != nil {

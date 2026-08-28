@@ -690,8 +690,8 @@ type ResolverDataOutput struct {
 // Example: SingleFill
 type ResolverDataOutputOrderType string
 
-// OrderApiControllerGetActiveOrdersParams defines parameters for OrderApiControllerGetActiveOrders.
-type OrderApiControllerGetActiveOrdersParams struct {
+// GetActiveOrdersParams defines parameters for GetActiveOrders.
+type GetActiveOrdersParams struct {
 	// Page Pagination step, default: 1 (page = offset / limit)
 	Page float32 `url:"page,omitempty" json:"page,omitempty"`
 
@@ -705,14 +705,14 @@ type OrderApiControllerGetActiveOrdersParams struct {
 	DstChain int `url:"dstChain,omitempty" json:"dstChain,omitempty"`
 }
 
-// OrderApiControllerGetSettlementContractParams defines parameters for OrderApiControllerGetSettlementContract.
-type OrderApiControllerGetSettlementContractParams struct {
+// GetSettlementContractParams defines parameters for GetSettlementContract.
+type GetSettlementContractParams struct {
 	// ChainId Chain ID
 	ChainId int `url:"chainId,omitempty" json:"chainId,omitempty"`
 }
 
-// OrderApiControllerGetOrdersByMakerParams defines parameters for OrderApiControllerGetOrdersByMaker.
-type OrderApiControllerGetOrdersByMakerParams struct {
+// GetOrdersByMakerParams defines parameters for GetOrdersByMaker.
+type GetOrdersByMakerParams struct {
 	// Page Pagination step, default: 1 (page = offset / limit)
 	Page float32 `url:"page,omitempty" json:"page,omitempty"`
 
@@ -744,5 +744,5 @@ type OrderApiControllerGetOrdersByMakerParams struct {
 	ChainId int `url:"chainId,omitempty" json:"chainId,omitempty"`
 }
 
-// OrderApiControllerGetOrdersByOrderHashesJSONRequestBody defines body for OrderApiControllerGetOrdersByOrderHashes for application/json ContentType.
-type OrderApiControllerGetOrdersByOrderHashesJSONRequestBody = OrdersByHashesInput
+// GetOrdersByHashesJSONRequestBody defines body for GetOrdersByHashes for application/json ContentType.
+type GetOrdersByHashesJSONRequestBody = OrdersByHashesInput

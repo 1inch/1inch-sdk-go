@@ -91,7 +91,7 @@ func TestGetPricesForWhitelistedTokens(t *testing.T) {
 		chainId:      constants.EthereumChainId,
 	}
 
-	params := SearchControllerSearchAllChainsParams{
+	params := SearchAllChainsParams{
 		Query:              "UNI",
 		IgnoreListed:       false,
 		OnlyPositiveRating: false,

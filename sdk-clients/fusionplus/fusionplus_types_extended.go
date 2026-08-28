@@ -22,20 +22,20 @@ type GetReadyToAcceptFillsParams struct {
 // integrations keep compiling.
 type GetOrderFillsByHashOutputFixed = GetOrderFillsByHashOutput
 
-// Deprecated: Use QuoterControllerGetQuoteParams instead. The type bugs this
+// Deprecated: Use QuoteParams instead. The type bugs this
 // type used to correct (string amount, integer fee, boolean isPermit2) are now
 // fixed at generation time (codegen/overrides.go); the alias is kept so
 // existing integrations keep compiling.
-type QuoterControllerGetQuoteParamsFixed = QuoterControllerGetQuoteParams
+type QuoterControllerGetQuoteParamsFixed = QuoteParams
 
-// Deprecated: Use QuoterControllerGetQuoteWithCustomPresetsParams instead;
+// Deprecated: Use CustomPresetQuoteParams instead;
 // see QuoterControllerGetQuoteParamsFixed.
-type QuoterControllerGetQuoteWithCustomPresetsParamsFixed = QuoterControllerGetQuoteWithCustomPresetsParams
+type QuoterControllerGetQuoteWithCustomPresetsParamsFixed = CustomPresetQuoteParams
 
-// Deprecated: Use GetQuoteOutput instead. The quoteId type bug this type used
+// Deprecated: Use Quote instead. The quoteId type bug this type used
 // to correct is now fixed at generation time (codegen/overrides.go); the alias
 // is kept so existing integrations keep compiling.
-type GetQuoteOutputFixed = GetQuoteOutput
+type GetQuoteOutputFixed = Quote
 
 type Order struct {
 	EscExtension        *EscrowExtension
@@ -240,10 +240,4 @@ type ExtensionPlus struct {
 	PreInteraction   string
 	PostInteraction  string
 	CustomData       string
-}
-
-// GetSettlementContractParams defines parameters for GetSettlementContract
-type GetSettlementContractParams struct {
-	// ChainId Chain ID
-	ChainId int `url:"chainId,omitempty" json:"chainId,omitempty"`
 }

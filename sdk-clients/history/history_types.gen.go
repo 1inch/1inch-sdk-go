@@ -360,8 +360,8 @@ type TransactionDetailsMetaDto struct {
 	ToChainId map[string]interface{} `json:"toChainId,omitempty"`
 }
 
-// V2RestApiControllerGetHistoryEventsByAddressParams defines parameters for V2RestApiControllerGetHistoryEventsByAddress.
-type V2RestApiControllerGetHistoryEventsByAddressParams struct {
+// GetHistoryEventsByAddressParams defines parameters for GetHistoryEventsByAddress.
+type GetHistoryEventsByAddressParams struct {
 	// Limit Amount of events to return, default is 100, max is 10000
 	Limit int `url:"limit,omitempty" json:"limit,omitempty"`
 

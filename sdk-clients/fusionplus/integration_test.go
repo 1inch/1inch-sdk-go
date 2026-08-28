@@ -15,8 +15,8 @@ import (
 )
 
 // createTestQuoteFusionPlus creates a realistic quote for testing
-func createTestQuoteFusionPlus() *GetQuoteOutput {
-	return &GetQuoteOutput{
+func createTestQuoteFusionPlus() *Quote {
+	return &Quote{
 		QuoteId: "test-quote-id-fusionplus-12345",
 		Presets: QuotePresets{
 			Fast: Preset{
@@ -186,7 +186,7 @@ func TestGetQuoteOutput_Serialization_FusionPlus(t *testing.T) {
 		}
 	}`
 
-	var quote GetQuoteOutput
+	var quote Quote
 	err := json.Unmarshal([]byte(apiResponse), &quote)
 	require.NoError(t, err)
 

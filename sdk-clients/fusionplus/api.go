@@ -69,7 +69,7 @@ func (api *api) SubmitSecret(ctx context.Context, params SecretInput) error {
 	return nil
 }
 
-func (api *api) GetQuote(ctx context.Context, params QuoterControllerGetQuoteParams) (*GetQuoteOutput, error) {
+func (api *api) GetQuote(ctx context.Context, params QuoteParams) (*Quote, error) {
 	u := "/fusion-plus/quoter/v1.1/quote/receive"
 
 	err := params.Validate()
@@ -84,7 +84,7 @@ func (api *api) GetQuote(ctx context.Context, params QuoterControllerGetQuotePar
 		Body:   nil,
 	}
 
-	var response GetQuoteOutput
+	var response Quote
 	err = api.httpExecutor.ExecuteRequest(ctx, payload, &response)
 	if err != nil {
 		return nil, err
@@ -96,7 +96,7 @@ func (api *api) GetQuote(ctx context.Context, params QuoterControllerGetQuotePar
 }
 
 // PlaceOrder accepts a quote and submits it as a fusion plus order
-func (api *api) PlaceOrder(ctx context.Context, quoteParams QuoterControllerGetQuoteParams, quote *GetQuoteOutput, orderParams OrderParams, wallet common.Wallet) (string, error) {
+func (api *api) PlaceOrder(ctx context.Context, quoteParams QuoteParams, quote *Quote, orderParams OrderParams, wallet common.Wallet) (string, error) {
 	u := "/fusion-plus/relayer/v1.1/submit"
 
 	err := orderParams.Validate()
@@ -165,7 +165,7 @@ func (api *api) PlaceOrder(ctx context.Context, quoteParams QuoterControllerGetQ
 }
 
 // GetActiveOrders returns cross-chain orders that are currently open for filling
-func (api *api) GetActiveOrders(ctx context.Context, params OrderApiControllerGetActiveOrdersParams) (*GetActiveOrdersOutput, error) {
+func (api *api) GetActiveOrders(ctx context.Context, params GetActiveOrdersParams) (*GetActiveOrdersOutput, error) {
 	u := "/fusion-plus/orders/v1.1/order/active"
 
 	payload := common.RequestPayload{

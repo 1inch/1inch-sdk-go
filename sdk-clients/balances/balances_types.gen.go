@@ -69,14 +69,14 @@ type GetAggregatedBalancesAndAllowancesParams struct {
 	FilterEmpty bool     `url:"filterEmpty" json:"filterEmpty"`
 }
 
-// ChainV12ControllerGetCustomAllowancesJSONRequestBody defines body for ChainV12ControllerGetCustomAllowances for application/json ContentType.
-type ChainV12ControllerGetCustomAllowancesJSONRequestBody = CustomTokensRequest
+// GetCustomAllowancesJSONRequestBody defines body for GetCustomAllowances for application/json ContentType.
+type GetCustomAllowancesJSONRequestBody = CustomTokensRequest
 
-// ChainV12ControllerGetCustomAllowancesAndBalancesJSONRequestBody defines body for ChainV12ControllerGetCustomAllowancesAndBalances for application/json ContentType.
-type ChainV12ControllerGetCustomAllowancesAndBalancesJSONRequestBody = CustomTokensRequest
+// GetCustomAllowancesAndBalancesJSONRequestBody defines body for GetCustomAllowancesAndBalances for application/json ContentType.
+type GetCustomAllowancesAndBalancesJSONRequestBody = CustomTokensRequest
 
-// ChainV12ControllerGetBalancesByMultipleWalletsJSONRequestBody defines body for ChainV12ControllerGetBalancesByMultipleWallets for application/json ContentType.
-type ChainV12ControllerGetBalancesByMultipleWalletsJSONRequestBody = CustomTokensAndWalletsRequest
+// GetBalancesByWalletsJSONRequestBody defines body for GetBalancesByWallets for application/json ContentType.
+type GetBalancesByWalletsJSONRequestBody = CustomTokensAndWalletsRequest
 
-// ChainV12ControllerGetCustomBalancesJSONRequestBody defines body for ChainV12ControllerGetCustomBalances for application/json ContentType.
-type ChainV12ControllerGetCustomBalancesJSONRequestBody = CustomTokensRequest
+// GetCustomBalancesJSONRequestBody defines body for GetCustomBalances for application/json ContentType.
+type GetCustomBalancesJSONRequestBody = CustomTokensRequest

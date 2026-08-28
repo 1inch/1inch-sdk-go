@@ -14,7 +14,7 @@ import (
 	geth_common "github.com/ethereum/go-ethereum/common"
 )
 
-func CreateFusionOrderData(quote GetQuoteOutput, orderParams OrderParams, wallet common.Wallet, chainId uint64) (*PreparedOrder, *orderbook.Order, error) {
+func CreateFusionOrderData(quote Quote, orderParams OrderParams, wallet common.Wallet, chainId uint64) (*PreparedOrder, *orderbook.Order, error) {
 
 	preset, err := getPreset(quote.Presets, orderParams.Preset)
 	if err != nil {

@@ -679,8 +679,8 @@ func TestCreateFusionOrderTdd(t *testing.T) {
 }
 
 // permit2TestQuote is the shared quote fixture for permit2 order creation tests
-func permit2TestQuote() GetQuoteOutput {
-	return GetQuoteOutput{
+func permit2TestQuote() Quote {
+	return Quote{
 		QuoteId:           "test-quote-id",
 		SettlementAddress: extensionContract,
 		Whitelist:         []string{"0x00000000219ab540356cbb839cbe05303d7705fa"},

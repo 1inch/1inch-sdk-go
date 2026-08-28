@@ -27,7 +27,7 @@ type CreateOrderParams struct {
 
 type GetOrdersByCreatorAddressParams struct {
 	CreatorAddress string
-	LimitOrderV3SubscribedApiControllerGetAllLimitOrdersParams
+	LimitOrdersQueryParams
 }
 
 type GetOrderParams struct {
@@ -36,11 +36,11 @@ type GetOrderParams struct {
 }
 
 type GetAllOrdersParams struct {
-	LimitOrderV3SubscribedApiControllerGetAllLimitOrdersParams
+	LimitOrdersQueryParams
 }
 
 type GetCountParams struct {
-	LimitOrderV3SubscribedApiControllerGetAllOrdersCountParams
+	OrdersCountQueryParams
 }
 
 type GetEventParams struct {
@@ -48,7 +48,7 @@ type GetEventParams struct {
 }
 
 type GetEventsParams struct {
-	LimitOrderV3SubscribedApiControllerGetEventsParams
+	EventsQueryParams
 }
 
 type GetActiveOrdersWithPermitParams struct {

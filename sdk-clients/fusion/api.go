@@ -8,7 +8,7 @@ import (
 	"github.com/1inch/1inch-sdk-go/v4/common"
 )
 
-func (api *api) GetActiveOrders(ctx context.Context, params OrderApiControllerGetActiveOrdersParams) (*GetActiveOrdersOutput, error) {
+func (api *api) GetActiveOrders(ctx context.Context, params GetActiveOrdersParams) (*GetActiveOrdersOutput, error) {
 	u := fmt.Sprintf("/fusion/orders/v2.0/%d/order/active", api.chainId)
 
 	payload := common.RequestPayload{
@@ -46,7 +46,7 @@ func (api *api) GetSettlementContract(ctx context.Context) (*SettlementAddressOu
 	return &response, nil
 }
 
-func (api *api) GetQuote(ctx context.Context, params QuoterControllerGetQuoteParams) (*GetQuoteOutput, error) {
+func (api *api) GetQuote(ctx context.Context, params QuoteParams) (*Quote, error) {
 	u := fmt.Sprintf("/fusion/quoter/v2.0/%d/quote/receive", api.chainId)
 
 	err := params.Validate()
@@ -65,7 +65,7 @@ func (api *api) GetQuote(ctx context.Context, params QuoterControllerGetQuotePar
 		Body:   nil,
 	}
 
-	var response GetQuoteOutput
+	var response Quote
 	err = api.httpExecutor.ExecuteRequest(ctx, payload, &response)
 	if err != nil {
 		return nil, err
@@ -74,7 +74,7 @@ func (api *api) GetQuote(ctx context.Context, params QuoterControllerGetQuotePar
 	return &response, nil
 }
 
-func (api *api) GetQuoteWithCustomPreset(ctx context.Context, params QuoterControllerGetQuoteWithCustomPresetsParams, customPreset CustomPreset) (*GetQuoteOutput, error) {
+func (api *api) GetQuoteWithCustomPreset(ctx context.Context, params CustomPresetQuoteParams, customPreset CustomPreset) (*Quote, error) {
 	u := fmt.Sprintf("/fusion/quoter/v2.0/%d/quote/receive", api.chainId)
 
 	err := params.Validate()
@@ -99,7 +99,7 @@ func (api *api) GetQuoteWithCustomPreset(ctx context.Context, params QuoterContr
 		Body:   body,
 	}
 
-	var response GetQuoteOutput
+	var response Quote
 	err = api.httpExecutor.ExecuteRequest(ctx, payload, &response)
 	if err != nil {
 		return nil, err
@@ -109,7 +109,7 @@ func (api *api) GetQuoteWithCustomPreset(ctx context.Context, params QuoterContr
 }
 
 // PlaceOrder accepts a quote and submits it as a fusion order
-func (api *api) PlaceOrder(ctx context.Context, fusionQuote GetQuoteOutput, orderParams OrderParams, wallet common.Wallet) (string, error) {
+func (api *api) PlaceOrder(ctx context.Context, fusionQuote Quote, orderParams OrderParams, wallet common.Wallet) (string, error) {
 	u := fmt.Sprintf("/fusion/relayer/v2.0/%d/order/submit", api.chainId)
 
 	err := orderParams.Validate()
@@ -158,7 +158,7 @@ func (api *api) PlaceOrder(ctx context.Context, fusionQuote GetQuoteOutput, orde
 	return limitOrder.OrderHash, nil
 }
 
-func (api *api) PlaceOrders(ctx context.Context, body []PlaceOrderBody) (*GetQuoteOutput, error) {
+func (api *api) PlaceOrders(ctx context.Context, body []PlaceOrderBody) (*Quote, error) {
 	u := fmt.Sprintf("/fusion/relayer/v2.0/%d/order/submit/many", api.chainId)
 
 	for _, order := range body {
@@ -180,7 +180,7 @@ func (api *api) PlaceOrders(ctx context.Context, body []PlaceOrderBody) (*GetQuo
 		Body:   bodyMarshaled,
 	}
 
-	var response GetQuoteOutput
+	var response Quote
 	err = api.httpExecutor.ExecuteRequest(ctx, payload, &response)
 	if err != nil {
 		return nil, err

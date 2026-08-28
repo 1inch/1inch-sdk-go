@@ -15,10 +15,10 @@ type (
 	Interaction = fusionorder.Interaction
 )
 
-// Deprecated: Use GetQuoteOutput instead. The spec bugs this type used to
+// Deprecated: Use Quote instead. The spec bugs this type used to
 // correct are now fixed at generation time (codegen/overrides.go); the alias
 // is kept so existing integrations keep compiling.
-type GetQuoteOutputFixed = GetQuoteOutput
+type GetQuoteOutputFixed = Quote
 
 type PlaceOrderBody struct {
 	Maker        string
@@ -123,15 +123,15 @@ type ExtraParams struct {
 	unwrapWeth           bool
 }
 
-// Deprecated: Use QuoterControllerGetQuoteParams instead. The spec bugs this
+// Deprecated: Use QuoteParams instead. The spec bugs this
 // type used to correct are now fixed at generation time
 // (codegen/overrides.go); the alias is kept so existing integrations keep
 // compiling.
-type QuoterControllerGetQuoteParamsFixed = QuoterControllerGetQuoteParams
+type QuoterControllerGetQuoteParamsFixed = QuoteParams
 
-// Deprecated: Use QuoterControllerGetQuoteWithCustomPresetsParams instead;
+// Deprecated: Use CustomPresetQuoteParams instead;
 // see QuoterControllerGetQuoteParamsFixed.
-type QuoterControllerGetQuoteWithCustomPresetsParamsFixed = QuoterControllerGetQuoteWithCustomPresetsParams
+type QuoterControllerGetQuoteWithCustomPresetsParamsFixed = CustomPresetQuoteParams
 
 type OrderResponse struct {
 	ApproximateTakingAmount string  `json:"approximateTakingAmount"`

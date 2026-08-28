@@ -62,7 +62,7 @@ func main() {
 	// The maker address must match the signing key, so it is derived from the wallet
 	owner := client.Wallet.Address().Hex()
 
-	quoteParams := fusionplus.QuoterControllerGetQuoteParams{
+	quoteParams := fusionplus.QuoteParams{
 		SrcChain:        srcChain,
 		DstChain:        dstChain,
 		SrcTokenAddress: arbitrumUsdc,
