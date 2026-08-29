@@ -5,7 +5,7 @@ import (
 	"strconv"
 	"strings"
 
-	"github.com/1inch/1inch-sdk-go/v4/common"
+	"github.com/1inch/1inch-sdk-go/v5/common"
 )
 
 // GetSupportedChains Returns supported chains

@@ -9,8 +9,8 @@ import (
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
 
-	"github.com/1inch/1inch-sdk-go/v4/constants"
-	web3_provider "github.com/1inch/1inch-sdk-go/v4/internal/web3-provider"
+	"github.com/1inch/1inch-sdk-go/v5/constants"
+	web3_provider "github.com/1inch/1inch-sdk-go/v5/internal/web3-provider"
 )
 
 func TestBuildPermit2Calldata(t *testing.T) {

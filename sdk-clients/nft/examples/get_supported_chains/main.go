@@ -7,7 +7,7 @@ import (
 	"log"
 	"os"
 
-	"github.com/1inch/1inch-sdk-go/v4/sdk-clients/nft"
+	"github.com/1inch/1inch-sdk-go/v5/sdk-clients/nft"
 )
 
 var (

@@ -6,11 +6,11 @@ import (
 	"math/big"
 	"time"
 
-	"github.com/1inch/1inch-sdk-go/v4/common"
-	"github.com/1inch/1inch-sdk-go/v4/common/fusionorder"
-	"github.com/1inch/1inch-sdk-go/v4/constants"
-	random_number_generation "github.com/1inch/1inch-sdk-go/v4/internal/random-number-generation"
-	"github.com/1inch/1inch-sdk-go/v4/sdk-clients/orderbook"
+	"github.com/1inch/1inch-sdk-go/v5/common"
+	"github.com/1inch/1inch-sdk-go/v5/common/fusionorder"
+	"github.com/1inch/1inch-sdk-go/v5/constants"
+	random_number_generation "github.com/1inch/1inch-sdk-go/v5/internal/random-number-generation"
+	"github.com/1inch/1inch-sdk-go/v5/sdk-clients/orderbook"
 	geth_common "github.com/ethereum/go-ethereum/common"
 )
 

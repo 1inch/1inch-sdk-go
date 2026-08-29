@@ -16,11 +16,11 @@ import (
 	"github.com/ethereum/go-ethereum/core/types"
 	"github.com/stretchr/testify/require"
 
-	"github.com/1inch/1inch-sdk-go/v4/constants"
-	"github.com/1inch/1inch-sdk-go/v4/sdk-clients/aggregation"
-	"github.com/1inch/1inch-sdk-go/v4/sdk-clients/fusion"
-	"github.com/1inch/1inch-sdk-go/v4/sdk-clients/fusionplus"
-	"github.com/1inch/1inch-sdk-go/v4/sdk-clients/orderbook"
+	"github.com/1inch/1inch-sdk-go/v5/constants"
+	"github.com/1inch/1inch-sdk-go/v5/sdk-clients/aggregation"
+	"github.com/1inch/1inch-sdk-go/v5/sdk-clients/fusion"
+	"github.com/1inch/1inch-sdk-go/v5/sdk-clients/fusionplus"
+	"github.com/1inch/1inch-sdk-go/v5/sdk-clients/orderbook"
 )
 
 // Production canaries place real dust-sized trades through the production API,

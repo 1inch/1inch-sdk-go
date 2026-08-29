@@ -7,8 +7,8 @@ import (
 	"slices"
 	"strings"
 
-	"github.com/1inch/1inch-sdk-go/v4/constants"
-	"github.com/1inch/1inch-sdk-go/v4/internal/bigint"
+	"github.com/1inch/1inch-sdk-go/v5/constants"
+	"github.com/1inch/1inch-sdk-go/v5/internal/bigint"
 )
 
 // Pre-compiled regexes to avoid recompilation on every validation call

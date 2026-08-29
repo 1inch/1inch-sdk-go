@@ -12,9 +12,9 @@ import (
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
 
-	"github.com/1inch/1inch-sdk-go/v4/constants"
-	"github.com/1inch/1inch-sdk-go/v4/sdk-clients/fusion"
-	"github.com/1inch/1inch-sdk-go/v4/sdk-clients/orderbook"
+	"github.com/1inch/1inch-sdk-go/v5/constants"
+	"github.com/1inch/1inch-sdk-go/v5/sdk-clients/fusion"
+	"github.com/1inch/1inch-sdk-go/v5/sdk-clients/orderbook"
 )
 
 // TestPermit2TargetSemanticsFork pins the protocol semantics of the maker permit's

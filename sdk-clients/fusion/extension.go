@@ -5,12 +5,12 @@ import (
 	"math/big"
 	"strings"
 
-	"github.com/1inch/1inch-sdk-go/v4/common/fusionorder"
-	"github.com/1inch/1inch-sdk-go/v4/internal/bigint"
-	"github.com/1inch/1inch-sdk-go/v4/internal/bytesbuilder"
-	"github.com/1inch/1inch-sdk-go/v4/internal/hexadecimal"
-	"github.com/1inch/1inch-sdk-go/v4/internal/times"
-	"github.com/1inch/1inch-sdk-go/v4/sdk-clients/orderbook"
+	"github.com/1inch/1inch-sdk-go/v5/common/fusionorder"
+	"github.com/1inch/1inch-sdk-go/v5/internal/bigint"
+	"github.com/1inch/1inch-sdk-go/v5/internal/bytesbuilder"
+	"github.com/1inch/1inch-sdk-go/v5/internal/hexadecimal"
+	"github.com/1inch/1inch-sdk-go/v5/internal/times"
+	"github.com/1inch/1inch-sdk-go/v5/sdk-clients/orderbook"
 	geth_common "github.com/ethereum/go-ethereum/common"
 )
 

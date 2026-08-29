@@ -10,9 +10,9 @@ import (
 
 	gethCommon "github.com/ethereum/go-ethereum/common"
 
-	"github.com/1inch/1inch-sdk-go/v4/constants"
-	"github.com/1inch/1inch-sdk-go/v4/sdk-clients/fusionplus"
-	"github.com/1inch/1inch-sdk-go/v4/sdk-clients/orderbook"
+	"github.com/1inch/1inch-sdk-go/v5/constants"
+	"github.com/1inch/1inch-sdk-go/v5/sdk-clients/fusionplus"
+	"github.com/1inch/1inch-sdk-go/v5/sdk-clients/orderbook"
 )
 
 /*

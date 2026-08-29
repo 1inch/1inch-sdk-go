@@ -28,6 +28,7 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 
 ### Breaking Changes
 _Only genuine incompatibilities — code updates required. Renames with aliases are under Deprecated above, not here._
+- Module path is now `github.com/1inch/1inch-sdk-go/v5` (was `/v4`) — update every import and `go get` (one-line `sed` in MIGRATION.md §1).
 - Chain-id fields are now `int` instead of `float32` (which silently corrupted Aurora's chain id in the signing domain); drop any `float32(...)` conversions.
 - Type/shape corrections now on the generated types (previously only on the `*Fixed` copies): `Amount` → `string`, `Fee` → `int`, `QuoteId` → `string`, `tokens` optional fields are values not pointers, `Tags` → `[]TagDto`. The `*Fixed` names still resolve (aliases), but field access on the old types must be updated (e.g. drop `*token.Eip2612`).
 - oapi-codegen v1 → v2: bare enum constants are now type-prefixed (`spotprices.USD` → `spotprices.GetPricesForRequestedTokensParamsCurrencyUSD`) — the bare names are gone (no alias); `web3.ApiKeyAuthScopes` removed.

@@ -7,9 +7,9 @@ import (
 	"strconv"
 	"time"
 
-	"github.com/1inch/1inch-sdk-go/v4/constants"
-	"github.com/1inch/1inch-sdk-go/v4/internal/bytesbuilder"
-	"github.com/1inch/1inch-sdk-go/v4/internal/bytesiterator"
+	"github.com/1inch/1inch-sdk-go/v5/constants"
+	"github.com/1inch/1inch-sdk-go/v5/internal/bytesbuilder"
+	"github.com/1inch/1inch-sdk-go/v5/internal/bytesiterator"
 )
 
 // AuctionDetails contains the auction configuration for a fusion order

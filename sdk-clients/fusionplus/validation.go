@@ -3,8 +3,8 @@ package fusionplus
 import (
 	"fmt"
 
-	"github.com/1inch/1inch-sdk-go/v4/constants"
-	"github.com/1inch/1inch-sdk-go/v4/internal/validate"
+	"github.com/1inch/1inch-sdk-go/v5/constants"
+	"github.com/1inch/1inch-sdk-go/v5/internal/validate"
 )
 
 func (params *GetActiveOrdersParams) Validate() error {

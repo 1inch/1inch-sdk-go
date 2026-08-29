@@ -4,7 +4,7 @@
 
 This is the official Go SDK for interacting with 1inch Network APIs. It provides type-safe Go bindings for all 1inch DEX aggregation, limit orders, Fusion swaps, and various Web3 data services.
 
-**Module**: `github.com/1inch/1inch-sdk-go/v4`  
+**Module**: `github.com/1inch/1inch-sdk-go/v5`  
 **Go Version**: 1.22+ (toolchain 1.23.0)  
 **License**: MIT  
 **Version**: git tags, mirrored in `internal/version/version.go` (owned by the release workflow; never edit by hand)

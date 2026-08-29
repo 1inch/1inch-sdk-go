@@ -7,8 +7,8 @@ import (
 	"math/big"
 	"reflect"
 
-	"github.com/1inch/1inch-sdk-go/v4/internal/bytesiterator"
-	"github.com/1inch/1inch-sdk-go/v4/internal/hexadecimal"
+	"github.com/1inch/1inch-sdk-go/v5/internal/bytesiterator"
+	"github.com/1inch/1inch-sdk-go/v5/internal/hexadecimal"
 )
 
 type ExtensionParams struct {

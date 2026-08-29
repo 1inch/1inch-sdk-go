@@ -22,9 +22,9 @@ import (
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
 
-	"github.com/1inch/1inch-sdk-go/v4/constants"
-	"github.com/1inch/1inch-sdk-go/v4/sdk-clients/fusionplus"
-	"github.com/1inch/1inch-sdk-go/v4/sdk-clients/tokens"
+	"github.com/1inch/1inch-sdk-go/v5/constants"
+	"github.com/1inch/1inch-sdk-go/v5/sdk-clients/fusionplus"
+	"github.com/1inch/1inch-sdk-go/v5/sdk-clients/tokens"
 )
 
 const apiURL = "https://api.1inch.dev"

@@ -1,7 +1,7 @@
 package portfolio
 
 import (
-	"github.com/1inch/1inch-sdk-go/v4/internal/validate"
+	"github.com/1inch/1inch-sdk-go/v5/internal/validate"
 )
 
 func (params *GetProtocolsCurrentValueParams) Validate() error {

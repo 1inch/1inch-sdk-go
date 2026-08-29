@@ -1,7 +1,7 @@
 package http_executor
 
 import (
-	"github.com/1inch/1inch-sdk-go/v4/internal/version"
+	"github.com/1inch/1inch-sdk-go/v5/internal/version"
 )
 
 // userAgent identifies the SDK and its release version on every API request.

@@ -5,7 +5,7 @@ import (
 	"encoding/json"
 	"fmt"
 
-	"github.com/1inch/1inch-sdk-go/v4/common"
+	"github.com/1inch/1inch-sdk-go/v5/common"
 )
 
 func (api *api) PerformRpcCallAgainstFullNode(ctx context.Context, params PerformRpcCallAgainstFullNodeParams) (map[string]any, error) {

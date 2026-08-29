@@ -11,8 +11,8 @@ import (
 
 	gethCommon "github.com/ethereum/go-ethereum/common"
 
-	"github.com/1inch/1inch-sdk-go/v4/common/fusionorder"
-	"github.com/1inch/1inch-sdk-go/v4/constants"
+	"github.com/1inch/1inch-sdk-go/v5/common/fusionorder"
+	"github.com/1inch/1inch-sdk-go/v5/constants"
 )
 
 // TestConvertToOrderbookExtensionIsPure pins funds-critical behavior: encoding

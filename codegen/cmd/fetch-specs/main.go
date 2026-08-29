@@ -16,7 +16,7 @@ import (
 	"fmt"
 	"os"
 
-	"github.com/1inch/1inch-sdk-go/v4/codegen"
+	"github.com/1inch/1inch-sdk-go/v5/codegen"
 )
 
 func main() {

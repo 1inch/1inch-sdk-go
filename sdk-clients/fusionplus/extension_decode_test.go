@@ -7,8 +7,8 @@ import (
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
 
-	"github.com/1inch/1inch-sdk-go/v4/common/fusionorder"
-	"github.com/1inch/1inch-sdk-go/v4/sdk-clients/orderbook"
+	"github.com/1inch/1inch-sdk-go/v5/common/fusionorder"
+	"github.com/1inch/1inch-sdk-go/v5/sdk-clients/orderbook"
 	"github.com/ethereum/go-ethereum/common"
 )
 

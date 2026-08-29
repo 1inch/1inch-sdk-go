@@ -1,4 +1,4 @@
-module github.com/1inch/1inch-sdk-go/v4
+module github.com/1inch/1inch-sdk-go/v5
 
 go 1.25.0
 

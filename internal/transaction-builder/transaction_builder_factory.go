@@ -1,7 +1,7 @@
 package transaction_builder
 
 import (
-	"github.com/1inch/1inch-sdk-go/v4/common"
+	"github.com/1inch/1inch-sdk-go/v5/common"
 )
 
 type TransactionBuilderFactory struct {

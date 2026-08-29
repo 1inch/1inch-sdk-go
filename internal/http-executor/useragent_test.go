@@ -5,7 +5,7 @@ import (
 
 	"github.com/stretchr/testify/assert"
 
-	"github.com/1inch/1inch-sdk-go/v4/internal/version"
+	"github.com/1inch/1inch-sdk-go/v5/internal/version"
 )
 
 func TestUserAgent(t *testing.T) {

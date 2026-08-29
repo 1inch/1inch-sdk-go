@@ -8,6 +8,7 @@ For a step-by-step upgrade checklist, see [MIGRATION.md](MIGRATION.md); this doc
 
 ### Compile-Time Breaking Changes
 
+- **Module path is now `github.com/1inch/1inch-sdk-go/v5`** (was `/v4`). Every import path and `go get` command must change the `/v4` suffix to `/v5`; this is required by Go's [major-version rule](https://go.dev/ref/mod#major-version-suffixes) for `v5.x.x` tags. See MIGRATION.md §1 for the one-line `sed`.
 - **Chain-id fields are `int` instead of `float32`** across `fusionplus` and `tokens` (quoter/orders params, response DTOs, `EscrowExtension`/`EscrowExtensionParams`/`EscrowExtraData`, `SignedOrderInput`, `GetSettlementContractParams`). `float32` cannot represent Aurora's chain id (1313161554), which silently rounded and corrupted the EIP-712 signing domain. Untyped constants and literals compile unchanged; explicit `float32(...)` conversions do not.
 - **Corrected field types on the generated quoter/orders types** (previously exclusive to the `*Fixed` copies): `Amount` `float32` → `string` on all fusion/fusionplus quoter params; `fusionplus` `IsPermit2` `string` → `bool`; `fusion.Quote.QuoteId` and `fusionplus.Quote.QuoteId` `map[string]interface{}` → `string`; `fusion.PresetClass.ExclusiveResolver` `map[string]interface{}` → `string`; `fusionplus.GetOrderFillsByHashOutput` USD prices `map[string]interface{}` → `string` and `Points` → `[]AuctionPointOutput`.
 - **`Fee` on the fusionplus quoter params is `int` (basis points)** — previously `*big.Int` on the `Fixed` types and `float32` on the raw generated types.
