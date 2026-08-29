@@ -17,8 +17,11 @@ For a step-by-step upgrade checklist, see [MIGRATION.md](MIGRATION.md); this doc
 - **`web3.ApiKeyAuthScopes` removed** (unused generated artifact).
 - **`fusionplus.CreateAuctionDetailsPlus` takes `*Preset`** instead of `*PresetClassFixed`.
 - **Embedded field name changed in the `orderbook` wrapper params** (`GetAllOrdersParams`, `GetOrdersByCreatorAddressParams`): struct literals naming the embedded query field must use the new name `LimitOrdersQueryParams`. Promoted field access (`params.Page`) is unaffected.
-
-Not breaking, for the avoidance of doubt: ~60 generated types and constants were renamed to intent-based names (`fusionplus.QuoteParams`, `fusionplus.Quote`, …), `fusionorder.AuctionPointClassFixed`/`GasCostConfigClassFixed` became `AuctionPoint`/`GasCostConfig`, and all 12 `*Fixed` types became aliases — every old name remains available as a `// Deprecated:` alias of the identical type, so existing code compiles and behaves unchanged.
+- **`common.RequestPayload.U` renamed to `.Path`** — exported struct field, no alias possible.
+- **`fusionplus.Order.EscExtension` renamed to `.EscrowExtension`** — exported struct field, no alias possible.
+- **`traces.NewConfiguration` now takes a `ConfigurationParams` struct** instead of positional `(chainId, apiUrl, apiKey)`, matching every other client's constructor.
+- **`constants.ChainToWrapper` is keyed by `int` and `GetWrappedToken` takes an `int`** (was `NetworkEnum`) — pass a chain-id int (e.g. `constants.EthereumChainId`).
+- **Removed dead, unused public types** (no alias): `fusion.Preset` (the old hand-written struct — the name now refers to the quoter preset), `fusionplus.FusionOrderV4`, `fusionplus.CrossChainOrderParams`, and `orderbook.GetCountParams`/`CountResponse`/`GetEventParams`/`GetEventsParams`/`EventResponse`/`OrderResponseExtended`/`GetActiveOrdersWithPermitParams`. `fusionplus.ParentIndex` is now unexported.
 
 ### Behavior Changes (compile clean, act differently)
 
@@ -28,55 +31,7 @@ Not breaking, for the avoidance of doubt: ~60 generated types and constants were
 - **API requests time out after 60 seconds** (previously they could hang forever) and response bodies are capped at 64 MiB.
 - `fusion.Quote.SurplusFee` and `fusion.Quote.MarketAmount` marshal with `omitempty`; fee params are validated as basis points in [0, 10000].
 
-### API Surface Cleanup (v5)
-
-The v5 major is used to make the public API consistent and intent-based. Every renamed symbol keeps its old name as a `// Deprecated:` alias, so existing code compiles unchanged; only removed **dead** types (never referenced by any SDK method) have no alias. New clean names are additive.
-
-**`fusion`**
-- Added clean, `fusionplus`-consistent names `fusion.Preset`, `fusion.QuotePresets`, `fusion.AuctionPoint`, `fusion.GasCostConfig` (aliases of the generated `*Class` types, which remain valid). Prefer the clean names.
-- **Removed** the unused hand-written `fusion.Preset` struct (it shadowed the real quoter preset and had no SDK references). If you referenced it directly, use the generated preset type. No alias (the name now refers to the quoter preset).
-
-**`fusionplus`**
-- `MakeTree`→`NewMerkleTree`, `MyMerkleTree`→`MerkleTree`, `GetOrderByOrderHash`→`GetOrderFillsByHash` (matches its `GetOrderFillsByHashOutput` return), and the param type `GetOrderByOrderHashParams`→`GetOrderFillsByHashParams`. All old names kept (aliases / a forwarding method/function). `GasCostConfigClass` and `AuctionPointClass` are now aliases of the generated `GasCostConfig`/`AuctionPoint`.
-- **Breaking (no alias possible):** the exported field `Order.EscExtension` is renamed to `Order.EscrowExtension` (struct fields can't be aliased). Update any `prepared.Order.EscExtension` access to `.EscrowExtension`.
-- **Removed** dead unused public types `FusionOrderV4` and `CrossChainOrderParams` (never referenced by any SDK method), and unexported the internal `ParentIndex` merkle helper. No aliases.
-
-**`orderbook`**
-- `Decode`→`DecodeExtension` (the bare `Decode` was too generic at package scope) and `GetSaltParams`→`GenerateSaltWithFeesParams` (named for its consumer). Old names kept as a forwarding function / alias.
-- **Removed** 7 dead unused public types (`GetCountParams`, `CountResponse`, `GetEventParams`, `GetEventsParams`, `EventResponse`, `OrderResponseExtended`, `GetActiveOrdersWithPermitParams`) that no API method referenced (two shadowed the real `GetOrderCount*` types). No aliases.
-
-**`balances`**
-- Dropped the misleading `List` suffix: `GetBalancesAndAllowancesByWalletAddressList`→`GetBalancesAndAllowancesByWalletAddress`, `GetBalancesAndAllowancesOfCustomTokensByWalletAddressList`→`…ByWalletAddress`, `GetBalancesOfCustomTokensByWalletAddressesList`→`…ByWalletAddresses` (and the matching `*Params`/`*Response` types). Old method names forward; old type names are aliases.
-
-**`tokens`**
-- `WhitelistedTokens`→`GetWhitelistedTokens`, `WhitelistedTokensAsList`→`GetWhitelistedTokensAsList` (the `Get` prefix every other method uses). Old methods forward. `CustomTokensControllerGetTokenInfoParams`→`GetCustomTokenParams` (aliased).
-
-**`aggregation`**
-- Added clean param names `GetApproveAllowanceParams` / `GetApproveTransactionParams` (aliases of the generated `GetAllowanceParams` / `GetApproveParams`) matching their consumer methods; the method signatures now use them.
-
-**`common`**
-- **Breaking (no alias possible):** `RequestPayload.U` renamed to `RequestPayload.Path` (exported struct field; the cryptic `U` held the request path).
-
-**`constants`**
-- `ChainToWrapper` is now `map[int]` (keyed by chain id) and `GetWrappedToken(chainID int)` — consistent with `ChainToTrueERC20`/`GetTrueERC20`. **Breaking:** callers indexing `ChainToWrapper` or calling `GetWrappedToken` with a `NetworkEnum` must pass an `int` chain id (e.g. `constants.EthereumChainId` or `int(chainId)`). `NetworkEnum` and its `Network*` constants are deprecated in favor of the `*ChainId` int constants.
-
-**`portfolio`**
-- Standardized on the `ProfitAndLoss` spelling: `GetProfitLoss`→`GetProfitAndLoss`, `GetTokensProfitLoss`→`GetTokensProfitAndLoss` (old methods forward). Response types renamed to match their methods: `GetPortfolioValueResponse`→`GetProtocolsCurrentValueResponse`, `GetPortfolioProfitAndLossResponse`→`GetProtocolsProfitAndLossResponse`, `GetTokensProfitLossResponse`→`GetTokensProfitAndLossResponse`, `GetCurrentProfitLossResponse`→`GetProfitAndLossResponse` (all aliased).
-
-**`history`**
-- `Item`→`HistoryEvent`, `Details`→`HistoryEventDetails` (bare names were uninformative / clashed with fusion `Details`); both aliased.
-
-**`nft`**
-- `SupportedChainsResponse`→`GetSupportedChainsResponse` (matches the method and portfolio's naming; aliased). Added clean-cased `GetNFTsByAddressParams` alias of the generated `GetNftsByAddressParams`.
-
-**`gasprices` / `spotprices`**
-- Clean names dropping the upstream `Dto` suffix, as aliases of the generated types: `GetGasPriceEIP1559Response` (= `Eip1559GasPriceResponse`), `GetCustomCurrenciesResponse` (= `CurrenciesResponseDto`).
-
-**`traces`**
-- **Breaking (no alias possible):** `NewConfiguration(chainId, apiUrl, apiKey)` now takes a `ConfigurationParams` struct, matching every other client's constructor. Update `traces.NewConfiguration(id, url, key)` to `traces.NewConfiguration(traces.ConfigurationParams{ChainId: id, ApiUrl: url, ApiKey: key})`.
-- Clean names dropping the `Dto`/impl-leaking prefixes, as aliases: `GetSyncedIntervalResponse` (= `ReadSyncedIntervalResponseDto`), `GetBlockTraceByNumberResponse` (= `CoreBuiltinBlockTracesDto`), `GetBlockTraceByNumberParams` (= `GetBlockTraceByNumberParam`).
-
-_Deferred (name collisions with existing generated types, to be resolved separately): `history.EventsByAddressParams`/`Response`→`GetHistoryEventsByAddress*` and `spotprices.GetPricesRequestDto`→`GetPricesForRequestedTokensParams`._
+> The many other v5 renames (types, methods, constants — e.g. `QuoterControllerGetQuoteParams`→`QuoteParams`, `Decode`→`DecodeExtension`, `WhitelistedTokens`→`GetWhitelistedTokens`, `ProfitLoss`→`ProfitAndLoss`) are **source-compatible**: every old name is kept as a `// Deprecated:` alias or forwarding method, so they are deprecations, not breaks. See [MIGRATION.md](MIGRATION.md) §4 for the list.
 
 ## Version 4.0.0
 

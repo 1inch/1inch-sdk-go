@@ -51,21 +51,29 @@ BREAKING_CHANGES.md → "Behavior Changes" for detail.
 
 ## 4. Optionally: move off the deprecated names
 
-Old type names still work indefinitely, but they are marked `// Deprecated:`
-(your editor shows strikethroughs; `staticcheck` flags them). The most common
-renames:
+These all still compile (old names are kept as `// Deprecated:` aliases or
+forwarding methods); your editor and `staticcheck` flag each with its
+replacement. Notable v5 renames:
 
 | v4 name | v5 name |
 |---|---|
-| `fusionplus.QuoterControllerGetQuoteParamsFixed` | `fusionplus.QuoteParams` |
-| `fusionplus.GetQuoteOutputFixed` | `fusionplus.Quote` |
-| `fusion.QuoterControllerGetQuoteParamsFixed` | `fusion.QuoteParams` |
-| `fusion.GetQuoteOutputFixed` | `fusion.Quote` |
-| `tokens.ProviderTokenDtoFixed` | `tokens.ProviderTokenDto` |
+| `*.QuoterControllerGetQuoteParamsFixed`, `*.GetQuoteOutputFixed`, all `*Fixed` types | `QuoteParams`, `Quote`, the plain generated types |
+| `orderbook.Decode` | `orderbook.DecodeExtension` |
+| `orderbook.GetSaltParams` | `orderbook.GenerateSaltWithFeesParams` |
 | `orderbook.LimitOrderV3SubscribedApiControllerGetAllLimitOrdersParams` | `orderbook.LimitOrdersQueryParams` |
-| `txbroadcast.TxProcessorApiControllerBroadcastTransactionJSONRequestBody` | `txbroadcast.BroadcastPublicTransactionJSONRequestBody` |
+| `fusionplus.GetOrderByOrderHash` / `…Params` | `fusionplus.GetOrderFillsByHash` / `…Params` |
+| `fusionplus.MakeTree` / `MyMerkleTree` | `fusionplus.NewMerkleTree` / `MerkleTree` |
+| `tokens.WhitelistedTokens` / `WhitelistedTokensAsList` | `tokens.GetWhitelistedTokens` / `GetWhitelistedTokensAsList` |
+| `tokens.CustomTokensControllerGetTokenInfoParams` | `tokens.GetCustomTokenParams` |
+| `balances.*ByWalletAddressList` (methods + types) | drop the `List` suffix |
+| `portfolio.GetProfitLoss` / `GetTokensProfitLoss` | `portfolio.GetProfitAndLoss` / `GetTokensProfitAndLoss` |
+| `history.Item` / `Details` | `history.HistoryEvent` / `HistoryEventDetails` |
+| `nft.SupportedChainsResponse` | `nft.GetSupportedChainsResponse` |
+| `fusion.PresetClass` / `QuotePresetsClass` / `AuctionPointClass` / `GasCostConfigClass` | `fusion.Preset` / `QuotePresets` / `AuctionPoint` / `GasCostConfig` |
+| `constants.NetworkEnum` + `Network*` consts | the `*ChainId` int constants |
 
-Each package's `deprecated_names.go` lists every alias with its replacement.
+Each package's `deprecated_names.go` / `*_types_extended.go` is the exhaustive
+list.
 
 ## 5. Verify
 
