@@ -38,7 +38,7 @@ likelihood:
 | cannot use `NetworkEnum` as `int` in `constants.GetWrappedToken` / `ChainToWrapper[…]` | Pass an `int` chain id (`constants.EthereumChainId`, or `int(x)`); `NetworkEnum` is deprecated |
 | undefined: `fusion.Preset` (old hand-written struct), `fusionplus.FusionOrderV4`/`CrossChainOrderParams`, or the removed `orderbook` dead types (`GetCountParams`, `CountResponse`, `GetEventParams`, `GetEventsParams`, `EventResponse`, `OrderResponseExtended`, `GetActiveOrdersWithPermitParams`) | These were dead/unused and are removed; use the live equivalents (e.g. `orderbook.GetOrderCountParams`) |
 
-Everything else in the v5 surface cleanup — the intent-based renames (e.g. `history.Item`→`HistoryEvent`, `balances` `…List`-suffix drops, `orderbook.Decode`→`DecodeExtension`, `fusion.Preset` clean names, `GetOrderByOrderHash`→`GetOrderFillsByHash`, `Whitelisted…`→`GetWhitelisted…`, `NetworkEnum`→`*ChainId`) — keeps the old name as a `// Deprecated:` alias or forwarding method, so it compiles unchanged. See [BREAKING_CHANGES.md](BREAKING_CHANGES.md) → "API Surface Cleanup (v5)" for the full per-package list.
+Everything else in the v5 surface cleanup — the intent-based renames (e.g. `history.Item`→`HistoryEvent`, `balances` `…List`-suffix drops, `orderbook.Decode`→`DecodeExtension`, `fusion.Preset` clean names, `GetOrderByOrderHash`→`GetOrderFillsByHash`, `Whitelisted…`→`GetWhitelisted…`, `NetworkEnum`→`*ChainId`) — keeps the old name as a `// Deprecated:` alias or forwarding method, so it compiles unchanged. See §4 below for the rename list.
 
 ## 3. Review behavior changes (compile clean, act differently)
 
@@ -71,6 +71,12 @@ replacement. Notable v5 renames:
 | `nft.SupportedChainsResponse` | `nft.GetSupportedChainsResponse` |
 | `fusion.PresetClass` / `QuotePresetsClass` / `AuctionPointClass` / `GasCostConfigClass` | `fusion.Preset` / `QuotePresets` / `AuctionPoint` / `GasCostConfig` |
 | `constants.NetworkEnum` + `Network*` consts | the `*ChainId` int constants |
+| `aggregation.GetAllowanceParams` / `GetApproveParams` | `aggregation.GetApproveAllowanceParams` / `GetApproveTransactionParams` |
+| `portfolio.GetPortfolioValueResponse` / `GetPortfolioProfitAndLossResponse` / `GetCurrentProfitLossResponse` / `GetTokensProfitLossResponse` | `GetProtocolsCurrentValueResponse` / `GetProtocolsProfitAndLossResponse` / `GetProfitAndLossResponse` / `GetTokensProfitAndLossResponse` |
+| `nft.GetNftsByAddressParams` | `nft.GetNFTsByAddressParams` |
+| `gasprices.Eip1559GasPriceResponse` | `gasprices.GetGasPriceEIP1559Response` |
+| `spotprices.CurrenciesResponseDto` | `spotprices.GetCustomCurrenciesResponse` |
+| `traces.ReadSyncedIntervalResponseDto` / `CoreBuiltinBlockTracesDto` / `GetBlockTraceByNumberParam` | `traces.GetSyncedIntervalResponse` / `GetBlockTraceByNumberResponse` / `GetBlockTraceByNumberParams` |
 
 Each package's `deprecated_names.go` / `*_types_extended.go` is the exhaustive
 list.

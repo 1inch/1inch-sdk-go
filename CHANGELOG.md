@@ -23,7 +23,7 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 - `fusionplus` quote `Fee` is now transmitted — it was silently dropped (`*big.Int` cannot be query-encoded); the field is now `int` basis points.
 
 ### Deprecated
-- Generated type names are now intent-based (e.g. `fusionplus.QuoteParams`/`Quote`), and the v5 surface cleanup renamed types/methods across all clients for consistency. **These are source-compatible:** every old name is kept as a `type Old = New` alias or a forwarding method, so existing code compiles and behaves identically — it just gets a deprecation warning. Migrate before a future major removes them. Full list in BREAKING_CHANGES.md.
+- Generated type names are now intent-based (e.g. `fusionplus.QuoteParams`/`Quote`), and the v5 surface cleanup renamed types/methods across all clients for consistency. **These are source-compatible:** every old name is kept as a `type Old = New` alias or a forwarding method, so existing code compiles and behaves identically — it just gets a deprecation warning. Migrate before a future major removes them. Full list in MIGRATION.md §4.
 
 ### Breaking Changes
 _Only genuine incompatibilities — code updates required. Renames with aliases are under Deprecated above, not here._
