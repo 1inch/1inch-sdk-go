@@ -12,6 +12,7 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 
 ### Changed
 - All `*Fixed` types are now deprecated aliases; SDK signatures use the generated names.
+- Un-deprecated the `fusionorder` re-export aliases `fusion`/`fusionplus`.`TakingFeeInfo`, `CustomPreset`, `CustomPresetPoint` (deprecated in v3.0.0). They are now permanent ergonomic re-exports, consistent with `Bps`/`Interaction`, so callers of the leaf packages need not import `common/fusionorder`.
 - Codegen pipeline hardened: rewritten from bash/jq into a Go tool with a declarative override table (replacing hand-maintained `*Fixed` copies), a spec-provenance lock, and a weekly upstream-drift workflow. Output is byte-for-byte reproducible.
 - CI expanded: public-API compatibility gate (`gorelease`), wire-surface (struct-tag) diff, decoder fuzzing, `govulncheck`, and weekly live-API smoke tests.
 

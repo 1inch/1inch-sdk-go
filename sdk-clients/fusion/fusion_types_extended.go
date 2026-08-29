@@ -59,13 +59,10 @@ type OrderParams struct {
 	OrderExpirationDelay    uint32 // TODO this field is inaccessible in the typescript SDK
 }
 
-// Deprecated: Use fusionorder.TakingFeeInfo directly instead.
+// Ergonomic re-exports of fusionorder types, so callers of this package need not
+// import common/fusionorder directly.
 type TakingFeeInfo = fusionorder.TakingFeeInfo
-
-// Deprecated: Use fusionorder.CustomPreset directly instead.
 type CustomPreset = fusionorder.CustomPreset
-
-// Deprecated: Use fusionorder.CustomPresetPoint directly instead.
 type CustomPresetPoint = fusionorder.CustomPresetPoint
 
 type PreparedOrder struct {
