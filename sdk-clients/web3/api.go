@@ -24,7 +24,7 @@ func (api *api) PerformRpcCallAgainstFullNode(ctx context.Context, params Perfor
 	payload := common.RequestPayload{
 		Method: "POST",
 		Params: nil,
-		U:      u,
+		Path:   u,
 		Body:   body,
 	}
 
@@ -53,7 +53,7 @@ func (api *api) PerformRpcCall(ctx context.Context, params PerformRpcCallParams)
 	payload := common.RequestPayload{
 		Method: "POST",
 		Params: nil,
-		U:      u,
+		Path:   u,
 		Body:   body,
 	}
 

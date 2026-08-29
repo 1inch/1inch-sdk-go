@@ -19,7 +19,7 @@ func (api *api) SearchTokenAllChains(ctx context.Context, params SearchAllChains
 	payload := common.RequestPayload{
 		Method: "GET",
 		Params: params,
-		U:      u,
+		Path:   u,
 		Body:   nil,
 	}
 
@@ -44,7 +44,7 @@ func (api *api) SearchTokenSingleChain(ctx context.Context, params SearchSingleC
 	payload := common.RequestPayload{
 		Method: "GET",
 		Params: params,
-		U:      u,
+		Path:   u,
 		Body:   nil,
 	}
 
@@ -68,7 +68,7 @@ func (api *api) GetWhitelistedTokens(ctx context.Context, params GetWhitelistedT
 	payload := common.RequestPayload{
 		Method: "GET",
 		Params: params,
-		U:      u,
+		Path:   u,
 		Body:   nil,
 	}
 
@@ -92,7 +92,7 @@ func (api *api) GetWhitelistedTokensAsList(ctx context.Context, params GetWhitel
 	payload := common.RequestPayload{
 		Method: "GET",
 		Params: params,
-		U:      u,
+		Path:   u,
 		Body:   nil,
 	}
 
@@ -116,7 +116,7 @@ func (api *api) GetCustomTokens(ctx context.Context, params GetCustomTokensParam
 	payload := common.RequestPayload{
 		Method: "GET",
 		Params: params,
-		U:      u,
+		Path:   u,
 		Body:   nil,
 	}
 
@@ -140,7 +140,7 @@ func (api *api) GetCustomToken(ctx context.Context, params GetCustomTokenParams)
 	payload := common.RequestPayload{
 		Method: "GET",
 		Params: nil,
-		U:      u,
+		Path:   u,
 		Body:   nil,
 	}
 

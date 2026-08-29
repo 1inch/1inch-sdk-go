@@ -15,7 +15,7 @@ func (api *api) GetSupportedChains(ctx context.Context) (*SupportedChainsRespons
 	payload := common.RequestPayload{
 		Method: "GET",
 		Params: nil,
-		U:      u,
+		Path:   u,
 		Body:   nil,
 	}
 
@@ -56,7 +56,7 @@ func (api *api) GetNFTsByAddress(ctx context.Context, params GetNftsByAddressPar
 			Limit:    params.Limit,
 			Offset:   params.Offset,
 		},
-		U:    u,
+		Path: u,
 		Body: nil,
 	}
 

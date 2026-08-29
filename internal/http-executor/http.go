@@ -53,7 +53,7 @@ type Client struct {
 }
 
 func (c *Client) ExecuteRequest(ctx context.Context, payload common.RequestPayload, v any) error {
-	u, err := addQueryParameters(payload.U, payload.Params)
+	u, err := addQueryParameters(payload.Path, payload.Params)
 	if err != nil {
 		return err
 	}

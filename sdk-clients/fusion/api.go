@@ -14,7 +14,7 @@ func (api *api) GetActiveOrders(ctx context.Context, params GetActiveOrdersParam
 	payload := common.RequestPayload{
 		Method: "GET",
 		Params: params,
-		U:      u,
+		Path:   u,
 		Body:   nil,
 	}
 
@@ -33,7 +33,7 @@ func (api *api) GetSettlementContract(ctx context.Context) (*SettlementAddressOu
 	payload := common.RequestPayload{
 		Method: "GET",
 		Params: nil,
-		U:      u,
+		Path:   u,
 		Body:   nil,
 	}
 
@@ -61,7 +61,7 @@ func (api *api) GetQuote(ctx context.Context, params QuoteParams) (*Quote, error
 	payload := common.RequestPayload{
 		Method: "GET",
 		Params: params,
-		U:      u,
+		Path:   u,
 		Body:   nil,
 	}
 
@@ -95,7 +95,7 @@ func (api *api) GetQuoteWithCustomPreset(ctx context.Context, params CustomPrese
 	payload := common.RequestPayload{
 		Method: "POST",
 		Params: params,
-		U:      u,
+		Path:   u,
 		Body:   body,
 	}
 
@@ -146,7 +146,7 @@ func (api *api) PlaceOrder(ctx context.Context, fusionQuote Quote, orderParams O
 	payload := common.RequestPayload{
 		Method: "POST",
 		Params: nil,
-		U:      u,
+		Path:   u,
 		Body:   body,
 	}
 
@@ -176,7 +176,7 @@ func (api *api) PlaceOrders(ctx context.Context, body []PlaceOrderBody) (*Quote,
 	payload := common.RequestPayload{
 		Method: "POST",
 		Params: nil,
-		U:      u,
+		Path:   u,
 		Body:   bodyMarshaled,
 	}
 
@@ -195,7 +195,7 @@ func (api *api) GetOrderStatus(ctx context.Context, orderHash string) (*OrderRes
 	payload := common.RequestPayload{
 		Method: "GET",
 		Params: nil,
-		U:      u,
+		Path:   u,
 		Body:   nil,
 	}
 

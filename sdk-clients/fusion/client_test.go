@@ -83,7 +83,7 @@ func TestPlaceOrderFromParams(t *testing.T) {
 
 	// The submitted order must embed the permit in its extension
 	submission := executor.Payloads[1]
-	assert.Contains(t, submission.U, "/order/submit")
+	assert.Contains(t, submission.Path, "/order/submit")
 	assert.Contains(t, string(submission.Body), "deadbeef01020304")
 }
 

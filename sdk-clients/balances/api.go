@@ -21,7 +21,7 @@ func (api *api) GetBalancesAndAllowancesByWalletAddress(ctx context.Context, par
 	payload := common.RequestPayload{
 		Method: "GET",
 		Params: nil,
-		U:      u,
+		Path:   u,
 		Body:   nil,
 	}
 
@@ -48,7 +48,7 @@ func (api *api) GetBalancesAndAllowances(ctx context.Context, params BalancesAnd
 		Params: struct {
 			Wallets string `url:"wallets"`
 		}{Wallets: strings.Join(params.Wallets, ",")},
-		U:    u,
+		Path: u,
 		Body: nil,
 	}
 
@@ -73,7 +73,7 @@ func (api *api) GetBalancesByWalletAddress(ctx context.Context, params BalancesB
 	payload := common.RequestPayload{
 		Method: "GET",
 		Params: nil,
-		U:      u,
+		Path:   u,
 		Body:   nil,
 	}
 
@@ -104,7 +104,7 @@ func (api *api) GetBalancesOfCustomTokensByWalletAddress(ctx context.Context, pa
 	payload := common.RequestPayload{
 		Method: "POST",
 		Params: nil,
-		U:      u,
+		Path:   u,
 		Body:   body,
 	}
 
@@ -134,7 +134,7 @@ func (api *api) GetBalancesOfCustomTokensByWalletAddresses(ctx context.Context, 
 	payload := common.RequestPayload{
 		Method: "POST",
 		Params: nil,
-		U:      u,
+		Path:   u,
 		Body:   body,
 	}
 
@@ -164,7 +164,7 @@ func (api *api) GetBalancesAndAllowancesOfCustomTokensByWalletAddress(ctx contex
 	payload := common.RequestPayload{
 		Method: "POST",
 		Params: nil,
-		U:      u,
+		Path:   u,
 		Body:   body,
 	}
 
@@ -189,7 +189,7 @@ func (api *api) GetAllowancesByWalletAddress(ctx context.Context, params Allowan
 	payload := common.RequestPayload{
 		Method: "GET",
 		Params: nil,
-		U:      u,
+		Path:   u,
 		Body:   nil,
 	}
 
@@ -219,7 +219,7 @@ func (api *api) GetAllowancesOfCustomTokensByWalletAddress(ctx context.Context, 
 	payload := common.RequestPayload{
 		Method: "POST",
 		Params: nil,
-		U:      u,
+		Path:   u,
 		Body:   body,
 	}
 

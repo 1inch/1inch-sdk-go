@@ -16,7 +16,7 @@ func (api *api) GetLiquiditySources(ctx context.Context) (*ProtocolsResponse, er
 	payload := common.RequestPayload{
 		Method: "GET",
 		Params: nil,
-		U:      u,
+		Path:   u,
 		Body:   nil,
 	}
 
@@ -36,7 +36,7 @@ func (api *api) GetTokens(ctx context.Context) (*TokensResponse, error) {
 	payload := common.RequestPayload{
 		Method: "GET",
 		Params: nil,
-		U:      u,
+		Path:   u,
 		Body:   nil,
 	}
 
@@ -61,7 +61,7 @@ func (api *api) GetApproveAllowance(ctx context.Context, params GetApproveAllowa
 	payload := common.RequestPayload{
 		Method: "GET",
 		Params: params,
-		U:      u,
+		Path:   u,
 		Body:   nil,
 	}
 
@@ -80,7 +80,7 @@ func (api *api) GetApproveSpender(ctx context.Context) (*SpenderResponse, error)
 
 	payload := common.RequestPayload{
 		Method: "GET",
-		U:      u,
+		Path:   u,
 		Params: nil,
 		Body:   nil,
 	}
@@ -106,7 +106,7 @@ func (api *api) GetApproveTransaction(ctx context.Context, params GetApproveTran
 	payload := common.RequestPayload{
 		Method: "GET",
 		Params: params,
-		U:      u,
+		Path:   u,
 		Body:   nil,
 	}
 
@@ -130,7 +130,7 @@ func (api *api) GetQuote(ctx context.Context, params GetQuoteParams) (*QuoteResp
 	payload := common.RequestPayload{
 		Method: "GET",
 		Params: params,
-		U:      u,
+		Path:   u,
 	}
 
 	var quote QuoteResponse
@@ -154,7 +154,7 @@ func (api *api) GetSwap(ctx context.Context, params GetSwapParams) (*SwapRespons
 	payload := common.RequestPayload{
 		Method: "GET",
 		Params: params,
-		U:      u,
+		Path:   u,
 		Body:   nil,
 	}
 

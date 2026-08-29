@@ -25,7 +25,7 @@ func (api *api) BroadcastPublicTransaction(ctx context.Context, params Broadcast
 	payload := common.RequestPayload{
 		Method: "POST",
 		Params: nil,
-		U:      u,
+		Path:   u,
 		Body:   body,
 	}
 
@@ -55,7 +55,7 @@ func (api *api) BroadcastPrivateTransaction(ctx context.Context, params Broadcas
 	payload := common.RequestPayload{
 		Method: "POST",
 		Params: nil,
-		U:      u,
+		Path:   u,
 		Body:   body,
 	}
 

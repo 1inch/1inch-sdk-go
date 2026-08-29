@@ -36,7 +36,7 @@ func (api *api) CreateOrder(ctx context.Context, params CreateOrderParams) (*Cre
 	payload := common.RequestPayload{
 		Method: "POST",
 		Params: nil,
-		U:      u,
+		Path:   u,
 		Body:   body,
 	}
 
@@ -61,7 +61,7 @@ func (api *api) GetOrdersByCreatorAddress(ctx context.Context, params GetOrdersB
 	payload := common.RequestPayload{
 		Method: "GET",
 		Params: params,
-		U:      u,
+		Path:   u,
 	}
 
 	var ordersResponse []*OrderResponse
@@ -85,7 +85,7 @@ func (api *api) GetOrder(ctx context.Context, params GetOrderParams) (*GetOrderB
 	payload := common.RequestPayload{
 		Method: "GET",
 		Params: params,
-		U:      u,
+		Path:   u,
 	}
 
 	var getOrderByHashResponse *GetOrderByHashResponse
@@ -109,7 +109,7 @@ func (api *api) GetOrderCount(ctx context.Context, params GetOrderCountParams) (
 	payload := common.RequestPayload{
 		Method: "GET",
 		Params: params,
-		U:      u,
+		Path:   u,
 	}
 
 	var response GetOrderCountResponse
@@ -169,7 +169,7 @@ func (api *api) GetAllOrders(ctx context.Context, params GetAllOrdersParams) (*O
 	payload := common.RequestPayload{
 		Method: "GET",
 		Params: params,
-		U:      u,
+		Path:   u,
 	}
 
 	var allOrdersResponse Orders
@@ -192,7 +192,7 @@ func (api *api) GetFeeInfo(ctx context.Context, params GetFeeInfoParams) (*FeeIn
 	payload := common.RequestPayload{
 		Method: "GET",
 		Params: params,
-		U:      u,
+		Path:   u,
 	}
 
 	var feeInfo *FeeInfoResponse

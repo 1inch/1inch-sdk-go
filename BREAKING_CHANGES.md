@@ -56,6 +56,9 @@ The v5 major is used to make the public API consistent and intent-based. Every r
 **`aggregation`**
 - Added clean param names `GetApproveAllowanceParams` / `GetApproveTransactionParams` (aliases of the generated `GetAllowanceParams` / `GetApproveParams`) matching their consumer methods; the method signatures now use them.
 
+**`common`**
+- **Breaking (no alias possible):** `RequestPayload.U` renamed to `RequestPayload.Path` (a struct field on the exported `HttpExecutor` payload type; the cryptic `U` held the request path). In practice this is internal-only — the SDK does not expose a way to inject a custom `HttpExecutor` — but the type is exported, so it is listed here for completeness.
+
 ## Version 4.0.0
 
 ### Module Path Now Includes the `/v4` Major-Version Suffix

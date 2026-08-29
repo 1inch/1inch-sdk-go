@@ -14,7 +14,7 @@ func (api *api) GetSyncedInterval(ctx context.Context) (*ReadSyncedIntervalRespo
 	payload := common.RequestPayload{
 		Method: "GET",
 		Params: nil,
-		U:      u,
+		Path:   u,
 		Body:   nil,
 	}
 
@@ -34,7 +34,7 @@ func (api *api) GetBlockTraceByNumber(ctx context.Context, param GetBlockTraceBy
 	payload := common.RequestPayload{
 		Method: "GET",
 		Params: nil,
-		U:      u,
+		Path:   u,
 		Body:   nil,
 	}
 
@@ -54,7 +54,7 @@ func (api *api) GetTxTraceByNumberAndHash(ctx context.Context, param GetTxTraceB
 	payload := common.RequestPayload{
 		Method: "GET",
 		Params: nil,
-		U:      u,
+		Path:   u,
 		Body:   nil,
 	}
 
@@ -74,7 +74,7 @@ func (api *api) GetTxTraceByNumberAndOffset(ctx context.Context, param GetTxTrac
 	payload := common.RequestPayload{
 		Method: "GET",
 		Params: nil,
-		U:      u,
+		Path:   u,
 		Body:   nil,
 	}
 

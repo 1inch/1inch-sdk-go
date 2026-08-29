@@ -20,7 +20,7 @@ func (api *api) GetOrderFillsByHash(ctx context.Context, params GetOrderFillsByH
 	payload := common.RequestPayload{
 		Method: "GET",
 		Params: params,
-		U:      u,
+		Path:   u,
 		Body:   nil,
 	}
 
@@ -39,7 +39,7 @@ func (api *api) GetReadyToAcceptFills(ctx context.Context, params GetReadyToAcce
 	payload := common.RequestPayload{
 		Method: "GET",
 		Params: params,
-		U:      u,
+		Path:   u,
 		Body:   nil,
 	}
 
@@ -63,7 +63,7 @@ func (api *api) SubmitSecret(ctx context.Context, params SecretInput) error {
 	payload := common.RequestPayload{
 		Method: "POST",
 		Params: params,
-		U:      u,
+		Path:   u,
 		Body:   body,
 	}
 
@@ -86,7 +86,7 @@ func (api *api) GetQuote(ctx context.Context, params QuoteParams) (*Quote, error
 	payload := common.RequestPayload{
 		Method: "GET",
 		Params: params,
-		U:      u,
+		Path:   u,
 		Body:   nil,
 	}
 
@@ -158,7 +158,7 @@ func (api *api) PlaceOrder(ctx context.Context, quoteParams QuoteParams, quote *
 	payload := common.RequestPayload{
 		Method: "POST",
 		Params: nil,
-		U:      u,
+		Path:   u,
 		Body:   body,
 	}
 
@@ -177,7 +177,7 @@ func (api *api) GetActiveOrders(ctx context.Context, params GetActiveOrdersParam
 	payload := common.RequestPayload{
 		Method: "GET",
 		Params: params,
-		U:      u,
+		Path:   u,
 		Body:   nil,
 	}
 
@@ -197,7 +197,7 @@ func (api *api) GetSettlementContract(ctx context.Context, params GetSettlementC
 	payload := common.RequestPayload{
 		Method: "GET",
 		Params: params,
-		U:      u,
+		Path:   u,
 		Body:   nil,
 	}
 

@@ -17,7 +17,7 @@ func (api *api) GetProtocolsCurrentValue(ctx context.Context, params GetProtocol
 	payload := common.RequestPayload{
 		Method: "GET",
 		Params: params,
-		U:      u,
+		Path:   u,
 		Body:   nil,
 	}
 
@@ -41,7 +41,7 @@ func (api *api) GetProtocolsProfitAndLoss(ctx context.Context, params GetProtoco
 	payload := common.RequestPayload{
 		Method: "GET",
 		Params: params,
-		U:      u,
+		Path:   u,
 		Body:   nil,
 	}
 
@@ -65,7 +65,7 @@ func (api *api) GetProtocolsDetails(ctx context.Context, params GetProtocolsDeta
 	payload := common.RequestPayload{
 		Method: "GET",
 		Params: params,
-		U:      u,
+		Path:   u,
 		Body:   nil,
 	}
 
@@ -89,7 +89,7 @@ func (api *api) GetTokensCurrentValue(ctx context.Context, params GetTokensCurre
 	payload := common.RequestPayload{
 		Method: "GET",
 		Params: params,
-		U:      u,
+		Path:   u,
 		Body:   nil,
 	}
 
@@ -113,7 +113,7 @@ func (api *api) GetTokensProfitLoss(ctx context.Context, params GetTokensProfitA
 	payload := common.RequestPayload{
 		Method: "GET",
 		Params: params,
-		U:      u,
+		Path:   u,
 		Body:   nil,
 	}
 
@@ -137,7 +137,7 @@ func (api *api) GetTokensDetails(ctx context.Context, params GetTokensDetailsPar
 	payload := common.RequestPayload{
 		Method: "GET",
 		Params: params,
-		U:      u,
+		Path:   u,
 		Body:   nil,
 	}
 
@@ -156,7 +156,7 @@ func (api *api) IsServiceAvailable(ctx context.Context) (*IsServiceAvailableResp
 	payload := common.RequestPayload{
 		Method: "GET",
 		Params: nil,
-		U:      u,
+		Path:   u,
 		Body:   nil,
 	}
 
@@ -175,7 +175,7 @@ func (api *api) GetSupportedChains(ctx context.Context) (*GetSupportedChainsResp
 	payload := common.RequestPayload{
 		Method: "GET",
 		Params: nil,
-		U:      u,
+		Path:   u,
 		Body:   nil,
 	}
 
@@ -199,7 +199,7 @@ func (api *api) GetCurrentValue(ctx context.Context, params GetCurrentValueParam
 	payload := common.RequestPayload{
 		Method: "GET",
 		Params: params,
-		U:      u,
+		Path:   u,
 		Body:   nil,
 	}
 
@@ -223,7 +223,7 @@ func (api *api) GetProfitLoss(ctx context.Context, params GetProfitAndLossParams
 	payload := common.RequestPayload{
 		Method: "GET",
 		Params: params,
-		U:      u,
+		Path:   u,
 		Body:   nil,
 	}
 
@@ -247,7 +247,7 @@ func (api *api) GetValueChart(ctx context.Context, params GetValueChartParams) (
 	payload := common.RequestPayload{
 		Method: "GET",
 		Params: params,
-		U:      u,
+		Path:   u,
 		Body:   nil,
 	}
 

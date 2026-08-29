@@ -21,7 +21,7 @@ func (api *api) GetPricesForWhitelistedTokens(ctx context.Context, params GetWhi
 	payload := common.RequestPayload{
 		Method: "GET",
 		Params: params,
-		U:      u,
+		Path:   u,
 		Body:   nil,
 	}
 
@@ -41,7 +41,7 @@ func (api *api) GetCustomCurrenciesList(ctx context.Context) (*CurrenciesRespons
 	payload := common.RequestPayload{
 		Method: "GET",
 		Params: nil,
-		U:      u,
+		Path:   u,
 		Body:   nil,
 	}
 
@@ -70,7 +70,7 @@ func (api *api) GetPricesForRequestedTokens(ctx context.Context, params GetPrice
 		}{
 			Currency: params.Currency,
 		},
-		U:    u,
+		Path: u,
 		Body: nil,
 	}
 
@@ -100,7 +100,7 @@ func (api *api) GetPricesForRequestedTokensLarge(ctx context.Context, params Get
 	payload := common.RequestPayload{
 		Method: "POST",
 		Params: nil,
-		U:      u,
+		Path:   u,
 		Body:   body,
 	}
 
