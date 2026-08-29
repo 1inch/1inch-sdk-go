@@ -365,7 +365,7 @@ func TestOrderbookExtensionConversion(t *testing.T) {
 
 	assert.True(t, len(encoded) >= 2 && encoded[:2] == "0x", "Encoded extension should start with 0x")
 
-	decoded, err := orderbook.Decode(mustDecodeHexLocal(encoded))
+	decoded, err := orderbook.DecodeExtension(mustDecodeHexLocal(encoded))
 	require.NoError(t, err)
 
 	assert.Equal(t, obExtension.MakerAssetSuffix, decoded.MakerAssetSuffix)

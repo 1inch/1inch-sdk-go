@@ -32,6 +32,13 @@ likelihood:
 | unknown field `LimitOrderV3SubscribedApiController...` in `orderbook` wrapper struct literal | Use the new embedded field name, e.g. `GetAllOrdersParams{LimitOrdersQueryParams: q}` |
 | cannot use `*PresetClassFixed` in `fusionplus.CreateAuctionDetailsPlus` | Pass the generated `*Preset` (from `GetPreset`) directly |
 | undefined: `web3.ApiKeyAuthScopes` | Delete the reference; it was an unused generated artifact |
+| unknown field `U` / undefined `RequestPayload.U` | Use `RequestPayload.Path` (the field was renamed from the cryptic `U`) |
+| unknown field `EscExtension` on `fusionplus.Order` | Use `Order.EscrowExtension` |
+| too many arguments to `traces.NewConfiguration` | It now takes a struct: `traces.NewConfiguration(traces.ConfigurationParams{ChainId: id, ApiUrl: url, ApiKey: key})` |
+| cannot use `NetworkEnum` as `int` in `constants.GetWrappedToken` / `ChainToWrapper[…]` | Pass an `int` chain id (`constants.EthereumChainId`, or `int(x)`); `NetworkEnum` is deprecated |
+| undefined: `fusion.Preset` (old hand-written struct), `fusionplus.FusionOrderV4`/`CrossChainOrderParams`, or the removed `orderbook` dead types (`GetCountParams`, `CountResponse`, `GetEventParams`, `GetEventsParams`, `EventResponse`, `OrderResponseExtended`, `GetActiveOrdersWithPermitParams`) | These were dead/unused and are removed; use the live equivalents (e.g. `orderbook.GetOrderCountParams`) |
+
+Everything else in the v5 surface cleanup — the intent-based renames (e.g. `history.Item`→`HistoryEvent`, `balances` `…List`-suffix drops, `orderbook.Decode`→`DecodeExtension`, `fusion.Preset` clean names, `GetOrderByOrderHash`→`GetOrderFillsByHash`, `Whitelisted…`→`GetWhitelisted…`, `NetworkEnum`→`*ChainId`) — keeps the old name as a `// Deprecated:` alias or forwarding method, so it compiles unchanged. See [BREAKING_CHANGES.md](BREAKING_CHANGES.md) → "API Surface Cleanup (v5)" for the full per-package list.
 
 ## 3. Review behavior changes (compile clean, act differently)
 
