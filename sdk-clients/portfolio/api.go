@@ -6,7 +6,7 @@ import (
 	"github.com/1inch/1inch-sdk-go/v4/common"
 )
 
-func (api *api) GetProtocolsCurrentValue(ctx context.Context, params GetProtocolsCurrentValueParams) (*GetPortfolioValueResponse, error) {
+func (api *api) GetProtocolsCurrentValue(ctx context.Context, params GetProtocolsCurrentValueParams) (*GetProtocolsCurrentValueResponse, error) {
 	u := "/portfolio/portfolio/v4/overview/protocols/current_value"
 
 	err := params.Validate()
@@ -21,7 +21,7 @@ func (api *api) GetProtocolsCurrentValue(ctx context.Context, params GetProtocol
 		Body:   nil,
 	}
 
-	var response GetPortfolioValueResponse
+	var response GetProtocolsCurrentValueResponse
 	err = api.httpExecutor.ExecuteRequest(ctx, payload, &response)
 	if err != nil {
 		return nil, err
@@ -30,7 +30,7 @@ func (api *api) GetProtocolsCurrentValue(ctx context.Context, params GetProtocol
 	return &response, nil
 }
 
-func (api *api) GetProtocolsProfitAndLoss(ctx context.Context, params GetProtocolsProfitAndLossParams) (*GetPortfolioProfitAndLossResponse, error) {
+func (api *api) GetProtocolsProfitAndLoss(ctx context.Context, params GetProtocolsProfitAndLossParams) (*GetProtocolsProfitAndLossResponse, error) {
 	u := "/portfolio/portfolio/v4/overview/protocols/profit_and_loss"
 
 	err := params.Validate()
@@ -45,7 +45,7 @@ func (api *api) GetProtocolsProfitAndLoss(ctx context.Context, params GetProtoco
 		Body:   nil,
 	}
 
-	var response GetPortfolioProfitAndLossResponse
+	var response GetProtocolsProfitAndLossResponse
 	err = api.httpExecutor.ExecuteRequest(ctx, payload, &response)
 	if err != nil {
 		return nil, err
@@ -102,7 +102,7 @@ func (api *api) GetTokensCurrentValue(ctx context.Context, params GetTokensCurre
 	return &response, nil
 }
 
-func (api *api) GetTokensProfitLoss(ctx context.Context, params GetTokensProfitAndLossParams) (*GetTokensProfitLossResponse, error) {
+func (api *api) GetTokensProfitAndLoss(ctx context.Context, params GetTokensProfitAndLossParams) (*GetTokensProfitAndLossResponse, error) {
 	u := "/portfolio/portfolio/v4/overview/erc20/profit_and_loss"
 
 	err := params.Validate()
@@ -117,7 +117,7 @@ func (api *api) GetTokensProfitLoss(ctx context.Context, params GetTokensProfitA
 		Body:   nil,
 	}
 
-	var response GetTokensProfitLossResponse
+	var response GetTokensProfitAndLossResponse
 	err = api.httpExecutor.ExecuteRequest(ctx, payload, &response)
 	if err != nil {
 		return nil, err
@@ -212,7 +212,7 @@ func (api *api) GetCurrentValue(ctx context.Context, params GetCurrentValueParam
 	return &response, nil
 }
 
-func (api *api) GetProfitLoss(ctx context.Context, params GetProfitAndLossParams) (*GetCurrentProfitLossResponse, error) {
+func (api *api) GetProfitAndLoss(ctx context.Context, params GetProfitAndLossParams) (*GetProfitAndLossResponse, error) {
 	u := "/portfolio/portfolio/v4/general/profit_and_loss"
 
 	err := params.Validate()
@@ -227,7 +227,7 @@ func (api *api) GetProfitLoss(ctx context.Context, params GetProfitAndLossParams
 		Body:   nil,
 	}
 
-	var response GetCurrentProfitLossResponse
+	var response GetProfitAndLossResponse
 	err = api.httpExecutor.ExecuteRequest(ctx, payload, &response)
 	if err != nil {
 		return nil, err
@@ -258,4 +258,14 @@ func (api *api) GetValueChart(ctx context.Context, params GetValueChartParams) (
 	}
 
 	return &response, nil
+}
+
+// Deprecated: Use GetTokensProfitAndLoss (standardized on the ProfitAndLoss spelling).
+func (api *api) GetTokensProfitLoss(ctx context.Context, params GetTokensProfitAndLossParams) (*GetTokensProfitAndLossResponse, error) {
+	return api.GetTokensProfitAndLoss(ctx, params)
+}
+
+// Deprecated: Use GetProfitAndLoss.
+func (api *api) GetProfitLoss(ctx context.Context, params GetProfitAndLossParams) (*GetProfitAndLossResponse, error) {
+	return api.GetProfitAndLoss(ctx, params)
 }

@@ -15,21 +15,21 @@ type EventsByAddressParams struct {
 }
 
 type EventsByAddressResponse struct {
-	Items        []Item `json:"items"`
-	CacheCounter int    `json:"cache_counter"`
+	Items        []HistoryEvent `json:"items"`
+	CacheCounter int            `json:"cache_counter"`
 }
 
-type Item struct {
-	TimeMs                  int64   `json:"timeMs"`
-	Address                 string  `json:"address"`
-	Type                    int     `json:"type"`
-	Rating                  string  `json:"rating"`
-	Details                 Details `json:"details"`
-	ID                      string  `json:"id"`
-	EventOrderInTransaction int     `json:"eventOrderInTransaction"`
+type HistoryEvent struct {
+	TimeMs                  int64               `json:"timeMs"`
+	Address                 string              `json:"address"`
+	Type                    int                 `json:"type"`
+	Rating                  string              `json:"rating"`
+	Details                 HistoryEventDetails `json:"details"`
+	ID                      string              `json:"id"`
+	EventOrderInTransaction int                 `json:"eventOrderInTransaction"`
 }
 
-type Details struct {
+type HistoryEventDetails struct {
 	TxHash       string        `json:"txHash"`
 	ChainID      int           `json:"chainId"`
 	BlockNumber  int           `json:"blockNumber"`
@@ -52,3 +52,10 @@ type TokenAction struct {
 	Amount      string `json:"amount"`
 	Direction   string `json:"direction"`
 }
+
+// Deprecated: Use HistoryEvent instead (the bare Item was uninformative).
+type Item = HistoryEvent
+
+// Deprecated: Use HistoryEventDetails instead (bare Details clashed conceptually
+// with fusion/fusionplus Details).
+type Details = HistoryEventDetails

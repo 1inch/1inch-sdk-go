@@ -9,7 +9,7 @@ import (
 )
 
 // GetSupportedChains Returns supported chains
-func (api *api) GetSupportedChains(ctx context.Context) (*SupportedChainsResponse, error) {
+func (api *api) GetSupportedChains(ctx context.Context) (*GetSupportedChainsResponse, error) {
 	u := "/nft/v1/supportedchains"
 
 	payload := common.RequestPayload{
@@ -19,7 +19,7 @@ func (api *api) GetSupportedChains(ctx context.Context) (*SupportedChainsRespons
 		Body:   nil,
 	}
 
-	var response SupportedChainsResponse
+	var response GetSupportedChainsResponse
 	err := api.httpExecutor.ExecuteRequest(ctx, payload, &response)
 	if err != nil {
 		return nil, err

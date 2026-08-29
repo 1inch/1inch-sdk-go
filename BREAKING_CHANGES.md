@@ -62,6 +62,24 @@ The v5 major is used to make the public API consistent and intent-based. Every r
 **`constants`**
 - `ChainToWrapper` is now `map[int]` (keyed by chain id) and `GetWrappedToken(chainID int)` — consistent with `ChainToTrueERC20`/`GetTrueERC20`. **Breaking:** callers indexing `ChainToWrapper` or calling `GetWrappedToken` with a `NetworkEnum` must pass an `int` chain id (e.g. `constants.EthereumChainId` or `int(chainId)`). `NetworkEnum` and its `Network*` constants are deprecated in favor of the `*ChainId` int constants.
 
+**`portfolio`**
+- Standardized on the `ProfitAndLoss` spelling: `GetProfitLoss`→`GetProfitAndLoss`, `GetTokensProfitLoss`→`GetTokensProfitAndLoss` (old methods forward). Response types renamed to match their methods: `GetPortfolioValueResponse`→`GetProtocolsCurrentValueResponse`, `GetPortfolioProfitAndLossResponse`→`GetProtocolsProfitAndLossResponse`, `GetTokensProfitLossResponse`→`GetTokensProfitAndLossResponse`, `GetCurrentProfitLossResponse`→`GetProfitAndLossResponse` (all aliased).
+
+**`history`**
+- `Item`→`HistoryEvent`, `Details`→`HistoryEventDetails` (bare names were uninformative / clashed with fusion `Details`); both aliased.
+
+**`nft`**
+- `SupportedChainsResponse`→`GetSupportedChainsResponse` (matches the method and portfolio's naming; aliased). Added clean-cased `GetNFTsByAddressParams` alias of the generated `GetNftsByAddressParams`.
+
+**`gasprices` / `spotprices`**
+- Clean names dropping the upstream `Dto` suffix, as aliases of the generated types: `GetGasPriceEIP1559Response` (= `Eip1559GasPriceResponse`), `GetCustomCurrenciesResponse` (= `CurrenciesResponseDto`).
+
+**`traces`**
+- **Breaking (no alias possible):** `NewConfiguration(chainId, apiUrl, apiKey)` now takes a `ConfigurationParams` struct, matching every other client's constructor. Update `traces.NewConfiguration(id, url, key)` to `traces.NewConfiguration(traces.ConfigurationParams{ChainId: id, ApiUrl: url, ApiKey: key})`.
+- Clean names dropping the `Dto`/impl-leaking prefixes, as aliases: `GetSyncedIntervalResponse` (= `ReadSyncedIntervalResponseDto`), `GetBlockTraceByNumberResponse` (= `CoreBuiltinBlockTracesDto`), `GetBlockTraceByNumberParams` (= `GetBlockTraceByNumberParam`).
+
+_Deferred (name collisions with existing generated types, to be resolved separately): `history.EventsByAddressParams`/`Response`→`GetHistoryEventsByAddress*` and `spotprices.GetPricesRequestDto`→`GetPricesForRequestedTokensParams`._
+
 ## Version 4.0.0
 
 ### Module Path Now Includes the `/v4` Major-Version Suffix
