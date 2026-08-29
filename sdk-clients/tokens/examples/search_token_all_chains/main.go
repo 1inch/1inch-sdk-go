@@ -34,7 +34,7 @@ func main() {
 	}
 	ctx := context.Background()
 
-	tokens, err := client.SearchTokenAllChains(ctx, tokens.SearchControllerSearchAllChainsParams{
+	tokens, err := client.SearchTokenAllChains(ctx, tokens.SearchAllChainsParams{
 		Query: "UNI",
 		Limit: 2,
 	})

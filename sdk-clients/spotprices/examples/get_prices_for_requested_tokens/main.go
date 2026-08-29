@@ -42,7 +42,7 @@ func main() {
 	ctx := context.Background()
 
 	requestedTokensPrices, err := client.GetPricesForRequestedTokens(ctx, spotprices.GetPricesRequestDto{
-		Currency: spotprices.GetPricesRequestDtoCurrency(spotprices.USD),
+		Currency: spotprices.GetPricesRequestDtoCurrencyUSD,
 		Tokens:   []string{tokenAddress1, tokenAddress2},
 	})
 	if err != nil {

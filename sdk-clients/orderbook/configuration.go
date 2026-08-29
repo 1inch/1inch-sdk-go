@@ -8,7 +8,7 @@ import (
 )
 
 type Configuration struct {
-	WalletConfiguration *WalletConfiguration
+	WalletConfiguration *ConfigurationWallet
 	APIConfiguration    *ConfigurationAPI
 }
 
@@ -19,7 +19,7 @@ type ConfigurationAPI struct {
 	API api
 }
 
-type WalletConfiguration struct {
+type ConfigurationWallet struct {
 	PrivateKey string
 	NodeURL    string
 
@@ -69,15 +69,20 @@ func NewConfigurationAPI(chainId uint64, apiUrl string, apiKey string) (*Configu
 	}, nil
 }
 
-func NewConfigurationWallet(nodeUrl string, privateKey string, chainId uint64) (*WalletConfiguration, error) {
+func NewConfigurationWallet(nodeUrl string, privateKey string, chainId uint64) (*ConfigurationWallet, error) {
 	w, err := web3_provider.DefaultWalletProvider(privateKey, nodeUrl, chainId)
 	if err != nil {
 		return nil, err
 	}
 
 	f := transaction_builder.NewFactory(w)
-	return &WalletConfiguration{
+	return &ConfigurationWallet{
 		Wallet:    w,
 		TxBuilder: f,
 	}, nil
 }
+
+// Deprecated: Use ConfigurationWallet. Renamed for consistency with the other
+// SDK clients (fusion, aggregation, fusionplus), which all name this type
+// ConfigurationWallet.
+type WalletConfiguration = ConfigurationWallet

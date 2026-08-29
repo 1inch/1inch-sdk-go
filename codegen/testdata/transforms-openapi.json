@@ -1,0 +1,127 @@
+{
+  "openapi": "3.0.0",
+  "info": {
+    "title": "Transform fixture API",
+    "description": "Synthetic spec exercising every transform in generate_types.sh. Used by codegen_test.go.",
+    "version": "1.0.0"
+  },
+  "paths": {
+    "/quote": {
+      "get": {
+        "operationId": "AggregationController_getQuote",
+        "parameters": [
+          {
+            "name": "chainId",
+            "in": "query",
+            "required": true,
+            "description": "Chain id declared as number; fix_chain_id_number_types must convert it to integer.",
+            "schema": {
+              "type": "number"
+            }
+          },
+          {
+            "name": "amounts",
+            "in": "query",
+            "required": true,
+            "description": "Malformed array type; check_and_fix_incorrect_number_arrays must rewrite it.",
+            "schema": { "type": "number[]" }
+          },
+          {
+            "name": "gasPrice",
+            "in": "query",
+            "required": false,
+            "description": "anyOf parameter; change_any_of_int_to_int must collapse it to the first variant.",
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "integer"
+                },
+                {
+                  "type": "string"
+                }
+              ]
+            }
+          },
+          {
+            "name": "filter",
+            "in": "query",
+            "required": false,
+            "description": "anyOf with a null variant listed first; remove_null_schemas must drop it before change_any_of_int_to_int collapses the rest.",
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "null"
+                },
+                {
+                  "type": "string"
+                }
+              ]
+            }
+          },
+          {
+            "name": "note",
+            "in": "query",
+            "required": false,
+            "description": "Optional string; add_pointer_skip_field must prevent pointer generation.",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "ok",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Widget"
+                }
+              }
+            }
+          }
+        }
+      }
+    }
+  },
+  "components": {
+    "schemas": {
+      "Widget": {
+        "type": "object",
+        "required": ["name", "price", "srcChainId"],
+        "properties": {
+          "name": {
+            "type": "string"
+          },
+          "price": {
+            "type": "number",
+            "description": "A non-chain number field; must remain float32."
+          },
+          "srcChainId": {
+            "type": "number",
+            "description": "Chain id property declared as number; must be generated as int."
+          },
+          "optionalNote": {
+            "type": "string",
+            "description": "Optional property; add_pointer_skip_field must prevent pointer generation."
+          },
+          "linked": {
+            "description": "allOf wrapper around a ref; change_any_of_ref_to_ref must collapse it to the bare ref.",
+            "allOf": [
+              {
+                "$ref": "#/components/schemas/Linked"
+              }
+            ]
+          }
+        }
+      },
+      "Linked": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "string"
+          }
+        }
+      }
+    }
+  }
+}

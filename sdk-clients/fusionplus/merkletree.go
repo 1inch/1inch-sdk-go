@@ -9,12 +9,12 @@ import (
 	"github.com/ethereum/go-ethereum/common/hexutil"
 )
 
-type MyMerkleTree struct {
+type MerkleTree struct {
 	tree   []string
 	leaves []string
 }
 
-func MakeTree(leaves []string) *MyMerkleTree {
+func NewMerkleTree(leaves []string) *MerkleTree {
 	leavesUnsorted := make([]string, len(leaves))
 	copy(leavesUnsorted, leaves)
 	sort.Strings(leaves)
@@ -45,7 +45,7 @@ func MakeTree(leaves []string) *MyMerkleTree {
 		finalTree[i] = nodeAsHex
 	}
 
-	return &MyMerkleTree{
+	return &MerkleTree{
 		tree:   finalTree,
 		leaves: leavesUnsorted,
 	}
@@ -56,7 +56,7 @@ func GetProof(leaves []string, index int) ([]string, error) {
 		return nil, errors.New("index out of bounds")
 	}
 
-	tree := MakeTree(leaves)
+	tree := NewMerkleTree(leaves)
 
 	leafToProve := tree.leaves[index]
 
@@ -90,7 +90,7 @@ func GetProof(leaves []string, index int) ([]string, error) {
 		}
 
 		// Move to the parent index.
-		currentIndex, err = ParentIndex(currentIndex)
+		currentIndex, err = parentIndex(currentIndex)
 		if err != nil {
 			return nil, err
 		}
@@ -106,10 +106,16 @@ func getSiblingIndex(i int) (int, error) {
 	return i - int(math.Pow(-1, float64(i%2))), nil
 }
 
-// ParentIndex returns the parent index of a given index in the tree.
-func ParentIndex(i int) (int, error) {
+// parentIndex returns the parent index of a given index in the tree.
+func parentIndex(i int) (int, error) {
 	if i > 0 {
 		return (i - 1) / 2, nil
 	}
 	return 0, errors.New("root has no parent")
 }
+
+// Deprecated: Use MerkleTree instead.
+type MyMerkleTree = MerkleTree
+
+// Deprecated: Use NewMerkleTree instead.
+func MakeTree(leaves []string) *MerkleTree { return NewMerkleTree(leaves) }

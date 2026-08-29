@@ -34,7 +34,7 @@ func main() {
 	}
 	ctx := context.Background()
 
-	response, err := client.GetQuote(ctx, fusionplus.QuoterControllerGetQuoteParamsFixed{
+	response, err := client.GetQuote(ctx, fusionplus.QuoteParams{
 		SrcChain:        42161,
 		DstChain:        8453,
 		SrcTokenAddress: "0xaf88d065e77c8cC2239327C5EDb3A432268e5831",

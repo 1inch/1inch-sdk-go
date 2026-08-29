@@ -35,7 +35,7 @@ func main() {
 	}
 
 	orders, err := client.GetAllOrders(ctx, orderbook.GetAllOrdersParams{
-		LimitOrderV3SubscribedApiControllerGetAllLimitOrdersParams: orderbook.LimitOrderV3SubscribedApiControllerGetAllLimitOrdersParams{
+		LimitOrdersQueryParams: orderbook.LimitOrdersQueryParams{
 			Page:     0,
 			Limit:    2,
 			Statuses: []float32{1},

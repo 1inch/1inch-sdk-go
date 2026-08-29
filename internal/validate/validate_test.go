@@ -1185,3 +1185,55 @@ func TestContains(t *testing.T) {
 		})
 	}
 }
+
+func TestCheckFeeBps(t *testing.T) {
+	tests := []struct {
+		name        string
+		value       int
+		expectError bool
+	}{
+		{name: "Zero means no fee", value: 0},
+		{name: "Typical fee", value: 100},
+		{name: "Maximum fee", value: 10000},
+		{name: "Negative fee", value: -1, expectError: true},
+		{name: "Above 100 percent", value: 10001, expectError: true},
+	}
+
+	for _, tc := range tests {
+		t.Run(tc.name, func(t *testing.T) {
+			err := CheckFeeBps(tc.value, "fee")
+			if tc.expectError {
+				require.Error(t, err)
+				assert.Contains(t, err.Error(), "basis points")
+			} else {
+				require.NoError(t, err)
+			}
+		})
+	}
+}
+
+func TestCheckFeeBpsFloat32(t *testing.T) {
+	tests := []struct {
+		name        string
+		value       float32
+		expectError bool
+	}{
+		{name: "Zero means no fee", value: 0},
+		{name: "Typical fee", value: 100},
+		{name: "Maximum fee", value: 10000},
+		{name: "Negative fee", value: -0.5, expectError: true},
+		{name: "Above 100 percent", value: 10000.5, expectError: true},
+	}
+
+	for _, tc := range tests {
+		t.Run(tc.name, func(t *testing.T) {
+			err := CheckFeeBpsFloat32(tc.value, "fee")
+			if tc.expectError {
+				require.Error(t, err)
+				assert.Contains(t, err.Error(), "basis points")
+			} else {
+				require.NoError(t, err)
+			}
+		})
+	}
+}

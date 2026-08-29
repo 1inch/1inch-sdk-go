@@ -8,17 +8,23 @@ import (
 	"github.com/1inch/1inch-sdk-go/v4/common"
 )
 
-func (api *api) GetOrderByOrderHash(ctx context.Context, params GetOrderByOrderHashParams) (*GetOrderFillsByHashOutputFixed, error) {
+// Deprecated: Use GetOrderFillsByHash instead. The name now matches its return
+// type (GetOrderFillsByHashOutput). This forwards to GetOrderFillsByHash.
+func (api *api) GetOrderByOrderHash(ctx context.Context, params GetOrderByOrderHashParams) (*GetOrderFillsByHashOutput, error) {
+	return api.GetOrderFillsByHash(ctx, params)
+}
+
+func (api *api) GetOrderFillsByHash(ctx context.Context, params GetOrderFillsByHashParams) (*GetOrderFillsByHashOutput, error) {
 	u := fmt.Sprintf("/fusion-plus/orders/v1.1/order/status/%s", params.Hash)
 
 	payload := common.RequestPayload{
 		Method: "GET",
 		Params: params,
-		U:      u,
+		Path:   u,
 		Body:   nil,
 	}
 
-	var response GetOrderFillsByHashOutputFixed
+	var response GetOrderFillsByHashOutput
 	err := api.httpExecutor.ExecuteRequest(ctx, payload, &response)
 	if err != nil {
 		return nil, err
@@ -33,7 +39,7 @@ func (api *api) GetReadyToAcceptFills(ctx context.Context, params GetReadyToAcce
 	payload := common.RequestPayload{
 		Method: "GET",
 		Params: params,
-		U:      u,
+		Path:   u,
 		Body:   nil,
 	}
 
@@ -57,7 +63,7 @@ func (api *api) SubmitSecret(ctx context.Context, params SecretInput) error {
 	payload := common.RequestPayload{
 		Method: "POST",
 		Params: params,
-		U:      u,
+		Path:   u,
 		Body:   body,
 	}
 
@@ -69,7 +75,7 @@ func (api *api) SubmitSecret(ctx context.Context, params SecretInput) error {
 	return nil
 }
 
-func (api *api) GetQuote(ctx context.Context, params QuoterControllerGetQuoteParamsFixed) (*GetQuoteOutputFixed, error) {
+func (api *api) GetQuote(ctx context.Context, params QuoteParams) (*Quote, error) {
 	u := "/fusion-plus/quoter/v1.1/quote/receive"
 
 	err := params.Validate()
@@ -80,11 +86,11 @@ func (api *api) GetQuote(ctx context.Context, params QuoterControllerGetQuotePar
 	payload := common.RequestPayload{
 		Method: "GET",
 		Params: params,
-		U:      u,
+		Path:   u,
 		Body:   nil,
 	}
 
-	var response GetQuoteOutputFixed
+	var response Quote
 	err = api.httpExecutor.ExecuteRequest(ctx, payload, &response)
 	if err != nil {
 		return nil, err
@@ -96,7 +102,7 @@ func (api *api) GetQuote(ctx context.Context, params QuoterControllerGetQuotePar
 }
 
 // PlaceOrder accepts a quote and submits it as a fusion plus order
-func (api *api) PlaceOrder(ctx context.Context, quoteParams QuoterControllerGetQuoteParamsFixed, quote *GetQuoteOutputFixed, orderParams OrderParams, wallet common.Wallet) (string, error) {
+func (api *api) PlaceOrder(ctx context.Context, quoteParams QuoteParams, quote *Quote, orderParams OrderParams, wallet common.Wallet) (string, error) {
 	u := "/fusion-plus/relayer/v1.1/submit"
 
 	err := orderParams.Validate()
@@ -121,7 +127,7 @@ func (api *api) PlaceOrder(ctx context.Context, quoteParams QuoterControllerGetQ
 	// TODO support multiple secrets
 	//}
 
-	fusionPlusOrder, err := CreateFusionPlusOrderData(quoteParams, quote, orderParams, wallet, int(quoteParams.SrcChain))
+	fusionPlusOrder, err := CreateOrderData(quoteParams, quote, orderParams, wallet, quoteParams.SrcChain)
 	if err != nil {
 		return "", fmt.Errorf("failed to create order: %w", err)
 	}
@@ -152,7 +158,7 @@ func (api *api) PlaceOrder(ctx context.Context, quoteParams QuoterControllerGetQ
 	payload := common.RequestPayload{
 		Method: "POST",
 		Params: nil,
-		U:      u,
+		Path:   u,
 		Body:   body,
 	}
 
@@ -165,13 +171,13 @@ func (api *api) PlaceOrder(ctx context.Context, quoteParams QuoterControllerGetQ
 }
 
 // GetActiveOrders returns cross-chain orders that are currently open for filling
-func (api *api) GetActiveOrders(ctx context.Context, params OrderApiControllerGetActiveOrdersParams) (*GetActiveOrdersOutput, error) {
+func (api *api) GetActiveOrders(ctx context.Context, params GetActiveOrdersParams) (*GetActiveOrdersOutput, error) {
 	u := "/fusion-plus/orders/v1.1/order/active"
 
 	payload := common.RequestPayload{
 		Method: "GET",
 		Params: params,
-		U:      u,
+		Path:   u,
 		Body:   nil,
 	}
 
@@ -191,7 +197,7 @@ func (api *api) GetSettlementContract(ctx context.Context, params GetSettlementC
 	payload := common.RequestPayload{
 		Method: "GET",
 		Params: params,
-		U:      u,
+		Path:   u,
 		Body:   nil,
 	}
 

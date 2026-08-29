@@ -6,6 +6,34 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 
 ## [Unreleased]
 
+### Added
+- MIGRATION.md: a v4 → v5 upgrade guide (checklist + compiler-error fixes), complementing the per-change reference in BREAKING_CHANGES.md.
+- Fee validation on fusion/fusionplus quote params: fees must be basis points in [0, 10000].
+
+### Changed
+- All `*Fixed` types are now deprecated aliases; SDK signatures use the generated names.
+- Un-deprecated the `fusionorder` re-export aliases `fusion`/`fusionplus`.`TakingFeeInfo`, `CustomPreset`, `CustomPresetPoint` (deprecated in v3.0.0). They are now permanent ergonomic re-exports, consistent with `Bps`/`Interaction`, so callers of the leaf packages need not import `common/fusionorder`.
+- Codegen pipeline hardened: rewritten from bash/jq into a Go tool with a declarative override table (replacing hand-maintained `*Fixed` copies), a spec-provenance lock, and a weekly upstream-drift workflow. Output is byte-for-byte reproducible.
+- CI expanded: public-API compatibility gate (`gorelease`), wire-surface (struct-tag) diff, decoder fuzzing, `govulncheck`, and weekly live-API smoke tests.
+
+### Fixed
+- **Funds-safety:** `fusionplus.DecodeEscrowExtension` no longer corrupts escrow terms on decode → re-encode (swapped safety deposits; hex/decimal mismatch on deposits and hashlock). A round-trip test pins it.
+- **Funds-safety:** `EscrowExtension.ConvertToOrderbookExtension` is now pure (it previously mutated its receiver, corrupting the extension/salt on a second call).
+- `fusionplus.DecodeEscrowExtension` returns an error instead of panicking on malformed input.
+- HTTP client now applies a 60s default timeout and caps response bodies at 64 MiB (previously could hang / read unbounded).
+- `fusionplus` quote `Fee` is now transmitted — it was silently dropped (`*big.Int` cannot be query-encoded); the field is now `int` basis points.
+
+### Deprecated
+- Generated type names are now intent-based (e.g. `fusionplus.QuoteParams`/`Quote`), and the v5 surface cleanup renamed types/methods across all clients for consistency. **These are source-compatible:** every old name is kept as a `type Old = New` alias or a forwarding method, so existing code compiles and behaves identically — it just gets a deprecation warning. Migrate before a future major removes them. Full list in MIGRATION.md §4.
+
+### Breaking Changes
+_Only genuine incompatibilities — code updates required. Renames with aliases are under Deprecated above, not here._
+- Chain-id fields are now `int` instead of `float32` (which silently corrupted Aurora's chain id in the signing domain); drop any `float32(...)` conversions.
+- Type/shape corrections now on the generated types (previously only on the `*Fixed` copies): `Amount` → `string`, `Fee` → `int`, `QuoteId` → `string`, `tokens` optional fields are values not pointers, `Tags` → `[]TagDto`. The `*Fixed` names still resolve (aliases), but field access on the old types must be updated (e.g. drop `*token.Eip2612`).
+- oapi-codegen v1 → v2: bare enum constants are now type-prefixed (`spotprices.USD` → `spotprices.GetPricesForRequestedTokensParamsCurrencyUSD`) — the bare names are gone (no alias); `web3.ApiKeyAuthScopes` removed.
+- No-alias-possible breaks: `common.RequestPayload.U` → `.Path`, `fusionplus.Order.EscExtension` → `.EscrowExtension`, `traces.NewConfiguration` now takes `ConfigurationParams`, `constants` maps keyed by `int` (`NetworkEnum` deprecated), removed dead types, and struct literals that named the renamed embedded `orderbook` query field.
+- See BREAKING_CHANGES.md for per-change detail and MIGRATION.md for upgrade steps.
+
 ## [v4.2.0] - 2026-08-28
 
 ### Added

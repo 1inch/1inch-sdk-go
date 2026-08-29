@@ -9,17 +9,17 @@ import (
 )
 
 // GetSupportedChains Returns supported chains
-func (api *api) GetSupportedChains(ctx context.Context) (*SupportedChainsResponse, error) {
+func (api *api) GetSupportedChains(ctx context.Context) (*GetSupportedChainsResponse, error) {
 	u := "/nft/v1/supportedchains"
 
 	payload := common.RequestPayload{
 		Method: "GET",
 		Params: nil,
-		U:      u,
+		Path:   u,
 		Body:   nil,
 	}
 
-	var response SupportedChainsResponse
+	var response GetSupportedChainsResponse
 	err := api.httpExecutor.ExecuteRequest(ctx, payload, &response)
 	if err != nil {
 		return nil, err
@@ -56,7 +56,7 @@ func (api *api) GetNFTsByAddress(ctx context.Context, params GetNftsByAddressPar
 			Limit:    params.Limit,
 			Offset:   params.Offset,
 		},
-		U:    u,
+		Path: u,
 		Body: nil,
 	}
 

@@ -103,25 +103,6 @@ func CheckChainIdInt(value int, variableName string) error {
 	return nil
 }
 
-func CheckChainIdFloat32Required(value float32, variableName string) error {
-	if value == 0 {
-		return NewParameterMissingError(variableName)
-	}
-
-	return CheckChainIdFloat32(value, variableName)
-}
-
-func CheckChainIdFloat32(value float32, variableName string) error {
-	if value == 0 {
-		return nil
-	}
-
-	if !slices.Contains(constants.ValidChainIds, int(value)) {
-		return NewParameterValidationError(variableName, fmt.Sprintf("is invalid, valid chain ids are: %v", constants.ValidChainIds))
-	}
-	return nil
-}
-
 func CheckPrivateKeyRequired(value string, variableName string) error {
 	if value == "" {
 		return NewParameterMissingError(variableName)
@@ -157,6 +138,30 @@ func CheckSlippageRequired(value float32, variableName string) error {
 		return NewParameterMissingError(variableName)
 	}
 	return CheckSlippage(value, variableName)
+}
+
+// CheckFeeBps validates an integrator fee expressed in basis points
+// (1% = 100 bps). Zero means no fee.
+func CheckFeeBps(value int, variableName string) error {
+	if value == 0 {
+		return nil
+	}
+	if value < 0 || value > 10000 {
+		return NewParameterValidationError(variableName, fmt.Sprintf("invalid fee value (%d) - fees are basis points in [0, 10000]", value))
+	}
+	return nil
+}
+
+// CheckFeeBpsFloat32 validates an integrator fee expressed in basis points
+// (1% = 100 bps). Zero means no fee.
+func CheckFeeBpsFloat32(value float32, variableName string) error {
+	if value == 0 {
+		return nil
+	}
+	if value < 0 || value > 10000 {
+		return NewParameterValidationError(variableName, fmt.Sprintf("invalid fee value (%v) - fees are basis points in [0, 10000]", value))
+	}
+	return nil
 }
 
 func CheckSlippage(value float32, variableName string) error {

@@ -32,82 +32,82 @@ func TestNativeTokenConstant(t *testing.T) {
 }
 
 func TestNetworkEnumValues(t *testing.T) {
-	// Verify NetworkEnum values match their corresponding chain IDs
-	assert.Equal(t, NetworkEnum(EthereumChainId), NetworkEthereum)
-	assert.Equal(t, NetworkEnum(PolygonChainId), NetworkPolygon)
-	assert.Equal(t, NetworkEnum(BscChainId), NetworkBinance)
-	assert.Equal(t, NetworkEnum(ArbitrumChainId), NetworkArbitrum)
-	assert.Equal(t, NetworkEnum(AvalancheChainId), NetworkAvalanche)
-	assert.Equal(t, NetworkEnum(OptimismChainId), NetworkOptimism)
-	assert.Equal(t, NetworkEnum(FantomChainId), NetworkFantom)
-	assert.Equal(t, NetworkEnum(GnosisChainId), NetworkGnosis)
-	assert.Equal(t, NetworkEnum(BaseChainId), NetworkBase)
+	// The deprecated NetworkEnum members still resolve to their chain ids.
+	assert.Equal(t, EthereumChainId, int(NetworkEthereum))
+	assert.Equal(t, PolygonChainId, int(NetworkPolygon))
+	assert.Equal(t, BscChainId, int(NetworkBinance))
+	assert.Equal(t, ArbitrumChainId, int(NetworkArbitrum))
+	assert.Equal(t, AvalancheChainId, int(NetworkAvalanche))
+	assert.Equal(t, OptimismChainId, int(NetworkOptimism))
+	assert.Equal(t, FantomChainId, int(NetworkFantom))
+	assert.Equal(t, GnosisChainId, int(NetworkGnosis))
+	assert.Equal(t, BaseChainId, int(NetworkBase))
 }
 
 func TestGetWrappedToken(t *testing.T) {
 	tests := []struct {
 		name     string
-		chainID  NetworkEnum
+		chainID  int
 		expected common.Address
 		found    bool
 	}{
 		{
 			name:     "Ethereum WETH",
-			chainID:  NetworkEthereum,
+			chainID:  EthereumChainId,
 			expected: common.HexToAddress("0xC02aaA39b223FE8D0A0e5C4F27eAD9083C756Cc2"),
 			found:    true,
 		},
 		{
 			name:     "Polygon WMATIC",
-			chainID:  NetworkPolygon,
+			chainID:  PolygonChainId,
 			expected: common.HexToAddress("0x0d500B1d8E8eF31E21C99d1Db9A6444d3ADf1270"),
 			found:    true,
 		},
 		{
 			name:     "BSC WBNB",
-			chainID:  NetworkBinance,
+			chainID:  BscChainId,
 			expected: common.HexToAddress("0xbb4CdB9CBd36B01bD1cBaEBF2De08d9173bc095c"),
 			found:    true,
 		},
 		{
 			name:     "Arbitrum WETH",
-			chainID:  NetworkArbitrum,
+			chainID:  ArbitrumChainId,
 			expected: common.HexToAddress("0x82aF49447D8a07e3bd95BD0d56f35241523fBab1"),
 			found:    true,
 		},
 		{
 			name:     "Avalanche WAVAX",
-			chainID:  NetworkAvalanche,
+			chainID:  AvalancheChainId,
 			expected: common.HexToAddress("0xB31f66AA3C1e785363F0875A1B74E27b85FD66c7"),
 			found:    true,
 		},
 		{
 			name:     "Optimism WETH",
-			chainID:  NetworkOptimism,
+			chainID:  OptimismChainId,
 			expected: common.HexToAddress("0x4200000000000000000000000000000000000006"),
 			found:    true,
 		},
 		{
 			name:     "Fantom WFTM",
-			chainID:  NetworkFantom,
+			chainID:  FantomChainId,
 			expected: common.HexToAddress("0x21be370D5312f44cB42ce377BC9b8a0cEF1A4C83"),
 			found:    true,
 		},
 		{
 			name:     "Gnosis WXDAI",
-			chainID:  NetworkGnosis,
+			chainID:  GnosisChainId,
 			expected: common.HexToAddress("0xe91D153E0b41518A2Ce8Dd3D7944Fa863463a97d"),
 			found:    true,
 		},
 		{
 			name:     "Base WETH",
-			chainID:  NetworkBase,
+			chainID:  BaseChainId,
 			expected: common.HexToAddress("0x4200000000000000000000000000000000000006"),
 			found:    true,
 		},
 		{
 			name:     "Unknown chain",
-			chainID:  NetworkEnum(9999),
+			chainID:  9999,
 			expected: common.Address{},
 			found:    false,
 		},
@@ -126,9 +126,9 @@ func TestGetWrappedToken(t *testing.T) {
 
 func TestChainToWrapperMap(t *testing.T) {
 	// Verify all expected chains are in the map
-	expectedChains := []NetworkEnum{
-		NetworkEthereum, NetworkPolygon, NetworkBinance, NetworkArbitrum, NetworkAvalanche,
-		NetworkOptimism, NetworkFantom, NetworkGnosis, NetworkBase,
+	expectedChains := []int{
+		EthereumChainId, PolygonChainId, BscChainId, ArbitrumChainId, AvalancheChainId,
+		OptimismChainId, FantomChainId, GnosisChainId, BaseChainId,
 	}
 
 	for _, chain := range expectedChains {

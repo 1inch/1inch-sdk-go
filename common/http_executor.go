@@ -5,7 +5,7 @@ import "context"
 type RequestPayload struct {
 	Method string
 	Params any
-	U      string
+	Path   string
 	Body   []byte
 }
 

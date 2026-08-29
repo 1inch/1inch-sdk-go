@@ -9,14 +9,14 @@ import (
 	"github.com/ethereum/go-ethereum/crypto"
 )
 
-type GetSaltParams struct {
+type GenerateSaltWithFeesParams struct {
 	Extension string
 	Source    *string // Optional string for tracking code
 	UseRandom bool    // If true, uses random bits for the middle section; otherwise uses timestamp
 }
 
 // GenerateSaltWithFees generates a salt value with specific bit patterns
-func GenerateSaltWithFees(params *GetSaltParams) (*big.Int, error) {
+func GenerateSaltWithFees(params *GenerateSaltWithFeesParams) (*big.Int, error) {
 	salt := big.NewInt(0)
 
 	// Generate upper 32 bits (bits 224-255) - tracking code mask
@@ -68,3 +68,7 @@ func GenerateSaltWithFees(params *GetSaltParams) (*big.Int, error) {
 
 	return salt, nil
 }
+
+// Deprecated: Use GenerateSaltWithFeesParams instead (named for its consumer,
+// GenerateSaltWithFees).
+type GetSaltParams = GenerateSaltWithFeesParams

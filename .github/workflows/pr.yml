@@ -25,6 +25,113 @@ jobs:
       - name: Compile integration tests
         run: go vet -tags integration ./tests/...
 
+      - name: Compile live API tests
+        run: go vet -tags liveapi ./tests/...
+
+  govulncheck:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout code into workspace directory
+        uses: actions/checkout@v7
+
+      - name: Set up Go
+        uses: actions/setup-go@v7
+        with:
+          go-version: '1.25'
+
+      - name: Scan for known vulnerabilities
+        run: go run golang.org/x/vuln/cmd/govulncheck@latest ./...
+
+  # Machine-verifies the public API surface against the latest stable release
+  # with gorelease. The full report lands in the job summary on every PR;
+  # the job fails only when incompatible changes exist and BREAKING_CHANGES.md
+  # has no Unreleased section acknowledging pending breaking changes.
+  api-compat:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout code into workspace directory
+        uses: actions/checkout@v7
+        with:
+          fetch-depth: 0
+
+      - name: Set up Go
+        uses: actions/setup-go@v7
+        with:
+          go-version: '1.25'
+
+      - name: Diff public API against the latest stable release
+        run: |
+          set -uo pipefail
+          base=$(git tag -l 'v*' --sort=-v:refname | grep -vE '\-' | head -n1)
+          if [ -z "$base" ]; then
+            echo "No stable release tag found; skipping API diff." >> "$GITHUB_STEP_SUMMARY"
+            exit 0
+          fi
+          echo "## Public API diff vs $base" >> "$GITHUB_STEP_SUMMARY"
+          # A cross-major diff (e.g. a /v5 module vs a v4.x base tag) is not
+          # meaningful — gorelease would compare different module paths and
+          # error. Skip it explicitly rather than let the error read as a pass.
+          base_major="${base#v}"; base_major="${base_major%%.*}"
+          mod_major=$(go list -m | sed -nE 's|.*/v([0-9]+)$|\1|p'); mod_major="${mod_major:-1}"
+          if [ "$mod_major" != "$base_major" ]; then
+            echo "Module major v$mod_major differs from base tag major v$base_major; cross-major API diff is not meaningful — skipping." >> "$GITHUB_STEP_SUMMARY"
+            exit 0
+          fi
+          if go run golang.org/x/exp/cmd/gorelease@v0.0.0-20260824195058-e88cd73687aa -base="$base" > /tmp/apidiff.txt 2>&1; then rc=0; else rc=$?; fi
+          { echo '```'; cat /tmp/apidiff.txt; echo '```'; } >> "$GITHUB_STEP_SUMMARY"
+          if grep -q '^## incompatible changes' /tmp/apidiff.txt; then
+            if grep -q '^## Unreleased' BREAKING_CHANGES.md; then
+              echo "Incompatible API changes detected and acknowledged in BREAKING_CHANGES.md (Unreleased section)."
+            else
+              echo "::error::Incompatible public API changes detected (see job summary), but BREAKING_CHANGES.md has no Unreleased section documenting them."
+              exit 1
+            fi
+          elif [ "$rc" -ne 0 ]; then
+            # gorelease produced no diff report (e.g. it could not fetch the base
+            # module from the proxy right after a release, or the base failed to
+            # build). Warn loudly but do NOT block the PR on an infrastructure
+            # failure — the release workflow's semver guard is the hard gate for
+            # non-major releases. (The previous code silently reported this as a
+            # clean pass, hiding the fact that the diff never ran.)
+            echo "::warning::gorelease could not run the API diff (exit $rc, no report) — base fetch/build likely failed. See job summary."
+          else
+            echo "No incompatible public API changes."
+          fi
+
+  # Complements api-compat: gorelease sees Go types but not struct tags, and a
+  # changed json/url tag compiles fine while silently changing the wire format.
+  # This dumps every exported struct field (name, type, tag) for the PR and its
+  # base and puts the diff in the job summary. Informational — breaking type
+  # changes are gated by api-compat; this makes tag/wire changes impossible to
+  # miss in review.
+  wire-surface:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout code into workspace directory
+        uses: actions/checkout@v7
+        with:
+          fetch-depth: 0
+
+      - name: Set up Go
+        uses: actions/setup-go@v7
+        with:
+          go-version: '1.25'
+
+      - name: Diff wire surface against the base branch
+        run: |
+          set -euo pipefail
+          go run ./tools/wiredump . > /tmp/wire-new.json
+          git worktree add /tmp/base "origin/${{ github.base_ref }}"
+          # Use the PR's tool for both trees so the comparison is apples-to-apples.
+          go run ./tools/wiredump /tmp/base > /tmp/wire-old.json
+          echo "## Wire surface diff vs ${{ github.base_ref }}" >> "$GITHUB_STEP_SUMMARY"
+          if diff -u /tmp/wire-old.json /tmp/wire-new.json > /tmp/wire.diff; then
+            echo "No exported struct field, type, or tag changes." >> "$GITHUB_STEP_SUMMARY"
+          else
+            { echo '```diff'; cat /tmp/wire.diff; echo '```'; } >> "$GITHUB_STEP_SUMMARY"
+            echo "::warning::This PR changes the exported wire surface (fields, types, or struct tags) — see the wire-surface job summary and confirm every change is intended and documented."
+          fi
+
   # Two release-hygiene rules: the version constant is owned by the release
   # workflow (PRs must not modify it), and code changes without a CHANGELOG
   # entry get a warning that their release notes will be auto-generated.

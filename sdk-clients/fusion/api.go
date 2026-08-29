@@ -8,13 +8,13 @@ import (
 	"github.com/1inch/1inch-sdk-go/v4/common"
 )
 
-func (api *api) GetActiveOrders(ctx context.Context, params OrderApiControllerGetActiveOrdersParams) (*GetActiveOrdersOutput, error) {
+func (api *api) GetActiveOrders(ctx context.Context, params GetActiveOrdersParams) (*GetActiveOrdersOutput, error) {
 	u := fmt.Sprintf("/fusion/orders/v2.0/%d/order/active", api.chainId)
 
 	payload := common.RequestPayload{
 		Method: "GET",
 		Params: params,
-		U:      u,
+		Path:   u,
 		Body:   nil,
 	}
 
@@ -33,7 +33,7 @@ func (api *api) GetSettlementContract(ctx context.Context) (*SettlementAddressOu
 	payload := common.RequestPayload{
 		Method: "GET",
 		Params: nil,
-		U:      u,
+		Path:   u,
 		Body:   nil,
 	}
 
@@ -46,7 +46,7 @@ func (api *api) GetSettlementContract(ctx context.Context) (*SettlementAddressOu
 	return &response, nil
 }
 
-func (api *api) GetQuote(ctx context.Context, params QuoterControllerGetQuoteParamsFixed) (*GetQuoteOutputFixed, error) {
+func (api *api) GetQuote(ctx context.Context, params QuoteParams) (*Quote, error) {
 	u := fmt.Sprintf("/fusion/quoter/v2.0/%d/quote/receive", api.chainId)
 
 	err := params.Validate()
@@ -61,11 +61,11 @@ func (api *api) GetQuote(ctx context.Context, params QuoterControllerGetQuotePar
 	payload := common.RequestPayload{
 		Method: "GET",
 		Params: params,
-		U:      u,
+		Path:   u,
 		Body:   nil,
 	}
 
-	var response GetQuoteOutputFixed
+	var response Quote
 	err = api.httpExecutor.ExecuteRequest(ctx, payload, &response)
 	if err != nil {
 		return nil, err
@@ -74,7 +74,7 @@ func (api *api) GetQuote(ctx context.Context, params QuoterControllerGetQuotePar
 	return &response, nil
 }
 
-func (api *api) GetQuoteWithCustomPreset(ctx context.Context, params QuoterControllerGetQuoteWithCustomPresetsParamsFixed, customPreset CustomPreset) (*GetQuoteOutputFixed, error) {
+func (api *api) GetQuoteWithCustomPreset(ctx context.Context, params CustomPresetQuoteParams, customPreset CustomPreset) (*Quote, error) {
 	u := fmt.Sprintf("/fusion/quoter/v2.0/%d/quote/receive", api.chainId)
 
 	err := params.Validate()
@@ -95,11 +95,11 @@ func (api *api) GetQuoteWithCustomPreset(ctx context.Context, params QuoterContr
 	payload := common.RequestPayload{
 		Method: "POST",
 		Params: params,
-		U:      u,
+		Path:   u,
 		Body:   body,
 	}
 
-	var response GetQuoteOutputFixed
+	var response Quote
 	err = api.httpExecutor.ExecuteRequest(ctx, payload, &response)
 	if err != nil {
 		return nil, err
@@ -109,7 +109,7 @@ func (api *api) GetQuoteWithCustomPreset(ctx context.Context, params QuoterContr
 }
 
 // PlaceOrder accepts a quote and submits it as a fusion order
-func (api *api) PlaceOrder(ctx context.Context, fusionQuote GetQuoteOutputFixed, orderParams OrderParams, wallet common.Wallet) (string, error) {
+func (api *api) PlaceOrder(ctx context.Context, fusionQuote Quote, orderParams OrderParams, wallet common.Wallet) (string, error) {
 	u := fmt.Sprintf("/fusion/relayer/v2.0/%d/order/submit", api.chainId)
 
 	err := orderParams.Validate()
@@ -117,7 +117,7 @@ func (api *api) PlaceOrder(ctx context.Context, fusionQuote GetQuoteOutputFixed,
 		return "", err
 	}
 
-	_, limitOrder, err := CreateFusionOrderData(fusionQuote, orderParams, wallet, api.chainId)
+	_, limitOrder, err := CreateOrderData(fusionQuote, orderParams, wallet, api.chainId)
 	if err != nil {
 		return "", fmt.Errorf("failed to create order: %w", err)
 	}
@@ -146,7 +146,7 @@ func (api *api) PlaceOrder(ctx context.Context, fusionQuote GetQuoteOutputFixed,
 	payload := common.RequestPayload{
 		Method: "POST",
 		Params: nil,
-		U:      u,
+		Path:   u,
 		Body:   body,
 	}
 
@@ -158,7 +158,7 @@ func (api *api) PlaceOrder(ctx context.Context, fusionQuote GetQuoteOutputFixed,
 	return limitOrder.OrderHash, nil
 }
 
-func (api *api) PlaceOrders(ctx context.Context, body []PlaceOrderBody) (*GetQuoteOutput, error) {
+func (api *api) PlaceOrders(ctx context.Context, body []PlaceOrderBody) (*Quote, error) {
 	u := fmt.Sprintf("/fusion/relayer/v2.0/%d/order/submit/many", api.chainId)
 
 	for _, order := range body {
@@ -176,11 +176,11 @@ func (api *api) PlaceOrders(ctx context.Context, body []PlaceOrderBody) (*GetQuo
 	payload := common.RequestPayload{
 		Method: "POST",
 		Params: nil,
-		U:      u,
+		Path:   u,
 		Body:   bodyMarshaled,
 	}
 
-	var response GetQuoteOutput
+	var response Quote
 	err = api.httpExecutor.ExecuteRequest(ctx, payload, &response)
 	if err != nil {
 		return nil, err
@@ -195,7 +195,7 @@ func (api *api) GetOrderStatus(ctx context.Context, orderHash string) (*OrderRes
 	payload := common.RequestPayload{
 		Method: "GET",
 		Params: nil,
-		U:      u,
+		Path:   u,
 		Body:   nil,
 	}
 

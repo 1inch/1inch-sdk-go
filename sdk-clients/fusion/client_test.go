@@ -73,7 +73,7 @@ func TestPlaceOrderFromParams(t *testing.T) {
 	require.Len(t, executor.Payloads, 2)
 
 	// The quote request must carry the permit settings from the single input
-	quoteParams, ok := executor.Payloads[0].Params.(QuoterControllerGetQuoteParamsFixed)
+	quoteParams, ok := executor.Payloads[0].Params.(QuoteParams)
 	require.True(t, ok, "first request must be the quote request")
 	assert.Equal(t, "true", quoteParams.IsPermit2)
 	assert.Equal(t, orderParams.Permit, quoteParams.Permit)
@@ -83,7 +83,7 @@ func TestPlaceOrderFromParams(t *testing.T) {
 
 	// The submitted order must embed the permit in its extension
 	submission := executor.Payloads[1]
-	assert.Contains(t, submission.U, "/order/submit")
+	assert.Contains(t, submission.Path, "/order/submit")
 	assert.Contains(t, string(submission.Body), "deadbeef01020304")
 }
 
@@ -121,8 +121,8 @@ func TestPlaceOrderFromParams_CustomPreset(t *testing.T) {
 	require.NoError(t, err)
 
 	quote := permit2TestQuote()
-	customFixed := quote.Presets.Fast
-	quote.Presets.Custom = &customFixed
+	customPreset := quote.Presets.Fast
+	quote.Presets.Custom = &customPreset
 
 	tests := []struct {
 		name         string
@@ -178,7 +178,7 @@ func TestPlaceOrderFromParams_CustomPreset(t *testing.T) {
 
 			quoteRequest := executor.Payloads[0]
 			assert.Equal(t, "POST", quoteRequest.Method, "custom preset quotes use the POST endpoint")
-			_, ok := quoteRequest.Params.(QuoterControllerGetQuoteWithCustomPresetsParamsFixed)
+			_, ok := quoteRequest.Params.(CustomPresetQuoteParams)
 			assert.True(t, ok, "quote request must use the custom preset params")
 			assert.Contains(t, string(quoteRequest.Body), "auctionDuration")
 		})

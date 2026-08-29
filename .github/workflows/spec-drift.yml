@@ -1,0 +1,123 @@
+# Detects drift between the committed OpenAPI spec copies and the live specs
+# served by the 1inch Dev Portal.
+#
+# Weekly (and on demand), this fetches every configured spec, and when anything
+# changed it regenerates the types, runs the full test suite, and opens (or
+# updates) an automated PR with the spec diff, the regenerated code, and the
+# updated provenance lock. If regeneration or tests fail — upstream changed in
+# a way the codegen overrides don't expect — the PR is still opened so the
+# failure is visible and actionable, with the failing step named in the PR
+# body.
+#
+# Requires the DEV_PORTAL_TOKEN repository secret. Note: PRs created with the
+# default GITHUB_TOKEN do not trigger the pr.yml workflow; this workflow runs
+# the same tests itself and reports the outcome in the PR body.
+name: Spec drift detection
+
+on:
+  schedule:
+    - cron: '0 6 * * 1' # Mondays 06:00 UTC
+  workflow_dispatch:
+
+permissions:
+  contents: write
+  pull-requests: write
+
+jobs:
+  detect:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Check for Dev Portal token
+        id: token
+        env:
+          DEV_PORTAL_TOKEN: ${{ secrets.DEV_PORTAL_TOKEN }}
+        run: |
+          if [ -z "$DEV_PORTAL_TOKEN" ]; then
+            echo "DEV_PORTAL_TOKEN secret is not configured; skipping drift detection." >> "$GITHUB_STEP_SUMMARY"
+            echo "available=false" >> "$GITHUB_OUTPUT"
+          else
+            echo "available=true" >> "$GITHUB_OUTPUT"
+          fi
+
+      - uses: actions/checkout@v4
+        if: steps.token.outputs.available == 'true'
+
+      - uses: actions/setup-go@v5
+        if: steps.token.outputs.available == 'true'
+        with:
+          go-version: '1.25'
+
+      # Live behavior check: production responses must still decode into the
+      # SDK's types. Catches drift that spec comparison alone cannot see.
+      - name: Live API smoke tests
+        if: steps.token.outputs.available == 'true'
+        env:
+          DEV_PORTAL_TOKEN: ${{ secrets.DEV_PORTAL_TOKEN }}
+        run: go test -tags liveapi -v ./tests/liveapi/
+
+      - name: Fetch latest specs
+        if: steps.token.outputs.available == 'true'
+        env:
+          DEV_PORTAL_TOKEN: ${{ secrets.DEV_PORTAL_TOKEN }}
+        run: go run ./codegen/cmd/fetch-specs
+
+      - name: Detect changes
+        if: steps.token.outputs.available == 'true'
+        id: drift
+        run: |
+          if git diff --quiet -- codegen/openapi codegen/specs.lock.json; then
+            echo "No spec drift detected." >> "$GITHUB_STEP_SUMMARY"
+            echo "changed=false" >> "$GITHUB_OUTPUT"
+          else
+            git diff --stat -- codegen/openapi codegen/specs.lock.json >> "$GITHUB_STEP_SUMMARY"
+            echo "changed=true" >> "$GITHUB_OUTPUT"
+          fi
+
+      - name: Regenerate types
+        if: steps.drift.outputs.changed == 'true'
+        id: regen
+        continue-on-error: true
+        run: go run ./codegen/cmd/generate-types
+
+      - name: Run tests
+        if: steps.drift.outputs.changed == 'true'
+        id: tests
+        continue-on-error: true
+        run: go build ./... && go test ./...
+
+      - name: Open or update drift PR
+        if: steps.drift.outputs.changed == 'true'
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          set -euo pipefail
+          branch="automation/spec-drift"
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git checkout -B "$branch"
+          git add codegen/openapi codegen/specs.lock.json sdk-clients
+          git commit -m "chore(codegen): refresh OpenAPI specs from the Dev Portal"
+          git push -f origin "$branch"
+
+          regen_status="${{ steps.regen.outcome }}"
+          tests_status="${{ steps.tests.outcome }}"
+          if [ "$regen_status" = "success" ] && [ "$tests_status" = "success" ]; then
+            status_note="Type regeneration and the full test suite passed."
+          else
+            status_note="**Action required:** regeneration=$regen_status, tests=$tests_status — upstream likely changed in a way the codegen overrides do not expect. See the workflow run logs and codegen/overrides.go."
+          fi
+
+          body="Automated weekly spec refresh from the 1inch Dev Portal.
+
+          $status_note
+
+          Review the spec diff and the regenerated types before merging. Provenance (source, upstream version, hash) is recorded in codegen/specs.lock.json.
+
+          Workflow run: ${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }}"
+
+          if gh pr view "$branch" --json state --jq .state 2>/dev/null | grep -q OPEN; then
+            gh pr edit "$branch" --body "$body"
+          else
+            gh pr create --title "chore(codegen): OpenAPI spec drift detected" \
+              --body "$body" --base main --head "$branch"
+          fi

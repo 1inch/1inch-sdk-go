@@ -16,7 +16,7 @@ func (api *api) GetGasPriceEIP1559(ctx context.Context) (*Eip1559GasPriceRespons
 	payload := common.RequestPayload{
 		Method: "GET",
 		Params: nil,
-		U:      u,
+		Path:   u,
 		Body:   nil,
 	}
 
@@ -38,7 +38,7 @@ func (api *api) GetGasPriceLegacy(ctx context.Context) (*GetGasPriceLegacyRespon
 	payload := common.RequestPayload{
 		Method: "GET",
 		Params: nil,
-		U:      u,
+		Path:   u,
 		Body:   nil,
 	}
 

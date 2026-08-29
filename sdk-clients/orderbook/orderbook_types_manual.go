@@ -27,7 +27,7 @@ type CreateOrderParams struct {
 
 type GetOrdersByCreatorAddressParams struct {
 	CreatorAddress string
-	LimitOrderV3SubscribedApiControllerGetAllLimitOrdersParams
+	LimitOrdersQueryParams
 }
 
 type GetOrderParams struct {
@@ -36,24 +36,7 @@ type GetOrderParams struct {
 }
 
 type GetAllOrdersParams struct {
-	LimitOrderV3SubscribedApiControllerGetAllLimitOrdersParams
-}
-
-type GetCountParams struct {
-	LimitOrderV3SubscribedApiControllerGetAllOrdersCountParams
-}
-
-type GetEventParams struct {
-	OrderHash string
-}
-
-type GetEventsParams struct {
-	LimitOrderV3SubscribedApiControllerGetEventsParams
-}
-
-type GetActiveOrdersWithPermitParams struct {
-	Wallet string
-	Token  string
+	LimitOrdersQueryParams
 }
 
 type Order struct {
@@ -93,11 +76,6 @@ type OrderResponse struct {
 	OrderInvalidReason   any       `json:"orderInvalidReason"`
 }
 
-type OrderResponseExtended struct {
-	OrderResponse
-	LimitOrderDataNormalized NormalizedLimitOrderData
-}
-
 type GetOrderByHashResponse struct {
 	OrderHash            string    `json:"orderHash"`
 	CreateDateTime       time.Time `json:"createDateTime"`
@@ -112,24 +90,6 @@ type GetOrderByHashResponse struct {
 	OrderInvalidReason   string    `json:"orderInvalidReason"`
 	IsMakerContract      bool      `json:"isMakerContract"`
 	Events               string    `json:"events"`
-}
-
-type CountResponse struct {
-	Count int `json:"count"`
-}
-
-type EventResponse struct {
-	Id                   int       `json:"id"`
-	Network              int       `json:"network"`
-	LogId                string    `json:"logId"`
-	Version              int       `json:"version"`
-	Action               string    `json:"action"`
-	OrderHash            string    `json:"orderHash"`
-	Taker                string    `json:"taker"`
-	RemainingMakerAmount string    `json:"remainingMakerAmount"`
-	TransactionHash      string    `json:"transactionHash"`
-	BlockNumber          int       `json:"blockNumber"`
-	CreateDateTime       time.Time `json:"createDateTime"`
 }
 
 type GetOrderByHashResponseExtended struct {

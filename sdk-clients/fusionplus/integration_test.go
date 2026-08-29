@@ -15,8 +15,8 @@ import (
 )
 
 // createTestQuoteFusionPlus creates a realistic quote for testing
-func createTestQuoteFusionPlus() *GetQuoteOutputFixed {
-	return &GetQuoteOutputFixed{
+func createTestQuoteFusionPlus() *Quote {
+	return &Quote{
 		QuoteId: "test-quote-id-fusionplus-12345",
 		Presets: QuotePresets{
 			Fast: Preset{
@@ -122,8 +122,8 @@ func TestSignedOrderInput_Serialization_FusionPlus(t *testing.T) {
 	assert.Equal(t, order.QuoteId, deserialized.QuoteId)
 }
 
-// TestGetQuoteOutputFixed_Serialization_FusionPlus tests quote response deserialization
-func TestGetQuoteOutputFixed_Serialization_FusionPlus(t *testing.T) {
+// TestGetQuoteOutput_Serialization_FusionPlus tests quote response deserialization
+func TestQuote_Serialization_FusionPlus(t *testing.T) {
 	apiResponse := `{
 		"quoteId": "abc123",
 		"srcEscrowFactory": "0x8273f37417da37c4a6c3995e82cf442f87a25d9c",
@@ -186,7 +186,7 @@ func TestGetQuoteOutputFixed_Serialization_FusionPlus(t *testing.T) {
 		}
 	}`
 
-	var quote GetQuoteOutputFixed
+	var quote Quote
 	err := json.Unmarshal([]byte(apiResponse), &quote)
 	require.NoError(t, err)
 
@@ -256,7 +256,7 @@ func TestMerkleTreeIntegration(t *testing.T) {
 	singleLeaf := []string{
 		"0xaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
 	}
-	tree1 := MakeTree(singleLeaf)
+	tree1 := NewMerkleTree(singleLeaf)
 	require.NotNil(t, tree1)
 	assert.Len(t, tree1.leaves, 1)
 
@@ -266,7 +266,7 @@ func TestMerkleTreeIntegration(t *testing.T) {
 		"0xbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb",
 		"0xcccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccc",
 	}
-	tree2 := MakeTree(multipleLeaves)
+	tree2 := NewMerkleTree(multipleLeaves)
 	require.NotNil(t, tree2)
 	assert.Len(t, tree2.leaves, 3)
 
@@ -300,12 +300,12 @@ func TestBpsToRatioFormat_Integration(t *testing.T) {
 func TestNativeTokenWrapping_FusionPlus(t *testing.T) {
 	tests := []struct {
 		name     string
-		chainId  constants.NetworkEnum
+		chainId  int
 		expected string
 	}{
-		{"Ethereum WETH", constants.NetworkEthereum, "0xC02aaA39b223FE8D0A0e5C4F27eAD9083C756Cc2"},
-		{"Polygon WMATIC", constants.NetworkPolygon, "0x0d500B1d8E8eF31E21C99d1Db9A6444d3ADf1270"},
-		{"Arbitrum WETH", constants.NetworkArbitrum, "0x82aF49447D8a07e3bd95BD0d56f35241523fBab1"},
+		{"Ethereum WETH", constants.EthereumChainId, "0xC02aaA39b223FE8D0A0e5C4F27eAD9083C756Cc2"},
+		{"Polygon WMATIC", constants.PolygonChainId, "0x0d500B1d8E8eF31E21C99d1Db9A6444d3ADf1270"},
+		{"Arbitrum WETH", constants.ArbitrumChainId, "0x82aF49447D8a07e3bd95BD0d56f35241523fBab1"},
 	}
 
 	for _, tc := range tests {

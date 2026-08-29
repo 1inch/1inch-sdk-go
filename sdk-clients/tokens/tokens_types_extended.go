@@ -1,32 +1,18 @@
 package tokens
 
-// ProviderTokenDtoFixed uses the Tag struct for Tags
-type ProviderTokenDtoFixed struct {
-	Address         string   `json:"address"`
-	ChainId         float32  `json:"chainId"`
-	Decimals        float32  `json:"decimals"`
-	DisplayedSymbol *string  `json:"displayedSymbol,omitempty"`
-	Eip2612         *bool    `json:"eip2612,omitempty"`
-	IsFoT           *bool    `json:"isFoT,omitempty"`
-	LogoURI         *string  `json:"logoURI,omitempty"`
-	Name            string   `json:"name"`
-	Providers       []string `json:"providers"`
-	Symbol          string   `json:"symbol"`
-	Tags            []TagDto `json:"tags"`
-}
+// Deprecated: Use ProviderTokenDto instead. The type bugs this type used to
+// correct (tags being objects, not strings) are now fixed at generation time
+// (codegen/overrides.go); the alias is kept so existing integrations keep
+// compiling.
+type ProviderTokenDtoFixed = ProviderTokenDto
 
-// TokenInfoDtoFixed uses the Tag struct for Tags
-type TokenInfoDtoFixed struct {
-	Address    string          `json:"address"`
-	ChainId    float32         `json:"chainId"`
-	Decimals   float32         `json:"decimals"`
-	Extensions *map[string]any `json:"extensions,omitempty"`
-	LogoURI    string          `json:"logoURI"`
-	Name       string          `json:"name"`
-	Symbol     string          `json:"symbol"`
-	Tags       []TagDto        `json:"tags"`
-}
+// Deprecated: Use TokenInfoDto instead; see ProviderTokenDtoFixed.
+type TokenInfoDtoFixed = TokenInfoDto
 
-type CustomTokensControllerGetTokenInfoParams struct {
+type GetCustomTokenParams struct {
 	Address string `url:"address" json:"address"`
 }
+
+// Deprecated: Use GetCustomTokenParams instead. Renamed to match the intent-based
+// naming used across the SDK (and its sibling GetCustomTokensParams).
+type CustomTokensControllerGetTokenInfoParams = GetCustomTokenParams

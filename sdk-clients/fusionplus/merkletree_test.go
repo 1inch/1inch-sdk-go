@@ -7,28 +7,28 @@ import (
 	"github.com/stretchr/testify/require"
 )
 
-func TestMakeTree_SingleLeaf(t *testing.T) {
+func TestNewMerkleTree_SingleLeaf(t *testing.T) {
 	leaves := []string{"0x1234567890abcdef1234567890abcdef1234567890abcdef1234567890abcdef"}
 
-	tree := MakeTree(leaves)
+	tree := NewMerkleTree(leaves)
 	require.NotNil(t, tree)
 	assert.Len(t, tree.leaves, 1)
 	assert.Len(t, tree.tree, 1)
 }
 
-func TestMakeTree_TwoLeaves(t *testing.T) {
+func TestNewMerkleTree_TwoLeaves(t *testing.T) {
 	leaves := []string{
 		"0x1234567890abcdef1234567890abcdef1234567890abcdef1234567890abcdef",
 		"0xabcdef1234567890abcdef1234567890abcdef1234567890abcdef1234567890",
 	}
 
-	tree := MakeTree(leaves)
+	tree := NewMerkleTree(leaves)
 	require.NotNil(t, tree)
 	assert.Len(t, tree.leaves, 2)
 	assert.Len(t, tree.tree, 3) // 2 leaves + 1 root
 }
 
-func TestMakeTree_FourLeaves(t *testing.T) {
+func TestNewMerkleTree_FourLeaves(t *testing.T) {
 	leaves := []string{
 		"0x1111111111111111111111111111111111111111111111111111111111111111",
 		"0x2222222222222222222222222222222222222222222222222222222222222222",
@@ -36,19 +36,19 @@ func TestMakeTree_FourLeaves(t *testing.T) {
 		"0x4444444444444444444444444444444444444444444444444444444444444444",
 	}
 
-	tree := MakeTree(leaves)
+	tree := NewMerkleTree(leaves)
 	require.NotNil(t, tree)
 	assert.Len(t, tree.leaves, 4)
 	assert.Len(t, tree.tree, 7) // 4 leaves + 2 intermediate + 1 root
 }
 
-func TestMakeTree_PreservesOriginalOrderInLeaves(t *testing.T) {
+func TestNewMerkleTree_PreservesOriginalOrderInLeaves(t *testing.T) {
 	leaves := []string{
 		"0xbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb",
 		"0xaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
 	}
 
-	tree := MakeTree(leaves)
+	tree := NewMerkleTree(leaves)
 	require.NotNil(t, tree)
 
 	// The tree.leaves field stores the original unsorted order
@@ -194,7 +194,7 @@ func TestParentIndex(t *testing.T) {
 
 	for _, tc := range tests {
 		t.Run(tc.name, func(t *testing.T) {
-			result, err := ParentIndex(tc.index)
+			result, err := parentIndex(tc.index)
 			if tc.expectError {
 				require.Error(t, err)
 			} else {

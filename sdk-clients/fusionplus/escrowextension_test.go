@@ -36,7 +36,7 @@ func TestGenerateSalt(t *testing.T) {
 		{
 			name: "Generate salt when extension is not empty",
 			extension: &EscrowExtension{
-				ExtensionPlus: ExtensionPlus{
+				Extension: Extension{
 					MakerAssetSuffix: "suffix1",
 					TakerAssetSuffix: "suffix2",
 					MakingAmountData: "data1",
@@ -87,7 +87,7 @@ func TestNewExtension(t *testing.T) {
 						Duration:        0,
 						InitialRateBump: 0,
 						Points:          nil,
-						GasCost:         fusionorder.GasCostConfigClassFixed{},
+						GasCost:         fusionorder.GasCostConfig{},
 					},
 					PostInteractionData: &SettlementPostInteractionData{
 						Whitelist: []fusionorder.WhitelistItem{},
@@ -109,7 +109,7 @@ func TestNewExtension(t *testing.T) {
 				},
 			},
 			expected: &EscrowExtension{
-				ExtensionPlus: ExtensionPlus{
+				Extension: Extension{
 					MakerAssetSuffix: "0x1234",
 					TakerAssetSuffix: "0x1234",
 					MakingAmountData: "0x00000000000000000000000000000000000056780000000000000000000000000000000000",

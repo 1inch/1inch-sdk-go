@@ -597,9 +597,9 @@ func runFusionPlusCanary(t *testing.T, mode fusionPlusMode) {
 	plusClient, err := fusionplus.NewClient(plusConfig)
 	require.NoError(t, err)
 
-	quoteParams := fusionplus.QuoterControllerGetQuoteParamsFixed{
-		SrcChain:        float32(src.chainId),
-		DstChain:        float32(dst.chainId),
+	quoteParams := fusionplus.QuoteParams{
+		SrcChain:        int(src.chainId),
+		DstChain:        int(dst.chainId),
 		SrcTokenAddress: strings.ToLower(srcToken.Hex()),
 		DstTokenAddress: strings.ToLower(dstToken.Hex()),
 		Amount:          canaryFusionPlusAmount.String(),
@@ -609,7 +609,7 @@ func runFusionPlusCanary(t *testing.T, mode fusionPlusMode) {
 		IsPermit2:       usePermit2,
 	}
 	// The estimation inside the quote can race a base fee update; retry briefly
-	var quote *fusionplus.GetQuoteOutputFixed
+	var quote *fusionplus.Quote
 	for attempt := 0; ; attempt++ {
 		quote, err = plusClient.GetQuote(ctx, quoteParams)
 		if err == nil {

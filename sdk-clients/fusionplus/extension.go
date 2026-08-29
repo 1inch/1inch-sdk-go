@@ -10,7 +10,7 @@ import (
 	geth_common "github.com/ethereum/go-ethereum/common"
 )
 
-func NewExtensionPlus(params ExtensionParamsPlus) (*ExtensionPlus, error) {
+func NewExtension(params ExtensionParamsPlus) (*Extension, error) {
 	if err := fusionorder.ValidateExtensionHexParams(fusionorder.ExtensionHexParams{
 		SettlementContract: params.SettlementContract,
 		MakerAssetSuffix:   params.MakerAssetSuffix,
@@ -29,7 +29,7 @@ func NewExtensionPlus(params ExtensionParamsPlus) (*ExtensionPlus, error) {
 	// FusionPlus uses encoding without point count byte
 	makingAndTakingAmountData := settlementContractAddress.String() + hexadecimal.Trim0x(params.AuctionDetails.EncodeWithoutPointCount())
 
-	extensionPlus := &ExtensionPlus{
+	extensionPlus := &Extension{
 		SettlementContract:  params.SettlementContract,
 		AuctionDetails:      params.AuctionDetails,
 		PostInteractionData: params.PostInteractionData,
@@ -69,11 +69,11 @@ func NewExtensionPlus(params ExtensionParamsPlus) (*ExtensionPlus, error) {
 }
 
 // Keccak256 calculates the Keccak256 hash of the extension data
-func (e *ExtensionPlus) Keccak256() (*big.Int, error) {
+func (e *Extension) Keccak256() (*big.Int, error) {
 	return fusionorder.Keccak256Hash(e)
 }
 
-func (e *ExtensionPlus) ConvertToOrderbookExtension() *orderbook.Extension {
+func (e *Extension) ConvertToOrderbookExtension() *orderbook.Extension {
 	return &orderbook.Extension{
 		MakerAssetSuffix: e.MakerAssetSuffix,
 		TakerAssetSuffix: e.TakerAssetSuffix,
@@ -87,7 +87,7 @@ func (e *ExtensionPlus) ConvertToOrderbookExtension() *orderbook.Extension {
 	}
 }
 
-func (e *ExtensionPlus) GenerateSalt() (*big.Int, error) {
+func (e *Extension) GenerateSalt() (*big.Int, error) {
 	hash, err := e.Keccak256()
 	if err != nil {
 		return nil, fmt.Errorf("failed to calculate extension hash: %w", err)
@@ -96,14 +96,14 @@ func (e *ExtensionPlus) GenerateSalt() (*big.Int, error) {
 }
 
 // isEmpty checks if the extension data is empty
-func (e *ExtensionPlus) isEmpty() bool {
-	return *e == (ExtensionPlus{})
+func (e *Extension) isEmpty() bool {
+	return *e == (Extension{})
 }
 
-func DecodeExtension(data []byte) (*ExtensionPlus, error) {
-	orderbookExtension, err := orderbook.Decode(data)
+func DecodeExtension(data []byte) (*Extension, error) {
+	orderbookExtension, err := orderbook.DecodeExtension(data)
 	if err != nil {
-		return &ExtensionPlus{}, fmt.Errorf("failed to decode extension: %w", err)
+		return &Extension{}, fmt.Errorf("failed to decode extension: %w", err)
 	}
 
 	extensionPlus, err := FromLimitOrderExtension(orderbookExtension)
@@ -111,7 +111,7 @@ func DecodeExtension(data []byte) (*ExtensionPlus, error) {
 		return nil, fmt.Errorf("failed to convert orderbook extension to fusionplus extension: %w", err)
 	}
 
-	return &ExtensionPlus{
+	return &Extension{
 		SettlementContract:  extensionPlus.SettlementContract,
 		AuctionDetails:      extensionPlus.AuctionDetails,
 		PostInteractionData: extensionPlus.PostInteractionData,
@@ -129,7 +129,7 @@ func DecodeExtension(data []byte) (*ExtensionPlus, error) {
 	}, nil
 }
 
-func FromLimitOrderExtension(extension *orderbook.Extension) (*ExtensionPlus, error) {
+func FromLimitOrderExtension(extension *orderbook.Extension) (*Extension, error) {
 	if len(extension.MakingAmountData) < 42 || len(extension.TakingAmountData) < 42 || len(extension.PostInteraction) < 42 {
 		return nil, fmt.Errorf("malformed extension: amount data and post interaction must start with a settlement contract address")
 	}
@@ -153,7 +153,7 @@ func FromLimitOrderExtension(extension *orderbook.Extension) (*ExtensionPlus, er
 		return nil, fmt.Errorf("failed to decode post interaction data: %w", err)
 	}
 
-	extensionPlus := &ExtensionPlus{
+	extensionPlus := &Extension{
 		SettlementContract:  settlementContractAddress,
 		AuctionDetails:      auctionDetails,
 		PostInteractionData: postInteractionData,

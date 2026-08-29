@@ -32,7 +32,7 @@ func main() {
 	}
 	ctx := context.Background()
 
-	response, err := client.GetTokensCurrentValue(ctx, portfolio.GetCurrentValuePortfolioV4OverviewErc20CurrentValueGetParams{
+	response, err := client.GetTokensCurrentValue(ctx, portfolio.GetTokensCurrentValueParams{
 		Addresses: []string{"0xd8dA6BF26964aF9D7eEd9e03E53415D37aA96045"},
 		ChainId:   1,
 	})

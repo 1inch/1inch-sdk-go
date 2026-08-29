@@ -34,7 +34,7 @@ func main() {
 	}
 	ctx := context.Background()
 
-	whitelistedTokensList, err := client.GetCustomTokens(ctx, tokens.CustomTokensControllerGetTokensInfoParams{
+	whitelistedTokensList, err := client.GetCustomTokens(ctx, tokens.GetCustomTokensParams{
 		Addresses: []string{"0x111111111117dc0aa78b770fa6a738034120c302"},
 	})
 	if err != nil {

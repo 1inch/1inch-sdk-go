@@ -9,155 +9,40 @@ import (
 	"github.com/ethereum/go-ethereum/common"
 )
 
-type GetOrderByOrderHashParams struct {
+type GetOrderFillsByHashParams struct {
 	Hash string `url:"hash" json:"hash"`
 }
+
+// Deprecated: Use GetOrderFillsByHashParams instead (renamed to match the
+// GetOrderFillsByHash method and its GetOrderFillsByHashOutput return type).
+type GetOrderByOrderHashParams = GetOrderFillsByHashParams
 type GetReadyToAcceptFillsParams struct {
 	Hash string `url:"hash" json:"hash"`
 }
 
-// GetOrderFillsByHashOutputFixed replaces the DstTokenPriceUsd and SrcTokenPriceUsd fields with string and changes Points to be an array
-type GetOrderFillsByHashOutputFixed struct {
-	// ApproximateTakingAmount Approximate amount of the takerAsset being requested by the maker in dst chain.
-	ApproximateTakingAmount string `json:"approximateTakingAmount"`
+// Deprecated: Use GetOrderFillsByHashOutput instead. The type bugs this type
+// used to correct (string USD prices, points being an array) are now fixed at
+// generation time (codegen/overrides.go); the alias is kept so existing
+// integrations keep compiling.
+type GetOrderFillsByHashOutputFixed = GetOrderFillsByHashOutput
 
-	// AuctionDuration Unix timestamp in milliseconds
-	AuctionDuration float32 `json:"auctionDuration"`
+// Deprecated: Use QuoteParams instead. The type bugs this
+// type used to correct (string amount, integer fee, boolean isPermit2) are now
+// fixed at generation time (codegen/overrides.go); the alias is kept so
+// existing integrations keep compiling.
+type QuoterControllerGetQuoteParamsFixed = QuoteParams
 
-	// AuctionStartDate Unix timestamp in milliseconds
-	AuctionStartDate float32        `json:"auctionStartDate"`
-	CancelTx         map[string]any `json:"cancelTx"`
+// Deprecated: Use CustomPresetQuoteParams instead;
+// see QuoterControllerGetQuoteParamsFixed.
+type QuoterControllerGetQuoteWithCustomPresetsParamsFixed = CustomPresetQuoteParams
 
-	// Cancelable Is order cancelable
-	Cancelable bool `json:"cancelable"`
-
-	// CreatedAt Unix timestamp in milliseconds
-	CreatedAt float32 `json:"createdAt"`
-
-	// DstChainId Identifier of the chain where the taker asset is located.
-	DstChainId       float32 `json:"dstChainId"`
-	DstTokenPriceUsd string  `json:"dstTokenPriceUsd"`
-
-	// Extension An interaction call data. ABI encoded set of makerAssetSuffix, takerAssetSuffix, makingAmountGetter, takingAmountGetter, predicate, permit, preInteraction, postInteraction.If extension exists then lowest 160 bits of the order salt must be equal to the lowest 160 bits of the extension hash
-	Extension string `json:"extension"`
-
-	// Fills Fills
-	Fills []FillOutputDto `json:"fills"`
-
-	// InitialRateBump Initial rate bump
-	InitialRateBump float32                  `json:"initialRateBump"`
-	Order           LimitOrderV4StructOutput `json:"order"`
-
-	// OrderHash Order hash
-	OrderHash string               `json:"orderHash"`
-	Points    []AuctionPointOutput `json:"points"`
-
-	// SrcChainId Identifier of the chain where the maker asset is located.
-	SrcChainId       float32 `json:"srcChainId"`
-	SrcTokenPriceUsd string  `json:"srcTokenPriceUsd"`
-
-	// Status Order status
-	Status GetOrderFillsByHashOutputStatus `json:"status"`
-
-	// TakerAsset Identifier of the asset being requested by the maker in exchange in dst chain.
-	TakerAsset string `json:"takerAsset"`
-
-	// TimeLocks TimeLocks without deployedAt
-	TimeLocks string `json:"timeLocks"`
-
-	// Validation Order validation status
-	Validation GetOrderFillsByHashOutputValidation `json:"validation"`
-}
-
-// QuoterControllerGetQuoteParamsFixed defines parameters for QuoterControllerGetQuote.
-type QuoterControllerGetQuoteParamsFixed struct {
-	// SrcChain Id of source chain
-	SrcChain float32 `url:"srcChain" json:"srcChain"`
-
-	// DstChain Id of destination chain
-	DstChain float32 `url:"dstChain" json:"dstChain"`
-
-	// SrcTokenAddress Address of "SOURCE" token in source chain
-	SrcTokenAddress string `url:"srcTokenAddress" json:"srcTokenAddress"`
-
-	// DstTokenAddress Address of "DESTINATION" token in destination chain
-	DstTokenAddress string `url:"dstTokenAddress" json:"dstTokenAddress"`
-
-	// Amount to take from "SOURCE" token to get "DESTINATION" token
-	Amount string `url:"amount" json:"amount"`
-
-	// WalletAddress An address of the wallet or contract in source chain who will create Fusion order
-	WalletAddress string `url:"walletAddress" json:"walletAddress"`
-
-	// EnableEstimate if enabled then get estimation from 1inch swap builder and generates quoteId, by default is false
-	EnableEstimate bool `url:"enableEstimate" json:"enableEstimate"`
-
-	// Fee in bps format, 1% is equal to 100bps
-	Fee *big.Int `url:"fee,omitempty" json:"fee,omitempty"` // This is changed from float32 to *big.Int
-
-	// IsPermit2 permit2 allowance transfer encoded call
-	IsPermit2 bool `url:"isPermit2,omitempty" json:"isPermit2,omitempty"` // This is changed from string to bool
-
-	// Permit permit, user approval sign
-	Permit string `url:"permit,omitempty" json:"permit,omitempty"`
-}
-
-// QuoterControllerGetQuoteWithCustomPresetsParamsFixed defines parameters for QuoterControllerGetQuoteWithCustomPresets.
-// This is a fixed version with Amount as string instead of float32 for proper BigInt validation.
-type QuoterControllerGetQuoteWithCustomPresetsParamsFixed struct {
-	// SrcChain Id of source chain
-	SrcChain float32 `url:"srcChain" json:"srcChain"`
-
-	// DstChain Id of destination chain
-	DstChain float32 `url:"dstChain" json:"dstChain"`
-
-	// SrcTokenAddress Address of "SOURCE" token
-	SrcTokenAddress string `url:"srcTokenAddress" json:"srcTokenAddress"`
-
-	// DstTokenAddress Address of "DESTINATION" token
-	DstTokenAddress string `url:"dstTokenAddress" json:"dstTokenAddress"`
-
-	// Amount Amount to take from "SOURCE" token to get "DESTINATION" token
-	Amount string `url:"amount" json:"amount"`
-
-	// WalletAddress An address of the wallet or contract who will create Fusion order
-	WalletAddress string `url:"walletAddress" json:"walletAddress"`
-
-	// EnableEstimate if enabled then get estimation from 1inch swap builder and generates quoteId, by default is false
-	EnableEstimate bool `url:"enableEstimate" json:"enableEstimate"`
-
-	// Permit permit, user approval sign
-	Permit string `url:"permit,omitempty" json:"permit,omitempty"`
-}
-
-// GetQuoteOutputFixed defines model for GetQuoteOutput. QuoteId, DstSafetyDeposit, and SrcSafetyDeposit have been fixed
-type GetQuoteOutputFixed struct {
-	// DstEscrowFactory Escrow factory contract address at destination chain
-	DstEscrowFactory string       `json:"dstEscrowFactory"`
-	DstSafetyDeposit string       `json:"dstSafetyDeposit"` // This is changed from string to *big.Int
-	DstTokenAmount   string       `json:"dstTokenAmount"`
-	Presets          QuotePresets `json:"presets"`
-	Prices           PairCurrency `json:"prices"`
-
-	// QuoteId Current generated quote id, should be passed with order
-	QuoteId string `json:"quoteId"` // This is changed from map[string]any to string
-
-	// RecommendedPreset suggested preset
-	RecommendedPreset GetQuoteOutputRecommendedPreset `json:"recommendedPreset"`
-
-	// SrcEscrowFactory Escrow factory contract address at source chain
-	SrcEscrowFactory string       `json:"srcEscrowFactory"`
-	SrcSafetyDeposit string       `json:"srcSafetyDeposit"` // This is changed from string to *big.Int
-	SrcTokenAmount   string       `json:"srcTokenAmount"`
-	TimeLocks        TimeLocks    `json:"timeLocks"`
-	Volume           PairCurrency `json:"volume"`
-
-	// Whitelist current executors whitelist addresses
-	Whitelist []string `json:"whitelist"`
-}
+// Deprecated: Use Quote instead. The quoteId type bug this type used
+// to correct is now fixed at generation time (codegen/overrides.go); the alias
+// is kept so existing integrations keep compiling.
+type GetQuoteOutputFixed = Quote
 
 type Order struct {
-	EscExtension        *EscrowExtension
+	EscrowExtension     *EscrowExtension
 	Inner               orderbook.OrderData
 	SettlementExtension common.Address
 	OrderInfo           CrossChainOrderDto
@@ -170,27 +55,11 @@ type EscrowExtensionParams struct {
 	fusion.ExtensionParams
 	ExtensionParamsPlus
 	HashLock         *HashLock
-	DstChainId       float32
+	DstChainId       int
 	DstToken         common.Address
 	SrcSafetyDeposit string
 	DstSafetyDeposit string
 	TimeLocks        TimeLocks
-}
-
-type CrossChainOrderParams struct {
-	HashLock                *HashLock
-	Preset                  GetQuoteOutputRecommendedPreset
-	Receiver                string
-	Nonce                   *big.Int
-	Permit                  string
-	IsPermit2               bool
-	TakingFeeReceiver       string
-	DelayAuctionStartTimeBy float32
-	/**
-	 * Order will expire in `orderExpirationDelay` after auction ends
-	 * Default 12s
-	 */
-	OrderExpirationDelay uint32
 }
 
 type OrderParams struct {
@@ -207,13 +76,10 @@ type OrderParams struct {
 	CustomPreset      CustomPreset
 }
 
-// Deprecated: Use fusionorder.TakingFeeInfo directly instead.
+// Ergonomic re-exports of fusionorder types, so callers of this package need not
+// import common/fusionorder directly.
 type TakingFeeInfo = fusionorder.TakingFeeInfo
-
-// Deprecated: Use fusionorder.CustomPreset directly instead.
 type CustomPreset = fusionorder.CustomPreset
-
-// Deprecated: Use fusionorder.CustomPresetPoint directly instead.
 type CustomPresetPoint = fusionorder.CustomPresetPoint
 
 type PreparedOrder struct {
@@ -265,7 +131,9 @@ type SettlementSuffixData struct {
 	CustomReceiver     common.Address
 }
 
-// PresetClassFixed defines model for PresetClass.
+// Deprecated: Use the generated Preset type instead. This legacy shape is no
+// longer produced or consumed by the SDK (CreateAuctionDetailsPlus now takes
+// *Preset); it is kept so existing integrations keep compiling.
 type PresetClassFixed struct {
 	AllowMultipleFills bool                `json:"allowMultipleFills"`
 	AllowPartialFills  bool                `json:"allowPartialFills"`
@@ -282,44 +150,13 @@ type PresetClassFixed struct {
 	TokenFee           string              `json:"tokenFee"`
 }
 
-// GasCostConfigClass defines model for GasCostConfigClass.
-type GasCostConfigClass struct {
-	GasBumpEstimate  float32 `json:"gasBumpEstimate"`
-	GasPriceEstimate string  `json:"gasPriceEstimate"`
-}
+// Deprecated: Use the generated GasCostConfig type instead. Now an alias of it
+// (the shapes are identical); kept so existing integrations keep compiling.
+type GasCostConfigClass = GasCostConfig
 
-// AuctionPointClass defines model for AuctionPointClass.
-type AuctionPointClass struct {
-	Coefficient float32 `json:"coefficient"`
-	Delay       float32 `json:"delay"`
-}
-
-// FusionOrderV4 defines model for FusionOrderV4.
-type FusionOrderV4 struct {
-	// Maker Address of the account creating the order (maker).
-	Maker string `json:"maker"`
-
-	// MakerAsset Identifier of the asset being offered by the maker.
-	MakerAsset string `json:"makerAsset"`
-
-	// MakerTraits Includes some flags like, allow multiple fills, is partial fill allowed or not, price improvement, nonce, deadline etc.
-	MakerTraits string `json:"makerTraits"`
-
-	// MakingAmount Amount of the makerAsset being offered by the maker.
-	MakingAmount string `json:"makingAmount"`
-
-	// Receiver Address of the account receiving the assets (receiver), if different from maker.
-	Receiver string `json:"receiver"`
-
-	// Salt Some unique value. It is necessary to be able to create limit orders with the same parameters (so that they have a different hash), Lowest 160 bits of the order salt must be equal to the lowest 160 bits of the extension hash
-	Salt string `json:"salt"`
-
-	// TakerAsset Identifier of the asset being requested by the maker in exchange.
-	TakerAsset string `json:"takerAsset"`
-
-	// TakingAmount Amount of the takerAsset being requested by the maker.
-	TakingAmount string `json:"takingAmount"`
-}
+// Deprecated: Use the generated AuctionPoint type instead. Now an alias of it
+// (the shapes are identical); kept so existing integrations keep compiling.
+type AuctionPointClass = AuctionPoint
 
 type ExtensionParamsPlus struct {
 	SettlementContract  string
@@ -335,9 +172,9 @@ type ExtensionParamsPlus struct {
 	CustomData       string
 }
 
-// ExtensionPlus represents the extension data for the FusionPlus order
-// and should be only created using the NewExtensionPlus function
-type ExtensionPlus struct {
+// Extension represents the extension data for the FusionPlus order
+// and should be only created using the NewExtension function
+type Extension struct {
 	// Raw unencoded data
 	SettlementContract  string
 	AuctionDetails      *fusionorder.AuctionDetails
@@ -357,8 +194,8 @@ type ExtensionPlus struct {
 	CustomData       string
 }
 
-// GetSettlementContractParams defines parameters for GetSettlementContract
-type GetSettlementContractParams struct {
-	// ChainId Chain ID
-	ChainId float32 `url:"chainId,omitempty" json:"chainId,omitempty"`
-}
+// Deprecated: Use Extension. The Plus suffix is redundant inside the fusionplus package.
+type ExtensionPlus = Extension
+
+// Deprecated: Use NewExtension. The Plus suffix is redundant inside the fusionplus package.
+func NewExtensionPlus(params ExtensionParamsPlus) (*Extension, error) { return NewExtension(params) }

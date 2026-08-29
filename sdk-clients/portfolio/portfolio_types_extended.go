@@ -2,7 +2,7 @@ package portfolio
 
 //TODO These response bodies are largely a guess due to the lack of documentation
 
-type GetPortfolioValueResponse struct {
+type GetProtocolsCurrentValueResponse struct {
 	Result []struct {
 		ProtocolName   string `json:"protocol_name"`
 		ProtocolLocked bool   `json:"protocol_locked"`
@@ -20,7 +20,7 @@ type GetPortfolioValueResponse struct {
 	} `json:"system"`
 }
 
-type GetPortfolioProfitAndLossResponse struct {
+type GetProtocolsProfitAndLossResponse struct {
 	Result []struct {
 		ChainId      *int    `json:"chain_id"`
 		AbsProfitUsd float64 `json:"abs_profit_usd"`
@@ -106,7 +106,7 @@ type GetTokensCurrentValueResponse struct {
 	} `json:"system"`
 }
 
-type GetTokensProfitLossResponse struct {
+type GetTokensProfitAndLossResponse struct {
 	Result []struct {
 		ChainId      *int    `json:"chain_id"`
 		AbsProfitUsd float64 `json:"abs_profit_usd"`
@@ -163,7 +163,7 @@ type GetCurrentValueResponse struct {
 	} `json:"system"`
 }
 
-type GetCurrentProfitLossResponse struct {
+type GetProfitAndLossResponse struct {
 	Result []struct {
 		ChainId      *int    `json:"chain_id"`
 		AbsProfitUsd float64 `json:"abs_profit_usd"`
@@ -191,3 +191,11 @@ type GetValueChartResponse struct {
 		TotalTime         float64 `json:"total_time"`
 	} `json:"system"`
 }
+
+// Deprecated aliases (renamed to match their methods / the ProfitAndLoss spelling).
+type (
+	GetPortfolioValueResponse         = GetProtocolsCurrentValueResponse
+	GetPortfolioProfitAndLossResponse = GetProtocolsProfitAndLossResponse
+	GetTokensProfitLossResponse       = GetTokensProfitAndLossResponse
+	GetCurrentProfitLossResponse      = GetProfitAndLossResponse
+)

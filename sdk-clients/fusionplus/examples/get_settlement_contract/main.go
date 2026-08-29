@@ -44,7 +44,7 @@ func main() {
 	ctx := context.Background()
 
 	response, err := client.GetSettlementContract(ctx, fusionplus.GetSettlementContractParams{
-		ChainId: float32(constants.EthereumChainId),
+		ChainId: constants.EthereumChainId,
 	})
 	if err != nil {
 		log.Fatalf("failed to get settlement contract: %v", err)

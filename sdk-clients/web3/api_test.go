@@ -76,11 +76,11 @@ func TestPerformRpcCallAgainstFullNode(t *testing.T) {
 	expectedPayload := common.RequestPayload{
 		Method: "POST",
 		Params: nil,
-		U:      expectedURL,
+		Path:   expectedURL,
 		Body:   expectedBody,
 	}
 
-	require.Equal(t, expectedPayload.U, expectedURL)
+	require.Equal(t, expectedPayload.Path, expectedURL)
 	require.Equal(t, string(expectedPayload.Body), string(expectedBody))
 
 	// Validate the response
@@ -128,11 +128,11 @@ func TestPerformRpcCall(t *testing.T) {
 	expectedPayload := common.RequestPayload{
 		Method: "POST",
 		Params: nil,
-		U:      expectedURL,
+		Path:   expectedURL,
 		Body:   expectedBody,
 	}
 
-	require.Equal(t, expectedPayload.U, expectedURL)
+	require.Equal(t, expectedPayload.Path, expectedURL)
 	require.Equal(t, string(expectedPayload.Body), string(expectedBody))
 
 	// Validate the response

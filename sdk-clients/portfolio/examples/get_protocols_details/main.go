@@ -32,7 +32,7 @@ func main() {
 	}
 	ctx := context.Background()
 
-	response, err := client.GetProtocolsDetails(ctx, portfolio.GetDetailsPortfolioV4OverviewProtocolsDetailsGetParams{
+	response, err := client.GetProtocolsDetails(ctx, portfolio.GetProtocolsDetailsParams{
 		Addresses: []string{"0xd8dA6BF26964aF9D7eEd9e03E53415D37aA96045"},
 		ChainId:   1,
 	})

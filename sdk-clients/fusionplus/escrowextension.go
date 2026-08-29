@@ -14,9 +14,9 @@ import (
 )
 
 type EscrowExtension struct {
-	ExtensionPlus
+	Extension
 	HashLock         *HashLock
-	DstChainId       float32
+	DstChainId       int
 	DstToken         common.Address
 	SrcSafetyDeposit string
 	DstSafetyDeposit string
@@ -25,13 +25,13 @@ type EscrowExtension struct {
 
 func NewEscrowExtension(escrowParams EscrowExtensionParams) (*EscrowExtension, error) {
 
-	extension, err := NewExtensionPlus(escrowParams.ExtensionParamsPlus)
+	extension, err := NewExtension(escrowParams.ExtensionParamsPlus)
 	if err != nil {
 		return nil, err
 	}
 
 	escrowExtension := &EscrowExtension{
-		ExtensionPlus:    *extension,
+		Extension:        *extension,
 		HashLock:         escrowParams.HashLock,
 		DstChainId:       escrowParams.DstChainId,
 		DstToken:         escrowParams.DstToken,
@@ -48,13 +48,13 @@ func (e *EscrowExtension) ConvertToOrderbookExtension() (*orderbook.Extension, e
 	srcSafetyDepositBig := new(big.Int)
 	_, ok := srcSafetyDepositBig.SetString(e.SrcSafetyDeposit, 10)
 	if !ok {
-		return nil, fmt.Errorf("invalid source safety deposit hex: %s", e.SrcSafetyDeposit)
+		return nil, fmt.Errorf("invalid source safety deposit (decimal expected): %s", e.SrcSafetyDeposit)
 	}
 
 	dstSafetyDepositBig := new(big.Int)
 	_, ok = dstSafetyDepositBig.SetString(e.DstSafetyDeposit, 10)
 	if !ok {
-		return nil, fmt.Errorf("invalid destination safety deposit hex: %s", e.DstSafetyDeposit)
+		return nil, fmt.Errorf("invalid destination safety deposit (decimal expected): %s", e.DstSafetyDeposit)
 	}
 
 	extraDataBytes, err := encodeExtraData(&EscrowExtraData{
@@ -69,7 +69,10 @@ func (e *EscrowExtension) ConvertToOrderbookExtension() (*orderbook.Extension, e
 		return nil, fmt.Errorf("failed to encode extra data: %w", err)
 	}
 
-	e.PostInteraction += hexadecimal.Trim0x(fmt.Sprintf("%x", extraDataBytes))
+	// The escrow extra data is appended to a local copy: mutating the receiver
+	// would corrupt the extension on a second call (double-appended extra
+	// data), producing a salt/extension mismatch for anyone signing afterwards.
+	postInteraction := e.PostInteraction + hexadecimal.Trim0x(fmt.Sprintf("%x", extraDataBytes))
 
 	return &orderbook.Extension{
 		MakerAssetSuffix: e.MakerAssetSuffix,
@@ -79,7 +82,7 @@ func (e *EscrowExtension) ConvertToOrderbookExtension() (*orderbook.Extension, e
 		Predicate:        e.Predicate,
 		MakerPermit:      e.MakerPermit,
 		PreInteraction:   e.PreInteraction,
-		PostInteraction:  e.PostInteraction,
+		PostInteraction:  postInteraction,
 		//hexadecimal.Trim0x(e.CustomData), // TODO Blocking custom data for now because it is breaking the cumsum method. The extension constructor will return with an error if the user provides this field.
 	}, nil
 }
@@ -90,9 +93,13 @@ func DecodeEscrowExtension(data []byte) (*EscrowExtension, error) {
 	const extraDataCharacterLength = 320
 
 	// Create one extension that will be used for the Escrow extension data
-	orderbookExtensionTruncated, err := orderbook.Decode(data)
+	orderbookExtensionTruncated, err := orderbook.DecodeExtension(data)
 	if err != nil {
 		return nil, fmt.Errorf("failed to decode extension: %w", err)
+	}
+
+	if len(orderbookExtensionTruncated.PostInteraction) < extraDataCharacterLength {
+		return nil, fmt.Errorf("invalid escrow extension: post-interaction data is %d characters, need at least %d", len(orderbookExtensionTruncated.PostInteraction), extraDataCharacterLength)
 	}
 
 	// Remove the Fusion Plus Extension data before decoding
@@ -103,7 +110,7 @@ func DecodeEscrowExtension(data []byte) (*EscrowExtension, error) {
 	}
 
 	// Create a second extension to extract extra data
-	orderbookExtension, err := orderbook.Decode(data)
+	orderbookExtension, err := orderbook.DecodeExtension(data)
 	if err != nil {
 		return nil, fmt.Errorf("failed to decode extension: %w", err)
 	}
@@ -120,12 +127,14 @@ func DecodeEscrowExtension(data []byte) (*EscrowExtension, error) {
 	}
 
 	return &EscrowExtension{
-		ExtensionPlus:    *extensionPlus,
-		HashLock:         extraData.HashLock,
-		DstChainId:       extraData.DstChainId,
-		DstToken:         extraData.DstToken,
-		SrcSafetyDeposit: fmt.Sprintf("%x", extraData.SrcSafetyDeposit),
-		DstSafetyDeposit: fmt.Sprintf("%x", extraData.DstSafetyDeposit),
+		Extension:  *extensionPlus,
+		HashLock:   extraData.HashLock,
+		DstChainId: extraData.DstChainId,
+		DstToken:   extraData.DstToken,
+		// Decimal, matching what ConvertToOrderbookExtension parses — a decoded
+		// extension must survive re-encoding unchanged.
+		SrcSafetyDeposit: extraData.SrcSafetyDeposit.String(),
+		DstSafetyDeposit: extraData.DstSafetyDeposit.String(),
 		TimeLocks:        *extraData.TimeLocks,
 	}, nil
 }
@@ -158,8 +167,10 @@ func decodeExtraData(data []byte) (*EscrowExtraData, error) {
 	mask := new(big.Int)
 	mask.Exp(big.NewInt(2), big.NewInt(128), nil).Sub(mask, big.NewInt(1))
 
-	srcSafetyDeposit := new(big.Int).And(safetyDepositData, mask)
-	dstSafetyDeposit := new(big.Int).Rsh(safetyDepositData, 128)
+	// encodeExtraData packs the source deposit in the high 128 bits and the
+	// destination deposit in the low 128 bits; decode mirrors that layout.
+	srcSafetyDeposit := new(big.Int).Rsh(safetyDepositData, 128)
+	dstSafetyDeposit := new(big.Int).And(safetyDepositData, mask)
 
 	timelocksData, err := iter.NextUint256()
 	if err != nil {
@@ -173,9 +184,11 @@ func decodeExtraData(data []byte) (*EscrowExtraData, error) {
 
 	return &EscrowExtraData{
 		HashLock: &HashLock{
-			hashlockData.String(),
+			// 0x-prefixed 32-byte hex, matching what encodeExtraData parses — a
+			// corrupted hashlock on re-encode would break the escrow secret.
+			fmt.Sprintf("0x%064x", hashlockData),
 		},
-		DstChainId:       float32(dstChainIdData.Uint64()),
+		DstChainId:       int(dstChainIdData.Uint64()),
 		DstToken:         common.HexToAddress(addressHex),
 		SrcSafetyDeposit: srcSafetyDeposit,
 		DstSafetyDeposit: dstSafetyDeposit,
@@ -217,7 +230,7 @@ func decodeTimeLocks(value *big.Int) (*TimeLocks, error) {
 
 type EscrowExtraData struct {
 	HashLock         *HashLock
-	DstChainId       float32
+	DstChainId       int
 	DstToken         common.Address
 	SrcSafetyDeposit *big.Int
 	DstSafetyDeposit *big.Int

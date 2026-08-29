@@ -7,32 +7,34 @@ import (
 	"github.com/1inch/1inch-sdk-go/v4/internal/validate"
 )
 
-func (params *OrderApiControllerGetActiveOrdersParams) Validate() error {
+func (params *GetActiveOrdersParams) Validate() error {
 	var validationErrors []error
 	validationErrors = validate.Parameter(params.Page, "Page", validate.CheckPage, validationErrors)
 	validationErrors = validate.Parameter(params.Limit, "Limit", validate.CheckLimit, validationErrors)
 	return validate.ConsolidateValidationErrors(validationErrors)
 }
 
-func (params *QuoterControllerGetQuoteParamsFixed) Validate() error {
+func (params *QuoteParams) Validate() error {
 	var validationErrors []error
 	validationErrors = validate.Parameter(params.FromTokenAddress, "FromTokenAddress", validate.CheckEthereumAddressRequired, validationErrors)
 	validationErrors = validate.Parameter(params.ToTokenAddress, "ToTokenAddress", validate.CheckEthereumAddressRequired, validationErrors)
 	validationErrors = validate.Parameter(params.Amount, "Amount", validate.CheckBigIntRequired, validationErrors)
+	validationErrors = validate.Parameter(params.Fee, "Fee", validate.CheckFeeBpsFloat32, validationErrors)
 	validationErrors = validate.Parameter(params.Permit, "Permit", validate.CheckPermitHash, validationErrors)
 	return validate.ConsolidateValidationErrors(validationErrors)
 }
 
-// Note: QuoterControllerGetQuoteWithCustomPresetsParams (non-Fixed) intentionally has no Validate() method.
+// Note: CustomPresetQuoteParams (non-Fixed) intentionally has no Validate() method.
 // The generated type has Amount as float32 which is incorrect for Ethereum uint256 amounts.
-// Users should use QuoterControllerGetQuoteWithCustomPresetsParamsFixed instead.
+// Users should use CustomPresetQuoteParams instead.
 
-func (params *QuoterControllerGetQuoteWithCustomPresetsParamsFixed) Validate() error {
+func (params *CustomPresetQuoteParams) Validate() error {
 	var validationErrors []error
 	validationErrors = validate.Parameter(params.FromTokenAddress, "FromTokenAddress", validate.CheckEthereumAddressRequired, validationErrors)
 	validationErrors = validate.Parameter(params.ToTokenAddress, "ToTokenAddress", validate.CheckEthereumAddressRequired, validationErrors)
 	validationErrors = validate.Parameter(params.Amount, "Amount", validate.CheckBigIntRequired, validationErrors)
 	validationErrors = validate.Parameter(params.WalletAddress, "WalletAddress", validate.CheckEthereumAddressRequired, validationErrors)
+	validationErrors = validate.Parameter(params.Fee, "Fee", validate.CheckFeeBpsFloat32, validationErrors)
 	return validate.ConsolidateValidationErrors(validationErrors)
 }
 

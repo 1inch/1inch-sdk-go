@@ -37,7 +37,7 @@ func main() {
 	ctx := context.Background()
 
 	whitelistedTokensPrices, err := client.GetPricesForWhitelistedTokens(ctx, spotprices.GetWhitelistedTokensPricesParams{
-		Currency: spotprices.GetWhitelistedTokensPricesParamsCurrency(spotprices.USD),
+		Currency: spotprices.GetWhitelistedTokensPricesParamsCurrencyUSD,
 	})
 	if err != nil {
 		log.Fatalf("failed to GetWhitelistedTokensPrices: %v", err)

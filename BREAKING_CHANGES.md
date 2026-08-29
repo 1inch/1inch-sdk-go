@@ -2,6 +2,36 @@
 
 This document tracks breaking changes between major versions of the SDK that affect users importing and integrating the library.
 
+For a step-by-step upgrade checklist, see [MIGRATION.md](MIGRATION.md); this document is the per-change reference it links back to.
+
+## Unreleased
+
+### Compile-Time Breaking Changes
+
+- **Chain-id fields are `int` instead of `float32`** across `fusionplus` and `tokens` (quoter/orders params, response DTOs, `EscrowExtension`/`EscrowExtensionParams`/`EscrowExtraData`, `SignedOrderInput`, `GetSettlementContractParams`). `float32` cannot represent Aurora's chain id (1313161554), which silently rounded and corrupted the EIP-712 signing domain. Untyped constants and literals compile unchanged; explicit `float32(...)` conversions do not.
+- **Corrected field types on the generated quoter/orders types** (previously exclusive to the `*Fixed` copies): `Amount` `float32` → `string` on all fusion/fusionplus quoter params; `fusionplus` `IsPermit2` `string` → `bool`; `fusion.Quote.QuoteId` and `fusionplus.Quote.QuoteId` `map[string]interface{}` → `string`; `fusion.PresetClass.ExclusiveResolver` `map[string]interface{}` → `string`; `fusionplus.GetOrderFillsByHashOutput` USD prices `map[string]interface{}` → `string` and `Points` → `[]AuctionPointOutput`.
+- **`Fee` on the fusionplus quoter params is `int` (basis points)** — previously `*big.Int` on the `Fixed` types and `float32` on the raw generated types.
+- **`tokens` optional fields are values instead of pointers** (`DisplayedSymbol`, `Eip2612`, `IsFoT`, `LogoURI`, `Extensions`), and `Tags` is `[]TagDto` (was `[]string` on the generated types).
+- **Optional object-typed response fields lost their pointers**: `history.TransactionDetailsDto.Meta`, `nft.Asset.Collection`, `nft.Asset.RarityData`.
+- **Bare enum constants in `spotprices` and `traces` are prefixed with their type name** (`spotprices.USD` → `spotprices.GetPricesForRequestedTokensParamsCurrencyUSD`, `traces.CALL` → `traces.CoreCustomRootTxEventCallstackTraceFullDtoTypeCALL`).
+- **`web3.ApiKeyAuthScopes` removed** (unused generated artifact).
+- **`fusionplus.CreateAuctionDetails` (and the now-deprecated `CreateAuctionDetailsPlus`) take `*Preset`** instead of `*PresetClassFixed`.
+- **Embedded field name changed in the `orderbook` wrapper params** (`GetAllOrdersParams`, `GetOrdersByCreatorAddressParams`): struct literals naming the embedded query field must use the new name `LimitOrdersQueryParams`. Promoted field access (`params.Page`) is unaffected.
+- **`common.RequestPayload.U` renamed to `.Path`** — exported struct field, no alias possible.
+- **`fusionplus.Order.EscExtension` renamed to `.EscrowExtension`** — exported struct field, no alias possible.
+- **`fusionplus.EscrowExtension`'s embedded field renamed `ExtensionPlus` → `Extension`** — the embedded type `ExtensionPlus` was renamed to `Extension` (the `Plus` suffix was redundant), which renames the embedded field with it. Explicit access (`esc.ExtensionPlus.Foo`) and struct literals (`EscrowExtension{ExtensionPlus: …}`) must use `Extension`; promoted field access (`esc.SettlementContract`) is unaffected. `type ExtensionPlus = Extension` remains as a deprecated alias for the *type*, but a struct field name cannot be aliased.
+- **`traces.NewConfiguration` now takes a `ConfigurationParams` struct** instead of positional `(chainId, apiUrl, apiKey)`, matching every other client's constructor.
+- **`constants.ChainToWrapper` is keyed by `int` and `GetWrappedToken` takes an `int`** (was `NetworkEnum`) — pass a chain-id int (e.g. `constants.EthereumChainId`).
+- **Removed dead, unused public types** (no alias): `fusion.Preset` (the old hand-written struct — the name now refers to the quoter preset), `fusionplus.FusionOrderV4`, `fusionplus.CrossChainOrderParams`, and `orderbook.GetCountParams`/`CountResponse`/`GetEventParams`/`GetEventsParams`/`EventResponse`/`OrderResponseExtended`/`GetActiveOrdersWithPermitParams`. `fusionplus.ParentIndex` is now unexported.
+
+### Behavior Changes (compile clean, act differently)
+
+- **`fusionplus` quote fees are now transmitted.** Previously a configured `Fee` was silently omitted from the quote request (`*big.Int` cannot be encoded by go-querystring), so quotes were priced without the fee the order then carried.
+- **`fusionplus.DecodeEscrowExtension` output is corrected**: source/destination safety deposits are no longer swapped, deposits are decimal strings, and the hashlock is 0x-prefixed hex — decode → re-encode is now lossless. Malformed input returns an error instead of panicking.
+- **`EscrowExtension.ConvertToOrderbookExtension` no longer mutates the receiver** (a second call previously double-appended the escrow extra data, corrupting the extension).
+- **API requests time out after 60 seconds** (previously they could hang forever) and response bodies are capped at 64 MiB.
+- `fusion.Quote.SurplusFee` and `fusion.Quote.MarketAmount` marshal with `omitempty`; fee params are validated as basis points in [0, 10000].
+
 ## Version 4.0.0
 
 ### Module Path Now Includes the `/v4` Major-Version Suffix

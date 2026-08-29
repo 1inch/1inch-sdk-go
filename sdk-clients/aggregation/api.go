@@ -16,7 +16,7 @@ func (api *api) GetLiquiditySources(ctx context.Context) (*ProtocolsResponse, er
 	payload := common.RequestPayload{
 		Method: "GET",
 		Params: nil,
-		U:      u,
+		Path:   u,
 		Body:   nil,
 	}
 
@@ -36,7 +36,7 @@ func (api *api) GetTokens(ctx context.Context) (*TokensResponse, error) {
 	payload := common.RequestPayload{
 		Method: "GET",
 		Params: nil,
-		U:      u,
+		Path:   u,
 		Body:   nil,
 	}
 
@@ -50,7 +50,7 @@ func (api *api) GetTokens(ctx context.Context) (*TokensResponse, error) {
 }
 
 // GetApproveAllowance returns the allowance the 1inch router has to spend a token on behalf of a wallet
-func (api *api) GetApproveAllowance(ctx context.Context, params GetAllowanceParams) (*AllowanceResponse, error) {
+func (api *api) GetApproveAllowance(ctx context.Context, params GetApproveAllowanceParams) (*AllowanceResponse, error) {
 	u := fmt.Sprintf("/swap/%s/%d/approve/allowance", apiVersion, api.chainId)
 
 	err := params.Validate()
@@ -61,7 +61,7 @@ func (api *api) GetApproveAllowance(ctx context.Context, params GetAllowancePara
 	payload := common.RequestPayload{
 		Method: "GET",
 		Params: params,
-		U:      u,
+		Path:   u,
 		Body:   nil,
 	}
 
@@ -80,7 +80,7 @@ func (api *api) GetApproveSpender(ctx context.Context) (*SpenderResponse, error)
 
 	payload := common.RequestPayload{
 		Method: "GET",
-		U:      u,
+		Path:   u,
 		Params: nil,
 		Body:   nil,
 	}
@@ -95,7 +95,7 @@ func (api *api) GetApproveSpender(ctx context.Context) (*SpenderResponse, error)
 }
 
 // GetApproveTransaction returns the transaction data for approving the 1inch router to spend a token on behalf of a wallet
-func (api *api) GetApproveTransaction(ctx context.Context, params GetApproveParams) (*ApproveCallDataResponseExtended, error) {
+func (api *api) GetApproveTransaction(ctx context.Context, params GetApproveTransactionParams) (*ApproveCallDataResponseExtended, error) {
 	u := fmt.Sprintf("/swap/%s/%d/approve/transaction", apiVersion, api.chainId)
 
 	err := params.Validate()
@@ -106,7 +106,7 @@ func (api *api) GetApproveTransaction(ctx context.Context, params GetApprovePara
 	payload := common.RequestPayload{
 		Method: "GET",
 		Params: params,
-		U:      u,
+		Path:   u,
 		Body:   nil,
 	}
 
@@ -130,7 +130,7 @@ func (api *api) GetQuote(ctx context.Context, params GetQuoteParams) (*QuoteResp
 	payload := common.RequestPayload{
 		Method: "GET",
 		Params: params,
-		U:      u,
+		Path:   u,
 	}
 
 	var quote QuoteResponse
@@ -154,7 +154,7 @@ func (api *api) GetSwap(ctx context.Context, params GetSwapParams) (*SwapRespons
 	payload := common.RequestPayload{
 		Method: "GET",
 		Params: params,
-		U:      u,
+		Path:   u,
 		Body:   nil,
 	}
 

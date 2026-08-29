@@ -169,8 +169,8 @@ func TestAuctionDetailsEncoding_FusionPlus_KnownValues(t *testing.T) {
 				StartTime:       1673548149,
 				Duration:        180,
 				InitialRateBump: 50000,
-				Points:          []fusionorder.AuctionPointClassFixed{{Coefficient: 20000, Delay: 12}},
-				GasCost:         fusionorder.GasCostConfigClassFixed{GasBumpEstimate: 0, GasPriceEstimate: 0},
+				Points:          []fusionorder.AuctionPoint{{Coefficient: 20000, Delay: 12}},
+				GasCost:         fusionorder.GasCostConfig{GasBumpEstimate: 0, GasPriceEstimate: 0},
 			},
 			expectedEncode: "0000000000000063c051750000b400c350004e20000c",
 		},
@@ -180,11 +180,11 @@ func TestAuctionDetailsEncoding_FusionPlus_KnownValues(t *testing.T) {
 				StartTime:       1673548149,
 				Duration:        180,
 				InitialRateBump: 50000,
-				Points: []fusionorder.AuctionPointClassFixed{
+				Points: []fusionorder.AuctionPoint{
 					{Coefficient: 10000, Delay: 10},
 					{Coefficient: 5000, Delay: 20},
 				},
-				GasCost: fusionorder.GasCostConfigClassFixed{GasBumpEstimate: 0, GasPriceEstimate: 0},
+				GasCost: fusionorder.GasCostConfig{GasBumpEstimate: 0, GasPriceEstimate: 0},
 			},
 			expectedEncode: "0000000000000063c051750000b400c350002710000a0013880014",
 		},
@@ -293,15 +293,15 @@ func TestEscrowExtraDataEncoding_KnownValues(t *testing.T) {
 	}
 }
 
-// TestExtensionPlusConversion verifies ExtensionPlus converts correctly to orderbook extension
+// TestExtensionPlusConversion verifies Extension converts correctly to orderbook extension
 func TestExtensionPlusConversion(t *testing.T) {
 	tests := []struct {
 		name      string
-		extension ExtensionPlus
+		extension Extension
 	}{
 		{
 			name: "Standard extension",
-			extension: ExtensionPlus{
+			extension: Extension{
 				MakerAssetSuffix: "0x1234",
 				TakerAssetSuffix: "0x5678",
 				MakingAmountData: "0xabcd",
@@ -325,7 +325,7 @@ func TestExtensionPlusConversion(t *testing.T) {
 
 			assert.True(t, len(encoded) >= 2 && encoded[:2] == "0x", "Encoded extension should start with 0x")
 
-			decoded, err := orderbook.Decode(mustDecodeHexLocal(encoded))
+			decoded, err := orderbook.DecodeExtension(mustDecodeHexLocal(encoded))
 			require.NoError(t, err)
 
 			assert.Equal(t, obExtension.MakerAssetSuffix, decoded.MakerAssetSuffix)
@@ -350,7 +350,7 @@ func TestSaltGeneration_FusionPlus_KnownValues(t *testing.T) {
 		{
 			name: "Extension with all fields",
 			extension: &EscrowExtension{
-				ExtensionPlus: ExtensionPlus{
+				Extension: Extension{
 					MakerAssetSuffix: "suffix1",
 					TakerAssetSuffix: "suffix2",
 					MakingAmountData: "data1",
@@ -384,7 +384,7 @@ func TestSaltGeneration_Deterministic(t *testing.T) {
 	defer func() { random_number_generation.BigIntMaxFunc = originalBigIntMaxFunc }()
 
 	extension := &EscrowExtension{
-		ExtensionPlus: ExtensionPlus{
+		Extension: Extension{
 			MakerAssetSuffix: "0x1234",
 			TakerAssetSuffix: "0x5678",
 			MakingAmountData: "0xabcd",
@@ -523,7 +523,7 @@ func TestEscrowExtension_KnownFields(t *testing.T) {
 						Duration:        0,
 						InitialRateBump: 0,
 						Points:          nil,
-						GasCost:         fusionorder.GasCostConfigClassFixed{},
+						GasCost:         fusionorder.GasCostConfig{},
 					},
 					PostInteractionData: &SettlementPostInteractionData{
 						Whitelist: []fusionorder.WhitelistItem{},

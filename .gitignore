@@ -3,6 +3,9 @@
 /tmp
 /bin
 
+# Local secrets (API tokens etc.)
+.env*
+
 ### macOS ###
 *.DS_Store
 .AppleDouble

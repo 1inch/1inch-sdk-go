@@ -1,6 +1,6 @@
 package nft
 
-type SupportedChainsResponse []GetNftsByAddressParamsChainIds
+type GetSupportedChainsResponse []GetNftsByAddressParamsChainIds
 
 type Trait struct {
 	TraitType string `json:"trait_type"`
@@ -42,3 +42,10 @@ type AssetExtended struct {
 type GetNFTsByAddressResponse struct {
 	Assets []AssetExtended `json:"assets"`
 }
+
+// Deprecated: Use GetSupportedChainsResponse (matches the GetSupportedChains method).
+type SupportedChainsResponse = GetSupportedChainsResponse
+
+// GetNFTsByAddressParams is the clean-cased name matching the GetNFTsByAddress
+// method; the generated GetNftsByAddressParams remains valid.
+type GetNFTsByAddressParams = GetNftsByAddressParams

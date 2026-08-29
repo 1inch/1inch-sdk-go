@@ -37,7 +37,7 @@ func TestExecuteRequest_SuccessGET(t *testing.T) {
 	data := common.RequestPayload{
 		Method: "GET",
 		Params: nil,
-		U:      "/test",
+		Path:   "/test",
 		Body:   nil,
 	}
 
@@ -81,7 +81,7 @@ func TestExecuteRequest_SuccessfulPOST(t *testing.T) {
 
 	payload := common.RequestPayload{
 		Method: "POST",
-		U:      "/test",
+		Path:   "/test",
 		Body:   []byte(`{"key":"value"}`),
 	}
 
@@ -117,7 +117,7 @@ func TestExecuteRequest_ServerErrorPOST(t *testing.T) {
 
 	payload := common.RequestPayload{
 		Method: "POST",
-		U:      "/error",
+		Path:   "/error",
 		Body:   []byte(`{"key":"value"}`),
 	}
 
@@ -163,7 +163,7 @@ func TestAuthorizationKey(t *testing.T) {
 
 	payload := common.RequestPayload{
 		Method: "GET",
-		U:      "/",
+		Path:   "/",
 	}
 
 	var response any

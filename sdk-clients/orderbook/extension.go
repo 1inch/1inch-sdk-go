@@ -61,7 +61,7 @@ type Extension struct {
 }
 
 // Decode decodes the input byte slice into an Extension struct using reflection.
-func Decode(data []byte) (*Extension, error) {
+func DecodeExtension(data []byte) (*Extension, error) {
 	// TODO Handle the special case where data equals ZX.
 	//if string(data) == ZX {
 	//	return DefaultExtension(), nil
@@ -187,3 +187,7 @@ func (ext *Extension) Encode() (string, error) {
 	// Concatenate with "0x" prefix
 	return "0x" + offsetsHex + dataHex, nil
 }
+
+// Deprecated: Use DecodeExtension instead. The bare Decode name was too generic
+// at the package level; this forwards to DecodeExtension.
+func Decode(data []byte) (*Extension, error) { return DecodeExtension(data) }

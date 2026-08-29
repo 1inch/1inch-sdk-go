@@ -46,6 +46,7 @@ func TestGetTrueERC20(t *testing.T) {
 // never the native-token address. If the sentinel equals the native-token
 // address, the source-chain taker asset can move real value.
 func TestTrueERC20NeverCollidesWithNativeSentinel(t *testing.T) {
+	require.NotEmpty(t, ChainToTrueERC20, "sentinel map must not be empty, or this safety check is a no-op")
 	for chainID, addr := range ChainToTrueERC20 {
 		require.NotEqualf(t, NativeToken, addr.Hex(), "TRUE_ERC20 for chain %d equals the native sentinel", chainID)
 	}

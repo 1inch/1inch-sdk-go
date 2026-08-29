@@ -65,7 +65,7 @@ func TestFusionPlusSourceTakerAssetIsTrueERC20(t *testing.T) {
 			assert.NotEqual(t, strings.ToLower(tc.dstToken), signedTaker,
 				"source-chain taker asset must never be the destination token")
 
-			assert.Equal(t, tc.wantDstHex, prepared.Order.EscExtension.DstToken.Hex(),
+			assert.Equal(t, tc.wantDstHex, prepared.Order.EscrowExtension.DstToken.Hex(),
 				"escrow extension must carry the real destination token")
 		})
 	}
@@ -87,15 +87,15 @@ func TestFusionPlusUnsupportedSourceChainFailsLoudly(t *testing.T) {
 	assert.Contains(t, err.Error(), "not supported")
 }
 
-func takerAssetTestQuoteParams(dstToken string) QuoterControllerGetQuoteParamsFixed {
-	return QuoterControllerGetQuoteParamsFixed{
+func takerAssetTestQuoteParams(dstToken string) QuoteParams {
+	return QuoteParams{
 		SrcChain:        constants.EthereumChainId,
 		DstChain:        constants.BscChainId,
 		SrcTokenAddress: "0x5555555555555555555555555555555555555555",
 		DstTokenAddress: dstToken,
 		Amount:          "1000000",
 		WalletAddress:   "0x4444444444444444444444444444444444444444",
-		Fee:             big.NewInt(0),
+		Fee:             0,
 	}
 }
 
@@ -108,8 +108,8 @@ func takerAssetTestOrderParams() OrderParams {
 	}
 }
 
-func takerAssetTestQuote() *GetQuoteOutputFixed {
-	return &GetQuoteOutputFixed{
+func takerAssetTestQuote() *Quote {
+	return &Quote{
 		QuoteId:          "local-only",
 		SrcEscrowFactory: "0x3333333333333333333333333333333333333333",
 		DstEscrowFactory: "0x3333333333333333333333333333333333333333",

@@ -57,31 +57,6 @@ func (params *GetAllOrdersParams) Validate() error {
 	return validate.ConsolidateValidationErrors(validationErrors)
 }
 
-func (params *GetCountParams) Validate() error {
-	var validationErrors []error
-	validationErrors = validate.Parameter(params.Statuses, "statuses", validate.CheckStatusesStrings, validationErrors)
-	return validate.ConsolidateValidationErrors(validationErrors)
-}
-
-func (params *GetEventParams) Validate() error {
-	var validationErrors []error
-	validationErrors = validate.Parameter(params.OrderHash, "orderHash", validate.CheckOrderHashRequired, validationErrors)
-	return validate.ConsolidateValidationErrors(validationErrors)
-}
-
-func (params *GetEventsParams) Validate() error {
-	var validationErrors []error
-	validationErrors = validate.Parameter(params.Limit, "limit", validate.CheckLimit, validationErrors)
-	return validate.ConsolidateValidationErrors(validationErrors)
-}
-
-func (params *GetActiveOrdersWithPermitParams) Validate() error {
-	var validationErrors []error
-	validationErrors = validate.Parameter(params.Wallet, "wallet", validate.CheckPrivateKeyRequired, validationErrors)
-	validationErrors = validate.Parameter(params.Token, "token", validate.CheckEthereumAddressRequired, validationErrors)
-	return validate.ConsolidateValidationErrors(validationErrors)
-}
-
 func (params *GetFeeInfoParams) Validate() error {
 	var validationErrors []error
 	validationErrors = validate.Parameter(params.MakerAmount, "makerAmount", validate.CheckBigIntRequired, validationErrors)

@@ -8,21 +8,21 @@ import (
 	"github.com/stretchr/testify/require"
 )
 
-func TestOrderApiControllerGetActiveOrdersParams_Validate(t *testing.T) {
+func TestGetActiveOrdersParams_Validate(t *testing.T) {
 	tests := []struct {
 		name        string
-		params      OrderApiControllerGetActiveOrdersParams
+		params      GetActiveOrdersParams
 		expectError bool
 		errorMsg    string
 	}{
 		{
 			name:        "Valid params - empty (defaults)",
-			params:      OrderApiControllerGetActiveOrdersParams{},
+			params:      GetActiveOrdersParams{},
 			expectError: false,
 		},
 		{
 			name: "Valid params - with page and limit",
-			params: OrderApiControllerGetActiveOrdersParams{
+			params: GetActiveOrdersParams{
 				Page:  1,
 				Limit: 10,
 			},
@@ -30,7 +30,7 @@ func TestOrderApiControllerGetActiveOrdersParams_Validate(t *testing.T) {
 		},
 		{
 			name: "Invalid page - negative",
-			params: OrderApiControllerGetActiveOrdersParams{
+			params: GetActiveOrdersParams{
 				Page: -1,
 			},
 			expectError: true,
@@ -38,7 +38,7 @@ func TestOrderApiControllerGetActiveOrdersParams_Validate(t *testing.T) {
 		},
 		{
 			name: "Invalid limit - negative",
-			params: OrderApiControllerGetActiveOrdersParams{
+			params: GetActiveOrdersParams{
 				Limit: -1,
 			},
 			expectError: true,
@@ -59,18 +59,18 @@ func TestOrderApiControllerGetActiveOrdersParams_Validate(t *testing.T) {
 	}
 }
 
-func TestQuoterControllerGetQuoteParamsFixed_Validate(t *testing.T) {
+func TestQuoteParams_Validate(t *testing.T) {
 	validAddress := "0x6B175474E89094C44Da98b954EedeAC495271d0F"
 
 	tests := []struct {
 		name        string
-		params      QuoterControllerGetQuoteParamsFixed
+		params      QuoteParams
 		expectError bool
 		errorMsg    string
 	}{
 		{
 			name: "Valid params",
-			params: QuoterControllerGetQuoteParamsFixed{
+			params: QuoteParams{
 				FromTokenAddress: validAddress,
 				ToTokenAddress:   validAddress,
 				Amount:           "1000000000000000000",
@@ -79,7 +79,7 @@ func TestQuoterControllerGetQuoteParamsFixed_Validate(t *testing.T) {
 		},
 		{
 			name: "Missing FromTokenAddress",
-			params: QuoterControllerGetQuoteParamsFixed{
+			params: QuoteParams{
 				ToTokenAddress: validAddress,
 				Amount:         "1000000000000000000",
 			},
@@ -88,7 +88,7 @@ func TestQuoterControllerGetQuoteParamsFixed_Validate(t *testing.T) {
 		},
 		{
 			name: "Missing ToTokenAddress",
-			params: QuoterControllerGetQuoteParamsFixed{
+			params: QuoteParams{
 				FromTokenAddress: validAddress,
 				Amount:           "1000000000000000000",
 			},
@@ -97,7 +97,7 @@ func TestQuoterControllerGetQuoteParamsFixed_Validate(t *testing.T) {
 		},
 		{
 			name: "Missing Amount",
-			params: QuoterControllerGetQuoteParamsFixed{
+			params: QuoteParams{
 				FromTokenAddress: validAddress,
 				ToTokenAddress:   validAddress,
 			},
@@ -106,7 +106,7 @@ func TestQuoterControllerGetQuoteParamsFixed_Validate(t *testing.T) {
 		},
 		{
 			name: "Invalid Amount - not a number",
-			params: QuoterControllerGetQuoteParamsFixed{
+			params: QuoteParams{
 				FromTokenAddress: validAddress,
 				ToTokenAddress:   validAddress,
 				Amount:           "invalid",
@@ -116,7 +116,7 @@ func TestQuoterControllerGetQuoteParamsFixed_Validate(t *testing.T) {
 		},
 		{
 			name: "Invalid FromTokenAddress",
-			params: QuoterControllerGetQuoteParamsFixed{
+			params: QuoteParams{
 				FromTokenAddress: "invalid",
 				ToTokenAddress:   validAddress,
 				Amount:           "1000000000000000000",
@@ -126,7 +126,7 @@ func TestQuoterControllerGetQuoteParamsFixed_Validate(t *testing.T) {
 		},
 		{
 			name: "Valid with permit",
-			params: QuoterControllerGetQuoteParamsFixed{
+			params: QuoteParams{
 				FromTokenAddress: validAddress,
 				ToTokenAddress:   validAddress,
 				Amount:           "1000000000000000000",
@@ -149,18 +149,18 @@ func TestQuoterControllerGetQuoteParamsFixed_Validate(t *testing.T) {
 	}
 }
 
-func TestQuoterControllerGetQuoteWithCustomPresetsParamsFixed_Validate(t *testing.T) {
+func TestCustomPresetQuoteParams_Validate(t *testing.T) {
 	validAddress := "0x6B175474E89094C44Da98b954EedeAC495271d0F"
 
 	tests := []struct {
 		name        string
-		params      QuoterControllerGetQuoteWithCustomPresetsParamsFixed
+		params      CustomPresetQuoteParams
 		expectError bool
 		errorMsg    string
 	}{
 		{
 			name: "Valid params",
-			params: QuoterControllerGetQuoteWithCustomPresetsParamsFixed{
+			params: CustomPresetQuoteParams{
 				FromTokenAddress: validAddress,
 				ToTokenAddress:   validAddress,
 				Amount:           "1000000000000000000",
@@ -170,7 +170,7 @@ func TestQuoterControllerGetQuoteWithCustomPresetsParamsFixed_Validate(t *testin
 		},
 		{
 			name: "Missing WalletAddress",
-			params: QuoterControllerGetQuoteWithCustomPresetsParamsFixed{
+			params: CustomPresetQuoteParams{
 				FromTokenAddress: validAddress,
 				ToTokenAddress:   validAddress,
 				Amount:           "1000000000000000000",
@@ -180,7 +180,7 @@ func TestQuoterControllerGetQuoteWithCustomPresetsParamsFixed_Validate(t *testin
 		},
 		{
 			name:        "Missing all required fields",
-			params:      QuoterControllerGetQuoteWithCustomPresetsParamsFixed{},
+			params:      CustomPresetQuoteParams{},
 			expectError: true,
 		},
 	}

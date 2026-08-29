@@ -46,7 +46,9 @@ This is the official Go SDK for interacting with 1inch Network APIs. It provides
 │   └── times/            # Time utilities
 ├── codegen/              # OpenAPI spec files and type generation
 │   ├── openapi/          # OpenAPI JSON specs for each API
-│   ├── generate_types.sh # Type generation script
+│   ├── generate.go       # Type generation pipeline (Go)
+│   ├── transforms.go     # In-memory spec corrections applied before generation
+│   ├── cmd/generate-types # CLI entry point (go run ./codegen/cmd/generate-types)
 │   └── mapping.json      # Operation ID mappings
 └── .github/workflows/    # CI/CD (pr.yml, release.yml)
 ```
@@ -175,11 +177,30 @@ Common validators in `internal/validate/`:
 
 ## Type Generation
 
-Types are auto-generated from OpenAPI specs using `oapi-codegen`:
+Types are auto-generated from OpenAPI specs by the Go pipeline in `codegen/`:
 
 1. OpenAPI specs live in `codegen/openapi/*-openapi.json`
-2. Run `make codegen-types` from the repo root (or `./generate_types.sh` from `codegen/`)
+2. Run `make codegen-types` from the repo root (or `go run ./codegen/cmd/generate-types`)
 3. Generated files: `sdk-clients/{package}/{package}_types.gen.go`
+
+The pipeline applies in-memory corrections to each spec (see `codegen/transforms.go` and the per-spec override table in `codegen/overrides.go`) before invoking a pinned `oapi-codegen` via `go run module@version`; the committed spec files are never modified — they are untouched copies of the upstream documents. The pipeline's behavior is pinned by characterization tests in `codegen/codegen_test.go` — the committed `*_types.gen.go` files must be reproducible byte-for-byte, so any intentional pipeline change requires regenerating and committing the types alongside it.
+
+### Refreshing Specs from the Dev Portal
+
+```bash
+DEV_PORTAL_TOKEN=... make codegen-fetch-specs   # rewrite local spec copies
+git diff codegen/openapi                        # review upstream changes
+make codegen-types                              # regenerate types
+go test ./codegen                               # re-pin the output
+```
+
+Sources live in `specSources` in `codegen/fetch.go`. Fetched specs are validated against the transform pipeline at fetch time, so upstream drift that breaks an override fails immediately with a pointer to `codegen/overrides.go`. **Never hand-edit files in `codegen/openapi/`** — fix type bugs in the override table instead; CI enforces this by hashing every spec against `codegen/specs.lock.json`.
+
+### Spec Provenance and Drift Detection
+
+`codegen/specs.lock.json` records each spec's source URL, upstream `info.version`, content hash, and fetch time — tying the generated code to a specific upstream snapshot (generated code ⇔ specs via the byte-for-byte tests, specs ⇔ upstream via the lock). The fetch tool maintains it; `fetch-specs -seed` rebuilds it from local copies (bootstrap/repair only).
+
+The `spec-drift.yml` workflow runs weekly (and via manual dispatch, requires the `DEV_PORTAL_TOKEN` repo secret): it fetches the live specs and, when anything changed, regenerates the types, runs the tests, and opens an automated PR (`automation/spec-drift` branch) with the diff and updated lock — flagging in the PR body if regeneration or tests failed.
 
 **DO NOT manually edit `*_types.gen.go` files** - they are overwritten by codegen.
 
@@ -331,7 +352,7 @@ client.Wallet.BroadcastTransaction(ctx, signedTx)
 ### Fusion Order
 ```go
 // 1. Get quote
-quote, _ := client.GetQuote(ctx, fusion.QuoterControllerGetQuoteParamsFixed{...})
+quote, _ := client.GetQuote(ctx, fusion.QuoteParams{...})
 
 // 2. Place order (signs and submits)
 orderHash, _ := client.PlaceOrder(ctx, *quote, fusion.OrderParams{
@@ -398,11 +419,12 @@ type CustomPreset = fusionorder.CustomPreset
 type CustomPresetPoint = fusionorder.CustomPresetPoint
 ```
 
-**Plus Suffix**: Types in `fusionplus` that need to be distinguished from `fusion` equivalents use the `Plus` suffix:
-- `ExtensionPlus` (not `Extension` - would conflict with fusion.Extension conceptually)
-- `ExtensionParamsPlus`
-- `NewExtensionPlus()`
-- `CreateAuctionDetailsPlus()`
+**Plus Suffix**: Avoid the `Plus` suffix. Because callers always reach these symbols package-qualified (`fusionplus.Extension`, never bare `Extension` next to `fusion.Extension`), the suffix adds nothing at the call site. The clean names are canonical; the old `*Plus` names are kept as `// Deprecated:` aliases/forwarders for source compatibility:
+- `Extension` (was `ExtensionPlus`)
+- `NewExtension()` (was `NewExtensionPlus()`)
+- `CreateAuctionDetails()` (was `CreateAuctionDetailsPlus()`)
+
+The one exception is `ExtensionParamsPlus`, which **must** keep its suffix: `EscrowExtensionParams` embeds both `fusion.ExtensionParams` and the fusionplus params type, so they need distinct field names. Renaming it to `ExtensionParams` is a hard compile error (duplicate embedded field).
 
 **Variable Naming**: Match the package context:
 - In `fusion`: `fusionExtension`, `fusionOrder`

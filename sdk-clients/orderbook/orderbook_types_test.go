@@ -101,11 +101,11 @@ func TestGetOrdersByCreatorAddressParams_Validate(t *testing.T) {
 			description: "Valid parameters",
 			params: GetOrdersByCreatorAddressParams{
 				CreatorAddress: "0x1234567890abcdef1234567890abcdef12345678",
-				LimitOrderV3SubscribedApiControllerGetAllLimitOrdersParams: LimitOrderV3SubscribedApiControllerGetAllLimitOrdersParams{
+				LimitOrdersQueryParams: LimitOrdersQueryParams{
 					Page:       1,
 					Limit:      1,
 					Statuses:   []float32{1},
-					SortBy:     LimitOrderV3SubscribedApiControllerGetAllLimitOrdersParamsSortByCreateDateTime,
+					SortBy:     LimitOrdersQueryParamsSortByCreateDateTime,
 					TakerAsset: "0x1234567890abcdef1234567890abcdef12345678",
 					MakerAsset: "0x1234567890abcdef1234567890abcdef12345678",
 				},
@@ -148,168 +148,14 @@ func TestGetAllOrdersParams_Validate(t *testing.T) {
 		{
 			description: "Valid parameters",
 			params: GetAllOrdersParams{
-				LimitOrderV3SubscribedApiControllerGetAllLimitOrdersParams: LimitOrderV3SubscribedApiControllerGetAllLimitOrdersParams{
+				LimitOrdersQueryParams: LimitOrdersQueryParams{
 					Page:       1,
 					Limit:      1,
 					Statuses:   []float32{1},
-					SortBy:     LimitOrderV3SubscribedApiControllerGetAllLimitOrdersParamsSortByCreateDateTime,
+					SortBy:     LimitOrdersQueryParamsSortByCreateDateTime,
 					TakerAsset: "0x1234567890abcdef1234567890abcdef12345678",
 					MakerAsset: "0x1234567890abcdef1234567890abcdef12345678",
 				},
-			},
-		},
-	}
-
-	for _, tc := range testCases {
-		t.Run(tc.description, func(t *testing.T) {
-			err := tc.params.Validate()
-
-			fmt.Printf("Errors: %v\n", err)
-
-			if len(tc.expectErrors) > 0 {
-				require.Error(t, err)
-				for _, expectedError := range tc.expectErrors {
-					require.Contains(t, err.Error(), expectedError, "Error message should contain the expected text")
-				}
-				require.Equal(t, len(tc.expectErrors), validate.GetValidatorErrorsCount(err), "The number of errors returned should match the length of the expected errors")
-			} else {
-				require.NoError(t, err)
-			}
-		})
-	}
-}
-
-func TestGetCountParams_Validate(t *testing.T) {
-	testCases := []struct {
-		description  string
-		params       GetCountParams
-		expectErrors []string
-	}{
-		{
-			description: "Valid parameters",
-			params: GetCountParams{
-				LimitOrderV3SubscribedApiControllerGetAllOrdersCountParams: LimitOrderV3SubscribedApiControllerGetAllOrdersCountParams{
-					Statuses: []string{"1"},
-				},
-			},
-		},
-	}
-
-	for _, tc := range testCases {
-		t.Run(tc.description, func(t *testing.T) {
-			err := tc.params.Validate()
-
-			fmt.Printf("Errors: %v\n", err)
-
-			if len(tc.expectErrors) > 0 {
-				require.Error(t, err)
-				for _, expectedError := range tc.expectErrors {
-					require.Contains(t, err.Error(), expectedError, "Error message should contain the expected text")
-				}
-				require.Equal(t, len(tc.expectErrors), validate.GetValidatorErrorsCount(err), "The number of errors returned should match the length of the expected errors")
-			} else {
-				require.NoError(t, err)
-			}
-		})
-	}
-}
-
-func TestGetEventParams_Validate(t *testing.T) {
-	testCases := []struct {
-		description  string
-		params       GetEventParams
-		expectErrors []string
-	}{
-		{
-			description: "Valid parameters",
-			params: GetEventParams{
-				OrderHash: "0x1234567890abcdef1234567890abcdef1234567890abcdef1234567890abcdef12",
-			},
-		},
-		{
-			description: "Missing required parameters",
-			params:      GetEventParams{},
-			expectErrors: []string{
-				"'orderHash' is required",
-			},
-		},
-	}
-
-	for _, tc := range testCases {
-		t.Run(tc.description, func(t *testing.T) {
-			err := tc.params.Validate()
-
-			fmt.Printf("Errors: %v\n", err)
-
-			if len(tc.expectErrors) > 0 {
-				require.Error(t, err)
-				for _, expectedError := range tc.expectErrors {
-					require.Contains(t, err.Error(), expectedError, "Error message should contain the expected text")
-				}
-				require.Equal(t, len(tc.expectErrors), validate.GetValidatorErrorsCount(err), "The number of errors returned should match the length of the expected errors")
-			} else {
-				require.NoError(t, err)
-			}
-		})
-	}
-}
-
-func TestGetEventsParams_Validate(t *testing.T) {
-	testCases := []struct {
-		description  string
-		params       GetEventsParams
-		expectErrors []string
-	}{
-		{
-			description: "Invalid limit parameter",
-			params: GetEventsParams{
-				LimitOrderV3SubscribedApiControllerGetEventsParams: LimitOrderV3SubscribedApiControllerGetEventsParams{
-					Limit: -1,
-				}},
-			expectErrors: []string{
-				"'limit': must be greater than 0",
-			},
-		},
-	}
-
-	for _, tc := range testCases {
-		t.Run(tc.description, func(t *testing.T) {
-			err := tc.params.Validate()
-
-			fmt.Printf("Errors: %v\n", err)
-
-			if len(tc.expectErrors) > 0 {
-				require.Error(t, err)
-				for _, expectedError := range tc.expectErrors {
-					require.Contains(t, err.Error(), expectedError, "Error message should contain the expected text")
-				}
-				require.Equal(t, len(tc.expectErrors), validate.GetValidatorErrorsCount(err), "The number of errors returned should match the length of the expected errors")
-			} else {
-				require.NoError(t, err)
-			}
-		})
-	}
-}
-
-func TestGetActiveOrdersWithPermitParams_Validate(t *testing.T) {
-	testCases := []struct {
-		description  string
-		params       GetActiveOrdersWithPermitParams
-		expectErrors []string
-	}{
-		{
-			description: "Valid parameters",
-			params: GetActiveOrdersWithPermitParams{
-				Wallet: "a0b1c2d3e4f5a6b7c8d9e0f1a2b3c4d5e6f7a8b9c0d1e2f3a4b5c6d7e8f9a0b1",
-				Token:  "0x1234567890abcdef1234567890abcdef12345678",
-			},
-		},
-		{
-			description: "Missing required parameters",
-			params:      GetActiveOrdersWithPermitParams{},
-			expectErrors: []string{
-				"'wallet' is required",
-				"'token' is required",
 			},
 		},
 	}

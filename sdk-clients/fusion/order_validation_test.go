@@ -175,8 +175,8 @@ func TestExtensionKeccak256_Deterministic(t *testing.T) {
 		StartTime:       1673548149,
 		Duration:        180,
 		InitialRateBump: 50000,
-		Points:          []fusionorder.AuctionPointClassFixed{{Coefficient: 20000, Delay: 12}},
-		GasCost:         fusionorder.GasCostConfigClassFixed{GasBumpEstimate: 10000, GasPriceEstimate: 1000000},
+		Points:          []fusionorder.AuctionPoint{{Coefficient: 20000, Delay: 12}},
+		GasCost:         fusionorder.GasCostConfig{GasBumpEstimate: 10000, GasPriceEstimate: 1000000},
 	}
 
 	extension, err := NewExtension(ExtensionParams{
@@ -225,8 +225,8 @@ func TestOrderDataConsistency(t *testing.T) {
 		StartTime:       1673548149,
 		Duration:        180,
 		InitialRateBump: 50000,
-		Points:          []fusionorder.AuctionPointClassFixed{{Coefficient: 20000, Delay: 12}},
-		GasCost:         fusionorder.GasCostConfigClassFixed{GasBumpEstimate: 10000, GasPriceEstimate: 1000000},
+		Points:          []fusionorder.AuctionPoint{{Coefficient: 20000, Delay: 12}},
+		GasCost:         fusionorder.GasCostConfig{GasBumpEstimate: 10000, GasPriceEstimate: 1000000},
 	}
 
 	extension, err := NewExtension(ExtensionParams{
@@ -299,8 +299,8 @@ func TestAuctionDetailsEncoding_Fusion_KnownValues(t *testing.T) {
 				StartTime:       1673548149,
 				Duration:        180,
 				InitialRateBump: 50000,
-				Points:          []fusionorder.AuctionPointClassFixed{{Coefficient: 20000, Delay: 12}},
-				GasCost:         fusionorder.GasCostConfigClassFixed{GasBumpEstimate: 0, GasPriceEstimate: 0},
+				Points:          []fusionorder.AuctionPoint{{Coefficient: 20000, Delay: 12}},
+				GasCost:         fusionorder.GasCostConfig{GasBumpEstimate: 0, GasPriceEstimate: 0},
 			},
 			expectedEncode: "0000000000000063c051750000b400c35001004e20000c",
 		},
@@ -310,8 +310,8 @@ func TestAuctionDetailsEncoding_Fusion_KnownValues(t *testing.T) {
 				StartTime:       1673548149,
 				Duration:        180,
 				InitialRateBump: 50000,
-				Points:          []fusionorder.AuctionPointClassFixed{{Coefficient: 20000, Delay: 12}},
-				GasCost:         fusionorder.GasCostConfigClassFixed{GasBumpEstimate: 10000, GasPriceEstimate: 1000000},
+				Points:          []fusionorder.AuctionPoint{{Coefficient: 20000, Delay: 12}},
+				GasCost:         fusionorder.GasCostConfig{GasBumpEstimate: 10000, GasPriceEstimate: 1000000},
 			},
 			expectedEncode: "002710000f424063c051750000b400c35001004e20000c",
 		},
@@ -342,8 +342,8 @@ func TestOrderbookExtensionConversion(t *testing.T) {
 		StartTime:       1673548149,
 		Duration:        180,
 		InitialRateBump: 50000,
-		Points:          []fusionorder.AuctionPointClassFixed{{Coefficient: 20000, Delay: 12}},
-		GasCost:         fusionorder.GasCostConfigClassFixed{GasBumpEstimate: 10000, GasPriceEstimate: 1000000},
+		Points:          []fusionorder.AuctionPoint{{Coefficient: 20000, Delay: 12}},
+		GasCost:         fusionorder.GasCostConfig{GasBumpEstimate: 10000, GasPriceEstimate: 1000000},
 	}
 
 	extension, err := NewExtension(ExtensionParams{
@@ -365,7 +365,7 @@ func TestOrderbookExtensionConversion(t *testing.T) {
 
 	assert.True(t, len(encoded) >= 2 && encoded[:2] == "0x", "Encoded extension should start with 0x")
 
-	decoded, err := orderbook.Decode(mustDecodeHexLocal(encoded))
+	decoded, err := orderbook.DecodeExtension(mustDecodeHexLocal(encoded))
 	require.NoError(t, err)
 
 	assert.Equal(t, obExtension.MakerAssetSuffix, decoded.MakerAssetSuffix)
@@ -385,11 +385,11 @@ func TestBuildAmountGetterData_KnownValues(t *testing.T) {
 		{
 			name: "Basic auction details with forAmountGetters true",
 			auctionDetails: &fusionorder.AuctionDetails{
-				GasCost:         fusionorder.GasCostConfigClassFixed{GasBumpEstimate: 0, GasPriceEstimate: 0},
+				GasCost:         fusionorder.GasCostConfig{GasBumpEstimate: 0, GasPriceEstimate: 0},
 				StartTime:       1673548149,
 				Duration:        180,
 				InitialRateBump: 50000,
-				Points:          []fusionorder.AuctionPointClassFixed{{Delay: 12, Coefficient: 20000}},
+				Points:          []fusionorder.AuctionPoint{{Delay: 12, Coefficient: 20000}},
 			},
 			whitelist:        []fusionorder.WhitelistItem{{AddressHalf: "bb839cbe05303d7705fa", Delay: big.NewInt(0)}},
 			resolvingTime:    big.NewInt(1673548139),
@@ -399,11 +399,11 @@ func TestBuildAmountGetterData_KnownValues(t *testing.T) {
 		{
 			name: "Basic auction details with forAmountGetters false",
 			auctionDetails: &fusionorder.AuctionDetails{
-				GasCost:         fusionorder.GasCostConfigClassFixed{GasBumpEstimate: 0, GasPriceEstimate: 0},
+				GasCost:         fusionorder.GasCostConfig{GasBumpEstimate: 0, GasPriceEstimate: 0},
 				StartTime:       1673548149,
 				Duration:        180,
 				InitialRateBump: 50000,
-				Points:          []fusionorder.AuctionPointClassFixed{{Delay: 12, Coefficient: 20000}},
+				Points:          []fusionorder.AuctionPoint{{Delay: 12, Coefficient: 20000}},
 			},
 			whitelist:        []fusionorder.WhitelistItem{{AddressHalf: "bb839cbe05303d7705fa", Delay: big.NewInt(0)}},
 			resolvingTime:    big.NewInt(1673548139),
@@ -451,7 +451,7 @@ func TestExtensionCreation_KnownValues(t *testing.T) {
 					Duration:        0,
 					InitialRateBump: 0,
 					Points:          nil,
-					GasCost:         fusionorder.GasCostConfigClassFixed{},
+					GasCost:         fusionorder.GasCostConfig{},
 				},
 				PostInteractionData: &SettlementPostInteractionData{
 					Whitelist: []fusionorder.WhitelistItem{},
@@ -574,8 +574,8 @@ func TestPermit2OrderCreation_KnownValues(t *testing.T) {
 		StartTime:       1673548149,
 		Duration:        180,
 		InitialRateBump: 50000,
-		Points:          []fusionorder.AuctionPointClassFixed{{Delay: 12, Coefficient: 20000}},
-		GasCost:         fusionorder.GasCostConfigClassFixed{},
+		Points:          []fusionorder.AuctionPoint{{Delay: 12, Coefficient: 20000}},
+		GasCost:         fusionorder.GasCostConfig{},
 	}
 
 	whitelist, err := fusionorder.GenerateWhitelist(

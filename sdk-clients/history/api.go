@@ -19,7 +19,7 @@ func (api *api) GetHistoryEventsByAddress(ctx context.Context, params EventsByAd
 	payload := common.RequestPayload{
 		Method: "GET",
 		Params: params,
-		U:      u,
+		Path:   u,
 		Body:   nil,
 	}
 

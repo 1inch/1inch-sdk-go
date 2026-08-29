@@ -1,13 +1,13 @@
 package balances
 
 // BalancesAndAllowancesByWalletAddressListParams is used instead of codegen struct to right now as params for API handle
-type BalancesAndAllowancesByWalletAddressListParams struct {
+type BalancesAndAllowancesByWalletAddressParams struct {
 	Wallet  string `json:"-"`
 	Spender string `json:"-"`
 }
 
 // BalancesAndAllowancesByWalletAddressListResponse is used instead of codegen struct to right now as params for API handle
-type BalancesAndAllowancesByWalletAddressListResponse map[string]TokenDetails
+type BalancesAndAllowancesByWalletAddressResponse map[string]TokenDetails
 
 // TokenDetails holds balances and allowance for an Ethereum address (token)
 type TokenDetails struct {
@@ -53,13 +53,13 @@ type BalancesOfCustomTokensByWalletAddressParams struct {
 type BalancesOfCustomTokensByWalletAddressResponse map[string]string
 
 // BalancesOfCustomTokensByWalletAddressesListParams is used instead of codegen struct to right now as params for API handle
-type BalancesOfCustomTokensByWalletAddressesListParams struct {
+type BalancesOfCustomTokensByWalletAddressesParams struct {
 	Wallets []string `url:"wallets" json:"wallets"`
 	Tokens  []string `url:"tokens" json:"tokens"`
 }
 
 // BalancesOfCustomTokensByWalletAddressesListResponse is used instead of codegen struct to right now as params for API handle
-type BalancesOfCustomTokensByWalletAddressesListResponse map[string]map[string]string
+type BalancesOfCustomTokensByWalletAddressesResponse map[string]map[string]string
 
 // AllowancesByWalletAddressParams is used instead of codegen struct to right now as params for API handle
 type AllowancesByWalletAddressParams struct {
@@ -79,3 +79,12 @@ type AllowancesOfCustomTokensByWalletAddressParams struct {
 
 // AllowancesOfCustomTokensByWalletAddressResponse is used instead of codegen struct to right now as params for API handle
 type AllowancesOfCustomTokensByWalletAddressResponse map[string]string
+
+// Deprecated aliases: the "List" suffix was misleading (these are single-request
+// shapes). Use the names without "List".
+type (
+	BalancesAndAllowancesByWalletAddressListParams      = BalancesAndAllowancesByWalletAddressParams
+	BalancesAndAllowancesByWalletAddressListResponse    = BalancesAndAllowancesByWalletAddressResponse
+	BalancesOfCustomTokensByWalletAddressesListParams   = BalancesOfCustomTokensByWalletAddressesParams
+	BalancesOfCustomTokensByWalletAddressesListResponse = BalancesOfCustomTokensByWalletAddressesResponse
+)

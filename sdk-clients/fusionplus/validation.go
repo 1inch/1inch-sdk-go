@@ -7,33 +7,35 @@ import (
 	"github.com/1inch/1inch-sdk-go/v4/internal/validate"
 )
 
-func (params *OrderApiControllerGetActiveOrdersParams) Validate() error {
+func (params *GetActiveOrdersParams) Validate() error {
 	var validationErrors []error
 	validationErrors = validate.Parameter(params.Page, "Page", validate.CheckPage, validationErrors)
 	validationErrors = validate.Parameter(params.Limit, "Limit", validate.CheckLimit, validationErrors)
 	return validate.ConsolidateValidationErrors(validationErrors)
 }
 
-func (params *QuoterControllerGetQuoteParamsFixed) Validate() error {
+func (params *QuoteParams) Validate() error {
 	var validationErrors []error
 	validationErrors = validate.Parameter(params.SrcTokenAddress, "SrcTokenAddress", validate.CheckEthereumAddressRequired, validationErrors)
 	validationErrors = validate.Parameter(params.DstTokenAddress, "DstTokenAddress", validate.CheckEthereumAddressRequired, validationErrors)
 	validationErrors = validate.Parameter(params.WalletAddress, "WalletAddress", validate.CheckEthereumAddressRequired, validationErrors)
-	validationErrors = validate.Parameter(params.SrcChain, "SrcChain", validate.CheckChainIdFloat32Required, validationErrors)
-	validationErrors = validate.Parameter(params.DstChain, "DstChain", validate.CheckChainIdFloat32Required, validationErrors)
+	validationErrors = validate.Parameter(params.SrcChain, "SrcChain", validate.CheckChainIdIntRequired, validationErrors)
+	validationErrors = validate.Parameter(params.DstChain, "DstChain", validate.CheckChainIdIntRequired, validationErrors)
 	validationErrors = validate.Parameter(params.Amount, "Amount", validate.CheckBigIntRequired, validationErrors)
+	validationErrors = validate.Parameter(params.Fee, "Fee", validate.CheckFeeBps, validationErrors)
 	validationErrors = validate.Parameter(params.Permit, "Permit", validate.CheckPermitHash, validationErrors)
 	return validate.ConsolidateValidationErrors(validationErrors)
 }
 
-func (params *QuoterControllerGetQuoteWithCustomPresetsParamsFixed) Validate() error {
+func (params *CustomPresetQuoteParams) Validate() error {
 	var validationErrors []error
 	validationErrors = validate.Parameter(params.SrcTokenAddress, "SrcTokenAddress", validate.CheckEthereumAddressRequired, validationErrors)
 	validationErrors = validate.Parameter(params.DstTokenAddress, "DstTokenAddress", validate.CheckEthereumAddressRequired, validationErrors)
 	validationErrors = validate.Parameter(params.WalletAddress, "WalletAddress", validate.CheckEthereumAddressRequired, validationErrors)
-	validationErrors = validate.Parameter(params.SrcChain, "SrcChain", validate.CheckChainIdFloat32Required, validationErrors)
-	validationErrors = validate.Parameter(params.DstChain, "DstChain", validate.CheckChainIdFloat32Required, validationErrors)
+	validationErrors = validate.Parameter(params.SrcChain, "SrcChain", validate.CheckChainIdIntRequired, validationErrors)
+	validationErrors = validate.Parameter(params.DstChain, "DstChain", validate.CheckChainIdIntRequired, validationErrors)
 	validationErrors = validate.Parameter(params.Amount, "Amount", validate.CheckBigIntRequired, validationErrors)
+	validationErrors = validate.Parameter(params.Fee, "Fee", validate.CheckFeeBps, validationErrors)
 	validationErrors = validate.Parameter(params.Permit, "Permit", validate.CheckPermitHash, validationErrors)
 	return validate.ConsolidateValidationErrors(validationErrors)
 }

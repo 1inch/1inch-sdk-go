@@ -14,7 +14,7 @@ import (
 	geth_common "github.com/ethereum/go-ethereum/common"
 )
 
-func CreateFusionOrderData(quote GetQuoteOutputFixed, orderParams OrderParams, wallet common.Wallet, chainId uint64) (*PreparedOrder, *orderbook.Order, error) {
+func CreateOrderData(quote Quote, orderParams OrderParams, wallet common.Wallet, chainId uint64) (*PreparedOrder, *orderbook.Order, error) {
 
 	preset, err := getPreset(quote.Presets, orderParams.Preset)
 	if err != nil {
@@ -28,7 +28,7 @@ func CreateFusionOrderData(quote GetQuoteOutputFixed, orderParams OrderParams, w
 
 	takerAsset := orderParams.ToTokenAddress
 	if takerAsset == constants.NativeToken {
-		takerAssetWrapped, ok := constants.ChainToWrapper[constants.NetworkEnum(chainId)]
+		takerAssetWrapped, ok := constants.ChainToWrapper[int(chainId)]
 		if !ok {
 			return nil, nil, fmt.Errorf("unsupported network for wrapped token: %d", chainId)
 		}
@@ -178,7 +178,7 @@ func CreateFusionOrderData(quote GetQuoteOutputFixed, orderParams OrderParams, w
 	}, limitOrder, nil
 }
 
-func getPreset(presets QuotePresetsClassFixed, presetType GetQuoteOutputRecommendedPreset) (*PresetClassFixed, error) {
+func getPreset(presets QuotePresets, presetType GetQuoteOutputRecommendedPreset) (*Preset, error) {
 	switch presetType {
 	case Custom:
 		if presets.Custom == nil {
@@ -195,7 +195,7 @@ func getPreset(presets QuotePresetsClassFixed, presetType GetQuoteOutputRecommen
 	return nil, fmt.Errorf("unsupported preset type: %v", presetType)
 }
 
-func CreateAuctionDetails(preset *PresetClassFixed, additionalWaitPeriod float32) (*fusionorder.AuctionDetails, error) {
+func CreateAuctionDetails(preset *Preset, additionalWaitPeriod float32) (*fusionorder.AuctionDetails, error) {
 	points := make([]fusionorder.AuctionPointInput, len(preset.Points))
 	for i, point := range preset.Points {
 		points[i] = fusionorder.AuctionPointInput{
@@ -301,4 +301,9 @@ func CreateOrder(params CreateOrderDataParams) (*Order, error) {
 			Source:               params.ExtraParams.Source,
 		},
 	}, nil
+}
+
+// Deprecated: Use CreateOrderData. The Fusion prefix stutters with the package name.
+func CreateFusionOrderData(quote Quote, orderParams OrderParams, wallet common.Wallet, chainId uint64) (*PreparedOrder, *orderbook.Order, error) {
+	return CreateOrderData(quote, orderParams, wallet, chainId)
 }

@@ -169,11 +169,11 @@ func TestCreateAuctionDetails(t *testing.T) {
 				StartTime:       times.CalculateAuctionStartTime(5, 2),
 				Duration:        300,
 				InitialRateBump: 1,
-				Points: []fusionorder.AuctionPointClassFixed{
+				Points: []fusionorder.AuctionPoint{
 					{Coefficient: 100, Delay: 10},
 					{Coefficient: 200, Delay: 20},
 				},
-				GasCost: fusionorder.GasCostConfigClassFixed{
+				GasCost: fusionorder.GasCostConfig{
 					GasBumpEstimate:  1,
 					GasPriceEstimate: 100,
 				},
@@ -219,8 +219,8 @@ func TestCreateAuctionDetails(t *testing.T) {
 				StartTime:       times.CalculateAuctionStartTime(5, 2),
 				Duration:        300,
 				InitialRateBump: 1,
-				Points:          []fusionorder.AuctionPointClassFixed{},
-				GasCost: fusionorder.GasCostConfigClassFixed{
+				Points:          []fusionorder.AuctionPoint{},
+				GasCost: fusionorder.GasCostConfig{
 					GasBumpEstimate:  1,
 					GasPriceEstimate: 100,
 				},

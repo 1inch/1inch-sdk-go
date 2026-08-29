@@ -97,7 +97,7 @@ func main() {
 		log.Fatalf("failed to create extension: %v", err)
 	}
 
-	salt, err := orderbook.GenerateSaltWithFees(&orderbook.GetSaltParams{
+	salt, err := orderbook.GenerateSaltWithFees(&orderbook.GenerateSaltWithFeesParams{
 		Extension: extensionEncoded,
 	})
 	if err != nil {

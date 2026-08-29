@@ -33,14 +33,14 @@ func TestFromLimitOrderExtension_RoundTrip(t *testing.T) {
 
 	for _, tc := range tests {
 		t.Run(tc.name, func(t *testing.T) {
-			built, err := NewExtensionPlus(ExtensionParamsPlus{
+			built, err := NewExtension(ExtensionParamsPlus{
 				SettlementContract: "0x5678",
 				AuctionDetails: &fusionorder.AuctionDetails{
 					StartTime:       0,
 					Duration:        0,
 					InitialRateBump: 0,
 					Points:          nil,
-					GasCost:         fusionorder.GasCostConfigClassFixed{},
+					GasCost:         fusionorder.GasCostConfig{},
 				},
 				PostInteractionData: &SettlementPostInteractionData{
 					Whitelist: []fusionorder.WhitelistItem{},
@@ -75,14 +75,14 @@ func TestFromLimitOrderExtension_RoundTrip(t *testing.T) {
 // TestDecodeExtension_RoundTrip verifies the raw byte entry point reproduces the
 // built extension, exercising orderbook.Decode and FromLimitOrderExtension together
 func TestDecodeExtension_RoundTrip(t *testing.T) {
-	built, err := NewExtensionPlus(ExtensionParamsPlus{
+	built, err := NewExtension(ExtensionParamsPlus{
 		SettlementContract: "0x5678",
 		AuctionDetails: &fusionorder.AuctionDetails{
 			StartTime:       0,
 			Duration:        0,
 			InitialRateBump: 0,
 			Points:          nil,
-			GasCost:         fusionorder.GasCostConfigClassFixed{},
+			GasCost:         fusionorder.GasCostConfig{},
 		},
 		PostInteractionData: &SettlementPostInteractionData{
 			Whitelist: []fusionorder.WhitelistItem{},

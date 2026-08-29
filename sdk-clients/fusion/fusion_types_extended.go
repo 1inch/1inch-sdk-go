@@ -9,39 +9,17 @@ import (
 )
 
 // Type aliases for internal use - these types are now in fusionorder
-// Users should import from fusionorder directly for new code
+// Ergonomic re-exports of fusionorder types, so callers of this package need not
+// import common/fusionorder directly.
 type (
 	Bps         = fusionorder.Bps
 	Interaction = fusionorder.Interaction
 )
 
-type GetQuoteOutputFixed struct {
-	// FeeToken Destination token address
-	FeeToken        string                 `json:"feeToken"`
-	FromTokenAmount string                 `json:"fromTokenAmount"`
-	Presets         QuotePresetsClassFixed `json:"presets"`
-	Prices          TokenPairValue         `json:"prices"`
-
-	// QuoteId Current generated quote id, should be passed with order
-	QuoteId string `json:"quoteId"` // TODO This field is marked as "object" instead of "string" in the swagger file. This is an easy fix from the Fusion team
-
-	// RecommendedPreset suggested to use this preset
-	RecommendedPreset GetQuoteOutputRecommendedPreset `json:"recommended_preset"`
-
-	// SettlementAddress settlement contract address
-	SettlementAddress string `json:"settlementAddress"`
-
-	// Suggested is it suggested to use Fusion
-	Suggested     bool           `json:"suggested"`
-	ToTokenAmount string         `json:"toTokenAmount"`
-	Volume        TokenPairValue `json:"volume"`
-
-	// Whitelist current executors whitelist addresses
-	Whitelist []string `json:"whitelist"`
-
-	SurplusFee   float32 `json:"surplusFee"`
-	MarketAmount string  `json:"marketAmount"`
-}
+// Deprecated: Use Quote instead. The spec bugs this type used to
+// correct are now fixed at generation time (codegen/overrides.go); the alias
+// is kept so existing integrations keep compiling.
+type GetQuoteOutputFixed = Quote
 
 type PlaceOrderBody struct {
 	Maker        string
@@ -82,29 +60,11 @@ type OrderParams struct {
 	OrderExpirationDelay    uint32 // TODO this field is inaccessible in the typescript SDK
 }
 
-// Deprecated: Use fusionorder.TakingFeeInfo directly instead.
+// Ergonomic re-exports of fusionorder types, so callers of this package need not
+// import common/fusionorder directly.
 type TakingFeeInfo = fusionorder.TakingFeeInfo
-
-// Deprecated: Use fusionorder.CustomPreset directly instead.
 type CustomPreset = fusionorder.CustomPreset
-
-// Deprecated: Use fusionorder.CustomPresetPoint directly instead.
 type CustomPresetPoint = fusionorder.CustomPresetPoint
-
-type Preset struct {
-	AuctionDuration    float32             `json:"auctionDuration"`
-	StartAuctionIn     float32             `json:"startAuctionIn"`
-	BankFee            *big.Int            `json:"bankFee"`
-	InitialRateBump    float32             `json:"initialRateBump"`
-	AuctionStartAmount string              `json:"auctionStartAmount"`
-	AuctionEndAmount   string              `json:"auctionEndAmount"`
-	TokenFee           *big.Int            `json:"tokenFee"`
-	Points             []AuctionPointClass `json:"points"`
-	GasCostInfo        GasCostConfigClass  `json:"gasCostInfo"`
-	ExclusiveResolver  *common.Address     `json:"exclusiveResolver,omitempty"`
-	AllowPartialFills  bool                `json:"allowPartialFills"`
-	AllowMultipleFills bool                `json:"allowMultipleFills"`
-}
 
 type PreparedOrder struct {
 	Order   Order  `json:"order"`
@@ -118,7 +78,7 @@ type AdditionalParams struct {
 	PrivateKey  string
 }
 
-type FusionOrderConstructor struct {
+type OrderConstructor struct {
 	SettlementExtension common.Address
 	OrderInfo           FusionOrderV4
 }
@@ -146,61 +106,15 @@ type ExtraParams struct {
 	unwrapWeth           bool
 }
 
-type QuoterControllerGetQuoteParamsFixed struct {
-	// FromTokenAddress Address of "FROM" token
-	FromTokenAddress string `url:"fromTokenAddress" json:"fromTokenAddress"`
+// Deprecated: Use QuoteParams instead. The spec bugs this
+// type used to correct are now fixed at generation time
+// (codegen/overrides.go); the alias is kept so existing integrations keep
+// compiling.
+type QuoterControllerGetQuoteParamsFixed = QuoteParams
 
-	// ToTokenAddress Address of "TO" token
-	ToTokenAddress string `url:"toTokenAddress" json:"toTokenAddress"`
-
-	// Amount to take from "FROM" token to get "TO" token
-	Amount string `url:"amount" json:"amount"`
-
-	// WalletAddress An address of the wallet or contract who will create Fusion order
-	WalletAddress string `url:"walletAddress" json:"walletAddress"`
-
-	// EnableEstimate if enabled then get estimation from 1inch swap builder and generates quoteId, by default is false
-	EnableEstimate bool `url:"enableEstimate" json:"enableEstimate"`
-
-	// Fee in bps format, 1% is equal to 100bps
-	Fee float32 `url:"fee,omitempty" json:"fee,omitempty"`
-
-	// IsPermit2 permit2 allowance transfer encoded call
-	IsPermit2    string `url:"isPermit2,omitempty" json:"isPermit2,omitempty"`
-	IsLedgerLive bool   `url:"isLedgerLive" json:"isLedgerLive"`
-
-	// Permit permit, user approval sign
-	Permit  string `url:"permit,omitempty" json:"permit,omitempty"`
-	Surplus bool   `url:"surplus,omitempty" json:"surplus,omitempty"`
-}
-
-type QuoterControllerGetQuoteWithCustomPresetsParamsFixed struct {
-	// FromTokenAddress Address of "FROM" token
-	FromTokenAddress string `url:"fromTokenAddress" json:"fromTokenAddress"`
-
-	// ToTokenAddress Address of "TO" token
-	ToTokenAddress string `url:"toTokenAddress" json:"toTokenAddress"`
-
-	// Amount to take from "FROM" token to get "TO" token
-	Amount string `url:"amount" json:"amount"`
-
-	// WalletAddress An address of the wallet or contract who will create Fusion order
-	WalletAddress string `url:"walletAddress" json:"walletAddress"`
-
-	// EnableEstimate if enabled then get estimation from 1inch swap builder and generates quoteId, by default is false
-	EnableEstimate bool `url:"enableEstimate" json:"enableEstimate"`
-
-	// Fee in bps format, 1% is equal to 100bps
-	Fee float32 `url:"fee,omitempty" json:"fee,omitempty"`
-
-	// IsPermit2 permit2 allowance transfer encoded call
-	IsPermit2    string `url:"isPermit2,omitempty" json:"isPermit2,omitempty"`
-	IsLedgerLive bool   `url:"isLedgerLive" json:"isLedgerLive"`
-
-	// Permit permit, user approval sign
-	Permit  string `url:"permit,omitempty" json:"permit,omitempty"`
-	Surplus bool   `url:"surplus,omitempty" json:"surplus,omitempty"`
-}
+// Deprecated: Use CustomPresetQuoteParams instead;
+// see QuoterControllerGetQuoteParamsFixed.
+type QuoterControllerGetQuoteWithCustomPresetsParamsFixed = CustomPresetQuoteParams
 
 type OrderResponse struct {
 	ApproximateTakingAmount string  `json:"approximateTakingAmount"`
@@ -227,33 +141,31 @@ type OrderResponse struct {
 		TakerAsset   string `json:"takerAsset"`
 		TakingAmount string `json:"takingAmount"`
 	} `json:"order"`
-	OrderHash         string                               `json:"orderHash"`
-	Points            []fusionorder.AuctionPointClassFixed `json:"points"`
-	Status            string                               `json:"status"`
-	ToTokenToUsdPrice string                               `json:"toTokenToUsdPrice"`
+	OrderHash         string                     `json:"orderHash"`
+	Points            []fusionorder.AuctionPoint `json:"points"`
+	Status            string                     `json:"status"`
+	ToTokenToUsdPrice string                     `json:"toTokenToUsdPrice"`
 }
 
-// PresetClassFixed defines model for PresetClass.
-type PresetClassFixed struct {
-	AllowMultipleFills bool                `json:"allowMultipleFills"`
-	AllowPartialFills  bool                `json:"allowPartialFills"`
-	AuctionDuration    float32             `json:"auctionDuration"`
-	AuctionEndAmount   string              `json:"auctionEndAmount"`
-	AuctionStartAmount string              `json:"auctionStartAmount"`
-	BankFee            string              `json:"bankFee"`
-	EstP               float32             `json:"estP"`
-	ExclusiveResolver  string              `json:"exclusiveResolver"` // This was changed to a string from a map[string]any
-	GasCost            GasCostConfigClass  `json:"gasCost"`
-	InitialRateBump    float32             `json:"initialRateBump"`
-	Points             []AuctionPointClass `json:"points"`
-	StartAuctionIn     float32             `json:"startAuctionIn"`
-	TokenFee           string              `json:"tokenFee"`
-}
+// Deprecated: Use Preset instead. The exclusiveResolver type bug this type used
+// to correct is now fixed at generation time (codegen/overrides.go); the alias
+// is kept so existing integrations keep compiling.
+type PresetClassFixed = PresetClass
 
-// QuotePresetsClassFixed defines model for QuotePresetsClass.
-type QuotePresetsClassFixed struct {
-	Custom *PresetClassFixed `json:"custom,omitempty"`
-	Fast   PresetClassFixed  `json:"fast"`
-	Medium PresetClassFixed  `json:"medium"`
-	Slow   PresetClassFixed  `json:"slow"`
-}
+// Deprecated: Use QuotePresets instead. The alias is kept so existing
+// integrations keep compiling.
+type QuotePresetsClassFixed = QuotePresetsClass
+
+// Clean, fusionplus-consistent names for the fusion quoter types. The generated
+// types keep the upstream "Class" suffix (renaming them via x-go-name would also
+// rename every struct field that references them), so these aliases give callers
+// the clean names — prefer these over the *Class names.
+type (
+	Preset        = PresetClass
+	QuotePresets  = QuotePresetsClass
+	AuctionPoint  = AuctionPointClass
+	GasCostConfig = GasCostConfigClass
+)
+
+// Deprecated: Use OrderConstructor. The Fusion prefix stutters with the package name.
+type FusionOrderConstructor = OrderConstructor

@@ -14,7 +14,7 @@ import (
 	geth_common "github.com/ethereum/go-ethereum/common"
 )
 
-func CreateFusionPlusOrderData(quoteParams QuoterControllerGetQuoteParamsFixed, quote *GetQuoteOutputFixed, orderParams OrderParams, wallet common.Wallet, chainId int) (*PreparedOrder, error) {
+func CreateOrderData(quoteParams QuoteParams, quote *Quote, orderParams OrderParams, wallet common.Wallet, chainId int) (*PreparedOrder, error) {
 
 	// TODO preset is already gotten earlier for the secret count
 	preset, err := GetPreset(quote.Presets, orderParams.Preset)
@@ -22,29 +22,7 @@ func CreateFusionPlusOrderData(quoteParams QuoterControllerGetQuoteParamsFixed, 
 		return nil, fmt.Errorf("failed to get preset: %w", err)
 	}
 
-	auctionPointsPlus := make([]AuctionPointClass, 0)
-	for _, point := range preset.Points {
-		auctionPointsPlus = append(auctionPointsPlus, AuctionPointClass(point))
-	}
-
-	gasCostsPlus := GasCostConfigClass{
-		GasBumpEstimate:  preset.GasCost.GasBumpEstimate,
-		GasPriceEstimate: preset.GasCost.GasPriceEstimate,
-	}
-	presetPlus := &PresetClassFixed{
-		AllowMultipleFills: preset.AllowMultipleFills,
-		//ExclusiveResolver: preset.ExclusiveResolver, // TODO This is not working for fusion at the moment
-		AllowPartialFills:  preset.AllowPartialFills,
-		AuctionDuration:    preset.AuctionDuration,
-		AuctionEndAmount:   preset.AuctionEndAmount,
-		AuctionStartAmount: preset.AuctionStartAmount,
-		GasCost:            gasCostsPlus,
-		InitialRateBump:    preset.InitialRateBump,
-		Points:             auctionPointsPlus,
-		StartAuctionIn:     preset.StartAuctionIn,
-	}
-
-	auctionDetailsPlus, err := CreateAuctionDetailsPlus(presetPlus, 0)
+	auctionDetailsPlus, err := CreateAuctionDetails(preset, 0)
 	if err != nil {
 		return nil, fmt.Errorf("failed to create auction details: %w", err)
 	}
@@ -78,7 +56,7 @@ func CreateFusionPlusOrderData(quoteParams QuoterControllerGetQuoteParamsFixed, 
 
 	fees := Fees{
 		IntFee: IntegratorFee{
-			Ratio:    fusionorder.BpsToRatioFormat(quoteParams.Fee),
+			Ratio:    fusionorder.BpsToRatioFormat(big.NewInt(int64(quoteParams.Fee))),
 			Receiver: takingFeeReceiver,
 		},
 		BankFee: big.NewInt(0),
@@ -317,7 +295,7 @@ func CreateOrder(params CreateOrderDataParams) (*Order, error) {
 	}
 
 	return &Order{
-		EscExtension: params.extension,
+		EscrowExtension: params.extension,
 		Inner: orderbook.OrderData{
 			MakerAsset:   params.orderInfo.MakerAsset,
 			TakerAsset:   params.orderInfo.TakerAsset,
@@ -345,25 +323,10 @@ func CreateOrder(params CreateOrderDataParams) (*Order, error) {
 	}, nil
 }
 
-func CreateAuctionDetailsPlus(preset *PresetClassFixed, additionalWaitPeriod float32) (*fusionorder.AuctionDetails, error) {
-	points := make([]fusionorder.AuctionPointInput, len(preset.Points))
-	for i, point := range preset.Points {
-		points[i] = fusionorder.AuctionPointInput{
-			Coefficient: point.Coefficient,
-			Delay:       point.Delay,
-		}
-	}
-	return fusionorder.CreateAuctionDetailsFromParams(fusionorder.CreateAuctionDetailsParams{
-		StartAuctionIn:       preset.StartAuctionIn,
-		AdditionalWaitPeriod: additionalWaitPeriod,
-		AuctionDuration:      preset.AuctionDuration,
-		InitialRateBump:      preset.InitialRateBump,
-		Points:               points,
-		GasCost: fusionorder.GasCostInput{
-			GasBumpEstimate:  preset.GasCost.GasBumpEstimate,
-			GasPriceEstimate: preset.GasCost.GasPriceEstimate,
-		},
-	})
+// Deprecated: Use CreateAuctionDetails. The Plus suffix is redundant inside the
+// fusionplus package; this forwards to the identical CreateAuctionDetails.
+func CreateAuctionDetailsPlus(preset *Preset, additionalWaitPeriod float32) (*fusionorder.AuctionDetails, error) {
+	return CreateAuctionDetails(preset, additionalWaitPeriod)
 }
 
 // CreateMakerTraits creates MakerTraits from Details and ExtraParams
@@ -394,4 +357,9 @@ func CreateSettlementPostInteractionDataWithFees(details Details, orderInfo Cros
 		ResolvingStartTime: resolverStartTime,
 		CustomReceiver:     geth_common.HexToAddress(orderInfo.Receiver),
 	})
+}
+
+// Deprecated: Use CreateOrderData. The FusionPlus prefix stutters with the package name.
+func CreateFusionPlusOrderData(quoteParams QuoteParams, quote *Quote, orderParams OrderParams, wallet common.Wallet, chainId int) (*PreparedOrder, error) {
+	return CreateOrderData(quoteParams, quote, orderParams, wallet, chainId)
 }
