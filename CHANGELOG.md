@@ -6,6 +6,8 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 
 ## [Unreleased]
 
+## [v5.0.0] - 2026-08-29
+
 ### Added
 - MIGRATION.md: a v4 → v5 upgrade guide (checklist + compiler-error fixes), complementing the per-change reference in BREAKING_CHANGES.md.
 - Fee validation on fusion/fusionplus quote params: fees must be basis points in [0, 10000].
