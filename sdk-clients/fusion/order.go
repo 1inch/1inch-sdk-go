@@ -28,7 +28,7 @@ func CreateFusionOrderData(quote Quote, orderParams OrderParams, wallet common.W
 
 	takerAsset := orderParams.ToTokenAddress
 	if takerAsset == constants.NativeToken {
-		takerAssetWrapped, ok := constants.ChainToWrapper[constants.NetworkEnum(chainId)]
+		takerAssetWrapped, ok := constants.ChainToWrapper[int(chainId)]
 		if !ok {
 			return nil, nil, fmt.Errorf("unsupported network for wrapped token: %d", chainId)
 		}

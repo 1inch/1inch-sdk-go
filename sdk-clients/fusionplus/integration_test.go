@@ -310,7 +310,7 @@ func TestNativeTokenWrapping_FusionPlus(t *testing.T) {
 
 	for _, tc := range tests {
 		t.Run(tc.name, func(t *testing.T) {
-			wrapper, exists := constants.ChainToWrapper[tc.chainId]
+			wrapper, exists := constants.ChainToWrapper[int(tc.chainId)]
 			assert.True(t, exists)
 			assert.Equal(t, common.HexToAddress(tc.expected), wrapper)
 		})

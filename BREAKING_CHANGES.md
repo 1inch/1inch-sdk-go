@@ -59,6 +59,9 @@ The v5 major is used to make the public API consistent and intent-based. Every r
 **`common`**
 - **Breaking (no alias possible):** `RequestPayload.U` renamed to `RequestPayload.Path` (a struct field on the exported `HttpExecutor` payload type; the cryptic `U` held the request path). In practice this is internal-only — the SDK does not expose a way to inject a custom `HttpExecutor` — but the type is exported, so it is listed here for completeness.
 
+**`constants`**
+- `ChainToWrapper` is now `map[int]` (keyed by chain id) and `GetWrappedToken(chainID int)` — consistent with `ChainToTrueERC20`/`GetTrueERC20`. **Breaking:** callers indexing `ChainToWrapper` or calling `GetWrappedToken` with a `NetworkEnum` must pass an `int` chain id (e.g. `constants.EthereumChainId` or `int(chainId)`). `NetworkEnum` and its `Network*` constants are deprecated in favor of the `*ChainId` int constants.
+
 ## Version 4.0.0
 
 ### Module Path Now Includes the `/v4` Major-Version Suffix
