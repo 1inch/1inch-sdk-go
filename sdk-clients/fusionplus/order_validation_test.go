@@ -293,15 +293,15 @@ func TestEscrowExtraDataEncoding_KnownValues(t *testing.T) {
 	}
 }
 
-// TestExtensionPlusConversion verifies ExtensionPlus converts correctly to orderbook extension
+// TestExtensionPlusConversion verifies Extension converts correctly to orderbook extension
 func TestExtensionPlusConversion(t *testing.T) {
 	tests := []struct {
 		name      string
-		extension ExtensionPlus
+		extension Extension
 	}{
 		{
 			name: "Standard extension",
-			extension: ExtensionPlus{
+			extension: Extension{
 				MakerAssetSuffix: "0x1234",
 				TakerAssetSuffix: "0x5678",
 				MakingAmountData: "0xabcd",
@@ -350,7 +350,7 @@ func TestSaltGeneration_FusionPlus_KnownValues(t *testing.T) {
 		{
 			name: "Extension with all fields",
 			extension: &EscrowExtension{
-				ExtensionPlus: ExtensionPlus{
+				Extension: Extension{
 					MakerAssetSuffix: "suffix1",
 					TakerAssetSuffix: "suffix2",
 					MakingAmountData: "data1",
@@ -384,7 +384,7 @@ func TestSaltGeneration_Deterministic(t *testing.T) {
 	defer func() { random_number_generation.BigIntMaxFunc = originalBigIntMaxFunc }()
 
 	extension := &EscrowExtension{
-		ExtensionPlus: ExtensionPlus{
+		Extension: Extension{
 			MakerAssetSuffix: "0x1234",
 			TakerAssetSuffix: "0x5678",
 			MakingAmountData: "0xabcd",

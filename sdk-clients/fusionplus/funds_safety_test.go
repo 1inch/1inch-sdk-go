@@ -23,7 +23,7 @@ import (
 // more than once.
 func TestConvertToOrderbookExtensionIsPure(t *testing.T) {
 	ext := &EscrowExtension{
-		ExtensionPlus: ExtensionPlus{
+		Extension: Extension{
 			PostInteraction: "deadbeef",
 		},
 		HashLock:         &HashLock{Value: "0x00112233445566778899aabbccddeeff00112233445566778899aabbccddeeff"},

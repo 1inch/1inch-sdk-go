@@ -8,6 +8,7 @@ var (
 	_ AuctionPointClass  = AuctionPoint{}
 
 	_ MyMerkleTree              = MerkleTree{}
+	_ ExtensionPlus             = Extension{}
 	_ GetOrderByOrderHashParams = GetOrderFillsByHashParams{}
 
 	_ QuoterControllerGetQuoteParamsFixed = QuoteParams{}

@@ -14,7 +14,7 @@ import (
 )
 
 type EscrowExtension struct {
-	ExtensionPlus
+	Extension
 	HashLock         *HashLock
 	DstChainId       int
 	DstToken         common.Address
@@ -25,13 +25,13 @@ type EscrowExtension struct {
 
 func NewEscrowExtension(escrowParams EscrowExtensionParams) (*EscrowExtension, error) {
 
-	extension, err := NewExtensionPlus(escrowParams.ExtensionParamsPlus)
+	extension, err := NewExtension(escrowParams.ExtensionParamsPlus)
 	if err != nil {
 		return nil, err
 	}
 
 	escrowExtension := &EscrowExtension{
-		ExtensionPlus:    *extension,
+		Extension:        *extension,
 		HashLock:         escrowParams.HashLock,
 		DstChainId:       escrowParams.DstChainId,
 		DstToken:         escrowParams.DstToken,
@@ -127,10 +127,10 @@ func DecodeEscrowExtension(data []byte) (*EscrowExtension, error) {
 	}
 
 	return &EscrowExtension{
-		ExtensionPlus: *extensionPlus,
-		HashLock:      extraData.HashLock,
-		DstChainId:    extraData.DstChainId,
-		DstToken:      extraData.DstToken,
+		Extension:  *extensionPlus,
+		HashLock:   extraData.HashLock,
+		DstChainId: extraData.DstChainId,
+		DstToken:   extraData.DstToken,
 		// Decimal, matching what ConvertToOrderbookExtension parses — a decoded
 		// extension must survive re-encoding unchanged.
 		SrcSafetyDeposit: extraData.SrcSafetyDeposit.String(),

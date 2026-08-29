@@ -15,7 +15,7 @@ func FuzzDecodeEscrowExtension(f *testing.F) {
 	})
 }
 
-func FuzzDecodeExtensionPlus(f *testing.F) {
+func FuzzDecodeExtension(f *testing.F) {
 	f.Add([]byte{})
 	f.Add(make([]byte, 64))
 	f.Fuzz(func(t *testing.T, data []byte) {

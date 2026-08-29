@@ -175,9 +175,9 @@ type ExtensionParamsPlus struct {
 	CustomData       string
 }
 
-// ExtensionPlus represents the extension data for the FusionPlus order
-// and should be only created using the NewExtensionPlus function
-type ExtensionPlus struct {
+// Extension represents the extension data for the FusionPlus order
+// and should be only created using the NewExtension function
+type Extension struct {
 	// Raw unencoded data
 	SettlementContract  string
 	AuctionDetails      *fusionorder.AuctionDetails
@@ -196,3 +196,9 @@ type ExtensionPlus struct {
 	PostInteraction  string
 	CustomData       string
 }
+
+// Deprecated: Use Extension. The Plus suffix is redundant inside the fusionplus package.
+type ExtensionPlus = Extension
+
+// Deprecated: Use NewExtension. The Plus suffix is redundant inside the fusionplus package.
+func NewExtensionPlus(params ExtensionParamsPlus) (*Extension, error) { return NewExtension(params) }

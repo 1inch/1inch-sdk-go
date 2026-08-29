@@ -419,11 +419,12 @@ type CustomPreset = fusionorder.CustomPreset
 type CustomPresetPoint = fusionorder.CustomPresetPoint
 ```
 
-**Plus Suffix**: Types in `fusionplus` that need to be distinguished from `fusion` equivalents use the `Plus` suffix:
-- `ExtensionPlus` (not `Extension` - would conflict with fusion.Extension conceptually)
-- `ExtensionParamsPlus`
-- `NewExtensionPlus()`
-- `CreateAuctionDetailsPlus()`
+**Plus Suffix**: Avoid the `Plus` suffix. Because callers always reach these symbols package-qualified (`fusionplus.Extension`, never bare `Extension` next to `fusion.Extension`), the suffix adds nothing at the call site. The clean names are canonical; the old `*Plus` names are kept as `// Deprecated:` aliases/forwarders for source compatibility:
+- `Extension` (was `ExtensionPlus`)
+- `NewExtension()` (was `NewExtensionPlus()`)
+- `CreateAuctionDetails()` (was `CreateAuctionDetailsPlus()`)
+
+The one exception is `ExtensionParamsPlus`, which **must** keep its suffix: `EscrowExtensionParams` embeds both `fusion.ExtensionParams` and the fusionplus params type, so they need distinct field names. Renaming it to `ExtensionParams` is a hard compile error (duplicate embedded field).
 
 **Variable Naming**: Match the package context:
 - In `fusion`: `fusionExtension`, `fusionOrder`
