@@ -39,7 +39,7 @@ func strPtr(s string) *string { return &s }
 func intPtr(i int) *int       { return &i }
 func boolPtr(b bool) *bool    { return &b }
 
-func TestGetBalancesAndAllowancesByWalletAddressList(t *testing.T) {
+func TestGetBalancesAndAllowancesByWalletAddress(t *testing.T) {
 	ctx := context.Background()
 
 	mockedResp := BalancesAndAllowancesByWalletAddressListResponse{
@@ -83,7 +83,7 @@ func TestGetBalancesAndAllowancesByWalletAddressList(t *testing.T) {
 		Spender: "0x111111125421ca6dc452d289314280a0f8842a65",
 	}
 
-	balances, err := api.GetBalancesAndAllowancesByWalletAddressList(ctx, params)
+	balances, err := api.GetBalancesAndAllowancesByWalletAddress(ctx, params)
 	require.NoError(t, err)
 	require.NotNil(t, balances)
 
@@ -286,7 +286,7 @@ func TestGetBalancesOfCustomTokensByWalletAddressesList(t *testing.T) {
 	require.NoError(t, err)
 }
 
-func TestGetBalancesAndAllowancesOfCustomTokensByWalletAddressList(t *testing.T) {
+func TestGetBalancesAndAllowancesOfCustomTokensByWalletAddress(t *testing.T) {
 	ctx := context.Background()
 
 	mockedResp := BalancesAndAllowancesOfCustomTokensByWalletAddressResponse{
@@ -315,7 +315,7 @@ func TestGetBalancesAndAllowancesOfCustomTokensByWalletAddressList(t *testing.T)
 		Tokens:  []string{"0x0d8775f648430679a709e98d2b0cb6250d2887ef", "0x58b6a8a3302369daec383334672404ee733ab239"},
 	}
 
-	balances, err := api.GetBalancesAndAllowancesOfCustomTokensByWalletAddressList(ctx, params)
+	balances, err := api.GetBalancesAndAllowancesOfCustomTokensByWalletAddress(ctx, params)
 	require.NoError(t, err)
 	require.NotNil(t, balances)
 

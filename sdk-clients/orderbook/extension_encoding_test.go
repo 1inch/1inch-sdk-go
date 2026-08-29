@@ -199,7 +199,7 @@ func TestExtension_EncodeDecodeRoundTrip_EmptyFields(t *testing.T) {
 	assert.Equal(t, "0x", decoded.TakerAssetSuffix)
 }
 
-func TestDecode_InvalidData(t *testing.T) {
+func TestDecodeExtension_InvalidData(t *testing.T) {
 	tests := []struct {
 		name     string
 		data     []byte
@@ -219,7 +219,7 @@ func TestDecode_InvalidData(t *testing.T) {
 
 	for _, tc := range tests {
 		t.Run(tc.name, func(t *testing.T) {
-			_, err := Decode(tc.data)
+			_, err := DecodeExtension(tc.data)
 			require.Error(t, err)
 			assert.Contains(t, err.Error(), tc.errorMsg)
 		})

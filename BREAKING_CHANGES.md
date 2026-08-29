@@ -6,8 +6,6 @@ For a step-by-step upgrade checklist, see [MIGRATION.md](MIGRATION.md); this doc
 
 ## Unreleased
 
-Step-by-step upgrade instructions for everything below: [MIGRATION.md](MIGRATION.md).
-
 ### Compile-Time Breaking Changes
 
 - **Chain-id fields are `int` instead of `float32`** across `fusionplus` and `tokens` (quoter/orders params, response DTOs, `EscrowExtension`/`EscrowExtensionParams`/`EscrowExtraData`, `SignedOrderInput`, `GetSettlementContractParams`). `float32` cannot represent Aurora's chain id (1313161554), which silently rounded and corrupted the EIP-712 signing domain. Untyped constants and literals compile unchanged; explicit `float32(...)` conversions do not.
@@ -57,7 +55,7 @@ The v5 major is used to make the public API consistent and intent-based. Every r
 - Added clean param names `GetApproveAllowanceParams` / `GetApproveTransactionParams` (aliases of the generated `GetAllowanceParams` / `GetApproveParams`) matching their consumer methods; the method signatures now use them.
 
 **`common`**
-- **Breaking (no alias possible):** `RequestPayload.U` renamed to `RequestPayload.Path` (a struct field on the exported `HttpExecutor` payload type; the cryptic `U` held the request path). In practice this is internal-only — the SDK does not expose a way to inject a custom `HttpExecutor` — but the type is exported, so it is listed here for completeness.
+- **Breaking (no alias possible):** `RequestPayload.U` renamed to `RequestPayload.Path` (exported struct field; the cryptic `U` held the request path).
 
 **`constants`**
 - `ChainToWrapper` is now `map[int]` (keyed by chain id) and `GetWrappedToken(chainID int)` — consistent with `ChainToTrueERC20`/`GetTrueERC20`. **Breaking:** callers indexing `ChainToWrapper` or calling `GetWrappedToken` with a `NetworkEnum` must pass an `int` chain id (e.g. `constants.EthereumChainId` or `int(chainId)`). `NetworkEnum` and its `Network*` constants are deprecated in favor of the `*ChainId` int constants.

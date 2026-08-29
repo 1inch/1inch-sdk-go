@@ -7,7 +7,7 @@ import (
 	"github.com/stretchr/testify/require"
 )
 
-func TestMakeTree_SingleLeaf(t *testing.T) {
+func TestNewMerkleTree_SingleLeaf(t *testing.T) {
 	leaves := []string{"0x1234567890abcdef1234567890abcdef1234567890abcdef1234567890abcdef"}
 
 	tree := NewMerkleTree(leaves)
@@ -16,7 +16,7 @@ func TestMakeTree_SingleLeaf(t *testing.T) {
 	assert.Len(t, tree.tree, 1)
 }
 
-func TestMakeTree_TwoLeaves(t *testing.T) {
+func TestNewMerkleTree_TwoLeaves(t *testing.T) {
 	leaves := []string{
 		"0x1234567890abcdef1234567890abcdef1234567890abcdef1234567890abcdef",
 		"0xabcdef1234567890abcdef1234567890abcdef1234567890abcdef1234567890",
@@ -28,7 +28,7 @@ func TestMakeTree_TwoLeaves(t *testing.T) {
 	assert.Len(t, tree.tree, 3) // 2 leaves + 1 root
 }
 
-func TestMakeTree_FourLeaves(t *testing.T) {
+func TestNewMerkleTree_FourLeaves(t *testing.T) {
 	leaves := []string{
 		"0x1111111111111111111111111111111111111111111111111111111111111111",
 		"0x2222222222222222222222222222222222222222222222222222222222222222",
@@ -42,7 +42,7 @@ func TestMakeTree_FourLeaves(t *testing.T) {
 	assert.Len(t, tree.tree, 7) // 4 leaves + 2 intermediate + 1 root
 }
 
-func TestMakeTree_PreservesOriginalOrderInLeaves(t *testing.T) {
+func TestNewMerkleTree_PreservesOriginalOrderInLeaves(t *testing.T) {
 	leaves := []string{
 		"0xbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb",
 		"0xaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",

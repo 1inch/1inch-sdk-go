@@ -42,17 +42,12 @@ Everything else in the v5 surface cleanup — the intent-based renames (e.g. `hi
 
 ## 3. Review behavior changes (compile clean, act differently)
 
-- **`fusionplus` quote fees are now transmitted.** In v4 a configured `Fee`
-  never reached the quoter (encoding bug), so quotes were priced without it.
-- **`fusionplus.DecodeEscrowExtension` output is corrected**: source and
-  destination safety deposits are no longer swapped, deposits are decimal
-  strings, and the hashlock is 0x-prefixed hex. Decoded extensions now
-  round-trip losslessly through re-encoding.
-- **HTTP requests time out after 60s** (previously they could hang forever)
-  and response bodies are capped at 64 MiB. Pass a context with a deadline for
-  tighter control.
-- Optional JSON fields generated without pointers marshal with `omitempty`
-  where they previously always emitted.
+These compile fine but behave differently — verify each applies to you. See
+BREAKING_CHANGES.md → "Behavior Changes" for detail.
+
+- [ ] `fusionplus` quote `Fee` is now actually transmitted — re-check your pricing.
+- [ ] `fusionplus.DecodeEscrowExtension` output is corrected (safety deposits, hashlock) and round-trips losslessly.
+- [ ] HTTP requests now time out at 60s and cap response bodies at 64 MiB — pass a shorter context deadline if you need one.
 
 ## 4. Optionally: move off the deprecated names
 
@@ -79,67 +74,26 @@ go build ./... && go vet ./...
 go run honnef.co/go/tools/cmd/staticcheck@latest ./... # flags remaining deprecated-name usages
 ```
 
-If anything behaves differently after upgrading that is not listed here,
-please open an issue — the SDK's CI machine-verifies its public API surface
-against each release, and undocumented differences are treated as bugs.
+If something behaves differently after upgrading and isn't listed here, please
+open an issue.
 
-## Appendix: reference detail
+## Appendix: two common fix patterns
 
-### Chain-id fields changed to `int`
+The full list of affected types lives in BREAKING_CHANGES.md; these are the two
+edits most callers actually make.
 
-Every chain-id field in `fusionplus` and `tokens` is `int`. Untyped constants
-(`constants.ArbitrumChainId`, literals) compile unchanged; only explicit
-`float32(...)` conversions need removing:
+**Chain-id fields are now `int`** — drop `float32(...)` conversions:
 
 ```go
-// Before
-params := fusionplus.QuoteParams{
-    SrcChain: float32(constants.ArbitrumChainId),
-    DstChain: float32(constants.BaseChainId),
-}
-
-// After
-params := fusionplus.QuoteParams{
-    SrcChain: constants.ArbitrumChainId,
-    DstChain: constants.BaseChainId,
-}
+fusionplus.QuoteParams{SrcChain: float32(constants.ArbitrumChainId)} // before
+fusionplus.QuoteParams{SrcChain: constants.ArbitrumChainId}          // after
 ```
 
-Affected exported types:
-
-| Package | Type | Field(s) |
-|---------|------|----------|
-| `fusionplus` | `QuoteParams`, `CustomPresetQuoteParams`, `BuildQuoteTypedDataParams` | `SrcChain`, `DstChain` |
-| `fusionplus` | `GetSettlementContractParams` | `ChainId` |
-| `fusionplus` | `EscrowExtension`, `EscrowExtensionParams`, `EscrowExtraData` | `DstChainId` |
-| `fusionplus` | `SignedOrderInput` | `SrcChainId` |
-| `fusionplus` | `GetOrderFillsByHashOutput`, `ActiveOrdersOutput`, `ReadyToExecutePublicAction`, `GetActiveOrdersParams`, `GetOrdersByMakerParams` | chain-id fields |
-| `tokens` | `ProviderTokenDto`, `TokenDto`, `TokenInfoDto` | `ChainId` |
-
-(The deprecated `*Fixed` aliases of these types carry the same field types.)
-
-### Tokens optional fields changed to values
+**Tokens optional fields are now values** — use zero-value checks, not nil
+checks (same for `history.TransactionDetailsDto.Meta`, `nft.Asset.Collection`,
+`nft.Asset.RarityData`):
 
 ```go
-// Before
-if token.DisplayedSymbol != nil { use(*token.DisplayedSymbol) }
-eip2612 := token.Eip2612 != nil && *token.Eip2612
-
-// After
-if token.DisplayedSymbol != "" { use(token.DisplayedSymbol) }
-eip2612 := token.Eip2612
-```
-
-The same pattern applies to `history.TransactionDetailsDto.Meta`,
-`nft.Asset.Collection`, and `nft.Asset.RarityData` (zero-struct checks instead
-of nil checks).
-
-### Renamed types in one picture
-
-```go
-// Before (v4)
-quote, err := client.GetQuote(ctx, fusionplus.QuoterControllerGetQuoteParamsFixed{...}) // *GetQuoteOutputFixed
-
-// After (v5) — the v4 names still compile as deprecated aliases
-quote, err := client.GetQuote(ctx, fusionplus.QuoteParams{...}) // *fusionplus.Quote
+if token.DisplayedSymbol != nil { … } // before
+if token.DisplayedSymbol != "" { … }  // after
 ```
