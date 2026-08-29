@@ -63,6 +63,7 @@ replacement. Notable v5 renames:
 | `orderbook.LimitOrderV3SubscribedApiControllerGetAllLimitOrdersParams` | `orderbook.LimitOrdersQueryParams` |
 | `fusionplus.GetOrderByOrderHash` / `…Params` | `fusionplus.GetOrderFillsByHash` / `…Params` |
 | `fusionplus.MakeTree` / `MyMerkleTree` | `fusionplus.NewMerkleTree` / `MerkleTree` |
+| `fusionplus.CreateAuctionDetailsPlus` | `fusionplus.CreateAuctionDetails` (the `Plus` suffix is redundant in the `fusionplus` package) |
 | `tokens.WhitelistedTokens` / `WhitelistedTokensAsList` | `tokens.GetWhitelistedTokens` / `GetWhitelistedTokensAsList` |
 | `tokens.CustomTokensControllerGetTokenInfoParams` | `tokens.GetCustomTokenParams` |
 | `balances.*ByWalletAddressList` (methods + types) | drop the `List` suffix |

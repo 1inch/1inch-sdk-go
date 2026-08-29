@@ -22,7 +22,7 @@ func CreateFusionPlusOrderData(quoteParams QuoteParams, quote *Quote, orderParam
 		return nil, fmt.Errorf("failed to get preset: %w", err)
 	}
 
-	auctionDetailsPlus, err := CreateAuctionDetailsPlus(preset, 0)
+	auctionDetailsPlus, err := CreateAuctionDetails(preset, 0)
 	if err != nil {
 		return nil, fmt.Errorf("failed to create auction details: %w", err)
 	}
@@ -323,25 +323,10 @@ func CreateOrder(params CreateOrderDataParams) (*Order, error) {
 	}, nil
 }
 
+// Deprecated: Use CreateAuctionDetails. The Plus suffix is redundant inside the
+// fusionplus package; this forwards to the identical CreateAuctionDetails.
 func CreateAuctionDetailsPlus(preset *Preset, additionalWaitPeriod float32) (*fusionorder.AuctionDetails, error) {
-	points := make([]fusionorder.AuctionPointInput, len(preset.Points))
-	for i, point := range preset.Points {
-		points[i] = fusionorder.AuctionPointInput{
-			Coefficient: point.Coefficient,
-			Delay:       point.Delay,
-		}
-	}
-	return fusionorder.CreateAuctionDetailsFromParams(fusionorder.CreateAuctionDetailsParams{
-		StartAuctionIn:       preset.StartAuctionIn,
-		AdditionalWaitPeriod: additionalWaitPeriod,
-		AuctionDuration:      preset.AuctionDuration,
-		InitialRateBump:      preset.InitialRateBump,
-		Points:               points,
-		GasCost: fusionorder.GasCostInput{
-			GasBumpEstimate:  preset.GasCost.GasBumpEstimate,
-			GasPriceEstimate: preset.GasCost.GasPriceEstimate,
-		},
-	})
+	return CreateAuctionDetails(preset, additionalWaitPeriod)
 }
 
 // CreateMakerTraits creates MakerTraits from Details and ExtraParams

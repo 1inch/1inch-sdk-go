@@ -15,7 +15,7 @@ For a step-by-step upgrade checklist, see [MIGRATION.md](MIGRATION.md); this doc
 - **Optional object-typed response fields lost their pointers**: `history.TransactionDetailsDto.Meta`, `nft.Asset.Collection`, `nft.Asset.RarityData`.
 - **Bare enum constants in `spotprices` and `traces` are prefixed with their type name** (`spotprices.USD` → `spotprices.GetPricesForRequestedTokensParamsCurrencyUSD`, `traces.CALL` → `traces.CoreCustomRootTxEventCallstackTraceFullDtoTypeCALL`).
 - **`web3.ApiKeyAuthScopes` removed** (unused generated artifact).
-- **`fusionplus.CreateAuctionDetailsPlus` takes `*Preset`** instead of `*PresetClassFixed`.
+- **`fusionplus.CreateAuctionDetails` (and the now-deprecated `CreateAuctionDetailsPlus`) take `*Preset`** instead of `*PresetClassFixed`.
 - **Embedded field name changed in the `orderbook` wrapper params** (`GetAllOrdersParams`, `GetOrdersByCreatorAddressParams`): struct literals naming the embedded query field must use the new name `LimitOrdersQueryParams`. Promoted field access (`params.Page`) is unaffected.
 - **`common.RequestPayload.U` renamed to `.Path`** — exported struct field, no alias possible.
 - **`fusionplus.Order.EscExtension` renamed to `.EscrowExtension`** — exported struct field, no alias possible.
