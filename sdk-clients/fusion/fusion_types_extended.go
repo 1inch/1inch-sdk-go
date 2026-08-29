@@ -80,7 +80,7 @@ type AdditionalParams struct {
 	PrivateKey  string
 }
 
-type FusionOrderConstructor struct {
+type OrderConstructor struct {
 	SettlementExtension common.Address
 	OrderInfo           FusionOrderV4
 }
@@ -168,3 +168,6 @@ type (
 	AuctionPoint  = AuctionPointClass
 	GasCostConfig = GasCostConfigClass
 )
+
+// Deprecated: Use OrderConstructor. The Fusion prefix stutters with the package name.
+type FusionOrderConstructor = OrderConstructor

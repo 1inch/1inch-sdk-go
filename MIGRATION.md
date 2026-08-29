@@ -65,6 +65,10 @@ replacement. Notable v5 renames:
 | `fusionplus.MakeTree` / `MyMerkleTree` | `fusionplus.NewMerkleTree` / `MerkleTree` |
 | `fusionplus.CreateAuctionDetailsPlus` | `fusionplus.CreateAuctionDetails` (the `Plus` suffix is redundant in the `fusionplus` package) |
 | `fusionplus.ExtensionPlus` / `NewExtensionPlus` | `fusionplus.Extension` / `NewExtension` (same reason; `ExtensionParamsPlus` keeps its suffix — see BREAKING_CHANGES.md) |
+| `fusion.CreateFusionOrderData` | `fusion.CreateOrderData` (dropped the package-name stutter) |
+| `fusionplus.CreateFusionPlusOrderData` | `fusionplus.CreateOrderData` (dropped the package-name stutter) |
+| `fusion.FusionOrderConstructor` | `fusion.OrderConstructor` (dropped the package-name stutter) |
+| `orderbook.WalletConfiguration` | `orderbook.ConfigurationWallet` (renamed to match every other client) |
 | `tokens.WhitelistedTokens` / `WhitelistedTokensAsList` | `tokens.GetWhitelistedTokens` / `GetWhitelistedTokensAsList` |
 | `tokens.CustomTokensControllerGetTokenInfoParams` | `tokens.GetCustomTokenParams` |
 | `balances.*ByWalletAddressList` (methods + types) | drop the `List` suffix |

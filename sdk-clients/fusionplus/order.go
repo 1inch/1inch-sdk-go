@@ -14,7 +14,7 @@ import (
 	geth_common "github.com/ethereum/go-ethereum/common"
 )
 
-func CreateFusionPlusOrderData(quoteParams QuoteParams, quote *Quote, orderParams OrderParams, wallet common.Wallet, chainId int) (*PreparedOrder, error) {
+func CreateOrderData(quoteParams QuoteParams, quote *Quote, orderParams OrderParams, wallet common.Wallet, chainId int) (*PreparedOrder, error) {
 
 	// TODO preset is already gotten earlier for the secret count
 	preset, err := GetPreset(quote.Presets, orderParams.Preset)
@@ -357,4 +357,9 @@ func CreateSettlementPostInteractionDataWithFees(details Details, orderInfo Cros
 		ResolvingStartTime: resolverStartTime,
 		CustomReceiver:     geth_common.HexToAddress(orderInfo.Receiver),
 	})
+}
+
+// Deprecated: Use CreateOrderData. The FusionPlus prefix stutters with the package name.
+func CreateFusionPlusOrderData(quoteParams QuoteParams, quote *Quote, orderParams OrderParams, wallet common.Wallet, chainId int) (*PreparedOrder, error) {
+	return CreateOrderData(quoteParams, quote, orderParams, wallet, chainId)
 }

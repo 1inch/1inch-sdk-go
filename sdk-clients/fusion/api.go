@@ -117,7 +117,7 @@ func (api *api) PlaceOrder(ctx context.Context, fusionQuote Quote, orderParams O
 		return "", err
 	}
 
-	_, limitOrder, err := CreateFusionOrderData(fusionQuote, orderParams, wallet, api.chainId)
+	_, limitOrder, err := CreateOrderData(fusionQuote, orderParams, wallet, api.chainId)
 	if err != nil {
 		return "", fmt.Errorf("failed to create order: %w", err)
 	}

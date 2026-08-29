@@ -14,7 +14,7 @@ import (
 	geth_common "github.com/ethereum/go-ethereum/common"
 )
 
-func CreateFusionOrderData(quote Quote, orderParams OrderParams, wallet common.Wallet, chainId uint64) (*PreparedOrder, *orderbook.Order, error) {
+func CreateOrderData(quote Quote, orderParams OrderParams, wallet common.Wallet, chainId uint64) (*PreparedOrder, *orderbook.Order, error) {
 
 	preset, err := getPreset(quote.Presets, orderParams.Preset)
 	if err != nil {
@@ -301,4 +301,9 @@ func CreateOrder(params CreateOrderDataParams) (*Order, error) {
 			Source:               params.ExtraParams.Source,
 		},
 	}, nil
+}
+
+// Deprecated: Use CreateOrderData. The Fusion prefix stutters with the package name.
+func CreateFusionOrderData(quote Quote, orderParams OrderParams, wallet common.Wallet, chainId uint64) (*PreparedOrder, *orderbook.Order, error) {
+	return CreateOrderData(quote, orderParams, wallet, chainId)
 }

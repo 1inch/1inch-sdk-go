@@ -18,4 +18,6 @@ var (
 	// Deprecated *Fixed aliases must still resolve.
 	_ PresetClassFixed       = Preset{}
 	_ QuotePresetsClassFixed = QuotePresets{}
+
+	_ FusionOrderConstructor = OrderConstructor{}
 )
