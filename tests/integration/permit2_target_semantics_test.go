@@ -48,7 +48,7 @@ func TestPermit2TargetSemanticsFork(t *testing.T) {
 		AllowMultipleFills: true,
 	}
 
-	preparedOrder, limitOrder, err := fusion.CreateFusionOrderData(quote, orderParams, env.maker.wallet, 1)
+	preparedOrder, limitOrder, err := fusion.CreateOrderData(quote, orderParams, env.maker.wallet, 1)
 	require.NoError(t, err)
 
 	// Rewrite the permit token field from the maker asset to the Permit2 address,

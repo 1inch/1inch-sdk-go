@@ -294,7 +294,7 @@ func TestFusionOrderPermit2Fork(t *testing.T) {
 			AllowMultipleFills: true,
 		}
 
-		preparedOrder, limitOrder, err := fusion.CreateFusionOrderData(quote, orderParams, env.maker.wallet, 1)
+		preparedOrder, limitOrder, err := fusion.CreateOrderData(quote, orderParams, env.maker.wallet, 1)
 		require.NoError(t, err)
 
 		// The first 20 bytes of the maker permit carry the token the permit applies to
@@ -359,7 +359,7 @@ func TestFusionOrderPermit2Fork(t *testing.T) {
 			AllowMultipleFills: true,
 		}
 
-		_, limitOrder, err := fusion.CreateFusionOrderData(quote, orderParams, env.maker.wallet, 1)
+		_, limitOrder, err := fusion.CreateOrderData(quote, orderParams, env.maker.wallet, 1)
 		require.NoError(t, err)
 
 		fillData := packFillOrderArgs(t, limitOrder, makingAmount, true)
@@ -388,7 +388,7 @@ func TestFusionOrderPermit2Fork(t *testing.T) {
 			AllowMultipleFills: true,
 		}
 
-		_, limitOrder, err := fusion.CreateFusionOrderData(quote, orderParams, env.maker.wallet, 1)
+		_, limitOrder, err := fusion.CreateOrderData(quote, orderParams, env.maker.wallet, 1)
 		require.NoError(t, err)
 
 		initMakerWeth := env.balanceOf(t, weth, env.maker.address)
@@ -450,7 +450,7 @@ func TestFusionOrderPermit2Fork(t *testing.T) {
 			AllowMultipleFills: true,
 		}
 
-		_, limitOrder, err := fusion.CreateFusionOrderData(quote, orderParams, env.maker.wallet, 1)
+		_, limitOrder, err := fusion.CreateOrderData(quote, orderParams, env.maker.wallet, 1)
 		require.NoError(t, err)
 
 		fillData := packFillOrderArgs(t, limitOrder, makingAmount, true)
@@ -487,7 +487,7 @@ func TestFusionOrderPermit2Fork(t *testing.T) {
 			AllowMultipleFills: true,
 		}
 
-		preparedOrder, limitOrder, err := fusion.CreateFusionOrderData(quote, orderParams, env.maker.wallet, 1)
+		preparedOrder, limitOrder, err := fusion.CreateOrderData(quote, orderParams, env.maker.wallet, 1)
 		require.NoError(t, err)
 		require.True(t,
 			strings.EqualFold(preparedOrder.Order.FusionExtension.MakerPermit[:42], usdcAddress),
@@ -528,7 +528,7 @@ func TestFusionOrderPermit2Fork(t *testing.T) {
 			AllowMultipleFills: true,
 		}
 
-		_, limitOrder, err := fusion.CreateFusionOrderData(quote, orderParams, env.maker.wallet, 1)
+		_, limitOrder, err := fusion.CreateOrderData(quote, orderParams, env.maker.wallet, 1)
 		require.NoError(t, err)
 
 		initMakerWeth := env.balanceOf(t, weth, env.maker.address)

@@ -659,7 +659,7 @@ func runFusionPlusCanary(t *testing.T, mode fusionPlusMode) {
 		require.True(t, time.Now().Before(deadline), "order %s did not complete within 15 minutes", orderHash)
 		time.Sleep(5 * time.Second)
 
-		order, err := plusClient.GetOrderByOrderHash(ctx, fusionplus.GetOrderByOrderHashParams{Hash: orderHash})
+		order, err := plusClient.GetOrderFillsByHash(ctx, fusionplus.GetOrderFillsByHashParams{Hash: orderHash})
 		if err != nil {
 			t.Logf("status poll failed, retrying: %v", err)
 			continue

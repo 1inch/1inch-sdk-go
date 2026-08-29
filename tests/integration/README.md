@@ -25,7 +25,7 @@ FORK_URL=https://your-mainnet-rpc go test -tags integration -v -timeout 15m ./te
 1. Boots an anvil mainnet fork and deploys `SimpleSettlement`.
 2. The maker approves WETH to the canonical Permit2 contract and signs a Permit2
    `PermitSingle` (AllowanceTransfer) message with the Limit Order Protocol v4 as spender.
-3. A fusion order is built through `fusion.CreateFusionOrderData` with `IsPermit2: true`
+3. A fusion order is built through `fusion.CreateOrderData` with `IsPermit2: true`
    and the permit calldata attached. The first 20 bytes of the maker permit carry the
    maker asset: the protocol's `tryPermit` receives them as its token parameter.
 4. A whitelisted taker fills the order via `fillOrderArgs` on the live LOP v4.
