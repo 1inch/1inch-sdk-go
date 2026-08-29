@@ -22,11 +22,15 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 - HTTP client now applies a 60s default timeout and caps response bodies at 64 MiB (previously could hang / read unbounded).
 - `fusionplus` quote `Fee` is now transmitted — it was silently dropped (`*big.Int` cannot be query-encoded); the field is now `int` basis points.
 
+### Deprecated
+- Generated type names are now intent-based (e.g. `fusionplus.QuoteParams`/`Quote`), and the v5 surface cleanup renamed types/methods across all clients for consistency. **These are source-compatible:** every old name is kept as a `type Old = New` alias or a forwarding method, so existing code compiles and behaves identically — it just gets a deprecation warning. Migrate before a future major removes them. Full list in BREAKING_CHANGES.md.
+
 ### Breaking Changes
-- Generated type names are now intent-based (e.g. `fusionplus.QuoteParams`, `fusionplus.Quote`); old names kept as deprecated aliases.
-- Chain-id fields are now `int` instead of `float32` (which silently corrupted Aurora's chain id in the signing domain).
-- oapi-codegen v1 → v2 upgrade: some bare enum constants are now type-prefixed (e.g. `spotprices.USD` → `spotprices.GetPricesForRequestedTokensParamsCurrencyUSD`); a few optional object fields are now values; `web3.ApiKeyAuthScopes` removed.
-- v5 public-API surface cleanup across all clients — almost all renames keep the old name as a deprecated alias or forwarding method. The unavoidable hard breaks (no alias possible): `common.RequestPayload.U` → `.Path`, `fusionplus.Order.EscExtension` → `.EscrowExtension`, `traces.NewConfiguration` now takes `ConfigurationParams`, `constants` maps are keyed by `int` (`NetworkEnum` deprecated), and removed dead types.
+_Only genuine incompatibilities — code updates required. Renames with aliases are under Deprecated above, not here._
+- Chain-id fields are now `int` instead of `float32` (which silently corrupted Aurora's chain id in the signing domain); drop any `float32(...)` conversions.
+- Type/shape corrections now on the generated types (previously only on the `*Fixed` copies): `Amount` → `string`, `Fee` → `int`, `QuoteId` → `string`, `tokens` optional fields are values not pointers, `Tags` → `[]TagDto`. The `*Fixed` names still resolve (aliases), but field access on the old types must be updated (e.g. drop `*token.Eip2612`).
+- oapi-codegen v1 → v2: bare enum constants are now type-prefixed (`spotprices.USD` → `spotprices.GetPricesForRequestedTokensParamsCurrencyUSD`) — the bare names are gone (no alias); `web3.ApiKeyAuthScopes` removed.
+- No-alias-possible breaks: `common.RequestPayload.U` → `.Path`, `fusionplus.Order.EscExtension` → `.EscrowExtension`, `traces.NewConfiguration` now takes `ConfigurationParams`, `constants` maps keyed by `int` (`NetworkEnum` deprecated), removed dead types, and struct literals that named the renamed embedded `orderbook` query field.
 - See BREAKING_CHANGES.md for per-change detail and MIGRATION.md for upgrade steps.
 
 ## [v4.2.0] - 2026-08-28
