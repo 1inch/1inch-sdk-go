@@ -6,6 +6,8 @@ For a step-by-step upgrade checklist, see [MIGRATION.md](MIGRATION.md); this doc
 
 ## Unreleased
 
+## Version 5.0.0
+
 ### Compile-Time Breaking Changes
 
 - **Module path is now `github.com/1inch/1inch-sdk-go/v5`** (was `/v4`). Every import path and `go get` command must change the `/v4` suffix to `/v5`; this is required by Go's [major-version rule](https://go.dev/ref/mod#major-version-suffixes) for `v5.x.x` tags. See MIGRATION.md §1 for the one-line `sed`.

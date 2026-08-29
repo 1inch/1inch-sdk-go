@@ -317,8 +317,8 @@ Key conventions:
 | `balances` | Token balances | `GetBalancesAndAllowances` |
 | `gasprices` | Gas oracle | `GetGasPriceEIP1559`, `GetGasPriceLegacy` |
 | `spotprices` | Token prices | `GetPricesForRequestedTokens` |
-| `tokens` | Token info | `WhitelistedTokens`, `SearchTokenAllChains` |
-| `portfolio` | Portfolio tracking | `GetCurrentValue`, `GetProfitLoss` |
+| `tokens` | Token info | `GetWhitelistedTokens`, `SearchTokenAllChains` |
+| `portfolio` | Portfolio tracking | `GetCurrentValue`, `GetProfitAndLoss` |
 | `history` | Tx history | `GetHistoryEventsByAddress` |
 | `web3` | RPC proxy | `PerformRpcCall` |
 | `txbroadcast` | Tx broadcasting | `BroadcastPublicTransaction` |
@@ -397,7 +397,7 @@ fusion/               # Fusion (single-chain gasless swaps)
 
 fusionplus/           # Fusion+ (cross-chain swaps)
 ├── Uses fusionorder types via aliases
-├── ExtensionPlus, ExtensionParamsPlus (fusionplus-specific)
+├── Extension, ExtensionParamsPlus (fusionplus-specific)
 ├── EscrowExtension (cross-chain escrow data)
 └── SettlementPostInteractionData (fusionplus-specific encoding)
 ```
