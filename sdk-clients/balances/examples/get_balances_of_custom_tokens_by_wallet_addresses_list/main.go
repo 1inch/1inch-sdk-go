@@ -50,7 +50,7 @@ func main() {
 	}
 	ctx := context.Background()
 
-	response, err := client.GetBalancesOfCustomTokensByWalletAddressesList(ctx, balances.BalancesOfCustomTokensByWalletAddressesListParams{
+	response, err := client.GetBalancesOfCustomTokensByWalletAddresses(ctx, balances.BalancesOfCustomTokensByWalletAddressesParams{
 		Wallets: []string{binanceHotWallet, binanceColdWallet},
 		Tokens:  []string{mainnetUsdc, mainnetDai},
 	})

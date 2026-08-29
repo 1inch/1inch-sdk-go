@@ -50,7 +50,7 @@ func (api *api) GetTokens(ctx context.Context) (*TokensResponse, error) {
 }
 
 // GetApproveAllowance returns the allowance the 1inch router has to spend a token on behalf of a wallet
-func (api *api) GetApproveAllowance(ctx context.Context, params GetAllowanceParams) (*AllowanceResponse, error) {
+func (api *api) GetApproveAllowance(ctx context.Context, params GetApproveAllowanceParams) (*AllowanceResponse, error) {
 	u := fmt.Sprintf("/swap/%s/%d/approve/allowance", apiVersion, api.chainId)
 
 	err := params.Validate()
@@ -95,7 +95,7 @@ func (api *api) GetApproveSpender(ctx context.Context) (*SpenderResponse, error)
 }
 
 // GetApproveTransaction returns the transaction data for approving the 1inch router to spend a token on behalf of a wallet
-func (api *api) GetApproveTransaction(ctx context.Context, params GetApproveParams) (*ApproveCallDataResponseExtended, error) {
+func (api *api) GetApproveTransaction(ctx context.Context, params GetApproveTransactionParams) (*ApproveCallDataResponseExtended, error) {
 	u := fmt.Sprintf("/swap/%s/%d/approve/transaction", apiVersion, api.chainId)
 
 	err := params.Validate()

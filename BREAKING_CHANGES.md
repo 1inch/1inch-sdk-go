@@ -47,6 +47,15 @@ The v5 major is used to make the public API consistent and intent-based. Every r
 - `Decode`→`DecodeExtension` (the bare `Decode` was too generic at package scope) and `GetSaltParams`→`GenerateSaltWithFeesParams` (named for its consumer). Old names kept as a forwarding function / alias.
 - **Removed** 7 dead unused public types (`GetCountParams`, `CountResponse`, `GetEventParams`, `GetEventsParams`, `EventResponse`, `OrderResponseExtended`, `GetActiveOrdersWithPermitParams`) that no API method referenced (two shadowed the real `GetOrderCount*` types). No aliases.
 
+**`balances`**
+- Dropped the misleading `List` suffix: `GetBalancesAndAllowancesByWalletAddressList`→`GetBalancesAndAllowancesByWalletAddress`, `GetBalancesAndAllowancesOfCustomTokensByWalletAddressList`→`…ByWalletAddress`, `GetBalancesOfCustomTokensByWalletAddressesList`→`…ByWalletAddresses` (and the matching `*Params`/`*Response` types). Old method names forward; old type names are aliases.
+
+**`tokens`**
+- `WhitelistedTokens`→`GetWhitelistedTokens`, `WhitelistedTokensAsList`→`GetWhitelistedTokensAsList` (the `Get` prefix every other method uses). Old methods forward. `CustomTokensControllerGetTokenInfoParams`→`GetCustomTokenParams` (aliased).
+
+**`aggregation`**
+- Added clean param names `GetApproveAllowanceParams` / `GetApproveTransactionParams` (aliases of the generated `GetAllowanceParams` / `GetApproveParams`) matching their consumer methods; the method signatures now use them.
+
 ## Version 4.0.0
 
 ### Module Path Now Includes the `/v4` Major-Version Suffix

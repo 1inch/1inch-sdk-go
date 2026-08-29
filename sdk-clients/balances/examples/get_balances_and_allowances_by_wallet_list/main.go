@@ -42,7 +42,7 @@ func main() {
 
 	ctx := context.Background()
 
-	response, err := client.GetBalancesAndAllowancesByWalletAddressList(ctx, balances.BalancesAndAllowancesByWalletAddressListParams{
+	response, err := client.GetBalancesAndAllowancesByWalletAddress(ctx, balances.BalancesAndAllowancesByWalletAddressParams{
 		Wallet:  secondaryWalletAddress,
 		Spender: spenderInch,
 	})

@@ -57,7 +57,7 @@ func (api *api) SearchTokenSingleChain(ctx context.Context, params SearchSingleC
 	return response, nil
 }
 
-func (api *api) WhitelistedTokens(ctx context.Context, params GetWhitelistedTokensParams) (map[string]ProviderTokenDto, error) {
+func (api *api) GetWhitelistedTokens(ctx context.Context, params GetWhitelistedTokensParams) (map[string]ProviderTokenDto, error) {
 	u := fmt.Sprintf("/token/v1.2/%d", api.chainId)
 
 	err := params.Validate()
@@ -81,7 +81,7 @@ func (api *api) WhitelistedTokens(ctx context.Context, params GetWhitelistedToke
 	return response, nil
 }
 
-func (api *api) WhitelistedTokensAsList(ctx context.Context, params GetWhitelistedTokensParams) (*TokenListResponseDto, error) {
+func (api *api) GetWhitelistedTokensAsList(ctx context.Context, params GetWhitelistedTokensParams) (*TokenListResponseDto, error) {
 	u := fmt.Sprintf("/token/v1.2/%d/token-list", api.chainId)
 
 	err := params.Validate()
@@ -151,4 +151,14 @@ func (api *api) GetCustomToken(ctx context.Context, params GetCustomTokenParams)
 	}
 
 	return &response, nil
+}
+
+// Deprecated: Use GetWhitelistedTokens (added the Get prefix used by every other method).
+func (api *api) WhitelistedTokens(ctx context.Context, params GetWhitelistedTokensParams) (map[string]ProviderTokenDto, error) {
+	return api.GetWhitelistedTokens(ctx, params)
+}
+
+// Deprecated: Use GetWhitelistedTokensAsList.
+func (api *api) WhitelistedTokensAsList(ctx context.Context, params GetWhitelistedTokensParams) (*TokenListResponseDto, error) {
+	return api.GetWhitelistedTokensAsList(ctx, params)
 }

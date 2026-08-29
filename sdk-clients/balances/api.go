@@ -10,7 +10,7 @@ import (
 )
 
 // GetBalancesAndAllowancesByWalletAddressList Get balances and allowances of tokens by spender for walletAddress
-func (api *api) GetBalancesAndAllowancesByWalletAddressList(ctx context.Context, params BalancesAndAllowancesByWalletAddressListParams) (*BalancesAndAllowancesByWalletAddressListResponse, error) {
+func (api *api) GetBalancesAndAllowancesByWalletAddress(ctx context.Context, params BalancesAndAllowancesByWalletAddressParams) (*BalancesAndAllowancesByWalletAddressResponse, error) {
 	u := fmt.Sprintf("/balance/v1.2/%d/allowancesAndBalances/%s/%s", api.chainId, params.Spender, params.Wallet)
 
 	err := params.Validate()
@@ -117,8 +117,8 @@ func (api *api) GetBalancesOfCustomTokensByWalletAddress(ctx context.Context, pa
 	return &response, nil
 }
 
-// GetBalancesOfCustomTokensByWalletAddress Get balances of custom tokens for list of wallets addresses
-func (api *api) GetBalancesOfCustomTokensByWalletAddressesList(ctx context.Context, params BalancesOfCustomTokensByWalletAddressesListParams) (*BalancesOfCustomTokensByWalletAddressesListResponse, error) {
+// GetBalancesOfCustomTokensByWalletAddresses Get balances of custom tokens for list of wallets addresses
+func (api *api) GetBalancesOfCustomTokensByWalletAddresses(ctx context.Context, params BalancesOfCustomTokensByWalletAddressesParams) (*BalancesOfCustomTokensByWalletAddressesResponse, error) {
 	u := fmt.Sprintf("/balance/v1.2/%d/balances/multiple/walletsAndTokens", api.chainId)
 
 	err := params.Validate()
@@ -148,7 +148,7 @@ func (api *api) GetBalancesOfCustomTokensByWalletAddressesList(ctx context.Conte
 }
 
 // GetBalancesAndAllowancesOfCustomTokensByWalletAddressList Get balances and allowances of custom tokens by spender for walletAddress
-func (api *api) GetBalancesAndAllowancesOfCustomTokensByWalletAddressList(ctx context.Context, params BalancesAndAllowancesOfCustomTokensByWalletAddressParams) (*BalancesAndAllowancesOfCustomTokensByWalletAddressResponse, error) {
+func (api *api) GetBalancesAndAllowancesOfCustomTokensByWalletAddress(ctx context.Context, params BalancesAndAllowancesOfCustomTokensByWalletAddressParams) (*BalancesAndAllowancesOfCustomTokensByWalletAddressResponse, error) {
 	u := fmt.Sprintf("/balance/v1.2/%d/allowancesAndBalances/%s/%s", api.chainId, params.Spender, params.Wallet)
 
 	err := params.Validate()
@@ -177,7 +177,7 @@ func (api *api) GetBalancesAndAllowancesOfCustomTokensByWalletAddressList(ctx co
 	return &response, nil
 }
 
-// GetBalancesByWalletAddress Get allowances of tokens by spender for walletAddress
+// GetAllowancesByWalletAddress Get allowances of tokens by spender for walletAddress
 func (api *api) GetAllowancesByWalletAddress(ctx context.Context, params AllowancesByWalletAddressParams) (*AllowancesByWalletAddressResponse, error) {
 	u := fmt.Sprintf("/balance/v1.2/%d/allowances/%s/%s", api.chainId, params.Spender, params.Wallet)
 
@@ -230,4 +230,20 @@ func (api *api) GetAllowancesOfCustomTokensByWalletAddress(ctx context.Context, 
 	}
 
 	return &response, nil
+}
+
+// Deprecated: Use GetBalancesAndAllowancesByWalletAddress. The "List" suffix was
+// misleading (this is a single wallet+spender request).
+func (api *api) GetBalancesAndAllowancesByWalletAddressList(ctx context.Context, params BalancesAndAllowancesByWalletAddressParams) (*BalancesAndAllowancesByWalletAddressResponse, error) {
+	return api.GetBalancesAndAllowancesByWalletAddress(ctx, params)
+}
+
+// Deprecated: Use GetBalancesOfCustomTokensByWalletAddresses.
+func (api *api) GetBalancesOfCustomTokensByWalletAddressesList(ctx context.Context, params BalancesOfCustomTokensByWalletAddressesParams) (*BalancesOfCustomTokensByWalletAddressesResponse, error) {
+	return api.GetBalancesOfCustomTokensByWalletAddresses(ctx, params)
+}
+
+// Deprecated: Use GetBalancesAndAllowancesOfCustomTokensByWalletAddress.
+func (api *api) GetBalancesAndAllowancesOfCustomTokensByWalletAddressList(ctx context.Context, params BalancesAndAllowancesOfCustomTokensByWalletAddressParams) (*BalancesAndAllowancesOfCustomTokensByWalletAddressResponse, error) {
+	return api.GetBalancesAndAllowancesOfCustomTokensByWalletAddress(ctx, params)
 }
