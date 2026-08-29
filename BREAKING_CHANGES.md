@@ -31,8 +31,6 @@ For a step-by-step upgrade checklist, see [MIGRATION.md](MIGRATION.md); this doc
 - **API requests time out after 60 seconds** (previously they could hang forever) and response bodies are capped at 64 MiB.
 - `fusion.Quote.SurplusFee` and `fusion.Quote.MarketAmount` marshal with `omitempty`; fee params are validated as basis points in [0, 10000].
 
-> The many other v5 renames (types, methods, constants — e.g. `QuoterControllerGetQuoteParams`→`QuoteParams`, `Decode`→`DecodeExtension`, `WhitelistedTokens`→`GetWhitelistedTokens`, `ProfitLoss`→`ProfitAndLoss`) are **source-compatible**: every old name is kept as a `// Deprecated:` alias or forwarding method, so they are deprecations, not breaks. See [MIGRATION.md](MIGRATION.md) §4 for the list.
-
 ## Version 4.0.0
 
 ### Module Path Now Includes the `/v4` Major-Version Suffix
