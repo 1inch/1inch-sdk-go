@@ -9,7 +9,8 @@ import (
 )
 
 // Type aliases for internal use - these types are now in fusionorder
-// Users should import from fusionorder directly for new code
+// Ergonomic re-exports of fusionorder types, so callers of this package need not
+// import common/fusionorder directly.
 type (
 	Bps         = fusionorder.Bps
 	Interaction = fusionorder.Interaction
