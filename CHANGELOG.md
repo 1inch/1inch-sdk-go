@@ -6,6 +6,9 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 
 ## [Unreleased]
 
+### Fixed
+- `fusionplus.NewMerkleTree` no longer reorders the caller's slice. It sorted its input argument in place, so a later `GetProof`/`ForMultipleFills` over the same slice mapped index N to the wrong secret and returned a proof for the wrong leaf. The committed hashlock root was unaffected (it is order-independent), so the impact was a correct-looking proof that failed the on-chain leaf check. `NewMerkleTree` now sorts a private copy. `GetProof` also searches only the leaf region, not internal nodes, so a leaf value cannot resolve to an inner node.
+
 ## [v5.0.0] - 2026-08-29
 
 ### Added
