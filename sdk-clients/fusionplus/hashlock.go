@@ -66,6 +66,19 @@ func ForMultipleFills(leaves []string) (*HashLock, error) {
 	return &HashLock{fmt.Sprintf("0x%x", rootWithCountBytes)}, nil
 }
 
+// GetPartsCount returns the number of fill parts a multiple-fill hashlock
+// commits to. ForMultipleFills packs this 16-bit count into the top bits of the
+// root (bits 240 to 256), so the count is len(leaves)-1. Use it only for a
+// multiple-fill hashlock. A single-fill hashlock returns a meaningless value.
+func (h *HashLock) GetPartsCount() uint64 {
+	raw, err := hexutil.Decode(h.Value)
+	if err != nil {
+		return 0
+	}
+	root := new(big.Int).SetBytes(raw)
+	return new(big.Int).Rsh(root, 240).Uint64() & 0xFFFF
+}
+
 func GetMerkleLeaves(secrets []string) ([]string, error) {
 	secretHashes := make([]string, len(secrets))
 	for i, secret := range secrets {

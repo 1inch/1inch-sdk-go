@@ -635,7 +635,12 @@ func runFusionPlusCanary(t *testing.T, mode fusionPlusMode) {
 	if len(secrets) == 1 {
 		hashLock, err = fusionplus.ForSingleFill(secrets[0])
 	} else {
-		hashLock, err = fusionplus.ForMultipleFills(secrets)
+		// ForMultipleFills takes the Merkle leaves, not the raw secrets. Each
+		// leaf binds the secret hash to its index, so build them first.
+		var leaves []string
+		leaves, err = fusionplus.GetMerkleLeaves(secrets)
+		require.NoError(t, err)
+		hashLock, err = fusionplus.ForMultipleFills(leaves)
 	}
 	require.NoError(t, err)
 

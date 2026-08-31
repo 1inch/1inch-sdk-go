@@ -6,8 +6,12 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 
 ## [Unreleased]
 
+### Added
+- `fusionplus.HashLock.GetPartsCount()` returns the fill-parts count committed in a multiple-fill hashlock (the 16-bit count `ForMultipleFills` packs into the top bits of the root). Parity with the JS SDK `HashLock.getPartsCount()`.
+
 ### Fixed
 - `fusionplus.NewMerkleTree` no longer reorders the caller's slice. It sorted its input argument in place, so a later `GetProof`/`ForMultipleFills` over the same slice mapped index N to the wrong secret and returned a proof for the wrong leaf. The committed hashlock root was unaffected (it is order-independent), so the impact was a correct-looking proof that failed the on-chain leaf check. `NewMerkleTree` now sorts a private copy. `GetProof` also searches only the leaf region, not internal nodes, so a leaf value cannot resolve to an inner node.
+- The `fusionplus` multiple-fill examples (`place_order`, `place_order_permit`) and the canary integration test passed raw secrets to `ForMultipleFills`. That builds the Merkle tree over the wrong values and produces a hashlock that does not match the index-bound-leaf hashlock the protocol expects. They now derive leaves with `GetMerkleLeaves` first, matching the JS SDK flow. A cross-check test pins the leaves, root, proofs, and parts count to golden vectors generated from `@1inch/cross-chain-sdk`.
 
 ## [v5.0.0] - 2026-08-29
 

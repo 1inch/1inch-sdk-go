@@ -142,7 +142,14 @@ func main() {
 	if len(secrets) == 1 {
 		hashLock, err = fusionplus.ForSingleFill(secrets[0])
 	} else {
-		hashLock, err = fusionplus.ForMultipleFills(secrets)
+		// ForMultipleFills takes the Merkle leaves, not the raw secrets. Each
+		// leaf binds the secret hash to its index, so build them first.
+		var leaves []string
+		leaves, err = fusionplus.GetMerkleLeaves(secrets)
+		if err != nil {
+			log.Fatalf("failed to build merkle leaves: %v", err)
+		}
+		hashLock, err = fusionplus.ForMultipleFills(leaves)
 	}
 	if err != nil {
 		log.Fatalf("failed to create hashlock: %v", err)
