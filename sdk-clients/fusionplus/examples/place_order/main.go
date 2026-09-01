@@ -130,7 +130,7 @@ func main() {
 // monitorFusionPlusOrder polls the order status, submits a secret for each fill
 // whose escrows are deployed, and returns when the order reaches a terminal status
 func monitorFusionPlusOrder(ctx context.Context, client *fusionplus.Client, orderHash string, secrets []string) {
-	submitted := 0
+	revealed := make(map[int]bool)
 	deadline := time.Now().Add(15 * time.Minute)
 	for time.Now().Before(deadline) {
 		time.Sleep(5 * time.Second)
@@ -155,14 +155,19 @@ func monitorFusionPlusOrder(ctx context.Context, client *fusionplus.Client, orde
 			fmt.Printf("fills poll failed, retrying: %v\n", err)
 			continue
 		}
-		for ; submitted < len(fills.Fills) && submitted < len(secrets); submitted++ {
+		// Reveal the secret each ready fill names by its index, once per index.
+		// Do not reveal secrets in submission order: a fill can become ready for
+		// any index (for example, a single resolver that fills the whole order
+		// needs the last secret).
+		for _, idx := range fusionplus.PendingSecretIndexes(fills.Fills, revealed, len(secrets)) {
 			if err := client.SubmitSecret(ctx, fusionplus.SecretInput{
 				OrderHash: orderHash,
-				Secret:    secrets[submitted],
+				Secret:    secrets[idx],
 			}); err != nil {
-				log.Fatalf("failed to submit secret %d: %v", submitted, err)
+				log.Fatalf("failed to submit secret %d: %v", idx, err)
 			}
-			fmt.Printf("Submitted secret %d\n", submitted)
+			revealed[idx] = true
+			fmt.Printf("Submitted secret %d\n", idx)
 		}
 	}
 	log.Fatalf("order %s did not reach a terminal status within 15 minutes", orderHash)
