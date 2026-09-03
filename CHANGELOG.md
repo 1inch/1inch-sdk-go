@@ -6,6 +6,8 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 
 ## [Unreleased]
 
+## [v5.1.0] - 2026-09-03
+
 ### Added
 - `fusionplus.HashLock.GetPartsCount()` returns the fill-parts count committed in a multi-fill hashlock (the 16-bit count `ForMultipleFills` packs into the top bits of the root).
 - `fusionplus.PendingSecretIndexes` returns the secret indexes a maker must reveal for a set of ready-to-accept fills. Each ready fill names the secret index the relayer expects (`ReadyToAcceptSecretFill.Idx`). 

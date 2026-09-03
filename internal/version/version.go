@@ -8,4 +8,4 @@ package version
 // Version is the most recent published release of this SDK and is reported in
 // the User-Agent header of every API request. Exact release form only:
 // vMAJOR.MINOR.PATCH.
-const Version = "v5.0.0"
+const Version = "v5.1.0"
