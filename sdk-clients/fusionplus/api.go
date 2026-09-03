@@ -115,17 +115,23 @@ func (api *api) PlaceOrder(ctx context.Context, quoteParams QuoteParams, quote *
 		return "", fmt.Errorf("failed to get preset: %w", err)
 	}
 
-	// TODO orders will not be allowed with multiple secret hashes for now
+	// A multiple-fill order commits to one secret per fill part. The relayer
+	// needs the secret hashes to rebuild the Merkle tree behind the hashlock.
+	// Mirror the cross-chain-sdk contract: a preset that disallows multiple
+	// fills cannot carry more than one hash, and a multiple-fill order must
+	// carry exactly parts+1 hashes, where parts is the count packed into the
+	// hashlock.
 	if len(orderParams.SecretHashes) > 1 {
-		return "", fmt.Errorf("unsupported: multiple secret hashes")
+		if !preset.AllowMultipleFills {
+			return "", fmt.Errorf("multiple secret hashes require a preset that allows multiple fills")
+		}
+		if orderParams.HashLock == nil {
+			return "", fmt.Errorf("a multiple-fill order requires a hashlock")
+		}
+		if want := int(orderParams.HashLock.GetPartsCount()) + 1; len(orderParams.SecretHashes) != want {
+			return "", fmt.Errorf("secret hashes length %d must equal the hashlock parts count plus one (%d)", len(orderParams.SecretHashes), want)
+		}
 	}
-
-	if !preset.AllowMultipleFills && len(orderParams.SecretHashes) > 1 {
-		return "", fmt.Errorf("multiple secret hashes require multiple secrets")
-	}
-	//else {
-	// TODO support multiple secrets
-	//}
 
 	fusionPlusOrder, err := CreateOrderData(quoteParams, quote, orderParams, wallet, quoteParams.SrcChain)
 	if err != nil {
@@ -144,10 +150,15 @@ func (api *api) PlaceOrder(ctx context.Context, quoteParams QuoteParams, quote *
 			TakerAsset:   fusionPlusOrder.LimitOrder.Data.TakerAsset,
 			TakingAmount: fusionPlusOrder.LimitOrder.Data.TakingAmount,
 		},
-		QuoteId: quote.QuoteId,
-		//SecretHashes: orderParams.SecretHashes, // TODO this only should be submitted when there are multiple secrets
+		QuoteId:    quote.QuoteId,
 		Signature:  fusionPlusOrder.LimitOrder.Signature,
 		SrcChainId: quoteParams.SrcChain,
+	}
+
+	// The relayer needs the secret hashes only for a multiple-fill order. A
+	// single-fill order omits them (its hashlock is the lone secret hash).
+	if len(orderParams.SecretHashes) > 1 {
+		signedOrder.SecretHashes = orderParams.SecretHashes
 	}
 
 	body, err := json.Marshal(signedOrder)

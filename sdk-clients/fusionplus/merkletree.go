@@ -15,16 +15,22 @@ type MerkleTree struct {
 }
 
 func NewMerkleTree(leaves []string) *MerkleTree {
+	// Keep the caller's order untouched. sort.Strings reorders its argument in
+	// place, so sort a private copy, never the caller's slice. The stored
+	// leavesUnsorted preserves index N -> leaf N for GetProof.
 	leavesUnsorted := make([]string, len(leaves))
 	copy(leavesUnsorted, leaves)
-	sort.Strings(leaves)
 
-	tree := make([][]byte, len(leaves)*2-1)
-	for i, leaf := range leaves {
+	sortedLeaves := make([]string, len(leaves))
+	copy(sortedLeaves, leaves)
+	sort.Strings(sortedLeaves)
+
+	tree := make([][]byte, len(sortedLeaves)*2-1)
+	for i, leaf := range sortedLeaves {
 		tree[len(tree)-1-i] = hexutil.MustDecode(leaf)
 	}
 
-	for i := len(tree) - len(leaves) - 1; i >= 0; i-- {
+	for i := len(tree) - len(sortedLeaves) - 1; i >= 0; i-- {
 		left := tree[leftChildIndex(i)]
 		rightIndex := rightChildIndex(i)
 		var right []byte
@@ -60,10 +66,14 @@ func GetProof(leaves []string, index int) ([]string, error) {
 
 	leafToProve := tree.leaves[index]
 
+	// Leaves occupy the last len(tree.leaves) slots of tree.tree. Search only
+	// that leaf region. A full scan also matches internal nodes, which is a
+	// second route to the wrong node when a leaf value repeats an inner hash.
+	leafRegionStart := len(tree.tree) - len(tree.leaves)
 	var leafIndexInTree int
 	var foundLeaf bool
-	for i, leaf := range tree.tree {
-		if leaf == leafToProve {
+	for i := leafRegionStart; i < len(tree.tree); i++ {
+		if tree.tree[i] == leafToProve {
 			foundLeaf = true
 			leafIndexInTree = i
 			break

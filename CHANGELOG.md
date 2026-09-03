@@ -6,6 +6,15 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 
 ## [Unreleased]
 
+### Added
+- `fusionplus.HashLock.GetPartsCount()` returns the fill-parts count committed in a multi-fill hashlock (the 16-bit count `ForMultipleFills` packs into the top bits of the root).
+- `fusionplus.PendingSecretIndexes` returns the secret indexes a maker must reveal for a set of ready-to-accept fills. Each ready fill names the secret index the relayer expects (`ReadyToAcceptSecretFill.Idx`). 
+
+### Fixed
+- `fusionplus.PlaceOrder` now supports multi-fill orders. 
+- The `fusionplus` multi-fill examples revealed secrets in submission order (`secrets[i]` for the i-th ready fill) and ignored `ReadyToAcceptSecretFill.Idx`, the index the relayer expects. The examples now reveal `secrets[fill.Idx]` via `PendingSecretIndexes`.
+- `fusionplus.NewMerkleTree` no longer reorders the caller's slice.
+
 ## [v5.0.0] - 2026-08-29
 
 ### Added
