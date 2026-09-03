@@ -7,14 +7,13 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 ## [Unreleased]
 
 ### Added
-- `fusionplus.HashLock.GetPartsCount()` returns the fill-parts count committed in a multiple-fill hashlock (the 16-bit count `ForMultipleFills` packs into the top bits of the root). Parity with the JS SDK `HashLock.getPartsCount()`.
-- `fusionplus.PendingSecretIndexes` returns the secret indexes a maker must reveal for a set of ready-to-accept fills. Each ready fill names the secret index the relayer expects (`ReadyToAcceptSecretFill.Idx`); this helper returns those indexes, sorted, deduplicated, and minus any already revealed or out of range.
+- `fusionplus.HashLock.GetPartsCount()` returns the fill-parts count committed in a multi-fill hashlock (the 16-bit count `ForMultipleFills` packs into the top bits of the root).
+- `fusionplus.PendingSecretIndexes` returns the secret indexes a maker must reveal for a set of ready-to-accept fills. Each ready fill names the secret index the relayer expects (`ReadyToAcceptSecretFill.Idx`). 
 
 ### Fixed
-- `fusionplus.PlaceOrder` now supports multiple-fill orders. It previously rejected any order with more than one secret hash (`unsupported: multiple secret hashes`) and, even without that guard, never transmitted the secret hashes to the relayer (the field was commented out). A multiple-fill order cannot be placed without them. `PlaceOrder` now sends `secretHashes` for a multiple-fill order and validates the count against the hashlock (`parts + 1`), mirroring the JS SDK `@1inch/cross-chain-sdk` relayer contract. A single-fill order still omits them.
-- The `fusionplus` multiple-fill examples revealed secrets in submission order (`secrets[i]` for the i-th ready fill) and ignored `ReadyToAcceptSecretFill.Idx`, the index the relayer expects. A fill can become ready for any index (for example, one resolver that fills the whole order needs the last secret), so this revealed the wrong secret and stalled the fill. The examples now reveal `secrets[fill.Idx]` via `PendingSecretIndexes`.
-- `fusionplus.NewMerkleTree` no longer reorders the caller's slice. It sorted its input argument in place, so a later `GetProof`/`ForMultipleFills` over the same slice mapped index N to the wrong secret and returned a proof for the wrong leaf. The committed hashlock root was unaffected (it is order-independent), so the impact was a correct-looking proof that failed the on-chain leaf check. `NewMerkleTree` now sorts a private copy. `GetProof` also searches only the leaf region, not internal nodes, so a leaf value cannot resolve to an inner node.
-- The `fusionplus` multiple-fill examples (`place_order`, `place_order_permit`) and the canary integration test passed raw secrets to `ForMultipleFills`. That builds the Merkle tree over the wrong values and produces a hashlock that does not match the index-bound-leaf hashlock the protocol expects. They now derive leaves with `GetMerkleLeaves` first, matching the JS SDK flow. A cross-check test pins the leaves, root, proofs, and parts count to golden vectors generated from `@1inch/cross-chain-sdk`.
+- `fusionplus.PlaceOrder` now supports multi-fill orders. 
+- The `fusionplus` multi-fill examples revealed secrets in submission order (`secrets[i]` for the i-th ready fill) and ignored `ReadyToAcceptSecretFill.Idx`, the index the relayer expects. The examples now reveal `secrets[fill.Idx]` via `PendingSecretIndexes`.
+- `fusionplus.NewMerkleTree` no longer reorders the caller's slice.
 
 ## [v5.0.0] - 2026-08-29
 
